@@ -1,0 +1,42 @@
+
+UnixAos (1.3/r4510) for Linux
+
+Trap   5.8  (ASSERT failed)
+SP = EEAFB178H, FP = EEAFB188H, PC = EFD3F956H
+
+TextUtilities.Load:29 pc=34222 [000085AEH] = 34193 + 29
+  text=00000000H (NIL)
+  filename="NSIEolLKc0l8QF4ru8aTEuA.Mod"
+  format="ISO8859-1"
+  res=0
+  decoder=00000000H (NIL)
+  in=00000000H (NIL)
+  t=00000000H (NIL)
+State TextUtilities:
+  unicodePropertyReader=00000000H (NIL)
+TextUtilities.LoadAscii:27 pc=34494 [000086BEH] = 34467 + 27
+  text=00000000H (NIL)
+  filename="NSIEolLKc0l8QF4ru8aTEuA.Mod"
+  res=0
+XNXLSaboteur.Sabotage:593 pc=997 [000003E5H] = 404 + 593
+  t="PROCEDURE  thisvox*():XNXLBase.Voxel;"!...
+  md5="NSIEolLKc0l8QF4ru8aTEuA"
+  hash="H"!
+  md5string=F0860B98H (NIL)
+  anonymod=00000000H (NIL)
+  hashtext=F0860838H (NIL)
+  anonymodtext=F2A0CDB8H (NIL)
+  len=283 (0000011BH)
+  res=0
+  error=FALSE
+XNXLSaboteur.test:767 pc=1171 [00000493H] = 404 + 767
+Commands.Runner.@Body:527 pc=1379 [00000563H] = 852 + 527
+Objects.BodyStarter:325 pc=685 [000002ADH] = 360 + 325
+  p=F1BDFF70H (Objects.Process)
+  res=0
+  prevBP=-290475112
+Unknown PC=0804A990H FP=EEAFB398H
+
+
+----------------------------------------------------
+

@@ -1,0 +1,12 @@
+VAR
+	TRED, TPURPLE,TCOLOR: XNPSVoxel.TransparaVox;
+	GREY: XNPSVoxel.DiffuseVox;	
+	SERP: XNPSierp.Sierp;	
+	
+		
+BEGIN	
+	NEW(TRED); TRED.setcolor(1,0.1,0.1, 1); 
+	NEW(SERP);
+	SERP.imposter:=GREY;	
+	SERP.sierp(SERP,TRED);	
+END;

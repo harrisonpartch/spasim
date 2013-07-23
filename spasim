@@ -1,0 +1,57 @@
+#!/bin/sh
+# Template for running a public copy of UnixAos
+
+if ulimit -n 1024 ; then
+    :
+else
+    echo "failed:  ulimit -n 1024"
+    exit 1
+fi
+
+
+#================== 
+# set home to the directory where UnixAos resides.
+#
+home=/home/sr/spasim/aoshome
+
+
+#================== 
+# create a symbolic link to the installation directory (needed for 
+# mounting the relative file systems
+# cf. Configuration.XML
+#
+if [ -h .aoshome ] ; then rm .aoshome ; fi
+ln -s ${home}  .aoshome
+
+
+#================== 
+# The environment variable AOSPATH defines a list of directories where
+# UnixAos is looking for its components.
+#
+AOSPATH=".:$home/obj:$home/system:$home/fonts:./source:$home/source"
+export AOSPATH
+
+
+#================== 
+# System configuration:
+# Aos:
+#   StackSize (kB)
+#   DisplaySize (% of screen size (min 50), or absolute WxH (min 640x480))
+#   TraceModules 0/1 (1: trace module loading)
+#   TraceCommands 0/1 (1: trace command invocations)
+#
+# Oberon subsystem:
+#   Color 0/1 (0: FillerColor:=0; 1: FillerColor:=12)
+#   MB 1/2/3  (number of mouse buttons)
+#   OberonWatch 0/1
+#
+AOSCONFIG="StackSize 128  DisplaySize 100  Color 0"
+export AOSCONFIG
+
+
+#================== 
+# start UnixAos
+#
+exec $home/aos.linux "$@" 
+
+

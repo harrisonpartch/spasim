@@ -1,0 +1,16 @@
+one general question i ll have concerning raytraced voxels would be : how to get rid of the pixelated / noisy look and get a smooth look?
+--glasz
+
+is that technology, voxels, is just for gaming, rendering?. what other real applications can use it? --necati
+
+is there any advantage of oberon here compared to other languages, C++/java/ and others, i.e, why you have chosen the oberon lang. what is your road map for this project? --necati
+
+uh could you define rasterization plz for the pleb viewer 
+can you explain exactly what is wrong with the whole air-solid potentially visible thing? why is that not efficient or something --nsnoox
+
+
+ok one question I had was, have you done any integrative work with the LLUDP (Linden UDP protocol) stack? 
+can you do any sort of viewer type experience on, say, an opensim, or sl?or even minecraft for that matter or WoW LOL --Hiro_Protagonist
+
+... so far the only question I have is whether you have or have thought about support for CSG operations yet? 
+And that is probably not the sort of question you are after? --immortius

@@ -1,0 +1,31 @@
+REQUEST FOR COMMENTS: BEAM SHADER
+
+The beam shader is a GPU shader  (texture: GLtexture; x,y: REAL: di,dj: INTEGER; nx,ny,nz: REAL; ra, ga, ba, dot: REAL) --> ARRAY di,dx OF GLPixel  [pseudocode] 
+
+texture: previously loaded
+x,y: a position in the texture unit rectangle (unit because the whole texture is on [0,1][0,1], rectangle because the texture need not be square) 
+di,dj: size of result patch
+nx,ny,nz: normal vector of texture plane to beam
+ra,ga,ba,dot: alpha multiplicands
+
+Intuition: Any math should be performed here on the GPU side rather than before the call if it can be.
+
+BEGIN
+	Project the result patch (a rectangle di*dj) onto the texture according to the normal (foreshortening)
+	Fill the result patch with pixels from the texture
+	For each pixel p:
+		p.red:= p.red*ra*dot;
+		p.green:=p.green*dot;
+		p.blue:=p.blue*dot;
+	END
+END
+
+The input to the shader is in the form of an array W,H of records (texture: GLtexture; x,y: REAL: di,dj: INTEGER; nx,ny,nz: REAL; ra, ga, ba, dot: REAL)
+The output is in the form of an array W*N,W*M of pixels, ie a texture
+If di and dj are equal for all records (beams) then the output array is made up of tiles of equal size 
+
+The shader runs once per frame.
+
+
+
+

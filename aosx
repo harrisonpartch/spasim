@@ -1,0 +1,41 @@
+#!/bin/sh
+# Template for running a public copy of UnixAos
+
+if ulimit -n 1024 ; then
+    :
+else
+    echo "failed:  ulimit -n 1024"
+    exit 1
+fi
+
+
+##### set aoshome to the directory where Oberon is installed
+aoshome=/usr/aos
+
+# The environment variable AOSPATH has to be set before running Aos.
+# It defines a list of directories where Aos is looking for its
+# components.
+#
+AOSPATH=".:${aoshome}/obj:${aoshome}/system:${aoshome}/fonts:./source"
+export AOSPATH
+
+##### System configuration:
+# Aos:
+#   StackSize (kB)
+#   DisplaySize (% of screen size (min 50), or absolute WxH (min 640x480))
+#   TraceModules 0/1 (1: trace module loading)
+#   FastNEW 0/1 (set to 1 if you prefer faster heap allocation over small heap size)
+#
+# Oberon subsystem:
+#   Color 0/1 (0: FillerColor:=0; 1: FillerColor:=12)
+#   MB 1/2/3  (number of mouse buttons)
+#   OberonWatch 0/1
+#
+AOSCONFIG="StackSize 256  DisplaySize 100  FastNEW 0  Color 0"
+export AOSCONFIG
+
+
+##### start UnixAos
+exec ${aoshome}/aos.linux "$@" 
+
+

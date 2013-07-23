@@ -1,0 +1,394 @@
+MODULE GLU; (** AUTHOR ""; PURPOSE "UnixAos GLU binding"; *)
+
+IMPORT Unix, Modules, GL := OpenGL, Strings, KernelLog;
+
+VAR
+	 (* handle to library *)
+	lib:LONGINT;
+
+CONST
+   	libname = 'libGLU.so.1';
+
+TYPE
+
+  Enum = GL.Enum;
+  Boolean = GL.Boolean;
+  Int = GL.Int;
+  Float = GL.Float;
+  Double = GL.Double;
+  Pointer = GL.Pointer;
+  PPointer = GL.PPointer;
+
+  PFloat = ADDRESS; (*POINTER TO ARRAY OF Float; *)
+  PDouble = ADDRESS; (* POINTER TO ARRAY OF Double;*)
+
+  GLVector3d* = ADDRESS; (* ARRAY 3 OF Double; *)
+  GLVector4i* = ADDRESS; (* ARRAY 4 OF Int; *)
+  GLVector4f* = ADDRESS; (* ARRAY 4 OF Float; *)
+  GLVector4p* = ADDRESS; (* ARRAY 4 OF Pointer; *)
+
+  GLArray4f* = GLVector4f;  (* ARRAY OF GLVector4f; *)
+  GLArray3d* = GLVector3d; (* ARRAY OF GLVector3d; *)
+  GLArray4p* = GLVector4p; (* ARRAY OF GLVector4p; *)
+
+  GLMatrix4f* = ADDRESS; (* ARRAY 4,4 OF Float; *)
+  GLMatrix4d* = ADDRESS; (* ARRAY 4,4 OF Double; *)
+
+  (* GLU types *)
+  Nurbs* = LONGINT;
+  Quadric* = LONGINT;
+  Tesselator* = LONGINT;
+
+  PNurbs* = ADDRESS; (* POINTER TO ARRAY OF Nurbs; *)
+  PQuadric* = ADDRESS; (* POINTER TO ARRAY OF Quadric; *)
+  PTesselator* = ADDRESS; (* POINTER TO ARRAY OF Tesselator; *)
+
+  (* backwards compatibility *)
+  NurbsObj* = Nurbs;
+  QuadricObj* = Quadric;
+  TesselatorObj* = Tesselator;
+  TriangulatorObj* = Tesselator;
+  PNurbsObj* = PNurbs;
+  PQuadricObj* = PQuadric;
+  PTesselatorObj* = PTesselator;
+  PTriangulatorObj* = PTesselator;
+
+  (* QuadricCallback *)
+  TQuadricErrorProc* = PROCEDURE{C}(errorCode: Enum);
+  (* GLUTessCallback *)
+  TTessBeginProc* = PROCEDURE{C}(AType: Enum);
+  TTessEdgeFlagProc* = PROCEDURE{C}(Flag: Boolean);
+  TTessVertexProc* = PROCEDURE{C}(VertexData: Pointer);
+  TTessEndProc* = PROCEDURE{C};
+  TTessErrorProc* = PROCEDURE{C}(ErrNo: Enum);
+  TTessCombineProc* = PROCEDURE{C}(Coords: GLArray3d; VertexData: GLArray4p; Weight: GLArray4f; OutData: PPointer);
+  TTessBeginDataProc* = PROCEDURE{C}(AType: Enum; UserData: Pointer);
+  TTessEdgeFlagDataProc* = PROCEDURE{C}(Flag: Boolean; UserData: Pointer);
+  TTessVertexDataProc* = PROCEDURE{C}(VertexData: Pointer; UserData: Pointer);
+  TTessEndDataProc* = PROCEDURE{C}(UserData: Pointer);
+  TTessErrorDataProc* = PROCEDURE{C}(ErrNo: Enum; UserData: Pointer);
+  TTessCombineDataProc* = PROCEDURE{C}(Coords: GLArray3d; VertexData: GLArray4p; Weight: GLArray4f; OutData: PPointer; UserData: Pointer);
+  (* NurbsCallback *)
+  TNurbsErrorProc* = PROCEDURE{C}(ErrorCode: Enum);
+
+
+CONST
+ (*  GLU constants *)
+  GLU_INVALID_ENUM* = 100900;
+  GLU_INVALID_VALUE* = 100901;
+  GLU_OUT_OF_MEMORY* = 100902;
+  GLU_INCOMPATIBLE_GL_VERSION* = 100903;
+  GLU_VERSION* = 100800;
+  GLU_EXTENSIONS* = 100801;
+  GLU_TRUE* = 1;  (* GL_TRUE *)
+  GLU_FALSE* = 0;  (*GL_FALSE *)
+  GLU_SMOOTH* = 100000;
+  GLU_FLAT* = 100001;
+  GLU_NONE* = 100002;
+  GLU_POINT* = 100010;
+  GLU_LINE* = 100011;
+  GLU_FILL* = 100012;
+  GLU_SILHOUETTE* = 100013;
+  GLU_OUTSIDE* = 100020;
+  GLU_INSIDE* = 100021;
+  GLU_TESS_MAX_COORD* = 1.0D150;
+  GLU_TESS_WINDING_RULE* = 100140;
+  GLU_TESS_BOUNDARY_ONLY* = 100141;
+  GLU_TESS_TOLERANCE* = 100142;
+  GLU_TESS_WINDING_ODD* = 100130;
+  GLU_TESS_WINDING_NONZERO* = 100131;
+  GLU_TESS_WINDING_POSITIVE* = 100132;
+  GLU_TESS_WINDING_NEGATIVE* = 100133;
+  GLU_TESS_WINDING_ABS_GEQ_TWO* = 100134;
+  GLU_TESS_BEGIN* = 100100; (*  TTessBeginProc *)
+  GLU_TESS_VERTEX* = 100101; (*  TTessVertexProc *)
+  GLU_TESS_END* = 100102; (*  TTessEndProc *)
+  GLU_TESS_ERROR* = 100103; (*  TTessErrorProc *)
+  GLU_TESS_EDGE_FLAG* = 100104; (*  TTessEdgeFlagProc *)
+  GLU_TESS_COMBINE* = 100105; (*  TTessCombineProc *)
+  GLU_TESS_BEGIN_DATA* = 100106; (*  TTessBeginDataProc *)
+  GLU_TESS_VERTEX_DATA* = 100107; (*  TTessVertexDataProc *)
+  GLU_TESS_END_DATA* = 100108; (*  TTessEndDataProc *)
+  GLU_TESS_ERROR_DATA* = 100109; (*  TTessErrorDataProc *)
+  GLU_TESS_EDGE_FLAG_DATA* = 100110; (* TTessEdgeFlagDataProc *)
+  GLU_TESS_COMBINE_DATA* = 100111; (* TTessCombineDataProc *)
+  GLU_TESS_ERROR1* = 100151;
+  GLU_TESS_ERROR2* = 100152;
+  GLU_TESS_ERROR3* = 100153;
+  GLU_TESS_ERROR4* = 100154;
+  GLU_TESS_ERROR5* = 100155;
+  GLU_TESS_ERROR6* = 100156;
+  GLU_TESS_ERROR7* = 100157;
+  GLU_TESS_ERROR8* = 100158;
+  GLU_TESS_MISSING_BEGIN_POLYGON* = GLU_TESS_ERROR1;
+  GLU_TESS_MISSING_BEGIN_CONTOUR* = GLU_TESS_ERROR2;
+  GLU_TESS_MISSING_END_POLYGON* = GLU_TESS_ERROR3;
+  GLU_TESS_MISSING_END_CONTOUR* = GLU_TESS_ERROR4;
+  GLU_TESS_COORD_TOO_LARGE* = GLU_TESS_ERROR5;
+  GLU_TESS_NEED_COMBINE_CALLBACK* = GLU_TESS_ERROR6;
+  GLU_AUTO_LOAD_MATRIX* = 100200;
+  GLU_CULLING* = 100201;
+  GLU_SAMPLING_TOLERANCE* = 100203;
+  GLU_DISPLAY_MODE* = 100204;
+  GLU_PARAMETRIC_TOLERANCE* = 100202;
+  GLU_SAMPLING_METHOD* = 100205;
+  GLU_U_STEP* = 100206;
+  GLU_V_STEP* = 100207;
+  GLU_PATH_LENGTH* = 100215;
+  GLU_PARAMETRIC_ERROR* = 100216;
+  GLU_DOMAIN_DISTANCE* = 100217;
+  GLU_MAP1_TRIM_2* = 100210;
+  GLU_MAP1_TRIM_3* = 100211;
+  GLU_OUTLINE_POLYGON* = 100240;
+  GLU_OUTLINE_PATCH* = 100241;
+  GLU_NURBS_ERROR1* = 100251;
+  GLU_NURBS_ERROR2* = 100252;
+  GLU_NURBS_ERROR3* = 100253;
+  GLU_NURBS_ERROR4* = 100254;
+  GLU_NURBS_ERROR5* = 100255;
+  GLU_NURBS_ERROR6* = 100256;
+  GLU_NURBS_ERROR7* = 100257;
+  GLU_NURBS_ERROR8* = 100258;
+  GLU_NURBS_ERROR9* = 100259;
+  GLU_NURBS_ERROR10* = 100260;
+  GLU_NURBS_ERROR11* = 100261;
+  GLU_NURBS_ERROR12* = 100262;
+  GLU_NURBS_ERROR13* = 100263;
+  GLU_NURBS_ERROR14* = 100264;
+  GLU_NURBS_ERROR15* = 100265;
+  GLU_NURBS_ERROR16* = 100266;
+  GLU_NURBS_ERROR17* = 100267;
+  GLU_NURBS_ERROR18* = 100268;
+  GLU_NURBS_ERROR19* = 100269;
+  GLU_NURBS_ERROR20* = 100270;
+  GLU_NURBS_ERROR21* = 100271;
+  GLU_NURBS_ERROR22* = 100272;
+  GLU_NURBS_ERROR23* = 100273;
+  GLU_NURBS_ERROR24* = 100274;
+  GLU_NURBS_ERROR25* = 100275;
+  GLU_NURBS_ERROR26* = 100276;
+  GLU_NURBS_ERROR27* = 100277;
+  GLU_NURBS_ERROR28* = 100278;
+  GLU_NURBS_ERROR29* = 100279;
+  GLU_NURBS_ERROR30* = 100280;
+  GLU_NURBS_ERROR31* = 100281;
+  GLU_NURBS_ERROR32* = 100282;
+  GLU_NURBS_ERROR33* = 100283;
+  GLU_NURBS_ERROR34* = 100284;
+  GLU_NURBS_ERROR35* = 100285;
+  GLU_NURBS_ERROR36* = 100286;
+  GLU_NURBS_ERROR37* = 100287;
+  GLU_CW* = 100120;
+  GLU_CCW* = 100121;
+  GLU_INTERIOR* = 100122;
+  GLU_EXTERIOR* = 100123;
+  GLU_UNKNOWN* = 100124;
+  GLU_BEGIN* = GLU_TESS_BEGIN;
+  GLU_VERTEX* = GLU_TESS_VERTEX;
+  GLU_END* = GLU_TESS_END;
+  GLU_ERROR* = GLU_TESS_ERROR;
+  GLU_EDGE_FLAG* = GLU_TESS_EDGE_FLAG;
+
+(* ---------------------------- *)
+
+VAR
+  GLU_VERSION_1_1* ,
+  GLU_VERSION_1_2* ,
+  GLU_VERSION_1_3* : BOOLEAN;
+
+  (*! GLU utility functions *)
+
+VAR
+
+  XgluErrorString - : PROCEDURE{C}(errCode: Enum): ADDRESS; (* AnsiChar; *)
+  XgluGetString - : PROCEDURE{C}(name: Enum): ADDRESS;
+  Ortho2D - : PROCEDURE{C}(left, right, bottom, top: Double);
+  Perspective - : PROCEDURE{C}(fovy, aspect, zNear, zFar: Double);
+  PickMatrix - : PROCEDURE{C}(x, y, width, height: Double; CONST viewport: GLVector4i);
+  LookAt - : PROCEDURE{C}(eyex, eyey, eyez, centerx, centery, centerz, upx, upy, upz: Double);
+  Project - : PROCEDURE{C}(objx, objy, objz: Double; CONST modelMatrix: GLMatrix4d; CONST projMatrix: GLMatrix4d; CONST viewport: GLVector4i; winx, winy, winz: PDouble): Int;
+  UnProject - : PROCEDURE{C}(winx, winy, winz: Double; CONST modelMatrix: GLMatrix4d; CONST projMatrix: GLMatrix4d; CONST viewport: GLVector4i; objx, objy, objz: PDouble): Int;
+  ScaleImage - : PROCEDURE{C}(format: Enum; widthin, heightin: Int; typein: Enum; datain: Pointer; widthout, heightout: Int; typeout: Enum;  dataout: Pointer): Int;
+  Build1DMipmaps - : PROCEDURE{C}(target: Enum; components, width: Int; format, atype: Enum;  data: Pointer): Int;
+  Build2DMipmaps - : PROCEDURE{C}(target: Enum; components, width, height: Int; format, atype: Enum;  Data: Pointer): Int;
+  NewQuadric - : PROCEDURE{C}(): Quadric;
+  DeleteQuadric - : PROCEDURE{C}(state: Quadric);
+  QuadricNormals - : PROCEDURE{C}(quadObject: Quadric; normals: Enum);
+  QuadricTexture - : PROCEDURE{C}(quadObject: PQuadric; textureCoords: Boolean);
+  QuadricOrientation - : PROCEDURE{C}(quadObject: PQuadric; orientation: Enum);
+  QuadricDrawStyle - : PROCEDURE{C}(quadObject: Quadric; drawStyle: Enum);
+  Cylinder - : PROCEDURE{C}(quadObject: Quadric; baseRadius, topRadius, height: Double; slices, stacks: Int);
+  Disk - : PROCEDURE{C}(quadObject: Quadric; innerRadius, outerRadius: Double; slices, loops: Int);
+  PartialDisk - : PROCEDURE{C}(quadObject: Quadric; innerRadius, outerRadius: Double; slices, loops: Int; startAngle, sweepAngle: Double);
+  Sphere - : PROCEDURE{C}(quadObject: Quadric; radius: Double; slices, stacks: Int);
+  QuadricCallback - : PROCEDURE{C}(quadObject: Quadric; which: Enum; fn: ADDRESS (*TQuadricErrorProc*));
+  NewTess - : PROCEDURE{C}(): PTesselator;
+  DeleteTess - : PROCEDURE{C}(tess: PTesselator);
+  TessBeginPolygon - : PROCEDURE{C}(tess: PTesselator; polygon_data: Pointer);
+  TessBeginContour - : PROCEDURE{C}(tess: PTesselator);
+  TessVertex - : PROCEDURE{C}(tess: PTesselator; CONST coords: GLArray3d; data: Pointer);
+  TessEndContour - : PROCEDURE{C}(tess: PTesselator);
+  TessEndPolygon - : PROCEDURE{C}(tess: PTesselator);
+  TessProperty - : PROCEDURE{C}(tess: PTesselator; which: Enum; value: Double);
+  TessNormal - : PROCEDURE{C}(tess: PTesselator; x, y, z: Double);
+  TessCallback - : PROCEDURE{C}(tess: PTesselator; which: Enum; fn: Pointer);
+  GetTessProperty - : PROCEDURE{C}(tess: PTesselator; which: Enum; value: PDouble);
+  NewNurbsRenderer - : PROCEDURE{C}(): PNurbs;
+  DeleteNurbsRenderer - : PROCEDURE{C}(nobj: PNurbs);
+  BeginSurface - : PROCEDURE{C}(nobj: PNurbs);
+  BeginCurve - : PROCEDURE{C}(nobj: PNurbs);
+  EndCurve - : PROCEDURE{C}(nobj: PNurbs);
+  EndSurface - : PROCEDURE{C}(nobj: PNurbs);
+  BeginTrim - : PROCEDURE{C}(nobj: PNurbs);
+  EndTrim - : PROCEDURE{C}(nobj: PNurbs);
+  PwlCurve - : PROCEDURE{C}(nobj: PNurbs; count: Int; points: PFloat; stride: Int; atype: Enum);
+  NurbsCurve - : PROCEDURE{C}(nobj: PNurbs; nknots: Int; knot: PFloat; stride: Int; ctlarray: PFloat; order: Int; atype: Enum);
+  NurbsSurface - : PROCEDURE{C}(nobj: PNurbs; sknot_count: Int; sknot: PFloat; tknot_count: Int; tknot: PFloat; s_stride, t_stride: Int; ctlarray: PFloat; sorder, torder: Int; atype: Enum);
+  LoadSamplingMatrices - : PROCEDURE{C}(nobj: PNurbs; CONST modelMatrix, projMatrix: GLMatrix4f; CONST viewport: GLVector4i);
+  NurbsProperty - : PROCEDURE{C}(nobj: PNurbs; aproperty: Enum; value: Float);
+  GetNurbsProperty - : PROCEDURE{C}(nobj: PNurbs; aproperty: Enum; value: PFloat);
+  NurbsCallback - : PROCEDURE{C}(nobj: PNurbs; which: Enum; fn: TNurbsErrorProc);
+  BeginPolygon - : PROCEDURE{C}(tess: PTesselator);
+  NextContour - : PROCEDURE{C}(tess: PTesselator; atype: Enum);
+  EndPolygon - : PROCEDURE{C}(tess: PTesselator);
+
+(* ---------------------------- *)
+(* wrapper procedures *)
+
+PROCEDURE ErrorString*(errCode: Enum): Strings.String;
+VAR  sadr: LONGINT;
+BEGIN
+  	sadr := XgluErrorString(errCode);
+	RETURN GL.GetStringFromAddr(sadr);
+END ErrorString;
+
+PROCEDURE GetString*(name: Enum): Strings.String;
+VAR  sadr: LONGINT;
+BEGIN
+  	sadr := XgluGetString(name);
+	RETURN GL.GetStringFromAddr(sadr);
+END GetString;
+
+(* ---------------------------- *)
+
+PROCEDURE ReadVersion*();
+VAR
+	Buffer: Strings.String;
+	MajorVersion, MinorVersion: LONGINT;
+
+	PROCEDURE isNumber(ch: CHAR): BOOLEAN;
+	VAR
+	      val: LONGINT;
+	      res: BOOLEAN;
+	BEGIN
+		res := FALSE;
+		val := ORD(ch);
+		IF (val >= ORD("0")) & (val<=ORD("9")) THEN res := TRUE; END;
+		RETURN res;
+	END isNumber;
+
+	PROCEDURE TrimAndSplitVersionString(CONST buffer: ARRAY OF CHAR; VAR Max, Min: LONGINT);
+	VAR
+		separator, i : LONGINT;
+	BEGIN
+		i := 0;
+		separator := Strings.Pos('.', buffer);
+		(* At least one number must be before and one after the dot. *)
+		IF (separator > 0) & (separator < Strings.Length(buffer)) & ((isNumber(buffer[separator - 1])) &
+		      isNumber(buffer[separator + 1])) THEN
+		      Max := ORD(buffer[separator + 1]);
+		      Min := ORD(buffer[separator - 1]);
+		ELSE
+		      Max := 0;
+		      Min := 0;
+		END;
+	END TrimAndSplitVersionString;
+
+BEGIN
+	GLU_VERSION_1_1 := FALSE;
+	GLU_VERSION_1_2 := FALSE;
+	GLU_VERSION_1_3 := FALSE;
+
+	IF XgluGetString # NIL THEN
+		Buffer := GetString(GLU_VERSION);
+		TrimAndSplitVersionString(Buffer^, MajorVersion, MinorVersion);
+		GLU_VERSION_1_1 := TRUE;
+		IF MinorVersion >= 2 THEN GLU_VERSION_1_2 := TRUE; END;
+		IF MinorVersion >= 3 THEN GLU_VERSION_1_3 := TRUE; END;
+	END;
+END ReadVersion;
+
+PROCEDURE InitGLU();
+BEGIN
+	lib := Unix.Dlopen(libname, 2);
+	ASSERT(lib # 0,102);
+
+	(* load GLU functions *)
+     Unix.Dlsym(lib,  'gluBeginCurve', ADDRESSOF( BeginCurve ));
+     Unix.Dlsym(lib,  'gluBeginPolygon', ADDRESSOF( BeginPolygon ));
+     Unix.Dlsym(lib,  'gluBeginSurface', ADDRESSOF( BeginSurface ));
+     Unix.Dlsym(lib,  'gluBeginTrim', ADDRESSOF(  BeginTrim));
+     Unix.Dlsym(lib,  'gluBuild1DMipmaps', ADDRESSOF( Build1DMipmaps ));
+     Unix.Dlsym(lib,  'gluBuild2DMipmaps', ADDRESSOF( Build2DMipmaps ));
+     Unix.Dlsym(lib,  'gluCylinder', ADDRESSOF( Cylinder ));
+     Unix.Dlsym(lib,  'gluDeleteNurbsRenderer', ADDRESSOF( DeleteNurbsRenderer ));
+     Unix.Dlsym(lib,  'gluDeleteQuadric', ADDRESSOF( DeleteQuadric ));
+     Unix.Dlsym(lib,  'gluDeleteTess', ADDRESSOF( DeleteTess ));
+     Unix.Dlsym(lib,  'gluDisk', ADDRESSOF( Disk ));
+     Unix.Dlsym(lib,  'gluEndCurve', ADDRESSOF( EndCurve ));
+     Unix.Dlsym(lib,  'gluEndPolygon', ADDRESSOF( EndPolygon ));
+     Unix.Dlsym(lib,  'gluEndSurface', ADDRESSOF( EndSurface ));
+     Unix.Dlsym(lib,  'gluEndTrim', ADDRESSOF( EndTrim ));
+     Unix.Dlsym(lib,  'gluErrorString', ADDRESSOF( XgluErrorString ));
+     Unix.Dlsym(lib,  'gluGetNurbsProperty', ADDRESSOF( GetNurbsProperty ));
+     Unix.Dlsym(lib,  'gluGetString', ADDRESSOF( XgluGetString ));
+     Unix.Dlsym(lib,  'gluGetTessProperty', ADDRESSOF( GetTessProperty ));
+     Unix.Dlsym(lib,  'gluLoadSamplingMatrices', ADDRESSOF( LoadSamplingMatrices ));
+     Unix.Dlsym(lib,  'gluLookAt', ADDRESSOF( LookAt ));
+     Unix.Dlsym(lib,  'gluNewNurbsRenderer', ADDRESSOF( NewNurbsRenderer ));
+     Unix.Dlsym(lib,  'gluNewQuadric', ADDRESSOF( NewQuadric ));
+     Unix.Dlsym(lib,  'gluNewTess', ADDRESSOF( NewTess ));
+     Unix.Dlsym(lib,  'gluNextContour', ADDRESSOF( NextContour ));
+     Unix.Dlsym(lib,  'gluNurbsCallback', ADDRESSOF( NurbsCallback ));
+     Unix.Dlsym(lib,  'gluNurbsCurve', ADDRESSOF( NurbsCurve ));
+     Unix.Dlsym(lib,  'gluNurbsProperty', ADDRESSOF( NurbsProperty ));
+     Unix.Dlsym(lib,  'gluNurbsSurface', ADDRESSOF( NurbsSurface ));
+     Unix.Dlsym(lib,  'gluOrtho2D', ADDRESSOF( Ortho2D ));
+     Unix.Dlsym(lib,  'gluPartialDisk', ADDRESSOF( PartialDisk ));
+     Unix.Dlsym(lib,  'gluPerspective', ADDRESSOF( Perspective ));
+     Unix.Dlsym(lib,  'gluPickMatrix', ADDRESSOF( PickMatrix ));
+     Unix.Dlsym(lib,  'gluProject', ADDRESSOF( Project ));
+     Unix.Dlsym(lib,  'gluPwlCurve', ADDRESSOF( PwlCurve ));
+     Unix.Dlsym(lib,  'gluQuadricCallback', ADDRESSOF( QuadricCallback ));
+     Unix.Dlsym(lib,  'gluQuadricDrawStyle', ADDRESSOF( QuadricDrawStyle ));
+     Unix.Dlsym(lib,  'gluQuadricNormals', ADDRESSOF( QuadricNormals ));
+     Unix.Dlsym(lib,  'gluQuadricOrientation', ADDRESSOF( QuadricOrientation ));
+     Unix.Dlsym(lib,  'gluQuadricTexture', ADDRESSOF( QuadricTexture ));
+     Unix.Dlsym(lib,  'gluScaleImage', ADDRESSOF( ScaleImage ));
+     Unix.Dlsym(lib,  'gluSphere', ADDRESSOF( Sphere ));
+     Unix.Dlsym(lib,  'gluTessBeginContour', ADDRESSOF( TessBeginContour ));
+     Unix.Dlsym(lib,  'gluTessBeginPolygon', ADDRESSOF( TessBeginPolygon ));
+     Unix.Dlsym(lib,  'gluTessCallback', ADDRESSOF( TessCallback ));
+     Unix.Dlsym(lib,  'gluTessEndContour', ADDRESSOF( TessEndContour ));
+     Unix.Dlsym(lib,  'gluTessEndPolygon', ADDRESSOF( TessEndPolygon ));
+     Unix.Dlsym(lib,  'gluTessNormal', ADDRESSOF( TessNormal ));
+     Unix.Dlsym(lib,  'gluTessProperty', ADDRESSOF( TessProperty ));
+     Unix.Dlsym(lib,  'gluTessVertex', ADDRESSOF( TessVertex ));
+     Unix.Dlsym(lib,  'gluUnProject', ADDRESSOF( UnProject ));
+
+      KernelLog.String(libname); KernelLog.String(" loaded."); KernelLog.Ln;
+END InitGLU;
+
+PROCEDURE OnClose;
+BEGIN
+	IF lib # 0 THEN
+		Unix.Dlclose(lib);
+		KernelLog.String(libname); KernelLog.String(" unloaded."); KernelLog.Ln;
+	END;
+END OnClose;
+
+BEGIN
+	Modules.InstallTermHandler(OnClose);
+	InitGLU();
+	ReadVersion;
+END GLU.

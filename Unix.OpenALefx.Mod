@@ -1,0 +1,813 @@
+MODULE OpenALefx; (** AUTHOR "fnecati"; PURPOSE "OpenAL effects library "; *)
+IMPORT SYSTEM,  AL:=OpenAL;
+
+TYPE 
+	ALint = AL.ALint;
+	ALuint = AL.ALuint;
+	ALsizei = AL.ALsizei;
+	ALfloat = AL.ALfloat;
+	ALenum = AL.ALenum;
+	ALboolean = AL.ALboolean;
+	PALint = AL.PALint;
+	PALuint = AL.PALuint;
+	PALfloat = AL.PALfloat;
+CONST	
+	ALC_EXT_EFX_NAME* ='ALC_EXT_EFX';
+	
+	ALC_EFX_MAJOR_VERSION* =  020001H;
+	ALC_EFX_MINOR_VERSION* =  020002H;
+	ALC_MAX_AUXILIARY_SENDS* =  020003H;
+	
+	
+(* Listener properties. *)
+CONST 
+	  AL_METERS_PER_UNIT * = 020004H;
+	
+	(* Source properties. *)
+	  AL_DIRECT_FILTER * = 020005H;
+	  AL_AUXILIARY_SEND_FILTER * = 020006H;
+	  AL_AIR_ABSORPTION_FACTOR * = 020007H;
+	  AL_ROOM_ROLLOFF_FACTOR * = 020008H;
+	  AL_CONE_OUTER_GAINHF * = 020009H;
+	  AL_DIRECT_FILTER_GAINHF_AUTO * = 02000AH;
+	  AL_AUXILIARY_SEND_FILTER_GAIN_AUTO * = 02000BH;
+	  AL_AUXILIARY_SEND_FILTER_GAINHF_AUTO * = 02000CH;
+	
+	
+	(* Effect properties. *)
+	
+	(* Reverb effect parameters *)
+	  AL_REVERB_DENSITY * = 00001H;
+	  AL_REVERB_DIFFUSION * = 00002H;
+	  AL_REVERB_GAIN * = 00003H;
+	  AL_REVERB_GAINHF * = 00004H;
+	  AL_REVERB_DECAY_TIME * = 00005H;
+	  AL_REVERB_DECAY_HFRATIO * = 00006H;
+	  AL_REVERB_REFLECTIONS_GAIN * = 00007H;
+	  AL_REVERB_REFLECTIONS_DELAY * = 00008H;
+	  AL_REVERB_LATE_REVERB_GAIN * = 00009H;
+	  AL_REVERB_LATE_REVERB_DELAY * = 0000AH;
+	  AL_REVERB_AIR_ABSORPTION_GAINHF * = 0000BH;
+	  AL_REVERB_ROOM_ROLLOFF_FACTOR * = 0000CH;
+	  AL_REVERB_DECAY_HFLIMIT * = 0000DH;
+	
+	(* EAX Reverb effect parameters *)
+	  AL_EAXREVERB_DENSITY * = 00001H;
+	  AL_EAXREVERB_DIFFUSION * = 00002H;
+	  AL_EAXREVERB_GAIN * = 00003H;
+	  AL_EAXREVERB_GAINHF * = 00004H;
+	  AL_EAXREVERB_GAINLF * = 00005H;
+	  AL_EAXREVERB_DECAY_TIME * = 00006H;
+	  AL_EAXREVERB_DECAY_HFRATIO * = 00007H;
+	  AL_EAXREVERB_DECAY_LFRATIO * = 00008H;
+	  AL_EAXREVERB_REFLECTIONS_GAIN * = 00009H;
+	  AL_EAXREVERB_REFLECTIONS_DELAY * = 0000AH;
+	  AL_EAXREVERB_REFLECTIONS_PAN * = 0000BH;
+	  AL_EAXREVERB_LATE_REVERB_GAIN * = 0000CH;
+	  AL_EAXREVERB_LATE_REVERB_DELAY * = 0000DH;
+	  AL_EAXREVERB_LATE_REVERB_PAN * = 0000EH;
+	  AL_EAXREVERB_ECHO_TIME * = 0000FH;
+	  AL_EAXREVERB_ECHO_DEPTH * = 00010H;
+	  AL_EAXREVERB_MODULATION_TIME * = 00011H;
+	  AL_EAXREVERB_MODULATION_DEPTH * = 00012H;
+	  AL_EAXREVERB_AIR_ABSORPTION_GAINHF * = 00013H;
+	  AL_EAXREVERB_HFREFERENCE * = 00014H;
+	  AL_EAXREVERB_LFREFERENCE * = 00015H;
+	  AL_EAXREVERB_ROOM_ROLLOFF_FACTOR * = 00016H;
+	  AL_EAXREVERB_DECAY_HFLIMIT * = 00017H;
+	
+	(* Chorus effect parameters *)
+	  AL_CHORUS_WAVEFORM * = 00001H;
+	  AL_CHORUS_PHASE * = 00002H;
+	  AL_CHORUS_RATE * = 00003H;
+	  AL_CHORUS_DEPTH * = 00004H;
+	  AL_CHORUS_FEEDBACK * = 00005H;
+	  AL_CHORUS_DELAY * = 00006H;
+	
+	(* Distortion effect parameters *)
+	  AL_DISTORTION_EDGE * = 00001H;
+	  AL_DISTORTION_GAIN * = 00002H;
+	  AL_DISTORTION_LOWPASS_CUTOFF * = 00003H;
+	  AL_DISTORTION_EQCENTER * = 00004H;
+	  AL_DISTORTION_EQBANDWIDTH * = 00005H;
+	
+	(* Echo effect parameters *)
+	  AL_ECHO_DELAY * = 00001H;
+	  AL_ECHO_LRDELAY * = 00002H;
+	  AL_ECHO_DAMPING * = 00003H;
+	  AL_ECHO_FEEDBACK * = 00004H;
+	  AL_ECHO_SPREAD * = 00005H;
+	
+	(* Flanger effect parameters *)
+	  AL_FLANGER_WAVEFORM * = 00001H;
+	  AL_FLANGER_PHASE * = 00002H;
+	  AL_FLANGER_RATE * = 00003H;
+	  AL_FLANGER_DEPTH * = 00004H;
+	  AL_FLANGER_FEEDBACK * = 00005H;
+	  AL_FLANGER_DELAY * = 00006H;
+	
+	(* Frequency shifter effect parameters *)
+	  AL_FREQUENCY_SHIFTER_FREQUENCY * = 00001H;
+	  AL_FREQUENCY_SHIFTER_LEFT_DIRECTION * = 00002H;
+	  AL_FREQUENCY_SHIFTER_RIGHT_DIRECTION * = 00003H;
+	
+	(* Vocal morpher effect parameters *)
+	  AL_VOCAL_MORPHER_PHONEMEA * = 00001H;
+	  AL_VOCAL_MORPHER_PHONEMEA_COARSE_TUNING * = 00002H;
+	  AL_VOCAL_MORPHER_PHONEMEB * = 00003H;
+	  AL_VOCAL_MORPHER_PHONEMEB_COARSE_TUNING * = 00004H;
+	  AL_VOCAL_MORPHER_WAVEFORM * = 00005H;
+	  AL_VOCAL_MORPHER_RATE * = 00006H;
+	
+	(* Pitchshifter effect parameters *)
+	  AL_PITCH_SHIFTER_COARSE_TUNE * = 00001H;
+	  AL_PITCH_SHIFTER_FINE_TUNE * = 00002H;
+	
+	(* Ringmodulator effect parameters *)
+	  AL_RING_MODULATOR_FREQUENCY * = 00001H;
+	  AL_RING_MODULATOR_HIGHPASS_CUTOFF * = 00002H;
+	  AL_RING_MODULATOR_WAVEFORM * = 00003H;
+	
+	(* Autowah effect parameters *)
+	  AL_AUTOWAH_ATTACK_TIME * = 00001H;
+	  AL_AUTOWAH_RELEASE_TIME * = 00002H;
+	  AL_AUTOWAH_RESONANCE * = 00003H;
+	  AL_AUTOWAH_PEAK_GAIN * = 00004H;
+	
+	(* Compressor effect parameters *)
+	  AL_COMPRESSOR_ONOFF * = 00001H;
+	
+	(* Equalizer effect parameters *)
+	  AL_EQUALIZER_LOW_GAIN * = 00001H;
+	  AL_EQUALIZER_LOW_CUTOFF * = 00002H;
+	  AL_EQUALIZER_MID1_GAIN * = 00003H;
+	  AL_EQUALIZER_MID1_CENTER * = 00004H;
+	  AL_EQUALIZER_MID1_WIDTH * = 00005H;
+	  AL_EQUALIZER_MID2_GAIN * = 00006H;
+	  AL_EQUALIZER_MID2_CENTER * = 00007H;
+	  AL_EQUALIZER_MID2_WIDTH * = 00008H;
+	  AL_EQUALIZER_HIGH_GAIN * = 00009H;
+	  AL_EQUALIZER_HIGH_CUTOFF * = 0000AH;
+	
+	(* Effect type *)
+	  AL_EFFECT_FIRST_PARAMETER * = 00000H;
+	  AL_EFFECT_LAST_PARAMETER * = 08000H;
+	  AL_EFFECT_TYPE * = 08001H;
+	
+	(* Effect types, used with the AL_EFFECT_TYPE property *)
+	  AL_EFFECT_NULL * = 00000H;
+	  AL_EFFECT_REVERB * = 00001H;
+	  AL_EFFECT_CHORUS * = 00002H;
+	  AL_EFFECT_DISTORTION * = 00003H;
+	  AL_EFFECT_ECHO * = 00004H;
+	  AL_EFFECT_FLANGER * = 00005H;
+	  AL_EFFECT_FREQUENCY_SHIFTER * = 00006H;
+	  AL_EFFECT_VOCAL_MORPHER * = 00007H;
+	  AL_EFFECT_PITCH_SHIFTER * = 00008H;
+	  AL_EFFECT_RING_MODULATOR * = 00009H;
+	  AL_EFFECT_AUTOWAH * = 0000AH;
+	  AL_EFFECT_COMPRESSOR * = 0000BH;
+	  AL_EFFECT_EQUALIZER * = 0000CH;
+	  AL_EFFECT_EAXREVERB * = 08000H;
+	
+	(* Auxiliary Effect Slot properties. *)
+	  AL_EFFECTSLOT_EFFECT * = 00001H;
+	  AL_EFFECTSLOT_GAIN * = 00002H;
+	  AL_EFFECTSLOT_AUXILIARY_SEND_AUTO * = 00003H;
+	
+	(* NULL Auxiliary Slot ID to disable a source send. *)
+	  AL_EFFECTSLOT_NULL * = 00000H;
+	
+	
+	(* Filter properties. *)
+	
+	(* Lowpass filter parameters *)
+	  AL_LOWPASS_GAIN * = 00001H;
+	  AL_LOWPASS_GAINHF * = 00002H;
+	
+	(* Highpass filter parameters *)
+	  AL_HIGHPASS_GAIN * = 00001H;
+	  AL_HIGHPASS_GAINLF * = 00002H;
+	
+	(* Bandpass filter parameters *)
+	  AL_BANDPASS_GAIN * = 00001H;
+	  AL_BANDPASS_GAINLF * = 00002H;
+	  AL_BANDPASS_GAINHF * = 00003H;
+	
+	(* Filter type *)
+	  AL_FILTER_FIRST_PARAMETER * = 00000H;
+	  AL_FILTER_LAST_PARAMETER * = 08000H;
+	  AL_FILTER_TYPE * = 08001H;
+	
+	(* Filter types, used with the AL_FILTER_TYPE property *)
+	  AL_FILTER_NULL * = 00000H;
+	  AL_FILTER_LOWPASS * = 00001H;
+	  AL_FILTER_HIGHPASS * = 00002H;
+	  AL_FILTER_BANDPASS * = 00003H;
+	
+	
+
+CONST	
+	(* Filter ranges and defaults. *)
+	
+	(* Lowpass filter *)
+	  LOWPASS_MIN_GAIN * = 0.0;
+	  LOWPASS_MAX_GAIN * = 1.0;
+	  LOWPASS_DEFAULT_GAIN * = 1.0;
+	
+	  LOWPASS_MIN_GAINHF * = 0.0;
+	  LOWPASS_MAX_GAINHF * = 1.0;
+	  LOWPASS_DEFAULT_GAINHF * = 1.0;
+	
+	(* Highpass filter *)
+	  HIGHPASS_MIN_GAIN * = 0.0;
+	  HIGHPASS_MAX_GAIN * = 1.0;
+	  HIGHPASS_DEFAULT_GAIN * = 1.0;
+	
+	  HIGHPASS_MIN_GAINLF * = 0.0;
+	  HIGHPASS_MAX_GAINLF * = 1.0;
+	  HIGHPASS_DEFAULT_GAINLF * = 1.0;
+	
+	(* Bandpass filter *)
+	  BANDPASS_MIN_GAIN * = 0.0;
+	  BANDPASS_MAX_GAIN * = 1.0;
+	  BANDPASS_DEFAULT_GAIN * = 1.0;
+	
+	  BANDPASS_MIN_GAINHF * = 0.0;
+	  BANDPASS_MAX_GAINHF * = 1.0;
+	  BANDPASS_DEFAULT_GAINHF * = 1.0;
+	
+	  BANDPASS_MIN_GAINLF * = 0.0;
+	  BANDPASS_MAX_GAINLF * = 1.0;
+	  BANDPASS_DEFAULT_GAINLF * = 1.0;
+	
+	
+	(* Effect parameter ranges and defaults. *)
+	
+	(* Standard reverb effect *)
+	  AL_REVERB_MIN_DENSITY * = 0.0;
+	  AL_REVERB_MAX_DENSITY * = 1.0;
+	  AL_REVERB_DEFAULT_DENSITY * = 1.0;
+	
+	  AL_REVERB_MIN_DIFFUSION * = 0.0;
+	  AL_REVERB_MAX_DIFFUSION * = 1.0;
+	  AL_REVERB_DEFAULT_DIFFUSION * = 1.0;
+	
+	  AL_REVERB_MIN_GAIN * = 0.0;
+	  AL_REVERB_MAX_GAIN * = 1.0;
+	  AL_REVERB_DEFAULT_GAIN * = 0.32;
+	
+	  AL_REVERB_MIN_GAINHF * = 0.0;
+	  AL_REVERB_MAX_GAINHF * = 1.0;
+	  AL_REVERB_DEFAULT_GAINHF * = 0.89;
+	
+	  AL_REVERB_MIN_DECAY_TIME * = 0.1;
+	  AL_REVERB_MAX_DECAY_TIME * = 20.0;
+	  AL_REVERB_DEFAULT_DECAY_TIME * = 1.49;
+	
+	  AL_REVERB_MIN_DECAY_HFRATIO * = 0.1;
+	  AL_REVERB_MAX_DECAY_HFRATIO * = 2.0;
+	  AL_REVERB_DEFAULT_DECAY_HFRATIO * = 0.83;
+	
+	  AL_REVERB_MIN_REFLECTIONS_GAIN * = 0.0;
+	  AL_REVERB_MAX_REFLECTIONS_GAIN * = 3.16;
+	  AL_REVERB_DEFAULT_REFLECTIONS_GAIN * = 0.05;
+	
+	  AL_REVERB_MIN_REFLECTIONS_DELAY * = 0.0;
+	  AL_REVERB_MAX_REFLECTIONS_DELAY * = 0.3;
+	  AL_REVERB_DEFAULT_REFLECTIONS_DELAY * = 0.007;
+	
+	  AL_REVERB_MIN_LATE_REVERB_GAIN * = 0.0;
+	  AL_REVERB_MAX_LATE_REVERB_GAIN * = 10.0;
+	  AL_REVERB_DEFAULT_LATE_REVERB_GAIN * = 1.26;
+	
+	  AL_REVERB_MIN_LATE_REVERB_DELAY * = 0.0;
+	  AL_REVERB_MAX_LATE_REVERB_DELAY * = 0.1;
+	  AL_REVERB_DEFAULT_LATE_REVERB_DELAY * = 0.011;
+	
+	  AL_REVERB_MIN_AIR_ABSORPTION_GAINHF * = 0.892;
+	  AL_REVERB_MAX_AIR_ABSORPTION_GAINHF * = 1.0;
+	  AL_REVERB_DEFAULT_AIR_ABSORPTION_GAINHF * = 0.994;
+	
+	  AL_REVERB_MIN_ROOM_ROLLOFF_FACTOR * = 0.0;
+	  AL_REVERB_MAX_ROOM_ROLLOFF_FACTOR * = 10.0;
+	  AL_REVERB_DEFAULT_ROOM_ROLLOFF_FACTOR * = 0.0;
+	
+	  AL_REVERB_MIN_DECAY_HFLIMIT * = AL.AL_FALSE;
+	  AL_REVERB_MAX_DECAY_HFLIMIT * = AL.AL_TRUE;
+	  AL_REVERB_DEFAULT_DECAY_HFLIMIT * = AL.AL_TRUE;
+	
+	(* EAX reverb effect *)
+	  AL_EAXREVERB_MIN_DENSITY * = 0.0;
+	  AL_EAXREVERB_MAX_DENSITY * = 1.0;
+	  AL_EAXREVERB_DEFAULT_DENSITY * = 1.0;
+	
+	  AL_EAXREVERB_MIN_DIFFUSION * = 0.0;
+	  AL_EAXREVERB_MAX_DIFFUSION * = 1.0;
+	  AL_EAXREVERB_DEFAULT_DIFFUSION * = 1.0;
+	
+	  AL_EAXREVERB_MIN_GAIN * = 0.0;
+	  AL_EAXREVERB_MAX_GAIN * = 1.0;
+	  AL_EAXREVERB_DEFAULT_GAIN * = 0.32;
+	
+	  AL_EAXREVERB_MIN_GAINHF * = 0.0;
+	  AL_EAXREVERB_MAX_GAINHF * = 1.0;
+	  AL_EAXREVERB_DEFAULT_GAINHF * = 0.89;
+	
+	  AL_EAXREVERB_MIN_GAINLF * = 0.0;
+	  AL_EAXREVERB_MAX_GAINLF * = 1.0;
+	  AL_EAXREVERB_DEFAULT_GAINLF * = 1.0;
+	
+	  AL_EAXREVERB_MIN_DECAY_TIME * = 0.1;
+	  AL_EAXREVERB_MAX_DECAY_TIME * = 20.0;
+	  AL_EAXREVERB_DEFAULT_DECAY_TIME * = 1.49;
+	
+	  AL_EAXREVERB_MIN_DECAY_HFRATIO * = 0.1;
+	  AL_EAXREVERB_MAX_DECAY_HFRATIO * = 2.0;
+	  AL_EAXREVERB_DEFAULT_DECAY_HFRATIO * = 0.83;
+	
+	  AL_EAXREVERB_MIN_DECAY_LFRATIO * = 0.1;
+	  AL_EAXREVERB_MAX_DECAY_LFRATIO * = 2.0;
+	  AL_EAXREVERB_DEFAULT_DECAY_LFRATIO * = 1.0;
+	
+	  AL_EAXREVERB_MIN_REFLECTIONS_GAIN * = 0.0;
+	  AL_EAXREVERB_MAX_REFLECTIONS_GAIN * = 3.16;
+	  AL_EAXREVERB_DEFAULT_REFLECTIONS_GAIN * = 0.05;
+	
+	  AL_EAXREVERB_MIN_REFLECTIONS_DELAY * = 0.0;
+	  AL_EAXREVERB_MAX_REFLECTIONS_DELAY * = 0.3;
+	  AL_EAXREVERB_DEFAULT_REFLECTIONS_DELAY * = 0.007;
+	
+	  AL_EAXREVERB_DEFAULT_REFLECTIONS_PAN_XYZ * = 0.0;
+	
+	  AL_EAXREVERB_MIN_LATE_REVERB_GAIN * = 0.0;
+	  AL_EAXREVERB_MAX_LATE_REVERB_GAIN * = 10.0;
+	  AL_EAXREVERB_DEFAULT_LATE_REVERB_GAIN * = 1.26;
+	
+	  AL_EAXREVERB_MIN_LATE_REVERB_DELAY * = 0.0;
+	  AL_EAXREVERB_MAX_LATE_REVERB_DELAY * = 0.1;
+	  AL_EAXREVERB_DEFAULT_LATE_REVERB_DELAY * = 0.011;
+	
+	  AL_EAXREVERB_DEFAULT_LATE_REVERB_PAN_XYZ * = 0.0;
+	
+	  AL_EAXREVERB_MIN_ECHO_TIME * = 0.075;
+	  AL_EAXREVERB_MAX_ECHO_TIME * = 0.25;
+	  AL_EAXREVERB_DEFAULT_ECHO_TIME * = 0.25;
+	
+	  AL_EAXREVERB_MIN_ECHO_DEPTH * = 0.0;
+	  AL_EAXREVERB_MAX_ECHO_DEPTH * = 1.0;
+	  AL_EAXREVERB_DEFAULT_ECHO_DEPTH * = 0.0;
+	
+	  AL_EAXREVERB_MIN_MODULATION_TIME * = 0.04;
+	  AL_EAXREVERB_MAX_MODULATION_TIME * = 4.0;
+	  AL_EAXREVERB_DEFAULT_MODULATION_TIME * = 0.25;
+	
+	  AL_EAXREVERB_MIN_MODULATION_DEPTH * = 0.0;
+	  AL_EAXREVERB_MAX_MODULATION_DEPTH * = 1.0;
+	  AL_EAXREVERB_DEFAULT_MODULATION_DEPTH * = 0.0;
+	
+	  AL_EAXREVERB_MIN_AIR_ABSORPTION_GAINHF * = 0.892;
+	  AL_EAXREVERB_MAX_AIR_ABSORPTION_GAINHF * = 1.0;
+	  AL_EAXREVERB_DEFAULT_AIR_ABSORPTION_GAINHF * = 0.994;
+	
+	  AL_EAXREVERB_MIN_HFREFERENCE * = 1000.0;
+	  AL_EAXREVERB_MAX_HFREFERENCE * = 20000.0;
+	  AL_EAXREVERB_DEFAULT_HFREFERENCE * = 5000.0;
+	
+	  AL_EAXREVERB_MIN_LFREFERENCE * = 20.0;
+	  AL_EAXREVERB_MAX_LFREFERENCE * = 1000.0;
+	  AL_EAXREVERB_DEFAULT_LFREFERENCE * = 250.0;
+	
+	  AL_EAXREVERB_MIN_ROOM_ROLLOFF_FACTOR * = 0.0;
+	  AL_EAXREVERB_MAX_ROOM_ROLLOFF_FACTOR * = 10.0;
+	  AL_EAXREVERB_DEFAULT_ROOM_ROLLOFF_FACTOR * = 0.0;
+	
+	  AL_EAXREVERB_MIN_DECAY_HFLIMIT * = AL.AL_FALSE;
+	  AL_EAXREVERB_MAX_DECAY_HFLIMIT * = AL.AL_TRUE;
+	  AL_EAXREVERB_DEFAULT_DECAY_HFLIMIT * = AL.AL_TRUE;
+	
+	(* Chorus effect *)
+	  AL_CHORUS_WAVEFORM_SINUSOID * = 0;
+	  AL_CHORUS_WAVEFORM_TRIANGLE * = 1;
+	
+	  AL_CHORUS_MIN_WAVEFORM * = 0;
+	  AL_CHORUS_MAX_WAVEFORM * = 1;
+	  AL_CHORUS_DEFAULT_WAVEFORM * = 1;
+	
+	  AL_CHORUS_MIN_PHASE * = -180;
+	  AL_CHORUS_MAX_PHASE * = 180;
+	  AL_CHORUS_DEFAULT_PHASE * = 90;
+	
+	  AL_CHORUS_MIN_RATE * = 0.0;
+	  AL_CHORUS_MAX_RATE * = 10.0;
+	  AL_CHORUS_DEFAULT_RATE * = 1.1;
+	
+	  AL_CHORUS_MIN_DEPTH * = 0.0;
+	  AL_CHORUS_MAX_DEPTH * = 1.0;
+	  AL_CHORUS_DEFAULT_DEPTH * = 0.1;
+	
+	  AL_CHORUS_MIN_FEEDBACK * = -1.0;
+	  AL_CHORUS_MAX_FEEDBACK * = 1.0;
+	  AL_CHORUS_DEFAULT_FEEDBACK * = 0.25;
+	
+	  AL_CHORUS_MIN_DELAY * = 0.0;
+	  AL_CHORUS_MAX_DELAY * = 0.016;
+	  AL_CHORUS_DEFAULT_DELAY * = 0.016;
+	
+	(* Distortion effect *)
+	  AL_DISTORTION_MIN_EDGE * = 0.0;
+	  AL_DISTORTION_MAX_EDGE * = 1.0;
+	  AL_DISTORTION_DEFAULT_EDGE * = 0.2;
+	
+	  AL_DISTORTION_MIN_GAIN * = 0.01;
+	  AL_DISTORTION_MAX_GAIN * = 1.0;
+	  AL_DISTORTION_DEFAULT_GAIN * = 0.05;
+	
+	  AL_DISTORTION_MIN_LOWPASS_CUTOFF * = 80.0;
+	  AL_DISTORTION_MAX_LOWPASS_CUTOFF * = 24000.0;
+	  AL_DISTORTION_DEFAULT_LOWPASS_CUTOFF * = 8000.0;
+	
+	  AL_DISTORTION_MIN_EQCENTER * = 80.0;
+	  AL_DISTORTION_MAX_EQCENTER * = 24000.0;
+	  AL_DISTORTION_DEFAULT_EQCENTER * = 3600.0;
+	
+	  AL_DISTORTION_MIN_EQBANDWIDTH * = 80.0;
+	  AL_DISTORTION_MAX_EQBANDWIDTH * = 24000.0;
+	  AL_DISTORTION_DEFAULT_EQBANDWIDTH * = 3600.0;
+	
+	(* Echo effect *)
+	  AL_ECHO_MIN_DELAY * = 0.0;
+	  AL_ECHO_MAX_DELAY * = 0.207;
+	  AL_ECHO_DEFAULT_DELAY * = 0.1;
+	
+	  AL_ECHO_MIN_LRDELAY * = 0.0;
+	  AL_ECHO_MAX_LRDELAY * = 0.404;
+	  AL_ECHO_DEFAULT_LRDELAY * = 0.1;
+	
+	  AL_ECHO_MIN_DAMPING * = 0.0;
+	  AL_ECHO_MAX_DAMPING * = 0.99;
+	  AL_ECHO_DEFAULT_DAMPING * = 0.5;
+	
+	  AL_ECHO_MIN_FEEDBACK * = 0.0;
+	  AL_ECHO_MAX_FEEDBACK * = 1.0;
+	  AL_ECHO_DEFAULT_FEEDBACK * = 0.5;
+	
+	  AL_ECHO_MIN_SPREAD * = -1.0;
+	  AL_ECHO_MAX_SPREAD * = 1.0;
+	  AL_ECHO_DEFAULT_SPREAD * = -1.0;
+	
+	(* Flanger effect *)
+	  AL_FLANGER_WAVEFORM_SINUSOID * = 0;
+	  AL_FLANGER_WAVEFORM_TRIANGLE * = 1;
+	
+	  AL_FLANGER_MIN_WAVEFORM * = 0;
+	  AL_FLANGER_MAX_WAVEFORM * = 1;
+	  AL_FLANGER_DEFAULT_WAVEFORM * = 1;
+	
+	  AL_FLANGER_MIN_PHASE * = -180;
+	  AL_FLANGER_MAX_PHASE * = 180;
+	  AL_FLANGER_DEFAULT_PHASE * = 0;
+	
+	  AL_FLANGER_MIN_RATE * = 0.0;
+	  AL_FLANGER_MAX_RATE * = 10.0;
+	  AL_FLANGER_DEFAULT_RATE * = 0.27;
+	
+	  AL_FLANGER_MIN_DEPTH * = 0.0;
+	  AL_FLANGER_MAX_DEPTH * = 1.0;
+	  AL_FLANGER_DEFAULT_DEPTH * = 1.0;
+	
+	  AL_FLANGER_MIN_FEEDBACK * = -1.0;
+	  AL_FLANGER_MAX_FEEDBACK * = 1.0;
+	  AL_FLANGER_DEFAULT_FEEDBACK * = -0.5;
+	
+	  AL_FLANGER_MIN_DELAY * = 0.0;
+	  AL_FLANGER_MAX_DELAY * = 0.004;
+	  AL_FLANGER_DEFAULT_DELAY * = 0.002;
+	
+	(* Frequency shifter effect *)
+	  AL_FREQUENCY_SHIFTER_MIN_FREQUENCY * = 0.0;
+	  AL_FREQUENCY_SHIFTER_MAX_FREQUENCY * = 24000.0;
+	  AL_FREQUENCY_SHIFTER_DEFAULT_FREQUENCY * = 0.0;
+	
+	  AL_FREQUENCY_SHIFTER_MIN_LEFT_DIRECTION * = 0;
+	  AL_FREQUENCY_SHIFTER_MAX_LEFT_DIRECTION * = 2;
+	  AL_FREQUENCY_SHIFTER_DEFAULT_LEFT_DIRECTION * = 0;
+	
+	  AL_FREQUENCY_SHIFTER_DIRECTION_DOWN * = 0;
+	  AL_FREQUENCY_SHIFTER_DIRECTION_UP * = 1;
+	  AL_FREQUENCY_SHIFTER_DIRECTION_OFF * = 2;
+	
+	  AL_FREQUENCY_SHIFTER_MIN_RIGHT_DIRECTION * = 0;
+	  AL_FREQUENCY_SHIFTER_MAX_RIGHT_DIRECTION * = 2;
+	  AL_FREQUENCY_SHIFTER_DEFAULT_RIGHT_DIRECTION * = 0;
+	
+	(* Vocal morpher effect *)
+	  AL_VOCAL_MORPHER_MIN_PHONEMEA * = 0;
+	  AL_VOCAL_MORPHER_MAX_PHONEMEA * = 29;
+	  AL_VOCAL_MORPHER_DEFAULT_PHONEMEA * = 0;
+	
+	  AL_VOCAL_MORPHER_MIN_PHONEMEA_COARSE_TUNING * = -24;
+	  AL_VOCAL_MORPHER_MAX_PHONEMEA_COARSE_TUNING * = 24;
+	  AL_VOCAL_MORPHER_DEFAULT_PHONEMEA_COARSE_TUNING * = 0;
+	
+	  AL_VOCAL_MORPHER_MIN_PHONEMEB * = 0;
+	  AL_VOCAL_MORPHER_MAX_PHONEMEB * = 29;
+	  AL_VOCAL_MORPHER_DEFAULT_PHONEMEB * = 10;
+	
+	  AL_VOCAL_MORPHER_MIN_PHONEMEB_COARSE_TUNING * = -24;
+	  AL_VOCAL_MORPHER_MAX_PHONEMEB_COARSE_TUNING * = 24;
+	  AL_VOCAL_MORPHER_DEFAULT_PHONEMEB_COARSE_TUNING * = 0;
+	
+	  AL_VOCAL_MORPHER_PHONEME_A * = 0;
+	  AL_VOCAL_MORPHER_PHONEME_E * = 1;
+	  AL_VOCAL_MORPHER_PHONEME_I * = 2;
+	  AL_VOCAL_MORPHER_PHONEME_O * = 3;
+	  AL_VOCAL_MORPHER_PHONEME_U * = 4;
+	  AL_VOCAL_MORPHER_PHONEME_AA * = 5;
+	  AL_VOCAL_MORPHER_PHONEME_AE * = 6;
+	  AL_VOCAL_MORPHER_PHONEME_AH * = 7;
+	  AL_VOCAL_MORPHER_PHONEME_AO * = 8;
+	  AL_VOCAL_MORPHER_PHONEME_EH * = 9;
+	  AL_VOCAL_MORPHER_PHONEME_ER * = 10;
+	  AL_VOCAL_MORPHER_PHONEME_IH * = 11;
+	  AL_VOCAL_MORPHER_PHONEME_IY * = 12;
+	  AL_VOCAL_MORPHER_PHONEME_UH * = 13;
+	  AL_VOCAL_MORPHER_PHONEME_UW * = 14;
+	  AL_VOCAL_MORPHER_PHONEME_B * = 15;
+	  AL_VOCAL_MORPHER_PHONEME_D * = 16;
+	  AL_VOCAL_MORPHER_PHONEME_F * = 17;
+	  AL_VOCAL_MORPHER_PHONEME_G * = 18;
+	  AL_VOCAL_MORPHER_PHONEME_J * = 19;
+	  AL_VOCAL_MORPHER_PHONEME_K * = 20;
+	  AL_VOCAL_MORPHER_PHONEME_L * = 21;
+	  AL_VOCAL_MORPHER_PHONEME_M * = 22;
+	  AL_VOCAL_MORPHER_PHONEME_N * = 23;
+	  AL_VOCAL_MORPHER_PHONEME_P * = 24;
+	  AL_VOCAL_MORPHER_PHONEME_R * = 25;
+	  AL_VOCAL_MORPHER_PHONEME_S * = 26;
+	  AL_VOCAL_MORPHER_PHONEME_T * = 27;
+	  AL_VOCAL_MORPHER_PHONEME_V * = 28;
+	  AL_VOCAL_MORPHER_PHONEME_Z * = 29;
+	
+	  AL_VOCAL_MORPHER_WAVEFORM_SINUSOID * = 0;
+	  AL_VOCAL_MORPHER_WAVEFORM_TRIANGLE * = 1;
+	  AL_VOCAL_MORPHER_WAVEFORM_SAWTOOTH * = 2;
+	
+	  AL_VOCAL_MORPHER_MIN_WAVEFORM * = 0;
+	  AL_VOCAL_MORPHER_MAX_WAVEFORM * = 2;
+	  AL_VOCAL_MORPHER_DEFAULT_WAVEFORM * = 0;
+	
+	  AL_VOCAL_MORPHER_MIN_RATE * = 0.0;
+	  AL_VOCAL_MORPHER_MAX_RATE * = 10.0;
+	  AL_VOCAL_MORPHER_DEFAULT_RATE * = 1.41;
+	
+	(* Pitch shifter effect *)
+	  AL_PITCH_SHIFTER_MIN_COARSE_TUNE * = -12;
+	  AL_PITCH_SHIFTER_MAX_COARSE_TUNE * = 12;
+	  AL_PITCH_SHIFTER_DEFAULT_COARSE_TUNE * = 12;
+	
+	  AL_PITCH_SHIFTER_MIN_FINE_TUNE * = -50;
+	  AL_PITCH_SHIFTER_MAX_FINE_TUNE * = 50;
+	  AL_PITCH_SHIFTER_DEFAULT_FINE_TUNE * = 0;
+	
+	(* Ring modulator effect *)
+	  AL_RING_MODULATOR_MIN_FREQUENCY * = 0.0;
+	  AL_RING_MODULATOR_MAX_FREQUENCY * = 8000.0;
+	  AL_RING_MODULATOR_DEFAULT_FREQUENCY * = 440.0;
+	
+	  AL_RING_MODULATOR_MIN_HIGHPASS_CUTOFF * = 0.0;
+	  AL_RING_MODULATOR_MAX_HIGHPASS_CUTOFF * = 24000.0;
+	  AL_RING_MODULATOR_DEFAULT_HIGHPASS_CUTOFF * = 800.0;
+	
+	  AL_RING_MODULATOR_SINUSOID * = 0;
+	  AL_RING_MODULATOR_SAWTOOTH * = 1;
+	  AL_RING_MODULATOR_SQUARE * = 2;
+	
+	  AL_RING_MODULATOR_MIN_WAVEFORM * = 0;
+	  AL_RING_MODULATOR_MAX_WAVEFORM * = 2;
+	  AL_RING_MODULATOR_DEFAULT_WAVEFORM * = 0;
+	
+	(* Autowah effect *)
+	  AL_AUTOWAH_MIN_ATTACK_TIME * = 0.0001;
+	  AL_AUTOWAH_MAX_ATTACK_TIME * = 1.0;
+	  AL_AUTOWAH_DEFAULT_ATTACK_TIME * = 0.06;
+	
+	  AL_AUTOWAH_MIN_RELEASE_TIME * = 0.0001;
+	  AL_AUTOWAH_MAX_RELEASE_TIME * = 1.0;
+	  AL_AUTOWAH_DEFAULT_RELEASE_TIME * = 0.06;
+	
+	  AL_AUTOWAH_MIN_RESONANCE * = 2.0;
+	  AL_AUTOWAH_MAX_RESONANCE * = 1000.0;
+	  AL_AUTOWAH_DEFAULT_RESONANCE * = 1000.0;
+	
+	  AL_AUTOWAH_MIN_PEAK_GAIN * = 0.00003;
+	  AL_AUTOWAH_MAX_PEAK_GAIN * = 31621.0;
+	  AL_AUTOWAH_DEFAULT_PEAK_GAIN * = 11.22;
+	
+	(* Compressor effect *)
+	  AL_COMPRESSOR_MIN_ONOFF * = 0;
+	  AL_COMPRESSOR_MAX_ONOFF * = 1;
+	  AL_COMPRESSOR_DEFAULT_ONOFF * = 1;
+	
+	(* Equalizer effect *)
+	  AL_EQUALIZER_MIN_LOW_GAIN * = 0.126;
+	  AL_EQUALIZER_MAX_LOW_GAIN * = 7.943;
+	  AL_EQUALIZER_DEFAULT_LOW_GAIN * = 1.0;
+	
+	  AL_EQUALIZER_MIN_LOW_CUTOFF * = 50.0;
+	  AL_EQUALIZER_MAX_LOW_CUTOFF * = 800.0;
+	  AL_EQUALIZER_DEFAULT_LOW_CUTOFF * = 200.0;
+	
+	  AL_EQUALIZER_MIN_MID1_GAIN * = 0.126;
+	  AL_EQUALIZER_MAX_MID1_GAIN * = 7.943;
+	  AL_EQUALIZER_DEFAULT_MID1_GAIN * = 1.0;
+	
+	  AL_EQUALIZER_MIN_MID1_CENTER * = 200.0;
+	  AL_EQUALIZER_MAX_MID1_CENTER * = 3000.0;
+	  AL_EQUALIZER_DEFAULT_MID1_CENTER * = 500.0;
+	
+	  AL_EQUALIZER_MIN_MID1_WIDTH * = 0.01;
+	  AL_EQUALIZER_MAX_MID1_WIDTH * = 1.0;
+	  AL_EQUALIZER_DEFAULT_MID1_WIDTH * = 1.0;
+	
+	  AL_EQUALIZER_MIN_MID2_GAIN * = 0.126;
+	  AL_EQUALIZER_MAX_MID2_GAIN * = 7.943;
+	  AL_EQUALIZER_DEFAULT_MID2_GAIN * = 1.0;
+	
+	  AL_EQUALIZER_MIN_MID2_CENTER * = 1000.0;
+	  AL_EQUALIZER_MAX_MID2_CENTER * = 8000.0;
+	  AL_EQUALIZER_DEFAULT_MID2_CENTER * = 3000.0;
+	
+	  AL_EQUALIZER_MIN_MID2_WIDTH * = 0.01;
+	  AL_EQUALIZER_MAX_MID2_WIDTH * = 1.0;
+	  AL_EQUALIZER_DEFAULT_MID2_WIDTH * = 1.0;
+	
+	  AL_EQUALIZER_MIN_HIGH_GAIN * = 0.126;
+	  AL_EQUALIZER_MAX_HIGH_GAIN * = 7.943;
+	  AL_EQUALIZER_DEFAULT_HIGH_GAIN * = 1.0;
+	
+	  AL_EQUALIZER_MIN_HIGH_CUTOFF * = 4000.0;
+	  AL_EQUALIZER_MAX_HIGH_CUTOFF * = 16000.0;
+	  AL_EQUALIZER_DEFAULT_HIGH_CUTOFF * = 6000.0;
+	
+	
+	(* Source parameter value ranges and defaults. *)
+	  AL_MIN_AIR_ABSORPTION_FACTOR * = 0.0;
+	  AL_MAX_AIR_ABSORPTION_FACTOR * = 10.0;
+	  AL_DEFAULT_AIR_ABSORPTION_FACTOR * = 0.0;
+	
+	  AL_MIN_ROOM_ROLLOFF_FACTOR * = 0.0;
+	  AL_MAX_ROOM_ROLLOFF_FACTOR * = 10.0;
+	  AL_DEFAULT_ROOM_ROLLOFF_FACTOR * = 0.0;
+	
+	  AL_MIN_CONE_OUTER_GAINHF * = 0.0;
+	  AL_MAX_CONE_OUTER_GAINHF * = 1.0;
+	  AL_DEFAULT_CONE_OUTER_GAINHF * = 1.0;
+	
+	  AL_MIN_DIRECT_FILTER_GAINHF_AUTO * = AL.AL_FALSE;
+	  AL_MAX_DIRECT_FILTER_GAINHF_AUTO * = AL.AL_TRUE;
+	  AL_DEFAULT_DIRECT_FILTER_GAINHF_AUTO * = AL.AL_TRUE;
+	
+	  AL_MIN_AUXILIARY_SEND_FILTER_GAIN_AUTO * = AL.AL_FALSE;
+	  AL_MAX_AUXILIARY_SEND_FILTER_GAIN_AUTO * = AL.AL_TRUE;
+	  AL_DEFAULT_AUXILIARY_SEND_FILTER_GAIN_AUTO * = AL.AL_TRUE;
+	
+	  AL_MIN_AUXILIARY_SEND_FILTER_GAINHF_AUTO * = AL.AL_FALSE;
+	  AL_MAX_AUXILIARY_SEND_FILTER_GAINHF_AUTO * = AL.AL_TRUE;
+	  AL_DEFAULT_AUXILIARY_SEND_FILTER_GAINHF_AUTO * = AL.AL_TRUE;
+	
+	
+	(* Listener parameter value ranges and defaults. *)
+
+	  AL_MIN_METERS_PER_UNIT * = MIN(REAL);
+	  AL_MAX_METERS_PER_UNIT * = MAX(REAL);
+	  AL_DEFAULT_METERS_PER_UNIT * = 1.0;
+
+
+	
+	(* Effect object function types. *)
+	
+	(* Filter object function types. *)
+	
+	(* Auxiliary Effect Slot object function types. *)
+TYPE
+
+	  TalGenEffects = PROCEDURE { C } (n: ALsizei;   effects: PALuint);
+	  TalDeleteEffects= PROCEDURE { C } (n: ALsizei;  effects: PALuint);
+	  TalIsEffect = PROCEDURE { C } (effect: ALuint): ALboolean;
+	  TalEffecti = PROCEDURE { C } (effect: ALuint;  param: ALenum;  iValue: ALint);
+	  TalEffectiv = PROCEDURE { C } (effect: ALuint;  param: ALenum;  piValues: PALint);
+	  TalEffectf = PROCEDURE { C } (effect: ALuint;  param: ALenum;  flValue: ALfloat);
+	  TalEffectfv = PROCEDURE { C } (effect: ALuint;  param: ALenum;  pflValues: PALfloat);
+	  TalGetEffecti = PROCEDURE { C } (effect: ALuint;  param: ALenum;  VAR piValue: ALint);
+	  TalGetEffectiv = PROCEDURE { C } (effect: ALuint;  param: ALenum;  piValues: PALint);
+	  TalGetEffectf = PROCEDURE { C } (effect: ALuint;  param: ALenum;  VAR pflValue: ALfloat);
+	  TalGetEffectfv = PROCEDURE { C } (effect: ALuint;  param: ALenum;  pflValues: PALfloat);
+	
+	  TalGenFilters = PROCEDURE { C } (n: ALsizei;  filters: PALuint);
+	  TalDeleteFilters = PROCEDURE { C } (n: ALsizei;  filters: PALuint);
+	  TalIsFilter = PROCEDURE { C } (filter: ALuint): ALboolean;
+	  TalFilteri = PROCEDURE { C } (filter: ALuint;  param: ALenum;  iValue: ALint);
+	  TalFilteriv = PROCEDURE { C } (filter: ALuint;  param: ALenum;  piValues: PALint);
+	  TalFilterf = PROCEDURE { C } (filter: ALuint;  param: ALenum;  flValue: ALfloat);
+	  TalFilterfv = PROCEDURE { C } (filter: ALuint;  param: ALenum;  pflValues: PALfloat);
+	  TalGetFilteri = PROCEDURE { C } (filter: ALuint;  param: ALenum;  VAR piValue: ALint);
+	  TalGetFilteriv = PROCEDURE { C } (filter: ALuint;  param: ALenum;  piValues: PALint);
+	  TalGetFilterf = PROCEDURE { C } (filter: ALuint;  param: ALenum;  VAR pflValue: ALfloat);
+	  TalGetFilterfv = PROCEDURE { C } (filter: ALuint;  param: ALenum;  pflValues: PALfloat);
+	
+	  TalGenAuxiliaryEffectSlots = PROCEDURE { C } (n: ALsizei;   effectslots: PALuint);
+	  TalDeleteAuxiliaryEffectSlots = PROCEDURE { C } (n: ALsizei;  effectslots: PALuint);
+	  TalIsAuxiliaryEffectSlot = PROCEDURE { C } (effectslot: ALuint): ALboolean;
+	  TalAuxiliaryEffectSloti = PROCEDURE { C } (effectslot: ALuint;  param: ALenum;  iValue: ALint);
+	  TalAuxiliaryEffectSlotiv = PROCEDURE { C } (effectslot: ALuint;  param: ALenum;  piValues: PALint);
+	  TalAuxiliaryEffectSlotf = PROCEDURE { C } (effectslot: ALuint;  param: ALenum;  flValue: ALfloat);
+	  TalAuxiliaryEffectSlotfv = PROCEDURE { C } (effectslot: ALuint;  param: ALenum;  pflValues: PALfloat);
+	  TalGetAuxiliaryEffectSloti = PROCEDURE { C } (effectslot: ALuint;  param: ALenum;  VAR piValue: ALint);
+	  TalGetAuxiliaryEffectSlotiv = PROCEDURE { C } (effectslot: ALuint;  param: ALenum;  piValues: PALint);
+	  TalGetAuxiliaryEffectSlotf = PROCEDURE { C } (effectslot: ALuint;  param: ALenum;  VAR pflValue: ALfloat);
+	  TalGetAuxiliaryEffectSlotfv = PROCEDURE { C } (effectslot: ALuint;  param: ALenum;  pflValues: PALfloat);
+
+(************************ *)
+
+VAR
+	  alGenEffects-: TalGenEffects;
+	  alDeleteEffects-: TalDeleteEffects;
+	  alIsEffect-: TalIsEffect;
+	  alEffecti-: TalEffecti;
+	  alEffectiv-: TalEffectiv;
+	  alEffectf-: TalEffectf;
+	  alEffectfv-: TalEffectfv; 
+	  alGetEffecti-: TalGetEffecti;
+	  alGetEffectiv-: TalGetEffectiv;
+	  alGetEffectf-: TalGetEffectf;
+	  alGetEffectfv-: TalGetEffectfv;
+	
+	  alGenFilters-: TalGenFilters;
+	  alDeleteFilters-: TalDeleteFilters;
+	  alIsFilter-: TalIsFilter;
+	  alFilteri-: TalFilteri;
+	  alFilteriv-: TalFilteriv;
+	  alFilterf-: TalFilterf;
+	  alFilterfv-: TalFilterfv;
+	  alGetFilteri-: TalGetFilteri;
+	  alGetFilteriv-: TalGetFilteriv;
+	  alGetFilterf-: TalGetFilterf;
+	  alGetFilterfv-: TalGetFilterfv;
+	
+	  alGenAuxiliaryEffectSlots-: TalGenAuxiliaryEffectSlots;
+	  alDeleteAuxiliaryEffectSlots-: TalDeleteAuxiliaryEffectSlots;
+	  alIsAuxiliaryEffectSlot-: TalIsAuxiliaryEffectSlot;
+	  alAuxiliaryEffectSloti-: TalAuxiliaryEffectSloti;
+	  alAuxiliaryEffectSlotiv-: TalAuxiliaryEffectSlotiv;
+	  alAuxiliaryEffectSlotf-:  TalAuxiliaryEffectSlotf;
+	  alAuxiliaryEffectSlotfv-: TalAuxiliaryEffectSlotfv;
+	  alGetAuxiliaryEffectSloti-: TalGetAuxiliaryEffectSloti;
+	  alGetAuxiliaryEffectSlotiv-: TalGetAuxiliaryEffectSlotiv;
+	  alGetAuxiliaryEffectSlotf-: TalGetAuxiliaryEffectSlotf;
+	  alGetAuxiliaryEffectSlotfv-: TalGetAuxiliaryEffectSlotfv;
+
+PROCEDURE Init;
+BEGIN
+		
+		alGenEffects := SYSTEM.VAL(TalGenEffects, AL.alGetProcAddress("alGenEffects"));
+		alDeleteEffects := SYSTEM.VAL(TalDeleteEffects, AL.alGetProcAddress("alDeleteEffects"));
+		alIsEffect := SYSTEM.VAL(TalIsEffect, AL.alGetProcAddress("alIsEffect"));
+		alEffecti := SYSTEM.VAL(TalEffecti, AL.alGetProcAddress("alEffecti"));
+		alEffectiv := SYSTEM.VAL(TalEffectiv, AL.alGetProcAddress("alEffectiv"));
+		alEffectf := SYSTEM.VAL(TalEffectf, AL.alGetProcAddress("alEffectf"));
+		alEffectfv := SYSTEM.VAL(TalEffectfv, AL.alGetProcAddress("alEffectfv"));
+		alGetEffecti := SYSTEM.VAL(TalGetEffecti, AL.alGetProcAddress("alGetEffecti"));
+		alGetEffectiv := SYSTEM.VAL(TalGetEffectiv, AL.alGetProcAddress("alGetEffectiv"));
+		alGetEffectf := SYSTEM.VAL(TalGetEffectf, AL.alGetProcAddress("alGetEffectf"));
+		alGetEffectfv := SYSTEM.VAL(TalGetEffectfv, AL.alGetProcAddress("alGetEffectfv"));
+		
+		alGenFilters := SYSTEM.VAL(TalGenFilters, AL.alGetProcAddress("alGenFilters"));
+		alDeleteFilters := SYSTEM.VAL(TalDeleteFilters, AL.alGetProcAddress("alDeleteFilters"));
+		alIsFilter := SYSTEM.VAL(TalIsFilter, AL.alGetProcAddress("alIsFilter"));
+		alFilteri := SYSTEM.VAL(TalFilteri, AL.alGetProcAddress("alFilteri"));
+		alFilteriv := SYSTEM.VAL(TalFilteriv, AL.alGetProcAddress("alFilteriv"));
+		alFilterf := SYSTEM.VAL(TalFilterf, AL.alGetProcAddress("alFilterf"));
+		alFilterfv := SYSTEM.VAL(TalFilterfv, AL.alGetProcAddress("alFilterfv"));
+		alGetFilteri := SYSTEM.VAL(TalGetFilteri, AL.alGetProcAddress("alGetFilteri"));
+		alGetFilteriv := SYSTEM.VAL(TalGetFilteriv, AL.alGetProcAddress("alGetFilteriv"));
+		alGetFilterf := SYSTEM.VAL(TalGetFilterf, AL.alGetProcAddress("alGetFilterf"));
+		alGetFilterfv := SYSTEM.VAL(TalGetFilterfv, AL.alGetProcAddress("alGetFilterfv"));
+		
+		alGenAuxiliaryEffectSlots := SYSTEM.VAL(TalGenAuxiliaryEffectSlots, AL.alGetProcAddress("alGenAuxiliaryEffectSlots"));
+		alDeleteAuxiliaryEffectSlots := SYSTEM.VAL(TalDeleteAuxiliaryEffectSlots, AL.alGetProcAddress("alDeleteAuxiliaryEffectSlots"));
+		alIsAuxiliaryEffectSlot := SYSTEM.VAL(TalIsAuxiliaryEffectSlot, AL.alGetProcAddress("alIsAuxiliaryEffectSlot"));
+		alAuxiliaryEffectSloti := SYSTEM.VAL(TalAuxiliaryEffectSloti, AL.alGetProcAddress("alAuxiliaryEffectSloti"));
+		alAuxiliaryEffectSlotiv := SYSTEM.VAL(TalAuxiliaryEffectSlotiv, AL.alGetProcAddress("alAuxiliaryEffectSlotiv"));
+		alAuxiliaryEffectSlotf := SYSTEM.VAL(TalAuxiliaryEffectSlotf, AL.alGetProcAddress("alAuxiliaryEffectSlotf"));
+		alAuxiliaryEffectSlotfv := SYSTEM.VAL(TalAuxiliaryEffectSlotfv, AL.alGetProcAddress("alAuxiliaryEffectSlotfv"));
+		alGetAuxiliaryEffectSloti := SYSTEM.VAL(TalGetAuxiliaryEffectSloti, AL.alGetProcAddress("alGetAuxiliaryEffectSloti"));
+		alGetAuxiliaryEffectSlotiv := SYSTEM.VAL(TalGetAuxiliaryEffectSlotiv, AL.alGetProcAddress("alGetAuxiliaryEffectSlotiv"));
+		alGetAuxiliaryEffectSlotf := SYSTEM.VAL(TalGetAuxiliaryEffectSlotf, AL.alGetProcAddress("alGetAuxiliaryEffectSlotf"));
+		alGetAuxiliaryEffectSlotfv := SYSTEM.VAL(TalGetAuxiliaryEffectSlotfv, AL.alGetProcAddress("alGetAuxiliaryEffectSlotfv"));
+						
+END Init;
+	
+BEGIN
+	Init;	
+END OpenALefx.

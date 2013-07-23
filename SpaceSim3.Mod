@@ -1,0 +1,253 @@
+MODULE SpaceSim3;
+
+	IMPORT KernelLog := KernelLog, Inputs,
+	GL:=OpenGL, GLC:=OpenGLConst, OGW := OGLWindow, GLU, ML := Decoder3DS;
+
+TYPE
+	(* our space simulation window object *)
+	SpaceWindow = OBJECT(OGW.Window)
+	VAR
+		model: ML.Model3D;
+		textureId: LONGINT;
+		(* Absolute rotation values (0-359 degrees) and rotation increments for each frame *)
+		rotationX, deltaXrotation: REAL;
+		rotationY, deltaYrotation: REAL;
+		rotationZ, deltaZrotation: REAL;
+
+		(* Flag for rendering as lines or filled polygons *)
+		filling: INTEGER;
+
+		object:  ML.Object3D;
+		fname: ARRAY 128 OF CHAR;
+
+	PROCEDURE &New();
+	BEGIN
+
+		rotationX := 0.0; deltaXrotation := 0.1;
+		rotationY := 0.0;  deltaYrotation := 0.05;
+		rotationZ := 0.0;  deltaZrotation := 0.03;
+		filling := 1; (*0=OFF 1=ON *)
+		NEW(object);
+
+		Init(640, 480, 200,100, FALSE);
+		fname := "opengloberon/spaceship.3ds";
+		SetTitle(fname);
+		(* cmdlinerun := TRUE; *) (* if you run this module from command line, set TRUE *)
+	END New;
+
+	(* Used to initialize OpenGL and to setup our world *)
+	PROCEDURE OnLoad;
+	VAR loadok: BOOLEAN;
+		ratio: LONGREAL;
+	BEGIN
+		ratio := width / height;
+		GL.ClearColor(0.0, 0.0, 0.0, 0.0);  (* This clear the background color to black *)
+		GL.ShadeModel(GLC.GL_SMOOTH);  (* Type of shading for the polygons *)
+
+		(* Viewport transformation *)
+		GL.Viewport(0,0,width, height);
+
+		(* Projection transformation *)
+		GL.MatrixMode(GLC.GL_PROJECTION);  (* Specifies which matrix stack is the target for matrix operations  *)
+		GL.LoadIdentity;  (* We initialize the projection matrix as identity *)
+
+
+		GLU.Perspective(45.0, ratio,1.0,10000.0);  (* We define the "viewing volume" *)
+
+
+		GL.Enable(GLC.GL_DEPTH_TEST);  (* We enable the depth test (also called z buffer) *)
+		GL.PolygonMode (GLC.GL_FRONT_AND_BACK, GLC.GL_FILL);  (* Polygon rasterization mode (polygon filled) *)
+
+		GL.Enable(GLC.GL_TEXTURE_2D);  (* This Enable the Texture mapping *)
+
+		loadok := ML.Import3DS(model, fname);
+		IF ~loadok THEN
+			KernelLog.String(fname);  KernelLog.String(' model file not loaded'); KernelLog.Ln;
+			Close;
+		END;
+
+		textureId:=ML.LoadImage('opengloberon/spaceshiptexture.bmp');  (* The Function LoadImage() return the current texture ID *)
+
+		(* If the last function returns -1 it means the file was not found so we exit from the program *)
+		IF (textureId = -1) THEN
+			KernelLog.String('Image file: spaceshiptexture.bmp not found'); KernelLog.Ln;
+			Close;
+		END;
+
+	END OnLoad;
+
+	(* This routine must be called everytime we resize our window.*)
+	PROCEDURE Reshape (w, h: LONGINT);
+	VAR ratio: LONGREAL;
+	BEGIN
+		ratio := w /h;
+		GL.Clear (GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT);  (* We clear both the color and the depth buffer so to draw the next frame *)
+		GL.Viewport(0,0,width, height);  (* Viewport transformation *)
+
+		GL.MatrixMode(GLC.GL_PROJECTION);  (* Projection transformation *)
+		GL.LoadIdentity;  (* We initialize the projection matrix as identity *)
+
+		GLU.Perspective(45.0, ratio,1.0,10000.0);
+
+
+		(*glutPostRedisplay;*)  (* This command redraw the scene (it calls the same routine of glutDisplayFunc) *)
+	END Reshape;
+
+	(* Used to handle the keyboard input *)
+	PROCEDURE KeyEvent* (ucs : LONGINT; flags : SET; keysym : LONGINT);
+	BEGIN
+		CASE CHR(ucs) OF
+			"q": Close;
+
+			| ' ':
+				deltaXrotation := 0.0;
+				deltaYrotation := 0.0;
+				deltaZrotation := 0.0;
+				  ReDisplay;
+			| 'r', 'R':
+
+				IF filling = 0 THEN
+					GL.PolygonMode (GLC.GL_FRONT_AND_BACK, GLC.GL_FILL);  (* Polygon rasterization mode (polygon filled) *)
+					filling:=1;
+					  ReDisplay;
+				ELSE
+					GL.PolygonMode (GLC.GL_FRONT_AND_BACK, GLC.GL_LINE);  (* Polygon rasterization mode (polygon outlined) *)
+					filling:=0;
+					  ReDisplay;
+				END;
+		ELSE
+			CASE keysym OF
+				Inputs.KsLeft:       deltaYrotation := deltaYrotation + 0.05;   ReDisplay;
+				| Inputs.KsRight:   deltaYrotation := deltaYrotation - 0.05;   ReDisplay;
+				| Inputs.KsUp:      deltaXrotation := deltaXrotation + 0.05;   ReDisplay;
+				| Inputs.KsDown:  deltaXrotation := deltaXrotation - 0.05; 	  ReDisplay;
+
+		ELSE
+		END;
+		END;
+
+	END KeyEvent;
+
+	PROCEDURE DrawObjectVert(object: ML.Object3D );
+		VAR  i: LONGINT;
+	BEGIN
+		GL.Color3f(1.0, 0.0, 0.0);
+		GL.Begin(GLC.GL_TRIANGLES);  (* glBegin and glEnd delimit the vertices that define a primitive (in our case triangles) *)
+
+		IF object.numFaces > 0 THEN
+			FOR i:=0 TO object.numVerts-1 DO
+				(*----------------- FIRST VERTEX ----------------- *)
+				(* Coordinates of the first vertex *)
+				GL.Vertex3f(object.verts[i].x, object.verts[ i ].y, object.verts[ i].z);  (*Vertex definition *)
+
+				(*----------------- SECOND VERTEX ----------------- *)
+				(* Coordinates of the second vertex *)
+				GL.Vertex3f(object.verts[i ].x, object.verts[i].y, object.verts[i].z);
+
+				(*----------------- THIRD VERTEX ----------------- *)
+				(* Coordinates of the Third vertex *)
+				GL.Vertex3f(object.verts[i].x, object.verts[i].y, object.verts[i].z);
+
+			END;
+		END;
+
+		GL.End;
+
+	END DrawObjectVert;
+
+	PROCEDURE DrawObjectTextured(object: ML.Object3D );
+	VAR i: LONGINT;
+	BEGIN
+		GL.BindTexture(GLC.GL_TEXTURE_2D, textureId);  (* We set the active texture  *)
+		GL.Begin(GLC.GL_TRIANGLES);  (* glBegin and glEnd delimit the vertices that define a primitive (in our case triangles) *)
+
+			FOR i:=0 TO object.numFaces-1 DO
+				(*----------------- FIRST VERTEX ----------------- *)
+				(* Texture coordinates of the first vertex *)
+				GL.TexCoord2f(object.texVerts[ object.faces[i].a].x, object.texVerts[ object.faces[i].a ].y);
+				(* Coordinates of the first vertex *)
+				GL.Vertex3f(object.verts[ object.faces[i].a ].x, object.verts[ object.faces[i].a ].y, object.verts[ object.faces[i].a ].z);  (*Vertex definition *)
+
+				(*----------------- SECOND VERTEX ----------------- *)
+				(* Texture coordinates of the second vertex *)
+				GL.TexCoord2f(object.texVerts[ object.faces[i].b ].x, object.texVerts[ object.faces[i].b ].y);
+				(* Coordinates of the second vertex *)
+				GL.Vertex3f(object.verts[ object.faces[i].b ].x, object.verts[ object.faces[i].b ].y, object.verts[ object.faces[i].b ].z);
+
+				(*----------------- THIRD VERTEX ----------------- *)
+				(* Texture coordinates of the third vertex *)
+				GL.TexCoord2f(object.texVerts[ object.faces[i].c ].x, object.texVerts[ object.faces[i].c ].y);
+				(* Coordinates of the Third vertex *)
+				GL.Vertex3f(object.verts[ object.faces[i].c ].x, object.verts[ object.faces[i].c ].y, object.verts[ object.faces[i].c ].z);
+		END;
+
+		GL.End;
+
+	END DrawObjectTextured;
+
+	(* This is our main rendering subroutine, called each frame *)
+	PROCEDURE Display;
+	VAR i, j: LONGINT;
+
+	BEGIN
+		GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT);  (* This clear the background color to dark blue *)
+		GL.MatrixMode(GLC.GL_MODELVIEW);  (* Modeling transformation *)
+		GL.LoadIdentity;  (* Initialize the model matrix as identity *)
+
+
+		GL.Translatef(0.0,0.0,-300);  (* We move the object forward (the model matrix is multiplied by the translation matrix) *)
+
+		rotationX := rotationX + deltaXrotation;
+		rotationY := rotationY + deltaYrotation;
+		rotationZ := rotationZ + deltaZrotation;
+
+		IF rotationX > 359.0 THEN
+			rotationX := 0.0;
+		END;
+		IF rotationY > 359.0 THEN
+			rotationY := 0.0;
+		END;
+		IF rotationZ > 359.0 THEN
+			rotationZ := 0.0;
+		END;
+
+		GL.Rotatef(rotationX, 1.0, 0.0, 0.0);  (* Rotations of the object (the model matrix is multiplied by the rotation matrices) *)
+		GL.Rotatef(rotationY, 0.0,1.0, 0.0);
+		GL.Rotatef(rotationZ, 0.0, 0.0,1.0);
+
+
+
+		FOR j := 0 TO model.objects.GetCount()-1 DO
+			object := model.objects.GetItem(j)(ML.Object3D);
+			IF object.numTexVerts = 0  THEN
+				DrawObjectVert(object)
+			ELSE
+				DrawObjectTextured(object);
+			END;
+		END;
+
+		GL.Flush;  (* This force the execution of OpenGL commands *)
+		SwapBuffers(); (* In double buffered mode we invert the positions of the visible buffer and the writing buffer *)
+	END Display;
+
+BEGIN
+	MainLoop();
+END SpaceWindow;
+
+(** Open window command procedure *)
+PROCEDURE Open*;
+VAR win : SpaceWindow;
+BEGIN
+	NEW(win);
+END Open;
+
+BEGIN
+
+END SpaceSim3.
+
+
+SpaceSim3.Open ~
+
+
+SystemTools.Free SpaceSim3 Decoder3DS OGLWindow ~
+

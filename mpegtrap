@@ -1,0 +1,262 @@
+
+LinuxAos (rev.4947)
+
+Trap   5.-230379978  (unknown trap, division error?)
+SP = EEBFEF34H, FP = EEBFEF78H, PC = F1BB3CA6H
+
+XNXLMPEG?.PW.Draw:1 pc=62 [0000003EH] = 61 + 1 crc=A7056C9B
+  canvas=F077FB40H (WMGraphics.BufferCanvas)
+  w=64 (00000040H)
+  h=64 (00000040H)
+  q=-289411168
+State XNXLMPEG?:
+  wnd=00000000H (NIL)
+WMNavigate.GetWindowImage:205 pc=16933 [00004225H] = 16728 + 205 crc=749DB5B0
+  window=F1482D80H (XNXLMPEG?.PW)
+  width=64 (00000040H)
+  height=64 (00000040H)
+  image=F1CF1B40H (WMGraphics.Image)
+  canvas=F077FB40H (WMGraphics.BufferCanvas)
+  ignore=1 (00000001H)
+  @hiddenIRVar0=F1CF1B40H (WMGraphics.Image)
+  @hiddenIRVar1=F077FB40H (WMGraphics.BufferCanvas)
+WMNavigate.TaskList.DrawInternalIcons:634 pc=16299 [00003FABH] = 15665 + 634 crc=749DB5B0
+  canvas=F2511D80H (WMGraphics.BufferCanvas)
+  x=384 (00000180H)
+  y=0
+  width=64 (00000040H)
+  height=64 (00000040H)
+  window=F1482D80H (XNXLMPEG?.PW)
+  hasFocus=FALSE
+  mouseOver=FALSE
+  extImage=00000000H (NIL)
+  image=00000000H (NIL)
+  imageRect=Rec@00000008H
+  indicatorRect=Rec@00000008H
+  title=00000000H (NIL)
+  @hiddenIRVar0=Rec@00000008H
+WMNavigate.TaskList.DrawInternal:242 pc=17581 [000044ADH] = 17339 + 242 crc=749DB5B0
+  canvas=F2511D80H (WMGraphics.BufferCanvas)
+  x=384 (00000180H)
+  y=0
+  width=64 (00000040H)
+  height=64 (00000040H)
+  window=F1482D80H (XNXLMPEG?.PW)
+  hasFocus=FALSE
+  mouseOver=FALSE
+  extImage=00000000H (NIL)
+  @hiddenIRVar0=Rec@00000008H
+WMNavigate.Base.DrawBackground:481 pc=6906 [00001AFAH] = 6425 + 481 crc=749DB5B0
+  canvas=F2511D80H (WMGraphics.BufferCanvas)
+  row=0
+  column=6 (00000006H)
+  x=384 (00000180H)
+  y=0
+  width=64 (00000040H)
+  height=64 (00000040H)
+  i=6 (00000006H)
+  @hiddenIRVar0=7 (00000007H)
+WMComponents.VisualComponent.Draw:171 pc=21875 [00005573H] = 21704 + 171 crc=E8EF3449
+  canvas=F2511D80H (WMGraphics.BufferCanvas)
+  command=00000000H (NIL)
+  event=Rec@00000018H
+  @hiddenIRVar0=EF25ABA0H (WMOberonFonts.Font)
+WMComponents.VisualComponent.DrawSubComponents:335 pc=21016 [00005218H] = 20681 + 335 crc=E8EF3449
+  canvas=F2511D80H (WMGraphics.BufferCanvas)
+  c=F2489F50H (WMNavigate.TaskList)
+  vc=F2489F50H (WMNavigate.TaskList)
+  cr=Rec@000002C0H
+  r=Rec@000002C0H
+WMComponents.VisualComponent.Draw:275 pc=21979 [000055DBH] = 21704 + 275 crc=E8EF3449
+  canvas=F2511D80H (WMGraphics.BufferCanvas)
+  command=00000000H (NIL)
+  event=Rec@00000018H
+  @hiddenIRVar0=EF25ABA0H (WMOberonFonts.Font)
+WMComponents.VisualComponent.DrawSubComponents:335 pc=21016 [00005218H] = 20681 + 335 crc=E8EF3449
+  canvas=F2511D80H (WMGraphics.BufferCanvas)
+  c=F2486970H (WMStandardComponents.Panel)
+  vc=F2486970H (WMStandardComponents.Panel)
+  cr=Rec@000002C0H
+  r=Rec@000002C0H
+WMComponents.VisualComponent.Draw:275 pc=21979 [000055DBH] = 21704 + 275 crc=E8EF3449
+  canvas=F2511D80H (WMGraphics.BufferCanvas)
+  command=00000000H (NIL)
+  event=Rec@00000018H
+  @hiddenIRVar0=EF25ABA0H (WMOberonFonts.Font)
+WMComponents.FormWindow.Update:314 pc=37575 [000092C7H] = 37261 + 314 crc=E8EF3449
+  rect=Rec@000002C0H
+WMComponents.Form.InvalidateRect:56 pc=39022 [0000986EH] = 38966 + 56 crc=E8EF3449
+  rect=Rec@000002C0H
+WMComponents.VisualComponent.HandleInternal:4649 pc=34359 [00008637H] = 29710 + 4649 crc=E8EF3449
+  msg=Rec@000001CCH
+  po=00000000H (NIL)
+  nm=Rec@000001CCH
+  handled=FALSE
+  b=Rec@000002C0H
+  r=00000000H (NIL)
+  v=00000000H (NIL)
+  p=00000000H (NIL)
+  keyFlags={}
+WMComponents.Component.Handle:189 pc=8608 [000021A0H] = 8419 + 189 crc=E8EF3449
+  msg=Rec@000001CCH
+  s=00000000H (NIL)
+WMMessages.MsgSequencer.Handle:230 pc=8371 [000020B3H] = 8141 + 230 crc=2C59AA80
+  msg=Rec@00000004H
+WMMessages.MsgSequencer.@Body:294 pc=10673 [000029B1H] = 10379 + 294 crc=2C59AA80
+Objects.BodyStarter:319 pc=3318 [00000CF6H] = 2999 + 319 crc=8B6328EE
+  p=F25174F0H (Objects.Process)
+  res=0
+  prevBP=-289410152
+
+
+----------------------------------------------------
+
+LinuxAos (rev.4947)
+
+Trap   5.7  (Index out of range)
+SP = EEFCE03CH, FP = EEFCE080H, PC = F1255ED2H
+
+MPEGUtilities.BlockActions.MoveBlockOverwrite:45 pc=22858 [0000594AH] = 22813 + 45 crc=E1C48151
+  src=F3E1F398H (NIL)
+  dest=F3E59D58H (NIL)
+  destOffs=240000 (0003A980H)
+  mvX=0
+  mvY=0
+  srcIncr=200 (000000C8H)
+  destIncr=200 (000000C8H)
+  lines=8 (00000008H)
+  buffer=""
+  bufadr=0
+  index=0
+  i=0
+  j=0
+  s=0
+  d=0
+  tmp1=0
+  tmp2=0
+  @hiddenIRVar0=0
+  @hiddenIRVar1=0
+State MPEGUtilities:
+  IdctBorder=F14E36B8H (NIL)
+  ii=512 (00000200H)
+XNXLMPEG.MPEGVideoDecoder.InsertPrediction:472 pc=17409 [00004401H] = 16937 + 472 crc=695FEF64
+  forward=TRUE
+  backward=FALSE
+  address=625 (00000271H)
+  mvfx=0
+  mvfy=0
+  mvbx=0
+  mvby=0
+  yOffs=160000 (00027100H)
+  cbOffs=200000 (00030D40H)
+  crOffs=240000 (0003A980H)
+XNXLMPEG.MPEGVideoDecoder.DecodeMacroBlock:427 pc=10155 [000027ABH] = 9728 + 427 crc=695FEF64
+  type=2 (00000002H)
+  quantScale=4 (00000004H)
+  tmp=8 (00000008H)
+  cbp=0
+  cbpBits=0
+  mbIntra=FALSE
+  mbPattern=FALSE
+  mbMotionBack=FALSE
+  mbMotionForw=FALSE
+  mbQuant=FALSE
+  i=625 (00000271H)
+  offsetX=0
+  offsetY=0
+  offsetXDiv2=0
+  offsetYDiv2=0
+  first=FALSE
+  fpmf=0
+  fpmb=0
+  yoffs=0
+  yincr=0
+  @hiddenIRVar0=631 (00000277H)
+XNXLMPEG.MPEGVideoDecoder.DecodeSlice:851 pc=9671 [000025C7H] = 8820 + 851 crc=695FEF64
+  type=2 (00000002H)
+  quantScale=4 (00000004H)
+  marker=00X
+XNXLMPEG.MPEGVideoDecoder.Next:1934 pc=8521 [00002149H] = 6587 + 1934 crc=695FEF64
+  marker=01X
+  picType=2 (00000002H)
+  tempRef=4 (00000004H)
+  res=TRUE
+  nextCode=281 (00000119H)
+  result=0
+  tmpFrame=00000000H (NIL)
+XNXLMPEG.Test:814 pc=32810 [0000802AH] = 31996 + 814 crc=695FEF64
+  context=F0BFBFF0H (Commands.Context)
+  demux=F0BF4FA0H (XNXLMPEG.MPEGDemultiplexer)
+  decoder=F0BF3BE0H (XNXLMPEG.MPEGVideoDecoder)
+Commands.Runner.@Body:584 pc=2040 [000007F8H] = 1456 + 584 crc=68BAE6F9
+Objects.BodyStarter:319 pc=3318 [00000CF6H] = 2999 + 319 crc=8B6328EE
+  p=F0BFA270H (Objects.Process)
+  res=0
+  prevBP=-285416552
+
+
+----------------------------------------------------
+
+LinuxAos (rev.4947)
+
+Trap   5.3005  (programmed HALT)
+SP = EEBFF000H, FP = EEBFF008H, PC = F740E837H
+
+Locks.Lock.Acquire:50 pc=143 [0000008FH] = 93 + 50 crc=E1B812D1
+  me=F25174F0H (Objects.Process)
+State Locks:
+  locks=F7411A30H (Kernel.FinalizedCollection)
+WMNavigate.Base.PointerMove:58 pc=5322 [000014CAH] = 5264 + 58 crc=749DB5B0
+  x=419 (000001A3H)
+  y=60 (0000003CH)
+  keys={}
+WMComponents.VisualComponent.HandleInternal:1282 pc=30992 [00007910H] = 29710 + 1282 crc=E8EF3449
+  msg=Rec@000001CCH
+  po=F2489F50H (WMNavigate.TaskList)
+  nm=Rec@000001CCH
+  handled=FALSE
+  b=Rec@000002C0H
+  r=00000000H (NIL)
+  v=00000000H (NIL)
+  p=00000000H (NIL)
+  keyFlags={0}
+WMComponents.Component.Handle:189 pc=8608 [000021A0H] = 8419 + 189 crc=E8EF3449
+  msg=Rec@000001CCH
+  s=00000000H (NIL)
+WMComponents.VisualComponent.HandleInternal:2193 pc=31903 [00007C9FH] = 29710 + 2193 crc=E8EF3449
+  msg=Rec@000001CCH
+  po=F2489F50H (WMNavigate.TaskList)
+  nm=Rec@000001CCH
+  handled=FALSE
+  b=Rec@000002C0H
+  r=00000000H (NIL)
+  v=00000000H (NIL)
+  p=00000000H (NIL)
+  keyFlags={}
+WMComponents.Component.Handle:189 pc=8608 [000021A0H] = 8419 + 189 crc=E8EF3449
+  msg=Rec@000001CCH
+  s=00000000H (NIL)
+WMComponents.VisualComponent.HandleInternal:2193 pc=31903 [00007C9FH] = 29710 + 2193 crc=E8EF3449
+  msg=Rec@000001CCH
+  po=F2486970H (WMStandardComponents.Panel)
+  nm=Rec@000001CCH
+  handled=FALSE
+  b=Rec@000002C0H
+  r=00000000H (NIL)
+  v=00000000H (NIL)
+  p=00000000H (NIL)
+  keyFlags={}
+WMComponents.Component.Handle:189 pc=8608 [000021A0H] = 8419 + 189 crc=E8EF3449
+  msg=Rec@000001CCH
+  s=00000000H (NIL)
+WMMessages.MsgSequencer.Handle:230 pc=8371 [000020B3H] = 8141 + 230 crc=2C59AA80
+  msg=Rec@00000004H
+WMMessages.MsgSequencer.@Body:294 pc=10673 [000029B1H] = 10379 + 294 crc=2C59AA80
+Objects.BodyStarter:319 pc=3318 [00000CF6H] = 2999 + 319 crc=8B6328EE
+  p=F25174F0H (Objects.Process)
+  res=1 (00000001H)
+  prevBP=-289410152
+
+
+----------------------------------------------------
+
