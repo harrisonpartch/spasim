@@ -1,0 +1,16 @@
+you can do nothing with this code until you install aos. for linux, download the latest version and the install script from
+
+http://www.informatik.uni-bremen.de/~fld/UnixAos/
+
+chmod +x install.UnixAos
+
+./install.UnixAos
+
+You need not be root unless you accept the installer's suggestion to install in a location that only root may write to.
+
+Install the binary to a location on your path.
+
+In the spasim directory: aos 
+
+
+
