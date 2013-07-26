@@ -1,29 +1,40 @@
 <Desktop>
-	<Window name="FileManager" loader="WMFileManager.Restore" l="78" t="176" r="578" b="576" flags="{0..2}"/>
-	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="27" t="123" r="667" b="534" flags="{0..2}"/>
 	<Window name="FileManager" loader="WMFileManager.Restore" l="73" t="321" r="573" b="721" flags="{0..2}"/>
-	<Window name="Notepad" loader="Notepad.Restore" l="648" t="235" r="1498" b="935" flags="{0..2}">
-		<NotepadData file="x.text" codecFormat="AUTO" firstLine="0" cursorPos="487" wordWrap="true"/>
+	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="397" t="47" r="1037" b="458" flags="{0..2}"/>
+	<Window name="Notepad" loader="Notepad.Restore" l="505" t="116" r="1355" b="816" flags="{0..2}">
+		<NotepadData file="x.text" codecFormat="AUTO" firstLine="3" cursorPos="0" wordWrap="true"/>
 	</Window>
-	<Window name="PET" loader="PET.Restore" l="411" t="51" r="1245" b="857" flags="{0..2}">
+	<Window name="PET" loader="PET.Restore" l="512" t="103" r="1333" b="812" flags="{0..2}">
+		<PETData>
+			<General SelectedPageNr="0" ProjectTextFile=""/>
+			<Tab file="GLTextureCopyDemoGLSL.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="89" cursorPos="2453"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="true" wrap="true" casesensitive="true" backwards="false" highlight="false" searchString="context" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="252" scratchHeight="5"/>
+			</Tab>
+		</PETData>
+	</Window>
+	<Window name="PET" loader="PET.Restore" l="463" t="51" r="1361" b="727" flags="{0..2}">
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>
 			<Tab file="XNXL.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="16"/>
+				<Editor firstLine="0" cursorPos="451"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
+				<SidePanel visible="true" width="142" scratchHeight="5"/>
 			</Tab>
 			<Tab file="XNXL.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="0"/>
+				<Editor firstLine="0" cursorPos="37"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
 			<Tab file="Retina.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="118" cursorPos="3188"/>
+				<Editor firstLine="212" cursorPos="4582"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="true" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="x+i,j+y" replaceString="i,j"/>
 				<LogPanel height="130"/>
@@ -51,7 +62,7 @@
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
 			<Tab file="Render.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="1107" cursorPos="32487"/>
+				<Editor firstLine="1108" cursorPos="33338"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="true" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="XNXLRetina" replaceString="Retina"/>
 				<LogPanel height="130"/>

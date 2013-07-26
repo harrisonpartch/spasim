@@ -2,7 +2,7 @@ MODULE Render;
 IMPORT SYSTEM, Kernel, Modules,Objects, Random, Marsh, 
  Out := KernelLog, Math,XNXLMath, Base,  Retina,Heaps,
 	 X11,  Api := X11Api, GL:=OpenGL, GLC := OpenGLConst,  GLSL:= GLShaderUtils,
-	 Inputs, KS := X11KeySymDef, V := XF86VMode, Raster,WMGraphics;
+	 Inputs, KS := X11KeySymDef, V := XF86VMode, Raster, Graphics:=WMGraphics, Commands,Strings,Streams;
 
 CONST PX=3; (* image size multiplier -- must be 3 for correct foveation! *)
 	ML = 0;  MM = 1;  MR = 2;
@@ -11,17 +11,15 @@ CONST PX=3; (* image size multiplier -- must be 3 for correct foveation! *)
 	Mod2KeyBit = 4;  Mod3KeyBit = 5;  Mod4KeyBit = 6;  Mod5KeyBit = 7;	  
 	rad2deg=360/6.28318;
 
-TYPE Aperture = Base.Aperture;
-TYPE Ray = Base.Ray;
-TYPE Voxel = Base.Voxel; 
-TYPE PT = Base.PT;
-TYPE Hints = RECORD
-	flags: SET;
-	functions: LONGINT;
-	decorations: LONGINT;
-	inputMode: LONGINT;
-	status: LONGINT
-END;
+TYPE 
+	Aperture = Base.Aperture;
+	Ray = Base.Ray;
+	Voxel = Base.Voxel; 
+	PT = Base.PT;
+	Float = GL.Float;
+	Uint = GL.Uint;
+    	Int = GL.Int;
+    	Ushort = GL.Ushort;
 TYPE SNAP = RECORD
 	lookphi, looktheta : REAL;
 	aperture: Aperture;
@@ -462,7 +460,6 @@ VAR
 	rand: Random.Generator;
 	wcount: INTEGER;
 	frame, tickframe: LONGINT;
-	frames: ARRAY 10000 OF SNAP;
 	movierecording, movieplaying: BOOLEAN; 
 	frtrace, foveate: BOOLEAN;
 	foveasize, fovealeft, fovearight, foveadown, foveaup: LONGINT;
@@ -514,10 +511,18 @@ VAR
 	MB:INTEGER;
 	GLIDE:REAL;
 	FR: LONGINT;
+	positionLocation, texcoordsLocation: Uint;
 	passthroughProgram, blurprogram,basetexture: GL.Uint;
-	progname: ARRAY 32 OF CHAR;
 	copy : Raster.Mode;
-	
+	visinfoptr : Api.VisualInfoPtr; (* pointer to X11 VisualInfo *)
+	glctx : GL.GLXContext;  (* GL context *)
+	gwa : Api.XWindowAttributes; (* get window attributes *)
+	swa : Api.XSetWindowAttributes; (* set window attributes*)
+	cmap : X11.Colormap; (* colormap for window *)
+	context: Commands.Context; (* StdIO context *)
+	curprogram: Uint; (* current active program *)
+	progname: ARRAY 32 OF CHAR;
+	image: Uint; (* image texture name *)			
 PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
 VAR d: REAL;
 BEGIN
@@ -653,87 +658,96 @@ BEGIN
 	GLClose;
 END Close;
 	
-PROCEDURE  InitWindow(w, h: LONGINT; CONST title: ARRAY OF CHAR);
-VAR 
+PROCEDURE  CreateWindow(w, h: LONGINT; CONST title: ARRAY OF CHAR);
+VAR
 	res: LONGINT;
 	masks: LONGINT;
 	buf: X11.Buffer;
-	attrib : ARRAY [*] OF GL.Int;  (* attributes of GL window *) 
-	visinfoptr : Api.VisualInfoPtr;
-	gwa : Api.XWindowAttributes; (* get window attributes *) 	
-	swa : Api.XSetWindowAttributes; (* set window attributes*)
-	cmap : X11.Colormap; (* colormap for window *)	
-		
+	attrib : ARRAY [*] OF GL.Int;  (* attributes of GL window *)
+
 BEGIN
-display := X11.OpenDisplay(0);
+ display := X11.OpenDisplay(0);
  IF display =0 THEN
- 	Out.String(" cannot connect to X server"); Out.Ln; 
+ 	context.out.String(" cannot connect to X server"); context.out.Ln; context.out.Update;
 	Close;
      RETURN;
-END;  
+END;
 
-  NEW(attrib, 13);
+(*  NEW(attrib, 7);
   attrib[0] := GLC.GLX_RGBA;
+  attrib[1] := GLC.GLX_DEPTH_SIZE; attrib[2] := 24;
+  attrib[3] := GLC.GLX_STENCIL_SIZE; attrib[4] := 8;
+  attrib[5] := GLC.GLX_DOUBLEBUFFER; attrib[6] := 0 ;
+*)
+(*
+ attrib := [GLC.GLX_RGBA, GLC.GLX_DOUBLEBUFFER, GLC.GLX_DEPTH_SIZE,  24, 0];
+ *)
+ NEW(attrib, 13);
+ attrib[0] := GLC.GLX_RGBA;
   attrib[1] := GLC.GLX_DOUBLEBUFFER;
-  attrib[2] := GLC.GLX_DEPTH_SIZE;	attrib[3] := 24; 
-  attrib[4] := GLC.GLX_STENCIL_SIZE;	attrib[5] := 8; 
+  attrib[2] := GLC.GLX_DEPTH_SIZE;	attrib[3] := 24;
+  attrib[4] := GLC.GLX_STENCIL_SIZE;	attrib[5] := 8;
   attrib[6] := GLC.GLX_RED_SIZE;  	attrib[7] := 8;
   attrib[8] := GLC.GLX_GREEN_SIZE;	attrib[9] := 8;
   attrib[10] := GLC.GLX_RED_SIZE;	attrib[11] := 8;
   attrib[12] := 0 ;
 
- (*try to find a visual with this attribs *)	
-  visinfoptr := GL.glXChooseVisual(display, 0 , ADDRESSOF(attrib[0]));
+ (* try to find a visual with this attribs *)
+ visinfoptr := GL.glXChooseVisual(display, 0 , ADDRESSOF(attrib[0]));
 
  IF visinfoptr = NIL THEN
-  	IF debug THEN Out.String(" NO appropriate visual found"); Out.Ln; END;
+  	IF debug THEN context.out.String(" NO appropriate visual found"); context.out.Ln; context.out.Update; END;
   	Close;
      RETURN;
- ELSE 
-	 IF debug THEN 
-		 Out.String("visinfoptr.depth= "); Out.Int(visinfoptr.depth,0); Out.Ln;
-	 	Out.String("visinfoptr.visual ");  Out.Int(visinfoptr.visualID, 0); Out.Ln; 
+ ELSE
+	 IF debug THEN
+		 context.out.String("visinfoptr.depth= "); context.out.Int(visinfoptr.depth,0); context.out.Ln;
+	 	context.out.String("visinfoptr.visual ");  context.out.Int(visinfoptr.visualID, 0); context.out.Ln;
+	 	context.out.Update;
 	END;
 END;
-
  cmap := X11.CreateColormap(display, X11.DefaultRootWindow(display), visinfoptr.visual, X11.AllocNone);
  IF cmap = 0 THEN
- 	IF debug THEN 
-	 	Out.String(" cannot create colormap"); Out.Ln; 
+ 	IF debug THEN
+	 	context.out.String(" cannot create colormap"); context.out.Ln;
 	 	X11.GetErrorText(display, cmap, buf, LEN(buf));
-	 	Out.String("ERROR: CreateColormap = "); Out.String(buf); Out.Ln;
+	 	context.out.String("ERROR: CreateColormap = "); context.out.String(buf); context.out.Ln;
+	 	context.out.Update;
  	END;
  END;
 
- (* window event masks *)	
-masks :=  Api.KeyPressMask + Api.KeyReleaseMask + Api.ButtonPressMask+ Api.ButtonReleaseMask + Api.PointerMotionMask + Api.ButtonMotionMask+ Api.ExposureMask + Api.StructureNotifyMask + Api.FocusChangeMask;
+ (* window event masks *)
+ masks :=  Api.KeyPressMask + Api.KeyReleaseMask + Api.ButtonPressMask + Api.ButtonReleaseMask + Api.PointerMotionMask +
+ Api.ButtonMotionMask + Api.ExposureMask + Api.StructureNotifyMask + Api.FocusChangeMask;
 
   (* window attributes *)
  swa.backgroundPixel := 0;
  swa.borderPixel := 0;
  swa.colormap := cmap;
  swa.eventMask := masks;
- 
- masks :=  Api.CWBackPixel + Api.CWBorderPixel + Api.CWColormap + Api.CWEventMask;
+
+ masks := Api.CWBackPixel + Api.CWBorderPixel + Api.CWColormap + Api.CWEventMask;
 
  win := Api.CreateWindow(display, X11.DefaultRootWindow(display), 0, 0, w, h,
 		        0, visinfoptr.depth, Api.InputOutput,  visinfoptr.visual, masks, swa);
 
- (* show window *)	
+ (* show window *)
   Api.MapWindow(display, win);
 
- (* set title of window *)	 
- res := Api.StoreName(display, win, title); 
+ (* set title of window *)
+ res := Api.StoreName(display, win, title);
 
 (* create GL context *)
- (* GL_TRUE: Use direct rendering, GL_FLSSE: use X server for rendering *)
- GLCtx := GL.glXCreateContext(display, visinfoptr, 0, GLC.GL_FALSE); 
-	IF debug THEN Out.String("glXCreateContext GLCtx= "); Out.Int(GLCtx, 0); Out.Ln; END;
- res := GL.glXMakeCurrent(display, win, GLCtx);
-	IF debug THEN  Out.String("glXMakeCurrent res= "); Out.Int(res, 0); Out.Ln; END;
-	SuppressX11Cursors(display,win);
+ (* GL_TRUE: Use direct rendering, GL_FLASE: use X server for rendering *)
+ glctx := GL.glXCreateContext(display, visinfoptr, 0, GLC.GL_TRUE);
+	 IF debug THEN context.out.String("glXCreateContext glctx= "); context.out.Int(glctx, 0); context.out.Ln; END;
 
-END InitWindow;
+ res := GL.glXMakeCurrent(display, win, glctx);
+	IF debug THEN  context.out.String("glXMakeCurrent res= "); context.out.Int(res, 0); context.out.Ln; END;
+
+SuppressX11Cursors(display,win);
+
+END CreateWindow;
 
  PROCEDURE SuppressX11Cursors( disp: X11.DisplayPtr; win: X11.Window);
 VAR
@@ -749,21 +763,6 @@ VAR
 	noCursor := X11.CreatePixmapCursor( disp, pixmap, pixmap, ADDRESSOF( fg ), ADDRESSOF( fg ), 0, 0 );
 	X11.DefineCursor( disp, win, noCursor ); 
 END SuppressX11Cursors;
-
-PROCEDURE ToggleDecorations;
-VAR 	hints: Hints; 
-	property: X11.Atom;
-BEGIN
-	IF  ~fullwindow OR  ~fullscreen THEN
-		hints.flags := {1};
- 		windecorations := ~windecorations;
- 		IF windecorations THEN hints.decorations := 0; ELSE hints.decorations := 1; END;
- 		X11.Lock;
-		property := Api.InternAtom(display, "_MOTIF_WM_HINTS", Api.True); 
-		X11.ChangeProperty(display, win, property, property, 32, Api.PropModeReplace, ADDRESSOF(hints), 5);
-		X11.Unlock;
-	END;	
-END ToggleDecorations;
 
 PROCEDURE Wr(CONST str: ARRAY OF CHAR);
 BEGIN
@@ -924,7 +923,6 @@ BEGIN
 		| KS.XK_Up: Wr("K_Up"); 
 		| KS.XK_Down: Wr("K_Down"); 
 		| KS.XK_F11: ToggleFullWindow;
-		| KS.XK_F12: ToggleDecorations;
 		| KS.XK_n1: leftsticky:=leftsticky*1.3; upsticky:=upsticky*1.3;
 		| KS.XK_m1: leftsticky:=leftsticky/1.3; upsticky:=upsticky/1.3;
 		| KS.XK_o1:
@@ -966,47 +964,50 @@ BEGIN
 	camera.left(left/(30000*leftsticky));
 
 END MouseVent;
+ 
+ PROCEDURE InitVAO();
+	VAR
+		vertices, texcoords: ARRAY [8] OF Float;
+		indices: ARRAY [6] OF Ushort;
+		vao:  Uint;
+		vertexBufferObjID: ARRAY [3] OF Uint;
+		
+	BEGIN
+		(* A2 Image origin is top-left, opengl's image left-bottom; so, flip it *)
+		vertices := [-1.0, -1.0, 	1.0, -1.0, 1.0, 1.0, -1.0, 1.0  ];
+		texcoords := [1.0, 1.0,  0.0, 1.0,  0.0, 0.0,	1.0, 0.0 ]; 
+		(*texcoords := [0.0, 1.0,  1.0, 1.0,  1.0, 0.0,	0.0, 0.0 ];*)
+		
+		indices := [ 0, 1, 3, 3, 1, 2 ]; 
+		
+		GL.GenVertexArrays(1, ADDRESSOF(vao));
+		GL.BindVertexArray(vao);
 
-PROCEDURE InitVAO();
-VAR
-	vertices, texcoords: ARRAY [8] OF GL.Float;
-	indices: ARRAY [6] OF GL.Ushort;
-	vao:  GL.Uint;
-	vertexBufferObjID: ARRAY [3] OF GL.Uint;
-	
-BEGIN
-	vertices := [
- 			-1.0, -1.0,
- 			1.0, -1.0,
- 			1.0, 1.0,
-			-1.0, 1.0
-				];
-	texcoords := [
-			1.0, 1.0,
-			 0.0, 1.0,
-			 0.0, 0.0,
-			1.0, 0.0
-				];
-	indices := [ 0, 1, 3, 3, 1, 2 ];
-	GL.GenVertexArrays(1, ADDRESSOF(vao));
-	GL.BindVertexArray(vao);
-	GL.GenBuffers(3, ADDRESSOF(vertexBufferObjID[0]));
-	GL.BindBuffer(GLC.GL_ARRAY_BUFFER, vertexBufferObjID[0]);
-	GL.BufferData(GLC.GL_ARRAY_BUFFER, LEN(vertices,0)*SIZEOF(GL.Float), ADDRESSOF(vertices[0]), GLC.GL_STATIC_DRAW);
+		GL.GenBuffers(3, ADDRESSOF(vertexBufferObjID[0]));
 
-	GL.BindBuffer(GLC.GL_ARRAY_BUFFER, vertexBufferObjID[1]);
-	GL.BufferData(GLC.GL_ARRAY_BUFFER, LEN(texcoords,0)*SIZEOF(GL.Float), ADDRESSOF(texcoords[0]), GLC.GL_STATIC_DRAW);
+		GL.BindBuffer(GLC.GL_ARRAY_BUFFER, vertexBufferObjID[0]);
+		GL.BufferData(GLC.GL_ARRAY_BUFFER, LEN(vertices,0)*SIZEOF(Float), ADDRESSOF(vertices[0]), GLC.GL_STATIC_DRAW);
+		GL.VertexAttribPointer(positionLocation, 2, GLC.GL_FLOAT, GLC.GL_FALSE, 0, 0);
+		GL.EnableVertexAttribArray(positionLocation);
 
-	GL.BindBuffer(GLC.GL_ELEMENT_ARRAY_BUFFER, vertexBufferObjID[2]);
-	GL.BufferData(GLC.GL_ELEMENT_ARRAY_BUFFER, LEN(indices,0)*SIZEOF(GL.Ushort), ADDRESSOF(indices[0]), GLC.GL_STATIC_DRAW);
-END InitVAO;
+		GL.BindBuffer(GLC.GL_ARRAY_BUFFER, vertexBufferObjID[1]);
+		GL.BufferData(GLC.GL_ARRAY_BUFFER, LEN(texcoords,0)*SIZEOF(Float), ADDRESSOF(texcoords[0]), GLC.GL_STATIC_DRAW);
+		GL.VertexAttribPointer(texcoordsLocation, 2, GLC.GL_FLOAT, GLC.GL_FALSE, 0, 0);
+		GL.EnableVertexAttribArray(texcoordsLocation);
+
+		GL.BindBuffer(GLC.GL_ELEMENT_ARRAY_BUFFER, vertexBufferObjID[2]);
+		GL.BufferData(GLC.GL_ELEMENT_ARRAY_BUFFER, LEN(indices,0)*SIZEOF(Ushort), ADDRESSOF(indices[0]), GLC.GL_STATIC_DRAW);
+
+
+	END InitVAO;
+
 
 PROCEDURE InitTextures();
 VAR 
 	image: GL.Uint;
 	teximg: Raster.Image;
 BEGIN
-	teximg := WMGraphics.LoadImage("Lenna.png", FALSE);
+	teximg := Graphics.LoadImage("Lenna.png", FALSE);
 	IF teximg # NIL THEN	
 		GL.GenTextures( 1, ADDRESSOF(image) );
 		GL.BindTexture(GLC.GL_TEXTURE_2D, image);
@@ -1030,14 +1031,31 @@ BEGIN
 END CreateBaseTexture;
 
 PROCEDURE  InitGL;
+VAR vs, fs: Strings.String;
 	BEGIN		
 	GL.ReadExtensions();
  	GL.ReadCoreVersion;
  	GL.ActiveTexture(GLC.GL_TEXTURE0); 
-	GL.ShadeModel( GLC.GL_SMOOTH );
-  	GL.ClearColor(0,0,1,0);
-	GL.ColorMaterial(GLC.GL_FRONT_AND_BACK, GLC.GL_AMBIENT_AND_DIFFUSE);
- 	GL.Color4f( 1.0, 1.0, 1.0, 0.5);
+	positionLocation := 0;
+	texcoordsLocation := 1;
+	InitVAO();	
+	NEW(Retina.image);
+	Raster.Create(Retina.image, 300, 300, Raster.BGRA8888);
+	(* create texture object for image *)
+	GL.GenTextures(1, ADDRESSOF(image));
+	GL.BindTexture(GLC.GL_TEXTURE_2D, image); 
+	(* These determine how interpolation is made when image scaled down on up *)
+	GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR);
+	GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_LINEAR);
+	GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height, 0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, ADDRESSOF(Retina.image.mem[0]));
+	(*	passthroughProgram := InitShader("MyDemos/blur2/passthroughVS.glsl", "MyDemos/blur2/passthroughFS.glsl");*)
+	vs := VertexSource();
+	fs := FragmentSource();
+	passthroughProgram := InitTheseShaders(vs, fs);
+	progname:="passthroughProgram";
+	curprogram := passthroughProgram;				
+	GL.UseProgram(curprogram);
+	GL.ActiveTexture(GLC.GL_TEXTURE0);
 END InitGL;
 
 (* Get the location of a uniform variable *)
@@ -1052,6 +1070,43 @@ BEGIN
 		RETURN loc;
 END getUniLoc;
 
+PROCEDURE VertexSource():Strings.String;
+VAR sw: Streams.StringWriter;
+      buf: Strings.String;
+BEGIN
+	NEW(sw,256);
+
+	sw.String("attribute vec4 Position;"); sw.Ln;
+	sw.String("attribute vec2 Texcoords;"); 	sw.Ln;
+	sw.String("varying vec2 v_Texcoords;"); 	sw.Ln;
+	
+	sw.String("void main(void) {"); 		sw.Ln;
+	sw.String("  v_Texcoords = Texcoords;"); 	sw.Ln;
+	sw.String("  gl_Position = Position;"); 		sw.Ln;
+	sw.String("}"); sw.Ln;
+	
+	NEW(buf, sw.Pos());
+	sw.Get(buf^);
+	RETURN buf;
+END VertexSource;
+
+PROCEDURE FragmentSource():Strings.String;
+VAR sw: Streams.StringWriter;
+      buf: Strings.String;
+BEGIN
+	NEW(sw,256);
+
+	sw.String("varying vec2 v_Texcoords;"); sw.Ln;
+	sw.String("uniform sampler2D u_image;"); 	sw.Ln;
+
+	sw.String("void main(void) { "); 	sw.Ln;
+	sw.String("  gl_FragColor = texture2D(u_image, v_Texcoords);"); sw.Ln;	
+	sw.String("} "); 	sw.Ln;
+	NEW(buf, sw.Pos());
+	sw.Get(buf^);
+	RETURN buf;
+END FragmentSource;
+
 PROCEDURE InitShader(CONST vertexShaderPath, fragmentShaderPath: ARRAY OF CHAR): GL.Uint;
 VAR program: GL.Uint;
 	location: GL.Int;
@@ -1065,6 +1120,24 @@ BEGIN
 	IF location # -1 THEN GL.Uniform2f(location, w, h);  END;
 	RETURN program;
 END InitShader;
+
+PROCEDURE InitTheseShaders(vertexShader, fragmentShader: Strings.String): Uint;
+	VAR program: Uint;
+		location: Int;
+		w, h: REAL;
+	BEGIN
+		IF  ~GLSL.LoadTheseShaders(vertexShader, fragmentShader, program) THEN RETURN 0 END;
+		GL.UseProgram(program);
+
+		location := GL.GetUniformLocation(program, "u_image");
+		IF location # -1 THEN GL.Uniform1i(location, 0); END;
+
+		location := GL.GetUniformLocation(program, "u_step") ;
+		w :=1.0/width; h := 1.0/height;
+		IF location # -1 THEN GL.Uniform2f(location, w, h);  END;
+
+		RETURN program;
+END InitTheseShaders;
 
 PROCEDURE draw;
 VAR
@@ -1106,8 +1179,9 @@ BEGIN
 	 GL.glXSwapBuffers(display, win);
 END draw;
 
-PROCEDURE Display();
+(* PROCEDURE Display();
 BEGIN
+	Out.Char('*');
 	GL.BindTexture(GLC.GL_TEXTURE_2D, basetexture);
 	GL.TexParameteri(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR);
 	GL.TexParameteri(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_LINEAR);
@@ -1123,6 +1197,28 @@ BEGIN
             GL.End;
             
 
+     GL.glXSwapBuffers(display, win);
+END Display;
+*)
+
+PROCEDURE Display();
+BEGIN
+
+			GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT) ;
+			
+			GL.ActiveTexture(GLC.GL_TEXTURE0);
+			GL.BindTexture(GLC.GL_TEXTURE_2D, image);
+
+			GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR);  (*  only first two can be used *)
+			GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_LINEAR);  (* all of the above can be used*)
+			
+			 GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height, 
+			 0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, ADDRESSOF(Retina.image.mem[0]));
+			 GL.UseProgram(curprogram);
+			 
+			 (* VAO, shader program, and texture already bound *)
+			GL.DrawElements(GLC.GL_TRIANGLES, 6, GLC.GL_UNSIGNED_SHORT, 0);
+			
      GL.glXSwapBuffers(display, win);
 END Display;
 
@@ -1164,7 +1260,7 @@ END mainloop;
 
 PROCEDURE openwincam(w,h: INTEGER);
 BEGIN
-	InitWindow(w,h,'SPASIM' );
+	CreateWindow(w,h,"SPASIM" );
 	NEW(camera,Base.W, Base.H); 
 	camera.aperjust(w,h);
 END openwincam;
@@ -1201,6 +1297,7 @@ BEGIN
 	upsticky:=10.0;	
 	Out.String('*line 1217!*');
 	mainloop; 
+	GL.DeleteProgram(passthroughProgram);	
 	FR:=1000;		
 END Open;
 
