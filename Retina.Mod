@@ -40,28 +40,7 @@ VAR
 	xyz,lxyz,oxyz: PT;
 	pixel: Raster.Pixel;
 BEGIN
-(*	dtheta := aperture.width/Base.W;
-	dphi := aperture.height/Base.H;
-	theta := -aperture.width/2-x*dtheta;
-	FOR i := 0 TO TS-1 DO
-		phi:= -aperture.height/2+y*dphi;
-		FOR reversej:=0 TO TS-1 DO	
-			j:=reversej;
-			angletoray(rays[x+i, y+j],theta,phi);
-			XNXLMath.orrot(rays[x+i, y+j].dxyz, UP, cameraphi);  	
-		   	XNXLMath.orrot(rays[x+i, y+j].dxyz, rward, cameratheta);  			  	  								  	  		
-			IF rays[x+i, y+j].dxyz.x < 0 THEN rays[x+i, y+j].di := FALSE  ELSE rays[x+i, y+j].di := TRUE END; 
-			IF rays[x+i, y+j].dxyz.y < 0 THEN rays[x+i, y+j].dj := FALSE  ELSE rays[x+i, y+j].dj := TRUE END;
-			IF rays[x+i, y+j].dxyz.z < 0 THEN rays[x+i, y+j].dk := FALSE  ELSE rays[x+i, y+j].dk := TRUE END;		
-			rays[x+i, y+j].lxyz := Base.cameraPT;
-			rays[x+i, y+j].xyz := Base.cameraPT;
-			rays[x+i, y+j].oxyz:=rays[x+i, y+j].xyz;
-			rays[x+i, y+j].dtl:= Base.DTL; 
-			phi := phi + dphi;
-		END;	
-		theta := theta +dtheta;
-	END;	
-*)	FOR ii := 0 TO TS-1 DO
+	FOR ii := 0 TO TS-1 DO
 		FOR jj :=  0 TO TS-1 DO	
 			i:=x+ii;
 			j:=y+jj;

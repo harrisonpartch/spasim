@@ -965,82 +965,35 @@ BEGIN
 
 END MouseVent;
  
- PROCEDURE InitVAO();
-	VAR
-		vertices, texcoords: ARRAY [8] OF Float;
-		indices: ARRAY [6] OF Ushort;
-		vao:  Uint;
-		vertexBufferObjID: ARRAY [3] OF Uint;
-		
-	BEGIN
-		(* A2 Image origin is top-left, opengl's image left-bottom; so, flip it *)
-		vertices := [-1.0, -1.0, 	1.0, -1.0, 1.0, 1.0, -1.0, 1.0  ];
-		texcoords := [1.0, 1.0,  0.0, 1.0,  0.0, 0.0,	1.0, 0.0 ]; 
-		(*texcoords := [0.0, 1.0,  1.0, 1.0,  1.0, 0.0,	0.0, 0.0 ];*)
-		
-		indices := [ 0, 1, 3, 3, 1, 2 ]; 
-		
-		GL.GenVertexArrays(1, ADDRESSOF(vao));
-		GL.BindVertexArray(vao);
 
-		GL.GenBuffers(3, ADDRESSOF(vertexBufferObjID[0]));
-
-		GL.BindBuffer(GLC.GL_ARRAY_BUFFER, vertexBufferObjID[0]);
-		GL.BufferData(GLC.GL_ARRAY_BUFFER, LEN(vertices,0)*SIZEOF(Float), ADDRESSOF(vertices[0]), GLC.GL_STATIC_DRAW);
-		GL.VertexAttribPointer(positionLocation, 2, GLC.GL_FLOAT, GLC.GL_FALSE, 0, 0);
-		GL.EnableVertexAttribArray(positionLocation);
-
-		GL.BindBuffer(GLC.GL_ARRAY_BUFFER, vertexBufferObjID[1]);
-		GL.BufferData(GLC.GL_ARRAY_BUFFER, LEN(texcoords,0)*SIZEOF(Float), ADDRESSOF(texcoords[0]), GLC.GL_STATIC_DRAW);
-		GL.VertexAttribPointer(texcoordsLocation, 2, GLC.GL_FLOAT, GLC.GL_FALSE, 0, 0);
-		GL.EnableVertexAttribArray(texcoordsLocation);
-
-		GL.BindBuffer(GLC.GL_ELEMENT_ARRAY_BUFFER, vertexBufferObjID[2]);
-		GL.BufferData(GLC.GL_ELEMENT_ARRAY_BUFFER, LEN(indices,0)*SIZEOF(Ushort), ADDRESSOF(indices[0]), GLC.GL_STATIC_DRAW);
-
-
-	END InitVAO;
-
-
-PROCEDURE InitTextures();
-VAR 
-	image: GL.Uint;
-	teximg: Raster.Image;
-BEGIN
-	teximg := Graphics.LoadImage("Lenna.png", FALSE);
-	IF teximg # NIL THEN	
-		GL.GenTextures( 1, ADDRESSOF(image) );
-		GL.BindTexture(GLC.GL_TEXTURE_2D, image);
-		GL.TexParameteri(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR);
-		GL.TexParameteri(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_LINEAR);
-		GL.TexImage2D( GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA8, teximg.width, teximg.height, 0,
-		GLC.GL_RGBA, GLC.GL_UNSIGNED_BYTE, teximg.adr );
-	ELSE
-	 	Out.String("teximg= NIL"); Out.Ln;
-	END
-END InitTextures;
-
-PROCEDURE CreateBaseTexture;
-BEGIN
-    GL.GenTextures( 1, ADDRESSOF(basetexture) );
-    GL.BindTexture(GLC.GL_TEXTURE_2D, basetexture);
-    GL.TexParameteri(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR);
-    GL.TexParameteri(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_LINEAR);
-    GL.TexImage2D( GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA8, Retina.image.width, Retina.image.height, 0,
-    GLC.GL_RGBA, GLC.GL_UNSIGNED_BYTE, 0 ); (* 0: no data yet *)
-END CreateBaseTexture;
-
-PROCEDURE  InitGL;
-VAR vs, fs: Strings.String;
+PROCEDURE  InitGL(): BOOLEAN;
+		VAR vs, fs: Strings.String;
+	vertexPosition, vertexUVID: Uint;
+	TextureID: Uint;	
+			vertices, texcoords: ARRAY [*] OF Float;
+			vertexbuffer, uvbuffer: Uint;			
 	BEGIN		
-	GL.ReadExtensions();
- 	GL.ReadCoreVersion;
- 	GL.ActiveTexture(GLC.GL_TEXTURE0); 
-	positionLocation := 0;
-	texcoordsLocation := 1;
-	InitVAO();	
+		GL.ReadImplementationProperties;
+ 		IF ~GL.GL_VERSION_2_0 THEN
+ 			context.out.String("Error: your graphic card does not support OpenGL 2.0"); 
+ 			context.out.Ln; context.out.Update;
+		 	RETURN FALSE;
+		 END;
+	
+
+		IF ~ (GL.GL_ARB_vertex_shader & GL.GL_ARB_fragment_shader) THEN
+			context.out.String("GL_ARB_vertex_shader and GL_ARB_fragment_shader are not supported"); 
+			context.out.Ln; context.out.Update;
+			RETURN FALSE;
+		END;
+
+		(* GL.Read_GL_ARB_Shader_Objects();*)
+		GL.ActiveTexture(GLC.GL_TEXTURE0);		
+
+
 	NEW(Retina.image);
-	Raster.Create(Retina.image, 300, 300, Raster.BGRA8888);
+	Raster.Create(Retina.image, Base.W, Base.H, Raster.BGRA8888);
+	
 	(* create texture object for image *)
 	GL.GenTextures(1, ADDRESSOF(image));
 	GL.BindTexture(GLC.GL_TEXTURE_2D, image); 
@@ -1048,27 +1001,62 @@ VAR vs, fs: Strings.String;
 	GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR);
 	GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_LINEAR);
 	GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height, 0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, ADDRESSOF(Retina.image.mem[0]));
+
 	(*	passthroughProgram := InitShader("MyDemos/blur2/passthroughVS.glsl", "MyDemos/blur2/passthroughFS.glsl");*)
 	vs := VertexSource();
 	fs := FragmentSource();
 	passthroughProgram := InitTheseShaders(vs, fs);
-	progname:="passthroughProgram";
-	curprogram := passthroughProgram;				
-	GL.UseProgram(curprogram);
-	GL.ActiveTexture(GLC.GL_TEXTURE0);
-END InitGL;
 
-(* Get the location of a uniform variable *)
-PROCEDURE getUniLoc(program: GL.Uint; CONST name: ARRAY OF CHAR): GL.Int;
-VAR loc: GL.Int;
-BEGIN
-	loc := GL.GetUniformLocation(program, name);
-	IF loc = -1 THEN
-		Out.String("No such uniform named "); Out.String(name); Out.Ln;
- 	END;
-     	GLSL.PrintOpenGLError("getUniloc: ");  (* Check for OpenGL errors *)
-		RETURN loc;
-END getUniLoc;
+		
+		(* Get a handle for our buffers *)
+		vertexPosition := GL.GetAttribLocation(passthroughProgram,  "Position");
+		vertexUVID := GL.GetAttribLocation(passthroughProgram, "Texcoords");	
+		
+		(* Get a handle for our "myTextureSampler" uniform *)
+		TextureID  := GL.GetUniformLocation(passthroughProgram, "u_image");
+		
+		(* A2 Image origin is top-left, opengl's image left-bottom; so, flip it *)
+	
+		vertices := [-1.0, -1.0,   1.0, -1.0,   1.0, 1.0,
+					 -1.0, -1.0,   1.0, 1.0, -1.0, 1.0  ];
+
+		texcoords := [0.0, 1.0,   1.0, 1.0,   1.0, 0.0,
+					 0.0, 1.0,    1.0, 0.0,   0.0, 0.0  ];
+		
+		(* create VBO handles *)
+		GL.GenBuffers(1, ADDRESSOF(vertexbuffer));
+		GL.BindBuffer(GLC.GL_ARRAY_BUFFER, vertexbuffer);
+		GL.BufferData(GLC.GL_ARRAY_BUFFER, LEN(vertices,0)*SIZEOF(Float), ADDRESSOF(vertices[0]), GLC.GL_STATIC_DRAW);
+
+		GL.GenBuffers(1, ADDRESSOF(uvbuffer));
+		GL.BindBuffer(GLC.GL_ARRAY_BUFFER, uvbuffer);
+		GL.BufferData(GLC.GL_ARRAY_BUFFER, LEN(texcoords,0)*SIZEOF(Float), ADDRESSOF(texcoords[0]), GLC.GL_STATIC_DRAW);
+
+		(* 1rst attribute buffer : vertices *)
+		GL.EnableVertexAttribArray(0);
+		GL.BindBuffer(GLC.GL_ARRAY_BUFFER, vertexbuffer);
+		GL.VertexAttribPointer(
+			vertexPosition, (* The attribute we want to configure *)
+			2, (*size *)
+			 GLC.GL_FLOAT, (* type *)
+			 GLC.GL_FALSE,  (* normalized ? *)
+			 0, (* stride *)
+			 0); (* array buffer offset *)
+
+		(* 2nd attribute buffer : UVs *)
+		GL.EnableVertexAttribArray(1);
+		GL.BindBuffer(GLC.GL_ARRAY_BUFFER, uvbuffer);
+		
+		GL.VertexAttribPointer(
+			vertexUVID, (* The attribute we want to configure *)
+			2, (* size : U+V => 2 *)
+			 GLC.GL_FLOAT, (* type *)
+			 GLC.GL_FALSE,  (* normalized ? *)
+			 0, (* stride *)
+			  0); (* array buffer offset *)
+
+	RETURN TRUE;
+END InitGL;
 
 PROCEDURE VertexSource():Strings.String;
 VAR sw: Streams.StringWriter;
@@ -1076,13 +1064,13 @@ VAR sw: Streams.StringWriter;
 BEGIN
 	NEW(sw,256);
 
-	sw.String("attribute vec4 Position;"); sw.Ln;
+	sw.String("attribute vec2 Position;"); sw.Ln;
 	sw.String("attribute vec2 Texcoords;"); 	sw.Ln;
 	sw.String("varying vec2 v_Texcoords;"); 	sw.Ln;
 	
 	sw.String("void main(void) {"); 		sw.Ln;
 	sw.String("  v_Texcoords = Texcoords;"); 	sw.Ln;
-	sw.String("  gl_Position = Position;"); 		sw.Ln;
+	sw.String("  gl_Position = vec4(Position,0,1);"); 		sw.Ln;
 	sw.String("}"); sw.Ln;
 	
 	NEW(buf, sw.Pos());
@@ -1107,34 +1095,17 @@ BEGIN
 	RETURN buf;
 END FragmentSource;
 
-PROCEDURE InitShader(CONST vertexShaderPath, fragmentShaderPath: ARRAY OF CHAR): GL.Uint;
-VAR program: GL.Uint;
-	location: GL.Int;
-	w, h: REAL;
-BEGIN
-	program := GLSL.LoadShaders(vertexShaderPath, fragmentShaderPath);
-	location := GL.GetUniformLocation(program, "u_image");
-	IF location # -1 THEN GL.Uniform1i(location, 0); END;
-	location := GL.GetUniformLocation(program, "u_step") ;
-	w :=1.0/width; h := 1.0/height;
-	IF location # -1 THEN GL.Uniform2f(location, w, h);  END;
-	RETURN program;
-END InitShader;
 
 PROCEDURE InitTheseShaders(vertexShader, fragmentShader: Strings.String): Uint;
 	VAR program: Uint;
 		location: Int;
-		w, h: REAL;
+
 	BEGIN
 		IF  ~GLSL.LoadTheseShaders(vertexShader, fragmentShader, program) THEN RETURN 0 END;
 		GL.UseProgram(program);
 
 		location := GL.GetUniformLocation(program, "u_image");
 		IF location # -1 THEN GL.Uniform1i(location, 0); END;
-
-		location := GL.GetUniformLocation(program, "u_step") ;
-		w :=1.0/width; h := 1.0/height;
-		IF location # -1 THEN GL.Uniform2f(location, w, h);  END;
 
 		RETURN program;
 END InitTheseShaders;
@@ -1203,23 +1174,11 @@ END Display;
 
 PROCEDURE Display();
 BEGIN
+	GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT) ;
+	GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height,  0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr);
+	GL.DrawArrays(GLC.GL_TRIANGLES, 0, 2*3);  (* 2*3 indices starting at 0 -> 2 triangles *)	     		
 
-			GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT) ;
-			
-			GL.ActiveTexture(GLC.GL_TEXTURE0);
-			GL.BindTexture(GLC.GL_TEXTURE_2D, image);
-
-			GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR);  (*  only first two can be used *)
-			GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_LINEAR);  (* all of the above can be used*)
-			
-			 GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height, 
-			 0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, ADDRESSOF(Retina.image.mem[0]));
-			 GL.UseProgram(curprogram);
-			 
-			 (* VAO, shader program, and texture already bound *)
-			GL.DrawElements(GLC.GL_TRIANGLES, 6, GLC.GL_UNSIGNED_SHORT, 0);
-			
-     GL.glXSwapBuffers(display, win);
+	GL.glXSwapBuffers(display, win);
 END Display;
 
 PROCEDURE mainloop;
@@ -1268,8 +1227,8 @@ END openwincam;
 PROCEDURE Open* ;
 BEGIN
 	openwincam(640,480);
-	InitGL; 	
-	InitTextures;
+	IF ~InitGL() THEN Close; RETURN END; 	
+
 	Raster.InitMode(copy, Raster.srcCopy);
 	Marsh.dawn;	
 	alive:=TRUE;
@@ -1297,7 +1256,7 @@ BEGIN
 	upsticky:=10.0;	
 	Out.String('*line 1217!*');
 	mainloop; 
-	GL.DeleteProgram(passthroughProgram);	
+	
 	FR:=1000;		
 END Open;
 

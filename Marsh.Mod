@@ -403,7 +403,7 @@ BEGIN
 	plane.vox:=sand;
 	Out.String("EEEEP!"); 				
 	w10.FRaster(plane,30);
-	z10.FRaster(noise,81);
+	w10.FRaster(tnoise,30);
 	z10.setcolor(1,0,0,0,0); 	
 	w10.setcolor(0,0,0,0,0);
 	w10.stroke(center,30,z10,undo);
