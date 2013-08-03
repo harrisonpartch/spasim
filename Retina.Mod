@@ -33,37 +33,94 @@ BEGIN{EXCLUSIVE}
      GO:=TRUE;
 END go;
 
-PROCEDURE trace;
+PROCEDURE tessa(cam: Base.Camera; imx, imy: INTEGER);
+VAR
+	i,j: LONGINT;
+	theta,phi,dtheta,dphi: REAL;
+	ray: Base.Ray;
+	pixel: Raster.Pixel;
+BEGIN
+	theta:=cam.theta; 
+	phi:=cam.phi;
+	
+	ray:=Base.blankray;
+	angletoray(ray,theta+cam.dtheta/5,phi+cam.dphi/5);
+	Base.world.Shade(ray); 
+	IF ~ray.terminate THEN
+		ray.b:= ray.b + ray.ba;
+		ray.r:= ray.r + 0.5*ray.ra;
+		ray.g:= ray.g + 0.5*ray.ga;
+	END;
+	Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255));
+	Raster.Put(image,imx,imy,pixel,copy);
+	Raster.Put(image,imx+1,imy,pixel,copy);	  
+	Raster.Put(image,imx,imy+1,pixel,copy);
+	Raster.Put(image,imx+1,imy+1,pixel,copy);	
+	Raster.Put(image,imx+2,imy,pixel,copy);
+
+	ray:=Base.blankray;
+	angletoray(ray,theta+cam.dtheta/5,phi+3*cam.dphi/5);
+	Base.world.Shade(ray); 
+	IF ~ray.terminate THEN
+		ray.b:= ray.b + ray.ba;
+		ray.r:= ray.r + 0.5*ray.ra;
+		ray.g:= ray.g + 0.5*ray.ga;
+	END;
+	Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255));
+	Raster.Put(image,imx,imy+3,pixel,copy);
+	Raster.Put(image,imx+1,imy+3,pixel,copy);	  
+	Raster.Put(image,imx,imy+4,pixel,copy);
+	Raster.Put(image,imx+1,imy+4,pixel,copy);	
+	Raster.Put(image,imx,imy+2,pixel,copy);	
+
+END tessa;
+
+PROCEDURE tessad(cam: Base.Camera; imx, imy: INTEGER);
+VAR
+	i,j: LONGINT;
+	theta,phi,dtheta,dphi: REAL;
+	ray: Base.Ray;
+	pixel: Raster.Pixel;
+BEGIN
+	theta:=cam.theta; 
+	phi:=cam.phi;
+	dtheta:=cam.dtheta/5;
+	dphi:=cam.dphi/5;
+	FOR i := 0 TO 4 DO
+		FOR j :=  0 TO 4 DO	
+			ray:=Base.blankray;
+			angletoray(ray,theta,phi);
+			Base.world.Shade(ray); 
+			IF ~ray.terminate THEN
+				ray.b:= ray.b + ray.ba;
+				ray.r:= ray.r + 0.5*ray.ra;
+				ray.g:= ray.g + 0.5*ray.ga;
+			END;
+			Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255));
+			Raster.Put(image,imx+i,imy+j,pixel,copy);
+			theta:=theta+dtheta;
+			phi:=phi+dphi;
+		END
+	END;	
+END tessad;
+
+PROCEDURE ztrace;
 VAR
 	i,j,ii,jj,reversej: LONGINT;
 	noise, theta,phi,dtheta,dphi,dtl: REAL;
 	xyz,lxyz,oxyz: PT;
 	pixel: Raster.Pixel;
 BEGIN
-	FOR ii := 0 TO TS-1 DO
-		FOR jj :=  0 TO TS-1 DO	
-			i:=x+ii;
-			j:=y+jj;
-			Base.world.Shade(rays[i,j]); 
-			IF ~rays[i,j].terminate THEN
-				(* noise:=0.2*XNXLNoise.noise3dperlin(rays[i,j].xyz.x,rays[i,j].xyz.y,rays[i,j].xyz.z,666,3,3.5);	*)
-				noise := 1/2;
-				rays[i,j].b:= rays[i,j].b + rays[i,j].ba;
-				rays[i,j].r:= rays[i,j].r + noise*rays[i,j].ra;
-				rays[i,j].g:= rays[i,j].g + noise*rays[i,j].ga;
-			END;
-			Raster.SetRGB(pixel,ENTIER(rays[i,j].r*255),ENTIER(rays[i,j].g*255),ENTIER(rays[i,j].b*255));
-			Raster.Put(image,i,j,pixel,copy);
-		END
-	END;	
-END trace;
+	(*from dxyz at corners calculate interpolation steps*)
+	(*then *)
+END ztrace;
 
 BEGIN{ACTIVE, PRIORITY(Objects.Normal)
 	 }REPEAT
 		BEGIN{EXCLUSIVE}
 			AWAIT(GO);
 		END;
-		trace;		
+	(*	trace;	*)	
 		BEGIN{EXCLUSIVE}
 			GO:=FALSE;
 			incTD;
@@ -165,22 +222,17 @@ VAR
 	i,j,t: INTEGER;
 BEGIN
 	zeroTD;
+	FOR i:= 0 TO TW-1  DO
+		FOR j:= 0 TO TH-1 DO
+			(*divide aperture by TW and TH *)
+			(*generate corner ray.dxyz etc for each tile*)
+		END
+	END;	
 	BEGIN{EXCLUSIVE} 
 		gotiles;
 		AWAIT((tilesdone=TW*TH) OR FRAMEBOORT)
 	END
 END go;
-
-PROCEDURE gosinglecore*;
-VAR
-	i,j: INTEGER;
-BEGIN
-	FOR i:= 0 TO TW-1  DO
-		FOR j:= 0 TO TH-1 DO
-			tile[i,j].trace
-		END
-	END
-END gosinglecore;
 
 PROCEDURE lsu*;
 BEGIN

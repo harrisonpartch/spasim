@@ -35,6 +35,11 @@ TYPE Aperture* = RECORD
 	width*, height*: REAL
 END;
 
+TYPE Camera*= RECORD			(* solid angle *)
+	dtheta*, dphi*,theta*, phi*: REAL;
+	look*,up*,right*:PT
+END;
+
 TYPE Color*=RECORD
 	red*,green*,blue*,alpha*: REAL
 END;
