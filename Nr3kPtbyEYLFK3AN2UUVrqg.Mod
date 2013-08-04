@@ -1,5 +1,5 @@
 MODULE Nr3kPtbyEYLFK3AN2UUVrqg;
-IMPORT Base:=XNXLBase, XNXLTexVox;  
+IMPORT Base, TexVox;  
 TYPE 	PT=Base.PT;
 		Ray = Base.Ray;
 		Voxel = Base.Voxel;

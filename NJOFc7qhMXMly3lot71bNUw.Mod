@@ -1,8 +1,8 @@
 MODULE NJOFc7qhMXMly3lot71bNUw;
-IMPORT  XNXLBase, XNXLTexVox;
+IMPORT  Base, TexVox;
   
-VAR vox: XNXLTexVox.TexVox;
-PROCEDURE thisvox*():XNXLBase.Voxel;
+VAR vox: TexVox.TexVox;
+PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	IF vox=NIL THEN NEW(vox,"hktarot.png")  END;
 	RETURN vox

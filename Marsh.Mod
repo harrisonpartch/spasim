@@ -149,7 +149,7 @@ VAR
 	v: Voxel;
 	d:REAL;
 BEGIN
-	Base.world.Shade(Base.rays[Base.W DIV 2, Base.H DIV 2]); 
+(*	Base.world.Shade(Base.rays[Base.W DIV 2, Base.H DIV 2]); 
 	ray:=Base.rays[Base.W DIV 2, Base.H DIV 2];
 	IF ray.hitmirrorTF THEN 
 		p:=ray.hitxyz; dp:=ray.hitdxyz
@@ -166,6 +166,7 @@ BEGIN
 		p.z:=p.z-dp.z/1000000;
 	END;
 	Base.cursorPT:=p; 
+	*)
 END drawcursor;
 
 PROCEDURE drawHUD*;
@@ -405,7 +406,7 @@ BEGIN
 	w10.FRaster(plane,30);
 	w10.FRaster(tnoise,30);
 	z10.setcolor(1,0,0,0,0); 	
-	w10.setcolor(0,0,0,0,0);
+	w10.setcolor(0,0,0,1,0);
 	w10.stroke(center,30,z10,undo);
 	Base.world:=w10; 	
 	Base.avatar:=xot;

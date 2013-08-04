@@ -1,9 +1,9 @@
 MODULE NUzl1lqmBmaKyswkc70kO1w;(*anonymous module created by saboteur*)
  
-IMPORT XNXLBase,XNXLTexVox;
-VAR vox: XNXLTexVox.TexVox;
+IMPORT Base,TexVox;
+VAR vox: TexVox.TexVox;
 
-PROCEDURE thisvox*():XNXLBase.Voxel;
+PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	NEW(vox,'aspiedog.png');
 	vox.pstscale:=1000;

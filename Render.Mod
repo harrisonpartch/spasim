@@ -205,12 +205,6 @@ VAR
 	rward:PT;
 	ray: Base.Ray;
 BEGIN
-	ray:=Base.rays[Base.W-1,Base.H DIV 2];
-	IF ray.hitmirrorTF THEN 
-		rward:=ray.hitdxyz
-	ELSE
-		rward:=ray.dxyz
-	END;
 	cvx :=cvx+(x*rward.x * Base.speed); 
 	cvy :=cvy+(x*rward.y * Base.speed); 	
 	cvz :=cvz+(x*rward.z * Base.speed); 	
@@ -221,12 +215,6 @@ VAR
 	lward:PT;
 	ray: Base.Ray;
 BEGIN
-	ray:=Base.rays[0,Base.H DIV 2];
-	IF ray.hitmirrorTF THEN 
-		lward:=ray.hitdxyz
-	ELSE
-		lward:=ray.dxyz
-	END;
 	cvx :=cvx+(x*lward.x * Base.speed); 
 	cvy :=cvy+(x*lward.y * Base.speed); 	
 	cvz :=cvz+(x*lward.z * Base.speed); 	
@@ -237,12 +225,6 @@ VAR
 	up:PT;
 	ray: Base.Ray;
 BEGIN
-	ray:=Base.rays[Base.W DIV 2,0];
-	IF ray.hitmirrorTF THEN 
-		up:=ray.hitdxyz
-	ELSE
-		up:=ray.dxyz
-	END;
 	cvx :=cvx+(x*up.x * Base.speed); 
 	cvy :=cvy+(x*up.y * Base.speed); 	
 	cvz :=cvz+(x*up.z * Base.speed); 	
@@ -253,7 +235,6 @@ VAR
 	down:PT;
 	ray: Base.Ray;
 BEGIN
-	ray:=Base.rays[Base.W DIV 2,Base.H-1];
 	IF ray.hitmirrorTF THEN 
 		down:=ray.hitdxyz
 	ELSE
@@ -264,142 +245,11 @@ BEGIN
 	cvz :=cvz+(x*down.z * Base.speed); 	
 END downstrafe;
 
-PROCEDURE initrays;
-VAR
-	reversej, i, j: LONGINT;
-	theta, phi, dtheta, dphi: REAL;
-	lookperpray: Ray;
-	lookvector:PT;
-	look: Base.PT;
-	camtweak: Base.PT;
-	d1,d2,d3: REAL;
-	w,h,dtl,swap: REAL;
-	fward,rward, down2, rward2, right:PT;
-BEGIN
-	fward:=Base.fward;
-	rward:=Base.rward;
-	UP:=Base.dward;
-	down:=Base.dward;
-	XNXLMath.orrot(fward, UP, cameraphi);  
-	XNXLMath.orrot(rward, UP, cameraphi);  
-	XNXLMath.orrot(fward, rward, cameratheta);  
-	XNXLMath.orrot(down, rward, cameratheta);  
-	Retina.UP:=UP;
-	Retina.rward:=rward;
-	Retina.cameratheta:=cameratheta;
-	Retina.cameraphi:=cameraphi;	
-	Retina.aperture:=aperture;				
-	FWard:=fward;
-	w:= aperture.width;
-	h:=aperture.height;
-	dtheta := w / W;
-	dphi := h/ H;
-	theta := -w / 2;
-	FOR i := 0 TO Base.W - 1 DO	
-		phi :=  -aperture.height / 2; 	(*bottom*)
-		FOR reversej := 0 TO Base.H - 1 DO
-			j:= (Base.H -1)-reversej;
-			Base.rays[i, j] := Base.blankray;		
-			angletoray(Base.rays[i, j],theta,phi);
-			XNXLMath.orrot(Base.rays[i, j].dxyz, UP, cameraphi);  	
-		   	XNXLMath.orrot(Base.rays[i, j].dxyz, rward, cameratheta);  			  	  								  	  		
-			IF Base.rays[i, j].dxyz.x < 0 THEN Base.rays[i, j].di := FALSE  ELSE Base.rays[i, j].di := TRUE END; 
-			IF Base.rays[i, j].dxyz.y < 0 THEN Base.rays[i, j].dj := FALSE  ELSE Base.rays[i, j].dj := TRUE END;
-			IF Base.rays[i, j].dxyz.z < 0 THEN Base.rays[i, j].dk := FALSE  ELSE Base.rays[i, j].dk := TRUE END;		
-			Base.rays[i, j].lxyz := cam;
-			Base.rays[i, j].xyz := cam;
-			Base.rays[i, j].oxyz:=Base.rays[i, j].xyz;
-			Base.rays[i, j].dtl := Base.DTL; 
-			Base.rays[i, j].texdtl :=1; 			
-			phi := phi + dphi;
-		END;
-		theta := theta + dtheta;
-	END;
-	IF  ~Retina.SACCADE THEN
-	w:= aperture.width/3;
-	h:=aperture.height/3;
-	w:=fisheye*w;
-	h:= fisheye*h;
-	dtheta := w / W;
-	dphi := h/ H;
-	theta := -w / 2;
-	FOR i := 0 TO Base.W - 1  DO
-		theta := theta + dtheta;
-		phi :=  -aperture.height / 6; 	(*bottom*)
-		FOR reversej := 0 TO Base.H - 1 DO
-			j:= (Base.H -1)-reversej;
-			phi := phi + dphi;
-			Base.frays[i, j] := Base.blankray;	
-			angletoray(Base.frays[i, j],theta,phi);
-			XNXLMath.orrot(Base.frays[i, j].dxyz, UP, cameraphi);  	
-		   	XNXLMath.orrot(Base.frays[i, j].dxyz, rward, cameratheta);  			  	  								  	  		
-			IF Base.frays[i, j].dxyz.x < 0 THEN Base.frays[i, j].di := FALSE  ELSE Base.frays[i, j].di := TRUE END; 
-			IF Base.frays[i, j].dxyz.y < 0 THEN Base.frays[i, j].dj := FALSE  ELSE Base.frays[i, j].dj := TRUE END;
-			IF Base.frays[i, j].dxyz.z < 0 THEN Base.frays[i, j].dk := FALSE  ELSE Base.frays[i, j].dk := TRUE END;		
-			Base.frays[i, j].lxyz := cam;
-			Base.frays[i, j].xyz := cam;
-			Base.frays[i, j].oxyz:=Base.frays[i, j].dxyz;
-			Base.frays[i, j].dtl := Base.DTL;
-			Base.rays[i, j].texdtl :=3;  
-		END
-	END
-END
-
-END initrays;
-
-PROCEDURE initdtlrays;
-VAR
-	reversej, i, j: LONGINT;
-	theta, phi, dtheta, dphi: REAL;
-	lookperpray: Ray;
-	lookvector:PT;
-	look: Base.PT;
-	camtweak: Base.PT;
-	d1,d2,d3: REAL;
-	w,h,dtl,swap: REAL;
-	fward,rward, down2, rward2, right:PT;
-BEGIN
-	fward:=Base.fward;
-	rward:=Base.rward;
-	UP:=Base.dward;
-	down:=Base.dward;
-	XNXLMath.orrot(fward, UP, cameraphi);  
-	XNXLMath.orrot(rward, UP, cameraphi);  
-	XNXLMath.orrot(fward, rward, cameratheta);  
-	XNXLMath.orrot(down, rward, cameratheta);  
-	FWard:=fward;
-	w:= aperture.width;
-	h:=aperture.height;
-	w:=fisheye*w;
-	h:= fisheye*h;
-	dtheta := w/(3*W);
-	dphi := h/(3*H);
-	theta := -w / 2;
-	dtl:= Base.DTL*9;
-	FOR i := 0 TO 3*Base.W - 1  DO
-		theta := theta + dtheta;
-		phi :=  -aperture.height / 2; 	(*bottom*)
-		FOR reversej := 0 TO 3*Base.H - 1 DO
-			j:= (3*Base.H -1)-reversej;
-			phi := phi + dphi;
-			Base.dtlrays[i, j]  := Base.blankray;	
-			angletoray(Base.dtlrays[i, j] ,theta,phi);
-			XNXLMath.orrot(Base.dtlrays[i, j] .dxyz, UP, cameraphi);  	
-		   	XNXLMath.orrot(Base.dtlrays[i, j] .dxyz, rward, cameratheta);  			  	  								  	  		
-			IF Base.dtlrays[i, j] .dxyz.x < 0 THEN Base.dtlrays[i, j] .di := FALSE  ELSE Base.dtlrays[i, j] .di := TRUE END; 
-			IF Base.dtlrays[i, j] .dxyz.y < 0 THEN Base.dtlrays[i, j] .dj := FALSE  ELSE Base.dtlrays[i, j] .dj := TRUE END;
-			IF Base.dtlrays[i, j] .dxyz.z < 0 THEN Base.dtlrays[i, j] .dk := FALSE  ELSE Base.dtlrays[i, j] .dk := TRUE END;		
-			Base.dtlrays[i, j] .lxyz := cam;
-			Base.dtlrays[i, j] .xyz := cam;
-			Base.dtlrays[i, j] .oxyz:=Base.dtlrays[i, j] .dxyz;
-			Base.dtlrays[i, j] .dtl := dtl; 
-		END
-	END
-END initdtlrays;
-
 PROCEDURE trace;
+VAR
+	t,p,h,w: REAL;
 BEGIN
-	Retina.go
+	Retina.go(cameratheta-aperture.width/2,cameraphi-aperture.height/2,aperture.width,aperture.height); 
 END trace; 
 
 PROCEDURE left (th: REAL);
@@ -440,7 +290,6 @@ BEGIN
 	cvz := cvz*GLIDE+gravityvector.x; 
 	cvx := cvx*GLIDE; cvy := cvy*GLIDE; 
 	cvl :=cvl*0.0; cvu := cvu*0.0;
-	initrays;
 	IF AVATAR THEN Marsh.drawavatar END;
 	IF MOUSEDOWN THEN
 		IF MB=3 THEN 
@@ -523,6 +372,7 @@ VAR
 	curprogram: Uint; (* current active program *)
 	progname: ARRAY 32 OF CHAR;
 	image: Uint; (* image texture name *)			
+
 PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
 VAR d: REAL;
 BEGIN
@@ -992,7 +842,7 @@ PROCEDURE  InitGL(): BOOLEAN;
 
 
 	NEW(Retina.image);
-	Raster.Create(Retina.image, Base.W, Base.H, Raster.BGRA8888);
+	Raster.Create(Retina.image,Retina.W,Retina.H,Raster.BGRA8888);
 	
 	(* create texture object for image *)
 	GL.GenTextures(1, ADDRESSOF(image));

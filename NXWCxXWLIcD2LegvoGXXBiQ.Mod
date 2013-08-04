@@ -1,7 +1,6 @@
 MODULE NXWCxXWLIcD2LegvoGXXBiQ;
 
-IMPORT Base:=XNXLBase;
-
+IMPORT Base;
 TYPE PT = Base.PT;
 	Ray = Base.Ray;
 	Voxel = Base.Voxel;  

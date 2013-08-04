@@ -1,10 +1,7 @@
 <Desktop>
-	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="462" t="41" r="1102" b="452" flags="{0..2}"/>
 	<Window name="FileManager" loader="WMFileManager.Restore" l="73" t="321" r="573" b="721" flags="{0..2}"/>
-	<Window name="Notepad" loader="Notepad.Restore" l="505" t="116" r="1355" b="816" flags="{0..2}">
-		<NotepadData file="x.text" codecFormat="AUTO" firstLine="3" cursorPos="0" wordWrap="true"/>
-	</Window>
-	<Window name="PET" loader="PET.Restore" l="620" t="50" r="1441" b="759" flags="{0..2}">
+	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="148" t="77" r="788" b="488" flags="{0..2}"/>
+	<Window name="PET" loader="PET.Restore" l="1088" t="114" r="1909" b="823" flags="{0..2}">
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>
 			<Tab file="Render.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
@@ -16,9 +13,9 @@
 			</Tab>
 		</PETData>
 	</Window>
-	<Window name="PET" loader="PET.Restore" l="257" t="70" r="1180" b="834" flags="{0..2}">
+	<Window name="PET" loader="PET.Restore" l="602" t="150" r="1525" b="914" flags="{0..2}">
 		<PETData>
-			<General SelectedPageNr="2" ProjectTextFile=""/>
+			<General SelectedPageNr="5" ProjectTextFile=""/>
 			<Tab file="XNXL.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
 				<Editor firstLine="0" cursorPos="452"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
@@ -34,7 +31,7 @@
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
 			<Tab file="Retina.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="42" cursorPos="1814"/>
+				<Editor firstLine="111" cursorPos="3797"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="true" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="rays[i,j]" replaceString="ray"/>
 				<LogPanel height="130"/>

@@ -1,5 +1,5 @@
 MODULE NM5;
-IMPORT Base:=XNXLBase, XNXLE, XNXLFRep, Math, Out := KernelLog, Debugging, Streams,Strings;
+IMPORT Base, XNXLE, XNXLFRep, Math, Out := KernelLog, Debugging, Streams,Strings;
 
 CONST M=5;
 	MMO=M-1;

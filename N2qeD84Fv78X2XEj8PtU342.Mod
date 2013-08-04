@@ -1,6 +1,6 @@
 MODULE N2qeD84Fv78X2XEj8PtU342;(*anonymous module created by saboteur*)
   
-IMPORT Objects, Base:=XNXLBase,  XNXLFRep, Out:=KernelLog, Random;
+IMPORT Objects, Base,  XNXLFRep, Out:=KernelLog, Random;
 
 TYPE Ray = Base.Ray;
 	Voxel = Base.Voxel;  

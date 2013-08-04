@@ -32,12 +32,7 @@ TYPE BOX*=RECORD
 END;
 
 TYPE Aperture* = RECORD
-	width*, height*: REAL
-END;
-
-TYPE Camera*= RECORD			(* solid angle *)
-	dtheta*, dphi*,theta*, phi*: REAL;
-	look*,up*,right*:PT
+	width*, height*: REAL  (* these are ANGLES *)
 END;
 
 TYPE Color*=RECORD
@@ -206,10 +201,7 @@ TYPE Ray* = RECORD
 	justhitTF*:BOOLEAN;
 	diositizeTF*:BOOLEAN;
 	texdtl*:REAL;
-END; 
-
-TYPE RAYS*= POINTER TO ARRAY W, H OF Ray;
-TYPE DTLRAYS*= POINTER TO ARRAY 3*W, 3*H OF Ray;
+END;
 
 TYPE Voxel*=OBJECT(V)
 VAR
@@ -478,8 +470,6 @@ VAR
 	Face*: ARRAY 6 OF PT;
 	EMPTY*,OPAQUE*: Voxel;
 	deathflag*:BOOLEAN;
-	rays*,frays*:RAYS;
-	dtlrays*:DTLRAYS;
 	LOOK*, LLOOK*: Ray;
 	world*:Voxel;
 	injection*: Voxel;
@@ -1052,9 +1042,6 @@ BEGIN
 	fward:=mkPT(1,0,0);
 	rward:=mkPT(0,1,0);
 	dward:=mkPT(0,0,-1);
-	NEW(rays);
-	NEW(frays);
-	NEW(dtlrays);
 	NEW(EMPTY);
 	NEW(OPAQUE);
 	EMPTY.passable:=TRUE;
