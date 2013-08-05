@@ -809,7 +809,7 @@ VAR
 	up,left: REAL;
 BEGIN
 	left:=ABS(x)*x;
-	up:=ABS(y)*y; 
+	up:=-ABS(y)*y; 
 	camera.up(up/(30000*leftsticky)); 
 	camera.left(left/(30000*leftsticky));
 END MouseVent;

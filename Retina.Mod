@@ -8,8 +8,8 @@ TYPE
 CONST
 	T=5;        (* must be a power of 2 *)
 	TS=5*32;   (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
-	TW=1;
-	TH=1;
+	TW=4;
+	TH=3;
 	W*=TS*TW;
 	H*=TS*TH
 
@@ -140,10 +140,10 @@ VAR
 	pixel: Raster.Pixel;
 BEGIN
 	theta:=cam.theta;
-	phi:=cam.phi;
-	dtheta:=cam.dtheta/4;
-	dphi:=cam.dphi/4;
+	dtheta:=cam.dtheta/5;
+	dphi:=cam.dphi/5;
 	FOR i:= 0 TO 4 DO
+		phi:=cam.phi;
 		FOR j :=  0 TO 4 DO 
 			ray:=Base.blankray;
 			angletoray(ray,theta,phi);
@@ -156,9 +156,9 @@ BEGIN
 			Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255)); 
 		(*	Raster.SetRGB(pixel,i*60,0,j*60); *)
 			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
-			theta:=theta+dtheta;	
+			phi:=phi+dphi;
 		END;
-		phi:=phi+dphi;
+		theta:=theta+dtheta;
 	END;
 END tessad;
 
@@ -333,10 +333,10 @@ VAR
 BEGIN
 	zeroTD;
 	theta:=t;
-	phi:=p;
 	dtheta:=dt/TW;
 	dphi:=dp/TH;
 	FOR i:= 0 TO TW-1  DO	
+		phi:=p;
 		FOR j:= 0 TO TH-1 DO
 			tile[i,j].cam.theta:=theta;
 			tile[i,j].cam.phi:=phi;
