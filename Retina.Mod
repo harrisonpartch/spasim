@@ -7,11 +7,11 @@ TYPE
 	PT=Base.PT;
 CONST
 	T=5;        (* must be a power of 2 *)
-	TS=5*16;   (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
-	TW=4;
-	TH=3;
+	TS=5*32;   (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
+	TW=1;
+	TH=1;
 	W*=TS*TW;
-	H*=TS*TH;
+	H*=TS*TH
 
 	
 TYPE Camera= RECORD			(* solid angle *)
@@ -55,10 +55,6 @@ BEGIN
 	imy:=cam.imy;
 	ray:=Base.blankray;
 	angletoray(ray,theta+cam.dtheta/5,phi+cam.dphi/5);
-	ray.lxyz:=Base.cameraPT;
-	ray.xyz:=Base.cameraPT;
-	ray.oxyz:=Base.cameraPT;
-	ray.dtl:=Base.DTL;
 	Base.world.Shade(ray);
 	IF ~ray.terminate THEN
 		ray.b:= ray.b + ray.ba;
@@ -74,10 +70,6 @@ BEGIN
 
 	ray:=Base.blankray;
 	angletoray(ray,theta+cam.dtheta/5,phi+3*cam.dphi/5);
-	ray.lxyz:=Base.cameraPT;
-	ray.xyz:=Base.cameraPT;
-	ray.oxyz:=Base.cameraPT;
-	ray.dtl:=Base.DTL;	
 	Base.world.Shade(ray);
 	IF ~ray.terminate THEN
 		ray.b:= ray.b + ray.ba;
@@ -108,10 +100,6 @@ BEGIN
 	
 	ray:=Base.blankray;
 	angletoray(ray,theta+3*cam.dtheta/5,phi+cam.dphi/5);
-	ray.lxyz:=Base.cameraPT;
-	ray.xyz:=Base.cameraPT;
-	ray.oxyz:=Base.cameraPT;
-	ray.dtl:=Base.DTL;
 	Base.world.Shade(ray);
 	IF ~ray.terminate THEN
 		ray.b:= ray.b + ray.ba;
@@ -127,10 +115,6 @@ BEGIN
 
 	ray:=Base.blankray;
 	angletoray(ray,theta+3*cam.dtheta/5,phi+3*cam.dphi/5);
-	ray.lxyz:=Base.cameraPT;
-	ray.xyz:=Base.cameraPT;
-	ray.oxyz:=Base.cameraPT;
-	ray.dtl:=Base.DTL;
 	Base.world.Shade(ray);
 	IF ~ray.terminate THEN	ray.lxyz:=Base.cameraPT;
 	ray.xyz:=Base.cameraPT;
@@ -157,17 +141,12 @@ VAR
 BEGIN
 	theta:=cam.theta;
 	phi:=cam.phi;
-	dtheta:=cam.dtheta/5;
-	dphi:=cam.dphi/5;
-	FOR i := 0 TO 4 DO
-		FOR j :=  0 TO 4 DO
+	dtheta:=cam.dtheta/4;
+	dphi:=cam.dphi/4;
+	FOR i:= 0 TO 4 DO
+		FOR j :=  0 TO 4 DO 
 			ray:=Base.blankray;
 			angletoray(ray,theta,phi);
-			ray.lxyz:=Base.cameraPT;
-			ray.xyz:=Base.cameraPT;
-			ray.oxyz:=Base.cameraPT;
-			ray.dtl:=Base.DTL;
-			ray.texdtl:=1;
 			Base.world.Shade(ray);
 			IF ~ray.terminate THEN
 				ray.b:= ray.b +ray.ba;
@@ -177,9 +156,9 @@ BEGIN
 			Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255)); 
 		(*	Raster.SetRGB(pixel,i*60,0,j*60); *)
 			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
-			theta:=theta+dtheta;
-			phi:=phi+dphi;
-		END
+			theta:=theta+dtheta;	
+		END;
+		phi:=phi+dphi;
 	END;
 END tessad;
 
@@ -261,13 +240,21 @@ PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
 VAR d: REAL;
 BEGIN
 	ray:=Base.blankray;
-	ray.dxyz.x := Math.cos(theta) * Math.cos(phi);
-	ray.dxyz.y := Math.sin(theta) * Math.cos(phi);
+	ray.dxyz.y := Math.cos(theta) * Math.cos(phi);
+	ray.dxyz.x:= Math.sin(theta) * Math.cos(phi);
 	ray.dxyz.z := Math.sin(phi);
 	d := Math.sqrt(ray.dxyz.x*ray.dxyz.x + ray.dxyz.y* ray.dxyz.y+ray.dxyz.z*ray.dxyz.z);  (* Norma! Liza! Ray! Front and center, oh dark thirty!*)
 	ray.dxyz.x := ray.dxyz.x/d;
 	ray.dxyz.y := ray.dxyz.y/d;
-	ray.dxyz.z := ray.dxyz.z/d;
+	ray.dxyz.z := ray.dxyz.z/d;	
+	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
+	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
+	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
+	ray.lxyz:=Base.cameraPT;
+	ray.xyz:=Base.cameraPT;
+	ray.oxyz:=Base.cameraPT;
+	ray.dtl:=Base.DTL;
+	ray.texdtl:=1;	
 END angletoray;
 
 PROCEDURE splitcam(cam: Camera; VAR a,b,c,d: Camera);
@@ -297,17 +284,17 @@ BEGIN
 	
 	c.dtheta:=dt;
 	c.dphi:=dp;
-	c.theta:=cam.theta+dt;
+	c.theta:=cam.theta;
 	c.phi:=cam.phi;
-	c.imx:=cam.imx+s;
+	c.imx:=cam.imx;
 	c.imy:=cam.imy;
 	c.size:=s;			
 	
 	d.dtheta:=dt;
 	d.dphi:=dp;
-	d.theta:=cam.theta;
+	d.theta:=cam.theta+dt;
 	d.phi:=cam.phi;
-	d.imx:=cam.imx;
+	d.imx:=cam.imx+s;
 	d.imy:=cam.imy;
 	d.size:=s;			
 	
@@ -347,8 +334,8 @@ BEGIN
 	zeroTD;
 	theta:=t;
 	phi:=p;
-	dtheta:=dt/TS;
-	dphi:=dp/TS;
+	dtheta:=dt/TW;
+	dphi:=dp/TH;
 	FOR i:= 0 TO TW-1  DO	
 		FOR j:= 0 TO TH-1 DO
 			tile[i,j].cam.theta:=theta;
@@ -357,7 +344,7 @@ BEGIN
 			tile[i,j].cam.dphi:=dphi;
 			tile[i,j].cam.imx:=i*TS;
 			tile[i,j].cam.imy:=j*TS;
-			tile[i,j].cam.size:=TS;	
+			tile[i,j].cam.size:=TS;			
 			phi:=phi+dphi;		
 		END;
 		theta:=theta+dtheta;

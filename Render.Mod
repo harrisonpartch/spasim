@@ -809,10 +809,9 @@ VAR
 	up,left: REAL;
 BEGIN
 	left:=ABS(x)*x;
-	up:=-ABS(y)*y; 
+	up:=ABS(y)*y; 
 	camera.up(up/(30000*leftsticky)); 
 	camera.left(left/(30000*leftsticky));
-
 END MouseVent;
  
 
@@ -960,74 +959,11 @@ PROCEDURE InitTheseShaders(vertexShader, fragmentShader: Strings.String): Uint;
 		RETURN program;
 END InitTheseShaders;
 
-PROCEDURE draw;
-VAR
-	i,j,ii,jj,k:LONGINT;
-	i3,j3,ii3,jj3:REAL;
-	a,w,h: REAL;
-	pixel: Raster.Pixel;
-BEGIN
-	GL.MatrixMode(GLC.GL_PROJECTION);
-	GL.LoadIdentity();
-	GL.Ortho(0,Base.W*PX, Base.H*PX,0,0,1);
-	GL.MatrixMode(GLC.GL_MODELVIEW);
-	GL.LoadIdentity();	
-	GL.Begin(GLC.GL_QUADS);		
-	FOR ii:=0 TO Base.W-1 DO
-		i:=3*ii;
-		FOR jj:=0 TO Base.H-1 DO
-			j:=3*jj;
-			Raster.Get(Retina.image,ii,jj,pixel,copy);
-			GL.Color3f(ORD(pixel[2])/255,ORD(pixel[1])/255,ORD(pixel[0])/255);		
-(*			GL.Color3f(ii/Base.W,jj/Base.H,1/2); *)
-			GL.Vertex2f(i,j); 
-			GL.Vertex2f(i,j+3); 			
-			GL.Vertex2f(i+3,j+3); 			
-			GL.Vertex2f(i+3,j); 				
-		END
-	END;
-        w:=PX*Base.W/2; h:=PX*Base.H/2;
-        GL.Vertex2f(w-1,h-1); 
-        GL.Vertex2f(w-1,h+1); 
-        GL.Vertex2f(w+1,h+1); 
-        GL.Vertex2f(w+1,h-1); 
-        GL.Color3f(0,0,0);
-        GL.Vertex2f(w-1/2,h-1/2); 
-        GL.Vertex2f(w-1/2,h+1/2); 
-        GL.Vertex2f(w+1/2,h+1/2); 
-        GL.Vertex2f(w+1/2,h-1/2);         
-	 GL.End;	
-	 GL.glXSwapBuffers(display, win);
-END draw;
-
-(* PROCEDURE Display();
-BEGIN
-	Out.Char('*');
-	GL.BindTexture(GLC.GL_TEXTURE_2D, basetexture);
-	GL.TexParameteri(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR);
-	GL.TexParameteri(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_LINEAR);
-	GL.TexImage2D( GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA8, Retina.image.width, Retina.image.height, 0,
-    GLC.GL_RGBA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr );
-         
-           GL.Begin( GLC.GL_QUADS );
-                GL.Normal3f( 0.0, 0.0, 1.0 );
-                GL.TexCoord2f( 1.0, 0.0 ); GL.Vertex3f( -1.0, -1.0,  0.0 );
-                GL.TexCoord2f( 0.0, 0.0 ); GL.Vertex3f(  1.0, -1.0,  0.0 );
-                GL.TexCoord2f( 0.0, 1.0 ); GL.Vertex3f(  1.0,  1.0,  0.0 );
-                GL.TexCoord2f( 1.0, 1.0 ); GL.Vertex3f( -1.0,  1.0,  0.0 );
-            GL.End;
-            
-
-     GL.glXSwapBuffers(display, win);
-END Display;
-*)
-
 PROCEDURE Display();
 BEGIN
 	GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT) ;
 	GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height,  0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr);
 	GL.DrawArrays(GLC.GL_TRIANGLES, 0, 2*3);  (* 2*3 indices starting at 0 -> 2 triangles *)	     		
-
 	GL.glXSwapBuffers(display, win);
 END Display;
 
@@ -1049,7 +985,7 @@ BEGIN
 		PollXQueue; 
 		IF ~PAUSE THEN 
 			camera.tick; 
-			IF SCULL THEN draw ELSE Display END;
+			Display;
 			ft[i]:=Kernel.Elapsed(ftimer);
 			fmsum:=0;
 			FOR ii:=0 TO 9 DO
@@ -1106,7 +1042,6 @@ BEGIN
 	upsticky:=10.0;	
 	Out.String('*line 1217!*');
 	mainloop; 
-	
 	FR:=1000;		
 END Open;
 

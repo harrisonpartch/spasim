@@ -28,7 +28,7 @@ SystemTools.Timer elapsed ~ SystemTools.Ln ~~
 
 Render.Open ~
 
-SystemTools.FreeDownTo  XNXL~
+SystemTools.FreeDownTo Base~
 
 NanonyPET.Open NanonyPET.Mod ~  does not compile
 XNXLLifeVox.Mod		''	''
