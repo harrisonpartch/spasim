@@ -1041,7 +1041,7 @@ BEGIN
 	NEW(clock); *)
 	fward:=mkPT(1,0,0);
 	rward:=mkPT(0,1,0);
-	dward:=mkPT(0,0,-1);
+	dward:=mkPT(0,0,1);
 	NEW(EMPTY);
 	NEW(OPAQUE);
 	EMPTY.passable:=TRUE;

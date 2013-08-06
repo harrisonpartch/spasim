@@ -40,7 +40,7 @@ VAR
 	iamalargecamera: BOOLEAN;
 	lookdxyz:PT;
 	cx, cy, cz, cvx, cvy, cvz, cvl, cvu: REAL;   
-	FWard,xaxis,yaxis,zaxis,UP,down:PT; 
+	xaxis,yaxis,zaxis,UP,down:PT; 
 	croll: REAL;
 	cdroll: REAL;
 	cameratheta,cameraphi: REAL;
@@ -170,15 +170,9 @@ END glidetoggle;
 
 PROCEDURE forward(x:REAL);
 VAR
-	fward,rward, down, down2, rward2, right:PT;
+	fward:PT;
 BEGIN
-	fward:=xaxis;
-	rward:=yaxis;
-	down:=zaxis;
-	XNXLMath.orrot(fward, zaxis, cameraphi);  
-	XNXLMath.orrot(rward, zaxis, cameraphi);  
-	XNXLMath.orrot(fward, rward, cameratheta);  
-	XNXLMath.orrot(down, rward, cameratheta);  	
+	fward:=Base.fward;
 	cvx :=cvx+(x*fward.x * Base.speed); 
 	cvy :=cvy+(x*fward.y * Base.speed); 	
 	cvz :=cvz+(x*fward.z * Base.speed); 	
@@ -186,15 +180,10 @@ END forward;
 
 PROCEDURE backward(x:REAL);
 VAR	
-	fward,rward, down, right:PT;
+	fward:PT;
 BEGIN
-	fward:=xaxis;
-	rward:=yaxis;
-	down:=zaxis;
-	XNXLMath.orrot(fward, zaxis, cameraphi);  
-	XNXLMath.orrot(rward, zaxis, cameraphi);  
-	XNXLMath.orrot(fward, rward, cameratheta);  
-	XNXLMath.orrot(down, rward, cameratheta);  	
+	fward:=Base.fward;	
+	fward.x:=-fward.x;
 	cvx :=cvx-(x*fward.x * Base.speed); 
 	cvy :=cvy-(x*fward.y * Base.speed); 	
 	cvz :=cvz-(x*fward.z * Base.speed); 	
@@ -205,6 +194,7 @@ VAR
 	rward:PT;
 	ray: Base.Ray;
 BEGIN
+	rward:=Base.rward;
 	cvx :=cvx+(x*rward.x * Base.speed); 
 	cvy :=cvy+(x*rward.y * Base.speed); 	
 	cvz :=cvz+(x*rward.z * Base.speed); 	
@@ -215,6 +205,8 @@ VAR
 	lward:PT;
 	ray: Base.Ray;
 BEGIN
+	lward:= Base.rward;
+	lward.y:=-lward.y;
 	cvx :=cvx+(x*lward.x * Base.speed); 
 	cvy :=cvy+(x*lward.y * Base.speed); 	
 	cvz :=cvz+(x*lward.z * Base.speed); 	
@@ -225,6 +217,8 @@ VAR
 	up:PT;
 	ray: Base.Ray;
 BEGIN
+	up:=Base.dward;
+	up.z:=-up.z;
 	cvx :=cvx+(x*up.x * Base.speed); 
 	cvy :=cvy+(x*up.y * Base.speed); 	
 	cvz :=cvz+(x*up.z * Base.speed); 	
@@ -235,11 +229,7 @@ VAR
 	down:PT;
 	ray: Base.Ray;
 BEGIN
-	IF ray.hitmirrorTF THEN 
-		down:=ray.hitdxyz
-	ELSE
-		down:=ray.dxyz
-	END;	
+	down:=Base.dward;
 	cvx :=cvx+(x*down.x * Base.speed); 
 	cvy :=cvy+(x*down.y * Base.speed); 	
 	cvz :=cvz+(x*down.z * Base.speed); 	
@@ -249,7 +239,7 @@ PROCEDURE trace;
 VAR
 	t,p,h,w: REAL;
 BEGIN
-	Retina.go(cameratheta-(aperture.width/2),cameraphi-(aperture.height/2),aperture.width,aperture.height); 
+	Retina.go(cameratheta,cameraphi,aperture.width,aperture.height); 
 END trace; 
 
 PROCEDURE left (th: REAL);
@@ -282,8 +272,8 @@ BEGIN
 	gravityvector:=Base.subPT(worldcenter,cam);	
 	gravity:=Base.gravity;
 	gravityvector:=Base.mulPT(gravityvector,Base.gravity);
-	a:=FWard.x*Base.cursordist; b:=FWard.y*Base.cursordist; c:=FWard.z*Base.cursordist;
-	d:=-FWard.x*0.0001; 	e:=-FWard.y*0.0001;  	f:=-FWard.z*0.0001; 
+	a:=Retina.fward.x*Base.cursordist; b:=Retina.fward.y*Base.cursordist; c:=Retina.fward.z*Base.cursordist;
+	d:=-Retina.fward.x*0.0001; 	e:=-Retina.fward.y*0.0001;  	f:=-Retina.fward.z*0.0001; 
 	Base.updatecamera(cx,cy,cz,a,b,c,d,e,f);	
 (*	Marsh.drawavatar; *)
 	GLIDE:=0.975;	
@@ -847,7 +837,7 @@ PROCEDURE  InitGL(): BOOLEAN;
 	GL.GenTextures(1, ADDRESSOF(image));
 	GL.BindTexture(GLC.GL_TEXTURE_2D, image); 
 	(* These determine how interpolation is made when image scaled down on up *)
-	GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR);
+	GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_FLAT);
 	GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_LINEAR);
 	GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height, 0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, ADDRESSOF(Retina.image.mem[0]));
 

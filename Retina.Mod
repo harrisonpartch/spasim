@@ -6,10 +6,10 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=4;        (* must be a power of 2 *)
-	TS=5*16;   (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
-	TW=4;
-	TH=3;
+	T=5;        (* must be a power of 2 *)
+	TS=5*32;   (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
+	TW=2;
+	TH=2;
 	W*=TS*TW;
 	H*=TS*TH
 
@@ -166,13 +166,23 @@ PROCEDURE ztrace(cam: Camera; level: INTEGER);
 VAR
 	a,b,c,d: Camera;
 	l: INTEGER;
+	x,y: REAL;
 BEGIN
 	splitcam(cam,a,b,c,d);
 	IF level<2 THEN
-		tessad(a); 
-		tessad(b);
-		tessad(c);
-		tessad(d);
+		x:=cam.imx - W DIV 2;
+		y:=cam.imy-H/2;
+		IF (x*x+y*y)<(W*W/9) THEN
+			tessad(a); 
+			tessad(b);
+			tessad(c);
+			tessad(d)
+		ELSE
+			tessa(a); 
+			tessa(b);
+			tessa(c);
+			tessa(d)	
+		END;	
 	ELSE
 		l:=level-1;
 		ztrace(a,l);
@@ -231,25 +241,25 @@ VAR
 	lsense,ls2:REAL;
 	FGUAARD,FRAMEBOORT:BOOLEAN;
 	SACCADE*,SACCADE1*,DTLRAYS*:BOOLEAN;
-	rward*,UP*:PT;
 	cameratheta*,cameraphi*:REAL;
 	aperture*: Base.Aperture;
 	image*: Raster.Image;
-	rphi: REAL; (* camera pitch. global variable because it is the same for all rays in a frame *)
-	down, right: PT;  (* axes around which camera yaws, pitches *)
+	rtheta,rphi: REAL; (* camera pitch,roll. global variables because they are the same for all rays in a frame *)
+	fward*, dward, rward: PT;  
 	
 PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
 VAR d: REAL;
 BEGIN
 	ray:=Base.blankray;
-	ray.dxyz.y := Math.cos(theta) * Math.cos(phi);
-	ray.dxyz.x:= Math.sin(theta) * Math.cos(phi);
-	ray.dxyz.z := Math.sin(phi);
+	ray.dxyz.z:= Math.cos(theta) * Math.cos(phi);
+	ray.dxyz.y:= Math.sin(theta) * Math.cos(phi);
+	ray.dxyz.x := Math.sin(phi);
 	d := Math.sqrt(ray.dxyz.x*ray.dxyz.x + ray.dxyz.y* ray.dxyz.y+ray.dxyz.z*ray.dxyz.z);  (* Norma! Liza! Ray! Front and center, oh dark thirty!*)
 	ray.dxyz.x := ray.dxyz.x/d;
 	ray.dxyz.y := ray.dxyz.y/d;
 	ray.dxyz.z := ray.dxyz.z/d;	
-	XNXLMath.orrot(ray.dxyz, right, rphi);  
+	XNXLMath.orrot(ray.dxyz, rward, rphi);  
+	XNXLMath.orrot(ray.dxyz, dward, -rtheta);  
 	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
@@ -329,32 +339,37 @@ BEGIN
 
 END stitchtiles;
 
-PROCEDURE go*(t,p,dt,dp: REAL);
+PROCEDURE go*(theta,phi,apw,aph: REAL);
 VAR
 	i,j: INTEGER;
-	theta,phi,dtheta,dphi: REAL;
+	ctheta,cphi,dtheta,dphi: REAL;
 BEGIN
 	zeroTD;
-	theta:=t;
-	dtheta:=dt/TW;
-	dphi:=dp/TH;
+	dtheta:=apw/TW;
+	dphi:=aph/TH;
+	ctheta:=-apw/2;	
 	FOR i:= 0 TO TW-1  DO	
-		phi:=-dp/2;
+		cphi:=-aph/2;
 		FOR j:= 0 TO TH-1 DO
-			tile[i,j].cam.theta:=theta;
-			tile[i,j].cam.phi:=phi;
+			tile[i,j].cam.theta:=ctheta;
+			tile[i,j].cam.phi:=cphi;
 			tile[i,j].cam.dtheta:=dtheta;
 			tile[i,j].cam.dphi:=dphi;
 			tile[i,j].cam.imx:=i*TS;
 			tile[i,j].cam.imy:=j*TS;
 			tile[i,j].cam.size:=TS;			
-			phi:=phi+dphi;		
+			cphi:=cphi+dphi;		
 		END;
-		theta:=theta+dtheta;
+		ctheta:=ctheta+dtheta;
 	END;
-	Base.setPT(right,0,1,0);	
-	XNXLMath.orrot(right, down, t); 
-	rphi:=p;
+	dward:= Base.dward;
+	fward:= Base.fward;
+	rward:=Base.rward;
+	rtheta:=theta;
+	rphi:=phi;	
+	XNXLMath.orrot(fward, rward,rphi);   	
+	XNXLMath.orrot(fward, dward,rtheta);  		
+	XNXLMath.orrot(rward, dward,rtheta);   			
 	BEGIN{EXCLUSIVE}
 		gotiles;
 		AWAIT((tilesdone=TW*TH) OR FRAMEBOORT)
@@ -378,8 +393,8 @@ BEGIN
 		FOR b:= 0 TO TH-1 DO
 			NEW(tile[a,b],a*TS,b*TS);
 		END
-	END;
-	Base.setPT(down,0,0,-1);	
+	END;	
+	Base.setPT(dward,0,0,1);	
 	EDGE:=0.001;
 	AFTER:=2;
  	FAST:=3;

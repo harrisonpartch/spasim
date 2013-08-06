@@ -398,13 +398,13 @@ BEGIN
 	noise.setvoxel(sand);
 	noise.persistence:=4;
 	Out.String("EEEEP!");
-	Base.setPT(up,0,0,1);
-	Base.setPT(center,1/2,1/2,1/2);
+	Base.setPT(up,0,0,-1);
+	Base.setPT(center,1/2,1/2,1/12);
 	NEW(plane,center,up);
 	plane.vox:=sand;
 	Out.String("EEEEP!"); 				
 	w10.FRaster(plane,30);
-(*	w10.FRaster(tnoise,30); *)
+	w10.FRaster(noise,30); 
 	z10.setcolor(1,0,0,0,0); 	
 	w10.setcolor(0,0,0,0.1,0);
 	w10.stroke(center,30,z10,undo);
