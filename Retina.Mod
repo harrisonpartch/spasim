@@ -6,8 +6,8 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=5;        (* must be a power of 2 *)
-	TS=5*32;   (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
+	T=4;        (* must be a power of 2 *)
+	TS=5*16;   (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
 	TW=4;
 	TH=3;
 	W*=TS*TW;
@@ -15,7 +15,7 @@ CONST
 
 	
 TYPE Camera= RECORD			(* solid angle *)
-	dtheta, dphi, theta, phi:REAL;
+	dtheta, dphi, theta, phi,rphi:REAL;
 	imx,imy,size: INTEGER;
 END;
 
@@ -235,7 +235,9 @@ VAR
 	cameratheta*,cameraphi*:REAL;
 	aperture*: Base.Aperture;
 	image*: Raster.Image;
-
+	rphi: REAL; (* camera pitch. global variable because it is the same for all rays in a frame *)
+	down, right: PT;  (* axes around which camera yaws, pitches *)
+	
 PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
 VAR d: REAL;
 BEGIN
@@ -247,6 +249,7 @@ BEGIN
 	ray.dxyz.x := ray.dxyz.x/d;
 	ray.dxyz.y := ray.dxyz.y/d;
 	ray.dxyz.z := ray.dxyz.z/d;	
+	XNXLMath.orrot(ray.dxyz, right, rphi);  
 	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
@@ -336,7 +339,7 @@ BEGIN
 	dtheta:=dt/TW;
 	dphi:=dp/TH;
 	FOR i:= 0 TO TW-1  DO	
-		phi:=p;
+		phi:=-dp/2;
 		FOR j:= 0 TO TH-1 DO
 			tile[i,j].cam.theta:=theta;
 			tile[i,j].cam.phi:=phi;
@@ -349,6 +352,9 @@ BEGIN
 		END;
 		theta:=theta+dtheta;
 	END;
+	Base.setPT(right,0,1,0);	
+	XNXLMath.orrot(right, down, t); 
+	rphi:=p;
 	BEGIN{EXCLUSIVE}
 		gotiles;
 		AWAIT((tilesdone=TW*TH) OR FRAMEBOORT)
@@ -373,6 +379,7 @@ BEGIN
 			NEW(tile[a,b],a*TS,b*TS);
 		END
 	END;
+	Base.setPT(down,0,0,-1);	
 	EDGE:=0.001;
 	AFTER:=2;
  	FAST:=3;

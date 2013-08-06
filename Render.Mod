@@ -249,7 +249,7 @@ PROCEDURE trace;
 VAR
 	t,p,h,w: REAL;
 BEGIN
-	Retina.go(cameratheta-aperture.width/2,cameraphi-aperture.height/2,aperture.width,aperture.height); 
+	Retina.go(cameratheta-(aperture.width/2),cameraphi-(aperture.height/2),aperture.width,aperture.height); 
 END trace; 
 
 PROCEDURE left (th: REAL);
