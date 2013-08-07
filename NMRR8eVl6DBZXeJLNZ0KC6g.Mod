@@ -1,6 +1,6 @@
 MODULE NMRR8eVl6DBZXeJLNZ0KC6g;
-IMPORT Base:=XNXLBase, XNXLTexVox;
-VAR vox: XNXLTexVox.TexVox;
+IMPORT Base, TexVox;
+VAR vox: TexVox.TexVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	IF vox=NIL THEN NEW(vox,'etile0.png')  END;

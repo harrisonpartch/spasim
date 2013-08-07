@@ -1,6 +1,6 @@
 MODULE Marsh;
-IMPORT  Base , Engrainer, Random,
- XNXLFRep, Files, Streams, Commands, Out:=KernelLog, Kernel;
+IMPORT  Base , Retina, Engrainer, Random,
+ XNXLFRep, Files, Streams, Commands, Out:=KernelLog;
 
 CONST sfile="marshstrokes.text"
 TYPE Voxel=Base.Voxel;
@@ -149,8 +149,8 @@ VAR
 	v: Voxel;
 	d:REAL;
 BEGIN
-(*	Base.world.Shade(Base.rays[Base.W DIV 2, Base.H DIV 2]); 
-	ray:=Base.rays[Base.W DIV 2, Base.H DIV 2];
+	ray:=Base.sniperay;
+	Base.world.Shade(ray);
 	IF ray.hitmirrorTF THEN 
 		p:=ray.hitxyz; dp:=ray.hitdxyz
 	ELSE
@@ -165,8 +165,8 @@ BEGIN
 		p.y:=p.y-dp.y/1000000;
 		p.z:=p.z-dp.z/1000000;
 	END;
-	Base.cursorPT:=p; 
-	*)
+	Base.cursorPT:=p; 	
+	stroke(Base.cursorPT,cursorsize,marshv.vox,voxundo)
 END drawcursor;
 
 PROCEDURE drawHUD*;

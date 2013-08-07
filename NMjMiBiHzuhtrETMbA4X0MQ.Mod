@@ -1,11 +1,9 @@
 MODULE NMjMiBiHzuhtrETMbA4X0MQ;(*anonymous module created by saboteur*)
  
-IMPORT Math, Base:=XNXLBase, XNXLVoxel, XNXLLifeVox, XNXLTexVox, Random, 
-M2:=XNXLM3Space, M3:=XNXLM3Space, XNXLFRep, XNXLRotaVox, XNXLSierp, XNXLHalfSpace;
-
+IMPORT Base, TexVox, XNXLHalfSpace ;
 VAR 
 	vox: XNXLHalfSpace.halfvox; 
-	v: XNXLTexVox.TexVox
+	v: TexVox.TexVox
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	 NEW(v,'tigerlily.png'); 

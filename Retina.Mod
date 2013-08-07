@@ -8,8 +8,8 @@ TYPE
 CONST
 	T=4;        (* must be a power of 2 *)
 	TS=5*16;   (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
-	TW=6;
-	TH=4;
+	TW=8;
+	TH=6;
 	W*=TS*TW;
 	H*=TS*TH
 
@@ -245,7 +245,7 @@ VAR
 	aperture*: Base.Aperture;
 	image*: Raster.Image;
 	rtheta,rphi: REAL; (* camera pitch,roll. global variables because they are the same for all rays in a frame *)
-	fward*, dward, rward: PT;  
+	fward*, dward*, rward*: PT;  
 	
 PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
 VAR d: REAL;
@@ -369,7 +369,9 @@ BEGIN
 	rphi:=theta;	
 	XNXLMath.orrot(fward, Base.dward,rtheta);   
 	XNXLMath.orrot(rward, Base.dward,rtheta);   		
-	XNXLMath.orrot(fward, Base.rward,rphi);  		
+	XNXLMath.orrot(fward, Base.rward,rphi);  	
+	XNXLMath.orrot(dward, Base.rward,rphi);  
+	angletoray(Base.sniperay,0,0);	
 	BEGIN{EXCLUSIVE}
 		gotiles;
 		AWAIT((tilesdone=TW*TH) OR FRAMEBOORT)

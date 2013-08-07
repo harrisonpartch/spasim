@@ -194,7 +194,8 @@ VAR
 	rward:PT;
 	ray: Base.Ray;
 BEGIN
-	rward:=Base.rward;
+	rward:=Retina.rward;
+	rward:=Base.mulPT(rward,-1);
 	cvx :=cvx+(x*rward.x * Base.speed); 
 	cvy :=cvy+(x*rward.y * Base.speed); 	
 	cvz :=cvz+(x*rward.z * Base.speed); 	
@@ -205,8 +206,7 @@ VAR
 	lward:PT;
 	ray: Base.Ray;
 BEGIN
-	lward:= Base.rward;
-	lward.y:=-lward.y;
+	lward:= Retina.rward;
 	cvx :=cvx+(x*lward.x * Base.speed); 
 	cvy :=cvy+(x*lward.y * Base.speed); 	
 	cvz :=cvz+(x*lward.z * Base.speed); 	
@@ -217,8 +217,8 @@ VAR
 	up:PT;
 	ray: Base.Ray;
 BEGIN
-	up:=Base.dward;
-	up.z:=-up.z;
+	up:=Retina.dward;
+	up:=Base.mulPT(up,-1);
 	cvx :=cvx+(x*up.x * Base.speed); 
 	cvy :=cvy+(x*up.y * Base.speed); 	
 	cvz :=cvz+(x*up.z * Base.speed); 	
@@ -229,7 +229,7 @@ VAR
 	down:PT;
 	ray: Base.Ray;
 BEGIN
-	down:=Base.dward;
+	down:=Retina.dward;
 	cvx :=cvx+(x*down.x * Base.speed); 
 	cvy :=cvy+(x*down.y * Base.speed); 	
 	cvz :=cvz+(x*down.z * Base.speed); 	
@@ -284,7 +284,6 @@ BEGIN
 	IF MOUSEDOWN THEN
 		IF MB=3 THEN 
 			Marsh.drawcursor; 
-			Marsh.draw 
 		ELSIF MB=1 THEN Marsh.draw
 		END;
 	END;	
@@ -780,7 +779,6 @@ BEGIN
 		| KS.XK_F2: Base.gravity:= -Base.gravity;
 		| KS.XK_bracketright: camera.aperture.width := camera.aperture.width * 101/99; camera.aperture.height := camera.aperture.height *101/99
 		| KS.XK_bracketleft: camera.aperture.width := camera.aperture.width * 99/101;  camera.aperture.height := camera.aperture.height *99/101
-		| KS.XK_period: Base.fulllightcube.light[Base.rand.Dice(6)].red:=0;
 		| KS.XK_9: IF Marsh.cursorsize<999999 THEN Marsh.cursorsize:=Marsh.cursorsize * 2; Base.cursordist:=Base.cursordist/2 END
 		| KS.XK_0: IF Marsh.cursorsize>1 THEN Marsh.cursorsize:=Marsh.cursorsize DIV 2; Base.cursordist:=Base.cursordist*2 END
 		| KS.XK_7: Base.cursordist:=Base.cursordist*1.3
@@ -1004,7 +1002,6 @@ PROCEDURE Open* ;
 BEGIN
 	openwincam(1080,720);
 	IF ~InitGL() THEN Close; RETURN END; 	
-
 	Raster.InitMode(copy, Raster.srcCopy);
 	Marsh.dawn;	
 	alive:=TRUE;
@@ -1014,7 +1011,7 @@ BEGIN
 	camrotinertia:=100;
 	Base.DTL:=25000;
 	Base.DTL2:=25000;
-	Base.gravity:=0.00001;
+	Base.gravity:=0.0000001;
 	Base.speed:=0.000001;
 	Base.maxspeed:=0.001;
 	Base.cursordist:=0.01;

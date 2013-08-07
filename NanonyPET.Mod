@@ -45,10 +45,10 @@ IMPORT
 	KernelLog, KernelLogger, Modules, Commands, Options, Streams, Inputs, Files, WMRestorable, XML, XMLScanner, XMLParser, XMLObjects,
 	WMStandardComponents, WMGraphics, CompilerInterface, WhitespaceRemover,
 	WMComponents, WMRectangles, WMMessages, WMDialogs, WMDiagnostics,
-	NanonyTextView, WMEditors, Strings, TextUtilities, Texts,
+	WMTextView, WMEditors, Strings, TextUtilities, Texts,
 	WMWindowManager, WMGrids, WMMacros, WMPopups, WMDropTarget,
 	PETTrees, Configuration, Codecs, WMTabComponents, UndoManager, WMSearchComponents, Kernel,
-	XNXLSaboteur;
+	Saboteur;
 
 CONST
 	WindowWidth = 800; WindowHeight = 600;
@@ -348,7 +348,7 @@ TYPE
 	(* Association between a text position and a key combination *)
 	Position = OBJECT
 	VAR
-		marker : NanonyTextView.PositionMarker;
+		marker : WMTextView.PositionMarker;
 		ucs, keysym : LONGINT; flags : SET;
 		next : Position;
 
@@ -363,10 +363,10 @@ TYPE
 	(* Store and Recall cursor positions in the main editor. Flags are ignored for now *)
 	Positions = OBJECT
 	VAR
-		textView : NanonyTextView.TextView;
+		textView : WMTextView.TextView;
 		positions : Position;
 
-		PROCEDURE &Init*(textView : NanonyTextView.TextView);
+		PROCEDURE &Init*(textView : WMTextView.TextView);
 		BEGIN
 			ASSERT(textView # NIL);
 			SELF.textView := textView;
@@ -526,7 +526,7 @@ TYPE
 			resizerH, resizerV: WMStandardComponents.Resizer;
 			um: UndoManager.UndoManager;
 			colWidths : WMGrids.Spacings;
-			textViews : ARRAY 2 OF NanonyTextView.TextView;
+			textViews : ARRAY 2 OF WMTextView.TextView;
 		BEGIN
 			settings := GetSettings();
 			Init;
@@ -621,7 +621,7 @@ TYPE
 			editPanel.AddContent(editor);
 			editor.macros.Add(WMMacros.Handle);
 			editor.multiLine.Set(TRUE);
-			editor.tv.wrapMode.Set(NanonyTextView.NoWrap);
+			editor.tv.wrapMode.Set(WMTextView.NoWrap);
 			editor.tv.onCursorChanged := CursorChanged;
 			editor.tv.commandCaller := window;
 			editor.tv.commandWriter := logWriter;
@@ -643,7 +643,7 @@ TYPE
 			splitPanel.AddContent(splitEditor);
 			splitEditor.macros.Add(WMMacros.Handle);
 			splitEditor.multiLine.Set(TRUE);
-			splitEditor.tv.wrapMode.Set(NanonyTextView.NoWrap);
+			splitEditor.tv.wrapMode.Set(WMTextView.NoWrap);
 			splitEditor.tv.commandCaller := window;
 			splitEditor.tv.commandWriter := logWriter;
 			splitEditor.SetText(editor.text);
@@ -852,12 +852,12 @@ TYPE
 
 		PROCEDURE ToggleWrap;
 		BEGIN
-			IF (editor.tv.wrapMode.Get() = NanonyTextView.WrapWord) THEN
-				editor.tv.wrapMode.Set(NanonyTextView.NoWrap);
-				splitEditor.tv.wrapMode.Set(NanonyTextView.NoWrap);
+			IF (editor.tv.wrapMode.Get() = WMTextView.WrapWord) THEN
+				editor.tv.wrapMode.Set(WMTextView.NoWrap);
+				splitEditor.tv.wrapMode.Set(WMTextView.NoWrap);
 			ELSE
-				editor.tv.wrapMode.Set(NanonyTextView.WrapWord);
-				splitEditor.tv.wrapMode.Set(NanonyTextView.WrapWord);
+				editor.tv.wrapMode.Set(WMTextView.WrapWord);
+				splitEditor.tv.wrapMode.Set(WMTextView.WrapWord);
 			END;
 			wrap := ~wrap;
 		END ToggleWrap;
@@ -2277,8 +2277,8 @@ TYPE
 
 		PROCEDURE LinkClickedHandler(sender, data : ANY);
 		BEGIN
-			IF data IS NanonyTextView.LinkWrapper THEN
-				KernelLog.String("Link: "); KernelLog.String(data(NanonyTextView.LinkWrapper).link^); KernelLog.Ln
+			IF data IS WMTextView.LinkWrapper THEN
+				KernelLog.String("Link: "); KernelLog.String(data(WMTextView.LinkWrapper).link^); KernelLog.Ln
 			END;
 		END LinkClickedHandler;
 
@@ -2542,7 +2542,7 @@ TYPE
 			WMRestorable.StoreString(elem, "codecFormat", page.codecFormat);
 			WMRestorable.StoreString(elem, "compilerOptions", page.options);
 			WMRestorable.StoreBoolean(elem, "showLabels", page.editor.tv.showLabels.Get());
-			WMRestorable.StoreBoolean(elem, "wordWrap", page.editor.tv.wrapMode.Get() = NanonyTextView.WrapWord);
+			WMRestorable.StoreBoolean(elem, "wordWrap", page.editor.tv.wrapMode.Get() = WMTextView.WrapWord);
 
 			NEW(entry); entry.SetName("Editor");
 				WMRestorable.StoreLongint(entry, "firstLine", page.editor.tv.firstLine.Get());

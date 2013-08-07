@@ -1,12 +1,12 @@
 MODULE NtxxZorqH5oWxECOCwH59AQ;(*anonymous module created by saboteur*)
   
 
-IMPORT XNXLBase,  Noise:=XNXLNoise;
+IMPORT Base,  Noise:=XNXLNoise;
 
-TYPE Ray = XNXLBase.Ray;
-	Voxel = XNXLBase.Voxel;  
+TYPE Ray = Base.Ray;
+	Voxel = Base.Voxel;  
 	
-TYPE NoiseVox*=OBJECT(XNXLBase.Voxel);
+TYPE NoiseVox*=OBJECT(Base.Voxel);
 PROCEDURE Shade (VAR ray: Ray);
 VAR
 	n,m,o,dot,fade:REAL;

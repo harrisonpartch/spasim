@@ -1,7 +1,7 @@
 MODULE NnKyXYNiHwdxuM6wHrbxwuQ;
- IMPORT Base:=XNXLBase, XNXLTexVox;
+ IMPORT Base, TexVox;
   
-VAR vox: XNXLTexVox.TexVox;
+VAR vox: TexVox.TexVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	IF vox=NIL THEN NEW(vox,'axolotl.png')  END;

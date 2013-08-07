@@ -488,8 +488,7 @@ VAR
 	copy*: Raster.Mode;
 	skydistance*:REAL;
 	rnf*:REAL; (*random number for frame*);
-	fulllight: Light;
-	fulllightcube*,nolightcube*: LightCube;
+	sniperay*:Ray;
 	
 PROCEDURE VoxelFromName*(modname: Name): Voxel;
 	VAR voxel: Voxel;  fackery: VoxelFackery;
@@ -1072,13 +1071,6 @@ BEGIN
 	m3sdelta:=25;
 	speed:=0.00051;
 	skydistance:=1.0;
-	fulllight.red:=1; fulllight.green:=1;fulllight.blue:=1;
-	fulllightcube.light[0]:=fulllight;	
-	fulllightcube.light[1]:=fulllight;
-	fulllightcube.light[2]:=fulllight;
-	fulllightcube.light[3]:=fulllight;
-	fulllightcube.light[4]:=fulllight;
-	fulllightcube.light[5]:=fulllight;	
 	Out.String("loaded.");
 	Out.Ln;
 END Base.

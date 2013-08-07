@@ -1,5 +1,5 @@
 MODULE NUeconrGpx7plz7ym76ibLw;
-IMPORT Base:=XNXLBase, XNXLTexVox;
+IMPORT Base:=Base, TexVox;
 VAR
 	vox: Base.Voxel  ; 
 PROCEDURE  thisvox*():Base.Voxel;

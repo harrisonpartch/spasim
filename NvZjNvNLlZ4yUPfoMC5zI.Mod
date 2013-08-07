@@ -1,13 +1,13 @@
 MODULE NvZjNvNLlZ4yUPfoMC5zI;(*anonymous module created by saboteur*)
   
-IMPORT Base:=XNXLBase,  XNXLFRep,  M3:=XNXLM3Space;
+IMPORT Base,  XNXLFRep;
 
 TYPE Ray = Base.Ray;
 	Voxel = Base.Voxel;  
 	PT =Base.PT;
 VAR 
 	ball: XNXLFRep.sphere;
-	conglomerate:M3.cell;
+	conglomerate:Voxel;
 	center:  PT;
 	i:INTEGER;
 	
@@ -17,8 +17,7 @@ BEGIN
 END thisvox;
 
 BEGIN
-
-	NEW(conglomerate);
+	conglomerate:=Base.VoxelFromName("NM3");
 	FOR i :=0 TO 100 DO
 		Base.setPT(center,Base.rand.Uniform(),Base.rand.Uniform(),Base.rand.Uniform());
 		NEW(ball,center,Base.rand.Uniform()/10);

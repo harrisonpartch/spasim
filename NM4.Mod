@@ -1,10 +1,10 @@
 MODULE NM4;
-IMPORT Base:=XNXLBase, XNXLE, XNXLNoise, XNXLFRep, Math, Out := KernelLog, Debugging, Streams,Strings;
+IMPORT Base, XNXLE, XNXLNoise, XNXLFRep, Math, Out := KernelLog, Debugging, Streams,Strings;
 
 CONST M=4;
 	MMO=M-1;
 	CUBERADIUS=0.65;   (*change to sqrt(3)/2 ???*)
-	NCODE="NM3";
+	NCODE="NM4";
 	NL=Base.NL;
 
 TYPE PT = Base.PT;

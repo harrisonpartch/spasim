@@ -1,6 +1,6 @@
 MODULE NSIsnYBTYL9BajD8fbPDSqg;
-IMPORT Base:=XNXLBase, XNXLTexVox;
-VAR vox: XNXLTexVox.TexVox;
+IMPORT Base:=Base, TexVox;
+VAR vox: TexVox.TexVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	IF vox=NIL THEN NEW(vox,'sparx.png')  END;

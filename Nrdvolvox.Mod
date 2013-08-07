@@ -1,6 +1,6 @@
 MODULE Nrdvolvox;
 
-IMPORT Base:=XNXLBase, XNXLE, XNXLFRep;
+IMPORT Base, XNXLE, XNXLFRep;
 
 CONST	
 	M=20;

@@ -1,8 +1,8 @@
 MODULE NUzl1lqmBmaKyswkc70kO3w;(*anonymous module created by saboteur*)
  
-IMPORT Base:=XNXLBase, XNXLTexVox;
+IMPORT Base:=Base, TexVox;
   
-VAR vox: XNXLTexVox.TexVox;
+VAR vox: TexVox.TexVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	IF vox=NIL THEN NEW(vox,'XNXL.sky2.jpg')  END;

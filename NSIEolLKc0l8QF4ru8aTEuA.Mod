@@ -1,8 +1,9 @@
-MODULE NSIEolLKc0l8QF4ru8aTEuA;IMPORT XNXLBase, XNXLVoxel, XNXLVoxel4, XNXLLifeVox, XNXLTexVox, Random, 
-M2:=XNXLM3Space, M3:=XNXLM3Space, XNXLFRep, XNXLRotaVox, XNXLSierp, XNXLHalfSpace;
-PROCEDURE  thisvox*():XNXLBase.Voxel;
+MODULE NSIEolLKc0l8QF4ru8aTEuA;
+
+IMPORT Base, TexVox;
+PROCEDURE  thisvox*():Base.Voxel;
 VAR
-	vox:  XNXLTexVox.TexVox;
+	vox:  TexVox.TexVox;
 BEGIN
 	NEW(vox,'XNXL.dotz.png'); 
 	vox.passable:=TRUE;

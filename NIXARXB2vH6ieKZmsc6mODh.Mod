@@ -1,11 +1,11 @@
 MODULE NIXARXB2vH6ieKZmsc6mODh;
-IMPORT XNXLBase, XNXLTexVox;
+IMPORT Base, TexVox;
   
-TYPE PT = XNXLBase.PT;
-	Color = XNXLBase.Color;
-	Ray = XNXLBase.Ray;
-	Voxel = XNXLBase.Voxel;  
-TYPE TransparaVox*=OBJECT(XNXLBase.Voxel);
+TYPE PT = Base.PT;
+	Color = Base.Color;
+	Ray = Base.Ray;
+	Voxel = Base.Voxel;  
+TYPE TransparaVox*=OBJECT(Base.Voxel);
 VAR
 	r, g, b, black: REAL;	
 PROCEDURE setcolor* (red, green, blue,bl, alpha  : REAL); 
@@ -23,8 +23,8 @@ VAR
 	exit:PT;
 	dr,dg,db,dbl: REAL;
 BEGIN
-	exit:=XNXLBase.Exit(ray);
-	depth:=XNXLBase.distance(ray.lxyz,exit);
+	exit:=Base.Exit(ray);
+	depth:=Base.distance(ray.lxyz,exit);
 	dr := r*depth;
 	dg := g*depth;
 	db := b*depth;
@@ -41,7 +41,7 @@ END Shade;
 END TransparaVox;  
   
 VAR vox:TransparaVox;
-PROCEDURE thisvox*():XNXLBase.Voxel;
+PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	RETURN vox
 END thisvox;

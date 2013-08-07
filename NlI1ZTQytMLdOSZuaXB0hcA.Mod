@@ -1,8 +1,8 @@
 MODULE NlI1ZTQytMLdOSZuaXB0hcA;(*anonymous module created by saboteur*)
  
-IMPORT Base:=XNXLBase, XNXLTexVox;
+IMPORT Base, TexVox;
 
- VAR vox: Base.Voxel; v: XNXLTexVox.TexVox;
+ VAR vox: Base.Voxel; v: TexVox.TexVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	 NEW(v,'tigerlily.png'); 
