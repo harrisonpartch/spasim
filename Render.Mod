@@ -172,7 +172,7 @@ PROCEDURE forward(x:REAL);
 VAR
 	fward:PT;
 BEGIN
-	fward:=Base.fward;
+	fward:=Retina.fward;
 	cvx :=cvx+(x*fward.x * Base.speed); 
 	cvy :=cvy+(x*fward.y * Base.speed); 	
 	cvz :=cvz+(x*fward.z * Base.speed); 	
@@ -182,7 +182,7 @@ PROCEDURE backward(x:REAL);
 VAR	
 	fward:PT;
 BEGIN
-	fward:=Base.fward;	
+	fward:=Retina.fward;	
 	fward.x:=-fward.x;
 	cvx :=cvx-(x*fward.x * Base.speed); 
 	cvy :=cvy-(x*fward.y * Base.speed); 	
@@ -277,8 +277,8 @@ BEGIN
 	Base.updatecamera(cx,cy,cz,a,b,c,d,e,f);	
 (*	Marsh.drawavatar; *)
 	GLIDE:=0.975;	
-	cvz := cvz*GLIDE+gravityvector.x; 
-	cvx := cvx*GLIDE; cvy := cvy*GLIDE; 
+	cvz := cvz*GLIDE+gravityvector.z; 
+	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y; 
 	cvl :=cvl*0.0; cvu := cvu*0.0;
 	IF AVATAR THEN Marsh.drawavatar END;
 	IF MOUSEDOWN THEN
@@ -837,7 +837,7 @@ PROCEDURE  InitGL(): BOOLEAN;
 	GL.GenTextures(1, ADDRESSOF(image));
 	GL.BindTexture(GLC.GL_TEXTURE_2D, image); 
 	(* These determine how interpolation is made when image scaled down on up *)
-	GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_FLAT);
+	GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR);
 	GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_LINEAR);
 	GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height, 0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, ADDRESSOF(Retina.image.mem[0]));
 
@@ -1002,7 +1002,7 @@ END openwincam;
 
 PROCEDURE Open* ;
 BEGIN
-	openwincam(640,480);
+	openwincam(1080,720);
 	IF ~InitGL() THEN Close; RETURN END; 	
 
 	Raster.InitMode(copy, Raster.srcCopy);

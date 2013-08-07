@@ -6,10 +6,10 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=5;        (* must be a power of 2 *)
-	TS=5*32;   (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
-	TW=2;
-	TH=2;
+	T=4;        (* must be a power of 2 *)
+	TS=5*16;   (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
+	TW=4;
+	TH=3;
 	W*=TS*TW;
 	H*=TS*TH
 
@@ -251,15 +251,15 @@ PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
 VAR d: REAL;
 BEGIN
 	ray:=Base.blankray;
-	ray.dxyz.z:= Math.cos(theta) * Math.cos(phi);
+	ray.dxyz.x:= Math.cos(theta) * Math.cos(phi);
 	ray.dxyz.y:= Math.sin(theta) * Math.cos(phi);
-	ray.dxyz.x := Math.sin(phi);
+	ray.dxyz.z := Math.sin(phi);
 	d := Math.sqrt(ray.dxyz.x*ray.dxyz.x + ray.dxyz.y* ray.dxyz.y+ray.dxyz.z*ray.dxyz.z);  (* Norma! Liza! Ray! Front and center, oh dark thirty!*)
 	ray.dxyz.x := ray.dxyz.x/d;
 	ray.dxyz.y := ray.dxyz.y/d;
 	ray.dxyz.z := ray.dxyz.z/d;	
+	XNXLMath.orrot(ray.dxyz, Base.dward, rtheta);  
 	XNXLMath.orrot(ray.dxyz, rward, rphi);  
-	XNXLMath.orrot(ray.dxyz, dward, -rtheta);  
 	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
@@ -365,11 +365,11 @@ BEGIN
 	dward:= Base.dward;
 	fward:= Base.fward;
 	rward:=Base.rward;
-	rtheta:=theta;
-	rphi:=phi;	
-	XNXLMath.orrot(fward, rward,rphi);   	
-	XNXLMath.orrot(fward, dward,rtheta);  		
-	XNXLMath.orrot(rward, dward,rtheta);   			
+	rtheta:=phi;
+	rphi:=theta;	
+	XNXLMath.orrot(fward, Base.dward,rtheta);   
+	XNXLMath.orrot(rward, Base.dward,rtheta);   		
+	XNXLMath.orrot(fward, Base.rward,rphi);  		
 	BEGIN{EXCLUSIVE}
 		gotiles;
 		AWAIT((tilesdone=TW*TH) OR FRAMEBOORT)
@@ -394,7 +394,6 @@ BEGIN
 			NEW(tile[a,b],a*TS,b*TS);
 		END
 	END;	
-	Base.setPT(dward,0,0,1);	
 	EDGE:=0.001;
 	AFTER:=2;
  	FAST:=3;
