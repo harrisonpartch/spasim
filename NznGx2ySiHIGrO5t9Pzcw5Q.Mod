@@ -1,9 +1,9 @@
 MODULE NznGx2ySiHIGrO5t9Pzcw5Q;
-IMPORT XNXLBase, XNXLTexVox;
+IMPORT Base, TexVox;
   
 VAR
-	vox: XNXLTexVox.TexVox; 
-PROCEDURE thisvox*():XNXLBase.Voxel;
+	vox: TexVox.TexVox; 
+PROCEDURE thisvox*():Base.Voxel;
 BEGIN	
 	IF vox=NIL THEN NEW(vox,'krill.png'); 	
  END;

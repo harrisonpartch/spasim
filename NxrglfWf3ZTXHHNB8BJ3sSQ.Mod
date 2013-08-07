@@ -1,6 +1,6 @@
 MODULE NxrglfWf3ZTXHHNB8BJ3sSQ;
- IMPORT Base:=XNXLBase, XNXLTexVox;
-VAR vox: XNXLTexVox.TexVox;
+ IMPORT Base, TexVox;
+VAR vox: TexVox.TexVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	IF vox=NIL THEN NEW(vox,'caption.jpg')  END;

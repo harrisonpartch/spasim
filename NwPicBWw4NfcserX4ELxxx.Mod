@@ -1,9 +1,9 @@
 MODULE NwPicBWw4NfcserX4ELxxx;
 
-IMPORT XNXLBase, XNXLTexVox;
+IMPORT Base, TexVox;
   
-VAR vox: XNXLTexVox.TexCubeVox;
-PROCEDURE thisvox*():XNXLBase.Voxel;
+VAR vox: TexVox.TexCubeVox;
+PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	IF vox=NIL THEN NEW(vox,'lazyblock')  END;
 	RETURN vox

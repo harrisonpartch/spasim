@@ -1,8 +1,7 @@
-MODULE No13s7eEq5z1VzXOucrDZiw;IMPORT Math, XNXLBase, XNXLVoxel, XNXLLifeVox, XNXLTexVox, Random, 
-M2:=XNXLM3Space, M3:=XNXLM3Space, XNXLFRep, XNXLRotaVox, XNXLSierp, XNXLHalfSpace;
+MODULE No13s7eEq5z1VzXOucrDZiw;IMPORT Base, TexVox ;
   
-VAR vox: XNXLTexVox.TexVox;
-PROCEDURE thisvox*():XNXLBase.Voxel;
+VAR vox: TexVox.TexVox;
+PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	IF vox=NIL THEN NEW(vox,'dieone.png')  END;
 	RETURN vox

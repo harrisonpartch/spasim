@@ -1,9 +1,9 @@
 MODULE NZjDHYA8YHHcuymIh1fhHgg;(*anonymous module created by saboteur*)
   
-IMPORT XNXLBase,  XNXLTexVox;
+IMPORT Base,  TexVox;
 
-VAR vox: XNXLTexVox.TexVox;
-PROCEDURE thisvox*():XNXLBase.Voxel;
+VAR vox: TexVox.TexVox;
+PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	RETURN vox
 END thisvox;

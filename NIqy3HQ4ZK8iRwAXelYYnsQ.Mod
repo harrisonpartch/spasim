@@ -1,19 +1,18 @@
 MODULE NIqy3HQ4ZK8iRwAXelYYnsQ;
-IMPORT Math, XNXLBase, XNXLVoxel, XNXLVoxel4, XNXLLifeVox, XNXLTexVox, Random, 
-M2:=XNXLM3Space, M3:=XNXLM3Space, XNXLFRep, XNXLRotaVox, XNXLSierp, XNXLHalfSpace;
+IMPORT Math, Base, TexVox,Random;
 
 
 VAR
 	rand: Random.Generator;
 
 
-TYPE PT=XNXLBase.PT;
-	BOX=XNXLBase.BOX;
-	Ray = XNXLBase.Ray;
-	Voxel = XNXLBase.Voxel;
-	Name = XNXLBase.Name;
+TYPE PT=Base.PT;
+	BOX=Base.BOX;
+	Ray = Base.Ray;
+	Voxel = Base.Voxel;
+	Name = Base.Name;
 
-TYPE ImpliciVox=OBJECT(XNXLBase.Voxel)
+TYPE ImpliciVox=OBJECT(Base.Voxel)
 VAR
 	c: PT;
 	cx*,cy*,cz*: REAL; (* center of polar coordinates *)
@@ -69,7 +68,7 @@ END ImpliciVox;
 TYPE SphereInVox*=OBJECT(ImpliciVox);
 VAR
 	D2*:REAL;
-	Normal: XNXLBase.PT;
+	Normal: Base.PT;
 PROCEDURE & init*;
 BEGIN
 	setCenter(1/2,1/2,1/2);
@@ -89,7 +88,7 @@ END tick;
 PROCEDURE Shade*(VAR ray: Ray);
 VAR
 	x,y,z, th,ph,d,r,g,blue,alpha: REAL;
-	a,b,c,n: XNXLBase.PT;
+	a,b,c,n: Base.PT;
 	i: INTEGER;
 	hit: BOOLEAN;
 	dot:REAL;
@@ -103,7 +102,7 @@ BEGIN
 		ray.b := ray.b +dot*ray.ba; 
 		ray.terminate := TRUE;		
 	ELSE		
-		b:= XNXLBase.Exit(ray);
+		b:= Base.Exit(ray);
 		x := (a.x+b.x)/2; y := (a.y+b.y)/2; z := (a.z + b.z)/2;
 		d := d2(a.x, a.y, a.z);
 		IF d > D2 THEN
@@ -161,7 +160,7 @@ BEGIN
 	x := x-nx; y := y-ny; z := z-nz; 
 END reflect;
 
-PROCEDURE  thisvox*():XNXLBase.Voxel;
+PROCEDURE  thisvox*():Base.Voxel;
 BEGIN
 	IF sphere=NIL THEN
 		NEW(sphere); 

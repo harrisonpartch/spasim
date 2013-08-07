@@ -1,6 +1,18 @@
 <Desktop>
-	<Window name="FileManager" loader="WMFileManager.Restore" l="73" t="321" r="573" b="721" flags="{0..2}"/>
 	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="148" t="77" r="788" b="488" flags="{0..2}"/>
+	<Window name="FileManager" loader="WMFileManager.Restore" l="73" t="321" r="573" b="721" flags="{0..2}"/>
+	<Window name="PET" loader="PET.Restore" l="48" t="170" r="848" b="770" flags="{0..2}">
+		<PETData>
+			<General SelectedPageNr="0" ProjectTextFile=""/>
+			<Tab file="NwPicBWw4NfcserX4ELxxx.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="105"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+		</PETData>
+	</Window>
 	<Window name="PET" loader="PET.Restore" l="1088" t="114" r="1909" b="823" flags="{0..2}">
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>
@@ -13,9 +25,9 @@
 			</Tab>
 		</PETData>
 	</Window>
-	<Window name="PET" loader="PET.Restore" l="602" t="150" r="1525" b="914" flags="{0..2}">
+	<Window name="PET" loader="PET.Restore" l="367" t="105" r="1290" b="869" flags="{0..2}">
 		<PETData>
-			<General SelectedPageNr="5" ProjectTextFile=""/>
+			<General SelectedPageNr="4" ProjectTextFile=""/>
 			<Tab file="XNXL.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
 				<Editor firstLine="0" cursorPos="452"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
@@ -45,14 +57,14 @@
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
 			<Tab file="NCompiler.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="888"/>
+				<Editor firstLine="0" cursorPos="895"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
 			<Tab file="Marsh.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="228" cursorPos="4045"/>
+				<Editor firstLine="324" cursorPos="7813"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="true" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="XNXLBase" replaceString="Base"/>
 				<LogPanel height="130"/>

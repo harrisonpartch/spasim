@@ -263,8 +263,8 @@ BEGIN
 	EMPTY.passable:=TRUE;
       rand:=Base.rand;	
 
-  	w10:=Base.VoxelFromName("NM3");	
- 	z10:=Base.VoxelFromName("NM3");	
+  	w10:=Base.VoxelFromName("NM2");	
+ 	z10:=Base.VoxelFromName("NM2");	
     
 	Out.String("EEEEP!");
 	xot:=Base.VoxelFromName("Nharrisonavatar"); 
@@ -391,11 +391,11 @@ BEGIN
 
 	NEW(noise);		
 	noise.seed:=123666;		
-	noise.a:=1;
-	noise.b:=1;
-	noise.c:=1;		
+	noise.a:=3;
+	noise.b:=3;
+	noise.c:=3;		
 	noise.octaves:=4;
-	noise.setvoxel(sand);
+	noise.setvoxel(greenball);
 	noise.persistence:=4;
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,-1);
@@ -404,9 +404,10 @@ BEGIN
 	plane.vox:=sand;
 	Out.String("EEEEP!"); 				
 	w10.FRaster(plane,30);
-	w10.FRaster(tnoise,30); 
+	w10.FRaster(noise,128); 	
+	w10.FRaster(tnoise,64); 
 	z10.setcolor(1,0,0,0,0); 	
-	w10.setcolor(0,0,0,1,0);
+	w10.setcolor(0,0,0,10,0);
 	w10.stroke(center,30,z10,undo);
 	Base.world:=w10; 	
 	Base.avatar:=xot;

@@ -8,8 +8,8 @@ TYPE
 CONST
 	T=4;        (* must be a power of 2 *)
 	TS=5*16;   (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
-	TW=4;
-	TH=3;
+	TW=6;
+	TH=4;
 	W*=TS*TW;
 	H*=TS*TH
 
@@ -172,7 +172,7 @@ BEGIN
 	IF level<2 THEN
 		x:=cam.imx - W DIV 2;
 		y:=cam.imy-H/2;
-		IF (x*x+y*y)<(W*W/9) THEN
+		IF (x*x+y*y)<(W*W/23) THEN
 			tessad(a); 
 			tessad(b);
 			tessad(c);

@@ -69,7 +69,7 @@ BEGIN
 	lx:=lx*10-ENTIER(lx*10);
 	ly:=ly*10-ENTIER(ly*10);	
 	color1:=texcube.side[ray.face].pixel(lx,ly);	
-	mip:=ray.length*100;
+	mip:=ray.length*10;
 	IF mip>1 THEN mip:=1 END; 
 	mipverse:=1-mip;
 	color.red:=(color1.red*mipverse+mip*color.red);
