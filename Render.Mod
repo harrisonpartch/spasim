@@ -837,8 +837,8 @@ PROCEDURE  InitGL(): BOOLEAN;
 	GL.GenTextures(1, ADDRESSOF(image));
 	GL.BindTexture(GLC.GL_TEXTURE_2D, image); 
 	(* These determine how interpolation is made when image scaled down on up *)
-	GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR);
-	GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_LINEAR);
+	GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_FLAT);
+	GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_FLAT);
 	GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height, 0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, ADDRESSOF(Retina.image.mem[0]));
 
 	(*	passthroughProgram := InitShader("MyDemos/blur2/passthroughVS.glsl", "MyDemos/blur2/passthroughFS.glsl");*)
