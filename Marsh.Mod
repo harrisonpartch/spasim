@@ -384,8 +384,8 @@ BEGIN
 	tnoise.setvoxel(dotz);
 	tnoise.va[0]:=sand;
 	tnoise.va[1]:=axolotl;
-	tnoise.va[2]:=lazy;
-	tnoise.va[3]:=whiteblock;
+	tnoise.va[2]:=etile0;
+	tnoise.va[3]:=serp;
 	tnoise.va[4]:=tigerlily;
 	tnoise.va[5]:=btx;	
 
@@ -395,13 +395,13 @@ BEGIN
 	noise.b:=3;
 	noise.c:=3;		
 	noise.octaves:=4;
-	noise.setvoxel(serp);
+	noise.setvoxel(axolotl);
 	noise.persistence:=4;
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,-1);
-	Base.setPT(center,1/2,1/2,1/12);
+	Base.setPT(center,1/2,1/2,11/12);
 	NEW(plane,center,up);
-	plane.vox:=sand;
+	plane.vox:=tigerlily;
 	Out.String("EEEEP!"); 				
 	w10.FRaster(plane,30);
 	w10.FRaster(noise,128); 	

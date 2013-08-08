@@ -269,7 +269,8 @@ VAR
 BEGIN
 	move;	
 	cam.x := cx; cam.y := cy; cam.z := cz;
-	gravityvector:=Base.subPT(worldcenter,cam);	
+(*	gravityvector:=Base.subPT(worldcenter,cam);	*)
+	gravityvector:=Base.mkPT(0,0,1);		
 	gravity:=Base.gravity;
 	gravityvector:=Base.mulPT(gravityvector,Base.gravity);
 	a:=Retina.fward.x*Base.cursordist; b:=Retina.fward.y*Base.cursordist; c:=Retina.fward.z*Base.cursordist;
@@ -1000,7 +1001,7 @@ END openwincam;
 
 PROCEDURE Open* ;
 BEGIN
-	openwincam(480,320);
+	openwincam(720,480);
 	IF ~InitGL() THEN Close; RETURN END; 	
 	Raster.InitMode(copy, Raster.srcCopy);
 	Marsh.dawn;	
@@ -1011,7 +1012,7 @@ BEGIN
 	camrotinertia:=100;
 	Base.DTL:=25000;
 	Base.DTL2:=25000;
-	Base.gravity:=0.0000001;
+	Base.gravity:=0.00001;
 	Base.speed:=0.000001;
 	Base.maxspeed:=0.001;
 	Base.cursordist:=0.01;

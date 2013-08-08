@@ -8,7 +8,7 @@ TYPE PT = Base.PT;
 TYPE TransparaVox*=OBJECT(Base.Voxel);
 VAR
 	r, g, b, black: REAL;	
-PROCEDURE setcolor* (red, green, blue,bl, alpha  : REAL); 
+PROCEDURE setcolor* (red, green, blue,bl , a : REAL); 
 BEGIN
 	r := red;
 	g := green;
@@ -24,7 +24,7 @@ VAR
 	dr,dg,db,dbl: REAL;
 BEGIN
 	exit:=Base.Exit(ray);
-	depth:=Base.distance(ray.lxyz,exit);
+	depth:=Base.dist(ray.lxyz,exit)/ray.scale;
 	dr := r*depth;
 	dg := g*depth;
 	db := b*depth;
@@ -48,5 +48,5 @@ END thisvox;
 
 BEGIN
 NEW(vox); 
-vox.setcolor(0,1/40,0,1/20,0);
+vox.setcolor(1000,0,100,500,0);
 END NIXARXB2vH6ieKZmsc6mODh. 

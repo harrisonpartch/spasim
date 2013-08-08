@@ -65,7 +65,6 @@ BEGIN
 	serp.stroke(Base.mkPT(1/2,3/4,1/2),3,beatrix,v);
 	serp.stroke(Base.mkPT(1/2,1/2,1/2),3,beatrix,v);			
 	serp.imposter:=lobster;
-
-	RETURN beatrix
+	RETURN serp
 END thisvox;
  END NXWCxXWLIcD2LegvoGXXBiQ. 
