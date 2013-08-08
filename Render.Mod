@@ -1000,7 +1000,7 @@ END openwincam;
 
 PROCEDURE Open* ;
 BEGIN
-	openwincam(1080,720);
+	openwincam(480,320);
 	IF ~InitGL() THEN Close; RETURN END; 	
 	Raster.InitMode(copy, Raster.srcCopy);
 	Marsh.dawn;	

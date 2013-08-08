@@ -1,7 +1,19 @@
 <Desktop>
-	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="148" t="77" r="788" b="488" flags="{0..2}"/>
 	<Window name="FileManager" loader="WMFileManager.Restore" l="73" t="321" r="573" b="721" flags="{0..2}"/>
-	<Window name="PET" loader="PET.Restore" l="48" t="170" r="848" b="770" flags="{0..2}">
+	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="148" t="77" r="788" b="488" flags="{0..2}"/>
+	<Window name="PET" loader="PET.Restore" l="36" t="110" r="836" b="710" flags="{0..2}">
+		<PETData>
+			<General SelectedPageNr="0" ProjectTextFile=""/>
+			<Tab file="NXWCxXWLIcD2LegvoGXXBiQ.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="0"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+		</PETData>
+	</Window>
+	<Window name="PET" loader="PET.Restore" l="49" t="170" r="849" b="770" flags="{0..2}">
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>
 			<Tab file="NwPicBWw4NfcserX4ELxxx.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
@@ -25,9 +37,9 @@
 			</Tab>
 		</PETData>
 	</Window>
-	<Window name="PET" loader="PET.Restore" l="367" t="105" r="1290" b="869" flags="{0..2}">
+	<Window name="PET" loader="PET.Restore" l="355" t="105" r="1278" b="869" flags="{0..2}">
 		<PETData>
-			<General SelectedPageNr="4" ProjectTextFile=""/>
+			<General SelectedPageNr="5" ProjectTextFile=""/>
 			<Tab file="XNXL.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
 				<Editor firstLine="0" cursorPos="452"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>

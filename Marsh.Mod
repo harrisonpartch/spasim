@@ -395,7 +395,7 @@ BEGIN
 	noise.b:=3;
 	noise.c:=3;		
 	noise.octaves:=4;
-	noise.setvoxel(greenball);
+	noise.setvoxel(serp);
 	noise.persistence:=4;
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,-1);
