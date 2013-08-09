@@ -6,10 +6,10 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=4;        (* must be a power of 2 *)
-	TS=5*16;   (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
-	TW=7;
-	TH=5;
+	T=3;        (* must be a power of 2 *)
+	TS=5*8;   (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
+	TW=9;
+	TH=6;
 	W*=TS*TW;
 	H*=TS*TH
 
@@ -172,7 +172,7 @@ BEGIN
 	IF level<2 THEN
 		x:=cam.imx - W DIV 2;
 		y:=cam.imy-H/2;
-		IF (x*x+y*y)<(W*W/23) THEN
+		IF (x*x+y*y)<(W*W/foveaparameter) THEN
 			tessad(a); 
 			tessad(b);
 			tessad(c);
@@ -246,6 +246,7 @@ VAR
 	image*: Raster.Image;
 	rtheta,rphi: REAL; (* camera pitch,roll. global variables because they are the same for all rays in a frame *)
 	fward*, dward*, rward*: PT;  
+	foveaparameter:INTEGER;
 	
 PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
 VAR d: REAL;
@@ -312,6 +313,16 @@ BEGIN
 	d.size:=s;			
 	
 END splitcam;
+
+PROCEDURE lessdetail*;
+BEGIN
+	IF foveaparameter<30 THEN INC(foveaparameter) END
+END lessdetail;
+
+PROCEDURE moredetail*;
+BEGIN
+	foveaparameter:=ABS(foveaparameter-1)
+END moredetail;
 
 PROCEDURE incTD;
 BEGIN{EXCLUSIVE}
@@ -402,5 +413,6 @@ BEGIN
  	lsense:=0.2;
  	aperture.width:=3;
  	aperture.height:=3;
+ 	foveaparameter:=23;
  	Out.String("loaded...");
 END Retina.

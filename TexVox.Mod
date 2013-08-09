@@ -57,14 +57,80 @@ VAR
 	dtl: LONGINT;
 	mip,mipverse: REAL;
 BEGIN
-	xx:=ray.xyz.x;
-	yy:=ray.xyz.y;
-	zz:=ray.xyz.z;
-	xx:=xx*pstscale-ENTIER(xx*pstscale);
-	yy:=yy*pstscale-ENTIER(yy*pstscale);
-	zz:=zz*pstscale-ENTIER(zz*pstscale);
-	lx:=xx+zz/3 - ENTIER(xx+zz/3);
-	ly:=yy+zz/3 - ENTIER(yy+zz/3);
+	IF pstscale>0 THEN
+		xx:=ray.xyz.x;
+		yy:=ray.xyz.y;
+		zz:=ray.xyz.z;
+		xx:=xx*pstscale-ENTIER(xx*pstscale);
+		yy:=yy*pstscale-ENTIER(yy*pstscale);
+		zz:=zz*pstscale-ENTIER(zz*pstscale);
+		xxx:=ABS(1/2-xx);
+		yyy:=ABS(1/2-yy);
+		zzz:=ABS(1/2-zz);
+		IF xxx>yyy THEN
+			IF xxx>zzz THEN
+				(* yz pyramid *)  				(*  faces come in pairs: (0,3),(2,5),(1,4) *)
+				lx:=yy; ly:=zz;
+				lx1:=pstscale*ray.lxyz.x/ray.scale;
+				CASE ray.face OF
+					0:
+					|1: lx:=lx+lx1;
+					|2:  ly:=ly+lx1; 
+					|3: 
+					|4: lx:=lx+lx1-1;
+					|5: ly:=ly+lx1-1; 
+				END
+			ELSE
+				(* xy pyramid *)
+				lx:=xx; ly:=yy;
+				lz1:=pstscale*ray.lxyz.z/ray.scale;
+				CASE ray.face OF
+					 0: lx:=lx+lz1;
+					|1:  ly:=ly+lz1;
+					|2: 
+					|3: lx:=lx+lz1-1;
+					|4: ly:=ly+lz1-1;
+					|5:
+				END
+			END
+		ELSE
+			IF yyy>zzz THEN
+				(* xz pyramid *)	
+				lx:=xx; ly:=zz;	
+				ly1:=pstscale*ray.lxyz.y/ray.scale;	
+				CASE ray.face OF
+					 0: lx:= lx+ly1;
+					|1:
+					|2: ly:=ly+ly1;
+					|3: lx:= lx+ly1-1;
+					|4:  
+					|5:ly:=ly+ly1-1;
+				END
+
+			ELSE
+				(* xy pyramid *)
+				lx:=xx; ly:=yy;
+				lz1:=pstscale*ray.lxyz.z/ray.scale;
+				CASE ray.face OF
+					 0: lx:=lx+lz1;
+					|1:  ly:=ly+lz1;
+					|2: 
+					|3: lx:=lx+lz1-1;
+					|4: ly:=ly+lz1-1;
+					|5:
+				END
+			END
+		END 
+	ELSE
+		CASE ray.face OF
+			 0: lx := ray.xyz.y; ly := 1-ray.xyz.z; 
+			|1: lx := ray.xyz.x; ly := 1-ray.xyz.z; 
+			|2: lx := ray.xyz.x; ly := ray.xyz.y;
+			|3: lx := ray.xyz.y; ly := 1-ray.xyz.z; 
+			|4: lx := ray.xyz.x; ly := 1-ray.xyz.z; 
+			|5: lx := ray.xyz.x; ly := ray.xyz.y;  
+		END
+	END;
 	color:=texcube.side[ray.face].pixel(lx,ly);
 	lx:=lx*10-ENTIER(lx*10);
 	ly:=ly*10-ENTIER(ly*10);	

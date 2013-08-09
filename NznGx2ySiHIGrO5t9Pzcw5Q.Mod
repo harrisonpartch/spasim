@@ -5,7 +5,7 @@ VAR
 	vox: TexVox.TexVox; 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN	
-	IF vox=NIL THEN NEW(vox,'krill.png'); 	
+	IF vox=NIL THEN NEW(vox,"lobster.png"); 	
  END;
 	RETURN vox
 END thisvox;

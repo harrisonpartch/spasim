@@ -46,7 +46,7 @@ VAR
 	v: Voxel;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	beatrix:=Base.VoxelFromName("NwPicBWw4NfcserX4ELaQ3A"); 
+	beatrix:=Base.VoxelFromName("NGNYAfkxmEzxe6ZESmcMJtw"); 
 	lobster:=Base.VoxelFromName("NznGx2ySiHIGrO5t9Pzcw5Q"); 
 	serp:=Base.VoxelFromName("NM3"); 	
 	NEW(blue);
@@ -64,7 +64,9 @@ BEGIN
 	serp.stroke(Base.mkPT(1/2,1/4,1/2),3,beatrix,v);
 	serp.stroke(Base.mkPT(1/2,3/4,1/2),3,beatrix,v);
 	serp.stroke(Base.mkPT(1/2,1/2,1/2),3,beatrix,v);			
-	serp.imposter:=lobster;
-	RETURN serp
+	serp.imposter:=beatrix;
+	RETURN beatrix
 END thisvox;
  END NXWCxXWLIcD2LegvoGXXBiQ. 
+ 
+ Marsh.Rez NXWCxXWLIcD2LegvoGXXBiQ

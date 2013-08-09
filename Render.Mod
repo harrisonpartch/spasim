@@ -981,6 +981,7 @@ BEGIN
 				fmsum:=fmsum+ft[ii]
 			END;
 			fms:=fmsum DIV 10; 
+			IF ft[i]<40 THEN Retina.moredetail ELSIF ft[i]>50 THEN Retina.lessdetail END;
 			IF i=9 THEN 	
 				fmsum:=0;
 				Out.Int(fms, 6); 

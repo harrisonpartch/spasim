@@ -255,7 +255,7 @@ VAR
 	sfish,gxy,w10,w11,v,lobster, btx,ash, dotz, GREEN,PURPLE,MCUBE:Voxel;
 	undo,rd,blu, die,gren,granite,sand,whiteblock,lazy,pdestroyer,axolotl,xen,sky1,sky2,tigerlily,cloud: Voxel;
 	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,harrison:Voxel;
-	sky,dieone, serp,cthulhu,greenball,rat,conglomerate,conglo2,caption,gorge,xot,xot2,cage,floop,volvox,life,iml: Voxel;
+	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,cage,floop,volvox,life,iml: Voxel;
 	 
 BEGIN
 	NEW(ms);
@@ -274,6 +274,8 @@ BEGIN
 	
  	volvox:=Base.VoxelFromName("Nrdvolvox");  	
        push(volvox);
+	beatrix:=Base.VoxelFromName("NwPicBWw4NfcserX4ELaQ3A"); 
+	push(beatrix);
        lobster:=Base.VoxelFromName("NznGx2ySiHIGrO5t9Pzcw5Q"); 
 	push(lobster);
 	tigerlily:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  
@@ -327,8 +329,8 @@ BEGIN
 	push(granite);
 	sand:=Base.VoxelFromName("NnTJ6nDktAth4WTAUdr8HYQ"); 		
 	push(sand);
-	whiteblock:=Base.VoxelFromName("NwPicBWw4NfcserX4ELaQ3A"); 	
-	push(whiteblock);
+	blacksun:=Base.VoxelFromName("NGNYAfkxmEzxe6ZESmcMJtw"); 	
+	push(blacksun);
 	
 	lazy:=Base.VoxelFromName("NwPicBWw4NfcserX4ELxxx"); 	
 	push(lazy);	
@@ -386,7 +388,7 @@ BEGIN
 	tnoise.va[1]:=axolotl;
 	tnoise.va[2]:=etile0;
 	tnoise.va[3]:=serp;
-	tnoise.va[4]:=tigerlily;
+	tnoise.va[4]:=greenball;
 	tnoise.va[5]:=btx;	
 
 	NEW(noise);		
@@ -401,15 +403,15 @@ BEGIN
 	Base.setPT(up,0,0,-1);
 	Base.setPT(center,1/2,1/2,11/12);
 	NEW(plane,center,up);
-	plane.vox:=tigerlily;
+	plane.vox:=axolotl;
 	Out.String("EEEEP!"); 				
-	w10.FRaster(plane,30);
-	w10.FRaster(noise,128); 	
-	w10.FRaster(tnoise,64); 
+	gorge.FRaster(plane,128);
+	gorge.FRaster(noise,128); 	
+	gorge.FRaster(tnoise,64); 
 	z10.setcolor(1,0,0,0,0); 	
-	w10.setcolor(0,0,0,10,0);
+	gorge.setcolor(0,1,0,1,0);
 	w10.stroke(center,30,z10,undo);
-	Base.world:=w10; 	
+	Base.world:=gorge; 	
 	Base.avatar:=xot;
 	Base.avatarsize:=1000;
 (*	engrain; 
