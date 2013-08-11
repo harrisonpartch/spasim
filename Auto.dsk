@@ -1,45 +1,8 @@
 <Desktop>
-	<Window name="FileManager" loader="WMFileManager.Restore" l="73" t="321" r="573" b="721" flags="{0..2}"/>
-	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="548" t="109" r="1188" b="520" flags="{0..2}"/>
-	<Window name="PET" loader="PET.Restore" l="680" t="208" r="1501" b="917" flags="{0..2}">
+	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="30" t="94" r="468" b="421" flags="{0..2}"/>
+	<Window name="PET" loader="PET.Restore" l="496" t="45" r="1419" b="809" flags="{0..2}">
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>
-			<Tab file="Render.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="522" cursorPos="14283"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-		</PETData>
-	</Window>
-	<Window name="PET" loader="PET.Restore" l="36" t="110" r="836" b="710" flags="{0..2}">
-		<PETData>
-			<General SelectedPageNr="0" ProjectTextFile=""/>
-			<Tab file="NM3.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="0"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-		</PETData>
-	</Window>
-	<Window name="PET" loader="PET.Restore" l="101" t="160" r="901" b="760" flags="{0..2}">
-		<PETData>
-			<General SelectedPageNr="0" ProjectTextFile=""/>
-			<Tab file="NXWCxXWLIcD2LegvoGXXBiQ.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="0"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-		</PETData>
-	</Window>
-	<Window name="PET" loader="PET.Restore" l="649" t="66" r="1572" b="830" flags="{0..2}">
-		<PETData>
-			<General SelectedPageNr="5" ProjectTextFile=""/>
 			<Tab file="XNXL.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
 				<Editor firstLine="3" cursorPos="457"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
