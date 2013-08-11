@@ -814,12 +814,12 @@ PROCEDURE  InitGL(): BOOLEAN;
 			vertexbuffer, uvbuffer: Uint;			
 	BEGIN		
 		GL.ReadImplementationProperties;
- 		IF ~GL.GL_VERSION_2_0 THEN
- 			context.out.String("Error: your graphic card does not support OpenGL 2.0"); 
+ (*		IF ~GL.GL_VERSION_2_0 THEN
+ 			Out.String("Error: your graphic card does not support OpenGL 2.0"); 
  			context.out.Ln; context.out.Update;
 		 	RETURN FALSE;
 		 END;
-	
+	*)
 	Out.String("one");
 	Out.Ln;
 		IF ~ (GL.GL_ARB_vertex_shader & GL.GL_ARB_fragment_shader) THEN
