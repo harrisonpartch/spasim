@@ -6,10 +6,10 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=3;        (* must be a power of 2 *)
-	TS=5*8;   (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
-	TW=9;
-	TH=6;
+	T=4;        
+	TS=5*16;   (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
+	TW=6;
+	TH=4;
 	W*=TS*TW;
 	H*=TS*TH
 
@@ -23,12 +23,6 @@ TYPE Tile=OBJECT
 VAR
 	GO: BOOLEAN;
 	cam: Camera;
-	copy: Raster.Mode;
-
-PROCEDURE & init(a,b: LONGINT);
-BEGIN
-	Raster.InitMode(copy,Raster.srcCopy);
-END init;
 
 PROCEDURE go;
 BEGIN{EXCLUSIVE}
@@ -170,25 +164,40 @@ VAR
 BEGIN
 	splitcam(cam,a,b,c,d);
 	IF level<2 THEN
-		x:=cam.imx - W DIV 2;
-		y:=cam.imy-H/2;
-		IF (x*x+y*y)<(W*W/foveaparameter) THEN
-			tessad(a); 
-			tessad(b);
-			tessad(c);
-			tessad(d)
-		ELSE
-			tessa(a); 
-			tessa(b);
-			tessa(c);
-			tessa(d)	
-		END;	
+			x:=a.imx - W/2;
+			y:=a.imy-H/2;		
+			IF (x*x+y*y)<(W*W/foveaparameter) THEN	
+				tessad(a); 
+			ELSE
+				tessa(a); 
+			END;
+			x:=b.imx - W/2;
+			y:=b.imy-H/2;		
+			IF (x*x+y*y)<(W*W/foveaparameter) THEN	
+				tessad(b); 
+			ELSE
+				tessa(b); 			
+			END;			
+			x:=b.imx - W/2;
+			y:=b.imy-H/2;		
+			IF (x*x+y*y)<(W*W/foveaparameter) THEN	
+				tessad(c); 
+			ELSE
+				tessa(c); 
+			END;
+			x:=d.imx - W/2;
+			y:=d.imy-H/2;		
+			IF (x*x+y*y)<(W*W/foveaparameter) THEN	
+				tessad(d); 
+			ELSE
+				tessa(d); 
+			END;
 	ELSE
 		l:=level-1;
 		ztrace(a,l);
 		ztrace(b,l);
 		ztrace(c,l);
-		ztrace(d,l);
+		ztrace(d,l) 	
 	END;
 END ztrace;
 
@@ -247,6 +256,8 @@ VAR
 	rtheta,rphi: REAL; (* camera pitch,roll. global variables because they are the same for all rays in a frame *)
 	fward*, dward*, rward*: PT;  
 	foveaparameter:INTEGER;
+	copy: Raster.Mode;
+	
 	
 PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
 VAR d: REAL;
@@ -354,6 +365,7 @@ PROCEDURE go*(theta,phi,apw,aph: REAL);
 VAR
 	i,j: INTEGER;
 	ctheta,cphi,dtheta,dphi: REAL;
+	pixel: Raster.Pixel;
 BEGIN
 	zeroTD;
 	dtheta:=apw/TW;
@@ -386,7 +398,15 @@ BEGIN
 	BEGIN{EXCLUSIVE}
 		gotiles;
 		AWAIT((tilesdone=TW*TH) OR FRAMEBOORT)
-	END
+	END;
+	Raster.SetRGB(pixel,1,1,0);
+	Raster.Put(image,(W DIV 2)+1,(H DIV 2)+1,pixel,copy);	
+	Raster.SetRGB(pixel,0,1,1);
+	Raster.Put(image,(W DIV 2)-1,(H DIV 2)+1,pixel,copy);	
+	Raster.SetRGB(pixel,1,0,1);
+	Raster.Put(image,(W DIV 2)-1,(H DIV 2)-1,pixel,copy);	
+	Raster.SetRGB(pixel,0,1,1);
+	Raster.Put(image,(W DIV 2)+1,(H DIV 2)-1,pixel,copy);		
 END go;
 
 PROCEDURE lsu*;
@@ -404,13 +424,14 @@ BEGIN
 	image := Graphics.LoadImage("Lenna.png", FALSE);
 	FOR a:= 0 TO TW-1  DO
 		FOR b:= 0 TO TH-1 DO
-			NEW(tile[a,b],a*TS,b*TS);
+			NEW(tile[a,b]);
 		END
 	END;	
 	EDGE:=0.001;
 	AFTER:=2;
  	FAST:=3;
  	lsense:=0.2;
+	Raster.InitMode(copy,Raster.srcCopy);
  	aperture.width:=3;
  	aperture.height:=3;
  	foveaparameter:=23;

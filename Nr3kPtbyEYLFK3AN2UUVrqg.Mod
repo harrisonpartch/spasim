@@ -13,28 +13,10 @@ VAR
 	dot,d: REAL;
 	inside: BOOLEAN;
 BEGIN
-	CASE ray.face OF
-		0: inside := TRUE
-		|1: nx := -1
-		|2: ny := -1
-		|3: nz := -1
-		|4: nx := 1
-		|5: ny := 1
-		|6: nz := 1
-	ELSE
-	END; 
-	ray.normal.x:=1/2-ray.lxyz.x;
-	ray.normal.y:=1/2-ray.lxyz.y;	
-	ray.normal.z:=1/2-ray.lxyz.z;			
-	Base.normalizePT(ray.normal);
-
-(*	ray.normal.x:=nx;
-	ray.normal.y:=ny;	
-	ray.normal.z:=nz;
-*)		
+	d := (nx*ray.dxyz.x + ny*ray.dxyz.y+ nz*ray.dxyz.z); 
 	ray.ra := ray.ra- 0.1; 
 	ray.ga := ray.ga- 0.1; 
-	ray.ba := ray.ba- 0.1; 
+	ray.ba := ray.ba- 0.1; 	
 	mirror(ray);
 END Shade;
 

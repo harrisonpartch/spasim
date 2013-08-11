@@ -403,10 +403,10 @@ BEGIN
 	Base.setPT(up,0,0,-1);
 	Base.setPT(center,1/2,1/2,11/12);
 	NEW(plane,center,up);
-	plane.vox:=axolotl;
+	plane.vox:=serp;
 	Out.String("EEEEP!"); 				
-	gorge.FRaster(plane,128);
-	gorge.FRaster(noise,128); 	
+	gorge.FRaster(plane,32);
+	gorge.FRaster(noise,64); 	
 	gorge.FRaster(tnoise,64); 
 	z10.setcolor(1,0,0,0,0); 	
 	gorge.setcolor(0,1,0,1,0);

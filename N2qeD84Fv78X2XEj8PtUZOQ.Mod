@@ -45,7 +45,7 @@ BEGIN
 	star.setcolor(0,0,0,10,0);
 	star.copyonstroke:=TRUE;
 	conglomerate.copyonstroke:=TRUE;	
-(*	
+	
 	
 
 	FOR i := 0  TO 100 DO
@@ -54,7 +54,7 @@ BEGIN
 		ball.setcolor(Base.rand.Uniform(),Base.rand.Uniform(),Base.rand.Uniform());		
 		star.FRaster(ball,128);			
 	END;
-*)
+
 
 
  END N2qeD84Fv78X2XEj8PtUZOQ. 

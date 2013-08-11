@@ -361,7 +361,8 @@ VAR
 	context: Commands.Context; (* StdIO context *)
 	curprogram: Uint; (* current active program *)
 	progname: ARRAY 32 OF CHAR;
-	image: Uint; (* image texture name *)			
+	image: Uint; (* image texture name *)		
+	msd: REAL;	
 
 PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
 VAR d: REAL;
@@ -769,10 +770,11 @@ BEGIN
 		| KS.XK_t1: camera.glidetoggle 
 		| KS.XK_v1:Marsh.engrain
 		| KS.XK_c1:Marsh.sprout 
-		| KS.XK_x1: Marsh.incVN;
+		| KS.XK_x1: Marsh.incVN
+		| KS.XK_z1: Marsh.decVN		
 		| KS.XK_p1:  camera.stop			
-		| KS.XK_2 : Base.DTL:= ENTIER(3*Base.DTL/2)	+1
-		| KS.XK_3 : Base.DTL:= ENTIER(2*Base.DTL/3)	+1			
+		| KS.XK_2 : msd:= msd*10/9
+		| KS.XK_3 : 	msd:= msd*9/10
 		| KS.XK_4 : Base.gravity:= 1.5*Base.gravity		
 		| KS.XK_5 : Base.STOPGO	
 		| KS.XK_h1 : camera.hop	
@@ -788,7 +790,7 @@ BEGIN
 		| KS.XK_Control_R: Marsh.SNIPEINTO:=~Marsh.SNIPEINTO	
 		| KS.XK_l1: Marsh.lines:=~Marsh.lines
 		| KS.XK_b1: Marsh.showcode;  IF CAPTUREMOUSE THEN CAPTUREMOUSE := FALSE; PAUSE:=TRUE END
-		| KS.XK_z1: SCULL:=~SCULL		
+	
 	ELSE	
 	END
 END KeyEvent;
@@ -981,7 +983,7 @@ BEGIN
 				fmsum:=fmsum+ft[ii]
 			END;
 			fms:=fmsum DIV 10; 
-			IF ft[i]<40 THEN Retina.moredetail ELSIF ft[i]>50 THEN Retina.lessdetail END;
+			IF ft[i]<msd THEN Retina.moredetail ELSIF ft[i]>(msd+10) THEN Retina.lessdetail END;
 			IF i=9 THEN 	
 				fmsum:=0;
 				Out.Int(fms, 6); 
@@ -1013,9 +1015,9 @@ BEGIN
 	camrotinertia:=100;
 	Base.DTL:=25000;
 	Base.DTL2:=25000;
-	Base.gravity:=0.00001;
+	Base.gravity:=0.0000001;
 	Base.speed:=0.000001;
-	Base.maxspeed:=0.001;
+	Base.maxspeed:=0.0001;
 	Base.cursordist:=0.01;
 	R1:=100;
 	R2:=150;
@@ -1030,6 +1032,7 @@ BEGIN
 	leftsticky:=10.0;
 	upsticky:=10.0;	
 	Out.String('*line 1217!*');
+	msd:=40;
 	mainloop; 
 	FR:=1000;		
 END Open;

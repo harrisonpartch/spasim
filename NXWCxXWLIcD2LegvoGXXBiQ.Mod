@@ -41,31 +41,44 @@ END deepcopy;
 END AlphaVox; 
 
 VAR 
-	serp,beatrix,lobster: Voxel;
-	blue: AlphaVox;
+	serp, subserp, beatrix,lobster,sparx: Voxel;
+	blue: Voxel;
 	v: Voxel;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	beatrix:=Base.VoxelFromName("NGNYAfkxmEzxe6ZESmcMJtw"); 
 	lobster:=Base.VoxelFromName("NznGx2ySiHIGrO5t9Pzcw5Q"); 
-	serp:=Base.VoxelFromName("NM3"); 	
-	NEW(blue);
-	blue.setcolor(1,0,0,1,0);
+	sparx:=Base.VoxelFromName("NSIsnYBTYL9BajD8fbPDSqg"); 	
+	blue:=Base.VoxelFromName("Nharrisonavatar"); 		
 	blue.passable:=TRUE;
+	subserp:=Base.VoxelFromName("NM3"); 	
+	subserp.DTL:=3;
+	subserp.fill(subserp);
+	subserp.stroke(Base.mkPT(1/2,1/2,1/4),1,sparx,v);
+	subserp.stroke(Base.mkPT(1/2,1/2,3/4),1,sparx,v);
+	subserp.stroke(Base.mkPT(1/4,1/2,1/2),1,sparx,v);
+	subserp.stroke(Base.mkPT(3/4,1/2,1/2),1,sparx,v);
+	subserp.stroke(Base.mkPT(1/2,1/4,1/2),1,sparx,v);
+	subserp.stroke(Base.mkPT(1/2,3/4,1/2),1,sparx,v);
+	subserp.stroke(Base.mkPT(1/2,1/2,1/2),1,sparx,v);			
+	subserp.imposter:=beatrix;
+	subserp.lockTF:=TRUE; 
+	subserp.frozen:=TRUE;
+	subserp.passable:=FALSE;
+	serp:=Base.VoxelFromName("NM3"); 	
+	serp.DTL:=30;
+	serp.fill(subserp);
+	serp.stroke(Base.mkPT(1/2,1/2,1/4),1,blue,v);
+	serp.stroke(Base.mkPT(1/2,1/2,3/4),1,blue,v);
+	serp.stroke(Base.mkPT(1/4,1/2,1/2),1,blue,v);
+	serp.stroke(Base.mkPT(3/4,1/2,1/2),1,blue,v);
+	serp.stroke(Base.mkPT(1/2,1/4,1/2),1,blue,v);
+	serp.stroke(Base.mkPT(1/2,3/4,1/2),1,blue,v);
+	serp.stroke(Base.mkPT(1/2,1/2,1/2),1,blue,v);			
+	serp.imposter:=subserp;
 	serp.lockTF:=TRUE; 
 	serp.frozen:=TRUE;
-	serp.probelock:=TRUE;
-	serp.DTL:=30;
-	serp.fill(blue);
-	serp.stroke(Base.mkPT(1/2,1/2,1/4),3,beatrix,v);
-	serp.stroke(Base.mkPT(1/2,1/2,3/4),3,beatrix,v);
-	serp.stroke(Base.mkPT(1/4,1/2,1/2),3,beatrix,v);
-	serp.stroke(Base.mkPT(3/4,1/2,1/2),3,beatrix,v);
-	serp.stroke(Base.mkPT(1/2,1/4,1/2),3,beatrix,v);
-	serp.stroke(Base.mkPT(1/2,3/4,1/2),3,beatrix,v);
-	serp.stroke(Base.mkPT(1/2,1/2,1/2),3,beatrix,v);			
-	serp.imposter:=beatrix;
-	RETURN beatrix
+	RETURN serp
 END thisvox;
  END NXWCxXWLIcD2LegvoGXXBiQ. 
  

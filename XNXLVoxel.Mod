@@ -78,11 +78,9 @@ VAR
 	inside: BOOLEAN;
 BEGIN
 	d := (nx*ray.dxyz.x + ny*ray.dxyz.y+ nz*ray.dxyz.z); 
-(*	dot := d*(1/2-ray.lxyz.x); *)
 	ray.ra := ray.ra- 0.1; 
 	ray.ga := ray.ga- 0.1; 
-	ray.ba := ray.ba- 0.1; 
-	
+	ray.ba := ray.ba- 0.1; 	
 	mirror(ray);
 END Shade;
 END DiffuseMVox;

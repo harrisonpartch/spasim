@@ -43,7 +43,10 @@ BEGIN
 	xyz.y := ABS(ray.lxyz.y-offset.y) * M;		
 	xyz.z := ABS(ray.lxyz.z-offset.z)* M;	
 	pushxyz:=xyz;	
-	IF (ray.length*ray.scale>ray.dtl) THEN
+(*	IF DTL>0 THEN 
+		ray.dtl:=DTL;
+	END;
+*)	IF (ray.length*ray.scale>ray.dtl) THEN
 		IF imposter#NIL THEN
 			imposter.Shade(ray)
 		END	
