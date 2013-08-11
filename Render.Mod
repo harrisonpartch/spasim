@@ -813,27 +813,32 @@ PROCEDURE  InitGL(): BOOLEAN;
 			vertices, texcoords: ARRAY [*] OF Float;
 			vertexbuffer, uvbuffer: Uint;			
 	BEGIN		
-(*		GL.ReadImplementationProperties;
+		GL.ReadImplementationProperties;
  		IF ~GL.GL_VERSION_2_0 THEN
  			context.out.String("Error: your graphic card does not support OpenGL 2.0"); 
  			context.out.Ln; context.out.Update;
 		 	RETURN FALSE;
 		 END;
 	
-
+	Out.String("one");
+	Out.Ln;
 		IF ~ (GL.GL_ARB_vertex_shader & GL.GL_ARB_fragment_shader) THEN
 			context.out.String("GL_ARB_vertex_shader and GL_ARB_fragment_shader are not supported"); 
 			context.out.Ln; context.out.Update;
 			RETURN FALSE;
 		END;
-
+	Out.String("two");
+	Out.Ln;
 		(* GL.Read_GL_ARB_Shader_Objects();*)
 		GL.ActiveTexture(GLC.GL_TEXTURE0);		
 
 
 	NEW(Retina.image);
+		Out.String("three");
+	Out.Ln;
 	Raster.Create(Retina.image,Retina.W,Retina.H,Raster.BGRA8888);
-	
+	Out.String("four");
+	Out.Ln;
 	(* create texture object for image *)
 	GL.GenTextures(1, ADDRESSOF(image));
 	GL.BindTexture(GLC.GL_TEXTURE_2D, image); 
@@ -841,14 +846,17 @@ PROCEDURE  InitGL(): BOOLEAN;
 	GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_NEAREST);
 	GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_NEAREST);
 	GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height, 0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, ADDRESSOF(Retina.image.mem[0]));
-
+	Out.String("five");
+	Out.Ln;
 	(*	passthroughProgram := InitShader("MyDemos/blur2/passthroughVS.glsl", "MyDemos/blur2/passthroughFS.glsl");*)
 	vs := VertexSource();
 	fs := FragmentSource();
 	passthroughProgram := InitTheseShaders(vs, fs);
 
 		
-		(* Get a handle for our buffers *)
+	Out.String("six");
+	Out.Ln;
+	(* Get a handle for our buffers *)
 		vertexPosition := GL.GetAttribLocation(passthroughProgram,  "Position");
 		vertexUVID := GL.GetAttribLocation(passthroughProgram, "Texcoords");	
 		
@@ -873,7 +881,9 @@ PROCEDURE  InitGL(): BOOLEAN;
 		GL.BufferData(GLC.GL_ARRAY_BUFFER, LEN(texcoords,0)*SIZEOF(Float), ADDRESSOF(texcoords[0]), GLC.GL_STATIC_DRAW);
 
 		(* 1rst attribute buffer : vertices *)
-		GL.EnableVertexAttribArray(0);
+	Out.String("seven");
+	Out.Ln;
+	GL.EnableVertexAttribArray(0);
 		GL.BindBuffer(GLC.GL_ARRAY_BUFFER, vertexbuffer);
 		GL.VertexAttribPointer(
 			vertexPosition, (* The attribute we want to configure *)
@@ -894,7 +904,7 @@ PROCEDURE  InitGL(): BOOLEAN;
 			 GLC.GL_FALSE,  (* normalized ? *)
 			 0, (* stride *)
 			  0); (* array buffer offset *)
-*)
+
 	RETURN TRUE;
 END InitGL;
 
