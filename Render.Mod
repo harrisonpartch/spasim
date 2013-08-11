@@ -830,7 +830,7 @@ PROCEDURE  InitGL(): BOOLEAN;
 		(* GL.Read_GL_ARB_Shader_Objects();*)
 		GL.ActiveTexture(GLC.GL_TEXTURE0);		
 
-
+RETURN FALSE;
 	NEW(Retina.image);
 	Raster.Create(Retina.image,Retina.W,Retina.H,Raster.BGRA8888);
 	
