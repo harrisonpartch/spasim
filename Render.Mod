@@ -813,7 +813,7 @@ PROCEDURE  InitGL(): BOOLEAN;
 			vertices, texcoords: ARRAY [*] OF Float;
 			vertexbuffer, uvbuffer: Uint;			
 	BEGIN		
-		GL.ReadImplementationProperties;
+(*		GL.ReadImplementationProperties;
  		IF ~GL.GL_VERSION_2_0 THEN
  			context.out.String("Error: your graphic card does not support OpenGL 2.0"); 
  			context.out.Ln; context.out.Update;
@@ -830,7 +830,7 @@ PROCEDURE  InitGL(): BOOLEAN;
 		(* GL.Read_GL_ARB_Shader_Objects();*)
 		GL.ActiveTexture(GLC.GL_TEXTURE0);		
 
-RETURN FALSE;
+
 	NEW(Retina.image);
 	Raster.Create(Retina.image,Retina.W,Retina.H,Raster.BGRA8888);
 	
@@ -894,7 +894,7 @@ RETURN FALSE;
 			 GLC.GL_FALSE,  (* normalized ? *)
 			 0, (* stride *)
 			  0); (* array buffer offset *)
-
+*)
 	RETURN TRUE;
 END InitGL;
 
