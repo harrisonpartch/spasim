@@ -509,7 +509,7 @@ VAR
 BEGIN
  display := X11.OpenDisplay(0);
  IF display =0 THEN
- 	context.out.String(" cannot connect to X server"); context.out.Ln; context.out.Update;
+ 	Out.String(" cannot connect to X server"); Out.Ln; Out.Update;
 	Close;
      RETURN;
 END;
@@ -537,23 +537,23 @@ END;
  visinfoptr := GL.glXChooseVisual(display, 0 , ADDRESSOF(attrib[0]));
 
  IF visinfoptr = NIL THEN
-  	IF debug THEN context.out.String(" NO appropriate visual found"); context.out.Ln; context.out.Update; END;
+  	IF debug THEN Out.String(" NO appropriate visual found"); Out.Ln; Out.Update; END;
   	Close;
      RETURN;
  ELSE
 	 IF debug THEN
-		 context.out.String("visinfoptr.depth= "); context.out.Int(visinfoptr.depth,0); context.out.Ln;
-	 	context.out.String("visinfoptr.visual ");  context.out.Int(visinfoptr.visualID, 0); context.out.Ln;
-	 	context.out.Update;
+		 Out.String("visinfoptr.depth= "); Out.Int(visinfoptr.depth,0); Out.Ln;
+	 	Out.String("visinfoptr.visual ");  Out.Int(visinfoptr.visualID, 0); Out.Ln;
+	 	Out.Update;
 	END;
 END;
  cmap := X11.CreateColormap(display, X11.DefaultRootWindow(display), visinfoptr.visual, X11.AllocNone);
  IF cmap = 0 THEN
  	IF debug THEN
-	 	context.out.String(" cannot create colormap"); context.out.Ln;
+	 	Out.String(" cannot create colormap"); Out.Ln;
 	 	X11.GetErrorText(display, cmap, buf, LEN(buf));
-	 	context.out.String("ERROR: CreateColormap = "); context.out.String(buf); context.out.Ln;
-	 	context.out.Update;
+	 	Out.String("ERROR: CreateColormap = "); Out.String(buf); Out.Ln;
+	 	Out.Update;
  	END;
  END;
 
@@ -581,10 +581,10 @@ END;
 (* create GL context *)
  (* GL_TRUE: Use direct rendering, GL_FLASE: use X server for rendering *)
  glctx := GL.glXCreateContext(display, visinfoptr, 0, GLC.GL_TRUE);
-	 IF debug THEN context.out.String("glXCreateContext glctx= "); context.out.Int(glctx, 0); context.out.Ln; END;
+	 IF debug THEN Out.String("glXCreateContext glctx= "); Out.Int(glctx, 0); Out.Ln; END;
 
  res := GL.glXMakeCurrent(display, win, glctx);
-	IF debug THEN  context.out.String("glXMakeCurrent res= "); context.out.Int(res, 0); context.out.Ln; END;
+	IF debug THEN  Out.String("glXMakeCurrent res= "); Out.Int(res, 0); Out.Ln; END;
 
 SuppressX11Cursors(display,win);
 
@@ -816,15 +816,15 @@ PROCEDURE  InitGL(): BOOLEAN;
 		GL.ReadImplementationProperties;
  (*		IF ~GL.GL_VERSION_2_0 THEN
  			Out.String("Error: your graphic card does not support OpenGL 2.0"); 
- 			context.out.Ln; context.out.Update;
+ 			Out.Ln; Out.Update;
 		 	RETURN FALSE;
 		 END;
 	*)
 	Out.String("one");
 	Out.Ln;
 		IF ~ (GL.GL_ARB_vertex_shader & GL.GL_ARB_fragment_shader) THEN
-			context.out.String("GL_ARB_vertex_shader and GL_ARB_fragment_shader are not supported"); 
-			context.out.Ln; context.out.Update;
+		Out.String("GL_ARB_vertex_shader and GL_ARB_fragment_shader are not supported"); 
+			Out.Ln; Out.Update;
 			RETURN FALSE;
 		END;
 	Out.String("two");
