@@ -393,7 +393,7 @@ BEGIN
 	XNXLMath.orrot(fward, Base.dward,rtheta);   
 	XNXLMath.orrot(rward, Base.dward,rtheta);   		
 	XNXLMath.orrot(fward, Base.rward,rphi);  	
-	XNXLMath.orrot(dward, Base.rward,rphi);  
+	XNXLMath.orrot(dward, rward,rphi);  
 	angletoray(Base.sniperay,0,0);	
 	BEGIN{EXCLUSIVE}
 		gotiles;
