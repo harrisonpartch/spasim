@@ -1,5 +1,5 @@
 MODULE Retina;
-IMPORT  XNXL, Base, Objects, Kernel, Out:=KernelLog, GLC := OpenGLConst, XNXLNoise,
+IMPORT  XNXL, Base, Objects, Kernel, Out:=KernelLog, XNXLNoise,
 Math, XNXLMath, Raster, Graphics:=WMGraphics;
 
 TYPE
@@ -11,7 +11,7 @@ CONST
 	TW=6;
 	TH=4;
 	W*=TS*TW;
-	H*=TS*TH
+	H*=TS*TH;
 
 	
 TYPE Camera= RECORD			(* solid angle *)

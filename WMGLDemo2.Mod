@@ -23,7 +23,7 @@ TYPE
 
 		PROCEDURE &New(w, h: LONGINT);
 		BEGIN
-			Init(w, h, FALSE); (* use alpha, for 32bpp img *)
+			Init(w, h, TRUE); (* use alpha, for 32bpp img *)
 			WM.DefaultAddWindow(SELF);
 			SetTitle(Strings.NewString("WMGLDemo2: axolotl"));
 
@@ -132,7 +132,7 @@ BEGIN
   GL.BindTexture( GLC.GL_TEXTURE_2D, texture[0] );
 
     (* Generate The Texture *)
-  GL.TexImage2D( GLC.GL_TEXTURE_2D, 0, 4, teximg.width, teximg.height, 0,GLC. GL_RGBA,
+  GL.TexImage2D( GLC.GL_TEXTURE_2D, 0, 4, teximg.width, teximg.height, 0,GLC. GL_BGRA,
     GLC.GL_UNSIGNED_BYTE, teximg.adr );
 
   (* Linear Filtering *)
@@ -147,7 +147,7 @@ BEGIN
 
     (* Generate The Texture *)
   GL.TexImage2D( GLC.GL_TEXTURE_2D, 0, 4, teximg.width,
-    teximg.height, 0, GLC.GL_RGBA, GLC.GL_UNSIGNED_BYTE, teximg.adr );
+    teximg.height, 0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, teximg.adr );
 
   GL.BindTexture( GLC.GL_TEXTURE_2D, texture[2] );
 
@@ -157,7 +157,7 @@ BEGIN
 
   (* Generate The MipMapped Texture  *)
   res := GLU.Build2DMipmaps(GLC.GL_TEXTURE_2D, 4, teximg.width, teximg.height,
-    GLC.GL_RGBA, GLC.GL_UNSIGNED_BYTE, teximg.adr);
+    GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, teximg.adr);
 
   (* Free up any memory we may have used *)
     teximg := NIL;
@@ -242,7 +242,7 @@ LightPosition[0]:= 0.0; LightPosition[1]:= 0.0; LightPosition[2]:= 0.2; LightPos
   GL.BlendFunc( GLC.GL_SRC_ALPHA, GLC.GL_ONE );
 
 
-  IF ~LoadGLTextures("opengloberon/axolotl.png") THEN Close; END;
+  IF ~LoadGLTextures("axolotl.png") THEN Close; END;
 
  DeActivate();
 END InitGL;

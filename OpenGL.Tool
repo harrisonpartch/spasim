@@ -23,6 +23,9 @@ Compiler.Compile
 	 Unix.OGLWindow.Mod
 	 Unix.WMGLWindow.Mod
 	 Unix.GLXinfo.Mod
+	 GLShaderUtils.Mod
+	 GLShadersBuild.Mod
+	 GLLib.Mod	 
 	~
 	
 	GLXinfo.Do~  # display opengl info
@@ -31,15 +34,16 @@ Compiler.Compile
 
 Compiler.Compile
 	OpenGLConst.Mod
-	WinApi.Mod
-	
+	WinApi.Mod	
 	Win32.OpenGL.Mod
-	Win32.GLU.Mod
-	
+	Win32.GLU.Mod	
 	Win32.GLContext.Mod
 	Win32.OGLWindow.Mod
 	Win32.WMGLWindow.Mod
 	Win32.WGLinfo.Mod
+	GLShaderUtils.Mod
+	GLShadersBuild.Mod
+	GLLib.Mod	
 	 ~
 
 	WGLinfo.Do ~ 
@@ -47,9 +51,7 @@ Compiler.Compile
 # 2- Compile platform independent demo examples of GLContext :
 
 Compiler.Compile
-	 GLTest.Mod 
-	 GLLib.Mod
-	 GLShaderUtils.Mod
+	 GLTest.Mod
 	 WMGLDemo.Mod
 	 WMGLDemo1.Mod
 	 WMGLDemo2.Mod
@@ -123,7 +125,7 @@ Compiler.Compile
 # **********************
 # A 3DS model Loader example
 	Compiler.Compile 
-		Lists.Mod 
+		Containers.Mod 
 		Decoder3DS.Mod 
 		SpaceSim3.Mod 
 		WMSpaceSim3.Mod
@@ -171,9 +173,9 @@ VAR
 
 	width := 300; height := 300;
 
-	(* create an image object using Raster module with RGBA8888 mode (32 bpp image *)
+	(* create an image object using Raster module with BGRA8888 mode (32 bpp image *)
 	NEW(image);
-	Raster.Create(image, width, height, Raster.RGBA8888);
+	Raster.Create(image, width, height, Raster.BGRA8888);
 
  	NEW(context);
 
@@ -304,7 +306,7 @@ VAR
 ....
   	create an instance of this object in a command procedure.
 
-  	NEW(win, width, height, xofset, yofset, "Title");
+  	NEW(win, width, height, xofset, yofset, fulscreen);
 
  	that is all ...
 
@@ -316,23 +318,18 @@ VAR
 NOTE:
 
  By default, all OpenGL core functions loaded by the driver. If you would like to use higher extensions,
- 1.2 .. 4.x,  use OpenGL.ReadExtensions after context.MakeCurrent().
+ 1.2 .. 4.x,  use OpenGL.ReadExtensions after MakeCurrent().
 
-
- OpenGL driver uses different floating point exceptions while using floating point operations in
- coordinate transfomations, etc. These operations are in the driver side. So, these floating operations conflicts
- with the Oberons' floating operations and may produce unpredictable results. In the OpenGL binding module,
- SetFCR and DelFCR functions may be used to set Floating Point Control Register and recover this problem just
- before the these OpenGL functions and after respectively. See the provided examples for usage.
 
  While using OpenGL with WMWindowManager.Window care should be taken. The OpenGL contexts
  is process and thread sensitive. One context to one one thread. If more than one available, as in Active objects,
  after first thread acquires the OpenGL context using context.MakeCurrent the other thread can not access the
- context untill previous thread release it (context.DeActivate).
+ context untill previous thread release it (DeActivate).
 
   Nvidia, Ati, Intel, Mesa drivers may behave differently depending on extensions. The examples are tested on
-  Nvidia 8500GT GPU vith latest driver (Windows-XP32-SP3, Ubuntu 10.04 X64, Pardus-32bit-2011 with MESA) and not
-  all OpenGL functions are not tested, there can be missing and miss-definition in the OpenGL.Mod functions.
+  Nvidia 8500GT GPU vith latest driver (Windows-XP32-SP3, Ubuntu 10.04 AMD64, i386 and Ubuntu 12.04 AMD64, 
+  i386, Pardus-32bit-2011 with MESA) and not  all OpenGL functions are not tested, there can be missing and 
+  miss-definitions in the OpenGL.Mod mudule.
 
 
 # =============================================================================

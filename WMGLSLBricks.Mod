@@ -7,7 +7,6 @@ IMPORT
 	GLLib, GLSUtil := GLShaderUtils;
 
 TYPE
-	PChar = GLSUtil.PChar;
 
 	KillerMsg = OBJECT
 	END KillerMsg;
@@ -43,7 +42,7 @@ TYPE
 			rotate := TRUE;
 			RotL := 1 * 3.14 / 180;
 
-			IF ~initGL() THEN Close; END;
+			IF ~initGL() THEN Close; RETURN; END;
 			Reshape(w, h);
 			UpdateImage;
 		END New;
@@ -239,6 +238,7 @@ TYPE
 				GL.Rotatef(fZDiff, 0,0,1);
 				GL.Scalef(fScale, fScale, fScale);
 
+			(*GL.UseProgram(brickProg);*)
 			GL.Uniform3f(getUniLoc(brickProg, "MortarColor"), 0.85, 0.86, 0.84);
 			GL.Uniform3f(getUniLoc(brickProg, "LightPosition"), 0.0, 0.0, 4.0);
 			DrawCube();
@@ -254,10 +254,10 @@ TYPE
 
 			GL.Uniform3f(getUniLoc(brickProg, "MortarColor"), 0.1, 1.0, 0.2);
 			GL.Uniform3f(getUniLoc(brickProg, "LightPosition"), 2.0, 0.0, 2.0);
-			GLLib.SolidTeapot(0.8);
+			GLLib.SolidTeapot(0.8); 
 (*			GLLib.SolidSphere(0.8, 50,40); *)
 (*			GLLib.SolidDodecahedron;*)
-(*			GLLib.SolidTorus(0.2, 0.9, 10, 40); *)
+			GLLib.SolidTorus(0.2, 0.9, 10, 40); 
 
 		END Display;
 
@@ -303,18 +303,12 @@ TYPE
 		END getUniLoc;
 
 		PROCEDURE InstallBrickShaders(): BOOLEAN;
-		VAR
-			vss, fss: PChar;
+
 		BEGIN
-		    (* Create a vertex shader object and a fragment shader object *)
-
-			vss := GLSUtil.TextFileRead("opengloberon/brick.vert");
-			fss := GLSUtil.TextFileRead("opengloberon/brick.frag");
-			IF (fss = NIL) OR (vss = NIL ) THEN RETURN FALSE END;
-
-		    (* Install program object as part of current state *)
-
-			IF ~ GLSUtil.LoadTheseShaders(vss, fss, brickProg) THEN
+		    (* Create a vertex shader object and a fragment shader object,
+		    	install program object as part of current state *)
+			brickProg :=  GLSUtil.LoadShaders("brick.vert", "brick.frag" );
+			IF brickProg = 0 THEN
 				KernelLog.String("LoadShader Error"); KernelLog.Ln;
 				RETURN FALSE;
 			END;

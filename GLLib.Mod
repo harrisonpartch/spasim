@@ -3,13 +3,12 @@ MODULE  GLLib;
 (*  (C)  E. Pokora, 1999.  This module is part of the Ogl subsystem - a binding of OpenGL for BlackBox Component Pascal.*)
 (*  Procedures to draw the famous teapot and some 3d geometric primitives:
 	cube, cone, sphere, torus, tetrahedron, octahedron, dodecahedron, icosahedron.
-
-	All surfaces are no tested.
+	
 	uses GLU library.
 *)
 
-IMPORT  Math:=MathL,  GL := OpenGL, GLC := OpenGLConst, GLU,
-		SYSTEM, Streams, KernelLog;
+IMPORT  Math, gl := OpenGL, glc := OpenGLConst, glu := GLU,
+		KernelLog;
 
 CONST
 	pi = 3.14159265358979323846;
@@ -17,80 +16,39 @@ CONST
 	x = 0.525731112119133606;
 	z = 0.850650808352039932;
 
-TYPE
-	Vector16f = ARRAY [16] OF GL.Float; (* 4x4 Float Matrix *)
-(*	Vec = ARRAY [3] OF GL.Double; *)
-	Array3i = ARRAY [3] OF GL.Int;
-	Array16i = ARRAY [16] OF GL.Int;
-	Vec3d = ARRAY [3] OF GL.Double;
-	Vec4i = ARRAY [4] OF GL.Int;
 VAR
-	quadObj: GLU.QuadricObj;
-	tData: ARRAY [4] OF Vec3d;
-	tIndex: ARRAY [4] OF Array3i;
-	iData: ARRAY [12] OF Vec3d;
-	iIndex: ARRAY [20] OF Array3i;
-	oData: ARRAY [6] OF Vec3d;
-	oIndex: ARRAY[8] OF Array3i;
-	dodec: ARRAY [20]  OF Vec3d;
+	quadObj: glu.QuadricObj;
+	tData: ARRAY [4, 3] OF gl.Float;
+	tIndex: ARRAY [4, 3] OF gl.Int;
+	iData: ARRAY [12, 3] OF gl.Float;
+	iIndex: ARRAY [20,3] OF gl.Int;
+	oData: ARRAY [6, 3] OF gl.Float;
+	oIndex: ARRAY[8, 3] OF gl.Int;
+	dodec: ARRAY [20,3]  OF gl.Float;
 
 	(* Teapot data *)
-	patchData: ARRAY [10] OF Array16i;
-	cpData: ARRAY [127, 3] OF GL.Float;
-	tex: ARRAY [2, 2, 2] OF GL.Float;
+	patchData: ARRAY [10, 16] OF gl.Int;
+	cpData: ARRAY [127, 3] OF gl.Float;
+	tex: ARRAY [2, 2, 2] OF gl.Float;
 
-	wr: Streams.Writer;
-
-(* write projection matrix *)
-PROCEDURE WriteProjMatrix*(CONST title: ARRAY OF CHAR);
-VAR i: LONGINT;
-       v: Vector16f;
-BEGIN
-GL.GetFloatv(GLC.GL_PROJECTION_MATRIX, ADDRESSOF(v[0]));
-wr.String("-----------------"); wr.Ln;
-wr.String("PROJECTION_MATRIX: "); wr.String(title); wr.Ln;
-	FOR i:=0 TO 15 DO
-		wr.FloatFix(v[i], 10,4,0);
-	END;
-wr.Ln; wr.Update;
-END WriteProjMatrix;
-
-(* write modelview matrix *)
-PROCEDURE WriteModelViewMatrix*(CONST title: ARRAY OF CHAR);
-VAR i : LONGINT;
-       v: Vector16f;
-BEGIN
-GL.GetFloatv(GLC.GL_MODELVIEW_MATRIX, ADDRESSOF(v[0]));
-wr.String("-----------------"); wr.Ln;
-wr.String("GL_MODELVIEW_MATRIX: ");wr.String(title); wr.Ln;
-	FOR i:=0 TO 15 DO
-		wr.FloatFix(v[i], 10,4,0);
-	END;
-wr.Ln; wr.Update;
-END WriteModelViewMatrix;
 
 PROCEDURE  InitQuadObj;
 BEGIN
-	IF quadObj = 0 THEN quadObj := GLU.NewQuadric() END;
+	IF quadObj = 0 THEN quadObj := glu.NewQuadric() END;
 	ASSERT(quadObj # 0, 60)
 END InitQuadObj;
 
-PROCEDURE  Set2f (VAR a: ARRAY OF GL.Float;  a0, a1: LONGREAL);
+PROCEDURE  Set2f (VAR a: ARRAY [2] OF gl.Float;  a0, a1: REAL);
 BEGIN
-	a[0] := SHORT(a0);  a[1] := SHORT(a1)
+	a[0] := a0;  a[1] := a1
 END Set2f;
 
-PROCEDURE  Set3f (VAR a: ARRAY OF GL.Float;  a0, a1, a2: LONGREAL);
-BEGIN
-	a[0] := SHORT(a0);  a[1] := SHORT(a1);  a[2] := SHORT(a2)
-END Set3f;
-
-PROCEDURE  Set3i (VAR a: ARRAY OF LONGINT;  a0, a1, a2: LONGINT);
+PROCEDURE  Set3f (VAR a: ARRAY [3] OF gl.Float;  a0, a1, a2: REAL);
 BEGIN
 	a[0] := a0;  a[1] := a1;  a[2] := a2
-END Set3i;
+END Set3f;
 
-PROCEDURE  Set16i (VAR a: ARRAY OF GL.Int;
+PROCEDURE  Set16i (VAR a: ARRAY [16] OF gl.Int;
 							a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15: LONGINT);
 BEGIN
 	a[0] := a0;  a[1] := a1;  a[2] := a2;  a[3] := a3;
@@ -99,114 +57,117 @@ BEGIN
 	a[12] := a12;  a[13] := a13;  a[14] := a14;  a[15] := a15
 END Set16i;
 
-PROCEDURE  Len (CONST a: Vec3d): LONGREAL;
-BEGIN
-	RETURN  Math.sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2])
-END Len;
-
-
-PROCEDURE Cross (a, b: Vec3d;  VAR c: Vec3d);
+PROCEDURE Cross (a, b: ARRAY [3] OF gl.Float;  VAR c: ARRAY [3] OF gl.Float);
 BEGIN
 	c[0] := a[1] * b[2] - a[2] * b[1];
 	c[1] := a[2] * b[0] - a[0] * b[2];
 	c[2] := a[0] * b[1] - a[1] * b[0]
 END Cross;
 
-PROCEDURE NormalizeV (VAR v: Vec3d);
-	VAR d: GL.Double;
+PROCEDURE NormalizeV (VAR v: ARRAY [3] OF gl.Float);
+	VAR d: gl.Float;
 BEGIN
 	d := Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
 	IF d # 0 THEN
 		d := 1.0 / d;
 		v[0] := d * v[0];  v[1] := d * v[1];  v[2] := d * v[2]
 	ELSE
-		wr.String("GLLib: attempt to normalize zero length vector"); wr.Ln; wr.Update;
+		KernelLog.String("GLLib: attempt to normalize zero length vector"); KernelLog.Ln; 
 		v[0] := 1
 	END
 END NormalizeV;
 
-PROCEDURE  DrawBox (size: GL.Double;  type: GL.Enum);
-	VAR  n: ARRAY [6] OF Vec3d;  faces: ARRAY [6] OF Vec4i;
-			v: ARRAY [8] OF Vec3d;
-			i: LONGINT;  s: GL.Double;
+PROCEDURE  DrawBox (size: gl.Float;  type: gl.Enum);
+VAR  n: ARRAY [6,3] OF gl.Float;  faces: ARRAY [6,4] OF gl.Int;
+	v: ARRAY [8,3] OF gl.Float;
+	i: LONGINT;  s: gl.Float;
 BEGIN
-	n[0] := [ -1.0, 0.0, 0.0];
-	n[1] := [ 0.0, 1.0, 0.0];
-	n[2] := [ 1.0, 0.0, 0.0];
-	n[3] := [ 0.0, -1.0, 0.0];
-	n[4] := [ 0.0, 0.0, 1.0];
-	n[5] := [ 0.0, 0.0, -1.0];
+	n := [ 	[ -1.0, 0.0, 0.0], [ 0.0, 1.0, 0.0], [ 1.0, 0.0, 0.0],	
+			[ 0.0, -1.0, 0.0],	[ 0.0, 0.0, 1.0], 	[ 0.0, 0.0, -1.0]	];
 
-	faces[0] := [ 0, 1, 2, 3];
-	faces[1] := [ 3, 2, 6, 7];
-	faces[2] := [ 7, 6, 5, 4];
-	faces[3] := [ 4, 5, 1, 0];
-	faces[4] := [ 5, 6, 2, 1];
-	faces[5] := [ 7, 4, 0, 3];
+	faces := [ [ 0, 1, 2, 3], [ 3, 2, 6, 7], [ 7, 6, 5, 4],
+			[ 4, 5, 1, 0],	[ 5, 6, 2, 1], 	[ 7, 4, 0, 3]	];
 
 	s := size / 2.0;
-	v[0] := [ -s, -s, -s ];  v[1] := [ -s, -s, s];  v[2] := [ -s, s, s];  v[3] := [ -s, s, -s ];
-	v[4] := [  s, -s, -s ];  v[5] := [  s, -s,  s ];  v[6] := [  s, s, s ];  v[7] := [  s, s, -s ];
-
+	v := [ [ -s, -s, -s ],  [ -s, -s, s], [ -s, s, s], [ -s, s, -s ],
+		[  s, -s, -s ],  [  s, -s,  s ], [  s, s, s ], [  s, s, -s ]];
 
 	FOR  i := 5 TO 0 BY -1 DO
-		GL.Begin(type);
-			GL.Normal3dv(n[i]);
-			GL.Vertex3dv( v[ faces[i, 0] ]);
-			GL.Vertex3dv( v[faces[i, 1] ]);
-			GL.Vertex3dv( v[faces[i, 2] ]);
-			GL.Vertex3dv( v[faces[i, 3] ]);
-		GL.End
+		gl.Begin(type);
+			gl.Normal3fv(n[i]);
+			gl.Vertex3fv( v[ faces[i, 0] ]);
+			gl.Vertex3fv( v[faces[i, 1] ]);
+			gl.Vertex3fv( v[faces[i, 2] ]);
+			gl.Vertex3fv( v[faces[i, 3] ]);
+		gl.End
 	END;
-
 END DrawBox;
 
-PROCEDURE  WireCube* (size: LONGREAL);
+PROCEDURE  WireCube* (size: REAL);
 BEGIN
-	DrawBox(SHORT(size), GLC.GL_LINE_LOOP)
+	DrawBox(size, glc.GL_LINE_LOOP)
 END WireCube;
 
-PROCEDURE  SolidCube* (size: LONGREAL);
+PROCEDURE  SolidCube* (size: REAL);
 BEGIN
-	DrawBox(size, GLC.GL_QUADS)
+	DrawBox(size, glc.GL_QUADS)
 END SolidCube;
 
-PROCEDURE  WireSphere* (radius: LONGREAL;  slices, stacks: LONGINT);
+PROCEDURE  WireSphere* (radius: REAL;  slices, stacks: LONGINT);
 BEGIN
 	InitQuadObj;
-	GLU.QuadricDrawStyle(quadObj, GLU.GLU_LINE);
-	GLU.QuadricNormals(quadObj, GLU.GLU_SMOOTH);
-	GLU.Sphere(quadObj, radius, slices, stacks)
+	glu.QuadricDrawStyle(quadObj, glu.GLU_LINE);
+	glu.QuadricNormals(quadObj, glu.GLU_SMOOTH);
+	glu.Sphere(quadObj, radius, slices, stacks)
 END WireSphere;
 
-PROCEDURE  SolidSphere* (radius: LONGREAL;  slices, stacks: LONGINT);
+PROCEDURE SolidSphere* (radius: REAL;  slices, stacks: LONGINT);
 BEGIN
 	InitQuadObj;
-	GLU.QuadricDrawStyle(quadObj, GLU.GLU_FILL);
-	GLU.QuadricNormals(quadObj, GLU.GLU_SMOOTH);
-	GLU.Sphere(quadObj, radius, slices, stacks)
+	glu.QuadricDrawStyle(quadObj, glu.GLU_FILL);
+	glu.QuadricNormals(quadObj, glu.GLU_SMOOTH);
+	glu.Sphere(quadObj, radius, slices, stacks)
 END SolidSphere;
 
-PROCEDURE  WireCone* (base, height: LONGREAL;  slices, stacks: LONGINT);
+
+(** baseradius at z=0, topradius at x=height *)
+PROCEDURE WireCylinder* (baseradius, topradius, height: REAL;  slices, stacks: LONGINT);
 BEGIN
 	InitQuadObj;
-	GLU.QuadricDrawStyle(quadObj, GLU.GLU_LINE);
-	GLU.QuadricNormals(quadObj, GLU.GLU_SMOOTH);
-	GLU.Cylinder(quadObj, base, 0.0, height, slices, stacks);
+	glu.QuadricDrawStyle(quadObj, glu.GLU_LINE);
+	glu.QuadricNormals(quadObj, glu.GLU_SMOOTH);
+	glu.Cylinder(quadObj, baseradius, topradius, height, slices, stacks)
+END WireCylinder;
+
+(** baseradius at z=0, topradius at x=height *)
+PROCEDURE SolidCylinder* (baseradius, topradius, height: REAL;  slices, stacks: LONGINT);
+BEGIN
+	InitQuadObj;
+	glu.QuadricDrawStyle(quadObj, glu.GLU_FILL);
+	glu.QuadricNormals(quadObj, glu.GLU_SMOOTH);
+	glu.Cylinder(quadObj, baseradius, topradius, height, slices, stacks)
+END SolidCylinder;
+
+PROCEDURE WireCone* (base, height: REAL;  slices, stacks: LONGINT);
+BEGIN
+	InitQuadObj;
+	glu.QuadricDrawStyle(quadObj, glu.GLU_LINE);
+	glu.QuadricNormals(quadObj, glu.GLU_SMOOTH);
+	glu.Cylinder(quadObj, base, 0.0, height, slices, stacks);
 END WireCone;
 
-PROCEDURE  SolidCone* (base, height: LONGREAL;  slices, stacks: LONGINT);
+PROCEDURE  SolidCone* (base, height: REAL;  slices, stacks: LONGINT);
 BEGIN
 	InitQuadObj;
-	GLU.QuadricDrawStyle(quadObj, GLU.GLU_FILL);
-	GLU.QuadricNormals(quadObj, GLU.GLU_SMOOTH);
-	GLU.Cylinder(quadObj, base, 0.0, height, slices, stacks);
+	glu.QuadricDrawStyle(quadObj, glu.GLU_FILL);
+	glu.QuadricNormals(quadObj, glu.GLU_SMOOTH);
+	glu.Cylinder(quadObj, base, 0.0, height, slices, stacks);
 END SolidCone;
 
-PROCEDURE Torus (r, R: LONGREAL;  nsides, rings: LONGINT);
-	VAR  i, j: LONGINT;
-			theta, phi, theta1, cosPhi, sinPhi, dist, cosTheta, sinTheta,
-			cosTheta1, sinTheta1, ringDelta, sideDelta: LONGREAL;
+PROCEDURE Torus (r, R: REAL;  nsides, rings: LONGINT);
+VAR  i, j: LONGINT;
+	theta, phi, theta1, cosPhi, sinPhi, dist, cosTheta, sinTheta,
+	cosTheta1, sinTheta1, ringDelta, sideDelta: REAL;
 BEGIN
 	ringDelta := 2.0 * pi / rings;  sideDelta := 2.0 * pi / nsides;
 	theta := 0.0;  cosTheta := 1.0;  sinTheta := 0.0;
@@ -214,57 +175,55 @@ BEGIN
 	FOR i := rings - 1 TO 0 BY -1 DO
 		theta1 := theta + ringDelta;
 		cosTheta1 := Math.cos(theta1);   sinTheta1 := Math.sin(theta1);
-		GL.Begin(GLC.GL_QUAD_STRIP);
+		gl.Begin(glc.GL_QUAD_STRIP);
 			phi := 0.0;
 			FOR  j := nsides TO 0 BY -1 DO
 				phi := phi + sideDelta;
 				cosPhi := Math.cos(phi);  sinPhi := Math.sin(phi);
 				dist := R + r * cosPhi;
 
-				GL.Normal3d(cosTheta1 * cosPhi, -sinTheta1 * cosPhi, sinPhi);
-				GL.Vertex3d(cosTheta1 * dist, -sinTheta1 * dist, r * sinPhi);
-				GL.Normal3d(cosTheta * cosPhi, -sinTheta * cosPhi, sinPhi);
-				GL.Vertex3d(cosTheta * dist, -sinTheta * dist,  r * sinPhi);
+				gl.Normal3f(cosTheta1 * cosPhi, -sinTheta1 * cosPhi, sinPhi);
+				gl.Vertex3f(cosTheta1 * dist, -sinTheta1 * dist, r * sinPhi);
+				gl.Normal3f(cosTheta * cosPhi, -sinTheta * cosPhi, sinPhi);
+				gl.Vertex3f(cosTheta * dist, -sinTheta * dist,  r * sinPhi);
 			END;
-		GL.End;
+		gl.End;
 		theta := theta1;
 		cosTheta := cosTheta1;  sinTheta := sinTheta1;
 	END
 END Torus;
 
-PROCEDURE  WireTorus* (innerRadius, outerRadius: LONGREAL;  nsides, rings: LONGINT);
+PROCEDURE  WireTorus* (innerRadius, outerRadius: REAL;  nsides, rings: LONGINT);
 BEGIN
-	GL.PushAttrib(GLC.GL_POLYGON_BIT);
-	GL.PolygonMode(GLC.GL_FRONT_AND_BACK, GLC.GL_LINE);
+	gl.PushAttrib(glc.GL_POLYGON_BIT);
+	gl.PolygonMode(glc.GL_FRONT_AND_BACK, glc.GL_LINE);
 	Torus(innerRadius, outerRadius, nsides, rings);
-	GL.PopAttrib
+	gl.PopAttrib
 END WireTorus;
 
-PROCEDURE  SolidTorus* (innerRadius, outerRadius: LONGREAL;  nsides, rings: LONGINT);
+PROCEDURE  SolidTorus* (innerRadius, outerRadius: REAL;  nsides, rings: LONGINT);
 BEGIN
 	Torus(innerRadius, outerRadius, nsides, rings)
 END SolidTorus;
 
-
-PROCEDURE RecordItem (VAR n1, n2, n3: Vec3d;  shadeType: GL.Enum);
-	VAR  q0, q1: Vec3d;
+PROCEDURE RecordItem (VAR n1, n2, n3: ARRAY [3] OF gl.Float;  shadeType: gl.Enum);
+VAR  q0, q1: ARRAY [3] OF gl.Float;
 BEGIN
-(*	SubV(n1, n2, q0);  SubV(n2, n3, q1);*)
 	q0 := n1 -n2;
 	q1 := n2 -n3;
 	Cross(q0, q1, q1);  NormalizeV(q1);
 
-	GL.Begin(shadeType);
-		GL.Normal3dv(q1);
-		GL.Vertex3dv(n1);
-		GL.Vertex3dv(n2);
-		GL.Vertex3dv(n3);
-	GL.End
+	gl.Begin(shadeType);
+		gl.Normal3fv(q1);
+		gl.Vertex3fv(n1);
+		gl.Vertex3fv(n2);
+		gl.Vertex3fv(n3);
+	gl.End
 END RecordItem;
 
-PROCEDURE  Subdivide (CONST v0, v1, v2: Vec3d;  shadeType: GL.Enum);
-	VAR  depth, i, j, k, n: LONGINT;  l: LONGREAL;
-			w0, w1, w2: Vec3d;
+PROCEDURE  Subdivide (CONST v0, v1, v2: ARRAY [3] OF gl.Float;  shadeType: gl.Enum);
+VAR  depth, i, j, k, n: LONGINT; 
+	w0, w1, w2: ARRAY [3] OF gl.Float;
 BEGIN
 	depth := 1;
 	FOR  i := 0 TO depth - 1 DO
@@ -281,16 +240,12 @@ BEGIN
 	END
 END Subdivide;
 
-PROCEDURE DrawTriangle (i: LONGINT; VAR data: ARRAY [*] OF Vec3d;  VAR ndx: ARRAY [*] OF Array3i; shadeType: GL.Enum);
-VAR  x0, x1, x2:  Vec3d;
+PROCEDURE DrawTriangle (i: LONGINT; VAR data: ARRAY [*,3] OF gl.Float;  VAR ndx: ARRAY [*,3] OF gl.Int; shadeType: gl.Enum);
 BEGIN
-	x0 := data[ndx[i, 0]];
-	x1 := data[ndx[i, 1]];
-	x2 := data[ndx[i, 2]];
-	Subdivide(x0, x1, x2, shadeType)
+	Subdivide(data[ndx[i, 0]], data[ndx[i, 1]], data[ndx[i, 2]], shadeType)
 END DrawTriangle;
 
-PROCEDURE  DrawTetrahedron (shadeType: GL.Enum);
+PROCEDURE  DrawTetrahedron (shadeType: gl.Enum);
 	VAR  i: LONGINT;
 BEGIN
 	FOR  i := 3 TO 0 BY -1 DO
@@ -298,19 +253,18 @@ BEGIN
 	END
 END DrawTetrahedron;
 
-
 PROCEDURE  WireTetrahedron*;
 BEGIN
-	DrawTetrahedron(GLC.GL_LINE_LOOP)
+	DrawTetrahedron(glc.GL_LINE_LOOP)
 END WireTetrahedron;
 
 PROCEDURE  SolidTetrahedron*;
 BEGIN
-	DrawTetrahedron(GLC.GL_TRIANGLES)
+	DrawTetrahedron(glc.GL_TRIANGLES)
 END SolidTetrahedron;
 
-PROCEDURE DrawIcosahedron (shadeType: GL.Enum);
-	VAR  i: LONGINT;
+PROCEDURE DrawIcosahedron (shadeType: gl.Enum);
+VAR  i: LONGINT;
 BEGIN
 	FOR  i := 19 TO 0 BY -1 DO
 		DrawTriangle(i, iData, iIndex, shadeType)
@@ -319,27 +273,27 @@ END DrawIcosahedron;
 
 PROCEDURE  WireIcosahedron* ;
 BEGIN
-	DrawIcosahedron(GLC.GL_LINE_LOOP)
+	DrawIcosahedron(glc.GL_LINE_LOOP)
 END WireIcosahedron;
 
 PROCEDURE  SolidIcosahedron* ;
 BEGIN
-	DrawIcosahedron(GLC.GL_TRIANGLES)
+	DrawIcosahedron(glc.GL_TRIANGLES)
 END SolidIcosahedron;
 
-PROCEDURE  DrawTeapot (grid: GL.Int;  scale: GL.Double;  type: GL.Enum);
-	VAR  i, j, k, l: LONGINT;  p, q, r, s: ARRAY 4, 4, 3 OF GL.Float;
+PROCEDURE  DrawTeapot (grid: gl.Int;  scale: gl.Float;  type: gl.Enum);
+VAR  i, j, k, l: LONGINT;  p, q, r, s: ARRAY [4, 4, 3] OF gl.Float;
 BEGIN
-	GL.PushAttrib(GLC.GL_ENABLE_BIT + GLC.GL_EVAL_BIT);
-	GL.Enable(GLC.GL_AUTO_NORMAL);
-	GL.Enable(GLC.GL_NORMALIZE);
-	GL.Enable(GLC.GL_MAP2_VERTEX_3);
-	GL.Enable(GLC.GL_MAP2_TEXTURE_COORD_2);
-	GL.PushMatrix;
+	gl.PushAttrib(glc.GL_ENABLE_BIT + glc.GL_EVAL_BIT);
+	gl.Enable(glc.GL_AUTO_NORMAL);
+	gl.Enable(glc.GL_NORMALIZE);
+	gl.Enable(glc.GL_MAP2_VERTEX_3);
+	gl.Enable(glc.GL_MAP2_TEXTURE_COORD_2);
+	gl.PushMatrix;
 
-	GL.Rotated(270.0, 1.0, 0.0, 0.0);
-	GL.Scaled(0.5 * scale, 0.5 * scale, 0.5 * scale);
-	GL.Translated(0.0, 0.0, -1.5);
+	gl.Rotatef(270.0, 1.0, 0.0, 0.0);
+	gl.Scalef(0.5 * scale, 0.5 * scale, 0.5 * scale);
+	gl.Translatef(0.0, 0.0, -1.5);
 
 	FOR  i := 0 TO 9 DO
 
@@ -359,38 +313,37 @@ BEGIN
 			END
 		END;
 
-		GL.Map2f(GLC.GL_MAP2_TEXTURE_COORD_2, 0, 1, 2, 2, 0, 1, 4, 2, ADDRESSOF(tex[0, 0, 0]));
-		GL.Map2f(GLC.GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, ADDRESSOF(p[0, 0, 0]));
-		GL.MapGrid2f(grid, 0, 1, grid, 0, 1);
-		GL.EvalMesh2(type, 0, grid, 0, grid);
-		GL.Map2f(GLC.GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, ADDRESSOF(q[0, 0, 0]));
-		GL.EvalMesh2(type, 0, grid, 0, grid);
+		gl.Map2f(glc.GL_MAP2_TEXTURE_COORD_2, 0, 1, 2, 2, 0, 1, 4, 2, ADDRESSOF(tex[0, 0, 0]));
+		gl.Map2f(glc.GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, ADDRESSOF(p[0, 0, 0]));
+		gl.MapGrid2f(grid, 0, 1, grid, 0, 1);
+		gl.EvalMesh2(type, 0, grid, 0, grid);
+		gl.Map2f(glc.GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, ADDRESSOF(q[0, 0, 0]));
+		gl.EvalMesh2(type, 0, grid, 0, grid);
 		IF  i < 6 THEN
-			GL.Map2f(GLC.GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, ADDRESSOF(r[0, 0, 0]));
-			GL.EvalMesh2(type, 0, grid, 0, grid);
-			GL.Map2f(GLC.GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, ADDRESSOF(s[0, 0, 0]));
-			GL.EvalMesh2(type, 0, grid, 0, grid)
+			gl.Map2f(glc.GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, ADDRESSOF(r[0, 0, 0]));
+			gl.EvalMesh2(type, 0, grid, 0, grid);
+			gl.Map2f(glc.GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, ADDRESSOF(s[0, 0, 0]));
+			gl.EvalMesh2(type, 0, grid, 0, grid)
 		END
 	END;
 
-	GL.PopMatrix;
-	GL.PopAttrib
+	gl.PopMatrix;
+	gl.PopAttrib
 END DrawTeapot;
 
 
-PROCEDURE  SolidTeapot* (scale: LONGREAL);
+PROCEDURE  SolidTeapot* (scale: REAL);
 BEGIN
-	DrawTeapot(14, scale, GLC.GL_FILL)
+	DrawTeapot(14, scale, glc.GL_FILL)
 END SolidTeapot;
 
-PROCEDURE  WireTeapot* (scale: LONGREAL);
+PROCEDURE  WireTeapot* (scale: REAL);
 BEGIN
-	DrawTeapot(10, scale, GLC.GL_LINE)
+	DrawTeapot(10, scale, glc.GL_LINE)
 END WireTeapot;
 
-
-PROCEDURE DrawOctahedron (shadeType: GL.Enum);
-	VAR  i: LONGINT;
+PROCEDURE DrawOctahedron (shadeType: gl.Enum);
+VAR  i: LONGINT;
 BEGIN
 	FOR  i := 7 TO 0 BY -1 DO
 		DrawTriangle(i, oData, oIndex, shadeType)
@@ -399,33 +352,32 @@ END DrawOctahedron;
 
 PROCEDURE  WireOctahedron* ;
 BEGIN
-	DrawOctahedron(GLC.GL_LINE_LOOP)
+	DrawOctahedron(glc.GL_LINE_LOOP)
 END WireOctahedron;
 
 PROCEDURE  SolidOctahedron* ;
 BEGIN
-	DrawOctahedron(GLC.GL_TRIANGLES)
+	DrawOctahedron(glc.GL_TRIANGLES)
 END SolidOctahedron;
 
-PROCEDURE  DrawPentagon (a, b, c, d, e: LONGINT;  shadeType: GL.Enum);
-	VAR  n, d1, d2: Vec3d;
+PROCEDURE  DrawPentagon (a, b, c, d, e: LONGINT;  shadeType: gl.Enum);
+VAR  n, d1, d2: ARRAY [3] OF gl.Float;
 BEGIN
-(*	SubV(dodec[a], dodec[b], d1);  SubV(dodec[b], dodec[c], d2); *)
 	d1 := dodec[a] - dodec[b];
 	d2 := dodec[b] - dodec[c];
 	Cross(d1, d2, n);  NormalizeV(n);
 
-	GL.Begin(shadeType);
-		GL.Normal3dv( n);
-		GL.Vertex3dv( dodec[a]);
-		GL.Vertex3dv( dodec[b]);
-		GL.Vertex3dv( dodec[c]);
-		GL.Vertex3dv( dodec[d]);
-		GL.Vertex3dv(dodec[e]);
-	GL.End
+	gl.Begin(shadeType);
+		gl.Normal3fv( n);
+		gl.Vertex3fv( dodec[a]);
+		gl.Vertex3fv( dodec[b]);
+		gl.Vertex3fv( dodec[c]);
+		gl.Vertex3fv( dodec[d]);
+		gl.Vertex3fv(dodec[e]);
+	gl.End
 END DrawPentagon;
 
-PROCEDURE  DrawDodecahedron (type: GL.Enum);
+PROCEDURE  DrawDodecahedron (type: gl.Enum);
 BEGIN
 	DrawPentagon(0, 1, 9, 16, 5, type);
 	DrawPentagon(1, 0, 3, 18, 7, type);
@@ -443,47 +395,32 @@ END DrawDodecahedron;
 
 PROCEDURE  WireDodecahedron* ;
 BEGIN
-	DrawDodecahedron(GLC.GL_LINE_LOOP)
+	DrawDodecahedron(glc.GL_LINE_LOOP)
 END WireDodecahedron;
-
 
 PROCEDURE  SolidDodecahedron* ;
 BEGIN
-	DrawDodecahedron(GLC.GL_TRIANGLE_FAN)
+	DrawDodecahedron(glc.GL_TRIANGLE_FAN)
 END SolidDodecahedron;
 
-
 PROCEDURE  InitDodecahedron;
-	VAR  alpha, beta: LONGREAL;
+VAR  alpha, beta: REAL;
 BEGIN
 	alpha := Math.sqrt(2.0 / (3.0 + Math.sqrt(5.0)));
 	beta := 1.0 + Math.sqrt(6.0 / (3.0 + Math.sqrt(5.0)) -
 			  2.0 + 2.0 * Math.sqrt(2.0 / (3.0 + Math.sqrt(5.0))));
 
-	dodec[0] := [ -alpha, 0, beta];
-	dodec[1] := [ alpha, 0, beta];
-	dodec[2] := [ -1, -1, -1];
-	dodec[3] := [ -1, -1, 1];
-	dodec[4] := [ -1, 1, -1];
-	dodec[5] := [ -1, 1, 1 ];
-	dodec[6] := [ 1, -1, -1 ];
-	dodec[7] := [ 1, -1, 1 ];
-	dodec[8] := [ 1, 1, -1 ];
-	dodec[9] := [ 1, 1, 1 ];
-	dodec[10] := [ beta, alpha, 0 ];
-	dodec[11] := [ beta, -alpha, 0 ];
-	dodec[12] := [ -beta, alpha, 0 ];
-	dodec[13] := [ -beta, -alpha, 0 ];
-	dodec[14] := [ -alpha, 0, -beta ];
-	dodec[15] := [ alpha, 0, -beta];
-	dodec[16] := [ 0, beta, alpha ];
-	dodec[17] := [ 0, beta, -alpha];
-	dodec[18] := [ 0, -beta, alpha ];
-	dodec[19] := [0, -beta, -alpha ];
+	dodec := [ [ -alpha, 0, beta], [ alpha, 0, beta], [ -1.0, -1, -1],
+	[ -1.0, -1, 1], [ -1.0, 1, -1],	[ -1.0, 1, 1 ],
+	[ 1.0, -1, -1 ], [ 1.0, -1, 1 ], 	[ 1.0, 1, -1 ],
+	 [ 1.0, 1, 1 ], [ beta, alpha, 0 ], [ beta, -alpha, 0 ],
+	[ -beta, alpha, 0 ], [ -beta, -alpha, 0 ], [ -alpha, 0, -beta ],
+	[ alpha, 0, -beta], [ 0, beta, alpha ], [ 0, beta, -alpha],
+	[ 0, -beta, alpha ], [0, -beta, -alpha ]  ];
 END InitDodecahedron;
 
 PROCEDURE  InitTeapot;
-	VAR  i: LONGINT;
+VAR  i: LONGINT;
 BEGIN
 	i := 0;
 	(* rim *)
@@ -637,44 +574,35 @@ BEGIN
 END InitTeapot;
 
 BEGIN
-	(* Tetraheron data *)
-	tData[0] := [ t,  t,   t ];  tData[1] := [  t, -t, -t];
-	tData[2] := [ -t,  t, -t];  tData[3] :=[ -t, -t,  t];
-
-	Set3i(tIndex[0], 0, 1, 3);  Set3i(tIndex[1], 2, 1, 0);
-	Set3i(tIndex[2], 3, 2, 0);  Set3i(tIndex[3], 1, 2, 3);
-
+	
+	tData := [ [ t,  t,   t ], [  t, -t, -t], [ -t,  t, -t], [ -t, -t,  t] ]; 
+	tIndex := [ [0, 1, 3], [2, 1, 0], [3, 2, 0], [1, 2, 3] ];
+	
 	(* Icosaheron data;  radius = 1.0 *)
-	iData[0] := [ -x, 0, z];  iData[1] := [ x, 0, z];  iData[2] := [ -x, 0, -z];
-	iData[3] := [ x, 0, -z];  iData[4] := [ 0, z, x];  iData[5] := [ 0, z, -x];
-	iData[6] := [ 0, -z, x];  iData[7] := [ 0, -z, -x];  iData[8] := [ z, x, 0];
-	iData[9]:= [ -z, x, 0];  iData[10] := [ z, -x, 0];  iData[11] := [ -z, -x, 0];
+	iData := 	[ [ -x, 0, z],  [ x, 0, z],  [ -x, 0, -z],
+				[ x, 0, -z], [ 0, z, x], [ 0, z, -x],
+				[ 0, -z, x], [ 0, -z, -x], [ z, x, 0],
+				[ -z, x, 0], [ z, -x, 0], [ -z, -x, 0]];
 
-	Set3i(iIndex[0], 0, 4, 1);  Set3i(iIndex[1], 0, 9, 4);  Set3i(iIndex[2], 9, 5, 4);  Set3i(iIndex[3], 4, 5, 8);
-	Set3i(iIndex[4], 4, 8, 1);  Set3i(iIndex[5], 8, 10, 1);  Set3i(iIndex[6], 8, 3, 10);  Set3i(iIndex[7], 5, 3, 8);
-	Set3i(iIndex[8], 5, 2, 3);  Set3i(iIndex[9], 2, 7, 3);  Set3i(iIndex[10], 7, 10, 3);  Set3i(iIndex[11], 7, 6, 10);
-	Set3i(iIndex[12], 7, 11, 6);  Set3i(iIndex[13], 11, 0, 6);  Set3i(iIndex[14], 0, 1, 6);  Set3i(iIndex[15], 6, 1, 10);
-	Set3i(iIndex[16], 9, 0, 11);  Set3i(iIndex[17], 9, 11, 2);  Set3i(iIndex[18], 9, 2, 5);  Set3i(iIndex[19], 7, 2, 11);
+	iIndex := [ 	[ 0, 4, 1], [0, 9, 4], [ 9, 5, 4], [4, 5, 8],
+				[4, 8, 1], [8, 10, 1], [8, 3, 10], [ 5, 3, 8],
+				[5, 2, 3], [2, 7, 3], [7, 10, 3], [7, 6, 10],
+				[7, 11, 6], [11, 0, 6], [0, 1, 6], [ 6, 1, 10],
+				[9, 0, 11], [9, 11, 2], [9, 2, 5], [7, 2, 11] ];
 
 	(* octahedron data: The octahedron produced is *)
 	(* centered at the origin and has radius 1.0 *)
-	oData[0] := [ 1.0, 0.0, 0.0];  oData[1] := [ -1.0, 0.0, 0.0];
-	oData[2] := [ 0.0, 1.0, 0.0];  oData[3] := [ 0.0, -1.0, 0.0];
-	oData[4] := [ 0.0, 0.0, 1.0];  oData[5] := [ 0.0, 0.0, -1.0];
+	oData := [ 	[ 1.0, 0.0, 0.0], [ -1.0, 0.0, 0.0],
+				[ 0.0, 1.0, 0.0], [ 0.0, -1.0, 0.0],
+				[ 0.0, 0.0, 1.0], [ 0.0, 0.0, -1.0] ];
 
-	Set3i(oIndex[0], 0, 4, 2);  Set3i(oIndex[1], 1, 2, 4);
-	Set3i(oIndex[2], 0, 3, 4);  Set3i(oIndex[3], 1, 4, 3);
-	Set3i(oIndex[4], 0, 2, 5);  Set3i(oIndex[5], 1, 5, 2);
-	Set3i(oIndex[6], 0, 5, 3);  Set3i(oIndex[7], 1, 3, 5);
-
+	oIndex := [	[0, 4, 2], [1, 2, 4], [ 0, 3, 4], [1, 4, 3],
+				[0, 2, 5], [1, 5, 2], [0, 5, 3], [1, 3, 5] ];
+				
 	InitDodecahedron;
 
 	(* Teapot data *)
 	InitTeapot;
 
-	Streams.OpenWriter(wr, KernelLog.Send);
 END GLLib.
-
-Compiler.Compile --findPC=GLLib.DrawTriangle:91 openglduzelt/GLLib.Mod ~
-
 

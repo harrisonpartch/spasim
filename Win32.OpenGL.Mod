@@ -17,7 +17,6 @@ IMPORT SYSTEM, Kernel32, Modules,  Strings, GLC := OpenGLConst, KernelLog;
 VAR
 	(* handle to library *)
  	GL_LibHandle-: LONGINT;
-	oldfcr, newfcr: SET;  (* for FPU Control registers *)
 
 CONST
 	debug = FALSE; (* used in ReadImplementationProperties, when extension is not available *)
@@ -3753,7 +3752,7 @@ TYPE
 	Fogfv- : TglFogfv;
 	Fogi- : TglFogi;
 	Fogiv- : TglFogiv;
-	XglFrustum- : TglFrustum;
+	Frustum- : TglFrustum;
 	GenLists- : TglGenLists;
 	GetClipPlane- : TglGetClipPlane;
 	GetLightfv- : TglGetLightfv;
@@ -3788,7 +3787,7 @@ TYPE
 	InterleavedArrays- : TglInterleavedArrays;
 	IsList- : TglIsList;
 	IsTexture- : TglIsTexture;
-	XglLightModelf- : TglLightModelf;
+	LightModelf- : TglLightModelf;
 	XglLightModelfv- : TglLightModelfv;
 	LightModeli- : TglLightModeli;
 	LightModeliv- : TglLightModeliv;
@@ -3810,7 +3809,7 @@ TYPE
 	MapGrid1f- : TglMapGrid1f;
 	MapGrid2d- : TglMapGrid2d;
 	MapGrid2f- : TglMapGrid2f;
-	XglMaterialf- : TglMaterialf;
+	Materialf- : TglMaterialf;
 	XglMaterialfv- : TglMaterialfv;
 	Materiali- : TglMateriali;
 	Materialiv- : TglMaterialiv;
@@ -3820,16 +3819,16 @@ TYPE
 	NewList- : TglNewList;
 	Normal3b- : TglNormal3b;
 	Normal3bv- : TglNormal3bv;
-	XglNormal3d- : TglNormal3d;
+	Normal3d- : TglNormal3d;
 	XglNormal3dv- : TglNormal3dv;
-	XglNormal3f- : TglNormal3f;
+	Normal3f- : TglNormal3f;
 	XglNormal3fv- : TglNormal3fv;
 	Normal3i- : TglNormal3i;
 	Normal3iv- : TglNormal3iv;
 	Normal3s- : TglNormal3s;
 	Normal3sv- : TglNormal3sv;
 	NormalPointer- : TglNormalPointer;
-	XglOrtho- : TglOrtho;
+	Ortho- : TglOrtho;
 	PassThrough- : TglPassThrough;
 	PixelMapfv- : TglPixelMapfv;
 	PixelMapuiv- : TglPixelMapuiv;
@@ -3880,10 +3879,10 @@ TYPE
 	Rects- : TglRects;
 	Rectsv- : TglRectsv;
 	RenderMode- : TglRenderMode;
-	XglRotated- : TglRotated;
-	XglRotatef- : TglRotatef;
-	XglScaled- : TglScaled;
-	XglScalef- : TglScalef;
+	Rotated- : TglRotated;
+	Rotatef- : TglRotatef;
+	Scaled- : TglScaled;
+	Scalef- : TglScalef;
 	SelectBuffer- : TglSelectBuffer;
 	ShadeModel- : TglShadeModel;
 	TexCoord1d- : TglTexCoord1d;
@@ -3929,8 +3928,8 @@ TYPE
 	TexGenfv- : TglTexGenfv;
 	TexGeni- : TglTexGeni;
 	TexGeniv- : TglTexGeniv;
-	XglTranslated- : TglTranslated;
-	XglTranslatef- : TglTranslatef;
+	Translated- : TglTranslated;
+	Translatef- : TglTranslatef;
 	Vertex2d- : TglVertex2d;
 	Vertex2dv- : TglVertex2dv;
 	Vertex2f- : TglVertex2f;
@@ -3939,9 +3938,9 @@ TYPE
 	Vertex2iv- : TglVertex2iv;
 	Vertex2s- : TglVertex2s;
 	Vertex2sv- : TglVertex2sv;
-	XglVertex3d- : TglVertex3d;
+	Vertex3d- : TglVertex3d;
 	XglVertex3dv- : TglVertex3dv;
-	XglVertex3f- : TglVertex3f;
+	Vertex3f- : TglVertex3f;
 	XglVertex3fv- : TglVertex3fv;
 	Vertex3i- : TglVertex3i;
 	Vertex3iv- : TglVertex3iv;
@@ -4168,16 +4167,16 @@ TYPE
 	Uniform3i- : TglUniform3i;
 	Uniform4i- : TglUniform4i;
 	Uniform1fv- : TglUniform1fv;
-	XglUniform2fv- : TglUniform2fv;
-	XglUniform3fv- : TglUniform3fv;
-	XglUniform4fv- : TglUniform4fv;
+	Uniform2fv- : TglUniform2fv;
+	Uniform3fv- : TglUniform3fv;
+	Uniform4fv- : TglUniform4fv;
 	Uniform1iv- : TglUniform1iv;
 	Uniform2iv- : TglUniform2iv;
 	Uniform3iv- : TglUniform3iv;
 	Uniform4iv- : TglUniform4iv;
 	UniformMatrix2fv- : TglUniformMatrix2fv;
-	XglUniformMatrix3fv- : TglUniformMatrix3fv;
-	XglUniformMatrix4fv- : TglUniformMatrix4fv;
+	UniformMatrix3fv- : TglUniformMatrix3fv;
+	UniformMatrix4fv- : TglUniformMatrix4fv;
 	ValidateProgram- : TglValidateProgram;
 	VertexAttrib1d- : TglVertexAttrib1d;
 	VertexAttrib1dv- : TglVertexAttrib1dv;
@@ -4554,16 +4553,16 @@ TYPE
 	Uniform3iARB- : TglUniform3iARB;
 	Uniform4iARB- : TglUniform4iARB;
 	Uniform1fvARB- : TglUniform1fvARB;
-	XglUniform2fvARB- : TglUniform2fvARB;
-	XglUniform3fvARB- : TglUniform3fvARB;
-	XglUniform4fvARB- : TglUniform4fvARB;
+	Uniform2fvARB- : TglUniform2fvARB;
+	Uniform3fvARB- : TglUniform3fvARB;
+	Uniform4fvARB- : TglUniform4fvARB;
 	Uniform1ivARB- : TglUniform1ivARB;
 	Uniform2ivARB- : TglUniform2ivARB;
 	Uniform3ivARB- : TglUniform3ivARB;
 	Uniform4ivARB- : TglUniform4ivARB;
 	UniformMatrix2fvARB- : TglUniformMatrix2fvARB;
-	XglUniformMatrix3fvARB- : TglUniformMatrix3fvARB;
-	XglUniformMatrix4fvARB- : TglUniformMatrix4fvARB;
+	UniformMatrix3fvARB- : TglUniformMatrix3fvARB;
+	UniformMatrix4fvARB- : TglUniformMatrix4fvARB;
 	GetObjectParameterfvARB- : TglGetObjectParameterfvARB;
 	GetObjectParameterivARB- : TglGetObjectParameterivARB;
 	GetInfoLogARB- : TglGetInfoLogARB;
@@ -6520,9 +6519,7 @@ BEGIN
 	GL_LibHandle := Kernel32.LoadLibrary(name);
 	ASSERT(GL_LibHandle # 0,101);
 
-
 	(* load GL functions*)
-	IF (GL_LibHandle # 0) THEN
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglGetProcAddress', SYSTEM.VAL(ADDRESS, wglGetProcAddress));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglCopyContext', SYSTEM.VAL(ADDRESS, wglCopyContext ));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglCreateLayerContext', SYSTEM.VAL(ADDRESS, wglCreateLayerContext ));
@@ -6549,9 +6546,7 @@ BEGIN
 	    *)
 
 	    KernelLog.String(GL_LibName); KernelLog.String(" loaded.");  KernelLog.Ln;
-	END;
 END InitOpenGL;
-
 
 PROCEDURE ReadOpenGLCore*;
 BEGIN
@@ -6691,7 +6686,7 @@ BEGIN
 	Fogfv := SYSTEM.VAL(TglFogfv, GetProcAddress('glFogfv'));
 	Fogi := SYSTEM.VAL(TglFogi, GetProcAddress('glFogi'));
 	Fogiv := SYSTEM.VAL(TglFogiv, GetProcAddress('glFogiv'));
-	XglFrustum := SYSTEM.VAL(TglFrustum, GetProcAddress('glFrustum'));
+	Frustum := SYSTEM.VAL(TglFrustum, GetProcAddress('glFrustum'));
 	GenLists := SYSTEM.VAL(TglGenLists, GetProcAddress('glGenLists'));
 	GetClipPlane := SYSTEM.VAL(TglGetClipPlane, GetProcAddress('glGetClipPlane'));
 	GetLightfv := SYSTEM.VAL(TglGetLightfv, GetProcAddress('glGetLightfv'));
@@ -6726,7 +6721,7 @@ BEGIN
 	InterleavedArrays := SYSTEM.VAL(TglInterleavedArrays, GetProcAddress('glInterleavedArrays'));
 	IsList := SYSTEM.VAL(TglIsList, GetProcAddress('glIsList'));
 	IsTexture := SYSTEM.VAL(TglIsTexture, GetProcAddress('glIsTexture'));
-	XglLightModelf := SYSTEM.VAL(TglLightModelf, GetProcAddress('glLightModelf'));
+	LightModelf := SYSTEM.VAL(TglLightModelf, GetProcAddress('glLightModelf'));
 	XglLightModelfv := SYSTEM.VAL(TglLightModelfv, GetProcAddress('glLightModelfv'));
 	LightModeli := SYSTEM.VAL(TglLightModeli, GetProcAddress('glLightModeli'));
 	LightModeliv := SYSTEM.VAL(TglLightModeliv, GetProcAddress('glLightModeliv'));
@@ -6748,7 +6743,7 @@ BEGIN
 	MapGrid1f := SYSTEM.VAL(TglMapGrid1f, GetProcAddress('glMapGrid1f'));
 	MapGrid2d := SYSTEM.VAL(TglMapGrid2d, GetProcAddress('glMapGrid2d'));
 	MapGrid2f := SYSTEM.VAL(TglMapGrid2f, GetProcAddress('glMapGrid2f'));
-	XglMaterialf := SYSTEM.VAL(TglMaterialf, GetProcAddress('glMaterialf'));
+	Materialf := SYSTEM.VAL(TglMaterialf, GetProcAddress('glMaterialf'));
 	XglMaterialfv := SYSTEM.VAL(TglMaterialfv, GetProcAddress('glMaterialfv'));
 	Materiali := SYSTEM.VAL(TglMateriali, GetProcAddress('glMateriali'));
 	Materialiv := SYSTEM.VAL(TglMaterialiv, GetProcAddress('glMaterialiv'));
@@ -6758,16 +6753,16 @@ BEGIN
 	NewList := SYSTEM.VAL(TglNewList, GetProcAddress('glNewList'));
 	Normal3b := SYSTEM.VAL(TglNormal3b, GetProcAddress('glNormal3b'));
 	Normal3bv := SYSTEM.VAL(TglNormal3bv, GetProcAddress('glNormal3bv'));
-	XglNormal3d := SYSTEM.VAL(TglNormal3d, GetProcAddress('glNormal3d'));
+	Normal3d := SYSTEM.VAL(TglNormal3d, GetProcAddress('glNormal3d'));
 	XglNormal3dv := SYSTEM.VAL(TglNormal3dv, GetProcAddress('glNormal3dv'));
-	XglNormal3f := SYSTEM.VAL(TglNormal3f, GetProcAddress('glNormal3f'));
+	Normal3f := SYSTEM.VAL(TglNormal3f, GetProcAddress('glNormal3f'));
 	XglNormal3fv := SYSTEM.VAL(TglNormal3fv, GetProcAddress('glNormal3fv'));
 	Normal3i := SYSTEM.VAL(TglNormal3i, GetProcAddress('glNormal3i'));
 	Normal3iv := SYSTEM.VAL(TglNormal3iv, GetProcAddress('glNormal3iv'));
 	Normal3s := SYSTEM.VAL(TglNormal3s, GetProcAddress('glNormal3s'));
 	Normal3sv := SYSTEM.VAL(TglNormal3sv, GetProcAddress('glNormal3sv'));
 	NormalPointer := SYSTEM.VAL(TglNormalPointer, GetProcAddress('glNormalPointer'));
-	XglOrtho := SYSTEM.VAL(TglOrtho, GetProcAddress('glOrtho'));
+	Ortho := SYSTEM.VAL(TglOrtho, GetProcAddress('glOrtho'));
 	PassThrough := SYSTEM.VAL(TglPassThrough, GetProcAddress('glPassThrough'));
 	PixelMapfv := SYSTEM.VAL(TglPixelMapfv, GetProcAddress('glPixelMapfv'));
 	PixelMapuiv := SYSTEM.VAL(TglPixelMapuiv, GetProcAddress('glPixelMapuiv'));
@@ -6818,10 +6813,10 @@ BEGIN
 	Rects := SYSTEM.VAL(TglRects, GetProcAddress('glRects'));
 	Rectsv := SYSTEM.VAL(TglRectsv, GetProcAddress('glRectsv'));
 	RenderMode := SYSTEM.VAL(TglRenderMode, GetProcAddress('glRenderMode'));
-	XglRotated := SYSTEM.VAL(TglRotated, GetProcAddress('glRotated'));
-	XglRotatef := SYSTEM.VAL(TglRotatef, GetProcAddress('glRotatef'));
-	XglScaled := SYSTEM.VAL(TglScaled, GetProcAddress('glScaled'));
-	XglScalef := SYSTEM.VAL(TglScalef, GetProcAddress('glScalef'));
+	Rotated := SYSTEM.VAL(TglRotated, GetProcAddress('glRotated'));
+	Rotatef := SYSTEM.VAL(TglRotatef, GetProcAddress('glRotatef'));
+	Scaled := SYSTEM.VAL(TglScaled, GetProcAddress('glScaled'));
+	Scalef := SYSTEM.VAL(TglScalef, GetProcAddress('glScalef'));
 	SelectBuffer := SYSTEM.VAL(TglSelectBuffer, GetProcAddress('glSelectBuffer'));
 	ShadeModel := SYSTEM.VAL(TglShadeModel, GetProcAddress('glShadeModel'));
 	TexCoord1d := SYSTEM.VAL(TglTexCoord1d, GetProcAddress('glTexCoord1d'));
@@ -6867,8 +6862,8 @@ BEGIN
 	TexGenfv := SYSTEM.VAL(TglTexGenfv, GetProcAddress('glTexGenfv'));
 	TexGeni := SYSTEM.VAL(TglTexGeni, GetProcAddress('glTexGeni'));
 	TexGeniv := SYSTEM.VAL(TglTexGeniv, GetProcAddress('glTexGeniv'));
-	XglTranslated := SYSTEM.VAL(TglTranslated, GetProcAddress('glTranslated'));
-	XglTranslatef := SYSTEM.VAL(TglTranslatef, GetProcAddress('glTranslatef'));
+	Translated := SYSTEM.VAL(TglTranslated, GetProcAddress('glTranslated'));
+	Translatef := SYSTEM.VAL(TglTranslatef, GetProcAddress('glTranslatef'));
 	Vertex2d := SYSTEM.VAL(TglVertex2d, GetProcAddress('glVertex2d'));
 	Vertex2dv := SYSTEM.VAL(TglVertex2dv, GetProcAddress('glVertex2dv'));
 	Vertex2f := SYSTEM.VAL(TglVertex2f, GetProcAddress('glVertex2f'));
@@ -6877,9 +6872,9 @@ BEGIN
 	Vertex2iv := SYSTEM.VAL(TglVertex2iv, GetProcAddress('glVertex2iv'));
 	Vertex2s := SYSTEM.VAL(TglVertex2s, GetProcAddress('glVertex2s'));
 	Vertex2sv := SYSTEM.VAL(TglVertex2sv, GetProcAddress('glVertex2sv'));
-	XglVertex3d := SYSTEM.VAL(TglVertex3d, GetProcAddress('glVertex3d'));
+	Vertex3d := SYSTEM.VAL(TglVertex3d, GetProcAddress('glVertex3d'));
 	XglVertex3dv := SYSTEM.VAL(TglVertex3dv, GetProcAddress('glVertex3dv'));
-	XglVertex3f := SYSTEM.VAL(TglVertex3f, GetProcAddress('glVertex3f'));
+	Vertex3f := SYSTEM.VAL(TglVertex3f, GetProcAddress('glVertex3f'));
 	XglVertex3fv := SYSTEM.VAL(TglVertex3fv, GetProcAddress('glVertex3fv'));
 	Vertex3i := SYSTEM.VAL(TglVertex3i, GetProcAddress('glVertex3i'));
 	Vertex3iv := SYSTEM.VAL(TglVertex3iv, GetProcAddress('glVertex3iv'));
@@ -6985,16 +6980,16 @@ BEGIN
 	Uniform3i := SYSTEM.VAL(TglUniform3i, GetProcAddress('glUniform3i'));
 	Uniform4i := SYSTEM.VAL(TglUniform4i, GetProcAddress('glUniform4i'));
 	Uniform1fv := SYSTEM.VAL(TglUniform1fv, GetProcAddress('glUniform1fv'));
-	XglUniform2fv := SYSTEM.VAL(TglUniform2fv, GetProcAddress('glUniform2fv'));
-	XglUniform3fv := SYSTEM.VAL(TglUniform3fv, GetProcAddress('glUniform3fv'));
-	XglUniform4fv := SYSTEM.VAL(TglUniform4fv, GetProcAddress('glUniform4fv'));
+	Uniform2fv := SYSTEM.VAL(TglUniform2fv, GetProcAddress('glUniform2fv'));
+	Uniform3fv := SYSTEM.VAL(TglUniform3fv, GetProcAddress('glUniform3fv'));
+	Uniform4fv := SYSTEM.VAL(TglUniform4fv, GetProcAddress('glUniform4fv'));
 	Uniform1iv := SYSTEM.VAL(TglUniform1iv, GetProcAddress('glUniform1iv'));
 	Uniform2iv := SYSTEM.VAL(TglUniform2iv, GetProcAddress('glUniform2iv'));
 	Uniform3iv := SYSTEM.VAL(TglUniform3iv, GetProcAddress('glUniform3iv'));
 	Uniform4iv := SYSTEM.VAL(TglUniform4iv, GetProcAddress('glUniform4iv'));
 	UniformMatrix2fv := SYSTEM.VAL(TglUniformMatrix2fv, GetProcAddress('glUniformMatrix2fv'));
-	XglUniformMatrix3fv := SYSTEM.VAL(TglUniformMatrix3fv, GetProcAddress('glUniformMatrix3fv'));
-	XglUniformMatrix4fv := SYSTEM.VAL(TglUniformMatrix4fv, GetProcAddress('glUniformMatrix4fv'));
+	UniformMatrix3fv := SYSTEM.VAL(TglUniformMatrix3fv, GetProcAddress('glUniformMatrix3fv'));
+	UniformMatrix4fv := SYSTEM.VAL(TglUniformMatrix4fv, GetProcAddress('glUniformMatrix4fv'));
 	ValidateProgram := SYSTEM.VAL(TglValidateProgram, GetProcAddress('glValidateProgram'));
 	VertexAttrib1d := SYSTEM.VAL(TglVertexAttrib1d, GetProcAddress('glVertexAttrib1d'));
 	VertexAttrib1dv := SYSTEM.VAL(TglVertexAttrib1dv, GetProcAddress('glVertexAttrib1dv'));
@@ -7505,16 +7500,16 @@ BEGIN
 	Uniform3iARB := SYSTEM.VAL(TglUniform3iARB, GetProcAddress('glUniform3iARB'));
 	Uniform4iARB := SYSTEM.VAL(TglUniform4iARB, GetProcAddress('glUniform4iARB'));
 	Uniform1fvARB := SYSTEM.VAL(TglUniform1fvARB, GetProcAddress('glUniform1fvARB'));
-	XglUniform2fvARB := SYSTEM.VAL(TglUniform2fvARB, GetProcAddress('glUniform2fvARB'));
-	XglUniform3fvARB := SYSTEM.VAL(TglUniform3fvARB, GetProcAddress('glUniform3fvARB'));
-	XglUniform4fvARB := SYSTEM.VAL(TglUniform4fvARB, GetProcAddress('glUniform4fvARB'));
+	Uniform2fvARB := SYSTEM.VAL(TglUniform2fvARB, GetProcAddress('glUniform2fvARB'));
+	Uniform3fvARB := SYSTEM.VAL(TglUniform3fvARB, GetProcAddress('glUniform3fvARB'));
+	Uniform4fvARB := SYSTEM.VAL(TglUniform4fvARB, GetProcAddress('glUniform4fvARB'));
 	Uniform1ivARB := SYSTEM.VAL(TglUniform1ivARB, GetProcAddress('glUniform1ivARB'));
 	Uniform2ivARB := SYSTEM.VAL(TglUniform2ivARB, GetProcAddress('glUniform2ivARB'));
 	Uniform3ivARB := SYSTEM.VAL(TglUniform3ivARB, GetProcAddress('glUniform3ivARB'));
 	Uniform4ivARB := SYSTEM.VAL(TglUniform4ivARB, GetProcAddress('glUniform4ivARB'));
 	UniformMatrix2fvARB := SYSTEM.VAL(TglUniformMatrix2fvARB, GetProcAddress('glUniformMatrix2fvARB'));
-	XglUniformMatrix3fvARB := SYSTEM.VAL(TglUniformMatrix3fvARB, GetProcAddress('glUniformMatrix3fvARB'));
-	XglUniformMatrix4fvARB := SYSTEM.VAL(TglUniformMatrix4fvARB, GetProcAddress('glUniformMatrix4fvARB'));
+	UniformMatrix3fvARB := SYSTEM.VAL(TglUniformMatrix3fvARB, GetProcAddress('glUniformMatrix3fvARB'));
+	UniformMatrix4fvARB := SYSTEM.VAL(TglUniformMatrix4fvARB, GetProcAddress('glUniformMatrix4fvARB'));
 	(* GL_ARB_vertex_shader  *)
 	GetActiveAttribARB := SYSTEM.VAL(TglGetActiveAttribARB, GetProcAddress('glGetActiveAttribARB'));
 	XglGetAttribLocationARB := SYSTEM.VAL(TglGetAttribLocationARB, GetProcAddress('glGetAttribLocationARB'));
@@ -10289,7 +10284,6 @@ BEGIN
   Read_WIN_swap_hint;
 
 (* ENDIF *)
-
 END ReadExtensions;
 
 (* utilities *)
@@ -10349,8 +10343,8 @@ END wglARBStrings;
 
 PROCEDURE ReadCoreVersion*;
 VAR
-  Buffer: Strings.String;
-  MajorVersion, MinorVersion: LONGINT;
+	Buffer: Strings.String;
+	MajorVersion, MinorVersion: LONGINT;
 
 	PROCEDURE isNumber(ch: CHAR): BOOLEAN;
 	VAR
@@ -10364,145 +10358,73 @@ VAR
 	END isNumber;
 
 
-	PROCEDURE TrimAndSplitVersionString(CONST Buffer: ARRAY OF CHAR; VAR Max, Min: LONGINT);
-	 VAR
-	    Separator,i : LONGINT;
+	PROCEDURE TrimAndSplitVersionString(CONST buffer: ARRAY OF CHAR; VAR Max, Min: LONGINT);
+	VAR separator,i : LONGINT;
 	BEGIN
-	i := 0;
-	Separator := Strings.Pos('.', Buffer);
-	(* At least one number must be before and one after the dot. *)
-	IF (Separator > 0) & (Separator < Strings.Length(Buffer)) & ((isNumber(Buffer[Separator - 1])) &
-	      isNumber(Buffer[Separator + 1])) THEN
-	      Max := ORD(Buffer[Separator + 1]);
-	      Min := ORD(Buffer[Separator - 1]);
-	ELSE
-	      Max := 0;
-	      Min := 0;
-	END;
+		i := 0;
+		separator := Strings.Pos('.', buffer);
+		(* At least one number must be before and one after the dot.  *)
+		IF (separator > 0) & (separator < Strings.Length(buffer)) & ((isNumber(buffer[separator - 1])) &
+			isNumber(buffer[separator + 1])) THEN
+			Min := ORD(buffer[separator + 1]) - ORD("0");
+			Max := ORD(buffer[separator - 1]) - ORD("0");
+		ELSE
+			Max := 1;
+			Min := 0;
+		END;
 	END TrimAndSplitVersionString;
 
 BEGIN
-  (* determine version of implementation
-   GL *)
-  IF XglGetString = NIL THEN
-    Kernel32.GetProcAddress(GL_LibHandle, "glGetString", SYSTEM.VAL(ADDRESS, XglGetString));
-  END;
-   Buffer := GetString(GLC.GL_VERSION );
-  TrimAndSplitVersionString(Buffer^, MajorVersion, MinorVersion);
-
- GL_VERSION_1_0 := TRUE;
-  GL_VERSION_1_1 := FALSE;
-  GL_VERSION_1_2 := FALSE;
-  GL_VERSION_1_3 := FALSE;
-  GL_VERSION_1_4 := FALSE;
-  GL_VERSION_1_5 := FALSE;
-  GL_VERSION_2_0 := FALSE;
-  GL_VERSION_2_1 := FALSE;
-  GL_VERSION_3_0 := FALSE;
-  GL_VERSION_3_1 := FALSE;
-  GL_VERSION_3_2 := FALSE;
-  GL_VERSION_3_3 := FALSE;
-  GL_VERSION_4_0 := FALSE;
-  GL_VERSION_4_1 := FALSE;
-  GL_VERSION_4_2 := FALSE;
-  GL_VERSION_4_3 := FALSE;
-
-  IF MajorVersion = 1 THEN
-
-    IF MinorVersion >= 1 THEN GL_VERSION_1_1 := TRUE; END;
-    IF MinorVersion >= 2 THEN GL_VERSION_1_2 := TRUE; END;
-    IF MinorVersion >= 3 THEN GL_VERSION_1_3 := TRUE; END;
-    IF MinorVersion >= 4 THEN GL_VERSION_1_4 := TRUE; END;
-    IF MinorVersion >= 5 THEN GL_VERSION_1_5 := TRUE; END;
-  END;
-
-  IF MajorVersion >= 2 THEN
-    GL_VERSION_1_1 := TRUE;
-    GL_VERSION_1_2 := TRUE;
-    GL_VERSION_1_3 := TRUE;
-    GL_VERSION_1_4 := TRUE;
-    GL_VERSION_1_5 := TRUE;
-    GL_VERSION_2_0 := TRUE;
-
-    IF MinorVersion >= 1 THEN GL_VERSION_2_1 := TRUE; END;
-  END;
-
-  IF MajorVersion >= 3 THEN
-    GL_VERSION_2_1 := TRUE;
-    GL_VERSION_3_0 := TRUE;
-
-    IF MinorVersion >= 1 THEN GL_VERSION_3_1 := TRUE; END;
-    IF MinorVersion >= 2 THEN GL_VERSION_3_2 := TRUE; END;
-    IF MinorVersion >= 3 THEN GL_VERSION_3_3 := TRUE; END;
-  END;
-
-  IF MajorVersion >= 4 THEN
-
-    GL_VERSION_3_1 := TRUE;
-    GL_VERSION_3_2 := TRUE;
-    GL_VERSION_3_3 := TRUE;
-    GL_VERSION_4_0 := TRUE;
-
-    IF MinorVersion >= 1 THEN GL_VERSION_4_1 := TRUE; END;
-    IF MinorVersion >= 2 THEN GL_VERSION_4_2 := TRUE; END;
-    IF MinorVersion >= 3 THEN GL_VERSION_4_3 := TRUE; END;
-  END;
-END ReadCoreVersion;
-
-(*
-PROCEDURE Int_GetExtensionString(): Strings.String;
-VAR
-	buffer0, buffer1, buffer2, buffer3: Strings.String;
-	len0, len1, len2: LONGINT;
-BEGIN
-  (* generel extension string *)
+	(* determine version of implementation *)
 	IF XglGetString = NIL THEN
-		Kernel32.GetProcAddress(GL_LibHandle, "glGetString", SYSTEM.VAL(LONGINT, XglGetString));
+		Kernel32.GetProcAddress(GL_LibHandle, "glGetString", SYSTEM.VAL(ADDRESS, XglGetString));
+	END;
+	Buffer := GetString(GLC.GL_VERSION );
+	TrimAndSplitVersionString(Buffer^, MajorVersion, MinorVersion);
+
+	IF MajorVersion = 1 THEN
+		IF MinorVersion >= 1 THEN GL_VERSION_1_1 := TRUE; END;
+		IF MinorVersion >= 2 THEN GL_VERSION_1_2 := TRUE; END;
+		IF MinorVersion >= 3 THEN GL_VERSION_1_3 := TRUE; END;
+		IF MinorVersion >= 4 THEN GL_VERSION_1_4 := TRUE; END;
+		IF MinorVersion >= 5 THEN GL_VERSION_1_5 := TRUE; END;
 	END;
 
-	IF XglGetString # NIL THEN
-		buffer0 := GetString(GLC.GL_EXTENSIONS);
-		len0 := Strings.Length(buffer0^)
+	IF MajorVersion >= 2 THEN
+		GL_VERSION_1_1 := TRUE;
+		GL_VERSION_1_2 := TRUE;
+		GL_VERSION_1_3 := TRUE;
+		GL_VERSION_1_4 := TRUE;
+		GL_VERSION_1_5 := TRUE;
+		GL_VERSION_2_0 := TRUE;
+		IF MinorVersion >= 1 THEN GL_VERSION_2_1 := TRUE; END;
 	END;
 
-  IF (GL_LibHandle # 0 ) THEN
-
-      (* wglGetExtensionsStringEXT *)
-       IF wglGetExtensionsStringEXT = NIL  THEN
-	          wglGetExtensionsStringEXT := SYSTEM.VAL(TwglGetExtensionsStringEXT, wglGetProcAddress('wglGetExtensionsStringEXT'));
-       END;
-	IF wglGetExtensionsStringEXT # NIL THEN
-		buffer1 := wglEXTStrings();
-		len1 := Strings.Length(buffer1^);
+	IF MajorVersion >= 3 THEN
+		GL_VERSION_2_1 := TRUE;
+		GL_VERSION_3_0 := TRUE;
+		IF MinorVersion >= 1 THEN GL_VERSION_3_1 := TRUE; END;
+		IF MinorVersion >= 2 THEN GL_VERSION_3_2 := TRUE; END;
+		IF MinorVersion >= 3 THEN GL_VERSION_3_3 := TRUE; END;
 	END;
 
-      (* wglGetExtensionsStringARB*)
-	IF wglGetExtensionsStringARB = NIL THEN
-		wglGetExtensionsStringARB := SYSTEM.VAL(TwglGetExtensionsStringARB, wglGetProcAddress('wglGetExtensionsStringARB'));
+	IF MajorVersion >= 4 THEN
+		GL_VERSION_3_1 := TRUE;
+		GL_VERSION_3_2 := TRUE;
+		GL_VERSION_3_3 := TRUE;
+		GL_VERSION_4_0 := TRUE;
+		IF MinorVersion >= 1 THEN GL_VERSION_4_1 := TRUE; END;
+		IF MinorVersion >= 2 THEN GL_VERSION_4_2 := TRUE; END;
+		IF MinorVersion >= 3 THEN GL_VERSION_4_3 := TRUE; END;
 	END;
-
-	IF wglGetExtensionsStringARB # NIL THEN
-		buffer2 :=  wglARBStrings();
-		len2 := Strings.Length(buffer2^);
-      END;
- END;
-
-NEW(buffer3, len0 + len1 + len2 + 6);
-Strings.Append(buffer3^, " ");
-Strings.Append(buffer3^, buffer0^); Strings.Append(buffer3^, " ");
-Strings.Append(buffer3^, buffer1^); Strings.Append(buffer3^, " ");
-Strings.Append(buffer3^, buffer2^); Strings.Append(buffer3^, " ");
-RETURN buffer3;
-END Int_GetExtensionString;
-*)
-
+END ReadCoreVersion;
 
 PROCEDURE Int_GetExtensionString(): Strings.String;
 VAR
 	buffer0, buffer1, buffer2: Strings.String;
 	len0, len1: LONGINT;
 BEGIN
-  (* generel extension string *)
+	(* generel extension string *)
 	IF XglGetString = NIL THEN
 		Kernel32.GetProcAddress(GL_LibHandle, "glGetString", SYSTEM.VAL(ADDRESS, XglGetString));
 	END;
@@ -10538,16 +10460,14 @@ BEGIN
 	IF debug & (pos = -1) THEN
 		KernelLog.String(thisextension); KernelLog.String(": NOT AVAILABLE"); KernelLog.Ln;
 	END;
-  RETURN pos > 0;
+	RETURN pos > 0;
 END Int_CheckExtension;
 
-
 PROCEDURE CheckExtension*(CONST extension: ARRAY OF CHAR): BOOLEAN;
-VAR
-  allextensions: Strings.String;
+VAR allextensions: Strings.String;
 BEGIN
-   allextensions := Int_GetExtensionString();
-  RETURN Int_CheckExtension(allextensions, extension);
+	allextensions := Int_GetExtensionString();
+	RETURN Int_CheckExtension(allextensions, extension);
 END CheckExtension;
 
 PROCEDURE  ReadImplementationProperties*;
@@ -11234,132 +11154,42 @@ BEGIN
 END GetVaryingLocationNV;
 
 (* ------------------  *)
-(*! wrapper procedures for FPU NaN  *)
-
-PROCEDURE Ortho*(left, right, bottom, top, zNear, zFar: Double);
-BEGIN
-	SetFCR();
-	XglOrtho(left, right, bottom, top, zNear, zFar);
-END Ortho;
-
-PROCEDURE Frustum*(left, right, bottom, top, zNear, zFar: Double);
-BEGIN
-	SetFCR();
-	XglFrustum(left, right, bottom, top, zNear, zFar);
-END  Frustum;
-
-PROCEDURE Rotated*(angle, x, y, z: Double);
-BEGIN
-	SetFCR();
-	XglRotated(angle, x, y, z)
-END Rotated;
-
-PROCEDURE Rotatef*(angle, x, y, z: Float);
-BEGIN
-	SetFCR();
-	XglRotatef(angle, x, y, z)
-END Rotatef;
-
-PROCEDURE Translated*(x, y, z: Double);
-BEGIN
-	(* SetFCR(); *)
-	XglTranslated( x, y, z)
-END Translated;
-
-PROCEDURE Translatef*(x, y, z: Float);
-BEGIN
-	(* SetFCR();  *)
-	XglTranslatef( x, y, z)
-END Translatef;
-
-PROCEDURE Scaled*(x, y, z: Double);
-BEGIN
-	SetFCR();
-	XglScaled(x, y, z);
-END Scaled;
-
-PROCEDURE Scalef*(x, y, z: Float);
-BEGIN
-	SetFCR();
-	XglScalef(x, y, z);
-END Scalef;
+(*! wrapper procedures *)
 
 PROCEDURE Materialfv*(face: Enum; pname: Enum;  CONST params:  ARRAY [4] OF Float);
 BEGIN
-
 	XglMaterialfv(face, pname, ADDRESSOF(params[0]));
 END Materialfv;
 
-PROCEDURE Materialf*(face: Enum; pname: Enum; param: Float);
-BEGIN
-
-	XglMaterialf(face, pname, param);
-END Materialf;
-
 PROCEDURE Lightfv*(light: Enum; pname: Enum;   CONST params: ARRAY [4] OF Float);
 BEGIN
-
 	XglLightfv(light, pname, ADDRESSOF(params[0]));
 END Lightfv;
 
-
 PROCEDURE Normal3fv*(CONST v: ARRAY [3] OF Float);
 BEGIN
-	(* SetFCR(); *)
 	XglNormal3fv(ADDRESSOF(v[0]));
 END Normal3fv;
 
-PROCEDURE Normal3f*(nx, ny, nz: Float);
-BEGIN
-	(* SetFCR(); *)
-	XglNormal3f(nx, ny, nz);
-END Normal3f;
-
 PROCEDURE Normal3dv*( CONST v: ARRAY [3] OF Double);
 BEGIN
-	(* SetFCR(); *)
 	XglNormal3dv(ADDRESSOF(v[0]));
 END Normal3dv;
 
-PROCEDURE Normal3d*(nx, ny, nz: Double);
-BEGIN
-	(* SetFCR();  *)
-	XglNormal3d(nx, ny, nz);
-END Normal3d;
-
 PROCEDURE Vertex3fv*( CONST v: ARRAY [3] OF Float);
 BEGIN
-	(* SetFCR(); *)
 	XglVertex3fv(ADDRESSOF(v[0]));
 END Vertex3fv;
 
-PROCEDURE Vertex3f*( x, y, z: Float);
-BEGIN
-	(* SetFCR(); *)
-	XglVertex3f(x, y, z);
-END Vertex3f;
-
 PROCEDURE Vertex3dv*( CONST v: ARRAY [3] OF Double);
 BEGIN
-	(* SetFCR(); *)
 	XglVertex3dv(ADDRESSOF(v[0]));
 END Vertex3dv;
-
-PROCEDURE Vertex3d*( x, y, z: Double);
-BEGIN
-	(* SetFCR(); *)
-	XglVertex3d(x, y, z);
-END Vertex3d;
 
 PROCEDURE LightModelfv*(pname: Enum;  CONST params: ARRAY [4] OF Float);
 BEGIN
 	XglLightModelfv(pname, ADDRESSOF(params[0]));
 END LightModelfv;
-
-PROCEDURE LightModelf*(pname: Enum;  param: Float);
-BEGIN
-	XglLightModelf(pname, param);
-END LightModelf;
 
 PROCEDURE Color3fv*(CONST c: ARRAY [3] OF Float);
 BEGIN
@@ -11371,104 +11201,19 @@ BEGIN
 	XglColor3dv(ADDRESSOF(c[0]));
 END Color3dv;
 
-PROCEDURE Uniform2fv*(location: Int; count: Sizei; CONST value: ARRAY [2] OF Float);
-BEGIN
-  XglUniform2fv(location, count, ADDRESSOF(value[0]));
-END Uniform2fv;
-
-PROCEDURE Uniform3fv*(location: Int; count: Sizei; CONST value: ARRAY [3] OF Float);
-BEGIN
- XglUniform3fv(location, count, ADDRESSOF(value[0]));
-END Uniform3fv;
-
-PROCEDURE Uniform4fv*(location: Int; count: Sizei; CONST value: ARRAY [4] OF Float);
-BEGIN
- XglUniform4fv(location, count, ADDRESSOF(value[0]));
-END Uniform4fv;
-
-PROCEDURE Uniform2fvARB*(location: Int; count: Sizei; CONST value: ARRAY [2] OF Float);
-BEGIN
- XglUniform2fvARB(location, count, ADDRESSOF(value[0]));
-END Uniform2fvARB;
-
-PROCEDURE Uniform3fvARB*(location: Int; count: Sizei; CONST value: ARRAY [3] OF Float);
-BEGIN
- XglUniform3fvARB(location, count, ADDRESSOF(value[0]));
-END Uniform3fvARB;
-
-PROCEDURE Uniform4fvARB*(location: Int; count: Sizei; CONST value: ARRAY [4] OF Float);
-BEGIN
- XglUniform4fvARB(location, count, ADDRESSOF(value[0]));
-END Uniform4fvARB;
-
-PROCEDURE UniformMatrix3fv*(location: Int; count: Sizei; transpose: Boolean; CONST value: ARRAY [3,3] OF Float);
-BEGIN
-  XglUniformMatrix3fv(location, count, transpose, ADDRESSOF(value[0,0]));
-END UniformMatrix3fv;
-
-PROCEDURE UniformMatrix3fvARB*(location: Int; count: Sizei; transpose: Boolean; CONST value: ARRAY [3,3] OF Float);
-BEGIN
-  XglUniformMatrix3fvARB(location, count, transpose, ADDRESSOF(value[0,0]));
-END UniformMatrix3fvARB;
-
-PROCEDURE UniformMatrix4fv*(location: Int; count: Sizei; transpose: Boolean; CONST value: ARRAY [4,4] OF Float);
-BEGIN
-  XglUniformMatrix4fv(location, count, transpose, ADDRESSOF(value[0,0]));
-END UniformMatrix4fv;
-
-PROCEDURE UniformMatrix4fvARB*(location: Int; count: Sizei; transpose: Boolean; CONST value: ARRAY [4,4] OF Float);
-BEGIN
-  XglUniformMatrix4fvARB(location, count, transpose, ADDRESSOF(value[0,0]));
-END UniformMatrix4fvARB;
-
 (* ---------------------- *)
 PROCEDURE OnClose;
 VAR res: LONGINT;
 BEGIN
-  IF GL_LibHandle # Kernel32.NULL THEN
-    res := Kernel32.FreeLibrary(GL_LibHandle);
-    KernelLog.String(GL_LibName); KernelLog.String(" unloaded."); KernelLog.Ln;
-  END;
+	IF GL_LibHandle # Kernel32.NULL THEN
+		res := Kernel32.FreeLibrary(GL_LibHandle);
+		KernelLog.String(GL_LibName); KernelLog.String(" unloaded."); KernelLog.Ln;
+	END;
 END OnClose;
 
-(** -- Processor initialization --  from Unix.386.Machine *)
-(* default for UixAos: fcr := (FCR() - {0,2,3,10,11}) + {0..5,8,9};	(* default FCR RC=00B *) *)
-PROCEDURE -SetFCR0( s: SET );
-CODE {SYSTEM.i386, SYSTEM.FPU}
-	FLDCW	[ESP]	;  parameter s
-	POP	EAX
-END SetFCR0;
-
-PROCEDURE -FCR( ): SET;
-CODE {SYSTEM.i386, SYSTEM.FPU}
-	PUSH	0
-	FNSTCW	[ESP]
-	FWAIT
-	POP	EAX
-END FCR;
-
-PROCEDURE -InitFPU;
-CODE {SYSTEM.i386, SYSTEM.FPU}
-	FNINIT
-END InitFPU;
-
-PROCEDURE SetFCR*;
 BEGIN
-InitFPU;
-SetFCR0( FCR() );
-END SetFCR;
-
-BEGIN
-  Modules.InstallTermHandler(OnClose);
-
-(* 133FH= {0..5, 8..9,12}  *)
-  oldfcr := FCR();
- (* newfcr := SYSTEM.VAL(SET, 133FH); *)
-
-(* put x86 FPU in 64 bit precision mode. Default under linux is to use 80-bit mode  *)
-
-  newfcr := SYSTEM.VAL(SET, 895);
-  InitOpenGL;
-(*  ReadOpenGLCore(); *)
+	Modules.InstallTermHandler(OnClose);
+	InitOpenGL;
+	(*  ReadOpenGLCore(); *)
 END OpenGL.
 

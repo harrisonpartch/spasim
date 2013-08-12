@@ -256,6 +256,18 @@ TYPE
 		RETURN (hGLRC # 0)
 	END CreateGLRC;
 
+	(** get current display of this window *)
+	PROCEDURE GetDisplay*(): LONGINT;
+	BEGIN
+		RETURN hDC;
+	END GetDisplay;
+
+	(** get current gl context of this window *)
+	PROCEDURE GetContext*(): LONGINT;
+	BEGIN
+		RETURN hGLRC;
+	END GetContext;		
+	
 	(** Abstract Window Procedures *)
 	(** called when window get focus *)
 	PROCEDURE FocusGot*();

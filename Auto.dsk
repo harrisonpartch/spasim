@@ -1,21 +1,14 @@
 <Desktop>
 	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="30" t="94" r="468" b="421" flags="{0..2}"/>
-	<Window name="PET" loader="PET.Restore" l="206" t="55" r="1129" b="819" flags="{0..2}">
+	<Window name="PET" loader="PET.Restore" l="427" t="55" r="1350" b="819" flags="{0..2}">
 		<PETData>
-			<General SelectedPageNr="9" ProjectTextFile=""/>
+			<General SelectedPageNr="0" ProjectTextFile=""/>
 			<Tab file="XNXL.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
 				<Editor firstLine="3" cursorPos="329"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="142" scratchHeight="5"/>
-			</Tab>
-			<Tab file="XNXL.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="0"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
 			<Tab file="Retina.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
 				<Editor firstLine="111" cursorPos="3797"/>
@@ -42,13 +35,6 @@
 				<Editor firstLine="388" cursorPos="9038"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="true" wrap="true" casesensitive="true" backwards="false" highlight="false" searchString="serp" replaceString="Base"/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-			<Tab file="OpenGL.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="15" cursorPos="1008"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>

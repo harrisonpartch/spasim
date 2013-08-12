@@ -92,6 +92,9 @@ TYPE
 
 		canvas.SetFont(canvas.GetFont());
 		array_index:= 0;
+		
+	(*	NEW(red_position, NUM_POINTS);
+		NEW(grn_position, NUM_POINTS); *)
 		initGL;
 		Reshape(w, h);
 		UpdateImage;
@@ -101,20 +104,23 @@ TYPE
 	PROCEDURE ResetPositions;
 	VAR i: LONGINT;
 	BEGIN
+	
 		(* Reset the Lorenz parameters *)
 		sigma := s0 ;  b := b0 ;  r := r0 ;
 		(* Set an initial position *)
-		red_position[0][0] := random.Uniform();
-		red_position[0][1] := random.Uniform();
-		red_position[0][2] := random.Uniform();
-		grn_position[0][0] := random.Uniform();
-		grn_position[0][1] := random.Uniform();
-		grn_position[0][2] := random.Uniform();
+		red_position[0,0] := random.Uniform();
+		red_position[0,1] := random.Uniform();
+		red_position[0,2] := random.Uniform();
+		grn_position[0,0] := random.Uniform();
+		grn_position[0,1] := random.Uniform();
+		grn_position[0,2] := random.Uniform();
 		array_index := 0 ;
+
 		(* Initialize the arrays *)
 		FOR i := 1 TO NUM_POINTS-1 DO
-			red_position[i] := red_position[0];
-			grn_position[i] := grn_position[0];
+			red_position[i,..] := red_position[0,..];
+			
+			grn_position[i,..] := grn_position[0,..];
 		END;
 
 	END ResetPositions;
@@ -279,6 +285,7 @@ TYPE
 
 	 	gl.Color3d ( 0.0, 1.0, 0.0 ) ;  (* Green *)
 	 	DrawCurve ( array_index, grn_position ) ;
+		
 	END Display;
 
 	PROCEDURE Reshape(w, h: LONGINT);
@@ -302,8 +309,6 @@ TYPE
 
 			gl.Translated ( 0.0, 0.0, zcen-40.0 ) ;
 
-
-		DeActivate;
 	END Reshape;
 
 	PROCEDURE TimerCB;
@@ -312,6 +317,7 @@ TYPE
 		new_index: LONGINT;
 		str: ARRAY 64 OF CHAR;
 	BEGIN
+
 		(* Function called at regular intervals to update the positions of the points *)
 		new_index := array_index + 1 ;
 
@@ -323,9 +329,9 @@ TYPE
 			(*  WritePositions;*)
 		 	array_index := new_index ;
 
-			deltax := red_position[array_index][0] - grn_position[array_index][0] ;
-			deltay := red_position[array_index][1] - grn_position[array_index][1] ;
-			deltaz := red_position[array_index][2] - grn_position[array_index][2] ;
+			deltax := red_position[array_index,0] - grn_position[array_index,0] ;
+			deltay := red_position[array_index,1] - grn_position[array_index,1] ;
+			deltaz := red_position[array_index,2] - grn_position[array_index,2] ;
 			distance := MathL.sqrt ( deltax * deltax + deltay * deltay + deltaz * deltaz ) ;
 
 			distancestr :="Distance= ";
@@ -340,7 +346,7 @@ TYPE
 	(* ********** Functions ***************** *)
 
 	(* The Lorenz Attractor *)
-	PROCEDURE CalcDeriv ( VAR  position: Vector3d; VAR deriv: Vector3d);
+	PROCEDURE CalcDeriv ( position: Vector3d; VAR deriv: Vector3d);
 	BEGIN
 		(* Calculate the Lorenz attractor derivatives *)
 	 	deriv[0] := sigma * ( position[1] - position[0] ) ;
@@ -348,7 +354,7 @@ TYPE
 	 	deriv[2] := -position[0] * position[1] - b * position[2] ;
 	END CalcDeriv;
 
-	PROCEDURE AdvanceInTime (time_step: LONGREAL; VAR position: Vector3d; VAR new_position: Vector3d );
+	PROCEDURE AdvanceInTime (time_step: LONGREAL;  position: Vector3d; VAR new_position: Vector3d );
 	VAR
 	       deriv0, deriv1, deriv2, deriv3: Vector3d;
 	BEGIN
@@ -374,7 +380,7 @@ TYPE
 
 	END AdvanceInTime;
 
-BEGIN {ACTIVE}
+BEGIN  {ACTIVE}
 
 	Kernel.SetTimer(timer, waittime);
 	WHILE alive DO
@@ -385,6 +391,7 @@ BEGIN {ACTIVE}
 			END;
 		END;
 	END;
+	
 END GLWindow;
 
 

@@ -111,9 +111,9 @@ TYPE
 	BEGIN
 		MakeCurrent();
 
-		texture := LoadTexture("opengloberon/europe.png");
+		texture := LoadTexture("europe.png");
 
-		texture2 := LoadTexture("opengloberon/turkiye.png");
+		texture2 := LoadTexture("turkiye.png");
 
 
 		GL.Enable(GLC.GL_TEXTURE_2D);                          (* Zapne mapov textur*)
