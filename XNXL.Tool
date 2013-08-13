@@ -1,7 +1,19 @@
+# WinAos
+Compiler.Compile
+	 OpenGLConst.Mod
+	 Win32.OpenGL.Mod
+	 Win32.GLU.Mod
+	 Win32.OGLWindow.Mod
+	 GLShaderUtils.Mod
+	~
+
+
+# LinuxAos
 Compiler.Compile
 	 OpenGLConst.Mod
 	 Unix.OpenGL.Mod
 	 Unix.GLU.Mod
+	 Unix.OGLWindow.Mod
 	 GLShaderUtils.Mod
  	Unix.X11KeySymDef.Mod
 	~
@@ -29,12 +41,16 @@ Saboteur.Mod
 NCompiler.Mod
 XNXLVoxConsole.Mod 
 Marsh.Mod
-Render.Mod 
+Render.Mod
+
+OGLRender.Mod
 ~
 SystemTools.Show Time elapsed: ~ SystemTools.Ln ~
 SystemTools.Timer elapsed ~ SystemTools.Ln ~~
 
-Render.Open ~
+Render.Open ~ 
+
+OGLRender.Open ~ 
 
 SystemTools.FreeDownTo Base~
 

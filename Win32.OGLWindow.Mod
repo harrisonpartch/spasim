@@ -763,8 +763,10 @@ TYPE
 		User32.SetWindowText(hWnd, title);
 
 		MakeCurrent();
-		OnLoad();
+		
+		OnLoad();	
 		Reshape(width, height);
+		Display;	
 		active := TRUE;
 
 		WHILE active DO (* loop until WMQuit received *)

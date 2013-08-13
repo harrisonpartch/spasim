@@ -79,7 +79,7 @@ VAR
 	(** Close the window *)
 	PROCEDURE Close*;
 	BEGIN {EXCLUSIVE}
-		active := FALSE;
+		active := FALSE;		
 	END Close;
 
 	(** abstract: reshape GL window, called while resizing the window *)
