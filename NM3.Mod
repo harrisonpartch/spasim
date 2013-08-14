@@ -171,7 +171,8 @@ BEGIN
 					ray.lxyz.y := ABS(xyz.y - ijk.j);
 					ray.lxyz.z := ABS(xyz.z - ijk.k);
 					ray.popdelta := Base.Origin; (* because many shaders don't set it and it *)
-					ray.normalTF:=nbloxTF[ijk.i,ijk.j,ijk.k];
+					ray.ncube:=nblox[ijk.i,ijk.j,ijk.k];
+					ray.ncubeTF:=nbloxTF[ijk.i,ijk.j,ijk.k];
 					v.Shade(ray);	
 					xyz.x := xyz.x + ray.popdelta.x;    
 					xyz.y := xyz.y + ray.popdelta.y;
@@ -462,7 +463,7 @@ BEGIN
 					v:=blox[i,j,k]; 
 					IF v.copyonstroke THEN 
 						copy:=Base.VoxelFromName(v.code);
-						copy.copyonstroke:=FALSE;
+						IF copyonstrokerecursion THEN copy.copyonstroke:=TRUE END;
 						blox[i,j,k]:=copy;
 					END;
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel,vu)	

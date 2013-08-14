@@ -199,7 +199,6 @@ VAR
 	p: PT;
 BEGIN
 	stroke(Base.previousavatarPT,Base.avatarsize,avatarundo,voxundo);
-	avatarundo:=NIL;
 	stroke(Base.avatarPT,Base.avatarsize,Base.avatar,avatarundo);
 END drawavatar;
 
@@ -405,15 +404,15 @@ BEGIN
 	NEW(plane,center,up);
 	plane.vox:=serp;
 	Out.String("EEEEP!"); 				
-	gorge.FRaster(plane,32);
-	gorge.FRaster(noise,64); 	
-	gorge.FRaster(tnoise,64); 
+(*	gorge.FRaster(noise,64); 	*)
+(*	gorge.FRaster(tnoise,64);  *)
+	gorge.FRaster(plane,8);
 	z10.setcolor(1,0,0,0,0); 	
 	gorge.setcolor(0,1,0,1,0);
 	w10.stroke(center,30,z10,undo);
 	Base.world:=gorge; 	
-	Base.avatar:=xot;
-	Base.avatarsize:=1000;
+	Base.avatar:=conglomerate;
+	Base.avatarsize:=10000;
 (*	engrain; 
 	sprout; *)
 	Out.String("EEEEP!");
@@ -429,7 +428,7 @@ PROCEDURE lighten*;
 BEGIN
 	IF atmdark>0.11 THEN atmdark:= atmdark/1.5 END;
 	Base.world.setcolor(0,0,atmdark,atmdark,atmdark);	
-END lighten;
+END lighten
 
 BEGIN
 	NEW(marshv);

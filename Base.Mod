@@ -181,6 +181,8 @@ TYPE Ray* = RECORD
 	cellred*,cellgreen*,cellblue*,cellblack*: REAL;
 	texcube*:TexCube;
 	texcubeTF*:BOOLEAN;
+	ncube*: NCube;
+	ncubeTF*: BOOLEAN;
 	r*, g*, b*, ra*, ga*, ba*, bla*,ulfire*: REAL; (* ulfire is an invisible color *)
 	rgb*: ARRAY 3,3 OF BPE;
 	terminate*: BOOLEAN;
@@ -212,7 +214,7 @@ VAR
 	code*,ncode*:Name;  
 	tscale*: PT;
 	red*,green*,blue*,black*,alpha*: REAL;
-	colored*,frozen*,probelock*,copyonstroke*:BOOLEAN;
+	colored*,frozen*,probelock*,copyonstroke*,copyonstrokerecursion*:BOOLEAN;
 	offset*:PT;
 	lightcube*:LightCube;
 PROCEDURE Shade*(VAR ray: Ray);
@@ -481,7 +483,7 @@ VAR
 	DTL*,DTL2*: REAL;
 	frameblack*:REAL;
 	avatar*:Voxel;
-	avatarsize*: INTEGER;
+	avatarsize*: LONGINT;
 	cursordist*:REAL;
 	RVR*:BOOLEAN;
 	vlist*: ARRAY 100 OF Voxel;

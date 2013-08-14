@@ -10,6 +10,8 @@ TYPE PT = Base.PT;
  	NCube=Base.NCube;
 	TexCube= Base.TexCube;
 
+(* pseudosolid texture *)
+
 TYPE TexVox* = OBJECT(Voxel);
 VAR
 	txTF*: BOOLEAN;
@@ -106,7 +108,6 @@ BEGIN
 					|4:  
 					|5:ly:=ly+ly1-1;
 				END
-
 			ELSE
 				(* xy pyramid *)
 				lx:=xx; ly:=yy;
@@ -135,14 +136,32 @@ BEGIN
 	lx:=lx*10-ENTIER(lx*10);
 	ly:=ly*10-ENTIER(ly*10);	
 	color1:=texcube.side[ray.face].pixel(lx,ly);	
+	lx:=lx*10-ENTIER(lx*10);
+	ly:=ly*10-ENTIER(ly*10);
+	color2:=texcube.side[ray.face].pixel(lx,ly);		
 	mip:=ray.length*10;
 	IF mip>1 THEN mip:=1 END; 
 	mipverse:=1-mip;
 	color.red:=(color1.red*mipverse+mip*color.red);
 	color.green:=(color1.green*mipverse+mip*color.green);
 	color.blue:=(color1.blue*mipverse+mip*color.blue);
-
-	dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
+	color.alpha:=(color1.alpha*mipverse+mip*color.alpha);
+	mip:=mip*10;
+	IF mip>1 THEN mip:=1 END; 
+	mipverse:=1-mip;
+	color.red:=(color2.red*mipverse+mip*color.red);
+	color.green:=(color2.green*mipverse+mip*color.green);
+	color.blue:=(color2.blue*mipverse+mip*color.blue);
+	color.alpha:=(color2.alpha*mipverse+mip*color.alpha);	
+	IF ray.ncubeTF THEN
+		dot1:= ABS(ray.ncube.normal.x*ray.dxyz.x + ray.ncube.normal.y*ray.dxyz.y+ ray.ncube.normal.z*ray.dxyz.z); 
+		dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
+		dot2:=dot2*0.7+0.3;
+		IF ray.length*ray.scale<20 THEN mix:=1-(ray.length*ray.scale/20) ELSE mix:=0 END;
+		dot:=mix*dot2+(1-mix)*dot1;
+	ELSE
+		dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
+	END;
 	dr:=color.red*dot*ray.ra;
 	dg:=color.green*dot*ray.ra;
 	db:=color.blue*dot*ray.ra;	

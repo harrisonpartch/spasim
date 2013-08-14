@@ -183,7 +183,6 @@ VAR
 	fward:PT;
 BEGIN
 	fward:=Retina.fward;	
-	fward.x:=-fward.x;
 	cvx :=cvx-(x*fward.x * Base.speed); 
 	cvy :=cvy-(x*fward.y * Base.speed); 	
 	cvz :=cvz-(x*fward.z * Base.speed); 	
@@ -274,9 +273,9 @@ BEGIN
 	gravity:=Base.gravity;
 	gravityvector:=Base.mulPT(gravityvector,Base.gravity);
 	a:=Retina.fward.x*Base.cursordist; b:=Retina.fward.y*Base.cursordist; c:=Retina.fward.z*Base.cursordist;
-	d:=-Retina.fward.x*0.0001; 	e:=-Retina.fward.y*0.0001;  	f:=-Retina.fward.z*0.0001; 
+	d:=Retina.fward.x*0.0001; 	e:=Retina.fward.y*0.0001;  	f:=Retina.fward.z*0.0001; 
 	Base.updatecamera(cx,cy,cz,a,b,c,d,e,f);	
-(*	Marsh.drawavatar; *)
+(*	Marsh.drawavatar;  *)
 	GLIDE:=0.975;	
 	cvz := cvz*GLIDE+gravityvector.z; 
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y; 
@@ -509,7 +508,7 @@ VAR
 BEGIN
  display := X11.OpenDisplay(0);
  IF display =0 THEN
- 	Out.String(" cannot connect to X server"); Out.Ln; Out.Update;
+ 	Out.String(" cannot connect to X server"); Out.Ln; ;
 	Close;
      RETURN;
 END;
@@ -537,14 +536,14 @@ END;
  visinfoptr := GL.glXChooseVisual(display, 0 , ADDRESSOF(attrib[0]));
 
  IF visinfoptr = NIL THEN
-  	IF debug THEN Out.String(" NO appropriate visual found"); Out.Ln; Out.Update; END;
+  	IF debug THEN Out.String(" NO appropriate visual found"); Out.Ln; END;
   	Close;
      RETURN;
  ELSE
 	 IF debug THEN
 		 Out.String("visinfoptr.depth= "); Out.Int(visinfoptr.depth,0); Out.Ln;
 	 	Out.String("visinfoptr.visual ");  Out.Int(visinfoptr.visualID, 0); Out.Ln;
-	 	Out.Update;
+	 	
 	END;
 END;
  cmap := X11.CreateColormap(display, X11.DefaultRootWindow(display), visinfoptr.visual, X11.AllocNone);
@@ -553,7 +552,7 @@ END;
 	 	Out.String(" cannot create colormap"); Out.Ln;
 	 	X11.GetErrorText(display, cmap, buf, LEN(buf));
 	 	Out.String("ERROR: CreateColormap = "); Out.String(buf); Out.Ln;
-	 	Out.Update;
+	 
  	END;
  END;
 
@@ -824,7 +823,7 @@ PROCEDURE  InitGL(): BOOLEAN;
 	Out.Ln;
 		IF ~ (GL.GL_ARB_vertex_shader & GL.GL_ARB_fragment_shader) THEN
 		Out.String("GL_ARB_vertex_shader and GL_ARB_fragment_shader are not supported"); 
-			Out.Ln; Out.Update;
+			Out.Ln; 
 			RETURN FALSE;
 		END;
 	Out.String("two");
