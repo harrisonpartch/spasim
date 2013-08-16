@@ -433,11 +433,11 @@ To update: Configuration.Init ~
 					
 					<Setting name="BackupOnCompile" value="FALSE"/>
 					<Setting name="ShowPathInTabs" value="FALSE"/>
-					<Setting name="ScratchPanelHeight" value="5"/>
+					<Setting name="ScratchPanelHeight" value="10"/>
 					<Setting name="EnableWhitespaceWarnings" value="FALSE"/>
-					<Setting name="ShowLineNumbers" value="FALSE"/>
-					<Setting name="IndicateTabs" value="FALSE"/>
-					<Setting name="CurrentLineColor" value="0"/>
+					<Setting name="ShowLineNumbers" value="TRUE"/>
+					<Setting name="IndicateTabs" value="TRUE"/>
+					<Setting name="CurrentLineColor" value="1"/>
 				</Section>
 				<Section name="Compilers">
 					<Section name="PACO">

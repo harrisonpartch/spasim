@@ -55,8 +55,8 @@ BEGIN
 	filter:=FALSE;
 	cameratheta := 0;
 	cameraphi := 0;
-	aperture.width :=2.3;
-	aperture.height :=2.3;
+	aperture.width :=1.5;
+	aperture.height :=1.5;
 	aperjust(1,1);
 	Base.setPT(xaxis, 1,0,0);	
 	Base.setPT(yaxis,0,1,0);	
@@ -1040,7 +1040,7 @@ BEGIN
 	fogdensity:=0.11;
 	leftsticky:=10.0;
 	upsticky:=10.0;	
-	Out.String('*line 1217!*');
+	Out.String('*line 1043!*');
 	msd:=40;
 	mainloop; 
 	FR:=1000;		

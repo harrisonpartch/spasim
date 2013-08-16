@@ -6,14 +6,13 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=4;        
-	TS=5*16;   (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
-	TW=6;
-	TH=4;
+	T=3;        
+	TS=5*8;   (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
+	TW=16;
+	TH=12;
 	W*=TS*TW;
 	H*=TS*TH
 
-	
 TYPE Camera= RECORD			(* solid angle *)
 	dtheta, dphi, theta, phi,rphi:REAL;
 	imx,imy,size: INTEGER;
@@ -327,7 +326,7 @@ END splitcam;
 
 PROCEDURE lessdetail*;
 BEGIN
-	IF foveaparameter<30 THEN INC(foveaparameter) END
+	IF foveaparameter<70 THEN INC(foveaparameter) END
 END lessdetail;
 
 PROCEDURE moredetail*;
@@ -432,8 +431,8 @@ BEGIN
  	FAST:=3;
  	lsense:=0.2;
 	Raster.InitMode(copy,Raster.srcCopy);
- 	aperture.width:=3;
- 	aperture.height:=3;
+ 	aperture.width:=1;
+ 	aperture.height:=1;
  	foveaparameter:=23;
  	Out.String("loaded...");
 END Retina.

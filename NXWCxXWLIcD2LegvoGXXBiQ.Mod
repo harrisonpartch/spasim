@@ -44,13 +44,21 @@ VAR
 	serp, subserp, beatrix,lobster,sparx: Voxel;
 	greenball: Voxel;
 	v: Voxel;
+	blue: AlphaVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	beatrix:=Base.VoxelFromName("NnTJ6nDktAth4WTAUdr8HYQ"); 
+	beatrix:=Base.VoxelFromName("NtL0zWGLy4MVijnDVIbPcqA"); 
 	lobster:=Base.VoxelFromName("NznGx2ySiHIGrO5t9Pzcw5Q"); 
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	subserp:=Base.VoxelFromName("NM3"); 	
-	subserp.DTL:=3000;
+	serp:=Base.VoxelFromName("NM3"); 	
+	NEW(blue);
+	blue.setcolor(1/2,0,0,1/2,0);
+	subserp.DTL:=300;
+	subserp.imposter:=greenball;		
+	serp.imposter:=beatrix;
+	serp.DTL:=300;	
+	subserp.fill(subserp);
 	subserp.stroke(Base.mkPT(1/2,1/2,1/4),1,subserp,v);
 	subserp.stroke(Base.mkPT(1/2,1/2,3/4),1,subserp,v);
 	subserp.stroke(Base.mkPT(1/4,1/2,1/2),1,subserp,v);
@@ -65,23 +73,21 @@ BEGIN
 	subserp.stroke(Base.mkPT(1,1,0),1,beatrix,v);		
 	subserp.stroke(Base.mkPT(0,1,0),1,beatrix,v);		
 	subserp.stroke(Base.mkPT(1,0,1),1,beatrix,v);		
-	subserp.stroke(Base.mkPT(1,1,1),1,beatrix,v);				
-	subserp.imposter:=greenball;
+	subserp.stroke(Base.mkPT(1,1,1),1,beatrix,v);	
+	serp.fill(serp);	
+	serp.imposter:=beatrix;	
+	sparx:=Base.EMPTY;	
+	serp.stroke(Base.mkPT(1/2,1/2,1/4),1,sparx,v);
+	serp.stroke(Base.mkPT(1/2,1/2,3/4),1,sparx,v);
+	serp.stroke(Base.mkPT(1/4,1/2,1/2),1,sparx,v);
+	serp.stroke(Base.mkPT(3/4,1/2,1/2),1,sparx,v);
+	serp.stroke(Base.mkPT(1/2,1/4,1/2),1,sparx,v);
+	serp.stroke(Base.mkPT(1/2,3/4,1/2),1,sparx,v);
+	serp.stroke(Base.mkPT(1/2,1/2,1/2),1,sparx,v);	
+	subserp.copyonstroke:=TRUE;	
+	serp.copyonstroke:=TRUE;	
 	beatrix.copyonstroke:=TRUE;
-	subserp.copyonstroke:=TRUE; 
-	serp:=Base.VoxelFromName("NM3"); 	
-	serp.DTL:=3000;
-	serp.fill(subserp);
-	serp.stroke(Base.mkPT(1/2,1/2,1/4),1,beatrix,v);
-	serp.stroke(Base.mkPT(1/2,1/2,3/4),1,beatrix,v);
-	serp.stroke(Base.mkPT(1/4,1/2,1/2),1,beatrix,v);
-	serp.stroke(Base.mkPT(3/4,1/2,1/2),1,beatrix,v);
-	serp.stroke(Base.mkPT(1/2,1/4,1/2),1,greenball,v);
-	serp.stroke(Base.mkPT(1/2,3/4,1/2),1,beatrix,v);
-	serp.stroke(Base.mkPT(1/2,1/2,1/2),1,beatrix,v);			
-	serp.imposter:=greenball;
-	serp.copyonstroke:=TRUE; 
-	RETURN serp
+	RETURN greenball
 END thisvox;
  END NXWCxXWLIcD2LegvoGXXBiQ. 
  
