@@ -1,10 +1,10 @@
 <Desktop>
 	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="30" t="94" r="468" b="421" flags="{0..2}"/>
 	<Window name="FileManager" loader="WMFileManager.Restore" l="77" t="505" r="485" b="690" flags="{0..2}"/>
-	<Window name="PET" loader="PET.Restore" l="706" t="64" r="1498" b="822" flags="{0..2}">
+	<Window name="PET" loader="PET.Restore" l="491" t="53" r="1283" b="811" flags="{0..2}">
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>
-			<Tab file="XNXL.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
+			<Tab file="Spasim.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
 				<Editor firstLine="27" cursorPos="854"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
