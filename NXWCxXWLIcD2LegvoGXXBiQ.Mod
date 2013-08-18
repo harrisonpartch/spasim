@@ -74,7 +74,7 @@ BEGIN
 	subserp.stroke(Base.mkPT(0,1,0),1,beatrix,v);		
 	subserp.stroke(Base.mkPT(1,0,1),1,beatrix,v);		
 	subserp.stroke(Base.mkPT(1,1,1),1,beatrix,v);	
-	serp.fill(beatrix);	
+	serp.fill(greenball);	
 	serp.imposter:=beatrix;
 	serp.stroke(Base.mkPT(1/2,1/2,1/4),1,beatrix,v);
 	serp.stroke(Base.mkPT(1/2,1/2,3/4),1,serp,v);
