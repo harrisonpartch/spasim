@@ -253,7 +253,7 @@ VAR
 	z10: Voxel;
 	sfish,gxy,w10,w11,v,lobster, btx,ash, dotz, GREEN,PURPLE,MCUBE:Voxel;
 	undo,rd,blu, die,gren,granite,sand,whiteblock,lazy,pdestroyer,axolotl,xen,sky1,sky2,tigerlily,cloud: Voxel;
-	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,harrison:Voxel;
+	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison:Voxel;
 	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,cage,floop,volvox,life,iml: Voxel;
 	 
 BEGIN
@@ -270,7 +270,8 @@ BEGIN
 	push(xot);
 	xot2:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 	
 	push(xot2);
-	
+	msphere:=Base.VoxelFromName("NBsHFiBKkSckXBAd46Zbsss"); 	
+	push(msphere);	
  	volvox:=Base.VoxelFromName("Nrdvolvox");  	
        push(volvox);
 	beatrix:=Base.VoxelFromName("NwPicBWw4NfcserX4ELaQ3A"); 
@@ -326,7 +327,7 @@ BEGIN
 	push(die);
 	granite:=Base.VoxelFromName("NH6nvNlOJNlCtpkDB56ljSw"); 	
 	push(granite);
-	sand:=Base.VoxelFromName("NnTJ6nDktAth4WTAUdr8HYQ"); 		
+	sand:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw"); 		
 	push(sand);
 	blacksun:=Base.VoxelFromName("NGNYAfkxmEzxe6ZESmcMJtw"); 	
 	push(blacksun);
@@ -404,9 +405,9 @@ BEGIN
 	NEW(plane,center,up);
 	plane.vox:=serp;
 	Out.String("EEEEP!"); 				
-	z10.FRaster(noise,128); 	
+(*	z10.FRaster(noise,128); 	
 	z10.FRaster(tnoise,128);  
-	z10.FRaster(plane,64);
+*)	z10.FRaster(plane,32);
 	z10.setcolor(1,0,0,0,0); 	
 	gorge.setcolor(0,1,0,1,0);
 	z10.stroke(center,30,z10,undo);

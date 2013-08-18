@@ -47,7 +47,7 @@ VAR
 	blue: AlphaVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	beatrix:=Base.VoxelFromName("NtL0zWGLy4MVijnDVIbPcqA"); 
+	beatrix:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw"); 
 	lobster:=Base.VoxelFromName("NznGx2ySiHIGrO5t9Pzcw5Q"); 
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	subserp:=Base.VoxelFromName("NM3"); 	
@@ -56,7 +56,7 @@ BEGIN
 	blue.setcolor(1/2,0,0,1/2,0);
 	subserp.DTL:=300;
 	subserp.imposter:=greenball;		
-	serp.imposter:=beatrix;
+
 	serp.DTL:=300;	
 	subserp.fill(subserp);
 	subserp.stroke(Base.mkPT(1/2,1/2,1/4),1,subserp,v);
@@ -74,20 +74,19 @@ BEGIN
 	subserp.stroke(Base.mkPT(0,1,0),1,beatrix,v);		
 	subserp.stroke(Base.mkPT(1,0,1),1,beatrix,v);		
 	subserp.stroke(Base.mkPT(1,1,1),1,beatrix,v);	
-	serp.fill(serp);	
-	serp.imposter:=beatrix;	
-	sparx:=Base.EMPTY;	
-	serp.stroke(Base.mkPT(1/2,1/2,1/4),1,sparx,v);
-	serp.stroke(Base.mkPT(1/2,1/2,3/4),1,sparx,v);
-	serp.stroke(Base.mkPT(1/4,1/2,1/2),1,sparx,v);
-	serp.stroke(Base.mkPT(3/4,1/2,1/2),1,sparx,v);
-	serp.stroke(Base.mkPT(1/2,1/4,1/2),1,sparx,v);
-	serp.stroke(Base.mkPT(1/2,3/4,1/2),1,sparx,v);
-	serp.stroke(Base.mkPT(1/2,1/2,1/2),1,sparx,v);	
+	serp.fill(beatrix);	
+	serp.imposter:=beatrix;
+	serp.stroke(Base.mkPT(1/2,1/2,1/4),1,beatrix,v);
+	serp.stroke(Base.mkPT(1/2,1/2,3/4),1,serp,v);
+	serp.stroke(Base.mkPT(1/4,1/2,1/2),1,beatrix,v);
+	serp.stroke(Base.mkPT(3/4,1/2,1/2),1,serp,v);
+	serp.stroke(Base.mkPT(1/2,1/4,1/2),1,beatrix,v);
+	serp.stroke(Base.mkPT(1/2,3/4,1/2),1,serp,v);
+	serp.stroke(Base.mkPT(1/2,1/2,1/2),1,greenball,v);	
 	subserp.copyonstroke:=TRUE;	
 	serp.copyonstroke:=TRUE;	
 	beatrix.copyonstroke:=TRUE;
-	RETURN greenball
+	RETURN serp
 END thisvox;
  END NXWCxXWLIcD2LegvoGXXBiQ. 
  

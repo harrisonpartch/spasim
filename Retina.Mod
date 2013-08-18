@@ -8,8 +8,8 @@ TYPE
 CONST
 	T=3;        
 	TS=5*8;   (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
-	TW=16;
-	TH=12;
+	TW=12;
+	TH=8;
 	W*=TS*TW;
 	H*=TS*TH
 

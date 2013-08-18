@@ -1007,7 +1007,7 @@ END mainloop;
 PROCEDURE openwincam(w,h: INTEGER);
 BEGIN
 	CreateWindow(w,h,"SPASIM" );
-	NEW(camera,Base.W, Base.H); 
+	NEW(camera,Retina.W, Retina.H); 
 	camera.aperjust(w,h);
 END openwincam;
 
@@ -1022,8 +1022,8 @@ BEGIN
 	foveasize := 100;
 	multicore:=TRUE;
 	camrotinertia:=100;
-	Base.DTL:=25000;
-	Base.DTL2:=25000;
+	Base.DTL:=2500;
+	Base.DTL2:=2500;
 	Base.gravity:=0.0000001;
 	Base.speed:=0.000001;
 	Base.maxspeed:=0.0001;

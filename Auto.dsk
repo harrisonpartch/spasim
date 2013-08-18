@@ -1,11 +1,11 @@
 <Desktop>
 	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="30" t="94" r="468" b="421" flags="{0..2}"/>
 	<Window name="FileManager" loader="WMFileManager.Restore" l="77" t="505" r="485" b="690" flags="{0..2}"/>
-	<Window name="PET" loader="PET.Restore" l="543" t="37" r="1335" b="795" flags="{0..2}">
+	<Window name="PET" loader="PET.Restore" l="706" t="64" r="1498" b="822" flags="{0..2}">
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>
 			<Tab file="XNXL.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="21" cursorPos="796"/>
+				<Editor firstLine="27" cursorPos="854"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
@@ -94,6 +94,20 @@
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="XNXLHalfSpace.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="9" cursorPos="0"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="134" scratchHeight="10"/>
+			</Tab>
+			<Tab file="NBsHFiBKkSckXBAd46ZbEQw.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="0"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="10"/>
 			</Tab>
 		</PETData>
 	</Window>

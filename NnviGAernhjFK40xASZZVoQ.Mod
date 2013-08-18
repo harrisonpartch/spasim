@@ -14,7 +14,7 @@ PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	n3ball:=Base.VoxelFromName("NM3"); 
 	bb:=Base.VoxelFromName("NM3"); 	
-	v:=Base.VoxelFromName("NtL0zWGLy4MVijnDVIbPcqA"); 	
+	v:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw"); 	
 	Base.setPT(center,1/2,1/2,1/2);
 	NEW(ball,center,6/12);
 	ball.setcolor(0.65,0.6,0.62);
