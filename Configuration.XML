@@ -56,7 +56,7 @@ To update: Configuration.Init ~
 			<Setting name="DefaultSkin" value="SkinEngine.Load xenoxolotl.skin"/>
 			<Setting name="Restore the desktop" value="WMRestorable.Load Auto.dsk"/>
 			<Setting name="navigation manager" value="WMNavigate.Open -vs 1 0 0 Navigation:TaskList"/>
-			
+			<Setting name="Linux to AOS clipboard" value="Clipboard.Install"/>
 		<!-- Pinyin Input Method Editor (remove comment to activate)
 			<Setting value="WMPinyinIME.Test"/>
 		-->
