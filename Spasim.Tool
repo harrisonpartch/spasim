@@ -55,7 +55,6 @@ Engrainer.Mod
 Saboteur.Mod
 NCompiler.Mod
 Marsh.Mod
-OGLWindow.Mod
 Render.Mod ~
 
 ]]></Span><Span style="AdHoc Oberon 10 0 0 F00BFFF 0000000"><![CDATA[The compile command stops looking for arguments when it encounters the tilde ]]></Span><Span style="Normal"><![CDATA[~ 
@@ -71,27 +70,13 @@ Modules must be freed to force their reloading after being changed and recompile
 
 ]]></Span><Span style="Bold"><![CDATA[Render.Open]]></Span><Span style="Normal"><![CDATA[ ~
 
-XNXLVoxConsole.Mod
-FRep.Mod
-Marsh.Mod
 
-OGLRender.Mod
+
 ~
-
-SystemTools.Show Time elapsed: ~ SystemTools.Ln ~
-SystemTools.Timer elapsed ~ SystemTools.Ln ~~
-
-# *********************************
-
-
-
 
 NanonyPET.Open NanonyPET.Mod ~  does not compile
 XNXLLifeVox.Mod		''	''
 XNXLSierp.Mod		''	''
-
-MyXGear.Open 
-
 
 OpenAL.Tool
 OpenGL.Tool

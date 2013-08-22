@@ -1001,37 +1001,6 @@ BEGIN
 	RETURN(exit);
 END Exit;
 
-(* object is fine except it messes up PET's program structure parser no matter where it is placed
-TYPE Clock*=OBJECT
-VAR
-	timer: Kernel.Timer;
-	time*:Time;
-	i: INTEGER
-PROCEDURE&init;
-BEGIN
-	sync;
-	time.seconds:=0;
-	time.centisecs:=0
-END init;
-
-PROCEDURE sync;
-BEGIN
-	(* get time from server *)
-END sync;
-
-BEGIN{ACTIVE, PRIORITY(Objects.Normal)}         (*this will drift! must add server synch with each server message *)
-	NEW(timer);
-	REPEAT
-		FOR i:=0 TO 100 DO
-			INC(time.centisecs);
-			timer.Sleep(10)	
-		END;
-		INC(time.seconds);
-		timer.Sleep(10)
-	UNTIL FALSE
-END Clock;
-*)
-
 BEGIN
 	Out.String("Base loading...");
 	WMFontManager.Install;

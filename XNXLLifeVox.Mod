@@ -1,7 +1,7 @@
 MODULE XNXLLifeVox;	(* Soren Renner *)
 
 IMPORT  Raster, Random, Kernel, Math, XNXLE, Base, 
-XNXLVoxel,  MSpace:=XNXLM3Space;
+XNXLVoxel,  MSpace:=NM3;
 
 CONST
 	N = 32;

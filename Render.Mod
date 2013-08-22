@@ -101,7 +101,6 @@ BEGIN
 END reflect;
 
 BEGIN
-
 	x := cx + cvx; y := cy + cvy; z := cz + cvz;
 	p:=Base.mkPT(x,y,z);
 	v := Base.world.probe(p,200);
@@ -132,6 +131,7 @@ BEGIN
 	IF  pass THEN 
 		cx:=x; cy:=y; cz:=z 
 	ELSE
+		Out.String("nopass");
 		Base.world.Shade(proberay);
 		normalize(cvx,cvy,cvz,d);
 		reflect(cvx, cvy, cvz, proberay.normal.x, proberay.normal.y, proberay.normal.z);
@@ -147,6 +147,7 @@ BEGIN
 	IF cz<0 THEN cz:=cz+1
 	ELSIF cz>1 THEN cz:=cz-1
 	END;	
+
 END move; 
 
 PROCEDURE stop;
@@ -169,6 +170,8 @@ BEGIN
 	cvx :=cvx+(x*fward.x * Base.speed); 
 	cvy :=cvy+(x*fward.y * Base.speed); 	
 	cvz :=cvz+(x*fward.z * Base.speed); 	
+	Out.String("forward!");
+	Out.Ln;
 END forward;
 
 PROCEDURE backward(x:REAL);
@@ -337,7 +340,7 @@ BEGIN
 	Base.DTL:=2500;
 	Base.DTL2:=2500;
 	Base.gravity:=0.0000001;
-	Base.speed:=0.000001;
+	Base.speed:=0.001;
 	Base.maxspeed:=0.0001;
 	Base.cursordist:=0.01;
 	R1:=100;

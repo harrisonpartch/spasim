@@ -5,7 +5,7 @@ CONST M=3;
 	MMO=M-1;
 	CUBERADIUS=0.65;   (*change to sqrt(3)/2 ???*)
 	NCODE="NM3";
-	NL=Base.NL;
+	NL=Base.NL
 
 TYPE PT = Base.PT;
 	Color = Base.Color;
@@ -16,7 +16,8 @@ TYPE PT = Base.PT;
  	NCube=Base.NCube;
  	LCube=Base.LightCube;
 
-TYPE cell = OBJECT(Voxel);
+TYPE cell* = OBJECT(Voxel);   
+(*! This module may be either imported or used anonymously *)
 VAR
 	blox*: ARRAY M,M,M OF Voxel;
 	nbloxTF*: ARRAY M,M,M OF BOOLEAN;
