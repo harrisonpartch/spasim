@@ -4,6 +4,7 @@ IMPORT Kernel, Objects, Random, Marsh,
 	 GL:=OpenGL, GLC := OpenGLConst,  GLSL:= GLShaderUtils,
 	 Inputs,  Raster, Strings,Streams;
 
+
 TYPE 
 	Aperture = Base.Aperture;
 	Ray = Base.Ray;
@@ -20,7 +21,6 @@ TYPE SNAP = RECORD
 	x,y,z,cdroll: REAL;		
 	lookdxyz:PT;
 END;	
-
 TYPE Camera = OBJECT
 VAR
 	random: Random.Generator;
@@ -49,8 +49,8 @@ BEGIN
 	filter:=FALSE;
 	cameratheta := 0;
 	cameraphi := 0;
-	aperture.width :=2.3;
-	aperture.height :=2.3;
+	aperture.width :=1.5;
+	aperture.height :=1.5;
 	aperjust(1,1);
 	Base.setPT(xaxis, 1,0,0);	
 	Base.setPT(yaxis,0,1,0);	
@@ -177,7 +177,6 @@ VAR
 	fward:PT;
 BEGIN
 	fward:=Retina.fward;	
-	fward.x:=-fward.x;
 	cvx :=cvx-(x*fward.x * Base.speed); 
 	cvy :=cvy-(x*fward.y * Base.speed); 	
 	cvz :=cvz-(x*fward.z * Base.speed); 	
@@ -268,7 +267,7 @@ BEGIN
 	gravity:=Base.gravity;
 	gravityvector:=Base.mulPT(gravityvector,Base.gravity);
 	a:=Retina.fward.x*Base.cursordist; b:=Retina.fward.y*Base.cursordist; c:=Retina.fward.z*Base.cursordist;
-	d:=-Retina.fward.x*0.0001; 	e:=-Retina.fward.y*0.0001;  	f:=-Retina.fward.z*0.0001; 
+	d:=Retina.fward.x*0.0001; 	e:=Retina.fward.y*0.0001;  	f:=Retina.fward.z*0.0001; 
 	Base.updatecamera(cx,cy,cz,a,b,c,d,e,f);	
 (*	Marsh.drawavatar;  *)
 	GLIDE:=0.975;	
@@ -276,12 +275,12 @@ BEGIN
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y; 
 	cvl :=cvl*0.0; cvu := cvu*0.0;
 	IF AVATAR THEN Marsh.drawavatar END;
-	IF MOUSEDOWN THEN
+(*	IF MOUSEDOWN THEN
 		IF MB=3 THEN 
 			Marsh.drawcursor; 
 		ELSIF MB=1 THEN Marsh.draw
 		END;
-	END;	
+	END;	*)
 	trace; 
 	Base.tick;
 END tick;
@@ -292,32 +291,52 @@ END Camera;
 (*! ************* XLTL AMALGAMATION FOLLOWS *)
 
 TYPE GLWindow=OBJECT(OGLWindow.Window)
-
+VAR
+	vertexbuffer, uvbuffer: Uint; (* GL buffers *)
+	image: Uint; (* image texture name *)
+	passthroughProgram: GL.Uint;
+	splashscreen: BOOLEAN;
+	
 PROCEDURE &openwincam(w,h: INTEGER);
 BEGIN
 	Init(w,h, 0,0, FALSE );
-	NEW(camera,Base.W, Base.H); 
+	NEW(camera,Retina.W, Retina.H); 
 	camera.aperjust(w, h);
 	SetTitle("SPASIM");
-	SetGameMode(TRUE);
-(*	HideMousePointer();	*)
-	SetPrintFPS(TRUE);
+
+	SetGameMode(TRUE); 
+	SetPrintFPS(TRUE); (* show frame time timing *)
+	splashscreen := TRUE;
+	
+	(* cmdlinerun := TRUE;*)
 END openwincam;
 
+(* called when iddling *)
+PROCEDURE IdleDisplay;
+BEGIN
+	ReDisplay; (* calls Display proc when idle timer is expired *)
+END IdleDisplay;
+
+(* is called by OGLWindow before MainLoop started *)
 PROCEDURE OnLoad* ;
 BEGIN
-	IF ~InitGL() THEN Close; RETURN END; 	
 	
-	Raster.InitMode(copy, Raster.srcCopy);
-	Display;	
+	IF ~InitGL() THEN Close; RETURN END;	
+	Display; (* display splash screen *)
+	
 	Marsh.dawn;
 	
+	NEW(Retina.image);
+	Raster.Create(Retina.image,Retina.W,Retina.H,Raster.BGRA8888);
+	
+	splashscreen := FALSE;
+		
 	NEW(rand);
 	foveasize := 100;
 	multicore:=TRUE;
 	camrotinertia:=100;
-	Base.DTL:=25000;
-	Base.DTL2:=25000;
+	Base.DTL:=2500;
+	Base.DTL2:=2500;
 	Base.gravity:=0.0000001;
 	Base.speed:=0.000001;
 	Base.maxspeed:=0.0001;
@@ -325,33 +344,38 @@ BEGIN
 	R1:=100;
 	R2:=150;
 	avtoggle:=TRUE;
-	
+	Base.worldalive := TRUE;	
 
-	mousex:=200;
-	mousey:=200;
-	centerx:=200;
-	centery:=200;
 	fogdensity:=0.11;
 	leftsticky:=10.0;
 	upsticky:=10.0;	
 	Out.String('*line 1217!*');
 	msd:=40;
-
-	Base.worldalive := TRUE;
-
+	
+	
 END OnLoad;
 
 PROCEDURE Reshape(w, h: LONGINT);
 BEGIN	
 	GL.Viewport(0, 0, w, h);
-	GL.ClearColor(0.0, 0.0, 0.0, 0.0);
-	centerx:= w DIV 2; centery:= h DIV 2;
+	centerx:= w DIV 2; centery:= h DIV 2;	
 END Reshape;
 
 PROCEDURE Close*;
 BEGIN
 	Base.worldalive:=FALSE;
-	Out.String("Closing.."); Out.Ln;
+	Out.String("OGLRender Closing.."); Out.Ln;
+	
+	(* cleanup gl buffers *)
+	GL.DeleteProgram(passthroughProgram);
+	
+	GL.DisableVertexAttribArray(0);
+	GL.DisableVertexAttribArray(1);
+	
+	GL.DeleteTextures(1, ADDRESSOF(image));
+	GL.DeleteBuffers(1, ADDRESSOF(vertexbuffer));
+	GL.DeleteBuffers(1, ADDRESSOF(uvbuffer));
+	
 	Close^;
 END Close;
   
@@ -381,26 +405,36 @@ BEGIN
 		| "4" : Base.gravity:= 1.5*Base.gravity		
 		| "5" : Base.STOPGO	
 		| "h" : camera.hop	
-		| " " : 	
-		| "]": camera.aperture.width := camera.aperture.width * 101/99; camera.aperture.height := camera.aperture.height *101/99
-		| "[":  camera.aperture.width := camera.aperture.width * 99/101;  camera.aperture.height := camera.aperture.height *99/101
+		| " " :  IF hidecursor THEN HideMousePointer(FALSE) ELSE HideMousePointer(TRUE) END;
+		| "]": camera.aperture.width := camera.aperture.width * 101/99; camera.aperture.height := camera.aperture.height *101/99;
+			(*    Out.String("] pressed"); Out.Ln; *)
+		| "[":  camera.aperture.width := camera.aperture.width * 99/101;  camera.aperture.height := camera.aperture.height *99/101;
+			(*Out.String("[ pressed"); Out.Ln;*)
 		| "9": IF Marsh.cursorsize<999999 THEN Marsh.cursorsize:=Marsh.cursorsize * 2; Base.cursordist:=Base.cursordist/2 END
 		| "0": IF Marsh.cursorsize>1 THEN Marsh.cursorsize:=Marsh.cursorsize DIV 2; Base.cursordist:=Base.cursordist*2 END
 		| "7": Base.cursordist:=Base.cursordist*1.3
 		| "8": Base.cursordist:=Base.cursordist/1.3
 		| "l": Marsh.lines:=~Marsh.lines
-		| "b": Marsh.showcode;  IF CAPTUREMOUSE THEN CAPTUREMOUSE := FALSE; PAUSE:=TRUE END
+		| "b": Marsh.showcode;  
+				IF CAPTUREMOUSE THEN 
+				CAPTUREMOUSE := FALSE; 
+				PAUSE:=TRUE;
+				SetIdleTime(5000);
+				HideMousePointer(FALSE);
+				END
 
 	ELSE (* use keysm *)
-		Out.String("ucs: "); Out.Hex(ucs,4); Out.Ln;
+(*		Out.String("ucs: "); Out.Hex(ucs,4); Out.Ln; *)
 		CASE keysym OF
-		| 1BH: IF CAPTUREMOUSE THEN 
+		| Inputs.KsEscape (*1BH*) : IF CAPTUREMOUSE THEN 
 							CAPTUREMOUSE := FALSE;
-							PAUSE:=TRUE 
+							PAUSE:=TRUE;
+							HideMousePointer(FALSE);
+							SetIdleTime(1000);
 						ELSE
 							(* alive:=FALSE *)
 						END;
-						Out.String("KsEscape.."); Out.Ln;
+						(* Out.String("KsEscape.."); Out.Ln;*)
 		|	Inputs.KsF1:
 				Out.String("F1- Close"); Out.Ln;
 				Marsh.engrain;
@@ -409,6 +443,8 @@ BEGIN
 				
 	(*	| Inputs.KsF11: ToggleFullWindow;*)
 		| Inputs.KsF2: Base.gravity:= -Base.gravity;
+
+		(* LeftCtrl and RightCtrl doest work with LinuxAos ?? *)
 		| Inputs.LeftCtrl: AVATAR:=~AVATAR; 	Out.String("LeftCtrl"); Out.Ln;
 		| Inputs.RightCtrl: Marsh.SNIPEINTO:=~Marsh.SNIPEINTO;	 Out.String("RightCtrl"); Out.Ln;
 		ELSE
@@ -417,15 +453,45 @@ BEGIN
 	END
 END KeyEvent;
 
+PROCEDURE PointerDown*(x, y: LONGINT; flags: SET);
+BEGIN
+	IF ~CAPTUREMOUSE THEN SetIdleTime(0); HideMousePointer(TRUE); END;
+	CAPTUREMOUSE:=TRUE;	
+	PAUSE:=FALSE;
+END PointerDown;
+
+	(** called when mouse button up  *)
+PROCEDURE PointerUp*(x, y: LONGINT; flags: SET);
+BEGIN
+
+END PointerUp;
+	
 PROCEDURE PointerMove* (x, y : LONGINT; keys : SET);
 VAR
 	up,left: REAL;
+	xr,yr: LONGINT;
 BEGIN
-	left:=ABS(x)*x;
-	up:=-ABS(y)*y; 
-	camera.up(up/(30000*leftsticky)); 
-	camera.left(left/(30000*leftsticky));
+	IF ~warpedthemouse OR TRUE THEN (* only once per frame *)
 
+	IF keys*{0} ={0} THEN Marsh.draw;
+	ELSIF keys*{1} = {1} THEN 
+	ELSIF keys*{2} = {2} THEN Marsh.drawcursor; 
+	END;
+		xr := x-centerx; yr :=y-centery;
+				
+		left:=ABS(xr)*xr;
+		up:=-ABS(yr)*yr; 
+		camera.up(up/(30000*leftsticky)); 
+		camera.left(left/(30000*leftsticky));
+	
+		IF CAPTUREMOUSE & (ABS(xr)+ABS(yr)>5) THEN
+				(*SetMousePosition(centerx, centery);
+				Api.WarpPointer( display, 0,mne.window, 0,0, 1000,1000, centerx,centery);*)
+				WarpPointer(1000,1000, centerx,centery);
+		END;
+		warpedthemouse:=TRUE;
+	END;
+	
 END PointerMove;
  
 PROCEDURE WheelMove*(dz: LONGINT);
@@ -439,29 +505,32 @@ END WheelMove;
 PROCEDURE  InitGL(): BOOLEAN;
 VAR 	vs, fs: Strings.String;
 		vertexPosition, vertexUVID: Uint;
-		TextureID: Uint;	
+		imageID: Uint;	
 		vertices, texcoords: ARRAY [*] OF Float;
-		vertexbuffer, uvbuffer: Uint;			
+				
 BEGIN		
 	GL.ReadImplementationProperties;
-	IF ~ (GL.GL_ARB_vertex_shader & GL.GL_ARB_fragment_shader) THEN
-	Out.String("GL_ARB_vertex_shader and GL_ARB_fragment_shader are not supported"); 
-		Out.Ln; 
-		RETURN FALSE;
-	END;
-	(* GL.Read_GL_ARB_Shader_Objects();*)
-	GL.ActiveTexture(GLC.GL_TEXTURE0);		
-
-	NEW(Retina.image);
+	IF ~GL.GL_VERSION_2_0 THEN
+		Out.String("Error: your graphic card does not support OpenGL 2.0"); 
+		Out.Ln;
+	 	RETURN FALSE;
+	 END;
+		 	
+	GL.ActiveTexture(GLC.GL_TEXTURE0);	
+	GL.Enable(GLC.GL_TEXTURE_2D);
+	
+	GL.ClearColor(0.0, 0.0, 0.0, 0.0);
+	
+(*	NEW(Retina.image);
 	Raster.Create(Retina.image,Retina.W,Retina.H,Raster.BGRA8888);
-
+*)
 	(* create texture object for image *)
 	GL.GenTextures(1, ADDRESSOF(image));
 	GL.BindTexture(GLC.GL_TEXTURE_2D, image); 
 	(* These determine how interpolation is made when image scaled down on up *)
 	GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_NEAREST);
 	GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_NEAREST);
-	GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height, 0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, ADDRESSOF(Retina.image.mem[0]));
+	GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height, 0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr);
 
 	vs := VertexSource();
 	fs := FragmentSource();
@@ -474,8 +543,8 @@ BEGIN
 		vertexUVID := GL.GetAttribLocation(passthroughProgram, "Texcoords");	
 		
 		(* Get a handle for our "myTextureSampler" uniform *)
-		TextureID  := GL.GetUniformLocation(passthroughProgram, "u_image");
-		GL.Uniform1i(TextureID, 0); 
+		imageID  := GL.GetUniformLocation(passthroughProgram, "u_image");
+		GL.Uniform1i(imageID, 0); 
 		
 		(* A2 Image origin is top-left, opengl's image left-bottom; so, flip it *)
 	
@@ -501,10 +570,10 @@ BEGIN
 		GL.VertexAttribPointer(
 			vertexPosition, (* The attribute we want to configure *)
 			2, (*size *)
-			 GLC.GL_FLOAT, (* type *)
-			 GLC.GL_FALSE,  (* normalized ? *)
-			 0, (* stride *)
-			 0); (* array buffer offset *)
+			GLC.GL_FLOAT, (* type *)
+			GLC.GL_FALSE,  (* normalized ? *)
+			0, (* stride *)
+			0); (* array buffer offset *)
 
 		(* 2nd attribute buffer : UVs *)
 		GL.EnableVertexAttribArray(1);
@@ -513,12 +582,13 @@ BEGIN
 		GL.VertexAttribPointer(
 			vertexUVID, (* The attribute we want to configure *)
 			2, (* size : U+V => 2 *)
-			 GLC.GL_FLOAT, (* type *)
-			 GLC.GL_FALSE,  (* normalized ? *)
-			 0, (* stride *)
-			  0); (* array buffer offset *)
-
-	GLSL.PrintOpenGLError("InitGL: ");
+			GLC.GL_FLOAT, (* type *)
+			GLC.GL_FALSE,  (* normalized ? *)
+			0, (* stride *)
+			0); (* array buffer offset *)
+			  
+	SwapBuffers();
+			  
 	RETURN TRUE;
 END InitGL;
 
@@ -559,62 +629,27 @@ BEGIN
 	RETURN buf;
 END FragmentSource;
 
-
 PROCEDURE Display();
 BEGIN
-	camera.tick;
+	IF ~splashscreen THEN	camera.tick; END;
 	GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT) ;
 	GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height,  0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr);
 	GL.DrawArrays(GLC.GL_TRIANGLES, 0, 2*3);  (* 2*3 indices starting at 0 -> 2 triangles *)	     		
-	SwapBuffers();
-	
+	SwapBuffers();	
 END Display;
 
-(*
-PROCEDURE mainloop;
-VAR
-	ftimer: Kernel.MilliTimer;
-	fms,fmsum: LONGINT;
-	ft: ARRAY 10 OF LONGINT;
-	i,ii: LONGINT;
+(* change detail according to frame speed, called in OGLWindow.MainLoop *)
+PROCEDURE GameLogic();
 BEGIN
-		MakeCurrent();
-		Reshape(width, height);
- 		OnLoad;
-				
-	active:=TRUE;
-	
-	WHILE active DO
-		i:=(i+1)MOD 10;
-		Base.rnf:=i/10;
-		Kernel.SetTimer(ftimer,1000);
-		LoopForEvents;
-		IF ~PAUSE THEN 
-			camera.tick;
-			Display;
-			ft[i]:=Kernel.Elapsed(ftimer);
-			fmsum:=0;
-			FOR ii:=0 TO 9 DO
-				fmsum:=fmsum+ft[ii]
-			END;
-			fms:=fmsum DIV 10; 
-			IF ft[i]<msd THEN Retina.moredetail ELSIF ft[i]>(msd+10) THEN Retina.lessdetail END;
-			IF i=9 THEN 	
-				fmsum:=0;
-				Out.Int(fms, 6); 
-				Out.Ln 
-			END;
-		ELSE
-			(* Kernel.Sleep(300) *)
-		 END;
+	IF GetCurrentFrameMs() <msd THEN 
+		Retina.moredetail;
+	ELSIF GetCurrentFrameMs() >(msd+10) THEN 
+		Retina.lessdetail;
 	END;
-	Out.String("MainLoop exiting.."); Out.Ln;
-	CloseWindow();
-END mainloop;	
-*)
+END GameLogic;
 
 BEGIN
-	MainLoop;
+	MainLoop; (* run this window's main loop *)
 END GLWindow;
 
 
@@ -626,7 +661,7 @@ VAR
 	movierecording, movieplaying: BOOLEAN; 
 	frtrace, foveate: BOOLEAN;
 	foveasize, fovealeft, fovearight, foveadown, foveaup: LONGINT;
-	DEATH, wLOOK, MOUSEDOWN, PAUSE: BOOLEAN;
+	DEATH, wLOOK, PAUSE: BOOLEAN;
 	tracetiled,avtoggle, capturethemouse: BOOLEAN;
 	framecount: LONGINT;
 	multicore,filtor,uplock,rollcam,suppressz: BOOLEAN;
@@ -638,11 +673,9 @@ VAR
 	update: LONGINT;
 	MMseen, MRseen: BOOLEAN;	
 
-	
-
 		
-	mousex, mousey : LONGINT; (* size of window *)	
 	
+	warpedthemouse: BOOLEAN;	
 
 
 	CAPTUREMOUSE, GO,TRAIL,AVATAR,SCULL,METASLASH: BOOLEAN;	
@@ -650,14 +683,9 @@ VAR
 	fogdensity:REAL;
 	leftsticky,upsticky: REAL;
 	centerx,centery: LONGINT;
-	MB:INTEGER;
+
 	GLIDE:REAL;
-	FR: LONGINT;
-
-	passthroughProgram: GL.Uint;
-	copy : Raster.Mode;
-
-	image: Uint; (* image texture name *)		
+		
 	msd: REAL;	
 
 PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
@@ -726,22 +754,22 @@ END cursorpull;
 
 PROCEDURE vlnext;
 BEGIN
-	Marsh.	incVN;
+	Marsh.incVN;
 END vlnext;
 
 PROCEDURE vllast;
 BEGIN
-	Marsh.	decVN;
+	Marsh.decVN;
 END vllast;
 
 PROCEDURE cursorsizeplus;
 BEGIN
-	Marsh.	cursorsize:=ENTIER(Marsh.cursorsize/1.5)
+	Marsh.cursorsize:=ENTIER(Marsh.cursorsize/1.5)
 END cursorsizeplus;
 
 PROCEDURE cursorsizeminus;
 BEGIN
-	Marsh.	cursorsize:=ENTIER(Marsh.cursorsize*1.5)
+	Marsh.cursorsize:=ENTIER(Marsh.cursorsize*1.5)
 END cursorsizeminus;
 
 PROCEDURE Open* ;
@@ -756,3 +784,7 @@ BEGIN
 END OGLRender.
 
 OGLRender.Open ~ 
+
+SystemTools.Free OGLRender ~ 
+
+

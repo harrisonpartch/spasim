@@ -4,6 +4,6 @@ PROCEDURE thisvox*():Base.Voxel;
 VAR
 	vox: TexVox.TexVox;
 BEGIN
-	NEW(vox,'XNXL.dotz.png'); 
+	NEW(vox,'whiteblock.png'); 
 	RETURN vox
 END thisvox; END NtL0zWGLy4MVijnDVIbPcqA.

@@ -90,9 +90,12 @@ TYPE
 
 		debugframes-: BOOLEAN; (** print FPS ? *)
 		frames-:LONGINT;  (** # of frames *)
-
-		idletime-: LONGINT;
+		hidecursor-: BOOLEAN; (** hide/show cursor *)
+		currentfms-: LONGINT; (* current frame update time *)
+		
+		idletime-: LONGINT; (** ms, for IdleDisplay *)
 		cmdlinerun* : BOOLEAN; (* run from commandline, exe ? *)
+		
 		active : BOOLEAN;  (* for main loop control *)
 		fullscreen-, fullwindow-: BOOLEAN;
 		gamemode-: BOOLEAN; (** if true poll Display procedure *)
@@ -147,26 +150,27 @@ TYPE
 	(** sets title of window *)
 	PROCEDURE SetTitle*(tit: ARRAY OF CHAR);
 	VAR res: LONGINT;
-	BEGIN {EXCLUSIVE}
+	BEGIN 
 		COPY(tit, title);
 		res:=User32.SetWindowText(SELF.hWnd, title);
 	END SetTitle;
 
 	(** set idle time  for calling IdleDisplay proc *)
 	PROCEDURE SetIdleTime*(ms: LONGINT);
-	BEGIN {EXCLUSIVE}
+	BEGIN 
+		IF ms < 0 THEN ms := 0 END;
 		idletime := ms;
 	END SetIdleTime;
 
 	(** print # frames per second, true/false *)
 	PROCEDURE SetPrintFPS*(df: BOOLEAN);
-	BEGIN {EXCLUSIVE}
+	BEGIN
 		debugframes := df;
 	END SetPrintFPS;
 
 	(** gm: TRUE-> Display procedure polled continuously *)
 	PROCEDURE SetGameMode*(gm: BOOLEAN);
-	BEGIN {EXCLUSIVE}
+	BEGIN 
 		gamemode := gm;
 	END SetGameMode;
 
@@ -188,18 +192,26 @@ TYPE
 	(** swap the GL context contents to the window *)
 	PROCEDURE SwapBuffers*();
 	VAR res: WinApi.BOOL;
-	BEGIN
-		GL.Finish();
+	BEGIN		
 		res := WinApi.SwapBuffers(hDC);
-		(*IF debug THEN KernelLog.String("SwapBuffers res= "); KernelLog.Int(res,0); KernelLog.Ln; END;*)
+		IF debug THEN KernelLog.String("SwapBuffers res= "); KernelLog.Int(res,0); KernelLog.Ln; END;
 	END SwapBuffers;
 
 	(** interval=1: vertical sync to video update rate; interval=0: disable vsynch, full speed *)
 	PROCEDURE SetSwapInterval*(interval: LONGINT);
 	VAR bres: BOOLEAN;
-	BEGIN {EXCLUSIVE}
+	BEGIN 
 		IF GL.wglSwapIntervalEXT # NIL THEN
 			 bres := GL.wglSwapIntervalEXT(interval);
+		END;
+		IF debug THEN
+			IF GL.wglSwapIntervalEXT #NIL THEN
+				KernelLog.String("wglSwapIntervalEXT # NIL "); 
+			ELSE
+				KernelLog.String("wglSwapIntervalEXT = NIL "); 
+			END;
+			IF bres THEN KernelLog.String("bres=TRUE"); ELSE KernelLog.String("bres= FALSE"); END;
+			KernelLog.Ln; 
 		END;
 	END SetSwapInterval;
 
@@ -247,12 +259,6 @@ TYPE
 		END;
 
 		hGLRC := GL.wglCreateContext(hDC);
-
-		MakeCurrent();
-		GL.ReadOpenGLCore();
-		GL.Read_WGL_EXT_swap_control; (* needed for swap interval *)
-		SetSwapInterval(0);
-		DeActivate();
 		RETURN (hGLRC # 0)
 	END CreateGLRC;
 
@@ -302,11 +308,8 @@ TYPE
 
 	(** Close the window *)
 	PROCEDURE Close*();
-	VAR res: LONGINT;
 	BEGIN (* {EXCLUSIVE} *)
-		 active := FALSE;
-		 (* User32.PostMessage( hWnd, User32.WMQuit, 0,0 )
-		 res := User32.SendMessage(hWnd, User32.WMQuit, 0, 0); *)
+		active := FALSE; 
 	END Close;
 
 	(** resize the window *)
@@ -338,29 +341,32 @@ TYPE
 	VAR pt: User32.Point;
 	BEGIN
 		(* convert client coords. to screen coords. *)
-		pt.x := x; pt.y := height-y-1;
+		pt.x := x; pt.y := y;
 		WinApi.ClientToScreen(hWnd, pt);
 		(* chage cursor position *)
 		User32.SetCursorPos(pt.x, pt.y);
 	END SetMousePosition;
 
+	(** warp pointer to x,y *)
+	PROCEDURE WarpPointer*(w, h: LONGINT; x, y: LONGINT);
+	BEGIN
+		SetMousePosition(x, y)
+	END WarpPointer;
+	
 	(** make null cursor for mouse pointer *)
-	PROCEDURE HideMousePointer*();
-	VAR
+	PROCEDURE HideMousePointer*(hide: BOOLEAN);
 	BEGIN
-		(* hide cursor *)
-		User32.ShowCursor(0); (* FALSE *)
-		User32.SetCapture(hWnd); (*  capture mouse to user window *)
+		hidecursor := hide;
+		IF hide THEN
+			(* hide cursor *)
+			User32.ShowCursor(0); (* FALSE *)
+			User32.SetCapture(hWnd); (*  capture mouse to user window *)
+		ELSE
+			(* show cursor *)
+			User32.ReleaseCapture(); (*  un-capture mouse from user window *)
+			User32.ShowCursor(1); (* TRUE *)
+		END;	
 	END HideMousePointer;
-
-	(** show mouse pointer image *)
-	PROCEDURE ShowMousePointer*();
-	VAR
-	BEGIN
-		User32.ReleaseCapture(); (*  un-capture mouse from user window *)
-		(* show cursor *)
-		User32.ShowCursor(1); (* TRUE *)
-	END ShowMousePointer;
 
 	(** called when mouse wheel changed  *)
 	PROCEDURE WheelMove*(dz: LONGINT);
@@ -401,8 +407,8 @@ TYPE
 	BEGIN
 		User32.SetCursor(hCurrentCursor);
 		m.x := lParam MOD ASH( 1, 16 )  ;
-		m.y := height-1-ASH( lParam, -16 ); (* opengl coordinates origin is lower-left *)
-
+	(*	m.y := height-1-ASH( lParam, -16 );*) (* opengl coordinates origin is lower-left *)
+		m.y := ASH( lParam, -16 ) -1;
 		keys := mkeys;
 
 		CASE uMsg OF
@@ -483,7 +489,7 @@ TYPE
 		GetKeyFlags(msg.flags);
 
 		  msg.ch := ch;  msg.keysym := key;
-
+			
 		(* ch := TranslateKey(wParam, FALSE);  *)
 		(*IF ch # 0X THEN*)
 		lParam := lParam MOD ASH( 1, 16 );
@@ -545,7 +551,9 @@ TYPE
 	END PosChanging;
 
 	PROCEDURE UpdateDisplay(id: LONGINT;  lParam: User32.LParam; wParam: User32.WParam );
-	BEGIN {EXCLUSIVE}
+	VAR
+		ps: User32.PaintStruct;
+	BEGIN 
 		IF ~(minimized IN state) THEN
 			IF id = resize THEN
 				width := lParam MOD ASH( 1, 16 );
@@ -553,7 +561,9 @@ TYPE
 				Reshape(width, height);
 
 			ELSIF id = redraw THEN
+					User32.BeginPaint(hWnd, ps);
 					Display();
+					User32.EndPaint(hWnd, ps);
 			END;
 		END
 	END UpdateDisplay;
@@ -578,7 +588,7 @@ TYPE
 						RETURN 0;
 				| User32.WMPaint:
 						UpdateDisplay(redraw, lParam, wParam );
-
+						RETURN 0;
 				| User32.WMMouseActivate:
 						IF ((lParam MOD 65536) # (User32.HTClient)) THEN ret := User32.SetFocus( hWnd ) END;
 						RETURN User32.MANoActivate
@@ -587,26 +597,30 @@ TYPE
 				| User32.WMWindowPosChanging:
 						handled := GetMinMaxInfo(lParam );  PosChanging(lParam );  handled := FALSE
 				| User32.WMSetFocus, User32.WMKillFocus:
-						HandleFocus(uMsg, wParam )
-				| User32.WMClose: Close;
+						HandleFocus(uMsg, wParam );
+						RETURN 0;
+				| User32.WMClose, User32.WMQuit: 	Close;					
+						(*active := FALSE;*)
 						RETURN 0;
 
 				| User32.WMKeyDown:
 						HandleKey(wParam, lParam);
+						RETURN 0;
 				(*| User32.WMKeyUp:
 						HandleKeyUp( win, wParam, lParam );*)
 				| User32.WMChar:
 						IF ~KeyHandled THEN
-							HandleChar(wParam, lParam )
+							HandleChar(wParam, lParam );
+							RETURN 0;
 						END;
-				| User32.WMSysKeyDown: HandleKey(wParam, lParam);
-				| User32.WMSysKeyUp: HandleKeyUp(wParam, lParam);
+				| User32.WMSysKeyDown: HandleKey(wParam, lParam); RETURN 0;
+				| User32.WMSysKeyUp: HandleKeyUp(wParam, lParam); RETURN 0;
 
 				| User32.WMLButtonDown, User32.WMLButtonUp,User32.WMMButtonDown, User32.WMMButtonUp,
 					User32.WMRButtonDown, User32.WMRButtonUp, User32.WMXButtonDown,
 				 User32.WMXButtonUp, User32.WMMouseWheel, User32.WMMouseMove:
 				 					HandleMouse(uMsg, wParam, lParam );
-
+				 					RETURN 0;
 		ELSE
 			handled := FALSE;
 		END;
@@ -656,10 +670,10 @@ TYPE
 	END CreateHWND;
 
 	(* close the window and its resources *)
-	PROCEDURE CloseWindow();
+	PROCEDURE CloseWindow*();
 	VAR res: Kernel32.BOOL;
 		bres : BOOLEAN;
-	BEGIN {EXCLUSIVE}
+	BEGIN 
 		active := FALSE;
 		(* do we have a rendering context *)
 		IF  hGLRC # 0 THEN
@@ -692,102 +706,101 @@ TYPE
 		END;
 	END CloseWindow;
 
-	(** translate messages to this window *)
-	PROCEDURE MessagePump(): BOOLEAN;
+
+	PROCEDURE LoopForEvents*();
 	VAR msg: User32.Msg;
 	BEGIN
-		IF WinApi.PeekMessage(msg, hWnd, 0,0, WinApi.PM_REMOVE) # 0 THEN
+		IF WinApi.PeekMessage(msg, 0, 0,0, WinApi.PM_REMOVE) # 0 THEN
 			IF msg.message = User32.WMQuit THEN
-				RETURN FALSE
-			END;
-			User32.TranslateMessage(msg);
-			User32.DispatchMessage(msg);
-		END;
-		RETURN TRUE;
-	END MessagePump;
+				active := FALSE
+			ELSE;
+				User32.TranslateMessage(msg);
+				User32.DispatchMessage(msg);
+			END
+		END;	
+	END LoopForEvents;
+	
+PROCEDURE GetCurrentFrameMs*():LONGINT;
+BEGIN 
+	RETURN currentfms;
+END GetCurrentFrameMs;
 
-	(** translate messages to this window *)
-	PROCEDURE MessageLoop(): BOOLEAN;
-	VAR msg: User32.Msg;
-	BEGIN
-		IF  User32.GetMessage(msg, 0, 0, 0) # 0 THEN
-			IF msg.message = User32.WMQuit THEN
-				RETURN FALSE
-			END;
-			User32.TranslateMessage(msg);
-			User32.DispatchMessage(msg);
-		END;
-		RETURN TRUE;
-	END MessageLoop;
-
-	(* if gamemode is enabled, call this proc in MainLoop. *)
-	PROCEDURE GameModeLoop();
-	BEGIN
-		IF idletime # 0 THEN
-			IF Kernel.Expired(idletimer) THEN
-				IdleDisplay;
-				Kernel.SetTimer(idletimer, idletime);
-			END;
-		ELSE
-			Display;
-		END;
-
-		(* measure timing info *)
-		IF debugframes THEN
-			INC(frames);
-			IF Kernel.Expired(fpstimer) THEN
-				KernelLog.Int(frames,0); KernelLog.String(" frames in 5 secs.");
-				KernelLog.String(" FPS = "); KernelLog.Int(frames DIV 5,0);
-				KernelLog.Ln;
-				Kernel.SetTimer(fpstimer, 5000);
-				frames := 0;
-			END;
-		END;
-	END GameModeLoop;
+(*  called in gamemode , use according to your needs *)
+PROCEDURE GameLogic*();
+BEGIN	
+END GameLogic;
 
 	(** windows main loop *)
 	PROCEDURE MainLoop*();
-	VAR
+	VAR fms,fmsum: LONGINT;
+		ft: ARRAY 10 OF LONGINT;
+		i,ii: LONGINT;	
 	BEGIN
-		frames := 0;
-		Kernel.SetTimer(fpstimer, 5000);
 
 		RegisterClasses();  CreateHWND( create );
 		(* create GL context for this window *)
 		IF ~CreateGLRC({opDoubleBuffered}, 32, 16, 8, 0,0,0) THEN
 			Close;
+			RETURN;
 		END;
 
-		User32.ShowWindow( hWnd, User32.SWShow);
-		User32.SetFocus(hWnd);
-		User32.SetWindowText(hWnd, title);
-
 		MakeCurrent();
+
+		GL.ReadOpenGLCore();
+		GL.Read_WGL_EXT_swap_control; (* needed for swap interval *)
+		SetSwapInterval(0);
 		
-		OnLoad();	
+		User32.ShowWindow( hWnd, User32.SWShow);
+		User32.SetWindowText(hWnd, title);
+		User32.SetFocus(hWnd);
+				
 		Reshape(width, height);
-		Display;	
+		OnLoad();	
+
 		active := TRUE;
 
 		WHILE active DO (* loop until WMQuit received *)
-
+			i:=(i+1)MOD 10;
+			Kernel.SetTimer(fpstimer, 1000);
+						
+	
+			LoopForEvents();
 			(* ------------ game mode starts ------------- *)
 			IF gamemode THEN
-				IF ~MessagePump() THEN active := FALSE; END;
-				GameModeLoop();
-				(* ------------ game mode ends ------------- *)
-			ELSE
-				IF ~MessageLoop() THEN active := FALSE; END;
+				IF idletime # 0 THEN
+					IF Kernel.Expired(idletimer) THEN					
+						IdleDisplay;
+						Kernel.SetTimer(idletimer, idletime);
+					END;
+				ELSE				
+					Display();
+					Kernel32.Sleep(0);
+				END;	
 			END;
 
-		END; (* while *)
+			(* measure frame timing info, ms *)
+			IF gamemode & debugframes & (idletime = 0) THEN
+				ft[i]:=Kernel.Elapsed(fpstimer);
+				currentfms := ft[i];
+				fmsum:=0;
+				FOR ii:=0 TO 9 DO
+					fmsum:=fmsum+ft[ii]
+				END;
+				fms:=fmsum DIV 10; 
+				
+				GameLogic();
+				IF i=9 THEN 	
+					fmsum:=0;
+					KernelLog.Int(fms, 6); KernelLog.String(" ms."); KernelLog.Ln
+				END;
+			END;	
 
+		END; (* while *)		
 		CloseWindow();
 	END MainLoop;
 
-
-	BEGIN  (*{ACTIVE}
-		MainLoop();*)
+	BEGIN  
+		(* MainLoop();*)
 	END Window;
 
 VAR
@@ -917,6 +930,11 @@ VAR
 				create := SYSTEM.VAL( CreateStruct, wParam );
 				RETURN 0;
 		ELSE
+(*
+		END;
+
+		RETURN User32.DefWindowProc( hwnd, uMsg, wParam, lParam )
+*)
 				RETURN  User32.DefWindowProc( hwnd, uMsg, wParam, lParam )
 		END;
 		RETURN 0;

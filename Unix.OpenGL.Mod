@@ -6167,7 +6167,14 @@ BEGIN
 			p[j] := '/';  k := 0;
 			REPEAT  INC( j );  p[j] := libname[k];  INC( k )  UNTIL p[j] = 0X;
 			h := Unix.Dlopen( p , mode );  INC( i )
-		END
+		END;
+		IF h # 0 THEN
+			KernelLog.String("using OpenGL search path: "); KernelLog.String(p); KernelLog.Ln;
+		ELSE
+			KernelLog.String("ERROR: could not find a suitable file for libGL.so.1"); KernelLog.String(libname); KernelLog.Ln;
+		END;
+	ELSE
+		KernelLog.String("using LinuxAos path: "); KernelLog.String(libname); KernelLog.Ln;	
 	END;
 	RETURN h
 END Dlopen;

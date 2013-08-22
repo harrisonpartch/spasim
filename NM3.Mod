@@ -138,7 +138,6 @@ BEGIN
 			ray.length:=ray.length+vdepth;
 			blr:=black*vdepth;
 			ray.bla := ray.bla-blr; 
-
 			IF ray.bla>0.01 THEN	
 				rr := red*vdepth*ray.ra; 
 				gr := green*vdepth*ray.ga; 
@@ -171,7 +170,8 @@ BEGIN
 					ray.lxyz.y := ABS(xyz.y - ijk.j);
 					ray.lxyz.z := ABS(xyz.z - ijk.k);
 					ray.popdelta := Base.Origin; (* because many shaders don't set it and it *)
-					ray.normalTF:=nbloxTF[ijk.i,ijk.j,ijk.k];
+					ray.ncube:=nblox[ijk.i,ijk.j,ijk.k];
+					ray.ncubeTF:=nbloxTF[ijk.i,ijk.j,ijk.k];
 					v.Shade(ray);	
 					xyz.x := xyz.x + ray.popdelta.x;    
 					xyz.y := xyz.y + ray.popdelta.y;
@@ -296,7 +296,6 @@ BEGIN
 	complex:=TRUE;
 	imposter:=Base.EMPTY;
 	DTL:=Base.DTL;
-	setcolor(0,0,1,1,0);
 	code:=NCODE; 
 	ncode:=NCODE
 END init;
@@ -328,7 +327,6 @@ VAR
 	i,j,k: INTEGER;
 BEGIN
 	copymarker:=TRUE;
-	colored:=TRUE;	
 	red:= r;
 	green := g;
 	blue := b;
@@ -457,28 +455,19 @@ BEGIN
 		ELSE
 			IF blox[i,j,k]#NIL THEN 
 				IF voxundo= NIL THEN voxundo:=blox[i,j,k] END;  
-				v:=blox[i,j,k];
-				IF blox[i,j,k].complex THEN
-					v:=blox[i,j,k]; 
-					IF v.copyonstroke THEN 
-						copy:=Base.VoxelFromName(v.code);
-						copy.copyonstroke:=FALSE;
-						blox[i,j,k]:=copy;
-					END;
-					blox[i,j,k].strokerec(p, resolution,nextscale,voxel,vu)	
+				IF  blox[i,j,k].copyonstroke THEN
+				(*	copy:=blox[i,j,k].deepcopy(); *)
+					v:=blox[i,j,k];
+					copy:= Base.VoxelFromName(v.code); 
+					copy.copyonstroke:=FALSE; 
+					blox[i,j,k]:=copy;
+					blox[i,j,k].strokerec(p, resolution,nextscale,voxel,vu);
+				ELSIF blox[i,j,k].complex THEN
+					blox[i,j,k].strokerec(p, resolution,nextscale,voxel,vu)
 				ELSE
 					NEW(c);
 					c.setcolor(red,green,blue,black,alpha);
-					c.imposter:=blox[i,j,k];	
-					blox[i,j,k].touch;
-					IF blox[i,j,k].emptysplit THEN 
-						FOR ii := 0 TO MMO DO FOR jj := 0 TO MMO DO FOR kk:= 0 TO MMO DO
-							NEW(c2);
-							c.blox[i,j,k]:=c2
-						END END END;
-					ELSE
-						c.fill(blox[i,j,k])
-					END;
+					c.fill(blox[i,j,k]);
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
 					c.strokerec(p, resolution,nextscale,voxel,vu);
@@ -726,21 +715,10 @@ END copy;
 PROCEDURE deepcopy*():Voxel;
 VAR	
 	c:cell;
-	child:Voxel;
+	cv,child:Voxel;
 	i,j,k: INTEGER;
 BEGIN
-	copyclear;
-	RETURN deepcopyrec()
-END deepcopy;
-
-PROCEDURE deepcopyrec*():Voxel;
-VAR	
-	c:cell;
-	child:Voxel;
-	i,j,k: INTEGER;
-BEGIN
-	NEW(c);
-	IF (~copymarker) & (code=NCODE)  THEN
+	IF code=NCODE THEN
 		copymarker:=TRUE;
 		NEW(c);
 		c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; c.alpha:=alpha;
@@ -749,16 +727,20 @@ BEGIN
 		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 			child:=blox[i,j,k]; 
 			IF (child#NIL) THEN
-				IF child.complex & (child.code = child.ncode) THEN 
-					 c.blox[i,j,k]:=child.deepcopy() 
+				IF ~child.copymarker THEN 
+					 c.blox[i,j,k]:=child.copy();
 				ELSE
 					c.blox[i,j,k]:=child
 				END
 			END
-		END END END;	
-	END;
-	RETURN c
-END deepcopyrec;
+		END END END;
+		copymarker:=FALSE;
+		RETURN c
+	ELSE
+		cv:= Base.VoxelFromName(code);
+		RETURN cv
+	END;	
+END deepcopy;
 
 PROCEDURE engrain(w: Streams.Writer); 
 VAR

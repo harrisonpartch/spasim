@@ -199,7 +199,6 @@ VAR
 	p: PT;
 BEGIN
 	stroke(Base.previousavatarPT,Base.avatarsize,avatarundo,voxundo);
-	avatarundo:=NIL;
 	stroke(Base.avatarPT,Base.avatarsize,Base.avatar,avatarundo);
 END drawavatar;
 
@@ -254,7 +253,7 @@ VAR
 	z10: Voxel;
 	sfish,gxy,w10,w11,v,lobster, btx,ash, dotz, GREEN,PURPLE,MCUBE:Voxel;
 	undo,rd,blu, die,gren,granite,sand,whiteblock,lazy,pdestroyer,axolotl,xen,sky1,sky2,tigerlily,cloud: Voxel;
-	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,harrison:Voxel;
+	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison:Voxel;
 	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,cage,floop,volvox,life,iml: Voxel;
 	 
 BEGIN
@@ -263,7 +262,7 @@ BEGIN
 	EMPTY.passable:=TRUE;
       rand:=Base.rand;	
 
-  	w10:=Base.VoxelFromName("NM2");	
+  	w10:=Base.VoxelFromName("NM3");	
  	z10:=Base.VoxelFromName("NM2");	
     
 	Out.String("EEEEP!");
@@ -271,7 +270,8 @@ BEGIN
 	push(xot);
 	xot2:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 	
 	push(xot2);
-	
+	msphere:=Base.VoxelFromName("NBsHFiBKkSckXBAd46Zbsss"); 	
+	push(msphere);	
  	volvox:=Base.VoxelFromName("Nrdvolvox");  	
        push(volvox);
 	beatrix:=Base.VoxelFromName("NwPicBWw4NfcserX4ELaQ3A"); 
@@ -327,7 +327,7 @@ BEGIN
 	push(die);
 	granite:=Base.VoxelFromName("NH6nvNlOJNlCtpkDB56ljSw"); 	
 	push(granite);
-	sand:=Base.VoxelFromName("NnTJ6nDktAth4WTAUdr8HYQ"); 		
+	sand:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw"); 		
 	push(sand);
 	blacksun:=Base.VoxelFromName("NGNYAfkxmEzxe6ZESmcMJtw"); 	
 	push(blacksun);
@@ -393,9 +393,9 @@ BEGIN
 
 	NEW(noise);		
 	noise.seed:=123666;		
-	noise.a:=3;
+	noise.a:=1;
 	noise.b:=3;
-	noise.c:=3;		
+	noise.c:=1;		
 	noise.octaves:=4;
 	noise.setvoxel(axolotl);
 	noise.persistence:=4;
@@ -405,15 +405,15 @@ BEGIN
 	NEW(plane,center,up);
 	plane.vox:=serp;
 	Out.String("EEEEP!"); 				
-	gorge.FRaster(plane,32);
-	gorge.FRaster(noise,64); 	
-	gorge.FRaster(tnoise,64); 
+(*	z10.FRaster(noise,128); 	
+	z10.FRaster(tnoise,128);  
+*)	z10.FRaster(plane,32);
 	z10.setcolor(1,0,0,0,0); 	
 	gorge.setcolor(0,1,0,1,0);
-	w10.stroke(center,30,z10,undo);
-	Base.world:=gorge; 	
-	Base.avatar:=xot;
-	Base.avatarsize:=1000;
+	z10.stroke(center,30,z10,undo);
+	Base.world:=z10; 	
+	Base.avatar:=conglomerate;
+	Base.avatarsize:=10000;
 (*	engrain; 
 	sprout; *)
 	Out.String("EEEEP!");
@@ -429,7 +429,7 @@ PROCEDURE lighten*;
 BEGIN
 	IF atmdark>0.11 THEN atmdark:= atmdark/1.5 END;
 	Base.world.setcolor(0,0,atmdark,atmdark,atmdark);	
-END lighten;
+END lighten
 
 BEGIN
 	NEW(marshv);

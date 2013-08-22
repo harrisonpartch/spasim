@@ -6544,12 +6544,6 @@ BEGIN
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglUseFontBitmapsA', SYSTEM.VAL(ADDRESS, wglUseFontBitmaps));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglUseFontOutlinesA', SYSTEM.VAL(ADDRESS, wglUseFontOutlines));
 	    *)
-
-	    KernelLog.String(GL_LibName); KernelLog.String(" loaded.");  KernelLog.Ln;
-END InitOpenGL;
-
-PROCEDURE ReadOpenGLCore*;
-BEGIN
 	(*! GL_VERSION_1_0 *)
 	CullFace := SYSTEM.VAL(TglCullFace, GetProcAddress('glCullFace'));
 	FrontFace := SYSTEM.VAL(TglFrontFace, GetProcAddress('glFrontFace'));
@@ -6888,8 +6882,15 @@ BEGIN
 	Vertex4iv := SYSTEM.VAL(TglVertex4iv, GetProcAddress('glVertex4iv'));
 	Vertex4s := SYSTEM.VAL(TglVertex4s, GetProcAddress('glVertex4s'));
 	Vertex4sv := SYSTEM.VAL(TglVertex4sv, GetProcAddress('glVertex4sv'));
-	VertexPointer := SYSTEM.VAL(TglVertexPointer, GetProcAddress('glVertexPointer'));
+	VertexPointer := SYSTEM.VAL(TglVertexPointer, GetProcAddress('glVertexPointer'));	
 	(*! endif  *)
+
+	    KernelLog.String(GL_LibName); KernelLog.String(" loaded.");  KernelLog.Ln;
+END InitOpenGL;
+
+PROCEDURE ReadOpenGLCore*;
+BEGIN
+	
 	(* GL_VERSION_1_2  *)
 	BlendColor := SYSTEM.VAL(TglBlendColor, GetProcAddress('glBlendColor'));
 	BlendEquation := SYSTEM.VAL(TglBlendEquation, GetProcAddress('glBlendEquation'));

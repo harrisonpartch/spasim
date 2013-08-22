@@ -1,5 +1,5 @@
 MODULE NM5;
-IMPORT Base, XNXLE, XNXLFRep, Math, Out := KernelLog, Debugging, Streams,Strings;
+IMPORT Base, XNXLE, XNXLNoise, XNXLFRep, Math, Out := KernelLog, Debugging, Streams,Strings;
 
 CONST M=5;
 	MMO=M-1;
@@ -39,11 +39,14 @@ VAR
 BEGIN
 	ray.scale := ray.scale*M;
 	scaleInv := 1/ray.scale;
-	xyz.x := ABS(ray.lxyz.x-offset.x) * M  - ray.ddxyz.x;  
-	xyz.y := ABS(ray.lxyz.y-offset.y) * M  - ray.ddxyz.y;		
-	xyz.z := ABS(ray.lxyz.z-offset.z)* M  - ray.ddxyz.z;	
+	xyz.x := ABS(ray.lxyz.x-offset.x) * M;  
+	xyz.y := ABS(ray.lxyz.y-offset.y) * M;		
+	xyz.z := ABS(ray.lxyz.z-offset.z)* M;	
 	pushxyz:=xyz;	
-	IF (ray.length*ray.scale>ray.dtl) THEN
+(*	IF DTL>0 THEN 
+		ray.dtl:=DTL;
+	END;
+*)	IF (ray.length*ray.scale>ray.dtl) THEN
 		IF imposter#NIL THEN
 			imposter.Shade(ray)
 		END	
@@ -126,23 +129,20 @@ BEGIN
 					ray.face := 5; ray.fnormal:= Base.Face[5]
 				END;
 				newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
-			END;
-			ray.len.x:=ray.len.x+ABS(newxyz.x-xyz.x)*scaleInv;
-			ray.len.y:=ray.len.y+ABS(newxyz.y-xyz.y)*scaleInv;
-			ray.len.z:=ray.len.z+ABS(newxyz.z-xyz.z)*scaleInv;		
+			END;	
 			vdepth:=Base.distance(newxyz,xyz)*scaleInv; 
 			ray.xyz.x:=ray.xyz.x +((newxyz.x-xyz.x)+ray.ddxyz.x)*scaleInv;
 			ray.xyz.y:=ray.xyz.y +((newxyz.y-xyz.y)+ray.ddxyz.y)*scaleInv;			
 			ray.xyz.z:=ray.xyz.z +((newxyz.z-xyz.z)+ray.ddxyz.z)*scaleInv;			
 			xyz:=newxyz;
 			ray.length:=ray.length+vdepth;
-			blr:=black*vdepth*ray.length;
+			blr:=black*vdepth;
 			ray.bla := ray.bla-blr; 
-			bounds(ijk.i,ijk.j,ijk.k, out);
+
 			IF ray.bla>0.01 THEN	
-				rr := red*vdepth*ray.ra*ray.length; 
-				gr := green*vdepth*ray.ga*ray.length; 
-				br := blue*vdepth*ray.ba*ray.length; 	
+				rr := red*vdepth*ray.ra; 
+				gr := green*vdepth*ray.ga; 
+				br := blue*vdepth*ray.ba; 	
 				ray.r := ray.r+rr;
 				ray.g:= ray.g+gr;
 				ray.b := ray.b+br; 
@@ -162,6 +162,7 @@ BEGIN
 				ray.ba := (ray.ba-br)-blr; 				
 				out:=TRUE
 			END;
+			bounds(ijk.i,ijk.j,ijk.k, out);			
 			IF ~out THEN
 				v := blox[ijk.i,ijk.j,ijk.k];		
 				IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal; ray.normalTF:= TRUE ELSE ray.normal:=ray.fnormal; ray.normalTF:=FALSE  END;
@@ -170,7 +171,8 @@ BEGIN
 					ray.lxyz.y := ABS(xyz.y - ijk.j);
 					ray.lxyz.z := ABS(xyz.z - ijk.k);
 					ray.popdelta := Base.Origin; (* because many shaders don't set it and it *)
-					ray.normalTF:=nbloxTF[ijk.i,ijk.j,ijk.k];
+					ray.ncube:=nblox[ijk.i,ijk.j,ijk.k];
+					ray.ncubeTF:=nbloxTF[ijk.i,ijk.j,ijk.k];
 					v.Shade(ray);	
 					xyz.x := xyz.x + ray.popdelta.x;    
 					xyz.y := xyz.y + ray.popdelta.y;
@@ -327,7 +329,6 @@ VAR
 	i,j,k: INTEGER;
 BEGIN
 	copymarker:=TRUE;
-	colored:=TRUE;	
 	red:= r;
 	green := g;
 	blue := b;
@@ -461,7 +462,6 @@ BEGIN
 					v:=blox[i,j,k]; 
 					IF v.copyonstroke THEN 
 						copy:=Base.VoxelFromName(v.code);
-						copy.copyonstroke:=FALSE;
 						blox[i,j,k]:=copy;
 					END;
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel,vu)	
@@ -745,6 +745,10 @@ BEGIN
 		c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; c.alpha:=alpha;
 		c.nbloxTF:=nbloxTF;
 		c.nblox:=nblox;
+		c.copyonstroke:=copyonstroke;
+		c.lockTF:=lockTF;
+		c.frozen:=frozen; 
+		c.probelock:=probelock;
 		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 			child:=blox[i,j,k]; 
 			IF (child#NIL) THEN

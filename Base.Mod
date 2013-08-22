@@ -1,14 +1,12 @@
 MODULE Base;
 
-IMPORT  Math:=Math, Random, Kernel, Out:=KernelLog (*DebugLog*), Objects, XNXL, 
+IMPORT  Math:=Math, Random, Kernel, Out:=KernelLog (*DebugLog*), Objects,  
 Strings, Streams, WMFontManager, Raster, Graphics := WMGraphics, Commands(*, XNXLAudio*);
 
 CONST
-	W*=XNXL.W;
-	H*=XNXL.H;
 	BPS*=3; 
 	NL*=24;
-	
+
 TYPE Name*=ARRAY NL OF CHAR;
 
 TYPE Pixel*=Raster.Pixel;
@@ -135,7 +133,7 @@ BEGIN
 	RETURN c
 END pixelT;
 
-	
+
 END Texture;
 
 TYPE TexCube*=OBJECT(V)
@@ -181,6 +179,8 @@ TYPE Ray* = RECORD
 	cellred*,cellgreen*,cellblue*,cellblack*: REAL;
 	texcube*:TexCube;
 	texcubeTF*:BOOLEAN;
+	ncube*: NCube;
+	ncubeTF*: BOOLEAN;
 	r*, g*, b*, ra*, ga*, ba*, bla*,ulfire*: REAL; (* ulfire is an invisible color *)
 	rgb*: ARRAY 3,3 OF BPE;
 	terminate*: BOOLEAN;
@@ -212,7 +212,7 @@ VAR
 	code*,ncode*:Name;  
 	tscale*: PT;
 	red*,green*,blue*,black*,alpha*: REAL;
-	colored*,frozen*,probelock*,copyonstroke*:BOOLEAN;
+	colored*,frozen*,probelock*,copyonstroke*,copyonstrokerecursion*:BOOLEAN;
 	offset*:PT;
 	lightcube*:LightCube;
 PROCEDURE Shade*(VAR ray: Ray);
@@ -368,7 +368,7 @@ VAR
 	mir*: REAL;
 	cxolor*:Color;
 	allowdeath*,passable*:BOOLEAN;
-	
+
 PROCEDURE in*(p:PT):BOOLEAN;
 BEGIN
 	RETURN FALSE
@@ -481,7 +481,7 @@ VAR
 	DTL*,DTL2*: REAL;
 	frameblack*:REAL;
 	avatar*:Voxel;
-	avatarsize*: INTEGER;
+	avatarsize*: LONGINT;
 	cursordist*:REAL;
 	RVR*:BOOLEAN;
 	vlist*: ARRAY 100 OF Voxel;
@@ -489,7 +489,7 @@ VAR
 	skydistance*:REAL;
 	rnf*:REAL; (*random number for frame*);
 	sniperay*:Ray;
-	
+
 PROCEDURE VoxelFromName*(modname: Name): Voxel;
 	VAR voxel: Voxel;  fackery: VoxelFackery;
 	BEGIN
@@ -545,7 +545,7 @@ BEGIN
 	cursorPT.x:=x+a; cursorPT.y:=y+b; cursorPT.z:=z+c; 
 	avatarPT.x:=x+d; avatarPT.y:=y+e; avatarPT.z:=z+f; 
 END updatecamera;
-	
+
 PROCEDURE clearvoxelist*;
 VAR i: INTEGER;
 BEGIN
