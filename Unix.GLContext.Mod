@@ -148,9 +148,9 @@ TYPE Context* = OBJECT
 	 VAR res: LONGINT;
 	 BEGIN
 		Machine.Acquire( Machine.X11 );
-		GL.glXWaitX();
+(*		GL.glXWaitX();
 		X11.Sync(glWin.display,X11.False);
-
+*)
 		res := GL.glXMakeCurrent(glWin.display, glWin.win, glWin.glctx);
 		 IF debug THEN KernelLog.String(" MakeCurrent:"); KernelLog.Boolean(res=1); KernelLog.Ln; END;
 
@@ -172,9 +172,9 @@ TYPE Context* = OBJECT
  	VAR res: LONGINT;
  	BEGIN
 		Machine.Acquire( Machine.X11 );
-		GL.glXWaitX();
+(*		GL.glXWaitX();
 		X11.Sync(glWin.display,X11.False);
-
+*)
 		res := GL.glXMakeCurrent(glWin.display, 0, 0);
 		IF debug THEN KernelLog.String(" DeActivate:"); KernelLog.Boolean(res=1); KernelLog.Ln; END;
 		Machine.Release( Machine.X11 );
@@ -222,8 +222,8 @@ TYPE Context* = OBJECT
 		w := image.width;
 		h := image.height;
 		Machine.Acquire( Machine.X11 );
-		GL.glXWaitX();
-		X11.Sync(glWin.display,X11.False);
+(*		GL.glXWaitX();
+		X11.Sync(glWin.display,X11.False);*)
 		GL.ReadPixels(0, 0, w, h, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, ADDRESSOF(buffer^[0]));
 		Machine.Release( Machine.X11 );
 

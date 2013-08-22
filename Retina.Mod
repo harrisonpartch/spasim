@@ -1,17 +1,17 @@
 MODULE Retina;
-IMPORT  XNXL, Base, Objects, Kernel, Out:=KernelLog, GLC := OpenGLConst, XNXLNoise,
+IMPORT  Base, Objects, Kernel, Out:=KernelLog, XNXLNoise,
 Math, XNXLMath, Raster, Graphics:=WMGraphics;
 
 TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=4;        
-	TS=5*16;   (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
-	TW=6;
-	TH=4;
+	T=3;        
+	TS=5*8;   (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
+	TW=12;
+	TH=8;
 	W*=TS*TW;
-	H*=TS*TH
+	H*=TS*TH;
 
 TYPE Camera= RECORD			(* solid angle *)
 	dtheta, dphi, theta, phi,rphi:REAL;
@@ -420,7 +420,9 @@ END lsd;
 
 BEGIN
 	Out.String("Retina loading...");
-	image := Graphics.LoadImage("Lenna.png", FALSE);
+	Raster.InitMode(copy,Raster.srcCopy);
+	
+	image := Graphics.LoadImage("granite.jpg", FALSE);
 	FOR a:= 0 TO TW-1  DO
 		FOR b:= 0 TO TH-1 DO
 			NEW(tile[a,b]);
@@ -430,7 +432,6 @@ BEGIN
 	AFTER:=2;
  	FAST:=3;
  	lsense:=0.2;
-	Raster.InitMode(copy,Raster.srcCopy);
  	aperture.width:=1;
  	aperture.height:=1;
  	foveaparameter:=23;

@@ -1,47 +1,32 @@
 <Desktop>
-	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="-1" t="29" r="496" b="796" flags="{0..2}"/>
-	<Window name="FileManager" loader="WMFileManager.Restore" l="991" t="667" r="1399" b="852" flags="{0..2}"/>
-	<Window name="WMSearchTool" loader="WMSearchTool.Restore" l="104" t="118" r="804" b="618" flags="{0..2}"/>
-	<Window name="PET" loader="PET.Restore" l="645" t="59" r="1445" b="659" flags="{0..2}">
+	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="30" t="94" r="485" b="416" flags="{0..2}"/>
+	<Window name="WMTextTool" loader="WMTextTool.Restore" l="50" t="120" r="172" b="340" flags="{0..3}"/>
+	<Window name="PET" loader="PET.Restore" l="256" t="36" r="1179" b="800" flags="{0..2}">
 		<PETData>
-			<General SelectedPageNr="5" ProjectTextFile=""/>
+			<General SelectedPageNr="0" ProjectTextFile=""/>
 			<Tab file="Spasim.Tool" codecFormat="BBT" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="36" cursorPos="1241"/>
+				<Editor firstLine="45" cursorPos="1334"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
-				<SidePanel visible="true" width="25" scratchHeight="10"/>
+				<SidePanel visible="true" width="169" scratchHeight="10"/>
+			</Tab>
+			<Tab file="Retina.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="435" cursorPos="9695"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="163" scratchHeight="10"/>
 			</Tab>
 			<Tab file="Render.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="819" cursorPos="23070"/>
+				<Editor firstLine="0" cursorPos="120"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="10"/>
+				<SidePanel visible="true" width="184" scratchHeight="10"/>
 			</Tab>
-			<Tab file="NXWCxXWLIcD2LegvoGXXBiQ.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="0"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="134" scratchHeight="10"/>
-			</Tab>
-			<Tab file="NnviGAernhjFK40xASZZVoQ.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="12" cursorPos="366"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="119"/>
-			</Tab>
-			<Tab file="NM3.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="175"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="128" scratchHeight="10"/>
-			</Tab>
-			<Tab file="NIqy3HQ4ZK8iRwAXelYYnsQ.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="0"/>
+			<Tab file="Marsh.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="381" cursorPos="9103"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>

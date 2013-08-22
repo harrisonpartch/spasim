@@ -1,8 +1,8 @@
 MODULE WMGLWindow; (** AUTHOR "fnecati"; PURPOSE "an OpenGL Context enabled WM.Window using GLXPixmap for LinuxAos"; *)
-(*! Hidden context  *)
+(*! test resizing traps,Hidden context  *)
 IMPORT
 	Machine, X11, Api:=X11Api, GL:=OpenGL, GLC := OpenGLConst, Raster,
-	WM := WMWindowManager, KernelLog;
+	WM := WMWindowManager, WMGraphics, KernelLog;
 
 CONST debug = FALSE;
 
@@ -24,7 +24,7 @@ TYPE Context = OBJECT
 	 	buffer: Buffer; (* for speedup flip image in y*)
 	 	rastermode: Raster.Mode;
 		width-, height-: LONGINT;
-
+		inited: BOOLEAN;
 	PROCEDURE Init(w, h: LONGINT);
 	VAR
 		res: LONGINT;
@@ -125,14 +125,13 @@ TYPE Context = OBJECT
 		Raster.InitMode(rastermode, Raster.srcCopy);
 
 (*		GL.ReadOpenGLCore; *)
-
+		BEGIN {EXCLUSIVE} inited := TRUE; END;
 	END Init;
 
 	(** *)
 	PROCEDURE CreatePixmaps(w, h: LONGINT): BOOLEAN;
-	VAR
 	BEGIN
-
+		
 		Machine.Acquire( Machine.X11 );
 		(* first delete these, do we have a gxpixmap *)
 		IF glWin.glxpixmap # 0 THEN
@@ -170,10 +169,10 @@ TYPE Context = OBJECT
 	PROCEDURE MakeCurrent();
 	 VAR res: LONGINT;
 	 BEGIN 
-	(* 	Machine.Acquire( Machine.X11 );*)
+	 	Machine.Acquire( Machine.X11 );
 		res := GL.glXMakeCurrent(glWin.display, glWin.glxpixmap, glWin.glctx);
 		 IF debug THEN KernelLog.String(" MakeCurrent:"); KernelLog.Boolean(res=1); KernelLog.Ln; END;
-	(* Machine.Release( Machine.X11 ); *)
+	 Machine.Release( Machine.X11 ); 
 	END MakeCurrent;
 
 	PROCEDURE SwapBuffers;
@@ -190,10 +189,10 @@ TYPE Context = OBJECT
 	PROCEDURE DeActivate();
  	VAR res: LONGINT;
  	BEGIN
-	(*	Machine.Acquire( Machine.X11 ); *)
+		Machine.Acquire( Machine.X11 ); 
 		res := GL.glXMakeCurrent(glWin.display, 0, 0);
 		IF debug THEN KernelLog.String(" DeActivate:"); KernelLog.Boolean(res=1); KernelLog.Ln; END;
-	(*	Machine.Release( Machine.X11 ); *)
+		Machine.Release( Machine.X11 ); 
 	END DeActivate;
 
 		(** Close the window *)
@@ -237,15 +236,19 @@ TYPE Context = OBJECT
  	END CloseWindow;
 
 
-	PROCEDURE Resize(w, h: LONGINT);
-	BEGIN {EXCLUSIVE}
-		IF (w = width) & (h=height) THEN RETURN END;
-		width := w; height := h;
-		buffer := NIL;
-		NEW(buffer, w*h*4);
-		IF ~ CreatePixmaps(w, h) THEN
-			Close;
-		END;
+	PROCEDURE Resize(w, h: LONGINT): BOOLEAN;
+	VAR res: BOOLEAN;
+	BEGIN (*{EXCLUSIVE}*)
+		IF (w = width) & (h=height) THEN RETURN FALSE END;
+		
+		(*buffer := NIL;*)
+		res := FALSE;		
+		IF  CreatePixmaps(w, h) THEN 
+			NEW(buffer, w*h*4);
+			width := w; height := h;
+				res := TRUE; 
+			END;
+		RETURN res;
 	END Resize;
 
 	PROCEDURE RenderInto(image: Raster.Image);
@@ -253,17 +256,18 @@ TYPE Context = OBJECT
 		i: LONGINT;
 		w, h: LONGINT;
 	BEGIN
+		IF (image = NIL) OR (image.adr = NIL) THEN RETURN END;
 		w := image.width;
 		h := image.height;
 		Machine.Acquire( Machine.X11 );		
-		GL.ReadPixels(0, 0, w, h, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, ADDRESSOF(buffer^[0])); 
-		Machine.Release( Machine.X11 ); 
+		GL.ReadPixels(0, 0, w, h, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, ADDRESSOF(buffer[0])); 
+		
 
 		(* flip vertical, y *)
 		FOR i := 0 TO h - 1 DO
 			Raster.PutPixels(image, 0, h-1-i, w, Raster.BGRA8888, buffer^, i * w * 4, rastermode)
-		END
-		
+		END;
+		Machine.Release( Machine.X11 ); 
 	END RenderInto;
 
 	(** *)
@@ -278,14 +282,14 @@ END Context;
 
 	Window* =  OBJECT(WM.DoubleBufferWindow)
 	VAR
-		context : Context;
+		context{UNTRACED} : Context;
 
 		PROCEDURE &Init(w, h: LONGINT; alpha: BOOLEAN);
 		BEGIN
 			Init^(w, h, alpha); (* use alpha, for 32bpp img *)
 			NEW(context);
 			context.Init(w, h);
-
+			BEGIN {EXCLUSIVE} AWAIT(context.inited); END;
 		END Init;
 
 		(** *)
@@ -317,12 +321,30 @@ END Context;
 		PROCEDURE UpdateImage*();
 		END UpdateImage;
 
-		PROCEDURE Resized(w, h: LONGINT);
+	(*	(** *)
+		PROCEDURE Resizing*(VAR w, h: LONGINT);
+		VAR
 		BEGIN
-			context.Resize(w, h);
+			Resizing^(w, h);
+			KernelLog.String("w= "); KernelLog.Int(w, 0); KernelLog.Int(h, 5); KernelLog.Ln; 
+		END Resizing;
+	*)	
+	(*
+	PROCEDURE Draw*(canvas : WMGraphics.Canvas; w, h, q : LONGINT);
+	BEGIN
+		Draw^(canvas, w, h, 0);
+	END Draw;
+	*)
+		PROCEDURE Resized*(w, h: LONGINT);
+		BEGIN 
+			
+			IF (backImg = NIL) OR (backImg.adr=NIL) THEN RETURN END;
 			ReInit(w, h);
-			Reshape(w, h);
-			UpdateImage;
+			IF context.Resize(w, h) THEN
+				
+				Reshape(w, h);
+				 UpdateImage;
+			END;	 
 		END Resized;
 
 		PROCEDURE GetDisplay*(): LONGINT;

@@ -1,7 +1,7 @@
 MODULE Decoder3DS; (** AUTHOR "fnecati"; PURPOSE "a simple 3ds model loader"; *)
-
-IMPORT KernelLog, Files, Strings, Lists, Commands, Math, Streams, Reals, WMGraphics, Raster,
-	GLC := OpenGLConst, GL := OpenGL, GLU, SYSTEM;
+(*! uses Containers instead of List *)
+IMPORT KernelLog, Files, Strings, Containers, Commands, Math, Streams, Reals, WMGraphics, Raster,
+	GLC := OpenGLConst, GL := OpenGL, GLU;
 
 CONST
 	debug = FALSE; (* for writing chunk values *)
@@ -113,7 +113,7 @@ MAIN3DS  = 4D4DH;
 	  COL_UNK = 00013H; (* unknown *)
 
 TYPE
-	List = Lists.List;
+	List = Containers.Vector;
 
 (*
 (* Here is our structure for our 3DS indicies (since .3DS stores 4 unsigned shorts) *)

@@ -28,8 +28,8 @@ BEGIN
 	END;
 END ncompile;
 
-END NCompiler.ncompile 
+END NCompiler.ncompile ~
 
-SystemTools.Free XNXLNCompiler
+SystemTools.Free NCompiler ~
 
  

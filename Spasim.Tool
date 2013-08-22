@@ -2,9 +2,41 @@
 <?bluebottle format version="0.1" ?>
 <?xml-stylesheet type="text/xsl" href="http://bluebottle.ethz.ch/bluebottle.xsl" ?>
 <Text>
-<Span style="Normal"><![CDATA[Run the commands in green below by middle-mouse-clicking.
+<Span style="Normal"><![CDATA[
+]]></Span><Span style="Bold"><![CDATA[# WinAos]]></Span><Span style="Normal"><![CDATA[
+]]></Span><Span style="Bold"><![CDATA[Compiler.Compile]]></Span><Span style="Normal"><![CDATA[
+	 OpenGLConst.Mod
+	 Win32.OpenGL.Mod
+	 Win32.GLU.Mod
+	 WinApi.Mod
+	 Win32.OGLWindow.Mod
+	 GLShaderUtils.Mod
+	 Win32.GLContext.Mod
+	 Win32.WGLinfo.Mod
+	~
 
-]]></Span><Span style="AdHoc Oberon 12 1 0 A7F00FF 0000000"><![CDATA[Compiler.Compile]]></Span><Span style="AdHoc Oberon 12 0 0 A7F00FF 0000000"><![CDATA[ ]]></Span><Span style="Normal"><![CDATA[
+	WGLinfo.Do ~
+	
+# for WinAos add spasim directory to aos.ini or myaos.ini search path:
+# Paths.Search = Work;spasim;obj;../source;PELinker;../UnixAos;vy.ants/source;vy.ants/documents
+
+
+# LinuxAos
+]]></Span><Span style="Bold"><![CDATA[Compiler.Compile]]></Span><Span style="Normal"><![CDATA[
+	OpenGLConst.Mod
+	Unix.OpenGL.Mod
+	Unix.GLU.Mod
+	Unix.OGLWindow.Mod
+	GLShaderUtils.Mod
+ 	Unix.X11KeySymDef.Mod
+ 	Unix.XF86VMode.Mod
+ 	Unix.GLContext.Mod
+ 	Unix.GLXinfo.Mod 	
+	~
+
+GLXinfo.Do ~ 
+
+]]></Span><Span style="Bold"><![CDATA[Compiler.Compile]]></Span><Span style="Normal"><![CDATA[
 Base.Mod
 XNXLE.Mod 
 XNXLMath.Mod
@@ -22,34 +54,50 @@ XNXLRotaVox.Mod
 Engrainer.Mod
 Saboteur.Mod
 NCompiler.Mod
-XNXLVoxConsole.Mod 
 Marsh.Mod
+OGLWindow.Mod
 Render.Mod ~
 
-The compile command stops looking for arguments when it encounters the tilde ~ 
-]]></Span><Span style="AdHoc Oberon 12 1 0 A7F00FF 0000000"><![CDATA[
-NCompiler.ncompile]]></Span><Span style="Normal"><![CDATA[ ~
+]]></Span><Span style="AdHoc Oberon 10 0 0 F00BFFF 0000000"><![CDATA[The compile command stops looking for arguments when it encounters the tilde ]]></Span><Span style="Normal"><![CDATA[~ 
 
-ncompile compiles the "anonymous" modules. See the tail of the kernel log.
+]]></Span><Span style="Bold"><![CDATA[NCompiler.ncompile]]></Span><Span style="Normal"><![CDATA[ ~
+]]></Span><Span style="AdHoc Oberon 10 0 0 F00BFFF 0000000"><![CDATA[
+ncompile compiles the "anonymous" modules. See the tail of the kernel log. If the files are not shown as compiled, open 
+NCompiler.Mod, compile it with the button, and run the command again.]]></Span><Span style="Normal"><![CDATA[
 
-]]></Span><Span style="AdHoc Oberon 12 1 0 A7F00FF 0000000"><![CDATA[Render.Open]]></Span><Span style="Normal"><![CDATA[ ~
+]]></Span><Span style="Bold"><![CDATA[SystemTools.FreeDownTo	Base ]]></Span><Span style="Normal"><![CDATA[~
+]]></Span><Span style="AdHoc Oberon 10 0 0 F00BFFF 0000000"><![CDATA[
+Modules must be freed to force their reloading after being changed and recompiled, or to return them to their original state. ]]></Span><Span style="Normal"><![CDATA[
 
-this is the 
+]]></Span><Span style="Bold"><![CDATA[Render.Open]]></Span><Span style="Normal"><![CDATA[ ~
 
-]]></Span><Span style="AdHoc Oberon 12 1 0 A7F00FF 0000000"><![CDATA[SystemTools.FreeDownTo Base]]></Span><Span style="Normal"><![CDATA[~
+XNXLVoxConsole.Mod
+FRep.Mod
+Marsh.Mod
 
-Modules must be freed to force their reloading after being changed and recompiled. 
+OGLRender.Mod
+~
 
-]]></Span><Span style="Bold"><![CDATA[Format: ]]></Span><Span style="Normal"><![CDATA[the format menu is important. UTF-8 can be opened in Linux; BBT cannot. The 
-*Mod files are all saved as UTF-8 so that they can be seen at Github. This text, Spasim.Tool,
-is saved as BBT.
+SystemTools.Show Time elapsed: ~ SystemTools.Ln ~
+SystemTools.Timer elapsed ~ SystemTools.Ln ~~
 
-]]></Span><Span style="AdHoc Oberon 12 1 0 F0055FF 0000000"><![CDATA[
-]]></Span><Span style="Debug"><![CDATA[*********************************************************************************************]]></Span><Span style="Normal"><![CDATA[
+# *********************************
+
+
+
+NanonyPET.Open NanonyPET.Mod ~  does not compile
+XNXLLifeVox.Mod		''	''
+XNXLSierp.Mod		''	''
+
+MyXGear.Open 
 
 
 OpenAL.Tool
 OpenGL.Tool
+
+
+======
+Clipboard.Install
 
 XNXLAudio.Mod
 
@@ -67,7 +115,6 @@ NnviGAernhjFK40xASZZVoQ.Mod
 NXWCxXWLIcD2LegvoGXXBiQ.Mod
 NnKyXYNiHwdxuM6wHrbxwuQ.Mod
 NBsHFiBKkSckXBAd46ZbEQw.Mod
-]]></Span><Span style="Normal"><![CDATA[NIqy3HQ4ZK8iRwAXelYYnsQ.Mod]]></Span><Span style="Normal"><![CDATA[
 
 ]]></Span>
 

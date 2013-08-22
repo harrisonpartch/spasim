@@ -403,11 +403,11 @@ BEGIN
 	Base.setPT(up,0,0,-1);
 	Base.setPT(center,1/2,1/2,11/12);
 	NEW(plane,center,up);
-	plane.vox:=serp;
+	plane.vox:=sand;
 	Out.String("EEEEP!"); 				
-	z10.FRaster(noise,128); 	
+(*	z10.FRaster(noise,128); 	
 	z10.FRaster(tnoise,128);  
-	z10.FRaster(plane,32);
+*)	z10.FRaster(plane,32);
 	z10.setcolor(1,0,0,0,0); 	
 	gorge.setcolor(0,1,0,1,0);
 	z10.stroke(center,30,z10,undo);

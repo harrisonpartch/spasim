@@ -35,7 +35,7 @@ VAR
 (** OpenGL enabled Window Object *)
 TYPE Window* = OBJECT
 VAR
-	fpstimer, idletimer : Kernel.MilliTimer;
+	fpstimer-, idletimer : Kernel.MilliTimer;
 
 	(* window variables *)
 	display: X11.DisplayPtr;
@@ -57,9 +57,11 @@ VAR
 	fullscreen-, fullwindow-, decorations-: BOOLEAN;
 	gamemode-: BOOLEAN; (** if true poll Display procedure *)
 	hidecursor-: BOOLEAN; (** hide/show cursor *)
+	currentfms-: LONGINT; (* current frame update time *)
+	noCursor: X11.Cursor;
 	wmDelete : X11.Atom;
 	wmstate, wmfullscreen: X11.Atom;
-
+	
 	(** constructor, initlialize window object, fs: fullscale: true/false *)
 	PROCEDURE & Init*(w, h, l, t: LONGINT; fs: BOOLEAN);
 	BEGIN
@@ -78,8 +80,8 @@ VAR
 
 	(** Close the window *)
 	PROCEDURE Close*;
-	BEGIN {EXCLUSIVE}
-		active := FALSE;
+	BEGIN
+		active := FALSE;		
 	END Close;
 
 	(** abstract: reshape GL window, called while resizing the window *)
@@ -185,7 +187,7 @@ VAR
 	END MoveResizeWindow;
 
 	(* close the window and its resources *)
-	 PROCEDURE CloseWindow;
+	 PROCEDURE CloseWindow*();
 	  VAR res: LONGINT;
 	 BEGIN
 
@@ -220,7 +222,23 @@ VAR
 			Modules.Shutdown( Modules.Reboot );
 		END;
 	 END CloseWindow;
-
+(*
+	PROCEDURE DefineNoCursor();
+		fg : X11.Color;
+		pixmap: X11.Pixmap;
+		data: ARRAY 8 OF CHAR;
+		i : LONGINT;
+	BEGIN
+			fg.red := 0;  fg.green := 0;  fg.blue :=0;
+			FOR i:=0 TO 7 DO data[i] := 0X  END;
+			pixmap := X11.CreateBitmapFromData( display, win, ADDRESSOF( data[0] ), 8, 8 );
+			noCursor := X11.CreatePixmapCursor( display, pixmap, pixmap, ADDRESSOF( fg ), ADDRESSOF( fg ), 0, 0 );
+			X11.DefineCursor( display, win, noCursor );
+			Api.FreeCursor(display, noCursor);
+			X11.FreePixmap(display, pixmap);
+		END;
+	END DefineNoCursor;
+	*)
 	(** make null cursor for mouse pointer *)
 	PROCEDURE HideMousePointer*(hide: BOOLEAN);
 	VAR
@@ -230,7 +248,7 @@ VAR
 		data: ARRAY 8 OF CHAR;
 		i : LONGINT;
 	BEGIN
-		IF hide = hidecursor THEN RETURN END;
+	(*	IF hide = hidecursor THEN RETURN END; *)
 		hidecursor := hide;
 		IF hidecursor THEN
 			fg.red := 0;  fg.green := 0;  fg.blue :=0;
@@ -240,6 +258,8 @@ VAR
 			X11.DefineCursor( display, win, noCursor );
 			Api.FreeCursor(display, noCursor);
 			X11.FreePixmap(display, pixmap);
+		ELSE
+			X11.DefineCursor( display, win, Api.XC_X_cursor );	
 		END;
 	END HideMousePointer;
 
@@ -247,39 +267,48 @@ VAR
 	PROCEDURE SetMousePosition*(x, y: LONGINT);
 	BEGIN
 		Api.WarpPointer(display, win, win,  0, 0, width, height, x, height-y-1);
+		X11.Flush(display);
 	END SetMousePosition;
+
+	(** warp pointer to x,y *)
+	PROCEDURE WarpPointer*(w, h: LONGINT; x, y: LONGINT);
+	BEGIN
+		Api.WarpPointer( display, 0, win, 0,0, w, h, x, y);
+		(*X11.Flush(display);*)
+	END WarpPointer;
+
 
 	(** set title of the window *)
 	PROCEDURE SetTitle*(tit: ARRAY OF CHAR);
 	VAR res: LONGINT;
-	BEGIN {EXCLUSIVE}
+	BEGIN 
 		COPY(tit, title);
 		 res := Api.StoreName(display, win, title);
 	END SetTitle;
 
 	(** set idle time  for calling IdleDisplay proc *)
 	PROCEDURE SetIdleTime*(ms: LONGINT);
-	BEGIN {EXCLUSIVE}
-		IF ms < 1 THEN ms := 1 END;
+	BEGIN 
+		IF ms < 0 THEN ms := 0 END;
 		idletime := ms;
 	END SetIdleTime;
 
 	(** print # frames per second, true/false *)
 	PROCEDURE SetPrintFPS*(df: BOOLEAN);
-	BEGIN {EXCLUSIVE}
+	BEGIN 
 		debugframes := df;
 	END SetPrintFPS;
 
 	(** gm: TRUE-> Display procedure polled continuously *)
 	PROCEDURE SetGameMode*(gm: BOOLEAN);
-	BEGIN {EXCLUSIVE}
+	BEGIN 
 		gamemode := gm;
 	END SetGameMode;
 
 	(** interval=1: vertical sync to video update rate; interval=0: disable vsynch, full speed *)
 	PROCEDURE SetSwapInterval*(interval: LONGINT);
 	VAR bres: BOOLEAN;
-	BEGIN {EXCLUSIVE}
+	BEGIN 
 	(*
 		IF GL.glXSwapIntervalSGI # NIL THEN
 			 bres := GL.glxSwapIntervalSGI(interval);
@@ -433,7 +462,7 @@ VAR
 	END KeyState;
 
 	(* process pending X11 events for this window *)
-	PROCEDURE LoopForEvents;
+	PROCEDURE LoopForEvents*();
 	CONST bufsize=20;
 	VAR
 		event: Api.XEvent;
@@ -552,13 +581,14 @@ VAR
 				datal := SYSTEM.VAL( Api.Data40l, cm.data );
 				IF  SYSTEM.VAL( X11.Atom,datal[0] ) = wmDelete THEN
 					(* shutdown *)
-					active := FALSE;
+					Close;
 				END;
 			ELSE
 			END;
 	  	END;
 	END LoopForEvents;
 
+(*
 	(* if gamemode is enabled, call this proc in MainLoop. *)
 	PROCEDURE GameModeLoop();
 	BEGIN
@@ -585,6 +615,7 @@ VAR
 
 	END GameModeLoop;
 
+
 	(** windows main loop *)
 	PROCEDURE MainLoop*();
 	BEGIN
@@ -606,6 +637,73 @@ VAR
 				GameModeLoop();
 			END;
 			(* ------------ game mode ends ------------- *)
+		END;
+
+		CloseWindow();
+	END MainLoop;
+*)
+
+
+PROCEDURE GetCurrentFrameMs*():LONGINT;
+BEGIN 
+	RETURN currentfms;
+END GetCurrentFrameMs;
+
+(*  called in gamemode , use according to your needs *)
+PROCEDURE GameLogic*();
+BEGIN	
+END GameLogic;
+
+	(** windows main loop *)
+	PROCEDURE MainLoop*();
+		VAR fms,fmsum: LONGINT;
+		ft: ARRAY 10 OF LONGINT;
+		i,ii: LONGINT;	
+	BEGIN
+		MakeCurrent();
+	(*	GL.ReadOpenGLCore;*)
+ 
+		Reshape(width, height);
+		OnLoad;
+		
+		active := TRUE;
+		
+		WHILE  active  DO
+			i:=(i+1)MOD 10;
+			Kernel.SetTimer(fpstimer, 1000);
+			(* process X11 events *)
+			LoopForEvents;
+
+			(* ------------ game mode starts ------------- *)
+			IF gamemode THEN 
+				IF  idletime # 0 THEN
+					IF Kernel.Expired(idletimer) THEN
+						IdleDisplay;
+						Kernel.SetTimer(idletimer, idletime);	
+					END;	
+				ELSE
+					Display;
+				END;
+			END;
+
+			(* measure frame timing info, ms *)
+			IF gamemode & debugframes & (idletime = 0) THEN
+				ft[i]:=Kernel.Elapsed(fpstimer);
+				currentfms := ft[i];
+				
+				fmsum:=0;
+				FOR ii:=0 TO 9 DO
+					fmsum:=fmsum+ft[ii]
+				END;
+				fms:=fmsum DIV 10; 
+
+				GameLogic();
+	
+				IF i=9 THEN 	
+					fmsum:=0;
+					KernelLog.Int(fms, 6); KernelLog.String(" ms."); KernelLog.Ln
+				END;
+			END;	
 		END;
 
 		CloseWindow();
@@ -637,6 +735,8 @@ BEGIN
 	keySymbol[0A3H] := Inputs.KsPageDown;
 	keySymbol[0A8H] := Inputs.KsHome;
 	keySymbol[0A9H] := Inputs.KsEnd;
+	keySymbol[01BH] := Inputs.KsEscape;
+	
 	FOR i := 0F1H TO 0FCH DO keySymbol[i] := 0FFBEH + (i - 0F1H) END
 END InitKeysym;
 
@@ -650,3 +750,5 @@ BEGIN
 END OGLWindow.
 
 SystemTools.Free OGLWindow ~
+
+SystemTools.FreeDownTo OpenGL ~

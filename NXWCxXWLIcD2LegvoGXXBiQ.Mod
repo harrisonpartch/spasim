@@ -44,7 +44,8 @@ VAR
 	serp, subserp, beatrix,lobster,sparx: Voxel;
 	greenball: Voxel;
 	v: Voxel;
-	blue: Voxel;
+blue: Voxel;
+
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	beatrix:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw"); 
@@ -54,11 +55,14 @@ BEGIN
 	subserp:=Base.VoxelFromName("NM3"); 	
 	serp:=Base.VoxelFromName("NM3"); 	
 
+
 	subserp.DTL:=300;
 	subserp.imposter:=greenball;		
 
 	serp.DTL:=300;	
+
 (*	subserp.fill(subserp);*)
+
 	subserp.stroke(Base.mkPT(1/2,1/2,1/4),1,subserp,v);
 	subserp.stroke(Base.mkPT(1/2,1/2,3/4),1,subserp,v);
 	subserp.stroke(Base.mkPT(1/4,1/2,1/2),1,subserp,v);

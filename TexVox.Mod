@@ -1,5 +1,5 @@
 MODULE TexVox;
-IMPORT Base, XNXLAudio, XNXLMath, Noise:=XNXLNoise, XNXLFilmLoop, Raster, Graphics := WMGraphics, Random, Math,Out := KernelLog; 
+IMPORT Base, (*XNXLAudio, *)XNXLMath, Noise:=XNXLNoise, XNXLFilmLoop, Raster, Graphics := WMGraphics, Random, Math,Out := KernelLog; 
 
 TYPE PT = Base.PT;
 	Color = Base.Color;
