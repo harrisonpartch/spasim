@@ -44,21 +44,21 @@ VAR
 	serp, subserp, beatrix,lobster,sparx: Voxel;
 	greenball: Voxel;
 	v: Voxel;
-	blue: AlphaVox;
+	blue: Voxel;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	beatrix:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw"); 
 	lobster:=Base.VoxelFromName("NznGx2ySiHIGrO5t9Pzcw5Q"); 
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
+	blue:=Base.VoxelFromName("Ndiffuseblue"); 
 	subserp:=Base.VoxelFromName("NM3"); 	
 	serp:=Base.VoxelFromName("NM3"); 	
-	NEW(blue);
-	blue.setcolor(1/2,0,0,1/2,0);
+
 	subserp.DTL:=300;
 	subserp.imposter:=greenball;		
 
 	serp.DTL:=300;	
-	subserp.fill(subserp);
+(*	subserp.fill(subserp);*)
 	subserp.stroke(Base.mkPT(1/2,1/2,1/4),1,subserp,v);
 	subserp.stroke(Base.mkPT(1/2,1/2,3/4),1,subserp,v);
 	subserp.stroke(Base.mkPT(1/4,1/2,1/2),1,subserp,v);
@@ -69,20 +69,20 @@ BEGIN
 	subserp.stroke(Base.mkPT(0,0,0),1,beatrix,v);		
 	subserp.stroke(Base.mkPT(1,0,0),1,greenball,v);		
 	subserp.stroke(Base.mkPT(0,0,1),1,beatrix,v);		
-	subserp.stroke(Base.mkPT(0,1,1),1,beatrix,v);	
+	subserp.stroke(Base.mkPT(0,1,1),1,greenball,v);	
 	subserp.stroke(Base.mkPT(1,1,0),1,beatrix,v);		
-	subserp.stroke(Base.mkPT(0,1,0),1,beatrix,v);		
+	subserp.stroke(Base.mkPT(0,1,0),1,greenball,v);		
 	subserp.stroke(Base.mkPT(1,0,1),1,beatrix,v);		
-	subserp.stroke(Base.mkPT(1,1,1),1,beatrix,v);	
-	serp.fill(greenball);	
-	serp.imposter:=beatrix;
-	serp.stroke(Base.mkPT(1/2,1/2,1/4),1,beatrix,v);
-	serp.stroke(Base.mkPT(1/2,1/2,3/4),1,serp,v);
-	serp.stroke(Base.mkPT(1/4,1/2,1/2),1,beatrix,v);
-	serp.stroke(Base.mkPT(3/4,1/2,1/2),1,serp,v);
-	serp.stroke(Base.mkPT(1/2,1/4,1/2),1,beatrix,v);
-	serp.stroke(Base.mkPT(1/2,3/4,1/2),1,serp,v);
-	serp.stroke(Base.mkPT(1/2,1/2,1/2),1,greenball,v);	
+	subserp.stroke(Base.mkPT(1,1,1),1,greenball,v);	
+	serp.fill(serp);	
+	serp.imposter:=blue;
+	serp.stroke(Base.mkPT(1/2,1/2,1/2),1,greenball,v);
+	serp.stroke(Base.mkPT(1/2,0,1),1,greenball,v);
+	serp.stroke(Base.mkPT(1/2,1,0),1,greenball,v);
+	serp.stroke(Base.mkPT(0,0,1/2),1,greenball,v);	
+	serp.stroke(Base.mkPT(0,1,1/2),1,greenball,v);
+	serp.stroke(Base.mkPT(1,0,1/2),1,greenball,v);	
+	serp.stroke(Base.mkPT(1,1,1/2),1,greenball,v);
 	subserp.copyonstroke:=TRUE;	
 	serp.copyonstroke:=TRUE;	
 	beatrix.copyonstroke:=TRUE;

@@ -6,10 +6,10 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=3;        
-	TS=5*8;   (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
-	TW=12;
-	TH=8;
+	T=4;        
+	TS=5*16;   (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
+	TW=6;
+	TH=4;
 	W*=TS*TW;
 	H*=TS*TH
 

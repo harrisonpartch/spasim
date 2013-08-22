@@ -405,9 +405,9 @@ BEGIN
 	NEW(plane,center,up);
 	plane.vox:=serp;
 	Out.String("EEEEP!"); 				
-(*	z10.FRaster(noise,128); 	
+	z10.FRaster(noise,128); 	
 	z10.FRaster(tnoise,128);  
-*)	z10.FRaster(plane,32);
+	z10.FRaster(plane,32);
 	z10.setcolor(1,0,0,0,0); 	
 	gorge.setcolor(0,1,0,1,0);
 	z10.stroke(center,30,z10,undo);

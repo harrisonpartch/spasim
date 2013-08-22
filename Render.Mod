@@ -1022,8 +1022,8 @@ BEGIN
 	foveasize := 100;
 	multicore:=TRUE;
 	camrotinertia:=100;
-	Base.DTL:=2500;
-	Base.DTL2:=2500;
+	Base.DTL:=100;
+	Base.DTL2:=250;
 	Base.gravity:=0.0000001;
 	Base.speed:=0.000001;
 	Base.maxspeed:=0.0001;

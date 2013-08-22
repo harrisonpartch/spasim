@@ -1,10 +1,8 @@
 MODULE NIqy3HQ4ZK8iRwAXelYYnsQ;
 IMPORT Math, Base, TexVox,Random;
 
-
 VAR
 	rand: Random.Generator;
-
 
 TYPE PT=Base.PT;
 	BOX=Base.BOX;
@@ -162,9 +160,8 @@ END reflect;
 
 PROCEDURE  thisvox*():Base.Voxel;
 BEGIN
-	IF sphere=NIL THEN
-		NEW(sphere); 
-	END;
+	NEW(sphere); 
+	sphere.setcolor(0.3,0.9,0.3,0,0);
 	RETURN sphere
 END thisvox;
 

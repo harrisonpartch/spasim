@@ -43,10 +43,10 @@ BEGIN
 	xyz.y := ABS(ray.lxyz.y-offset.y) * M;		
 	xyz.z := ABS(ray.lxyz.z-offset.z)* M;	
 	pushxyz:=xyz;	
-(*	IF DTL>0 THEN 
+	IF DTL>ray.dtl THEN
 		ray.dtl:=DTL;
 	END;
-*)	IF (ray.length*ray.scale>ray.dtl) THEN
+	IF (ray.length*ray.scale>ray.dtl) THEN
 		IF imposter#NIL THEN
 			imposter.Shade(ray)
 		END	
@@ -183,11 +183,11 @@ BEGIN
 		IF (ray.bla<0.1)OR((ray.ra<0.01)OR(ray.ga<0.01)OR(ray.ba<0.01))THEN ray.terminate:=TRUE 
 		END;
 		UNTIL  out OR ray.terminate;
-	END 	
-	END;
+	END 		END;
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
 	ray.popdelta.y := (xyz.y-pushxyz.y)/M;
 	ray.popdelta.z := (xyz.z-pushxyz.z)/M; 
+(*	ray.dtl:=Base.DTL;  *)
 	ray.scale := ray.scale/M;
 END Shade;
 
