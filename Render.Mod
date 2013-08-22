@@ -362,7 +362,7 @@ END Reshape;
 PROCEDURE Close*;
 BEGIN
 	Base.worldalive:=FALSE;
-	Out.String("OGLRender Closing.."); Out.Ln;
+	Out.String("Spasim Closing.."); Out.Ln;
 	
 	(* cleanup gl buffers *)
 	GL.DeleteProgram(passthroughProgram);
@@ -636,7 +636,7 @@ BEGIN
 	SwapBuffers();	
 END Display;
 
-(* change detail according to frame speed, called in OGLWindow.MainLoop *)
+(* change detail according to frame speed, called in GLWindow.MainLoop *)
 PROCEDURE GameLogic();
 BEGIN
 	IF GetCurrentFrameMs() <msd THEN 
@@ -782,6 +782,6 @@ END Render.
 
 Render.Open ~ 
 
-SystemTools.Free OGLRender ~ 
+SystemTools.Free	Render ~ 
 
 
