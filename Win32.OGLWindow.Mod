@@ -407,8 +407,8 @@ TYPE
 	BEGIN
 		User32.SetCursor(hCurrentCursor);
 		m.x := lParam MOD ASH( 1, 16 )  ;
-	(*	m.y := height-1-ASH( lParam, -16 );*) (* opengl coordinates origin is lower-left *)
-		m.y := ASH( lParam, -16 ) -1;
+		m.y := height-1-ASH( lParam, -16 ); (* opengl coordinates origin is lower-left  *)
+	(*	m.y := ASH( lParam, -16 ) -1;*)
 		keys := mkeys;
 
 		CASE uMsg OF
@@ -561,9 +561,9 @@ TYPE
 				Reshape(width, height);
 
 			ELSIF id = redraw THEN
-					User32.BeginPaint(hWnd, ps);
-					Display();
-					User32.EndPaint(hWnd, ps);
+				User32.BeginPaint(hWnd, ps);
+				Display();
+				User32.EndPaint(hWnd, ps);
 			END;
 		END
 	END UpdateDisplay;
@@ -606,8 +606,9 @@ TYPE
 				| User32.WMKeyDown:
 						HandleKey(wParam, lParam);
 						RETURN 0;
-				(*| User32.WMKeyUp:
-						HandleKeyUp( win, wParam, lParam );*)
+				| User32.WMKeyUp:
+						HandleKeyUp(wParam, lParam );
+						RETURN 0;
 				| User32.WMChar:
 						IF ~KeyHandled THEN
 							HandleChar(wParam, lParam );

@@ -53,6 +53,7 @@ XNXLHalfSpace.Mod
 XNXLRotaVox.Mod
 Engrainer.Mod
 Saboteur.Mod
+FRep.Mod
 NCompiler.Mod
 Marsh.Mod
 Render.Mod ~

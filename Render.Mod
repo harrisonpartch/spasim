@@ -1,6 +1,6 @@
 MODULE Render;
 IMPORT Kernel, Objects, Random, Marsh, 
- Out := KernelLog, Math,XNXLMath, Base,  Retina, OGLWindow, 
+ Out := KernelLog, Math,XNXLMath, Base,  Retina, GLW := OGLWindow, 
 	 GL:=OpenGL, GLC := OpenGLConst,  GLSL:= GLShaderUtils,
 	 Inputs,  Raster, Strings,Streams;
 
@@ -169,9 +169,7 @@ BEGIN
 	fward:=Retina.fward;
 	cvx :=cvx+(x*fward.x * Base.speed); 
 	cvy :=cvy+(x*fward.y * Base.speed); 	
-	cvz :=cvz+(x*fward.z * Base.speed); 	
-	Out.String("forward!");
-	Out.Ln;
+	cvz :=cvz+(x*fward.z * Base.speed);
 END forward;
 
 PROCEDURE backward(x:REAL);
@@ -277,12 +275,12 @@ BEGIN
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y; 
 	cvl :=cvl*0.0; cvu := cvu*0.0;
 	IF AVATAR THEN Marsh.drawavatar END;
-	IF MOUSEDOWN THEN
-(*!		IF MB=3 THEN 
-			Marsh.drawcursor; 
-		ELSIF MB=1 THEN Marsh.draw
-		END;
-*)	END;	
+	IF MOUSEDOWN THEN	
+		IF GLW.ML IN MB THEN Marsh.draw;
+		ELSIF  GLW.MM IN MB THEN (* *) 
+		ELSIF  GLW.MR IN MB THEN Marsh.drawcursor;
+		END;	
+	END;
 	trace; 
 	Base.tick;
 END tick;
@@ -292,7 +290,7 @@ END Camera;
 
 (*! ************* XLTL AMALGAMATION FOLLOWS *)
 
-TYPE GLWindow=OBJECT(OGLWindow.Window)
+TYPE GLWindow=OBJECT(GLW.Window)
 VAR
 	vertexbuffer, uvbuffer: Uint; (* GL buffers *)
 	image: Uint; (* image texture name *)
@@ -425,7 +423,7 @@ BEGIN
 				END
 
 	ELSE (* use keysm *)
-(*		Out.String("ucs: "); Out.Hex(ucs,4); Out.Ln; *)
+		(* Out.String("ucs: "); Out.Hex(ucs,4); Out.String("keysym: "); Out.Hex(keysym,4); Out.Ln;*)
 		CASE keysym OF
 		| Inputs.KsEscape (*1BH*) : IF CAPTUREMOUSE THEN 
 							CAPTUREMOUSE := FALSE;
@@ -445,24 +443,25 @@ BEGIN
 	(*	| Inputs.KsF11: ToggleFullWindow;*)
 		| Inputs.KsF2: Base.gravity:= -Base.gravity;
 
-		(* LeftCtrl and RightCtrl doest work with LinuxAos ?? *)
-		| Inputs.LeftCtrl: AVATAR:=~AVATAR; 	Out.String("LeftCtrl"); Out.Ln;
-		| Inputs.RightCtrl: Marsh.SNIPEINTO:=~Marsh.SNIPEINTO;	 Out.String("RightCtrl"); Out.Ln;
+		| Inputs.KsControlL: AVATAR:=~AVATAR; 
+
+		(*? KsControlR does not work on LinuAos  *)
+		| (* Inputs.KsControlR*) Inputs.KsInsert: Marsh.SNIPEINTO:=~Marsh.SNIPEINTO;
 		ELSE
-			Out.String("keysym: "); Out.Hex(keysym,4); Out.Ln;
+		(*	Out.String("keysym: "); Out.Hex(keysym,4); Out.Ln;*)
 		END;
 	END
 END KeyEvent;
 
-PROCEDURE PointerDown*(x, y: LONGINT; flags: SET);
+PROCEDURE PointerDown*(x, y: LONGINT; keys: SET);
 BEGIN
 	IF ~CAPTUREMOUSE THEN SetIdleTime(0); HideMousePointer(TRUE); CAPTUREMOUSE:=TRUE;	 END;
 	PAUSE:=FALSE;
-	MOUSEDOWN:=TRUE;
+	MOUSEDOWN:=TRUE;	
 END PointerDown;
 
 	(** called when mouse button up  *)
-PROCEDURE PointerUp*(x, y: LONGINT; flags: SET);
+PROCEDURE PointerUp*(x, y: LONGINT; keys: SET);
 BEGIN
 	MOUSEDOWN:=FALSE
 END PointerUp;
@@ -472,23 +471,21 @@ VAR
 	up,left: REAL;
 	xr,yr: LONGINT;
 BEGIN
-	IF ~warpedthemouse OR TRUE THEN (* only once per frame *)
-
-	IF keys*{0} ={0} THEN Marsh.draw;
-	ELSIF keys*{1} = {1} THEN 
-	ELSIF keys*{2} = {2} THEN Marsh.drawcursor; 
-	END;
+	IF ~warpedthemouse OR TRUE THEN (* only once per frame *)	
+		MB := keys;
 		xr := x-centerx; yr :=y-centery;
 				
-		left:=ABS(xr)*xr;
-		up:=-ABS(yr)*yr; 
-		camera.up(-up/(30000*leftsticky)); 
-		camera.left(left/(30000*leftsticky));
+
 	
 		IF CAPTUREMOUSE & (ABS(xr)+ABS(yr)>5) THEN
-				(*SetMousePosition(centerx, centery);
-				Api.WarpPointer( display, 0,mne.window, 0,0, 1000,1000, centerx,centery);*)
-				WarpPointer(1000,1000, centerx,centery);
+			left:=ABS(xr)*xr;
+			up:=-ABS(yr)*yr; 
+			camera.up(-up/(30000*leftsticky)); 
+			camera.left(left/(30000*leftsticky));
+				
+			(*SetMousePosition(centerx, centery);
+			Api.WarpPointer( display, 0,mne.window, 0,0, 1000,1000, centerx,centery);*)
+			WarpPointer(1000,1000, centerx,centery);
 		END;
 		warpedthemouse:=TRUE;
 	END;
@@ -497,9 +494,11 @@ END PointerMove;
  
 PROCEDURE WheelMove*(dz: LONGINT);
 BEGIN
-	IF dz < 0 THEN slowdown
-	ELSE speedup
+IF CAPTUREMOUSE THEN
+	IF dz < 0 THEN slowdown; Out.String("slowdown dz="); Out.Int(dz, 0); Out.Ln;
+	ELSE speedup; Out.String("speedup dz="); Out.Int(dz, 0); Out.Ln;
 	END;
+END;	
 END WheelMove;
 
 
@@ -675,7 +674,8 @@ VAR
 	MLseen, MMseen, MRseen: BOOLEAN;	
 
 	warpedthemouse: BOOLEAN;	
-
+	
+	MB : SET;	(* 0, 1, 2 *)
 
 	MOUSEDOWN, CAPTUREMOUSE, GO,TRAIL,AVATAR,SCULL,METASLASH: BOOLEAN;	
 	camera:Camera;
@@ -785,6 +785,6 @@ END Render.
 
 Render.Open ~ 
 
-SystemTools.Free	Render ~ 
+SystemTools.Free.Render ~ 
 
 
