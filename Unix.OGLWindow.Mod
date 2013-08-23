@@ -476,8 +476,10 @@ VAR
 		ch: CHAR;
 		flags: SET;
 		buffer: ARRAY bufsize OF CHAR;
+		events: LONGINT;
 	BEGIN
-		WHILE Api.Pending(display) > 0 DO
+		events := Api.Pending(display);
+		WHILE events > 0 DO
 			Api.NextEvent(display, event);
 			CASE event.typ OF
 
@@ -557,7 +559,6 @@ VAR
 			| Api.Expose, Api.GraphicsExpose:
 				em := SYSTEM.VAL( Api.XExposeEvent, event );
 				IF em.count = 0 THEN (* wait until last message*)
-					Wr("Expose");
 					Display;
 				END;
 
@@ -585,6 +586,7 @@ VAR
 				END;
 			ELSE
 			END;
+			events := Api.Pending( display );
 	  	END;
 	END LoopForEvents;
 
@@ -735,6 +737,7 @@ BEGIN
 	keySymbol[0A3H] := Inputs.KsPageDown;
 	keySymbol[0A8H] := Inputs.KsHome;
 	keySymbol[0A9H] := Inputs.KsEnd;
+	
 	keySymbol[01BH] := Inputs.KsEscape;
 	
 	FOR i := 0F1H TO 0FCH DO keySymbol[i] := 0FFBEH + (i - 0F1H) END
