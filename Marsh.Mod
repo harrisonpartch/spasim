@@ -142,7 +142,7 @@ BEGIN
 	IF lines THEN line END
 END stroke;
 
-PROCEDURE drawcursor*;
+PROCEDURE snipeinto*;
 VAR
 	p,dp:PT;
 	ray:Base.Ray;
@@ -156,18 +156,33 @@ BEGIN
 	ELSE
 		p:= ray.xyz; dp:=ray.dxyz
 	END;
-	IF SNIPEINTO THEN
-		p.x:=p.x+dp.x/1000000;
-		p.y:=p.y+dp.y/1000000;
-		p.z:=p.z+dp.z/1000000;
-	ELSE 
-		p.x:=p.x-dp.x/1000000;
-		p.y:=p.y-dp.y/1000000;
-		p.z:=p.z-dp.z/1000000;
-	END;
+	p.x:=p.x+dp.x/1000000;
+	p.y:=p.y+dp.y/1000000;
+	p.z:=p.z+dp.z/1000000;
 	Base.cursorPT:=p; 	
 	stroke(Base.cursorPT,cursorsize,marshv.vox,voxundo)
-END drawcursor;
+END snipeinto;
+
+PROCEDURE snipeonto*;
+VAR
+	p,dp:PT;
+	ray:Base.Ray;
+	v: Voxel;
+	d:REAL;
+BEGIN
+	ray:=Base.sniperay;
+	Base.world.Shade(ray);
+	IF ray.hitmirrorTF THEN 
+		p:=ray.hitxyz; dp:=ray.hitdxyz
+	ELSE
+		p:= ray.xyz; dp:=ray.dxyz
+	END;
+	p.x:=p.x-dp.x/1000000;
+	p.y:=p.y-dp.y/1000000;
+	p.z:=p.z-dp.z/1000000;
+	Base.cursorPT:=p; 	
+	stroke(Base.cursorPT,cursorsize,marshv.vox,voxundo)
+END snipeonto;
 
 PROCEDURE drawHUD*;
 VAR
@@ -405,9 +420,9 @@ BEGIN
 	NEW(plane,center,up);
 	plane.vox:=sand;
 	Out.String("EEEEP!"); 				
-(*	z10.FRaster(noise,128); 	
+	z10.FRaster(noise,128); 	
 	z10.FRaster(tnoise,128);  
-*)	z10.FRaster(plane,32);
+	z10.FRaster(plane,32);
 	z10.setcolor(1,0,0,0,0); 	
 	gorge.setcolor(0,1,0,1,0);
 	z10.stroke(center,30,z10,undo);

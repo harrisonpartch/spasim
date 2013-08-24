@@ -1,7 +1,7 @@
 MODULE NCompiler;
-IMPORT Files, Texts, TextUtilities, Diagnostics, CompilerInterface,Out:=KernelLog;
+IMPORT Files, Texts, TextUtilities, Diagnostics, CompilerInterface, Commands;
 
-PROCEDURE ncompile*;
+PROCEDURE ncompile*(context : Commands.Context);
 VAR
        e : Files.Enumerator;
        w: Files.Writer;
@@ -13,16 +13,18 @@ VAR
        name : ARRAY 256 OF CHAR; flags : SET; time, date, size : LONGINT;
 BEGIN
        NEW(e);
-       e.Open("N*.Mod", {});
+       e.Open("./N*Mod", {});
        compiler:=CompilerInterface.GetCompilerByName("Fox");
        IF compiler#NIL THEN
 		WHILE e.HasMoreEntries() DO
 			IF e.GetEntry(name, flags, time, date, size) THEN
-				Out.String(name); Out.Ln;
+				context.out.String(name); 
+				context.out.String("   ");
 				NEW(text);
 				TextUtilities.LoadAuto(text,name,format,res);
 				compiler.CompileText(text,"",0,"","",w,diagnostics,error);
-				IF error THEN Out.String("compile error ") END
+				IF error THEN context.out.String("compile error ") END;
+				context.out.Ln;
 			END
 		END
 	END;

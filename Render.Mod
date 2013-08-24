@@ -274,11 +274,11 @@ BEGIN
 	cvz := cvz*GLIDE+gravityvector.z; 
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y; 
 	cvl :=cvl*0.0; cvu := cvu*0.0;
-	IF AVATAR THEN Marsh.drawavatar END;
+(*	IF AVATAR THEN Marsh.drawavatar END; *)
 	IF MOUSEDOWN THEN	
 		IF GLW.ML IN MB THEN Marsh.draw;
-		ELSIF  GLW.MM IN MB THEN (* *) 
-		ELSIF  GLW.MR IN MB THEN Marsh.drawcursor;
+		ELSIF  GLW.MM IN MB THEN Marsh.snipeinto; 
+		ELSIF  GLW.MR IN MB THEN Marsh.snipeonto;
 		END;	
 	END;
 	trace; 
@@ -415,13 +415,6 @@ BEGIN
 		| "8": Base.cursordist:=Base.cursordist/1.3
 		| "l": Marsh.lines:=~Marsh.lines
 		| "b": Marsh.showcode;  
-				IF CAPTUREMOUSE THEN 
-				CAPTUREMOUSE := FALSE; 
-				PAUSE:=TRUE;
-				SetIdleTime(5000);
-				HideMousePointer(FALSE);
-				END
-
 	ELSE (* use keysm *)
 		(* Out.String("ucs: "); Out.Hex(ucs,4); Out.String("keysym: "); Out.Hex(keysym,4); Out.Ln;*)
 		CASE keysym OF
@@ -436,19 +429,19 @@ BEGIN
 						(* Out.String("KsEscape.."); Out.Ln;*)
 		|	Inputs.KsF1:
 				Out.String("F1- Close"); Out.Ln;
-				Marsh.engrain;
+				(* Marsh.engrain; *)
 				Close();	
 				
 				
-	(*	| Inputs.KsF11: ToggleFullWindow;*)
+	(*	| Inputs.KsF11: ToggleFullWindow; *)
 		| Inputs.KsF2: Base.gravity:= -Base.gravity;
 
 		| Inputs.KsControlL: AVATAR:=~AVATAR; 
 
-		(*? KsControlR does not work on LinuAos  *)
-		| (* Inputs.KsControlR*) Inputs.KsInsert: Marsh.SNIPEINTO:=~Marsh.SNIPEINTO;
+		(*? KsControlR does not work on LinuxAos  *)
+		| Inputs.KsControlR (* Inputs.KsInsert*): Marsh.SNIPEINTO:=~Marsh.SNIPEINTO;
 		ELSE
-		(*	Out.String("keysym: "); Out.Hex(keysym,4); Out.Ln;*)
+			Out.String("keysym: "); Out.Hex(keysym,4); Out.Ln;
 		END;
 	END
 END KeyEvent;
@@ -458,6 +451,11 @@ BEGIN
 	IF ~CAPTUREMOUSE THEN SetIdleTime(0); HideMousePointer(TRUE); CAPTUREMOUSE:=TRUE;	 END;
 	PAUSE:=FALSE;
 	MOUSEDOWN:=TRUE;	
+	MB := keys;
+	IF GLW.ML IN MB THEN Out.String("ML");
+	ELSIF  GLW.MM IN MB THEN Out.String("MM");
+	ELSIF  GLW.MR IN MB THEN Out.String("MR");
+	END;	
 END PointerDown;
 
 	(** called when mouse button up  *)
@@ -474,8 +472,7 @@ BEGIN
 	IF ~warpedthemouse OR TRUE THEN (* only once per frame *)	
 		MB := keys;
 		xr := x-centerx; yr :=y-centery;
-				
-
+			
 	
 		IF CAPTUREMOUSE & (ABS(xr)+ABS(yr)>5) THEN
 			left:=ABS(xr)*xr;
@@ -494,8 +491,8 @@ END PointerMove;
  
 PROCEDURE WheelMove*(dz: LONGINT);
 BEGIN
-IF CAPTUREMOUSE THEN
-	IF dz < 0 THEN slowdown; Out.String("slowdown dz="); Out.Int(dz, 0); Out.Ln;
+IF TRUE  THEN
+	IF dz > 0 THEN slowdown; Out.String("slowdown dz="); Out.Int(dz, 0); Out.Ln;
 	ELSE speedup; Out.String("speedup dz="); Out.Int(dz, 0); Out.Ln;
 	END;
 END;	
@@ -775,7 +772,7 @@ PROCEDURE Open* ;
 VAR w: GLWindow;
 
 BEGIN
-	NEW(w, 720,480);
+	NEW(w, Retina.W*2,Retina.H*2);
 
 END Open;
 

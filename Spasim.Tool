@@ -62,7 +62,7 @@ Render.Mod ~
 
 ]]></Span><Span style="Bold"><![CDATA[NCompiler.ncompile]]></Span><Span style="Normal"><![CDATA[ ~
 ]]></Span><Span style="AdHoc Oberon 10 0 0 F00BFFF 0000000"><![CDATA[
-ncompile compiles the "anonymous" modules. See the tail of the kernel log. If the files are not shown as compiled, open 
+ncompile compiles the "anonymous" modules. If the files are not shown as compiled (below), open 
 NCompiler.Mod, compile it with the button, and run the command again.]]></Span><Span style="Normal"><![CDATA[
 
 ]]></Span><Span style="Bold"><![CDATA[SystemTools.FreeDownTo	Base ]]></Span><Span style="Normal"><![CDATA[~
