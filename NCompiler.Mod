@@ -1,5 +1,7 @@
 MODULE NCompiler;
-IMPORT Files, Texts, TextUtilities, Diagnostics, CompilerInterface, Commands;
+IMPORT Base, Files, Texts, TextUtilities, Diagnostics, CompilerInterface, Commands;
+
+(* Base is never used and imported only so that NCompiler is freed by SystemTools.FreeDownTo	Base *)
 
 PROCEDURE ncompile*(context : Commands.Context);
 VAR
@@ -15,6 +17,8 @@ BEGIN
        NEW(e);
        e.Open("./N*Mod", {});
        compiler:=CompilerInterface.GetCompilerByName("Fox");
+       context.out.String("compiling all N*Mod ");
+       context.out.Ln;
        IF compiler#NIL THEN
 		WHILE e.HasMoreEntries() DO
 			IF e.GetEntry(name, flags, time, date, size) THEN
@@ -27,6 +31,9 @@ BEGIN
 				context.out.Ln;
 			END
 		END
+	ELSE
+       	context.out.String(" Fox compiler not found ");
+       	context.out.Ln;	 
 	END;
 END ncompile;
 

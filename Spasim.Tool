@@ -84,7 +84,6 @@ OpenGL.Tool
 
 
 ======
-Clipboard.Install
 
 XNXLAudio.Mod
 

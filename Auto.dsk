@@ -1,11 +1,11 @@
 <Desktop>
 	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="105" t="245" r="560" b="567" flags="{0..2}"/>
 	<Window name="WMTextTool" loader="WMTextTool.Restore" l="50" t="120" r="172" b="340" flags="{0..3}"/>
-	<Window name="PET" loader="PET.Restore" l="329" t="47" r="1252" b="811" flags="{0..2}">
+	<Window name="PET" loader="PET.Restore" l="328" t="59" r="1251" b="823" flags="{0..2}">
 		<PETData>
-			<General SelectedPageNr="0" ProjectTextFile=""/>
+			<General SelectedPageNr="4" ProjectTextFile=""/>
 			<Tab file="Spasim.Tool" codecFormat="BBT" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="45" cursorPos="1530"/>
+				<Editor firstLine="45" cursorPos="1161"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
@@ -19,7 +19,7 @@
 				<SidePanel visible="true" width="163" scratchHeight="10"/>
 			</Tab>
 			<Tab file="Render.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="324" cursorPos="6957"/>
+				<Editor firstLine="316" cursorPos="6957"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="true" wrap="true" casesensitive="true" backwards="false" highlight="false" searchString="OGL" replaceString=""/>
 				<LogPanel height="130"/>
@@ -27,6 +27,13 @@
 			</Tab>
 			<Tab file="Marsh.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
 				<Editor firstLine="381" cursorPos="9103"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="10"/>
+			</Tab>
+			<Tab file="NCompiler.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="18" cursorPos="1247"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
