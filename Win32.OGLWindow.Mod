@@ -341,7 +341,7 @@ TYPE
 	VAR pt: User32.Point;
 	BEGIN
 		(* convert client coords. to screen coords. *)
-		pt.x := x; pt.y := y;
+		pt.x := x; pt.y := height-1 - y;
 		WinApi.ClientToScreen(hWnd, pt);
 		(* chage cursor position *)
 		User32.SetCursorPos(pt.x, pt.y);
@@ -350,7 +350,7 @@ TYPE
 	(** warp pointer to x,y *)
 	PROCEDURE WarpPointer*(w, h: LONGINT; x, y: LONGINT);
 	BEGIN
-		SetMousePosition(x, y)
+		SetMousePosition(x, y);		
 	END WarpPointer;
 	
 	(** make null cursor for mouse pointer *)
@@ -359,8 +359,9 @@ TYPE
 		hidecursor := hide;
 		IF hide THEN
 			(* hide cursor *)
-			User32.ShowCursor(0); (* FALSE *)
 			User32.SetCapture(hWnd); (*  capture mouse to user window *)
+			User32.ShowCursor(0); (* FALSE *)
+			
 		ELSE
 			(* show cursor *)
 			User32.ReleaseCapture(); (*  un-capture mouse from user window *)
@@ -718,7 +719,7 @@ TYPE
 				User32.TranslateMessage(msg);
 				User32.DispatchMessage(msg);
 			END
-		END;	
+		END;
 	END LoopForEvents;
 	
 PROCEDURE GetCurrentFrameMs*():LONGINT;
@@ -757,9 +758,9 @@ END GameLogic;
 				
 		Reshape(width, height);
 		OnLoad();	
-
+		
 		active := TRUE;
-
+		
 		WHILE active DO (* loop until WMQuit received *)
 			i:=(i+1)MOD 10;
 			Kernel.SetTimer(fpstimer, 1000);
@@ -770,7 +771,7 @@ END GameLogic;
 			IF gamemode THEN
 				IF idletime # 0 THEN
 					IF Kernel.Expired(idletimer) THEN					
-						IdleDisplay;
+						IdleDisplay;						
 						Kernel.SetTimer(idletimer, idletime);
 					END;
 				ELSE				
@@ -992,4 +993,7 @@ BEGIN
 	InitMod();    KeyHandled := FALSE;
 END OGLWindow.
 
- SystemTools.FreeDownTo OpenGL ~
+
+SystemTools.Free OGLWindow ~
+ 
+SystemTools.FreeDownTo OpenGL ~
