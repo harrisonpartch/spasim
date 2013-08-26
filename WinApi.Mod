@@ -1,12 +1,16 @@
 MODULE WinApi; (** AUTHOR "fnecati"; PURPOSE "missing WinApi functions"; *)
 
 IMPORT
-	 S:=SYSTEM, Kernel32, User32, GDI32;
+	 S:=SYSTEM, Kernel32, User32, GDI32, Modules;
 
+VAR
+	libgdi, libuser: Kernel32.HMODULE;
+	
 CONST
 		NULL* = Kernel32.NULL;
-
-	 (** CreateWindow dwStyle values *)
+	(*	const and types are adapted from BlackBox.WinApi.odc *)
+	
+	 (* CreateWindow dwStyle values *)
 		WS_OVERLAPPED* = {};
 		WS_POPUP* = {31};
 		WS_CHILD* = {30};
@@ -203,6 +207,149 @@ CONST
 		WM_ERASEBKGND* = 20 (* {2, 4} *);
 		WM_SIZING* = 532 (* {2, 4, 9} *);
 
+
+(* Font system *)
+
+		WGL_FONT_LINES* = 0 (* {} *);
+		WGL_FONT_POLYGONS* = 1 (* {0} *);
+		LPD_DOUBLEBUFFER* = {0};
+		LPD_STEREO* = {1};
+		LPD_SUPPORT_GDI* = {4};
+		LPD_SUPPORT_OPENGL* = {5};
+		LPD_SHARE_DEPTH* = {6};
+		LPD_SHARE_STENCIL* = {7};
+		LPD_SHARE_ACCUM* = {8};
+		LPD_SWAP_EXCHANGE* = {9};
+		LPD_SWAP_COPY* = {10};
+		LPD_TRANSPARENT* = {12};
+		LPD_TYPE_RGBA* = {};
+		LPD_TYPE_COLORINDEX* = {0};
+		WGL_SWAP_MAIN_PLANE* = {0};
+		WGL_SWAP_OVERLAY1* = {1};
+		WGL_SWAP_OVERLAY2* = {2};
+		WGL_SWAP_OVERLAY3* = {3};
+		WGL_SWAP_OVERLAY4* = {4};
+		WGL_SWAP_OVERLAY5* = {5};
+		WGL_SWAP_OVERLAY6* = {6};
+		WGL_SWAP_OVERLAY7* = {7};
+		WGL_SWAP_OVERLAY8* = {8};
+		WGL_SWAP_OVERLAY9* = {9};
+		WGL_SWAP_OVERLAY10* = {10};
+		WGL_SWAP_OVERLAY11* = {11};
+		WGL_SWAP_OVERLAY12* = {12};
+		WGL_SWAP_OVERLAY13* = {13};
+		WGL_SWAP_OVERLAY14* = {14};
+		WGL_SWAP_OVERLAY15* = {15};
+		WGL_SWAP_UNDERLAY1* = {16};
+		WGL_SWAP_UNDERLAY2* = {17};
+		WGL_SWAP_UNDERLAY3* = {18};
+		WGL_SWAP_UNDERLAY4* = {19};
+		WGL_SWAP_UNDERLAY5* = {20};
+		WGL_SWAP_UNDERLAY6* = {21};
+		WGL_SWAP_UNDERLAY7* = {22};
+		WGL_SWAP_UNDERLAY8* = {23};
+		WGL_SWAP_UNDERLAY9* = {24};
+		WGL_SWAP_UNDERLAY10* = {25};
+		WGL_SWAP_UNDERLAY11* = {26};
+		WGL_SWAP_UNDERLAY12* = {27};
+		WGL_SWAP_UNDERLAY13* = {28};
+		WGL_SWAP_UNDERLAY14* = {29};
+		WGL_SWAP_UNDERLAY15* = {30};
+
+
+		TCI_SRCCHARSET* = 1 (* {0} *);
+		TCI_SRCCODEPAGE* = 2 (* {1} *);
+		TCI_SRCFONTSIG* = 3 (* {0, 1} *);
+		TMPF_FIXED_PITCH* = 1 (* {0} *);
+		TMPF_VECTOR* = 2 (* {1} *);
+		TMPF_DEVICE* = 8 (* {3} *);
+		TMPF_TRUETYPE* = 4 (* {2} *);
+		NTM_REGULAR* = 64 (* {6} *);
+		NTM_BOLD* = 32 (* {5} *);
+		NTM_ITALIC* = 1 (* {0} *);
+		LF_FACESIZE* = 32 (* {5} *);
+		LF_FULLFACESIZE* = 64 (* {6} *);
+		OUT_DEFAULT_PRECIS* = 0 (* {} *);
+		OUT_STRING_PRECIS* = 1 (* {0} *);
+		OUT_CHARACTER_PRECIS* = 2 (* {1} *);
+		OUT_STROKE_PRECIS* = 3 (* {0, 1} *);
+		OUT_TT_PRECIS* = 4 (* {2} *);
+		OUT_DEVICE_PRECIS* = 5 (* {0, 2} *);
+		OUT_RASTER_PRECIS* = 6 (* {1, 2} *);
+		OUT_TT_ONLY_PRECIS* = 7 (* {0..2} *);
+		OUT_OUTLINE_PRECIS* = 8 (* {3} *);
+		
+		CLIP_DEFAULT_PRECIS* = 0 (* {} *);
+		CLIP_CHARACTER_PRECIS* = 1 (* {0} *);
+		CLIP_STROKE_PRECIS* = 2 (* {1} *);
+		CLIP_MASK* = 15 (* {0..3} *);
+		CLIP_LH_ANGLES* = 16 (* {4} *);
+		CLIP_TT_ALWAYS* = 32 (* {5} *);
+		CLIP_EMBEDDED* = 128 (* {7} *);
+		DEFAULT_QUALITY* = 0 (* {} *);
+		DRAFT_QUALITY* = 1 (* {0} *);
+		PROOF_QUALITY* = 2 (* {1} *);
+		NONANTIALIASED_QUALITY* = 3 (* {0, 1} *);
+		ANTIALIASED_QUALITY* = 4 (* {2} *);
+		DEFAULT_PITCH* = 0 (* {} *);
+		FIXED_PITCH* = 1 (* {0} *);
+		VARIABLE_PITCH* = 2 (* {1} *);
+		MONO_FONT* = 8 (* {3} *);
+		ANSI_CHARSET* = 0 (* {} *);
+		DEFAULT_CHARSET* = 1 (* {0} *);
+		SYMBOL_CHARSET* = 2 (* {1} *);
+		SHIFTJIS_CHARSET* = 128 (* {7} *);
+		HANGEUL_CHARSET* = 129 (* {0, 7} *);
+		GB2312_CHARSET* = 134 (* {1, 2, 7} *);
+		CHINESEBIG5_CHARSET* = 136 (* {3, 7} *);
+		OEM_CHARSET* = 255 (* {0..7} *);
+		JOHAB_CHARSET* = 130 (* {1, 7} *);
+		HEBREW_CHARSET* = 177 (* {0, 4, 5, 7} *);
+		ARABIC_CHARSET* = 178 (* {1, 4, 5, 7} *);
+		GREEK_CHARSET* = 161 (* {0, 5, 7} *);
+		TURKISH_CHARSET* = 162 (* {1, 5, 7} *);
+		THAI_CHARSET* = 222 (* {1..4, 6, 7} *);
+		EASTEUROPE_CHARSET* = 238 (* {1..3, 5..7} *);
+		RUSSIAN_CHARSET* = 204 (* {2, 3, 6, 7} *);
+		MAC_CHARSET* = 77 (* {0, 2, 3, 6} *);
+		BALTIC_CHARSET* = 186 (* {1, 3..5, 7} *);
+		FS_LATIN1* = {0};
+		FS_LATIN2* = {1};
+		FS_CYRILLIC* = {2};
+		FS_GREEK* = {3};
+		FS_TURKISH* = {4};
+		FS_HEBREW* = {5};
+		FS_ARABIC* = {6};
+		FS_BALTIC* = {7};
+		FS_THAI* = {16};
+		FS_JISJAPAN* = {17};
+		FS_CHINESESIMP* = {18};
+		FS_WANSUNG* = {19};
+		FS_CHINESETRAD* = {20};
+		FS_JOHAB* = {21};
+		FS_SYMBOL* = {31};
+		FF_DONTCARE* = 0 (* {} *);
+		FF_ROMAN* = 16 (* {4} *);
+		FF_SWISS* = 32 (* {5} *);
+		FF_MODERN* = 48 (* {4, 5} *);
+		FF_SCRIPT* = 64 (* {6} *);
+		FF_DECORATIVE* = 80 (* {4, 6} *);
+		FW_DONTCARE* = 0 (* {} *);
+		FW_THIN* = 100 (* {2, 5, 6} *);
+		FW_EXTRALIGHT* = 200 (* {3, 6, 7} *);
+		FW_LIGHT* = 300 (* {2, 3, 5, 8} *);
+		FW_NORMAL* = 400 (* {4, 7, 8} *);
+		FW_MEDIUM* = 500 (* {2, 4..8} *);
+		FW_SEMIBOLD* = 600 (* {3, 4, 6, 9} *);
+		FW_BOLD* = 700 (* {2..5, 7, 9} *);
+		FW_EXTRABOLD* = 800 (* {5, 8, 9} *);
+		FW_HEAVY* = 900 (* {2, 7..9} *);
+		FW_ULTRALIGHT* = 200 (* {3, 6, 7} *);
+		FW_REGULAR* = 400 (* {4, 7, 8} *);
+		FW_DEMIBOLD* = 600 (* {3, 4, 6, 9} *);
+		FW_ULTRABOLD* = 800 (* {5, 8, 9} *);
+		FW_BLACK* = 900 (* {2, 7..9} *);
+		
   TYPE
   
 		HANDLE* = Kernel32.HANDLE;
@@ -215,6 +362,7 @@ CONST
 		BOOL* = Kernel32.BOOL;
 		HWND* = HANDLE;
 		HBITMAP* = HANDLE;
+		HFONT* = HANDLE;
 		WORD* = INTEGER;
 		DWORD* = LONGINT;
 
@@ -327,6 +475,41 @@ CONST
 		END;
 		CREATESTRUCT* = CREATESTRUCTA;
 
+	PGlyphMetricsFloat* = POINTER TO GlyphMetricsFloat;
+	GlyphMetricsFloat* = RECORD
+		gmfBlackBoxX*: REAL;
+		gmfBlackBoxY*: REAL;
+		gmfptGlyphOrigin*: User32.PointF;
+		gmfCellIncX*: REAL;
+		gmfCellIncY*: REAL;	
+	END;
+
+	LayerPlaneDescriptor* = RECORD
+		nSize*: INTEGER;
+		nVersion*: INTEGER;
+		dwFlags*: LONGINT;
+		iPixelType*: CHAR;
+		cColorBits*: CHAR;
+		cRedBits*: CHAR;
+		cRedShift*: CHAR;
+		cGreenBits*: CHAR;
+		cGreenShift*: CHAR;
+		cBlueBits*: CHAR;
+		cBlueShift*: CHAR;
+		cAlphaBits*: CHAR;
+		cAlphaShift*: CHAR;
+		cAccumBits*: CHAR;
+		cAccumRedBits*: CHAR;
+		cAccumGreenBits*: CHAR;
+		cAccumBlueBits*: CHAR;
+		cAccumAlphaBits*: CHAR;
+		cDepthBits*: CHAR;
+		cStencilBits*: CHAR;
+		cAuxBuffers*: CHAR;
+		iLayerType*: CHAR;
+		bReserved*: CHAR;
+		crTransparent*: LONGINT;
+	END;
 
 VAR
 
@@ -344,6 +527,10 @@ VAR
 	GetPixelFormat-: PROCEDURE {WINAPI} (p0: HDC): LONGINT;
 	SetPixelFormat- : PROCEDURE {WINAPI}  (p0: HDC; p1: LONGINT;  p2: ADDRESS (*PIXELFORMATDESCRIPTOR*)): BOOL;
 	SwapBuffers- : PROCEDURE {WINAPI}  (p0: HDC): BOOL;
+	CreateFont-: PROCEDURE{WINAPI} (nHeight, nWidth, nEscapement, nOrientation, fnWeight,
+					fdwItalic, fdwUnderline, fdwStrikeOut, fdwCharSet, fwOutputPrecision, fdwClipPrecision,
+					fdwQuality, fdwPitchAndFamily: LONGINT; CONST lpszFace: ARRAY OF CHAR): HFONT;
+
 
 	(* USER32.dll *)
 	AdjustWindowRectEx-: PROCEDURE {WINAPI} (VAR lpRect: User32.Rect (* ADDRESS *); dwStyle: SET; bMenu: BOOL; dwExStyle: SET): BOOL;
@@ -351,7 +538,6 @@ VAR
 	FindWindow- : PROCEDURE {WINAPI} (CONST lpClassName: ARRAY OF CHAR; CONST lpWindowName: ARRAY OF CHAR): HWND;
 	GetDesktopWindow-: PROCEDURE {WINAPI} (): HWND;
 	GetWindowDC- : PROCEDURE {WINAPI} (hwin: HWND): HDC;
-
 
 	PROCEDURE GetDC*(hwn: HANDLE): HDC;
 	BEGIN
@@ -378,48 +564,55 @@ VAR
 		RETURN GDI32.DeleteObject(hnd);
 	END DeleteObject;
 
-
 	PROCEDURE CreateCompatibleDC*(hdc: HDC): HDC;
 	BEGIN
 		RETURN GDI32.CreateCompatibleDC(hdc);
 	END CreateCompatibleDC;
 
 PROCEDURE InitWinApiLibs;
-VAR
-	lib: Kernel32.HMODULE;
 BEGIN
+	libgdi := Kernel32.LoadLibrary("GDI32.DLL");
 
-	lib := Kernel32.LoadLibrary("GDI32.DLL");
+	Kernel32.GetProcAddress(libgdi, "CreateDIBSection", S.VAL(ADDRESS, CreateDIBSection ));
+	Kernel32.GetProcAddress(libgdi, "CreatePalette", S.VAL(ADDRESS, CreatePalette ));
+	Kernel32.GetProcAddress(libgdi, "GetCurrentObject", S.VAL(ADDRESS, GetCurrentObject ));
 
-	Kernel32.GetProcAddress(lib, "CreateDIBSection", S.VAL(ADDRESS, CreateDIBSection ));
-	Kernel32.GetProcAddress(lib, "CreatePalette", S.VAL(ADDRESS, CreatePalette ));
-	Kernel32.GetProcAddress(lib, "GetCurrentObject", S.VAL(ADDRESS, GetCurrentObject ));
+	Kernel32.GetProcAddress(libgdi, "GetObjectA", S.VAL(ADDRESS, GetObject ));
+	Kernel32.GetProcAddress(libgdi, "GetObjectType", S.VAL(ADDRESS,GetObjectType ));
 
-	Kernel32.GetProcAddress(lib, "GetObjectA", S.VAL(ADDRESS, GetObject ));
-	Kernel32.GetProcAddress(lib, "GetObjectType", S.VAL(ADDRESS,GetObjectType ));
+	Kernel32.GetProcAddress(libgdi, "RealizePalette", S.VAL(ADDRESS, RealizePalette ));
+	Kernel32.GetProcAddress(libgdi, "SelectPalette", S.VAL(ADDRESS, SelectPalette ));
 
-	Kernel32.GetProcAddress(lib, "RealizePalette", S.VAL(ADDRESS, RealizePalette ));
-	Kernel32.GetProcAddress(lib, "SelectPalette", S.VAL(ADDRESS, SelectPalette ));
-
-	Kernel32.GetProcAddress(lib, "ChoosePixelFormat", S.VAL(ADDRESS, ChoosePixelFormat ));
-	Kernel32.GetProcAddress(lib, "DescribePixelFormat", S.VAL(ADDRESS, DescribePixelFormat ));
-	Kernel32.GetProcAddress(lib, "GetPixelFormat", S.VAL(ADDRESS, GetPixelFormat ));
-	Kernel32.GetProcAddress(lib, "SetPixelFormat", S.VAL(ADDRESS, SetPixelFormat ));
-	Kernel32.GetProcAddress(lib, "SwapBuffers", S.VAL(ADDRESS, SwapBuffers ));
+	Kernel32.GetProcAddress(libgdi, "ChoosePixelFormat", S.VAL(ADDRESS, ChoosePixelFormat ));
+	Kernel32.GetProcAddress(libgdi, "DescribePixelFormat", S.VAL(ADDRESS, DescribePixelFormat ));
+	Kernel32.GetProcAddress(libgdi, "GetPixelFormat", S.VAL(ADDRESS, GetPixelFormat ));
+	Kernel32.GetProcAddress(libgdi, "SetPixelFormat", S.VAL(ADDRESS, SetPixelFormat ));
+	Kernel32.GetProcAddress(libgdi, "SwapBuffers", S.VAL(ADDRESS, SwapBuffers ));
+	Kernel32.GetProcAddress(libgdi, "CreateFontW", S.VAL(ADDRESS, CreateFont));
 
 
-	lib := Kernel32.LoadLibrary("USER32.DLL");
-	Kernel32.GetProcAddress(lib, "AdjustWindowRectEx", S.VAL(ADDRESS, AdjustWindowRectEx ));
-	Kernel32.GetProcAddress(lib, "ClientToScreen", S.VAL(ADDRESS, ClientToScreen));
-	Kernel32.GetProcAddress(lib, "FindWindowA", S.VAL(ADDRESS, FindWindow));
-	Kernel32.GetProcAddress(lib, "GetDesktopWindow", S.VAL(ADDRESS,GetDesktopWindow ));
-	Kernel32.GetProcAddress(lib, "GetWindowDC", S.VAL(ADDRESS, GetWindowDC ));
-	Kernel32.GetProcAddress(lib, "PeekMessageA", S.VAL(ADDRESS, PeekMessage ));
-
+	libuser := Kernel32.LoadLibrary("USER32.DLL");
+	Kernel32.GetProcAddress(libuser, "AdjustWindowRectEx", S.VAL(ADDRESS, AdjustWindowRectEx ));
+	Kernel32.GetProcAddress(libuser, "ClientToScreen", S.VAL(ADDRESS, ClientToScreen));
+	Kernel32.GetProcAddress(libuser, "FindWindowA", S.VAL(ADDRESS, FindWindow));
+	Kernel32.GetProcAddress(libuser, "GetDesktopWindow", S.VAL(ADDRESS,GetDesktopWindow ));
+	Kernel32.GetProcAddress(libuser, "GetWindowDC", S.VAL(ADDRESS, GetWindowDC ));
+	Kernel32.GetProcAddress(libuser, "PeekMessageA", S.VAL(ADDRESS, PeekMessage ));
 
 END InitWinApiLibs;
 
+PROCEDURE OnClose;
+VAR res: LONGINT;
 BEGIN
-	InitWinApiLibs;
+	IF libuser # Kernel32.NULL THEN
+		res := Kernel32.FreeLibrary(libuser);
+	END;
+	IF libgdi # Kernel32.NULL THEN
+		res := Kernel32.FreeLibrary(libgdi);
+	END;	
+END OnClose;
 
+BEGIN
+	InitWinApiLibs();
+	Modules.InstallTermHandler(OnClose);
 END WinApi.
