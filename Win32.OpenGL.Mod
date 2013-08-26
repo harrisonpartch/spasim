@@ -1,6 +1,6 @@
 MODULE OpenGL; (** AUTHOR "fnecati"; PURPOSE "OpenGL binding for WinAos"; *)
 
-IMPORT SYSTEM, Kernel32, Modules,  Strings, GLC := OpenGLConst, KernelLog;
+IMPORT SYSTEM, Kernel32, Modules,  WinApi, Strings, GLC := OpenGLConst, KernelLog;
 
 (*
 	Compiler.Compile OpenGLConst.Mod Win32.OpenGL.Mod WinApi.Mod ~
@@ -3404,7 +3404,7 @@ TYPE
 	TwglCreateContext* = PROCEDURE {WINAPI} (DC: HDC): HGLRC;
 	TwglCreateLayerContext* = PROCEDURE {WINAPI} (p1: HDC; p2: Integer): HGLRC;
 	TwglDeleteContext = PROCEDURE {WINAPI} (p1: HGLRC): BOOLEAN;
-	(*TwglDescribeLayerPlane*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3: LONGINT; p4: LONGINT; p5: PLayerPlaneDescriptor): BOOLEAN; *)
+	TwglDescribeLayerPlane*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3: LONGINT; p4: LONGINT; p5: WinApi.LayerPlaneDescriptor): BOOLEAN;
 	TwglGetCurrentContext* = PROCEDURE {WINAPI}(): HGLRC;
 	TwglGetCurrentDC* = PROCEDURE {WINAPI}(): HDC;
 	TwglGetLayerPaletteEntries* = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: Integer; varpcr: ADDRESS): Integer;
@@ -3418,10 +3418,10 @@ TYPE
 	TwglUseFontBitmapsW*  = PROCEDURE {WINAPI} (DC: HDC; p2, p3, p4: DWORD): BOOLEAN;
 	TwglUseFontBitmaps*  = PROCEDURE {WINAPI} (DC: HDC; p2, p3, p4: DWORD): BOOLEAN;
 
-	(* TwglUseFontOutlinesA*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: DWORD; p5, p6: Single; p7: Integer; p8: PGlyphMetricsFloat): BOOLEAN;
-	TwglUseFontOutlinesW*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: DWORD; p5, p6: Single; p7: Integer; p8: PGlyphMetricsFloat): BOOLEAN;
-	TwglUseFontOutlines*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: DWORD; p5, p6: Single; p7: Integer; p8: PGlyphMetricsFloat): BOOLEAN;
-	*)
+	TwglUseFontOutlinesA*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: DWORD; p5, p6: REAL; p7: LONGINT; p8: ADDRESS (*GlyphMetricsFloat*) ): BOOLEAN;
+	TwglUseFontOutlinesW*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: DWORD; p5, p6: REAL; p7: LONGINT; p8: ADDRESS (*GlyphMetricsFloat*)): BOOLEAN;
+	TwglUseFontOutlines*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: DWORD; p5, p6: REAL; p7: LONGINT; p8: ADDRESS (*GlyphMetricsFloat*)): BOOLEAN;
+	
 
 	(* WGL_ARB_buffer_region *)
 	TwglCreateBufferRegionARB*  = PROCEDURE {WINAPI} (hDC: HDC; iLayerPlane: Int; uType: Uint): THandle;
@@ -6294,7 +6294,7 @@ TYPE
 	wglCreateContext- : TwglCreateContext;
 	wglCreateLayerContext- : TwglCreateLayerContext;
 	wglDeleteContext- : TwglDeleteContext;
-	(* wglDescribeLayerPlane- : TwglDescribeLayerPlane;*)
+	wglDescribeLayerPlane- : TwglDescribeLayerPlane;
 	wglGetCurrentContext- : TwglGetCurrentContext;
 	wglGetCurrentDC- : TwglGetCurrentDC;
 	wglGetLayerPaletteEntries- : TwglGetLayerPaletteEntries;
@@ -6305,12 +6305,12 @@ TYPE
 	wglSwapLayerBuffers- : TwglSwapLayerBuffers;
 	(*  wglSwapMultipleBuffers- : TwglSwapMultipleBuffers;*)
 	wglUseFontBitmapsA- : TwglUseFontBitmapsA;
-	(*  wglUseFontOutlinesA- : TwglUseFontOutlinesA;
+	wglUseFontOutlinesA- : TwglUseFontOutlinesA;
 	wglUseFontBitmapsW- : TwglUseFontBitmapsW;
 	wglUseFontOutlinesW- : TwglUseFontOutlinesW;
 	wglUseFontBitmaps- : TwglUseFontBitmaps;
 	wglUseFontOutlines- : TwglUseFontOutlines;
-	*)
+	
 	  (* WGL_ARB_buffer_region *)
 	wglCreateBufferRegionARB- : TwglCreateBufferRegionARB;
 	wglDeleteBufferRegionARB- : TwglDeleteBufferRegionARB;
@@ -6525,7 +6525,7 @@ BEGIN
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglCreateLayerContext', SYSTEM.VAL(ADDRESS, wglCreateLayerContext ));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglCreateContext', SYSTEM.VAL(ADDRESS, wglCreateContext));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglDeleteContext', SYSTEM.VAL(ADDRESS, wglDeleteContext ));
-	    (*  Kernel32.GetProcAddress(GL_LibHandle,'wglDescribeLayerPlane', SYSTEM.VAL(ADDRESS, wglDescribeLayerPlane ));*)
+	    Kernel32.GetProcAddress(GL_LibHandle,'wglDescribeLayerPlane', SYSTEM.VAL(ADDRESS, wglDescribeLayerPlane ));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglGetCurrentContext', SYSTEM.VAL(ADDRESS, wglGetCurrentContext));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglGetCurrentDC', SYSTEM.VAL(ADDRESS, wglGetCurrentDC));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglGetLayerPaletteEntries', SYSTEM.VAL(ADDRESS, wglGetLayerPaletteEntries));
@@ -6536,14 +6536,14 @@ BEGIN
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglShareLists', SYSTEM.VAL(ADDRESS, wglShareLists));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglSwapLayerBuffers', SYSTEM.VAL(ADDRESS, wglSwapLayerBuffers));
 
-	    (*     Kernel32.GetProcAddress(GL_LibHandle,'wglSwapMultipleBuffers', SYSTEM.VAL(ADDRESS, wglSwapMultipleBuffers));
+	    (*     Kernel32.GetProcAddress(GL_LibHandle,'wglSwapMultipleBuffers', SYSTEM.VAL(ADDRESS, wglSwapMultipleBuffers)); *)
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglUseFontBitmapsA', SYSTEM.VAL(ADDRESS, wglUseFontBitmapsA));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglUseFontOutlinesA', SYSTEM.VAL(ADDRESS, wglUseFontOutlinesA));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglUseFontBitmapsW', SYSTEM.VAL(ADDRESS, wglUseFontBitmapsW));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglUseFontOutlinesW', SYSTEM.VAL(ADDRESS, wglUseFontOutlinesW));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglUseFontBitmapsA', SYSTEM.VAL(ADDRESS, wglUseFontBitmaps));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglUseFontOutlinesA', SYSTEM.VAL(ADDRESS, wglUseFontOutlines));
-	    *)
+	    
 	(*! GL_VERSION_1_0 *)
 	CullFace := SYSTEM.VAL(TglCullFace, GetProcAddress('glCullFace'));
 	FrontFace := SYSTEM.VAL(TglFrontFace, GetProcAddress('glFrontFace'));
@@ -11212,9 +11212,9 @@ BEGIN
 	END;
 END OnClose;
 
-BEGIN
-	Modules.InstallTermHandler(OnClose);
+BEGIN	
 	InitOpenGL;
+	Modules.InstallTermHandler(OnClose);
 	(*  ReadOpenGLCore(); *)
 END OpenGL.
 

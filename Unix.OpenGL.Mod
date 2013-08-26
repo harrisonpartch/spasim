@@ -1,6 +1,6 @@
 MODULE OpenGL; (** AUTHOR "fnecati"; PURPOSE "OpenGL binding for UnixAos";  *)
 
-IMPORT SYSTEM, Unix, Modules, X11Api, Strings, GLC := OpenGLConst, KernelLog;
+IMPORT SYSTEM, Unix, Modules, X11, X11Api, Strings, GLC := OpenGLConst, KernelLog;
 
 (*
 	Compiler.Compile OpenGLConst.Mod Unix.OpenGL.Mod Unix.GLU.Mod ~
@@ -141,10 +141,9 @@ TYPE
 	GLXPixmap* = XID;
 	GLXWindow* = XID;
 
-	Window* = XID;
-	Colormap* = XID;
-	Pixmap* = XID;
-	Font* = XID;
+	Window* = X11.Window;
+	Pixmap* = X11.Pixmap;
+	Font* = X11.Font;
 
 VAR
 
