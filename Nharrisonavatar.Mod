@@ -2,7 +2,7 @@ MODULE Nharrisonavatar;
 IMPORT Base, TexVox, XNXLRotaVox;
   
 VAR 
-	cv: TexVox.TexVox;
+	cv: TexVox.TexCubeVox;
 	rv: XNXLRotaVox.RVox;
 	up,right: Base.PT;
 	sabot, vox,v: Base.Voxel;
@@ -11,14 +11,14 @@ PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	IF vox=NIL THEN 
 		sabot:=Base.VoxelFromName("NM3");	
-		NEW(cv,"harrisonavatar.png");
+		NEW(cv,"die");
 		Base.setPT(center,1/2,1/2,1/2);
-		sabot.stroke(center,3,cv,v);
+		sabot.stroke(center,1,cv,v);
 		Base.setPT(up,0,0,1);	
 		Base.setPT(right,1,0,0);
-		NEW(rv,sabot,up, right, 1/30, 0)	
+		NEW(rv,sabot,up, right, 3/10, 1/10)	
 	END;
-	vox:=cv;
+	vox:=rv;
 	RETURN vox
 END thisvox;
 

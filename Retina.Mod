@@ -6,10 +6,10 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=3;        
-	TS=5*8;   (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
-	TW=12;
-	TH=8;
+	T=4;        
+	TS=9*16;   (*  TS MUST BE 5 (or 9, etc) MULTIPLIED BY 2**T *)
+	TW=4;
+	TH=3;
 	W*=TS*TW;
 	H*=TS*TH;
 
@@ -51,8 +51,8 @@ BEGIN
 	Base.world.Shade(ray);
 	IF ~ray.terminate THEN
 		ray.b:= ray.b + ray.ba;
-		ray.r:= ray.r + 0.5*ray.ra;
-		ray.g:= ray.g + 0.5*ray.ga;
+		ray.r:= ray.r + ray.ra/2;
+		ray.g:= ray.g + ray.ga/2;	
 	END;
 	Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255));
 	Raster.Put(image,imx,imy,pixel,copy);
@@ -60,14 +60,13 @@ BEGIN
 	Raster.Put(image,imx,imy+1,pixel,copy);
 	Raster.Put(image,imx+1,imy+1,pixel,copy);
 	Raster.Put(image,imx+2,imy,pixel,copy);
-
 	ray:=Base.blankray;
 	angletoray(ray,theta+cam.dtheta/5,phi+3*cam.dphi/5);
 	Base.world.Shade(ray);
 	IF ~ray.terminate THEN
 		ray.b:= ray.b + ray.ba;
-		ray.r:= ray.r + 0.5*ray.ra;
-		ray.g:= ray.g + 0.5*ray.ga;
+		ray.r:= ray.r + ray.ra/2;
+		ray.g:= ray.g + ray.ga/2;	
 	END;
 	Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255));
 	Raster.Put(image,imx,imy+3,pixel,copy);
@@ -81,8 +80,8 @@ BEGIN
 	Base.world.Shade(ray);
 	IF ~ray.terminate THEN
 		ray.b:= ray.b + ray.ba;
-		ray.r:= ray.r + 0.5*ray.ra;
-		ray.g:= ray.g + 0.5*ray.ga;
+		ray.r:= ray.r + ray.ra/2;
+		ray.g:= ray.g + ray.ga/2;	
 	END;
 	Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255));
 	Raster.Put(image,imx+2,imy+1,pixel,copy);
@@ -96,8 +95,8 @@ BEGIN
 	Base.world.Shade(ray);
 	IF ~ray.terminate THEN
 		ray.b:= ray.b + ray.ba;
-		ray.r:= ray.r + 0.5*ray.ra;
-		ray.g:= ray.g + 0.5*ray.ga;
+		ray.r:= ray.r + ray.ra/2;
+		ray.g:= ray.g + ray.ga/2;	
 	END;
 	Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255));
 	Raster.Put(image,imx+3,imy,pixel,copy);
@@ -109,13 +108,10 @@ BEGIN
 	ray:=Base.blankray;
 	angletoray(ray,theta+3*cam.dtheta/5,phi+3*cam.dphi/5);
 	Base.world.Shade(ray);
-	IF ~ray.terminate THEN	ray.lxyz:=Base.cameraPT;
-	ray.xyz:=Base.cameraPT;
-	ray.oxyz:=Base.cameraPT;
-	ray.dtl:=Base.DTL;
+	IF ~ray.terminate THEN	
 		ray.b:= ray.b + ray.ba;
-		ray.r:= ray.r + 0.5*ray.ra;
-		ray.g:= ray.g + 0.5*ray.ga;
+		ray.r:= ray.r + ray.ra/2;
+		ray.g:= ray.g + ray.ga/2;
 	END;
 	Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255));
 	Raster.Put(image,imx+3,imy+3,pixel,copy);
@@ -142,18 +138,74 @@ BEGIN
 			angletoray(ray,theta,phi);
 			Base.world.Shade(ray);
 			IF ~ray.terminate THEN
-				ray.b:= ray.b +ray.ba;
-				ray.r:= ray.r + ray.ga/2;
-				ray.g:= ray.g + ray.ga/2;
+				ray.b:= ray.b + ray.ba;
+				ray.r:= ray.r + ray.ra/2;
+				ray.g:= ray.g + ray.ga/2;	
 			END;
 			Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255)); 
-		(*	Raster.SetRGB(pixel,i*60,0,j*60); *)
 			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
 			phi:=phi+dphi;
 		END;
 		theta:=theta+dtheta;
 	END;
 END tessad;
+
+PROCEDURE tessa9(cam: Camera);
+VAR
+	i,j: LONGINT;
+	theta,phi,dtheta,dphi: REAL;
+	ray: Base.Ray;
+	pixel: Raster.Pixel;
+BEGIN
+	dtheta:=cam.dtheta/9;
+	dphi:=cam.dphi/9;
+	FOR i:= 1 TO 8 BY 3 DO
+		theta:=cam.theta+dtheta*i;	
+		FOR j :=  1 TO 8 BY 3 DO 
+			phi:=cam.phi+dphi*j;
+			ray:=Base.blankray;
+			angletoray(ray,theta,phi);
+			Base.world.Shade(ray);
+			IF ~ray.terminate THEN
+				ray.b:= ray.b + ray.ba;
+				ray.r:= ray.r + ray.ra/2;
+				ray.g:= ray.g + ray.ga/2;	
+			END;
+			Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255)); 
+			Raster.Fill(image,cam.imx+i-1,cam.imy+j-1,cam.imx+i+2,cam.imy+j+2,pixel,copy);
+		END;
+	END;
+END tessa9;
+
+PROCEDURE tessad9(cam: Camera);
+VAR
+	i,j: LONGINT;
+	theta,phi,dtheta,dphi: REAL;
+	ray: Base.Ray;
+	pixel: Raster.Pixel;
+BEGIN
+	theta:=cam.theta;
+	dtheta:=cam.dtheta/9;
+	dphi:=cam.dphi/9;
+	FOR i:= 0 TO 8 DO
+		phi:=cam.phi;
+		FOR j :=  0 TO 8 DO 
+			ray:=Base.blankray;
+			angletoray(ray,theta,phi);
+			Base.world.Shade(ray);
+			IF ~ray.terminate THEN
+				ray.b:= ray.b + ray.ba;
+				ray.r:= ray.r + ray.ra/2;
+				ray.g:= ray.g + ray.ga/2;	
+			END;
+			Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255)); 
+			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
+			phi:=phi+dphi;
+		END;
+		theta:=theta+dtheta;
+	END;
+END tessad9;
+
 
 PROCEDURE ztrace(cam: Camera; level: INTEGER);
 VAR
@@ -166,30 +218,30 @@ BEGIN
 			x:=a.imx - W/2;
 			y:=a.imy-H/2;		
 			IF (x*x+y*y)<(W*W/foveaparameter) THEN	
-				tessad(a); 
+				tessad9(a); 
 			ELSE
-				tessa(a); 
+				tessa9(a); 
 			END;
 			x:=b.imx - W/2;
 			y:=b.imy-H/2;		
 			IF (x*x+y*y)<(W*W/foveaparameter) THEN	
-				tessad(b); 
+				tessad9(b); 
 			ELSE
-				tessa(b); 			
+				tessa9(b); 			
 			END;			
 			x:=b.imx - W/2;
 			y:=b.imy-H/2;		
 			IF (x*x+y*y)<(W*W/foveaparameter) THEN	
-				tessad(c); 
+				tessad9(c); 
 			ELSE
-				tessa(c); 
+				tessa9(c); 
 			END;
 			x:=d.imx - W/2;
 			y:=d.imy-H/2;		
 			IF (x*x+y*y)<(W*W/foveaparameter) THEN	
-				tessad(d); 
+				tessad9(d); 
 			ELSE
-				tessa(d); 
+				tessa9(d); 
 			END;
 	ELSE
 		l:=level-1;

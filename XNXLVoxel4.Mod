@@ -310,18 +310,13 @@ VAR
 	V,V2: Voxel;
 	Normal: Base.PT;
 	red,green: Base.Color;
-PROCEDURE & init*(v,v2: Voxel);
+PROCEDURE & init*(v,v2: Voxel; size: REAL);
 BEGIN
 	V := v;
 	V2:=v2;
 	setCenter(1/2,1/2,1/2);
-	D2 := 9/40;
+	D2 := size*size;
 END init;
-
-PROCEDURE setSize*(x: REAL);
-BEGIN
- 	D2 := x*x;
-END setSize;
 
 PROCEDURE tick;
 BEGIN
@@ -367,8 +362,23 @@ BEGIN
 				x := (a.x+b.x)/2; y := (a.y+b.y)/2; z := (a.z + b.z)/2;
 			END;
 		END;
-		IF (ABS(d-D2) < 0.001) THEN 
+		IF (ABS(d-D2) < 0.0001) THEN 
 			ray.lxyz.x := x; ray.lxyz.y := y; ray.lxyz.z :=  z;
+			IF ray.di THEN
+				ray.xyz.x := ray.xyz.x+x/ray.scale
+			ELSE
+				ray.xyz.x := ray.xyz.x-x/ray.scale
+			END;
+			IF ray.dj THEN
+				ray.xyz.y := ray.xyz.y+y/ray.scale
+			ELSE
+				ray.xyz.y := ray.xyz.y-y/ray.scale
+			END;
+			IF ray.dk THEN
+				ray.xyz.z := ray.xyz.z+z/ray.scale
+			ELSE
+				ray.xyz.z := ray.xyz.z-z/ray.scale
+			END;
 			n.x:= cx-x; n.y:=cy-y; n.z:=cz-z;
 			normalize(n.x,n.y,n.z);
 			ray.normal.x:=n.x;

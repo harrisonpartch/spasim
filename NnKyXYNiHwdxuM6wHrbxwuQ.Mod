@@ -1,10 +1,10 @@
 MODULE NnKyXYNiHwdxuM6wHrbxwuQ;
  IMPORT Base, TexVox;
   
-VAR vox: TexVox.TexVox;
+VAR vox: TexVox.TexCubeVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	IF vox=NIL THEN NEW(vox,'die.0.png')  END;
+	IF vox=NIL THEN NEW(vox,'die')  END;
 	RETURN vox
 END thisvox;
 

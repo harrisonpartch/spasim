@@ -277,7 +277,7 @@ BEGIN
 	EMPTY.passable:=TRUE;
       rand:=Base.rand;	
 
-  	w10:=Base.VoxelFromName("NM3");	
+  	w10:=Base.VoxelFromName("NM2");	
  	z10:=Base.VoxelFromName("NM2");	
     
 	Out.String("EEEEP!");
@@ -408,12 +408,12 @@ BEGIN
 
 	NEW(noise);		
 	noise.seed:=123666;		
-	noise.a:=1;
+	noise.a:=3;
 	noise.b:=3;
-	noise.c:=1;		
-	noise.octaves:=4;
+	noise.c:=3;		
+	noise.octaves:=5;
 	noise.setvoxel(axolotl);
-	noise.persistence:=4;
+	noise.persistence:=3.7;
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,-1);
 	Base.setPT(center,1/2,1/2,11/12);
@@ -423,8 +423,8 @@ BEGIN
 	z10.FRaster(noise,128); 	
 	z10.FRaster(tnoise,128);  
 	z10.FRaster(plane,32);
-	z10.setcolor(1,0,0,0,0); 	
-	gorge.setcolor(0,1,0,1,0);
+	z10.setcolor(1,3,1,5,3); 	
+	gorge.setcolor(0,0,0,0,0);
 	z10.stroke(center,30,z10,undo);
 	Base.world:=z10; 	
 	Base.avatar:=conglomerate;

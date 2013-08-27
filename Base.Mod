@@ -1030,12 +1030,12 @@ BEGIN
 	blankray.length := 0;
 	blankray.tscale:=1;
 	blankray.dtl:=30000;	
-	Face[0].x := 1; Face[0].y := 0; Face[0].z := 0; 
-	Face[3].x := -1; Face[3].y := 0; Face[3].z := 0; 
+	Face[0].x := -1; Face[0].y := 0; Face[0].z := 0; 
+	Face[3].x := 1; Face[3].y := 0; Face[3].z := 0; 
 	Face[1].x := 0; Face[1].y := 1; Face[1].z := 0; 
-	Face[4].x := 0; Face[4].y := -1; Face[4].z := 0; 
-	Face[2].x := 0; Face[2].y := 0; Face[2].z := 1; 
-	Face[5].x := 0; Face[5].y := 0; Face[5].z := -1; 	
+	Face[2].x := 0; Face[4].y := -1; Face[4].z := 0; 
+	Face[5].x := 0; Face[2].y := 0; Face[2].z := 1; 
+	Face[4].x := 0; Face[5].y := 0; Face[5].z := -1; 	
 	m2sdelta:=25;
 	m3sdelta:=25;
 	speed:=0.00051;

@@ -291,9 +291,9 @@ BEGIN
 END thisvox;
 
 BEGIN
-	r:=Base.VoxelFromName("NFLOOP"); 	
+	r:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU342"); 	
 	b:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODh");
-	y:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");
+	y:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ");
 	NEW(vox,r,NIL,b);
 	vox.passable:=TRUE
 END Nrdvolvox. 

@@ -124,12 +124,12 @@ BEGIN
 		END 
 	ELSE
 		CASE ray.face OF
-			 0: lx := ray.xyz.y; ly := 1-ray.xyz.z; 
-			|1: lx := ray.xyz.x; ly := 1-ray.xyz.z; 
-			|2: lx := ray.xyz.x; ly := ray.xyz.y;
-			|3: lx := ray.xyz.y; ly := 1-ray.xyz.z; 
-			|4: lx := ray.xyz.x; ly := 1-ray.xyz.z; 
-			|5: lx := ray.xyz.x; ly := ray.xyz.y;  
+			 0: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
+			|1: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
+			|2: lx := ray.lxyz.x; ly := ray.lxyz.y;
+			|3: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
+			|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
+			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 		END
 	END;
 	color:=texcube.side[ray.face].pixel(lx,ly);
@@ -153,15 +153,7 @@ BEGIN
 	color.green:=(color2.green*mipverse+mip*color.green);
 	color.blue:=(color2.blue*mipverse+mip*color.blue);
 	color.alpha:=(color2.alpha*mipverse+mip*color.alpha);	
-	IF ray.ncubeTF THEN
-		dot1:= ABS(ray.ncube.normal.x*ray.dxyz.x + ray.ncube.normal.y*ray.dxyz.y+ ray.ncube.normal.z*ray.dxyz.z); 
-		dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-		dot2:=dot2*0.7+0.3;
-		IF ray.length*ray.scale<20 THEN mix:=1-(ray.length*ray.scale/20) ELSE mix:=0 END;
-		dot:=mix*dot2+(1-mix)*dot1;
-	ELSE
-		dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
-	END;
+	dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
 	dr:=color.red*dot*ray.ra;
 	dg:=color.green*dot*ray.ra;
 	db:=color.blue*dot*ray.ra;	
@@ -223,9 +215,131 @@ PROCEDURE & init*(n: Name);
 BEGIN
 	NEW(texcube,n,TRUE);
 	name:=n;
-	pstscale:=128;
-	texscale:=128;
+	pstscale:=1;
+	texscale:=1;
 END init;
+
+
+PROCEDURE Shade (VAR ray: Ray);
+VAR
+	p: Raster.Pixel;
+	x,y,xi,yj: LONGINT;
+	X,Y, xblend, yblend,blendx,blendy: REAL;
+	r,g,b,a: REAL;
+	dr,dg,db,da,blackness:REAL;
+	bb,c, lx, ly,lz, lx1,ly1,lz1,lx2,ly2,lz2,tq,xx,yy,zz,xxx,yyy,zzz,sc : REAL;
+	i,j,face: INTEGER;
+	mix,dot,dot1,dot2, nx, ny, nz: REAL;	
+	bpdx,bpdy,cq: REAL;
+	xov,yov,zov:REAL;
+	inside: BOOLEAN;
+	color,color1,color2: Base.Color;
+	txcube: TexCube;
+	rlf: REAL;
+	lxyz: Base.PT;
+	lsp: Base.SPT;
+	dtl: LONGINT;
+	mip,mipverse: REAL;
+BEGIN
+	IF pstscale>0 THEN
+		xx:=ray.lxyz.x;
+		yy:=ray.lxyz.y;
+		zz:=ray.lxyz.z;
+		xx:=xx*pstscale-ENTIER(xx*pstscale);
+		yy:=yy*pstscale-ENTIER(yy*pstscale);
+		zz:=zz*pstscale-ENTIER(zz*pstscale);
+		xxx:=ABS(1/2-xx);
+		yyy:=ABS(1/2-yy);
+		zzz:=ABS(1/2-zz);
+		IF xxx>yyy THEN
+			IF xxx>zzz THEN
+				(* yz pyramid *)  				(*  faces come in pairs: (0,3),(2,5),(1,4) *)
+				lx:=yy; ly:=zz;
+				lx1:=pstscale*ray.lxyz.x/ray.scale;
+				CASE ray.face OF
+					0:
+					|1: lx:=lx+lx1;
+					|2:  ly:=ly+lx1; 
+					|3: 
+					|4: lx:=lx+lx1-1;
+					|5: ly:=ly+lx1-1; 
+				END
+			ELSE
+				(* xy pyramid *)
+				lx:=xx; ly:=yy;
+				lz1:=pstscale*ray.lxyz.z/ray.scale;
+				CASE ray.face OF
+					 0: lx:=lx+lz1;
+					|1:  ly:=ly+lz1;
+					|2: 
+					|3: lx:=lx+lz1-1;
+					|4: ly:=ly+lz1-1;
+					|5:
+				END
+			END
+		ELSE
+			IF yyy>zzz THEN
+				(* xz pyramid *)	
+				lx:=xx; ly:=zz;	
+				ly1:=pstscale*ray.lxyz.y/ray.scale;	
+				CASE ray.face OF
+					 0: lx:= lx+ly1;
+					|1:
+					|2: ly:=ly+ly1;
+					|3: lx:= lx+ly1-1;
+					|4:  
+					|5:ly:=ly+ly1-1;
+				END
+			ELSE
+				(* xy pyramid *)
+				lx:=xx; ly:=yy;
+				lz1:=pstscale*ray.lxyz.z/ray.scale;
+				CASE ray.face OF
+					 0: lx:=lx+lz1;
+					|1:  ly:=ly+lz1;
+					|2: 
+					|3: lx:=lx+lz1-1;
+					|4: ly:=ly+lz1-1;
+					|5:
+				END
+			END
+		END 
+	ELSE
+		CASE ray.face OF
+			 0: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
+			|1: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
+			|2: lx := ray.lxyz.x; ly := ray.lxyz.y;
+			|3: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
+			|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
+			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
+		END
+	END;
+	color:=texcube.side[ray.face].pixel(lx,ly);	
+	dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
+	dr:=color.red*dot*ray.ra;
+	dg:=color.green*dot*ray.ra;
+	db:=color.blue*dot*ray.ra;	
+	IF color.alpha<0.9 THEN
+		IF color.alpha>0.7 THEN
+			ray.ra:=ray.ra-0.1;
+			ray.ga:=ray.ga-0.1;
+			ray.ba:=ray.ba-0.1;
+			mirror(ray)
+		ELSE
+			ray.r := ray.r + dr*color.alpha;
+			ray.ra:=ray.ra-dr*color.alpha-0.4;	
+			ray.g := ray.g + dg*color.alpha;
+			ray.ga:=ray.ga-dg*color.alpha-0.4;
+			ray.b := ray.b + db*color.alpha;
+			ray.ba:=ray.ba-db*color.alpha-0.4;
+		END			
+	ELSE
+		ray.r := ray.r + dr;
+		ray.g := ray.g + dg;
+		ray.b := ray.b + db;	
+		ray.terminate:=TRUE
+	END
+END Shade;
 
 PROCEDURE reflect(VAR p: PT; n: PT);
 VAR 

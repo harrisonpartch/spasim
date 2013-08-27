@@ -32,7 +32,7 @@ BEGIN
 			END
 		END
 	ELSE
-       	context.out.String(" Fox compiler not found ");
+       	context.out.String(" compiler not found ");
        	context.out.Ln;	 
 	END;
 END ncompile;

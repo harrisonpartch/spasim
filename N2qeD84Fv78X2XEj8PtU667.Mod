@@ -20,7 +20,7 @@ BEGIN
 	dot.setcolor(0,0,0,250,0);
 	bludot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7");	 	
 	Base.setPT(center,1/2,1/2,1/2);
-	tigerlily:=Base.VoxelFromName("NUzl1lqmBmaKyswkc70kO1w");  
+	tigerlily:=Base.VoxelFromName("NznGx2ySiHIGrO5t9Pzcw5Q");  
 	NEW(ball,center,8/12);	
 	ball.setcolor(0.9,0.9,1);			
 	ball.setvoxel(tigerlily);
