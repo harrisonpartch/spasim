@@ -1,11 +1,11 @@
 MODULE NM3;
-IMPORT Base, XNXLE, XNXLNoise, XNXLFRep, Math, Out := KernelLog, Debugging, Streams,Strings;
+IMPORT Base, XNXLE, Noise:=XNXLNoise, XNXLFRep, Math, Out := KernelLog, Debugging, Streams,Strings;
 
 CONST M=3;
 	MMO=M-1;
 	CUBERADIUS=0.65;   (*change to sqrt(3)/2 ???*)
 	NCODE="NM3";
-	NL=Base.NL
+	NL=Base.NL;
 
 TYPE PT = Base.PT;
 	Color = Base.Color;
@@ -24,8 +24,8 @@ VAR
 	nblox*: ARRAY M,M,M OF NCube; 
 	lblox*: ARRAY M,M,M OF LCube;
 	nposterTF*:BOOLEAN;
-	nposter*: NCube;	
-
+	nposter*: NCube;
+	
 PROCEDURE Shade (VAR ray: Ray);
 VAR
 	pushxyz, newxyz, xyz: Base.PT;
@@ -37,6 +37,7 @@ VAR
 	vdepth: REAL;
 	last:BOOLEAN;
 	dtl:REAL;
+	vdepthmul: REAL;
 BEGIN
 	ray.scale := ray.scale*M;
 	scaleInv := 1/ray.scale;
@@ -131,12 +132,14 @@ BEGIN
 				END;
 				newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
 			END;	
+			vdepthmul:=(ENTIER((ray.xyz.x+ray.xyz.y+ray.xyz.z)*10000) MOD 100)/100;
 			vdepth:=Base.distance(newxyz,xyz)*scaleInv; 
 			ray.xyz.x:=ray.xyz.x +((newxyz.x-xyz.x)+ray.ddxyz.x)*scaleInv;
 			ray.xyz.y:=ray.xyz.y +((newxyz.y-xyz.y)+ray.ddxyz.y)*scaleInv;			
 			ray.xyz.z:=ray.xyz.z +((newxyz.z-xyz.z)+ray.ddxyz.z)*scaleInv;			
 			xyz:=newxyz;
 			ray.length:=ray.length+vdepth;
+			vdepth:=vdepth*vdepthmul;
 			blr:=black*vdepth;
 			ray.bla := ray.bla-blr; 
 			IF ray.bla>0.01 THEN	

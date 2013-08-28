@@ -1,18 +1,6 @@
 <Desktop>
 	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="130" t="136" r="585" b="458" flags="{0..2}"/>
 	<Window name="FileManager" loader="WMFileManager.Restore" l="36" t="110" r="536" b="510" flags="{0..2}"/>
-	<Window name="PET" loader="PET.Restore" l="107" t="89" r="907" b="689" flags="{0..2}">
-		<PETData>
-			<General SelectedPageNr="0" ProjectTextFile=""/>
-			<Tab file="N2qeD84Fv78X2XEj8PtUZO8.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="11"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="10"/>
-			</Tab>
-		</PETData>
-	</Window>
 	<Window name="PET" loader="PET.Restore" l="369" t="364" r="1154" b="1004" flags="{0..2}">
 		<PETData>
 			<General SelectedPageNr="3" ProjectTextFile=""/>

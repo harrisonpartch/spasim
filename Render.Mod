@@ -382,67 +382,79 @@ PROCEDURE KeyEvent* (ucs : LONGINT; flags : SET; keysym : LONGINT);
 
 VAR
 	v: Voxel;   
+	s: Strings.String;
+	c: CHAR;
 BEGIN
-	CASE CHR(ucs) OF		
-		   "s" : camera.backward(0.51)
-		| "w" :camera.forward(0.51) 
-		| "a" :camera.leftstrafe(0.5)	
-		| "d" :camera.rightstrafe(0.5)
-		| "e": camera.upstrafe(0.51)
-		| "q": camera.downstrafe(0.51)	
-		| "n": leftsticky:=leftsticky*1.3; upsticky:=upsticky*1.3;
-		| "m": leftsticky:=leftsticky/1.3; upsticky:=upsticky/1.3;
-		| "o":
-		| "t": camera.glidetoggle 
-		| "v":Marsh.engrain
-		| "c":Marsh.sprout 
-		| "x": Marsh.incVN
-		| "z": Marsh.decVN		
-		| "p":  camera.stop			
-		| "2" : msd:= msd*10/9
-		| "3" : 	msd:= msd*9/10
-		| "4" : Base.gravity:= 1.5*Base.gravity		
-		| "5" : Base.STOPGO	
-		| "h" : camera.hop	
-		| " " :  IF hidecursor THEN HideMousePointer(FALSE) ELSE HideMousePointer(TRUE) END;
-		| "]": camera.aperture.width := camera.aperture.width * 101/99; camera.aperture.height := camera.aperture.height *101/99;
-			(*    Out.String("] pressed"); Out.Ln; *)
-		| "[":  camera.aperture.width := camera.aperture.width * 99/101;  camera.aperture.height := camera.aperture.height *99/101;
-			(*Out.String("[ pressed"); Out.Ln;*)
-		| "9": IF Marsh.cursorsize<999999 THEN Marsh.cursorsize:=Marsh.cursorsize * 2; Base.cursordist:=Base.cursordist/2 END
-		| "0": IF Marsh.cursorsize>1 THEN Marsh.cursorsize:=Marsh.cursorsize DIV 2; Base.cursordist:=Base.cursordist*2 END
-		| "7": Base.cursordist:=Base.cursordist*1.3
-		| "8": Base.cursordist:=Base.cursordist/1.3
-		| "l": Marsh.lines:=~Marsh.lines
-		| "b": Marsh.showcode;  
-	ELSE (* use keysm *)
-		(* Out.String("ucs: "); Out.Hex(ucs,4); Out.String("keysym: "); Out.Hex(keysym,4); Out.Ln;*)
-		CASE keysym OF
-		| Inputs.KsEscape (*1BH*) : IF CAPTUREMOUSE THEN 
-							CAPTUREMOUSE := FALSE;
-							PAUSE:=TRUE;
-							HideMousePointer(FALSE);
-							SetIdleTime(1000);
-						ELSE
-							(* alive:=FALSE *)
-						END;
-						(* Out.String("KsEscape.."); Out.Ln;*)
-		|	Inputs.KsF1:
-				Out.String("F1- Close"); Out.Ln;
-				(* Marsh.engrain; *)
-				Close();	
-				
-				
-	(*	| Inputs.KsF11: ToggleFullWindow; *)
-		| Inputs.KsF2: Base.gravity:= -Base.gravity;
-
-		| Inputs.KsControlL: AVATAR:=~AVATAR; 
-
-		(*? KsControlR does not work on LinuxAos  *)
-		| Inputs.KsControlR (* Inputs.KsInsert*): Marsh.SNIPEINTO:=~Marsh.SNIPEINTO;
-		ELSE
-			Out.String("keysym: "); Out.Hex(keysym,4); Out.Ln;
+	IF keysym=Inputs.KsControlL THEN
+		chatvoxel:=Marsh.sniprobe(); 
+		chatting:=TRUE;
+	ELSIF chatting=TRUE THEN
+		IF keysym#Inputs.KsControlL THEN 
+			chatting:=FALSE
 		END;
+		Out.String(chatvoxel.chat(CHR(ucs))^)
+	ELSE
+		CASE CHR(ucs) OF		
+			   "s" : camera.backward(0.51)
+			| "w" :camera.forward(0.51) 
+			| "a" :camera.leftstrafe(0.5)	
+			| "d" :camera.rightstrafe(0.5)
+			| "e": camera.upstrafe(0.51)
+			| "q": camera.downstrafe(0.51)	
+			| "n": leftsticky:=leftsticky*1.3; upsticky:=upsticky*1.3;
+			| "m": leftsticky:=leftsticky/1.3; upsticky:=upsticky/1.3;
+			| "o":
+			| "t": camera.glidetoggle 
+			| "v":Marsh.engrain
+			| "c":  
+			| "x": Marsh.incVN
+			| "z": Marsh.decVN		
+			| "p":  camera.stop			
+			| "2" : msd:= msd*10/9
+			| "3" : 	msd:= msd*9/10
+			| "4" : Base.gravity:= 1.5*Base.gravity		
+			| "5" : Base.STOPGO	
+			| "h" : camera.hop	
+			| " " :  IF hidecursor THEN HideMousePointer(FALSE) ELSE HideMousePointer(TRUE) END;
+			| "]": camera.aperture.width := camera.aperture.width * 101/99; camera.aperture.height := camera.aperture.height *101/99;
+				(*    Out.String("] pressed"); Out.Ln; *)
+			| "[":  camera.aperture.width := camera.aperture.width * 99/101;  camera.aperture.height := camera.aperture.height *99/101;
+				(*Out.String("[ pressed"); Out.Ln;*)
+			| "9": IF Marsh.cursorsize<999999 THEN Marsh.cursorsize:=Marsh.cursorsize * 2; Base.cursordist:=Base.cursordist/2 END
+			| "0": IF Marsh.cursorsize>1 THEN Marsh.cursorsize:=Marsh.cursorsize DIV 2; Base.cursordist:=Base.cursordist*2 END
+			| "7": Base.cursordist:=Base.cursordist*1.3
+			| "8": Base.cursordist:=Base.cursordist/1.3
+			| "l": Marsh.lines:=~Marsh.lines
+			| "b": Marsh.showcode;  
+		ELSE (* use keysm *)
+			Out.String("ucs: "); Out.Hex(ucs,4); Out.String("keysym: "); Out.Hex(keysym,4); Out.Ln;
+			CASE keysym OF
+			| Inputs.KsEscape (*1BH*) : IF CAPTUREMOUSE THEN 
+								CAPTUREMOUSE := FALSE;
+								PAUSE:=TRUE;
+								HideMousePointer(FALSE);
+								SetIdleTime(1000);
+							ELSE
+								(* alive:=FALSE *)
+							END;
+							(* Out.String("KsEscape.."); Out.Ln;*)
+			|	Inputs.KsF1:
+					Out.String("F1- Close"); Out.Ln;
+					(* Marsh.engrain; *)
+					Close();	
+					
+					
+		(*	| Inputs.KsF11: ToggleFullWindow; *)
+			| Inputs.KsF2: Base.gravity:= -Base.gravity;
+
+			| Inputs.KsControlL: AVATAR:=~AVATAR; 
+
+			(*? KsControlR does not work on LinuxAos  *)
+			| Inputs.KsControlR (* Inputs.KsInsert*): Marsh.SNIPEINTO:=~Marsh.SNIPEINTO;
+			ELSE
+				Out.String("keysym: "); Out.Hex(keysym,4); Out.Ln;
+			END;
+		END
 	END
 END KeyEvent;
 
@@ -669,7 +681,8 @@ VAR
 	R1,R2: REAL;
 	update: LONGINT;
 	MLseen, MMseen, MRseen: BOOLEAN;	
-
+	chatting: BOOLEAN;
+	chatvoxel: Voxel;
 	warpedthemouse: BOOLEAN;	
 	
 	MB : SET;	(* 0, 1, 2 *)

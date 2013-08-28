@@ -231,6 +231,17 @@ PROCEDURE passprobe*(p:PT):BOOLEAN;
 BEGIN
 	RETURN(passable);
 END passprobe;
+PROCEDURE chat*(in: CHAR):Strings.String;
+VAR
+	out: Strings.String;
+BEGIN
+	out:=Strings.NewString("generic voxel chat response");
+	IF in='h' THEN 
+		out:=Strings.NewString("i have nothing to say")
+	END;
+	RETURN out
+ END chat;
+
 PROCEDURE setcolor* (r,g,b,bl,a: REAL); 
 END setcolor;
 PROCEDURE setcolorrec*(r,g,b,bl,a: REAL); 

@@ -174,6 +174,12 @@ BEGIN
 	END
 END d2s;
 
+PROCEDURE noise*(p:PT):REAL; 
+BEGIN
+	RETURN(Noise.noise3dperlin(a*p.x,b*p.y,c*p.z, seed,octaves,persistence));
+END noise;
+
+
 END noise;
 
 TYPE ellipsoid*= OBJECT(FR)

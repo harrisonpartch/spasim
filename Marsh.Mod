@@ -184,6 +184,14 @@ BEGIN
 	stroke(Base.cursorPT,cursorsize,marshv.vox,voxundo)
 END snipeonto;
 
+PROCEDURE sniprobe*():Voxel;
+VAR
+	v: Voxel;
+BEGIN
+	v:=Base.world.proberay(Base.sniperay);
+	RETURN v
+END sniprobe;
+
 PROCEDURE drawHUD*;
 VAR
 	p:PT;
@@ -278,7 +286,7 @@ BEGIN
       rand:=Base.rand;	
 
   	w10:=Base.VoxelFromName("NM2");	
- 	z10:=Base.VoxelFromName("NM2");	
+ 	z10:=Base.VoxelFromName("NM3");	
     
 	Out.String("EEEEP!");
 	xot:=Base.VoxelFromName("Nharrisonavatar"); 
@@ -423,7 +431,7 @@ BEGIN
 	z10.FRaster(noise,128); 	
 	z10.FRaster(tnoise,128);  
 	z10.FRaster(plane,32);
-	z10.setcolor(1,3,1,5,3); 	
+	z10.setcolor(2,2,4,5,3); 	
 	gorge.setcolor(0,0,0,0,0);
 	z10.stroke(center,30,z10,undo);
 	Base.world:=z10; 	
