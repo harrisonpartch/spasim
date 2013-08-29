@@ -1,5 +1,5 @@
 MODULE Marsh;
-IMPORT  Base , Retina, Engrainer, Random,
+IMPORT  Base , Retina, Engrainer, Random, CellAuto,
  XNXLFRep, Files, Streams, Commands, Out:=KernelLog;
 
 CONST sfile="marshstrokes.text"
@@ -276,7 +276,7 @@ VAR
 	z10: Voxel;
 	sfish,gxy,w10,w11,v,lobster, btx,ash, dotz, GREEN,PURPLE,MCUBE:Voxel;
 	undo,rd,blu, die,gren,granite,sand,whiteblock,lazy,pdestroyer,axolotl,xen,sky1,sky2,tigerlily,cloud: Voxel;
-	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison:Voxel;
+	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison,fuse:Voxel;
 	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,cage,floop,volvox,life,iml: Voxel;
 	 
 BEGIN
@@ -314,7 +314,9 @@ BEGIN
   	
 	cage:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");
   	push(cage);
- 
+ 	fuse:=Base.VoxelFromName("NFuse");
+ 	ASSERT(fuse#NIL);
+ 	push(fuse);
 
 	gxy:=Base.VoxelFromName("NmOgKSH5ZXYP3DODELOkO7g"); 	
 	push(gxy);
@@ -426,14 +428,14 @@ BEGIN
 	Base.setPT(up,0,0,-1);
 	Base.setPT(center,1/2,1/2,11/12);
 	NEW(plane,center,up);
-	plane.vox:=sand;
+	plane.vox:=granite;
 	Out.String("EEEEP!"); 				
-	z10.FRaster(noise,128); 	
-	z10.FRaster(tnoise,128);  
+	w10.FRaster(noise,32); 	
+	w10.FRaster(tnoise,81);  
 	z10.FRaster(plane,32);
-	z10.setcolor(2,2,4,5,3); 	
+	z10.setcolor(2,2,4,5,3); 
 	gorge.setcolor(0,0,0,0,0);
-	z10.stroke(center,30,z10,undo);
+	z10.stroke(center,30,w10,undo);
 	Base.world:=z10; 	
 	Base.avatar:=conglomerate;
 	Base.avatarsize:=10000;

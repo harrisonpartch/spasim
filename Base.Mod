@@ -241,7 +241,6 @@ BEGIN
 	END;
 	RETURN out
  END chat;
-
 PROCEDURE setcolor* (r,g,b,bl,a: REAL); 
 END setcolor;
 PROCEDURE setcolorrec*(r,g,b,bl,a: REAL); 
