@@ -48,6 +48,7 @@ Retina.Mod
 XNXLMPEG.Mod
 XNXLFilmLoop.Mod
 TexVox.Mod
+CellAuto.Mod
 XNXLVoxel4.Mod
 XNXLHalfSpace.Mod
 XNXLRotaVox.Mod
