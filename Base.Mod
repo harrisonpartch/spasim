@@ -323,6 +323,10 @@ END play;
 PROCEDURE touch*;
 END touch; 
 
+PROCEDURE free*;
+END free; 
+
+
 END Voxel; 
 
 TYPE VoxelStack*=OBJECT

@@ -16,6 +16,97 @@ TYPE PT = Base.PT;
  	NCube=Base.NCube;
  	LCube=Base.LightCube;
 
+TYPE cellarray=POINTER TO ARRAY OF cell;
+
+TYPE Pool = OBJECT
+VAR
+	pool: cellarray;
+	count: LONGINT;
+	
+PROCEDURE &New;
+BEGIN
+	NEW(pool,8);
+END New;
+
+PROCEDURE grow;
+VAR old: cellarray;
+	i : LONGINT;
+BEGIN
+	old := pool;
+	NEW(pool, LEN(pool)*2);
+	FOR i := 0 TO count-1 DO pool[i] := old[i] END;
+	Out.String("NM3 pool growing to ");
+	Out.Int(count*2,10);
+END grow;
+
+PROCEDURE add(c : cell);
+BEGIN 
+	IF count = LEN(pool) THEN grow END;
+	pool[count] := c;
+	INC(count)
+END add;
+
+PROCEDURE new(VAR c: cell);
+BEGIN
+	DEC(count);
+	IF count>0 THEN 
+		c:=pool[count]
+	ELSE
+		NEW(c);
+	END
+END new;
+
+END Pool;
+	
+TYPE WipeRecord=RECORD
+	c: cell;
+	i,j,k: INTEGER
+END;
+
+TYPE wipearray=POINTER TO ARRAY OF WipeRecord;
+
+TYPE Wiper=OBJECT
+VAR
+	wipe: wipearray;
+	i, count: LONGINT;
+	
+PROCEDURE &New;
+BEGIN
+	NEW(wipe,8);
+END New;
+
+PROCEDURE grow;
+VAR old: wipearray;
+	i : LONGINT;
+BEGIN
+	old := wipe;
+	NEW(wipe, LEN(wipe)*2);
+	FOR i := 0 TO count-1 DO wipe[i] := old[i] END;
+	Out.String("NM3 wipe growing to ");
+	Out.Int(count*2,10);
+END grow;
+
+PROCEDURE add(c : cell; i,j,k: INTEGER);
+BEGIN 
+	IF count = LEN(wipe) THEN grow END;
+	wipe[count].c := c;
+	wipe[count].i:= i;
+	wipe[count].j := j;
+	wipe[count].k:= k;		
+	INC(count)
+END add;
+
+BEGIN{ACTIVE}
+	REPEAT
+		AWAIT(TIC);
+		FOR i:=0 TO count-1 DO
+			wipe[count].c.blox[wipe[count].i,wipe[count].j,wipe[count].k].free();
+			wipe[count].c.blox[wipe[count].i,wipe[count].j,wipe[count].k]:=NIL
+		END;
+		count:=0
+	UNTIL FALSE;
+END Wiper;
+
 TYPE cell* = OBJECT(Voxel);   
 (*! This module may be either imported or used anonymously *)
 VAR
@@ -276,7 +367,7 @@ VAR
 	c: cell;
 BEGIN
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
-		NEW(c);
+		pool.new(c);
 		c.fillchequer(v,w);
 		blox[i,j,k]:=c;
 	END END END
@@ -300,6 +391,25 @@ BEGIN
 	code:=NCODE; 
 	ncode:=NCODE
 END init;
+
+PROCEDURE free*;
+VAR
+	i,j,k: INTEGER;
+BEGIN
+	FOR i:=0 TO MMO DO
+		FOR j:=0 TO MMO DO
+			FOR k:=0 TO MMO DO
+				IF blox[i,j,k]#NIL THEN
+					blox[i,j,k].free();
+					blox[i,j,k]:=NIL;
+					nbloxTF[i,j,k]:=FALSE;
+					blox[i,j,k].imposter:=Base.EMPTY;
+				END
+			END
+		END
+	END;
+	pool.add(SELF);
+END free; 
 
 PROCEDURE copyclear*;
 VAR
@@ -466,7 +576,7 @@ BEGIN
 				ELSIF blox[i,j,k].complex THEN
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel,vu)
 				ELSE
-					NEW(c);
+					pool.new(c);
 					c.setcolor(red,green,blue,black,alpha);
 					c.fill(blox[i,j,k]);
 					blox[i,j,k]:=c;
@@ -474,7 +584,7 @@ BEGIN
 					c.strokerec(p, resolution,nextscale,voxel,vu);
 				END	
 			ELSE
-				NEW(c);
+				pool.new(c);
 				c.setcolor(red,green,blue,black,alpha);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
@@ -510,12 +620,12 @@ BEGIN
 				ELSIF (blox[i,j,k] IS Voxel) THEN
 					blox[i,j,k].nstroke(p, resolution DIV nextscale,normal,color)
 				ELSE
-					NEW(c);
+					pool.new(c);
 					c.setcolor(red,green,blue,black,alpha);
 					c.imposter:=blox[i,j,k];	
 					IF blox[i,j,k].emptysplit THEN 
 						FOR ii := 0 TO MMO DO FOR jj := 0 TO MMO DO FOR kk:= 0 TO MMO DO
-							NEW(c2);
+							pool.new(c2);
 							blox[i,j,k]:=c2
 						END END END;
 					ELSE
@@ -526,7 +636,7 @@ BEGIN
 					c.nstrokerec(p, resolution,nextscale,normal,color);
 				END	
 			ELSE
-				NEW(c);
+				pool.new(c);
 				c.setcolor(red,green,blue,black,alpha);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
@@ -579,7 +689,7 @@ BEGIN
 			IF ABS(d2s) < CRDNS THEN				
 				o.x:=p.x-1/TWOMS; o.y:=p.y-1/TWOMS; o.z:=p.z-1/TWOMS; (* p is center, o is corner *)
 				IF blox[i,j,k]=NIL THEN 
-					NEW(newcell);
+					pool.new(newcell);
 					blox[i,j,k]:=newcell;
 					newcell.setcolor(red,green,blue,black,alpha);
 					newcell.imposter:=f.getimposter(p);
@@ -638,7 +748,7 @@ BEGIN
 			IF ABS(d2s)<CRDS THEN  (* at surface *)				
 				o.x:=p.x-1/TWOMS; o.y:=p.y-1/TWOMS; o.z:=p.z-1/TWOMS; (* p is center, o is corner *)
 				IF blox[i,j,k]=NIL THEN
-					NEW(newcell);
+					pool.new(newcell);
 					IF f.in(p) THEN 
 						newcell.imposter:=f.getimposter(p);
 						newcell.nposterTF:=TRUE;
@@ -696,7 +806,7 @@ PROCEDURE copy():Voxel;
 VAR c: cell;
 	i,j,k: INTEGER;
 BEGIN
-	NEW(c);
+	pool.new(c);
 	c.setcolor(red,green,blue,black,alpha);
 	c.nbloxTF:=nbloxTF;
 	c.nblox:=nblox;
@@ -721,7 +831,7 @@ VAR
 BEGIN
 	IF code=NCODE THEN
 		copymarker:=TRUE;
-		NEW(c);
+		pool.new(c);
 		c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; c.alpha:=alpha;
 		c.nbloxTF:=nbloxTF;
 		c.nblox:=nblox;
@@ -782,15 +892,20 @@ END sprout;
 
 END cell;
 
+VAR
+	pool:Pool;
+	TIC: BOOLEAN; 
 
 PROCEDURE thisvox*():Voxel;
 VAR
 	v: cell;  
 BEGIN
-	NEW(v);
+	pool.new(v);
 	RETURN v
 END thisvox;
 
+BEGIN
+	NEW(pool)
 END NM3.
 
 
