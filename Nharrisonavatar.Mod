@@ -19,6 +19,7 @@ BEGIN
 		NEW(rv,sabot,up, right, 3/10, 1/10)	
 	END;
 	vox:=rv;
+	vox.passable:=TRUE;
 	RETURN vox
 END thisvox;
 

@@ -34,7 +34,7 @@ BEGIN
 	IF YELLOW=NIL THEN NEW(YELLOW) END;
 	clere;
 	seed;
-	register; 
+(*	register; *)
 	tock := 1;
 END init;
 			

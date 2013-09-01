@@ -2,9 +2,11 @@
 <?bluebottle format version="0.1" ?>
 <?xml-stylesheet type="text/xsl" href="http://bluebottle.ethz.ch/bluebottle.xsl" ?>
 <Text>
-<Span style="Normal"><![CDATA[
-]]></Span><Span style="Bold"><![CDATA[# WinAos]]></Span><Span style="Normal"><![CDATA[
-]]></Span><Span style="Bold"><![CDATA[Compiler.Compile]]></Span><Span style="Normal"><![CDATA[
+<Span style="Bold"><![CDATA[
+
+]]></Span><Span style="Normal"><![CDATA[# for WinAos add spasim directory to aos.ini or myaos.ini search path:
+# Paths.Search = Work;spasim;obj;../source;PELinker;../UnixAos;vy.ants/source;vy.ants/documents]]></Span><Span style="Bold"><![CDATA[
+Compiler.Compile]]></Span><Span style="Normal"><![CDATA[
 	 OpenGLConst.Mod
 	 Win32.OpenGL.Mod
 	 Win32.GLU.Mod
@@ -15,11 +17,8 @@
 	 Win32.WGLinfo.Mod
 	~
 
-	WGLinfo.Do ~
+WGLinfo.Do ~
 	
-# for WinAos add spasim directory to aos.ini or myaos.ini search path:
-# Paths.Search = Work;spasim;obj;../source;PELinker;../UnixAos;vy.ants/source;vy.ants/documents
-
 
 # LinuxAos
 ]]></Span><Span style="Bold"><![CDATA[Compiler.Compile]]></Span><Span style="Normal"><![CDATA[
@@ -35,6 +34,8 @@
 	~
 
 GLXinfo.Do ~ 
+
+#Linux or Windows:
 
 ]]></Span><Span style="Bold"><![CDATA[Compiler.Compile]]></Span><Span style="Normal"><![CDATA[
 Base.Mod
@@ -63,16 +64,17 @@ Render.Mod ~
 
 ]]></Span><Span style="Bold"><![CDATA[NCompiler.ncompile]]></Span><Span style="Normal"><![CDATA[ ~
 ]]></Span><Span style="AdHoc Oberon 10 0 0 F00BFFF 0000000"><![CDATA[
-ncompile compiles the "anonymous" modules. If the files are not shown as compiled (below), open 
-NCompiler.Mod, compile it with the button, and run the command again.]]></Span><Span style="Normal"><![CDATA[
-
-]]></Span><Span style="Bold"><![CDATA[SystemTools.FreeDownTo	Base ]]></Span><Span style="Normal"><![CDATA[~
-]]></Span><Span style="AdHoc Oberon 10 0 0 F00BFFF 0000000"><![CDATA[
-Modules must be freed to force their reloading after being changed and recompiled, or to return them to their original state. ]]></Span><Span style="Normal"><![CDATA[
+ncompile compiles the "anonymous" modules]]></Span><Span style="Normal"><![CDATA[ 
 
 ]]></Span><Span style="Bold"><![CDATA[Render.Open]]></Span><Span style="Normal"><![CDATA[ ~
+]]></Span><Span style="Bold"><![CDATA[
+
+**********************************************************************************************************
 
 
+SystemTools.FreeDownTo	Base ]]></Span><Span style="Normal"><![CDATA[~
+]]></Span><Span style="AdHoc Oberon 10 0 0 F00BFFF 0000000"><![CDATA[
+Modules must be freed to force their reloading after being changed and recompiled, or to return them to their original state. ]]></Span><Span style="Normal"><![CDATA[
 
 ~
 
@@ -106,6 +108,8 @@ NBsHFiBKkSckXBAd46ZbEQw.Mod
 NBsHFiBKkSckXBAd46Zbsss.Mod
 Nharrisonavatar.Mod
 N2qeD84Fv78X2XEj8PtUZO8.Mod
+NH6nvNlOJNlCtpkDB56ljSx.Mod
+]]></Span><Span style="Normal"><![CDATA[N2qeD84Fv78X2XEj8PtU342.Mod]]></Span><Span style="Normal"><![CDATA[
 ]]></Span>
 
 </Text>

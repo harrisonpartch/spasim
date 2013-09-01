@@ -1,4 +1,4 @@
-MODULE NM3;
+MODULE NM3; (*! This module may be either imported or used anonymously *)
 IMPORT Base, XNXLE, Noise:=XNXLNoise, XNXLFRep, Math, Out := KernelLog, Debugging, Streams,Strings;
 
 CONST M=3;
@@ -26,6 +26,7 @@ VAR
 PROCEDURE &New;
 BEGIN
 	NEW(pool,8);
+	count:=0;
 END New;
 
 PROCEDURE grow;
@@ -41,19 +42,24 @@ END grow;
 
 PROCEDURE add(c : cell);
 BEGIN 
-	IF count = LEN(pool) THEN grow END;
-	pool[count] := c;
-	INC(count)
+	IF count < LEN(pool) THEN 
+		pool[0]:= c;
+		INC(count)	
+	ELSE	
+		grow;
+		add(c) 
+	END;
 END add;
 
 PROCEDURE new(VAR c: cell);
 BEGIN
-	DEC(count);
+
 	IF count>0 THEN 
 		c:=pool[count]
 	ELSE
 		NEW(c);
-	END
+	END;
+	DEC(count);
 END new;
 
 END Pool;
@@ -63,32 +69,36 @@ TYPE WipeRecord=RECORD
 	i,j,k: INTEGER
 END;
 
-TYPE wipearray=POINTER TO ARRAY OF WipeRecord;
+TYPE WipeArray=POINTER TO ARRAY OF WipeRecord;
 
-TYPE Wiper=OBJECT
+TYPE Wiper=OBJECT(Base.V)
 VAR
-	wipe: wipearray;
+	wipe: WipeArray;
 	i, count: LONGINT;
+	TIC:BOOLEAN;
+	tx: INTEGER;
 	
 PROCEDURE &New;
 BEGIN
 	NEW(wipe,8);
+	register
 END New;
 
 PROCEDURE grow;
-VAR old: wipearray;
+VAR old: WipeArray;
 	i : LONGINT;
 BEGIN
 	old := wipe;
-	NEW(wipe, LEN(wipe)*2);
-	FOR i := 0 TO count-1 DO wipe[i] := old[i] END;
+	NEW(wipe, count*2);
+	FOR i := 0 TO LEN(old)-1 DO wipe[i] := old[i] END;
 	Out.String("NM3 wipe growing to ");
 	Out.Int(count*2,10);
 END grow;
 
 PROCEDURE add(c : cell; i,j,k: INTEGER);
 BEGIN 
-	IF count = LEN(wipe) THEN grow END;
+	AWAIT(~TIC); 
+	IF count >= LEN(wipe)-1 THEN grow END;
 	wipe[count].c := c;
 	wipe[count].i:= i;
 	wipe[count].j := j;
@@ -96,19 +106,22 @@ BEGIN
 	INC(count)
 END add;
 
+PROCEDURE tick*;
+BEGIN{EXCLUSIVE} 
+	TIC:=TRUE 
+END tick;
+
 BEGIN{ACTIVE}
 	REPEAT
 		AWAIT(TIC);
-		FOR i:=0 TO count-1 DO
-			wipe[count].c.blox[wipe[count].i,wipe[count].j,wipe[count].k].free();
-			wipe[count].c.blox[wipe[count].i,wipe[count].j,wipe[count].k]:=NIL
-		END;
-		count:=0
+		i:=0;
+		wipe[i].c.blox[wipe[i].i,wipe[i].j,wipe[i].k]:=NIL;
+		count:=0;
+		BEGIN{EXCLUSIVE} TIC:=FALSE END
 	UNTIL FALSE;
 END Wiper;
 
 TYPE cell* = OBJECT(Voxel);   
-(*! This module may be either imported or used anonymously *)
 VAR
 	blox*: ARRAY M,M,M OF Voxel;
 	nbloxTF*: ARRAY M,M,M OF BOOLEAN;
@@ -361,6 +374,20 @@ BEGIN
 	END END END
 END fillchequer;
 
+PROCEDURE fillsierp*(v,w: Voxel);
+VAR
+	i,j,k: INTEGER;
+BEGIN
+	fill(v);
+	blox[1,1,0]:=w;
+	blox[1,1,2]:=w;	
+	blox[0,1,1]:=w;	
+	blox[2,1,1]:=w;
+	blox[1,0,1]:=w;	
+	blox[1,2,1]:=w;		
+	blox[1,1,1]:=w;	
+END fillsierp;
+
 PROCEDURE fillcqr2*(v,w: Voxel);
 VAR
 	i,j,k: INTEGER;
@@ -402,9 +429,9 @@ BEGIN
 				IF blox[i,j,k]#NIL THEN
 					blox[i,j,k].free();
 					blox[i,j,k]:=NIL;
-					nbloxTF[i,j,k]:=FALSE;
-					blox[i,j,k].imposter:=Base.EMPTY;
-				END
+				END;
+				imposter:=NIL;
+				nbloxTF[i,j,k]:=FALSE;
 			END
 		END
 	END;
@@ -538,6 +565,16 @@ BEGIN
 	END
 END stroke;
 
+PROCEDURE strokephemeral(p:PT; resolution:LONGINT; voxel,voxundo:Voxel);
+VAR
+	i,j,k: LONGINT;
+BEGIN
+	Base.clamPT(p);
+	IF voxel#NIL THEN
+		strokephemeralrec(p,resolution,1,voxel,voxundo);
+	END
+END strokephemeral;
+
 PROCEDURE nstroke(p:PT; resolution:LONGINT; normal:PT; color: Color);
 VAR
 	i,j,k: LONGINT;
@@ -567,32 +604,89 @@ BEGIN
 			IF blox[i,j,k]#NIL THEN 
 				IF voxundo= NIL THEN voxundo:=blox[i,j,k] END;  
 				IF  blox[i,j,k].copyonstroke THEN
-				(*	copy:=blox[i,j,k].deepcopy(); *)
-					v:=blox[i,j,k];
-					copy:= Base.VoxelFromName(v.code); 
+					copy:=blox[i,j,k].deepcopy(); 
 					copy.copyonstroke:=FALSE; 
+					copy.strokerec(p, resolution,nextscale,voxel,vu);					
 					blox[i,j,k]:=copy;
-					blox[i,j,k].strokerec(p, resolution,nextscale,voxel,vu);
 				ELSIF blox[i,j,k].complex THEN
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel,vu)
 				ELSE
 					pool.new(c);
 					c.setcolor(red,green,blue,black,alpha);
 					c.fill(blox[i,j,k]);
+					c.passable:=blox[i,j,k].passable;
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-					c.strokerec(p, resolution,nextscale,voxel,vu);
+					c.strokephemeralrec(p, resolution,nextscale,voxel,vu);
 				END	
 			ELSE
 				pool.new(c);
 				c.setcolor(red,green,blue,black,alpha);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-				c.strokerec(p, resolution,nextscale,voxel,vu);
+				c.strokephemeralrec(p, resolution,nextscale,voxel,vu);
 			END
 		END
 	END
 END strokerec;
+
+PROCEDURE strokephemeralrec(p:PT; resolution,scale:LONGINT; voxel,voxundo:Voxel);
+VAR
+	i,j,k,ii,jj,kk: INTEGER;
+	nextscale: LONGINT;
+	v,vv:Voxel;
+	c,c2: cell;	
+	copy,vu: Voxel;
+	code: Base.Name;
+BEGIN
+	IF ~lockTF THEN
+		nextscale:=scale*M;
+		p.x:=p.x*M;
+		p.y:=p.y*M;
+		p.z:=p.z*M;
+		i := SHORT(ENTIER(p.x)MOD M); j := SHORT(ENTIER(p.y)MOD M); k := SHORT(ENTIER(p.z)MOD M);	
+		IF nextscale>resolution THEN	
+			IF blox[i,j,k]=NIL THEN blox[i,j,k]:=voxel END;
+		ELSIF blox[i,j,k]=NIL THEN 
+			pool.new(c);
+			c.setcolor(red,green,blue,black,alpha);
+			blox[i,j,k]:=c;
+			wiper.add(SELF,i,j,k);
+			p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
+			c.strokedelicaterec(p, resolution,nextscale,voxel,vu);
+		ELSIF blox[i,j,k].passable THEN blox[i,j,k].strokerec(p, resolution,nextscale,voxel,vu)
+		END		
+	END
+END strokephemeralrec;
+
+PROCEDURE strokedelicaterec(p:PT; resolution,scale:LONGINT; voxel,voxundo:Voxel);
+VAR
+	i,j,k,ii,jj,kk: INTEGER;
+	nextscale: LONGINT;
+	v,vv:Voxel;
+	c,c2: cell;	
+	copy,vu: Voxel;
+	code: Base.Name;
+BEGIN
+	IF ~lockTF THEN
+		nextscale:=scale*M;
+		p.x:=p.x*M;
+		p.y:=p.y*M;
+		p.z:=p.z*M;
+		i := SHORT(ENTIER(p.x)MOD M); j := SHORT(ENTIER(p.y)MOD M); k := SHORT(ENTIER(p.z)MOD M);	
+		IF nextscale>resolution THEN	
+			IF blox[i,j,k]=NIL THEN blox[i,j,k]:=voxel END; 
+		ELSIF blox[i,j,k]=NIL THEN 
+			pool.new(c);
+			c.setcolor(red,green,blue,black,alpha);
+			blox[i,j,k]:=c;
+			wiper.add(SELF,i,j,k);
+			p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
+			c.strokedelicaterec(p, resolution,nextscale,voxel,vu);
+		ELSIF blox[i,j,k].passable THEN blox[i,j,k].strokedelicaterec(p, resolution,nextscale,voxel,vu)
+		END		
+	END
+END strokedelicaterec;
 
 PROCEDURE nstrokerec(p:PT; resolution,scale:LONGINT; normal:PT; color: Color);
 VAR
@@ -654,7 +748,6 @@ VAR
 	n: LONGINT;
 	p: PT;
 	vu: Voxel
-
 BEGIN
 	n := ENTIER(Base.distance(a,b)*resolution*M);
 	IF n > 0 THEN
@@ -894,8 +987,8 @@ END cell;
 
 VAR
 	pool:Pool;
-	TIC: BOOLEAN; 
-
+	wiper: Wiper;
+	
 PROCEDURE thisvox*():Voxel;
 VAR
 	v: cell;  
@@ -905,9 +998,9 @@ BEGIN
 END thisvox;
 
 BEGIN
-	NEW(pool)
+	NEW(pool);
+	NEW(wiper)
 END NM3.
-
 
 
 

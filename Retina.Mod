@@ -458,6 +458,7 @@ BEGIN
 	Raster.Put(image,(W DIV 2)-1,(H DIV 2)-1,pixel,copy);	
 	Raster.SetRGB(pixel,0,1,1);
 	Raster.Put(image,(W DIV 2)+1,(H DIV 2)-1,pixel,copy);		
+	Base.tick
 END go;
 
 PROCEDURE lsu*;

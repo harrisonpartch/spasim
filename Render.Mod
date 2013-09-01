@@ -267,14 +267,13 @@ BEGIN
 	gravity:=Base.gravity;
 	gravityvector:=Base.mulPT(gravityvector,Base.gravity);
 	a:=Retina.fward.x*Base.cursordist; b:=Retina.fward.y*Base.cursordist; c:=Retina.fward.z*Base.cursordist;
-	d:=Retina.fward.x*0.0001; 	e:=Retina.fward.y*0.0001;  	f:=Retina.fward.z*0.0001; 
+	d:=Retina.fward.x*0.0001; e:=Retina.fward.y*0.0001;  f:=Retina.fward.z*0.0001; 
 	Base.updatecamera(cx,cy,cz,a,b,c,d,e,f);	
-(*	Marsh.drawavatar;  *)
+	Marsh.drawavatar;  
 	GLIDE:=0.975;	
 	cvz := cvz*GLIDE+gravityvector.z; 
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y; 
 	cvl :=cvl*0.0; cvu := cvu*0.0;
-(*	IF AVATAR THEN Marsh.drawavatar END; *)
 	IF MOUSEDOWN THEN	
 		IF GLW.ML IN MB THEN Marsh.draw;
 		ELSIF  GLW.MM IN MB THEN Marsh.snipeinto; 
@@ -282,7 +281,6 @@ BEGIN
 		END;	
 	END;
 	trace; 
-	Base.tick;
 END tick;
  
 END Camera;
@@ -655,6 +653,7 @@ BEGIN
 	ELSIF GetCurrentFrameMs() >(msd+10) THEN 
 		Retina.lessdetail;
 	END;
+	Base.tick
 END GameLogic;
 
 BEGIN

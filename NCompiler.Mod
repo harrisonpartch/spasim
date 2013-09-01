@@ -16,7 +16,7 @@ VAR
 BEGIN
        NEW(e);
        e.Open("./N*Mod", {});
-       compiler:=CompilerInterface.GetCompilerByName("Fox");
+       compiler:=CompilerInterface.GetCompiler("Mod");
        context.out.String("compiling all N*Mod ");
        context.out.Ln;
        IF compiler#NIL THEN

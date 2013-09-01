@@ -220,9 +220,9 @@ PROCEDURE drawavatar*;
 VAR
 	i: LONGINT;
 	p: PT;
+	v: Voxel;
 BEGIN
-	stroke(Base.previousavatarPT,Base.avatarsize,avatarundo,voxundo);
-	stroke(Base.avatarPT,Base.avatarsize,Base.avatar,avatarundo);
+	Base.world.strokephemeral(Base.avatarPT,Base.avatarsize,Base.avatar,avatarundo)
 END drawavatar;
 
 PROCEDURE Rez*(context: Commands.Context);
@@ -350,7 +350,7 @@ BEGIN
 	push(gren);
 	die:=Base.VoxelFromName("NCjgzkmiTyecI5x6eOgYqpQ"); 
 	push(die);
-	granite:=Base.VoxelFromName("NH6nvNlOJNlCtpkDB56ljSw"); 	
+	granite:=Base.VoxelFromName("NH6nvNlOJNlCtpkDB56ljSx"); 	
 	push(granite);
 	sand:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw"); 		
 	push(sand);
@@ -396,7 +396,7 @@ BEGIN
 	push(tigerlily);
 	gorge:=Base.VoxelFromName("NxxxGAernhjFK40xASZZVoQ"); 
 	push(gorge);
-      harrison:=Base.VoxelFromName("squeep"); 
+      harrison:=Base.VoxelFromName("Nharrisonavatar"); 
 	push(harrison);
  
 	Base.setPT(up,0,0,1);
@@ -430,15 +430,16 @@ BEGIN
 	NEW(plane,center,up);
 	plane.vox:=granite;
 	Out.String("EEEEP!"); 				
-	w10.FRaster(noise,32); 	
-	w10.FRaster(tnoise,81);  
+	z10.FRaster(noise,32); 	
+	z10.FRaster(tnoise,81);  
 	z10.FRaster(plane,32);
 	z10.setcolor(2,2,4,5,3); 
 	gorge.setcolor(0,0,0,0,0);
 	z10.stroke(center,30,w10,undo);
 	Base.world:=z10; 	
-	Base.avatar:=conglomerate;
-	Base.avatarsize:=10000;
+	Base.avatar:=msphere;
+	msphere.passable:=TRUE;
+	Base.avatarsize:=100000;
 (*	engrain; 
 	sprout; *)
 	Out.String("EEEEP!");
