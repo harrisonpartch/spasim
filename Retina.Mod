@@ -451,10 +451,10 @@ BEGIN
 		AWAIT((tilesdone=TW*TH) OR FRAMEBOORT)
 	END;
 	Raster.SetRGB(pixel,255,255,255);
-	Raster.Put(image,(W DIV 2)+1,(H DIV 2)+2,pixel,copy);	
-	Raster.Put(image,(W DIV 2)-1,(H DIV 2)+2,pixel,copy);	
-	Raster.Put(image,(W DIV 2)-1,(H DIV 2)-2,pixel,copy);	
-	Raster.Put(image,(W DIV 2)+1,(H DIV 2)-2,pixel,copy);
+	Raster.Put(image,(W DIV 2)+2,(H DIV 2)+2,pixel,copy);	
+	Raster.Put(image,(W DIV 2)-2,(H DIV 2)+2,pixel,copy);	
+	Raster.Put(image,(W DIV 2)-2,(H DIV 2)-2,pixel,copy);	
+	Raster.Put(image,(W DIV 2)+2,(H DIV 2)-2,pixel,copy);
 	Raster.SetRGB(pixel,0,0,0);
 	Raster.Put(image,(W DIV 2)+1,(H DIV 2)+1,pixel,copy);	
 	Raster.Put(image,(W DIV 2)-1,(H DIV 2)+1,pixel,copy);	
