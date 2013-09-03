@@ -267,9 +267,9 @@ BEGIN
 	gravity:=Base.gravity;
 	gravityvector:=Base.mulPT(gravityvector,Base.gravity);
 	a:=Retina.fward.x*Base.cursordist; b:=Retina.fward.y*Base.cursordist; c:=Retina.fward.z*Base.cursordist;
-	d:=Retina.fward.x*0.0001; e:=Retina.fward.y*0.0001;  f:=Retina.fward.z*0.0001; 
+	d:=-Retina.fward.x*0.0003; e:=-Retina.fward.y*0.0003;  f:=-Retina.fward.z*0.0003; 
 	Base.updatecamera(cx,cy,cz,a,b,c,d,e,f);	
-	Marsh.drawavatar;  
+	IF TRUE THEN Marsh.drawavatar END;
 	GLIDE:=0.975;	
 	cvz := cvz*GLIDE+gravityvector.z; 
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y; 
@@ -281,6 +281,7 @@ BEGIN
 		END;	
 	END;
 	trace; 
+	Base.tick
 END tick;
  
 END Camera;
@@ -413,7 +414,7 @@ BEGIN
 			| "4" : Base.gravity:= 1.5*Base.gravity		
 			| "5" : Base.STOPGO	
 			| "h" : camera.hop	
-			| " " :  IF hidecursor THEN HideMousePointer(FALSE) ELSE HideMousePointer(TRUE) END;
+			| " " :  IF hidecursor THEN HideMousePointer(FALSE) ELSE HideMousePointer(TRUE) END; AVATAR:=~AVATAR;
 			| "]": camera.aperture.width := camera.aperture.width * 101/99; camera.aperture.height := camera.aperture.height *101/99;
 				(*    Out.String("] pressed"); Out.Ln; *)
 			| "[":  camera.aperture.width := camera.aperture.width * 99/101;  camera.aperture.height := camera.aperture.height *99/101;
@@ -653,7 +654,6 @@ BEGIN
 	ELSIF GetCurrentFrameMs() >(msd+10) THEN 
 		Retina.lessdetail;
 	END;
-	Base.tick
 END GameLogic;
 
 BEGIN

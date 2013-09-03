@@ -7,7 +7,7 @@ PROCEDURE thisvox*():Base.Voxel;
 BEGIN	
 	IF vox=NIL THEN NEW(vox,"lobster.png")	
  END;
-	RET URN vox
+	RETURN vox
 END thisvox;
 
  END NznGx2ySiHIGrO5t9Pzcw5Q. 

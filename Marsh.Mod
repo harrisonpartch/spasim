@@ -350,7 +350,7 @@ BEGIN
 	push(gren);
 	die:=Base.VoxelFromName("NCjgzkmiTyecI5x6eOgYqpQ"); 
 	push(die);
-	granite:=Base.VoxelFromName("NH6nvNlOJNlCtpkDB56ljSx"); 	
+	granite:=Base.VoxelFromName("NGNYAfkxmEzxe6ZESmcMJtw"); 	
 	push(granite);
 	sand:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw"); 		
 	push(sand);
@@ -403,9 +403,9 @@ BEGIN
 	Base.setPT(center,1/2,1/2,1/12);
 	NEW(tnoise);
 	tnoise.seed:=123666;	
-	tnoise.a:=3;
-	tnoise.b:=2;
-	tnoise.c:=2;		
+	tnoise.a:=1;
+	tnoise.b:=1;
+	tnoise.c:=1;		
 	tnoise.octaves:=4;
 	tnoise.persistence:=3.5;
 	tnoise.setvoxel(dotz);
@@ -413,7 +413,7 @@ BEGIN
 	tnoise.va[1]:=axolotl;
 	tnoise.va[2]:=etile0;
 	tnoise.va[3]:=serp;
-	tnoise.va[4]:=greenball;
+	tnoise.va[4]:=harrison;
 	tnoise.va[5]:=btx;	
 
 	NEW(noise);		
@@ -430,16 +430,16 @@ BEGIN
 	NEW(plane,center,up);
 	plane.vox:=granite;
 	Out.String("EEEEP!"); 				
-	z10.FRaster(noise,32); 	
+	z10.FRaster(noise,81); 	
 	z10.FRaster(tnoise,81);  
 	z10.FRaster(plane,32);
-	z10.setcolor(2,2,4,5,3); 
+	z10.setcolor(0,0,3/2,2,0); 
 	gorge.setcolor(0,0,0,0,0);
 	z10.stroke(center,30,w10,undo);
 	Base.world:=z10; 	
-	Base.avatar:=msphere;
+	Base.avatar:=harrison;
 	msphere.passable:=TRUE;
-	Base.avatarsize:=100000;
+	Base.avatarsize:=10000;
 (*	engrain; 
 	sprout; *)
 	Out.String("EEEEP!");

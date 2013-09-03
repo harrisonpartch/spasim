@@ -12,6 +12,80 @@ TYPE PT = Base.PT;
 
 (* pseudosolid texture *)
 
+
+TYPE AvaVox* = OBJECT(Voxel);
+VAR
+	texcube*: TexCube;
+	name: Name;
+
+PROCEDURE & init*(n: Name);
+BEGIN
+	NEW(texcube,n,FALSE);
+	name:=n;
+END init;
+
+PROCEDURE Shade (VAR ray: Ray);
+VAR
+	p: Raster.Pixel;
+	x,y,xi,yj: LONGINT;
+	dr,dg,db,a: REAL;
+	lx,ly: REAL;
+	i,j,face: INTEGER;
+	dot: REAL;	
+	xov,yov,zov:REAL;
+	inside: BOOLEAN;
+	color: Base.Color;
+BEGIN		
+	CASE ray.face OF
+		 0: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
+		|1: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
+		|2: lx := ray.lxyz.x; ly := ray.lxyz.y;
+		|3: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
+		|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
+		|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
+	END;	
+	color:=texcube.side[ray.face].pixel(1-lx,1-ly);
+	dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
+	dr:=color.red*dot*ray.ra;
+	dg:=color.green*dot*ray.ra;
+	db:=color.blue*dot*ray.ra;	
+	IF (color.alpha<0.9) THEN			
+		ray.ra:=ray.ra-0.1;
+		ray.ga:=ray.ga-0.1;
+		ray.ba:=ray.ba-0.1;
+		mirror(ray)
+	ELSE
+		ray.r := ray.r + dr;
+		ray.g := ray.g + dg;
+		ray.b := ray.b + db;	
+		ray.terminate:=TRUE
+	END
+END Shade;
+
+PROCEDURE reflect(VAR p: PT; n: PT);
+VAR 
+	a,b,c,dot: REAL;
+BEGIN
+	dot := p.x*n.x+p.y*n.y+p.z*n.z;
+	a := 2*n.x*dot; b := 2*n.y*dot; c := 2*n.z*dot;
+	p.x := p.x-a; p.y := p.y-b; p.z := p.z-c;
+END reflect;
+
+PROCEDURE mirror(VAR ray: Ray);
+BEGIN
+	ray.hitmirrorTF := TRUE;
+	ray.hitxyz:=ray.xyz;
+	ray.hitdxyz:=ray.dxyz;
+	ray.changed := TRUE;
+	ray.mirrortf:=TRUE;	
+	reflect(ray.dxyz, ray.normal);	
+	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
+	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
+	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
+END mirror;
+
+END AvaVox;
+
 TYPE TexVox* = OBJECT(Voxel);
 VAR
 	txTF*: BOOLEAN;
@@ -320,18 +394,11 @@ BEGIN
 	dg:=color.green*dot*ray.ra;
 	db:=color.blue*dot*ray.ra;	
 	IF color.alpha<0.9 THEN
-		IF color.alpha>0.7 THEN
-			ray.ra:=ray.ra-0.1;
-			ray.ga:=ray.ga-0.1;
-			ray.ba:=ray.ba-0.1;
+		IF color.alpha>0.1 THEN
+			ray.ra:=ray.ra-0.031;
+			ray.ga:=ray.ga-0.031;
+			ray.ba:=ray.ba-0.031;
 			mirror(ray)
-		ELSE
-			ray.r := ray.r + dr*color.alpha;
-			ray.ra:=ray.ra-dr*color.alpha-0.4;	
-			ray.g := ray.g + dg*color.alpha;
-			ray.ga:=ray.ga-dg*color.alpha-0.4;
-			ray.b := ray.b + db*color.alpha;
-			ray.ba:=ray.ba-db*color.alpha-0.4;
 		END			
 	ELSE
 		ray.r := ray.r + dr;

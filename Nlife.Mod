@@ -25,7 +25,7 @@ VAR
 PROCEDURE &init;
 BEGIN
 	seed;
-	register;
+	(* register; *)
 END init;
 			
 PROCEDURE seed;

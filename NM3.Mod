@@ -66,7 +66,8 @@ END Pool;
 	
 TYPE WipeRecord=RECORD
 	c: cell;
-	i,j,k: INTEGER
+	restore: Voxel;
+	i,j,k: LONGINT
 END;
 
 TYPE WipeArray=POINTER TO ARRAY OF WipeRecord;
@@ -95,30 +96,28 @@ BEGIN
 	Out.Int(count*2,10);
 END grow;
 
-PROCEDURE add(c : cell; i,j,k: INTEGER);
+PROCEDURE add(c : cell; i,j,k: LONGINT; v: Voxel);
 BEGIN 
-	AWAIT(~TIC); 
 	IF count >= LEN(wipe)-1 THEN grow END;
 	wipe[count].c := c;
+	wipe[count].restore := v;
 	wipe[count].i:= i;
 	wipe[count].j := j;
 	wipe[count].k:= k;		
 	INC(count)
 END add;
 
-PROCEDURE tick*;
-BEGIN{EXCLUSIVE} 
-	TIC:=TRUE 
+PROCEDURE tick;
+VAR
+	i: LONGINT;	
+BEGIN
+	FOR i:=0 TO count-1 DO
+		IF  wipe[i].c#NIL THEN
+			wipe[i].c.blox[wipe[i].i,wipe[i].j,wipe[i].k]:=wipe[i].restore
+		END
+	END;
 END tick;
 
-BEGIN{ACTIVE}
-	REPEAT
-		AWAIT(TIC);
-		i:=0;
-		wipe[i].c.blox[wipe[i].i,wipe[i].j,wipe[i].k]:=NIL;
-		count:=0;
-		BEGIN{EXCLUSIVE} TIC:=FALSE END
-	UNTIL FALSE;
 END Wiper;
 
 TYPE cell* = OBJECT(Voxel);   
@@ -617,14 +616,14 @@ BEGIN
 					c.passable:=blox[i,j,k].passable;
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-					c.strokephemeralrec(p, resolution,nextscale,voxel,vu);
+					c.strokerec(p, resolution,nextscale,voxel,vu);
 				END	
 			ELSE
 				pool.new(c);
 				c.setcolor(red,green,blue,black,alpha);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-				c.strokephemeralrec(p, resolution,nextscale,voxel,vu);
+				c.strokerec(p, resolution,nextscale,voxel,vu);
 			END
 		END
 	END
@@ -632,8 +631,7 @@ END strokerec;
 
 PROCEDURE strokephemeralrec(p:PT; resolution,scale:LONGINT; voxel,voxundo:Voxel);
 VAR
-	i,j,k,ii,jj,kk: INTEGER;
-	nextscale: LONGINT;
+	i,j,k,ii,jj,kk,nextscale: LONGINT;
 	v,vv:Voxel;
 	c,c2: cell;	
 	copy,vu: Voxel;
@@ -644,49 +642,34 @@ BEGIN
 		p.x:=p.x*M;
 		p.y:=p.y*M;
 		p.z:=p.z*M;
-		i := SHORT(ENTIER(p.x)MOD M); j := SHORT(ENTIER(p.y)MOD M); k := SHORT(ENTIER(p.z)MOD M);	
+		i := ENTIER(p.x)MOD M; j := ENTIER(p.y)MOD M; k := ENTIER(p.z)MOD M;	
 		IF nextscale>resolution THEN	
-			IF blox[i,j,k]=NIL THEN blox[i,j,k]:=voxel END;
-		ELSIF blox[i,j,k]=NIL THEN 
-			pool.new(c);
-			c.setcolor(red,green,blue,black,alpha);
-			blox[i,j,k]:=c;
-			wiper.add(SELF,i,j,k);
-			p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-			c.strokedelicaterec(p, resolution,nextscale,voxel,vu);
-		ELSIF blox[i,j,k].passable THEN blox[i,j,k].strokerec(p, resolution,nextscale,voxel,vu)
-		END		
+			blox[i,j,k]:=voxel
+		ELSE
+			IF blox[i,j,k]#NIL THEN 
+				IF blox[i,j,k].complex THEN
+					blox[i,j,k].strokephemeralrec(p, resolution,nextscale,voxel,vu)
+				ELSE
+					wiper.add(SELF,i,j,k,blox[i,j,k]);
+					pool.new(c);
+					c.setcolor(red,green,blue,black,alpha);
+					c.fill(blox[i,j,k]);
+					c.passable:=blox[i,j,k].passable;
+					blox[i,j,k]:=c;
+					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
+					c.strokerec(p, resolution,nextscale,voxel,vu);
+				END	
+			ELSE
+				wiper.add(SELF,i,j,k,NIL);
+				pool.new(c);
+				c.setcolor(red,green,blue,black,alpha);
+				blox[i,j,k]:=c;
+				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
+				c.strokerec(p, resolution,nextscale,voxel,vu);
+			END
+		END
 	END
 END strokephemeralrec;
-
-PROCEDURE strokedelicaterec(p:PT; resolution,scale:LONGINT; voxel,voxundo:Voxel);
-VAR
-	i,j,k,ii,jj,kk: INTEGER;
-	nextscale: LONGINT;
-	v,vv:Voxel;
-	c,c2: cell;	
-	copy,vu: Voxel;
-	code: Base.Name;
-BEGIN
-	IF ~lockTF THEN
-		nextscale:=scale*M;
-		p.x:=p.x*M;
-		p.y:=p.y*M;
-		p.z:=p.z*M;
-		i := SHORT(ENTIER(p.x)MOD M); j := SHORT(ENTIER(p.y)MOD M); k := SHORT(ENTIER(p.z)MOD M);	
-		IF nextscale>resolution THEN	
-			IF blox[i,j,k]=NIL THEN blox[i,j,k]:=voxel END; 
-		ELSIF blox[i,j,k]=NIL THEN 
-			pool.new(c);
-			c.setcolor(red,green,blue,black,alpha);
-			blox[i,j,k]:=c;
-			wiper.add(SELF,i,j,k);
-			p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-			c.strokedelicaterec(p, resolution,nextscale,voxel,vu);
-		ELSIF blox[i,j,k].passable THEN blox[i,j,k].strokedelicaterec(p, resolution,nextscale,voxel,vu)
-		END		
-	END
-END strokedelicaterec;
 
 PROCEDURE nstrokerec(p:PT; resolution,scale:LONGINT; normal:PT; color: Color);
 VAR

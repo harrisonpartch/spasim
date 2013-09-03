@@ -158,11 +158,12 @@ BEGIN
 		NEW(side[5],nstring^);	
 	ELSE
 		NEW(side[0],name);
-		NEW(side[1],name);	
-		NEW(side[2],name);		
-		NEW(side[3],name);
-		NEW(side[4],name);	
-		NEW(side[5],name);			
+		side[1]:=side[0];		
+		side[2]:=side[0];		
+		side[3]:=side[0];		
+		side[4]:=side[0];		
+		side[5]:=side[0];
+		
 	END
 END init;	
 END TexCube;
@@ -276,8 +277,6 @@ PROCEDURE strokephemeral*(p:PT; resolution: LONGINT; voxel,voxundo:Voxel);
 END strokephemeral;
 PROCEDURE strokephemeralrec*(p:PT; resolution,scale: LONGINT; voxel,voxundo:Voxel);
 END strokephemeralrec;
-PROCEDURE strokedelicaterec*(p:PT; resolution,scale: LONGINT; voxel,voxundo:Voxel);
-END strokedelicaterec;
 PROCEDURE nstroke*(p:PT; resolution: LONGINT; normal: PT; color: Color);
 END nstroke;
 PROCEDURE nstrokerec*(p:PT; resolution,scale: LONGINT; normal: PT; color: Color);

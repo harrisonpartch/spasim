@@ -1,11 +1,11 @@
-MODULE NM2;
-IMPORT Base, XNXLE, XNXLNoise, XNXLFRep, Math, Out := KernelLog, Debugging, Streams,Strings;
+MODULE NM2; (*! This module may be either imported or used anonymously *)
+IMPORT Base, XNXLE, Noise:=XNXLNoise, XNXLFRep, Math, Out := KernelLog, Debugging, Streams,Strings;
 
 CONST M=2;
 	MMO=M-1;
 	CUBERADIUS=0.65;   (*change to sqrt(3)/2 ???*)
-	NCODE="NM3";
-	NL=Base.NL
+	NCODE="NM2";
+	NL=Base.NL;
 
 TYPE PT = Base.PT;
 	Color = Base.Color;
@@ -16,16 +16,119 @@ TYPE PT = Base.PT;
  	NCube=Base.NCube;
  	LCube=Base.LightCube;
 
+TYPE cellarray=POINTER TO ARRAY OF cell;
+
+TYPE Pool = OBJECT
+VAR
+	pool: cellarray;
+	count: LONGINT;
+	
+PROCEDURE &New;
+BEGIN
+	NEW(pool,8);
+	count:=0;
+END New;
+
+PROCEDURE grow;
+VAR old: cellarray;
+	i : LONGINT;
+BEGIN
+	old := pool;
+	NEW(pool, LEN(pool)*2);
+	FOR i := 0 TO count-1 DO pool[i] := old[i] END;
+	Out.String("NM3 pool growing to ");
+	Out.Int(count*2,10);
+END grow;
+
+PROCEDURE add(c : cell);
+BEGIN 
+	IF count < LEN(pool) THEN 
+		pool[0]:= c;
+		INC(count)	
+	ELSE	
+		grow;
+		add(c) 
+	END;
+END add;
+
+PROCEDURE new(VAR c: cell);
+BEGIN
+
+	IF count>0 THEN 
+		c:=pool[count]
+	ELSE
+		NEW(c);
+	END;
+	DEC(count);
+END new;
+
+END Pool;
+	
+TYPE WipeRecord=RECORD
+	c: cell;
+	restore: Voxel;
+	i,j,k: LONGINT
+END;
+
+TYPE WipeArray=POINTER TO ARRAY OF WipeRecord;
+
+TYPE Wiper=OBJECT(Base.V)
+VAR
+	wipe: WipeArray;
+	i, count: LONGINT;
+	TIC:BOOLEAN;
+	tx: INTEGER;
+	
+PROCEDURE &New;
+BEGIN
+	NEW(wipe,8);
+	register
+END New;
+
+PROCEDURE grow;
+VAR old: WipeArray;
+	i : LONGINT;
+BEGIN
+	old := wipe;
+	NEW(wipe, count*2);
+	FOR i := 0 TO LEN(old)-1 DO wipe[i] := old[i] END;
+	Out.String("NM3 wipe growing to ");
+	Out.Int(count*2,10);
+END grow;
+
+PROCEDURE add(c : cell; i,j,k: LONGINT; v: Voxel);
+BEGIN 
+	IF count >= LEN(wipe)-1 THEN grow END;
+	wipe[count].c := c;
+	wipe[count].restore := v;
+	wipe[count].i:= i;
+	wipe[count].j := j;
+	wipe[count].k:= k;		
+	INC(count)
+END add;
+
+PROCEDURE tick;
+VAR
+	i: LONGINT;	
+BEGIN
+	FOR i:=0 TO count-1 DO
+		IF  wipe[i].c#NIL THEN
+			wipe[i].c.blox[wipe[i].i,wipe[i].j,wipe[i].k]:=wipe[i].restore
+		END
+	END;
+END tick;
+
+END Wiper;
+
 TYPE cell* = OBJECT(Voxel);   
-(*! This module may be either imported or used anonymously *)
 VAR
 	blox*: ARRAY M,M,M OF Voxel;
 	nbloxTF*: ARRAY M,M,M OF BOOLEAN;
 	nblox*: ARRAY M,M,M OF NCube; 
 	lblox*: ARRAY M,M,M OF LCube;
 	nposterTF*:BOOLEAN;
-	nposter*: NCube;	
-
+	nposter*: NCube;
+	
 PROCEDURE Shade (VAR ray: Ray);
 VAR
 	pushxyz, newxyz, xyz: Base.PT;
@@ -270,13 +373,24 @@ BEGIN
 	END END END
 END fillchequer;
 
+PROCEDURE fillsierp*(v,w: Voxel);
+VAR
+	i,j,k: INTEGER;
+BEGIN
+	fill(v);
+	blox[1,1,0]:=w;
+	blox[1,0,1]:=w;	
+	blox[0,1,1]:=w;	
+
+END fillsierp;
+
 PROCEDURE fillcqr2*(v,w: Voxel);
 VAR
 	i,j,k: INTEGER;
 	c: cell;
 BEGIN
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
-		NEW(c);
+		pool.new(c);
 		c.fillchequer(v,w);
 		blox[i,j,k]:=c;
 	END END END
@@ -300,6 +414,25 @@ BEGIN
 	code:=NCODE; 
 	ncode:=NCODE
 END init;
+
+PROCEDURE free*;
+VAR
+	i,j,k: INTEGER;
+BEGIN
+	FOR i:=0 TO MMO DO
+		FOR j:=0 TO MMO DO
+			FOR k:=0 TO MMO DO
+				IF blox[i,j,k]#NIL THEN
+					blox[i,j,k].free();
+					blox[i,j,k]:=NIL;
+				END;
+				imposter:=NIL;
+				nbloxTF[i,j,k]:=FALSE;
+			END
+		END
+	END;
+	pool.add(SELF);
+END free; 
 
 PROCEDURE copyclear*;
 VAR
@@ -428,6 +561,16 @@ BEGIN
 	END
 END stroke;
 
+PROCEDURE strokephemeral(p:PT; resolution:LONGINT; voxel,voxundo:Voxel);
+VAR
+	i,j,k: LONGINT;
+BEGIN
+	Base.clamPT(p);
+	IF voxel#NIL THEN
+		strokephemeralrec(p,resolution,1,voxel,voxundo);
+	END
+END strokephemeral;
+
 PROCEDURE nstroke(p:PT; resolution:LONGINT; normal:PT; color: Color);
 VAR
 	i,j,k: LONGINT;
@@ -457,24 +600,23 @@ BEGIN
 			IF blox[i,j,k]#NIL THEN 
 				IF voxundo= NIL THEN voxundo:=blox[i,j,k] END;  
 				IF  blox[i,j,k].copyonstroke THEN
-				(*	copy:=blox[i,j,k].deepcopy(); *)
-					v:=blox[i,j,k];
-					copy:= Base.VoxelFromName(v.code); 
+					copy:=blox[i,j,k].deepcopy(); 
 					copy.copyonstroke:=FALSE; 
+					copy.strokerec(p, resolution,nextscale,voxel,vu);					
 					blox[i,j,k]:=copy;
-					blox[i,j,k].strokerec(p, resolution,nextscale,voxel,vu);
 				ELSIF blox[i,j,k].complex THEN
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel,vu)
 				ELSE
-					NEW(c);
+					pool.new(c);
 					c.setcolor(red,green,blue,black,alpha);
 					c.fill(blox[i,j,k]);
+					c.passable:=blox[i,j,k].passable;
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
 					c.strokerec(p, resolution,nextscale,voxel,vu);
 				END	
 			ELSE
-				NEW(c);
+				pool.new(c);
 				c.setcolor(red,green,blue,black,alpha);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
@@ -483,6 +625,48 @@ BEGIN
 		END
 	END
 END strokerec;
+
+PROCEDURE strokephemeralrec(p:PT; resolution,scale:LONGINT; voxel,voxundo:Voxel);
+VAR
+	i,j,k,ii,jj,kk,nextscale: LONGINT;
+	v,vv:Voxel;
+	c,c2: cell;	
+	copy,vu: Voxel;
+	code: Base.Name;
+BEGIN
+	IF ~lockTF THEN
+		nextscale:=scale*M;
+		p.x:=p.x*M;
+		p.y:=p.y*M;
+		p.z:=p.z*M;
+		i := ENTIER(p.x)MOD M; j := ENTIER(p.y)MOD M; k := ENTIER(p.z)MOD M;	
+		IF nextscale>resolution THEN	
+			blox[i,j,k]:=voxel
+		ELSE
+			IF blox[i,j,k]#NIL THEN 
+				IF blox[i,j,k].complex THEN
+					blox[i,j,k].strokephemeralrec(p, resolution,nextscale,voxel,vu)
+				ELSE
+					wiper.add(SELF,i,j,k,blox[i,j,k]);
+					pool.new(c);
+					c.setcolor(red,green,blue,black,alpha);
+					c.fill(blox[i,j,k]);
+					c.passable:=blox[i,j,k].passable;
+					blox[i,j,k]:=c;
+					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
+					c.strokerec(p, resolution,nextscale,voxel,vu);
+				END	
+			ELSE
+				wiper.add(SELF,i,j,k,NIL);
+				pool.new(c);
+				c.setcolor(red,green,blue,black,alpha);
+				blox[i,j,k]:=c;
+				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
+				c.strokerec(p, resolution,nextscale,voxel,vu);
+			END
+		END
+	END
+END strokephemeralrec;
 
 PROCEDURE nstrokerec(p:PT; resolution,scale:LONGINT; normal:PT; color: Color);
 VAR
@@ -510,12 +694,12 @@ BEGIN
 				ELSIF (blox[i,j,k] IS Voxel) THEN
 					blox[i,j,k].nstroke(p, resolution DIV nextscale,normal,color)
 				ELSE
-					NEW(c);
+					pool.new(c);
 					c.setcolor(red,green,blue,black,alpha);
 					c.imposter:=blox[i,j,k];	
 					IF blox[i,j,k].emptysplit THEN 
 						FOR ii := 0 TO MMO DO FOR jj := 0 TO MMO DO FOR kk:= 0 TO MMO DO
-							NEW(c2);
+							pool.new(c2);
 							blox[i,j,k]:=c2
 						END END END;
 					ELSE
@@ -526,7 +710,7 @@ BEGIN
 					c.nstrokerec(p, resolution,nextscale,normal,color);
 				END	
 			ELSE
-				NEW(c);
+				pool.new(c);
 				c.setcolor(red,green,blue,black,alpha);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
@@ -544,7 +728,6 @@ VAR
 	n: LONGINT;
 	p: PT;
 	vu: Voxel
-
 BEGIN
 	n := ENTIER(Base.distance(a,b)*resolution*M);
 	IF n > 0 THEN
@@ -579,7 +762,7 @@ BEGIN
 			IF ABS(d2s) < CRDNS THEN				
 				o.x:=p.x-1/TWOMS; o.y:=p.y-1/TWOMS; o.z:=p.z-1/TWOMS; (* p is center, o is corner *)
 				IF blox[i,j,k]=NIL THEN 
-					NEW(newcell);
+					pool.new(newcell);
 					blox[i,j,k]:=newcell;
 					newcell.setcolor(red,green,blue,black,alpha);
 					newcell.imposter:=f.getimposter(p);
@@ -638,7 +821,7 @@ BEGIN
 			IF ABS(d2s)<CRDS THEN  (* at surface *)				
 				o.x:=p.x-1/TWOMS; o.y:=p.y-1/TWOMS; o.z:=p.z-1/TWOMS; (* p is center, o is corner *)
 				IF blox[i,j,k]=NIL THEN
-					NEW(newcell);
+					pool.new(newcell);
 					IF f.in(p) THEN 
 						newcell.imposter:=f.getimposter(p);
 						newcell.nposterTF:=TRUE;
@@ -696,7 +879,7 @@ PROCEDURE copy():Voxel;
 VAR c: cell;
 	i,j,k: INTEGER;
 BEGIN
-	NEW(c);
+	pool.new(c);
 	c.setcolor(red,green,blue,black,alpha);
 	c.nbloxTF:=nbloxTF;
 	c.nblox:=nblox;
@@ -721,7 +904,7 @@ VAR
 BEGIN
 	IF code=NCODE THEN
 		copymarker:=TRUE;
-		NEW(c);
+		pool.new(c);
 		c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; c.alpha:=alpha;
 		c.nbloxTF:=nbloxTF;
 		c.nblox:=nblox;
@@ -782,17 +965,22 @@ END sprout;
 
 END cell;
 
-
+VAR
+	pool:Pool;
+	wiper: Wiper;
+	
 PROCEDURE thisvox*():Voxel;
 VAR
 	v: cell;  
 BEGIN
-	NEW(v);
+	pool.new(v);
 	RETURN v
 END thisvox;
 
+BEGIN
+	NEW(pool);
+	NEW(wiper)
 END NM2.
-
 
 
 

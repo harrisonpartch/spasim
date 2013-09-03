@@ -6,10 +6,10 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=4;        
-	TS=9*16;   (*  TS MUST BE 5 (or 9, etc) MULTIPLIED BY 2**T *)
-	TW=4;
-	TH=3;
+	T=3;        
+	TS=9*8;   (*  TS MUST BE 5 (or 9, etc) MULTIPLIED BY 2**T *)
+	TW=6;
+	TH=4;
 	W*=TS*TW;
 	H*=TS*TH;
 
@@ -450,14 +450,16 @@ BEGIN
 		gotiles;
 		AWAIT((tilesdone=TW*TH) OR FRAMEBOORT)
 	END;
-	Raster.SetRGB(pixel,1,1,0);
+	Raster.SetRGB(pixel,255,255,255);
+	Raster.Put(image,(W DIV 2)+1,(H DIV 2)+2,pixel,copy);	
+	Raster.Put(image,(W DIV 2)-1,(H DIV 2)+2,pixel,copy);	
+	Raster.Put(image,(W DIV 2)-1,(H DIV 2)-2,pixel,copy);	
+	Raster.Put(image,(W DIV 2)+1,(H DIV 2)-2,pixel,copy);
+	Raster.SetRGB(pixel,0,0,0);
 	Raster.Put(image,(W DIV 2)+1,(H DIV 2)+1,pixel,copy);	
-	Raster.SetRGB(pixel,0,1,1);
 	Raster.Put(image,(W DIV 2)-1,(H DIV 2)+1,pixel,copy);	
-	Raster.SetRGB(pixel,1,0,1);
 	Raster.Put(image,(W DIV 2)-1,(H DIV 2)-1,pixel,copy);	
-	Raster.SetRGB(pixel,0,1,1);
-	Raster.Put(image,(W DIV 2)+1,(H DIV 2)-1,pixel,copy);		
+	Raster.Put(image,(W DIV 2)+1,(H DIV 2)-1,pixel,copy);			
 	Base.tick
 END go;
 
