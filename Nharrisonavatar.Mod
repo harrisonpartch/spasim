@@ -2,7 +2,7 @@ MODULE Nharrisonavatar;
 IMPORT Base, TexVox, XNXLRotaVox;
   
 VAR 
-	cv: TexVox.AvaVox;
+	cv: TexVox.TexVox;
 	rv: XNXLRotaVox.RVox;
 	up,right: Base.PT;
 	sabot, vox,v: Base.Voxel;

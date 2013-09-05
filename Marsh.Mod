@@ -407,7 +407,7 @@ BEGIN
 	tnoise.b:=1;
 	tnoise.c:=1;		
 	tnoise.octaves:=4;
-	tnoise.persistence:=3.5;
+	tnoise.persistence:=4.5;
 	tnoise.setvoxel(dotz);
 	tnoise.va[0]:=sand;
 	tnoise.va[1]:=axolotl;
@@ -418,30 +418,24 @@ BEGIN
 
 	NEW(noise);		
 	noise.seed:=123666;		
-	noise.a:=3;
-	noise.b:=3;
-	noise.c:=3;		
-	noise.octaves:=5;
-	noise.setvoxel(axolotl);
+	noise.a:=1;
+	noise.b:=1;
+	noise.c:=1;		
+	noise.octaves:=3;
+	noise.setvoxel(blacksun);
 	noise.persistence:=3.7;
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,-1);
 	Base.setPT(center,1/2,1/2,11/12);
 	NEW(plane,center,up);
-	plane.vox:=granite;
-	Out.String("EEEEP!"); 				
-	z10.FRaster(noise,81); 	
-	z10.FRaster(tnoise,81);  
-	z10.FRaster(plane,32);
-	z10.setcolor(0,0,3/2,2,0); 
+	plane.vox:=granite;		
+	z10.FRaster(noise,64); 		
+	z10.setcolor(1,0,0,1,0); 
 	gorge.setcolor(0,0,0,0,0);
-	z10.stroke(center,30,w10,undo);
 	Base.world:=z10; 	
-	Base.avatar:=harrison;
 	msphere.passable:=TRUE;
+	Base.avatar:=harrison;
 	Base.avatarsize:=10000;
-(*	engrain; 
-	sprout; *)
 	Out.String("EEEEP!");
 END dawn;
 

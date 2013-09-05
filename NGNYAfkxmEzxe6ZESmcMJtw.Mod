@@ -3,7 +3,7 @@ IMPORT Base, TexVox;
  VAR vox: TexVox.TexVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	IF vox=NIL THEN NEW(vox,'blacksun.png')  END;
+	IF vox=NIL THEN NEW(vox,'mipmap.png')  END;
 	RETURN vox
 END thisvox;
 

@@ -44,7 +44,7 @@ BEGIN
 		|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
 		|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 	END;	
-	color:=texcube.side[ray.face].pixel(1-lx,1-ly);
+	color:=texcube.side[ray.face].pixelmip0(1-lx,1-ly);
 	dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
 	dr:=color.red*dot*ray.ra;
 	dg:=color.green*dot*ray.ra;
@@ -90,7 +90,7 @@ TYPE TexVox* = OBJECT(Voxel);
 VAR
 	txTF*: BOOLEAN;
 	texcube*: TexCube;
-	pstscale*: INTEGER;
+	tscale*: INTEGER;
 	texscale*:LONGINT;
 	name: Name;
 
@@ -98,8 +98,8 @@ PROCEDURE & init*(n: Name);
 BEGIN
 	NEW(texcube,n,FALSE);
 	name:=n;
-	pstscale:=100;
-	texscale:=1000;
+	tscale:=9;
+	texscale:=900;
 END init;
 
 PROCEDURE deepcopy*():Voxel;
@@ -133,13 +133,16 @@ VAR
 	dtl: LONGINT;
 	mip,mipverse: REAL;
 BEGIN
-	IF pstscale>0 THEN
+	IF tscale>0 THEN
 		xx:=ray.xyz.x;
 		yy:=ray.xyz.y;
-		zz:=ray.xyz.z;
-		xx:=xx*pstscale-ENTIER(xx*pstscale);
-		yy:=yy*pstscale-ENTIER(yy*pstscale);
-		zz:=zz*pstscale-ENTIER(zz*pstscale);
+		zz:=ray.xyz.z;	
+		lx:=xx*90-ENTIER(xx*90);
+		ly:=yy*90-ENTIER(yy*90);
+		lz:=zz*90-ENTIER(zz*90);
+		xx:=xx*tscale-ENTIER(xx*tscale);
+		yy:=yy*tscale-ENTIER(yy*tscale);
+		zz:=zz*tscale-ENTIER(zz*tscale);
 		xxx:=ABS(1/2-xx);
 		yyy:=ABS(1/2-yy);
 		zzz:=ABS(1/2-zz);
@@ -147,7 +150,7 @@ BEGIN
 			IF xxx>zzz THEN
 				(* yz pyramid *)  				(*  faces come in pairs: (0,3),(2,5),(1,4) *)
 				lx:=yy; ly:=zz;
-				lx1:=pstscale*ray.lxyz.x/ray.scale;
+				lx1:=tscale*ray.lxyz.x/ray.scale;
 				CASE ray.face OF
 					0:
 					|1: lx:=lx+lx1;
@@ -159,7 +162,7 @@ BEGIN
 			ELSE
 				(* xy pyramid *)
 				lx:=xx; ly:=yy;
-				lz1:=pstscale*ray.lxyz.z/ray.scale;
+				lz1:=tscale*ray.lxyz.z/ray.scale;
 				CASE ray.face OF
 					 0: lx:=lx+lz1;
 					|1:  ly:=ly+lz1;
@@ -173,7 +176,7 @@ BEGIN
 			IF yyy>zzz THEN
 				(* xz pyramid *)	
 				lx:=xx; ly:=zz;	
-				ly1:=pstscale*ray.lxyz.y/ray.scale;	
+				ly1:=tscale*ray.lxyz.y/ray.scale;	
 				CASE ray.face OF
 					 0: lx:= lx+ly1;
 					|1:
@@ -185,7 +188,7 @@ BEGIN
 			ELSE
 				(* xy pyramid *)
 				lx:=xx; ly:=yy;
-				lz1:=pstscale*ray.lxyz.z/ray.scale;
+				lz1:=tscale*ray.lxyz.z/ray.scale;
 				CASE ray.face OF
 					 0: lx:=lx+lz1;
 					|1:  ly:=ly+lz1;
@@ -207,20 +210,20 @@ BEGIN
 		END
 	END;
 	color:=texcube.side[ray.face].pixel(lx,ly);
-	lx:=lx*10-ENTIER(lx*10);
-	ly:=ly*10-ENTIER(ly*10);	
-	color1:=texcube.side[ray.face].pixel(lx,ly);	
-	lx:=lx*10-ENTIER(lx*10);
-	ly:=ly*10-ENTIER(ly*10);
-	color2:=texcube.side[ray.face].pixel(lx,ly);		
-	mip:=ray.length*10;
+	lx:=lx*9-ENTIER(lx*9);
+	ly:=ly*9-ENTIER(ly*9);	
+	color1:=texcube.side[ray.face].pixelmip1(lx,ly);	
+	lx:=lx*9-ENTIER(lx*9);
+	ly:=ly*9-ENTIER(ly*9);		
+	color2:=texcube.side[ray.face].pixelmip0(lx,ly);		
+	mip:=ray.length*9;
 	IF mip>1 THEN mip:=1 END; 
 	mipverse:=1-mip;
 	color.red:=(color1.red*mipverse+mip*color.red);
 	color.green:=(color1.green*mipverse+mip*color.green);
 	color.blue:=(color1.blue*mipverse+mip*color.blue);
 	color.alpha:=(color1.alpha*mipverse+mip*color.alpha);
-	mip:=mip*10;
+	mip:=mip*9;
 	IF mip>1 THEN mip:=1 END; 
 	mipverse:=1-mip;
 	color.red:=(color2.red*mipverse+mip*color.red);
@@ -289,7 +292,7 @@ PROCEDURE & init*(n: Name);
 BEGIN
 	NEW(texcube,n,TRUE);
 	name:=n;
-	pstscale:=1;
+	tscale:=1;
 	texscale:=1;
 END init;
 
@@ -315,13 +318,13 @@ VAR
 	dtl: LONGINT;
 	mip,mipverse: REAL;
 BEGIN
-	IF pstscale>0 THEN
+	IF tscale>0 THEN
 		xx:=ray.lxyz.x;
 		yy:=ray.lxyz.y;
 		zz:=ray.lxyz.z;
-		xx:=xx*pstscale-ENTIER(xx*pstscale);
-		yy:=yy*pstscale-ENTIER(yy*pstscale);
-		zz:=zz*pstscale-ENTIER(zz*pstscale);
+		xx:=xx*tscale-ENTIER(xx*tscale);
+		yy:=yy*tscale-ENTIER(yy*tscale);
+		zz:=zz*tscale-ENTIER(zz*tscale);
 		xxx:=ABS(1/2-xx);
 		yyy:=ABS(1/2-yy);
 		zzz:=ABS(1/2-zz);
@@ -329,7 +332,7 @@ BEGIN
 			IF xxx>zzz THEN
 				(* yz pyramid *)  				(*  faces come in pairs: (0,3),(2,5),(1,4) *)
 				lx:=yy; ly:=zz;
-				lx1:=pstscale*ray.lxyz.x/ray.scale;
+				lx1:=tscale*ray.lxyz.x/ray.scale;
 				CASE ray.face OF
 					0:
 					|1: lx:=lx+lx1;
@@ -341,7 +344,7 @@ BEGIN
 			ELSE
 				(* xy pyramid *)
 				lx:=xx; ly:=yy;
-				lz1:=pstscale*ray.lxyz.z/ray.scale;
+				lz1:=tscale*ray.lxyz.z/ray.scale;
 				CASE ray.face OF
 					 0: lx:=lx+lz1;
 					|1:  ly:=ly+lz1;
@@ -355,7 +358,7 @@ BEGIN
 			IF yyy>zzz THEN
 				(* xz pyramid *)	
 				lx:=xx; ly:=zz;	
-				ly1:=pstscale*ray.lxyz.y/ray.scale;	
+				ly1:=tscale*ray.lxyz.y/ray.scale;	
 				CASE ray.face OF
 					 0: lx:= lx+ly1;
 					|1:
@@ -367,7 +370,7 @@ BEGIN
 			ELSE
 				(* xy pyramid *)
 				lx:=xx; ly:=yy;
-				lz1:=pstscale*ray.lxyz.z/ray.scale;
+				lz1:=tscale*ray.lxyz.z/ray.scale;
 				CASE ray.face OF
 					 0: lx:=lx+lz1;
 					|1:  ly:=ly+lz1;
@@ -422,12 +425,12 @@ END TexCubeVox;
 TYPE FloopVox* = OBJECT(Voxel);
 VAR
 	fl: XNXLFilmLoop.floop;
-	pstscale: REAL;
+	tscale: REAL;
 
 PROCEDURE&init*(fname: Name);
 BEGIN
 	NEW(fl,fname);
-	pstscale:=81;
+	tscale:=81;
 END init;
 
 PROCEDURE Shade (VAR ray: Ray);
@@ -446,9 +449,9 @@ BEGIN
 	xx:=ray.xyz.x;
 	yy:=ray.xyz.y;
 	zz:=ray.xyz.z;
-	xx:=xx*pstscale-ENTIER(xx*pstscale);
-	yy:=yy*pstscale-ENTIER(yy*pstscale);
-	zz:=zz*pstscale-ENTIER(zz*pstscale);
+	xx:=xx*tscale-ENTIER(xx*tscale);
+	yy:=yy*tscale-ENTIER(yy*tscale);
+	zz:=zz*tscale-ENTIER(zz*tscale);
 	xxx:=ABS(1/2-xx);
 	yyy:=ABS(1/2-yy);
 	zzz:=ABS(1/2-zz);	
@@ -456,7 +459,7 @@ BEGIN
 		IF xxx>zzz THEN
 			(* yz pyramid *)  				(*  faces come in pairs: (0,3),(2,5),(1,4) *)
 			lx:=yy; ly:=zz;
-			lx1:=pstscale*ray.lxyz.x/ray.scale;
+			lx1:=tscale*ray.lxyz.x/ray.scale;
 			CASE ray.face OF
 				0:
 				|1: lx:=lx+lx1;
@@ -468,7 +471,7 @@ BEGIN
 		ELSE
 			(* xy pyramid *)
 			lx:=xx; ly:=yy;
-			lz1:=pstscale*ray.lxyz.z/ray.scale;
+			lz1:=tscale*ray.lxyz.z/ray.scale;
 			CASE ray.face OF
 				 0: lx:=lx+lz1;
 				|1:  ly:=ly+lz1;
@@ -482,7 +485,7 @@ BEGIN
 		IF yyy>zzz THEN
 			(* xz pyramid *)	
 			lx:=xx; ly:=zz;	
-			ly1:=pstscale*ray.lxyz.y/ray.scale;	
+			ly1:=tscale*ray.lxyz.y/ray.scale;	
 			CASE ray.face OF
 				 0: lx:= lx+ly1;
 				|1:
@@ -495,7 +498,7 @@ BEGIN
 		ELSE
 			(* xy pyramid *)
 			lx:=xx; ly:=yy;
-			lz1:=pstscale*ray.lxyz.z/ray.scale;
+			lz1:=tscale*ray.lxyz.z/ray.scale;
 			CASE ray.face OF
 				 0: lx:=lx+lz1;
 				|1:  ly:=ly+lz1;
@@ -534,13 +537,13 @@ VAR
 	seed:LONGINT;
 	octaves:INTEGER;
 	aa,bb,cc,persistence: REAL;
-	pstscale: REAL;
+	tscale: REAL;
 	
 PROCEDURE&init*(s:LONGINT;o:INTEGER; a,b,c,p:REAL);
 BEGIN
 	seed:=s; octaves:=SHORT(o); persistence:=p;
 	aa:=a; bb:=b; cc:=c;
-	pstscale:=243;
+	tscale:=243;
 END init;
 
 PROCEDURE Shade (VAR ray: Ray);

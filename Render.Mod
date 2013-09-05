@@ -269,7 +269,7 @@ BEGIN
 	a:=Retina.fward.x*Base.cursordist; b:=Retina.fward.y*Base.cursordist; c:=Retina.fward.z*Base.cursordist;
 	d:=-Retina.fward.x*0.0003; e:=-Retina.fward.y*0.0003;  f:=-Retina.fward.z*0.0003; 
 	Base.updatecamera(cx,cy,cz,a,b,c,d,e,f);	
-	IF TRUE THEN Marsh.drawavatar END;
+	IF avaTF THEN Marsh.drawavatar END;
 	GLIDE:=0.975;	
 	cvz := cvz*GLIDE+gravityvector.z; 
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y; 
@@ -342,7 +342,6 @@ BEGIN
 	Base.cursordist:=0.01;
 	R1:=100;
 	R2:=150;
-	avtoggle:=TRUE;
 	Base.worldalive := TRUE;	
 
 	fogdensity:=0.11;
@@ -350,7 +349,6 @@ BEGIN
 	upsticky:=10.0;	
 	Out.String('*line 1217!*');
 	msd:=40;
-	
 END OnLoad;
 
 PROCEDURE Reshape(w, h: LONGINT);
@@ -412,7 +410,8 @@ BEGIN
 			| "2" : msd:= msd*10/9
 			| "3" : 	msd:= msd*9/10
 			| "4" : Base.gravity:= 1.5*Base.gravity		
-			| "5" : Base.STOPGO	
+			| "5" : Base.STOPGO
+			| "6" : avaTF:=~avaTF
 			| "h" : camera.hop	
 			| " " :  IF hidecursor THEN HideMousePointer(FALSE) ELSE HideMousePointer(TRUE) END; AVATAR:=~AVATAR;
 			| "]": camera.aperture.width := camera.aperture.width * 101/99; camera.aperture.height := camera.aperture.height *101/99;
@@ -479,25 +478,24 @@ PROCEDURE PointerMove* (x, y : LONGINT; keys : SET);
 VAR
 	up,left: REAL;
 	xr,yr: LONGINT;
+	temporaljust: REAL;
 BEGIN
-	IF ~warpedthemouse OR TRUE THEN (* only once per frame *)	
 		MB := keys;
-		xr := x-centerx; yr :=y-centery;
-			
+		temporaljust := msd/GetCurrentFrameMs();
+		
+		xr := ENTIER((x-centerx)*temporaljust); yr :=ENTIER((y-centery)*temporaljust);
+	
 	
 		IF CAPTUREMOUSE & (ABS(xr)+ABS(yr)>5) THEN
 			left:=ABS(xr)*xr;
 			up:=-ABS(yr)*yr; 
-			camera.up(-up/(30000*leftsticky)); 
+			camera.up(-up/(60000*leftsticky)); 
 			camera.left(left/(30000*leftsticky));
 				
 			(*SetMousePosition(centerx, centery);
 			Api.WarpPointer( display, 0,mne.window, 0,0, 1000,1000, centerx,centery);*)
 			WarpPointer(1000,1000, centerx,centery);
-		END;
-		warpedthemouse:=TRUE;
-	END;
-	
+		END
 END PointerMove;
  
 PROCEDURE WheelMove*(dz: LONGINT);
@@ -670,7 +668,7 @@ VAR
 	frtrace, foveate: BOOLEAN;
 	foveasize, fovealeft, fovearight, foveadown, foveaup: LONGINT;
 	DEATH, wLOOK, PAUSE: BOOLEAN;
-	tracetiled,avtoggle, capturethemouse: BOOLEAN;
+	tracetiled,avaTF, capturethemouse: BOOLEAN;
 	framecount: LONGINT;
 	multicore,filtor,uplock,rollcam,suppressz: BOOLEAN;
 	camrotinertia:REAL;

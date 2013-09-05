@@ -1,7 +1,7 @@
 MODULE Base;
 
 IMPORT  Math:=Math, Random, Kernel, Out:=KernelLog (*DebugLog*), Objects,  
-Strings, Streams, WMFontManager, Raster, Graphics := WMGraphics, Commands(*, XNXLAudio*);
+Strings, Streams, WMFontManager, Raster, WMRasterScale, WMRectangles, Graphics := WMGraphics, Commands(*, XNXLAudio*);
 
 CONST
 	BPS*=3; 
@@ -70,9 +70,7 @@ END V;
 
 TYPE Texture*=OBJECT(V)
 VAR
-	img*: Raster.Image;
-	imp*:ARRAY 10,10 OF Color;
-	fmt: Raster.Format;
+	img,mip0,mip1: Raster.Image;
 	W*,H*, bpr,adr: LONGINT;
 	transparent*: BOOLEAN;
 
@@ -82,22 +80,22 @@ VAR
 BEGIN
 	Raster.InitMode(copy,Raster.srcCopy);
 	img :=Graphics.LoadImage(n, TRUE); (* img format is BGRA8888 *)
-	IF img#NIL THEN 
-		W:=img.width-1; H:=img.height-1;
-		ix:=W DIV 10;
-		jy:=H DIV 10;
-		FOR i:=0 TO 9 DO
-			FOR j:=0 TO 9 DO
-				imp[i,j]:=pixel(rand.Dice(W),rand.Dice(H))
-			END
-		END
-	ELSE
+	IF img=NIL THEN 
 		img := Graphics.LoadImage("grain.png", TRUE); 
 		IF img=NIL THEN Out.String("NIL TEXTURE  FAULT") END;
-		ASSERT(img#NIL);
-		W:=img.width-1; H:=img.height-1;
 	END;
-END init;
+	mip0:=Graphics.LoadImage(n, TRUE); 
+	mip1:= Graphics.LoadImage(n,TRUE); 
+(*	NEW(mip0);
+	NEW(mip1);
+	
+	Raster.Create(mip0,8,8,Raster.BGRA8888);
+	Raster.Create(mip1,64,64,Raster.BGRA8888);		
+	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height),mip0,
+		WMRectangles.MakeRect(0,0, mip0.width, mip0.height),WMRectangles.MakeRect(0,0, mip0.width, mip0.height),0,1);
+	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height),mip1,
+		WMRectangles.MakeRect(0,0, mip1.width-1, mip1.height-1),WMRectangles.MakeRect(0,0, 1, 1),0,1);	
+*)END init;
 
 PROCEDURE pixel*(x,y:REAL):Color;
 VAR
@@ -105,15 +103,35 @@ VAR
 	p: Raster.Pixel;
 	c: Color;
 BEGIN
-	IF img#NIL THEN
-		i:=ENTIER(x*W) MOD W; j:=ENTIER(y*H) MOD H;	
-		Raster.Get(img,i,j,p,copy);
-		c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
-	ELSE
-		c.red:=1; c.blue:=1;
-	END;
+	i:=ENTIER(x*img.width) MOD img.width; j:=ENTIER(y*img.height) MOD img.height;	
+	Raster.Get(img,i,j,p,copy);
+	c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
 	RETURN c
 END pixel;
+
+PROCEDURE pixelmip0*(x,y:REAL):Color;
+VAR
+	i,j: LONGINT;
+	p: Raster.Pixel;
+	c: Color;
+BEGIN
+	i:=ENTIER(x*mip0.width) MOD mip0.width; j:=ENTIER(y*mip0.height) MOD mip0.height;	
+	Raster.Get(mip0,i,j,p,copy);
+	c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
+	RETURN c
+END pixelmip0;
+
+PROCEDURE pixelmip1*(x,y:REAL):Color;
+VAR
+	i,j: LONGINT;
+	p: Raster.Pixel;
+	c: Color;
+BEGIN
+	i:=ENTIER(x*mip1.width) MOD mip1.width; j:=ENTIER(y*mip1.height) MOD mip1.height;	
+	Raster.Get(mip1,i,j,p,copy);
+	c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
+	RETURN c
+END pixelmip1;
 
 PROCEDURE pixelT*(x,y:REAL; T: LONGINT):Color;
 VAR
@@ -132,7 +150,6 @@ BEGIN
 	END;
 	RETURN c
 END pixelT;
-
 
 END Texture;
 
@@ -1039,7 +1056,6 @@ BEGIN
 	rlimit := 4;
 	iterlimit := 500;
 	DTL:=25;	
-	STOP:=TRUE;
 	Origin:=mkPT(0,0,0);   (* unneeded initialization *)
 	blankray.bla := 1;
 	blankray.ra := 1;
