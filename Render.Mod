@@ -270,7 +270,7 @@ BEGIN
 	d:=-Retina.fward.x*0.0003; e:=-Retina.fward.y*0.0003;  f:=-Retina.fward.z*0.0003; 
 	Base.updatecamera(cx,cy,cz,a,b,c,d,e,f);	
 	IF avaTF THEN Marsh.drawavatar END;
-	GLIDE:=0.975;	
+	GLIDE:=0.99;	
 	cvz := cvz*GLIDE+gravityvector.z; 
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y; 
 	cvl :=cvl*0.0; cvu := cvu*0.0;
