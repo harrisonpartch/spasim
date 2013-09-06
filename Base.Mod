@@ -84,18 +84,20 @@ BEGIN
 		img := Graphics.LoadImage("grain.png", TRUE); 
 		IF img=NIL THEN Out.String("NIL TEXTURE  FAULT") END;
 	END;
-	mip0:=Graphics.LoadImage(n, TRUE); 
-	mip1:= Graphics.LoadImage(n,TRUE); 
-(*	NEW(mip0);
+(*	mip0:=Graphics.LoadImage("mip0.png", TRUE); 
+	mip1:= Graphics.LoadImage("mip1.png",TRUE); 
+*)	NEW(mip0);
 	NEW(mip1);
 	
-	Raster.Create(mip0,8,8,Raster.BGRA8888);
-	Raster.Create(mip1,64,64,Raster.BGRA8888);		
+	Raster.Create(mip0,64,64,Raster.BGRA8888);
+	Raster.Create(mip1,256,256,Raster.BGRA8888);		
 	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height),mip0,
-		WMRectangles.MakeRect(0,0, mip0.width, mip0.height),WMRectangles.MakeRect(0,0, mip0.width, mip0.height),0,1);
+		WMRectangles.MakeRect(0,0, mip0.width, mip0.height),WMRectangles.MakeRect(0,0,mip0.width, mip0.height),
+			WMRasterScale.ModeCopy, WMRasterScale.ScaleBilinear);
 	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height),mip1,
-		WMRectangles.MakeRect(0,0, mip1.width-1, mip1.height-1),WMRectangles.MakeRect(0,0, 1, 1),0,1);	
-*)END init;
+		WMRectangles.MakeRect(0,0, mip1.width, mip1.height),
+			WMRectangles.MakeRect(0,0, mip1.width, mip1.height),WMRasterScale.ModeSrcOverDst, WMRasterScale.ScaleBilinear);	
+END init;
 
 PROCEDURE pixel*(x,y:REAL):Color;
 VAR

@@ -3,7 +3,7 @@ IMPORT Base, XNXLE, Noise:=XNXLNoise, XNXLFRep, Math, Out := KernelLog, Debuggin
 
 CONST M=3;
 	MMO=M-1;
-	CUBERADIUS=0.65;   (*change to sqrt(3)/2 ???*)
+	CUBERADIUS=0.75;   (*change to sqrt(3)/2 ???*)
 	NCODE="NM3";
 	NL=Base.NL;
 

@@ -167,11 +167,7 @@ PROCEDURE d2s*(p:PT):REAL;  (* distance to surface *)
 VAR 
 	n,d:REAL;
 BEGIN
-	IF p.z>1/2 THEN 
-		RETURN 1.0 
-	ELSE
-		RETURN(Noise.noise3dperlin(a*p.x,b*p.y,c*p.z, seed,octaves,persistence)/1000 - 1/2000)	
-	END
+	RETURN(Noise.noise3dperlin(a*p.x,b*p.y,c*p.z, seed,octaves,persistence)/1000 - 1/2000)	
 END d2s;
 
 END noise;

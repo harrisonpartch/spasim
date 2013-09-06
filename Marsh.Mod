@@ -286,7 +286,7 @@ BEGIN
       rand:=Base.rand;	
 
   	w10:=Base.VoxelFromName("NM2");	
- 	z10:=Base.VoxelFromName("NM3");	
+ 	z10:=Base.VoxelFromName("NM2");	
     
 	Out.String("EEEEP!");
 	xot:=Base.VoxelFromName("Nharrisonavatar"); 
@@ -418,23 +418,25 @@ BEGIN
 
 	NEW(noise);		
 	noise.seed:=123666;		
-	noise.a:=1;
-	noise.b:=1;
-	noise.c:=1;		
-	noise.octaves:=3;
+	noise.a:=3;
+	noise.b:=3;
+	noise.c:=3;		
+	noise.octaves:=4;
 	noise.setvoxel(blacksun);
-	noise.persistence:=3.7;
+	noise.persistence:=3.1;
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,-1);
 	Base.setPT(center,1/2,1/2,11/12);
 	NEW(plane,center,up);
-	plane.vox:=granite;		
-	z10.FRaster(noise,64); 		
-	z10.setcolor(1,0,0,1,0); 
+	plane.vox:=granite;	
+	z10.FRaster(plane,32); 		
+	z10.FRaster(noise,128); 	
+	z10.FRaster(tnoise,256); 			
+	z10.setcolor(0,1/2,0,1,0); 
 	gorge.setcolor(0,0,0,0,0);
 	Base.world:=z10; 	
 	msphere.passable:=TRUE;
-	Base.avatar:=harrison;
+	Base.avatar:=lobster;
 	Base.avatarsize:=10000;
 	Out.String("EEEEP!");
 END dawn;

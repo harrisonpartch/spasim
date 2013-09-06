@@ -98,7 +98,7 @@ PROCEDURE & init*(n: Name);
 BEGIN
 	NEW(texcube,n,FALSE);
 	name:=n;
-	tscale:=9;
+	tscale:=23;
 	texscale:=900;
 END init;
 
@@ -209,13 +209,13 @@ BEGIN
 			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 		END
 	END;
-	color:=texcube.side[ray.face].pixel(lx,ly);
+	color:=texcube.side[ray.face].pixelmip0(lx,ly);
 	lx:=lx*9-ENTIER(lx*9);
 	ly:=ly*9-ENTIER(ly*9);	
 	color1:=texcube.side[ray.face].pixelmip1(lx,ly);	
 	lx:=lx*9-ENTIER(lx*9);
 	ly:=ly*9-ENTIER(ly*9);		
-	color2:=texcube.side[ray.face].pixelmip0(lx,ly);		
+	color2:=texcube.side[ray.face].pixel(lx,ly);		
 	mip:=ray.length*9;
 	IF mip>1 THEN mip:=1 END; 
 	mipverse:=1-mip;
