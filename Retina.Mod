@@ -6,8 +6,8 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=3;        
-	TS=9*8;   (*  TS MUST BE 5 (or 9, etc) MULTIPLIED BY 2**T *)
+	T=2;        
+	TS=16*4;   (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
 	TW=6;
 	TH=4;
 	W*=TS*TW;
@@ -206,6 +206,61 @@ BEGIN
 	END;
 END tessad9;
 
+PROCEDURE tessa16(cam: Camera);
+VAR
+	i,j: LONGINT;
+	theta,phi,dtheta,dphi: REAL;
+	ray: Base.Ray;
+	pixel: Raster.Pixel;
+BEGIN
+	dtheta:=cam.dtheta/16;
+	dphi:=cam.dphi/16;
+	FOR i:= 1 TO 15 BY 2 DO
+		theta:=cam.theta+dtheta*i;	
+		FOR j :=  1 TO 15 BY 2 DO 
+			phi:=cam.phi+dphi*j;
+			ray:=Base.blankray;
+			angletoray(ray,theta,phi);
+			Base.world.Shade(ray);
+			IF ~ray.terminate THEN
+				ray.b:= ray.b + ray.ba;
+				ray.r:= ray.r + ray.ra/2;
+				ray.g:= ray.g + ray.ga/2;	
+			END;
+			Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255)); 
+			Raster.Fill(image,cam.imx+i-1,cam.imy+j-1,cam.imx+i+1,cam.imy+j+1,pixel,copy);
+		END;
+	END;
+END tessa16;
+
+PROCEDURE tessad16(cam: Camera);
+VAR
+	i,j: LONGINT;
+	theta,phi,dtheta,dphi: REAL;
+	ray: Base.Ray;
+	pixel: Raster.Pixel;
+BEGIN
+	theta:=cam.theta;
+	dtheta:=cam.dtheta/16;
+	dphi:=cam.dphi/16;
+	FOR i:= 0 TO 15 DO
+		phi:=cam.phi;
+		FOR j :=  0 TO 15 DO 
+			ray:=Base.blankray;
+			angletoray(ray,theta,phi);
+			Base.world.Shade(ray);
+			IF ~ray.terminate THEN
+				ray.b:= ray.b + ray.ba;
+				ray.r:= ray.r + ray.ra/2;
+				ray.g:= ray.g + ray.ga/2;	
+			END;
+			Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255)); 
+			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
+			phi:=phi+dphi;
+		END;
+		theta:=theta+dtheta;
+	END;
+END tessad16;
 
 PROCEDURE ztrace(cam: Camera; level: INTEGER);
 VAR
@@ -218,30 +273,30 @@ BEGIN
 			x:=a.imx - W/2;
 			y:=a.imy-H/2;		
 			IF (x*x+y*y)<(W*W/foveaparameter) THEN	
-				tessad9(a); 
+				tessad16(a); 
 			ELSE
-				tessa9(a); 
+				tessa16(a); 
 			END;
 			x:=b.imx - W/2;
 			y:=b.imy-H/2;		
 			IF (x*x+y*y)<(W*W/foveaparameter) THEN	
-				tessad9(b); 
+				tessad16(b); 
 			ELSE
-				tessa9(b); 			
+				tessa16(b); 			
 			END;			
 			x:=b.imx - W/2;
 			y:=b.imy-H/2;		
 			IF (x*x+y*y)<(W*W/foveaparameter) THEN	
-				tessad9(c); 
+				tessad16(c); 
 			ELSE
-				tessa9(c); 
+				tessa16(c); 
 			END;
 			x:=d.imx - W/2;
 			y:=d.imy-H/2;		
 			IF (x*x+y*y)<(W*W/foveaparameter) THEN	
-				tessad9(d); 
+				tessad16(d); 
 			ELSE
-				tessa9(d); 
+				tessa16(d); 
 			END;
 	ELSE
 		l:=level-1;
@@ -308,7 +363,23 @@ VAR
 	fward*, dward*, rward*: PT;  
 	foveaparameter:INTEGER;
 	copy: Raster.Mode;
+
+PROCEDURE reflect(VAR p: PT; n: PT);
+VAR 
+	a,b,c,dot: REAL;
+BEGIN
+	dot := p.x*n.x+p.y*n.y+p.z*n.z;
+	a := 2*n.x*dot; b := 2*n.y*dot; c := 2*n.z*dot;
+	p.x := p.x-a; p.y := p.y-b; p.z := p.z-c;
+END reflect;
 	
+PROCEDURE mirror(VAR ray: Ray);
+BEGIN
+	reflect(ray.dxyz, ray.normal);	
+	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
+	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
+	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
+END mirror;
 	
 PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
 VAR d: REAL;

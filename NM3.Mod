@@ -264,7 +264,7 @@ BEGIN
 				ray.ga := (ray.ga-gr)-blr;
 				ray.ba := (ray.ba-br)-blr; 				
 				out:=TRUE
-			END;
+			END;	
 			bounds(ijk.i,ijk.j,ijk.k, out);			
 			IF ~out THEN
 				v := blox[ijk.i,ijk.j,ijk.k];		
@@ -286,6 +286,7 @@ BEGIN
 			END;
 		IF (ray.bla<0.1)OR((ray.ra<0.01)OR(ray.ga<0.01)OR(ray.ba<0.01))THEN ray.terminate:=TRUE 
 		END;
+(*		out:=out OR (ray.length>0.02);		*)
 		UNTIL  out OR ray.terminate;
 	END 		END;
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;

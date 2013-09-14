@@ -98,7 +98,7 @@ PROCEDURE & init*(n: Name);
 BEGIN
 	NEW(texcube,n,FALSE);
 	name:=n;
-	tscale:=23;
+	tscale:=100;
 	texscale:=900;
 END init;
 
@@ -128,6 +128,7 @@ VAR
 	color,color1,color2: Base.Color;
 	txcube: TexCube;
 	rlf: REAL;
+	rlm: BOOLEAN;
 	lxyz: Base.PT;
 	lsp: Base.SPT;
 	dtl: LONGINT;
@@ -209,45 +210,29 @@ BEGIN
 			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 		END
 	END;
-	color:=texcube.side[ray.face].pixelmip0(lx,ly);
-	lx:=lx*9-ENTIER(lx*9);
-	ly:=ly*9-ENTIER(ly*9);	
-	color1:=texcube.side[ray.face].pixelmip1(lx,ly);	
-	lx:=lx*9-ENTIER(lx*9);
-	ly:=ly*9-ENTIER(ly*9);		
-	color2:=texcube.side[ray.face].pixel(lx,ly);		
-	mip:=ray.length*9;
+	IF ray.length>0.051 THEN
+		rlm:=TRUE;
+		color:=texcube.side[ray.face].pixelmip0(lx,ly);
+		color1:=texcube.side[ray.face].pixelmip1(lx,ly);	
+	ELSE
+		color:=texcube.side[ray.face].pixelmip1(lx,ly);
+		color1:=texcube.side[ray.face].pixel(lx,ly);	
+	END;	
 	IF mip>1 THEN mip:=1 END; 
 	mipverse:=1-mip;
 	color.red:=(color1.red*mipverse+mip*color.red);
 	color.green:=(color1.green*mipverse+mip*color.green);
 	color.blue:=(color1.blue*mipverse+mip*color.blue);
 	color.alpha:=(color1.alpha*mipverse+mip*color.alpha);
-	mip:=mip*9;
-	IF mip>1 THEN mip:=1 END; 
-	mipverse:=1-mip;
-	color.red:=(color2.red*mipverse+mip*color.red);
-	color.green:=(color2.green*mipverse+mip*color.green);
-	color.blue:=(color2.blue*mipverse+mip*color.blue);
-	color.alpha:=(color2.alpha*mipverse+mip*color.alpha);	
 	dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
 	dr:=color.red*dot*ray.ra;
 	dg:=color.green*dot*ray.ra;
 	db:=color.blue*dot*ray.ra;	
-	IF color.alpha<0.9 THEN
-		IF color.alpha>0.7 THEN
-			ray.ra:=ray.ra-0.1;
-			ray.ga:=ray.ga-0.1;
-			ray.ba:=ray.ba-0.1;
-			mirror(ray)
-		ELSE
-			ray.r := ray.r + dr*color.alpha;
-			ray.ra:=ray.ra-dr*color.alpha-0.4;	
-			ray.g := ray.g + dg*color.alpha;
-			ray.ga:=ray.ga-dg*color.alpha-0.4;
-			ray.b := ray.b + db*color.alpha;
-			ray.ba:=ray.ba-db*color.alpha-0.4;
-		END			
+	IF ~rlm & (color.alpha<0.9) THEN
+		ray.ra:=ray.ra-0.1;
+		ray.ga:=ray.ga-0.1;
+		ray.ba:=ray.ba-0.1;
+		mirror(ray)
 	ELSE
 		ray.r := ray.r + dr;
 		ray.g := ray.g + dg;

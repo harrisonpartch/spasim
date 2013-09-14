@@ -150,7 +150,7 @@ END d2s;
 
 PROCEDURE voxel*(p:PT):Voxel;
 BEGIN
-	RETURN va[(ENTIER(100*Math.sqrt((1/2-p.x)*(1/2-p.x)*(1/2-p.y)*(1/2-p.y)*(1/2-p.z)*(1/2-p.z)))MOD 23)MOD 6] 
+	RETURN va[(ENTIER(117*Math.sqrt((1/2-p.x)*(1/2-p.x)*(1/2-p.y)*(1/2-p.y)*(1/2-p.z)*(1/2-p.z)))MOD 223)MOD 6] 
 END voxel;
 
 END tilednoise;

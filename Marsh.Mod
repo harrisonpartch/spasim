@@ -286,7 +286,7 @@ BEGIN
       rand:=Base.rand;	
 
   	w10:=Base.VoxelFromName("NM2");	
- 	z10:=Base.VoxelFromName("NM2");	
+ 	z10:=Base.VoxelFromName("NM3");	
     
 	Out.String("EEEEP!");
 	xot:=Base.VoxelFromName("Nharrisonavatar"); 
@@ -403,41 +403,40 @@ BEGIN
 	Base.setPT(center,1/2,1/2,1/12);
 	NEW(tnoise);
 	tnoise.seed:=123666;	
-	tnoise.a:=1;
-	tnoise.b:=1;
-	tnoise.c:=1;		
+	tnoise.a:=2;
+	tnoise.b:=2;
+	tnoise.c:=2;		
 	tnoise.octaves:=4;
-	tnoise.persistence:=4.5;
+	tnoise.persistence:=3.5;
 	tnoise.setvoxel(dotz);
 	tnoise.va[0]:=sand;
 	tnoise.va[1]:=axolotl;
-	tnoise.va[2]:=etile0;
-	tnoise.va[3]:=serp;
-	tnoise.va[4]:=harrison;
+	tnoise.va[2]:=lobster;
+	tnoise.va[3]:=tigerlily;
+	tnoise.va[4]:=granite;
 	tnoise.va[5]:=btx;	
 
 	NEW(noise);		
 	noise.seed:=123666;		
-	noise.a:=3;
-	noise.b:=3;
-	noise.c:=3;		
+	noise.a:=5;
+	noise.b:=5;
+	noise.c:=5;		
 	noise.octaves:=4;
-	noise.setvoxel(blacksun);
-	noise.persistence:=3.1;
+	noise.setvoxel(tigerlily);
+	noise.persistence:=3.8;
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,-1);
 	Base.setPT(center,1/2,1/2,11/12);
 	NEW(plane,center,up);
 	plane.vox:=granite;	
 	z10.FRaster(plane,32); 		
-	z10.FRaster(noise,128); 	
-	z10.FRaster(tnoise,256); 			
-	z10.setcolor(0,1/2,0,1,0); 
+	z10.FRaster(tnoise,128); 	
+(*	z10.FRaster(tnoise,128); 			
+*)	z10.setcolor(1,0,0,2,0); 
 	gorge.setcolor(0,0,0,0,0);
-	Base.world:=z10; 	
-	msphere.passable:=TRUE;
+	Base.world:=z10; 
 	Base.avatar:=lobster;
-	Base.avatarsize:=10000;
+	Base.avatarsize:=100000;
 	Out.String("EEEEP!");
 END dawn;
 
