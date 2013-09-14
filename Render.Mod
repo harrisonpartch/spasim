@@ -294,7 +294,7 @@ VAR
 	vertexbuffer, uvbuffer: Uint; (* GL buffers *)
 	image: Uint; (* image texture name *)
 	passthroughProgram: GL.Uint;
-	splashscreen: BOOLEAN;
+	splashscreen,fullwindow: BOOLEAN;
 	
 PROCEDURE &openwincam(w,h: INTEGER);
 BEGIN
@@ -442,7 +442,7 @@ BEGIN
 					Close();	
 					
 					
-		(*	| Inputs.KsF11: ToggleFullWindow; *)
+			| Inputs.KsF11: fullwindow:=~fullwindow; SetFullWindow(fullwindow); 
 			| Inputs.KsF2: Base.gravity:= -Base.gravity;
 
 			| Inputs.KsControlL: AVATAR:=~AVATAR; 
