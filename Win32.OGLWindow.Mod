@@ -2,14 +2,15 @@ MODULE OGLWindow;  (** AUTHOR "fnecati"; PURPOSE "OpenGL enabled OO Win32 Window
 
 (* stripped from Win32.Display.Mod *)
 (*! todo:
-  - fullscreen, fullwindow, decorations on/of  window:
+  _- check and cleanup Message handles, key handling and others	
+  - set fullwindow, decorations on/off  window:
   - add window icons
   - etc.
 
  *)
 
 IMPORT SYSTEM, Machine, Kernel32, User32, Kernel, Modules, KernelLog,
-	Inputs, GL:=OpenGL, Strings, WinApi;
+	Inputs, Objects, GL:=OpenGL, Strings, WinApi;
 
 CONST
 	debug = FALSE;
@@ -62,11 +63,12 @@ CONST
 		opGDI = 1;
 		opStereo = 2;
 
+
 TYPE
 	CreateStruct = POINTER TO RECORD
 		win: Window;
-		dwExStyleset: SET;
-		style: SET;
+		dwExStyle: SET;
+		dwStyle: SET;
 		x, y, w, h: LONGINT;
 	END;
 
@@ -97,20 +99,22 @@ TYPE
 		cmdlinerun* : BOOLEAN; (* run from commandline, exe ? *)
 		
 		active : BOOLEAN;  (* for main loop control *)
-		fullscreen-, fullwindow-: BOOLEAN;
+		fullscreen-, fullwindow-,  decorations-: BOOLEAN;
 		gamemode-: BOOLEAN; (** if true poll Display procedure *)
 
 		create: CreateStruct;
 		mkeys: SET; (* current mouse keys *)
-
+		screenSettings: WinApi.DEVMODE;
+		
 	(** constructor, initlialize window object, fs: fullscale: true/false *)
 	PROCEDURE &Init*( w, h, left, top: LONGINT; fs: BOOLEAN );
 	VAR
-		fixedsize: BOOLEAN;
 		str: ARRAY 8 OF CHAR;
 	BEGIN
-		fixedsize := FALSE;
+		decorations := TRUE;
 		fullscreen := fs;
+		fullwindow := FALSE;
+		
 		SELF.left := left; SELF.top := top;
 		(* Initialize the fields of a new Window instance with default values.*)
 		defWindowProc := User32.DefWindowProc;  state := {update};
@@ -125,26 +129,13 @@ TYPE
 		className := "OGLWindow";
 		Strings.Append(className, str);
 		INC(classCount);
-
+		
 		create.x := left; create.y := top;
 		create.w := w;
 		create.h := h;
 
 		width := w;
 		height := h;
-		SELF.left := left; SELF.top := top;
-
-		(*? needs checking *)
-		(* Set common window styles *)
-
-		IF fullscreen THEN
-			create.style := WinApi.WS_POPUP;
-			create.dwExStyleset := WinApi.WS_EX_APPWINDOW;
-		ELSE
-			create.style   := WinApi.WS_OVERLAPPEDWINDOW;
-			create.dwExStyleset := WinApi.WS_EX_APPWINDOW + WinApi.WS_EX_WINDOWEDGE;
-		END;
-
 	END Init;
 
 	(** sets title of window *)
@@ -393,11 +384,9 @@ TYPE
 	BEGIN
 		IF (uMsg = User32.WMSetFocus) THEN
 			Kernel32.Sleep( 0 );   (* ????????????????????? *)
+			FocusGot();			
 		ELSIF uMsg = User32.WMKillFocus THEN
-
-			IF wParam # Kernel32.NULL THEN
-				IF wParam = hWnd THEN RETURN END;
-			END;
+			FocusLost();
 		END
 	END HandleFocus;
 
@@ -566,7 +555,7 @@ TYPE
 				Display();
 				User32.EndPaint(hWnd, ps);
 			END;
-		END
+		END;
 	END UpdateDisplay;
 
 
@@ -575,19 +564,22 @@ TYPE
 													  lParam: User32.LParam ): User32.LResult;
 	VAR handled: BOOLEAN; ret: Kernel32.BOOL;
 	BEGIN
+				handled := TRUE;
 				CASE uMsg OF
 				(*| User32.WMMove:
 						KernelLog.String("WMMove"); KernelLog.Ln; *)
 
 				 WinApi.WM_ERASEBKGND: RETURN 1; (* disble flickering *)
-			(*	| WinApi.WM_SIZING :	*)
-				| User32.WMSize:
+				| WinApi.WM_SIZING :	 
+								
+				| WinApi.WM_SIZE: 
 						IF wParam = User32.SizeMaximized THEN Maximize();  UpdateDisplay( resize, lParam, wParam );
 						ELSIF wParam = User32.SizeMinimized THEN Minimize();
 						ELSIF wParam = User32.SizeRestored THEN Restore();  UpdateDisplay(resize, lParam, wParam );
 						END;
 						RETURN 0;
-				| User32.WMPaint:
+
+				| User32.WMPaint: 
 						UpdateDisplay(redraw, lParam, wParam );
 						RETURN 0;
 				| User32.WMMouseActivate:
@@ -607,13 +599,13 @@ TYPE
 				| User32.WMKeyDown:
 						HandleKey(wParam, lParam);
 						RETURN 0;
-				| User32.WMKeyUp:
-						HandleKeyUp(wParam, lParam );
-						RETURN 0;
+				(*| User32.WMKeyUp:
+						HandleKeyUp(wParam, lParam ); *)
+						(* RETURN 0; *) 
 				| User32.WMChar:
 						IF ~KeyHandled THEN
 							HandleChar(wParam, lParam );
-							RETURN 0;
+							RETURN 0; 
 						END;
 				| User32.WMSysKeyDown: HandleKey(wParam, lParam); RETURN 0;
 				| User32.WMSysKeyUp: HandleKeyUp(wParam, lParam); RETURN 0;
@@ -626,9 +618,9 @@ TYPE
 		ELSE
 			handled := FALSE;
 		END;
-
-		IF ~handled THEN RETURN defWindowProc(hWnd,uMsg, wParam, lParam ) END;
-		RETURN 0;
+		IF ~handled THEN RETURN defWindowProc(hWnd,uMsg, wParam, lParam );  ELSE RETURN 0 END;
+		
+(*		RETURN User32.DefWindowProc(hWnd,uMsg, wParam, lParam ) *)
 	END WindowHandler;
 
 	PROCEDURE RegisterClasses();
@@ -653,23 +645,51 @@ TYPE
 		ret := User32.UnregisterClass(className, Machine.hInstance );
 	END UnregisterClasses;
 
-	PROCEDURE CreateHWND( create: CreateStruct );
+	PROCEDURE CreateWindow(): BOOLEAN;
 	VAR
-		hwnd: User32.HWND;
 		rect: User32.Rect;
 	BEGIN
-		rect.left := 0; rect.right := create.w; rect.top := 0;	rect.bottom := create.h;
-		WinApi.AdjustWindowRectEx(rect, create.style, 0, create.dwExStyleset);
-		hwnd :=
-			User32.CreateWindowEx( SYSTEM.VAL(LONGINT, create.dwExStyleset) , className, title, create.style + WinApi.WS_CLIPCHILDREN + WinApi.WS_CLIPSIBLINGS, create.x, create.y,  (rect.right - rect.left) , (rect.bottom - rect.top),
+		IF fullscreen THEN
+			screenSettings.dmSize:=SIZEOF(WinApi.DEVMODE);
+			screenSettings.dmPelsWidth := width;
+			screenSettings.dmPelsHeight := height;
+			screenSettings.dmBitsPerPel := 32;
+			screenSettings.dmFields := WinApi.DM_BITSPERPEL + WinApi.DM_PELSWIDTH + WinApi.DM_PELSHEIGHT;
+
+			IF WinApi.ChangeDisplaySettings(ADDRESSOF(screenSettings), WinApi.CDS_FULLSCREEN) # WinApi.DISP_CHANGE_SUCCESSFUL THEN
+				IF debug THEN KernelLog.String("could not change to fullscreen"); KernelLog.Ln; END;
+
+				(* could not change, so revert to windowed mode *)			
+				fullscreen := FALSE;	
+			END;
+		END; 
+	
+		IF fullscreen THEN
+			create.dwExStyle := WinApi.WS_EX_APPWINDOW;
+			create.dwStyle := WinApi.WS_POPUP + WinApi.WS_CLIPSIBLINGS + WinApi.WS_CLIPCHILDREN;
+			User32.ShowCursor(0);
+		ELSE
+			create.dwExStyle := WinApi.WS_EX_APPWINDOW + WinApi.WS_EX_WINDOWEDGE;
+			create.dwStyle := WinApi.WS_OVERLAPPEDWINDOW + WinApi.WS_CLIPSIBLINGS + WinApi.WS_CLIPCHILDREN;
+		END;		
+
+		rect.left := 0 ; 
+		rect.top := 0;
+		
+		IF fullscreen THEN
+			left := 0;
+			top := 0;
+		END;	
+		
+		rect.right := width; 	rect.bottom := height;
+		WinApi.AdjustWindowRectEx(rect, create.dwStyle, 0, create.dwExStyle);
+			
+		hWnd :=
+			User32.CreateWindowEx( SYSTEM.VAL(LONGINT, create.dwExStyle) , className, title, create.dwStyle, left, top,  (rect.right - rect.left) , (rect.bottom - rect.top),
 													   0 ,0, Machine.hInstance,
 													   SYSTEM.VAL( User32.LParam, create));
-		create.win.hWnd := hwnd;
-		create.x := rect.left;
-		create.y := rect.top;
-		create.w := rect.right;
-		create.h := rect.bottom;
-	END CreateHWND;
+		RETURN (hWnd # 0);
+	END CreateWindow;
 
 	(* close the window and its resources *)
 	PROCEDURE CloseWindow*();
@@ -677,6 +697,11 @@ TYPE
 		bres : BOOLEAN;
 	BEGIN 
 		active := FALSE;
+		IF fullscreen THEN
+			WinApi.ChangeDisplaySettings(0, {});
+			User32.SetCursor(1);
+		END;
+		
 		(* do we have a rendering context *)
 		IF  hGLRC # 0 THEN
 			(* Release the DC and RC contexts *)
@@ -698,6 +723,7 @@ TYPE
 			res := User32.DestroyWindow(hWnd );
 			hWnd := Kernel32.NULL;
 		END;
+		
 		UnregisterClasses();
 
 		IF cmdlinerun THEN
@@ -721,7 +747,7 @@ TYPE
 			END
 		END;
 	END LoopForEvents;
-	
+		
 PROCEDURE GetCurrentFrameMs*():LONGINT;
 BEGIN 
 	RETURN currentfms;
@@ -739,7 +765,16 @@ END GameLogic;
 		i,ii: LONGINT;	
 	BEGIN
 
-		RegisterClasses();  CreateHWND( create );
+		RegisterClasses();  
+		IF ~CreateWindow() THEN Close(); RETURN END;
+
+		User32.ShowWindow( hWnd, User32.SWShow);
+		User32.SetForegroundWindow(hWnd);
+
+		(*User32.UpdateWindow(hWnd);*)
+		(*User32.SetWindowText(hWnd, title);*)
+		(*User32.SetFocus(hWnd);*)
+				
 		(* create GL context for this window *)
 		IF ~CreateGLRC({opDoubleBuffered}, 32, 16, 8, 0,0,0) THEN
 			Close;
@@ -750,22 +785,17 @@ END GameLogic;
 
 		GL.ReadOpenGLCore();
 		GL.Read_WGL_EXT_swap_control; (* needed for swap interval *)
-		SetSwapInterval(0);
-		
-		User32.ShowWindow( hWnd, User32.SWShow);
-		User32.SetWindowText(hWnd, title);
-		User32.SetFocus(hWnd);
-				
-		Reshape(width, height);
-		OnLoad();	
+		(* SetSwapInterval(0); *)
 		
 		active := TRUE;
-		
+
+		Reshape(width, height);
+		OnLoad();	
+				
 		WHILE active DO (* loop until WMQuit received *)
 			i:=(i+1)MOD 10;
 			Kernel.SetTimer(fpstimer, 1000);
-						
-	
+
 			LoopForEvents();
 			(* ------------ game mode starts ------------- *)
 			IF gamemode THEN
@@ -776,10 +806,12 @@ END GameLogic;
 					END;
 				ELSE				
 					Display();
-					Kernel32.Sleep(0);
+			(*		Kernel32.Sleep(0); *)
 				END;	
 			END;
-
+			
+			Objects.Yield();
+			
 			(* measure frame timing info, ms *)
 			IF gamemode & debugframes & (idletime = 0) THEN
 				ft[i]:=Kernel.Elapsed(fpstimer);
@@ -919,10 +951,12 @@ VAR
 	BEGIN
 		win := SYSTEM.VAL( Window, User32.GetWindowLong( hwnd, WinApi.GWL_USERDATA));
 
-		IF win # NIL THEN RETURN win.WindowHandler( uMsg, wParam, lParam ) END;
+		IF win # NIL THEN
+			RETURN win.WindowHandler( uMsg, wParam, lParam );
+		END;
 
 		CASE uMsg OF
-			 User32.WMCreate:
+			 User32.WMCreate:			 	
 				SYSTEM.GET( lParam, create );  wParam := SYSTEM.VAL( User32.WParam, create );
 				lParam := SYSTEM.VAL( User32.LParam, create.win );
 				ret := User32.PostMessage( hwnd, WMSetup, wParam, lParam );
@@ -932,14 +966,9 @@ VAR
 				create := SYSTEM.VAL( CreateStruct, wParam );
 				RETURN 0;
 		ELSE
-(*
 		END;
-
-		RETURN User32.DefWindowProc( hwnd, uMsg, wParam, lParam )
-*)
-				RETURN  User32.DefWindowProc( hwnd, uMsg, wParam, lParam )
-		END;
-		RETURN 0;
+		
+		RETURN  User32.DefWindowProc( hwnd, uMsg, wParam, lParam );
 	END WindowProc;
 
 	PROCEDURE InitMod;

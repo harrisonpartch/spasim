@@ -204,8 +204,222 @@ CONST
 		GWL_ID* = -12 (* {2, 4..31} *);
 
 		(* Messages *)
+		WM_NULL* = 0 (* {} *);
+		WM_CREATE* = 1 (* {0} *);
+		WM_DESTROY* = 2 (* {1} *);
+		WM_MOVE* = 3 (* {0, 1} *);
+		WM_SIZE* = 5 (* {0, 2} *);
+		WM_ACTIVATE* = 6 (* {1, 2} *);
+		WA_INACTIVE* = 0 (* {} *);
+		WA_ACTIVE* = 1 (* {0} *);
+		WA_CLICKACTIVE* = 2 (* {1} *);
+		WM_SETFOCUS* = 7 (* {0..2} *);
+		WM_KILLFOCUS* = 8 (* {3} *);
+		WM_ENABLE* = 10 (* {1, 3} *);
+		WM_SETREDRAW* = 11 (* {0, 1, 3} *);
+		WM_SETTEXT* = 12 (* {2, 3} *);
+		WM_GETTEXT* = 13 (* {0, 2, 3} *);
+		WM_GETTEXTLENGTH* = 14 (* {1..3} *);
+		WM_PAINT* = 15 (* {0..3} *);
+		WM_CLOSE* = 16 (* {4} *);
+		WM_QUERYENDSESSION* = 17 (* {0, 4} *);
+		WM_QUIT* = 18 (* {1, 4} *);
+		WM_QUERYOPEN* = 19 (* {0, 1, 4} *);
 		WM_ERASEBKGND* = 20 (* {2, 4} *);
+		WM_SYSCOLORCHANGE* = 21 (* {0, 2, 4} *);
+		WM_ENDSESSION* = 22 (* {1, 2, 4} *);
+		WM_SHOWWINDOW* = 24 (* {3, 4} *);
+		WM_WININICHANGE* = 26 (* {1, 3, 4} *);
+		WM_SETTINGCHANGE* = 26 (* {1, 3, 4} *);
+		WM_DEVMODECHANGE* = 27 (* {0, 1, 3, 4} *);
+		WM_ACTIVATEAPP* = 28 (* {2..4} *);
+		WM_FONTCHANGE* = 29 (* {0, 2..4} *);
+		WM_TIMECHANGE* = 30 (* {1..4} *);
+		WM_CANCELMODE* = 31 (* {0..4} *);
+		WM_SETCURSOR* = 32 (* {5} *);
+		WM_MOUSEACTIVATE* = 33 (* {0, 5} *);
+		WM_CHILDACTIVATE* = 34 (* {1, 5} *);
+		WM_QUEUESYNC* = 35 (* {0, 1, 5} *);
+		WM_GETMINMAXINFO* = 36 (* {2, 5} *);
+		WM_PAINTICON* = 38 (* {1, 2, 5} *);
+		WM_ICONERASEBKGND* = 39 (* {0..2, 5} *);
+		WM_NEXTDLGCTL* = 40 (* {3, 5} *);
+		WM_SPOOLERSTATUS* = 42 (* {1, 3, 5} *);
+		WM_DRAWITEM* = 43 (* {0, 1, 3, 5} *);
+		WM_MEASUREITEM* = 44 (* {2, 3, 5} *);
+		WM_DELETEITEM* = 45 (* {0, 2, 3, 5} *);
+		WM_VKEYTOITEM* = 46 (* {1..3, 5} *);
+		WM_CHARTOITEM* = 47 (* {0..3, 5} *);
+		WM_SETFONT* = 48 (* {4, 5} *);
+		WM_GETFONT* = 49 (* {0, 4, 5} *);
+		WM_SETHOTKEY* = 50 (* {1, 4, 5} *);
+		WM_GETHOTKEY* = 51 (* {0, 1, 4, 5} *);
+		WM_QUERYDRAGICON* = 55 (* {0..2, 4, 5} *);
+		WM_COMPAREITEM* = 57 (* {0, 3..5} *);
+		WM_COMPACTING* = 65 (* {0, 6} *);
+		WM_COMMNOTIFY* = 68 (* {2, 6} *);
+		WM_WINDOWPOSCHANGING* = 70 (* {1, 2, 6} *);
+		WM_WINDOWPOSCHANGED* = 71 (* {0..2, 6} *);
+		WM_POWER* = 72 (* {3, 6} *);
+		PWR_OK* = 1 (* {0} *);
+		PWR_FAIL* = -1 (* {0..31} *);
+		PWR_SUSPENDREQUEST* = 1 (* {0} *);
+		PWR_SUSPENDRESUME* = 2 (* {1} *);
+		PWR_CRITICALRESUME* = 3 (* {0, 1} *);
+		WM_COPYDATA* = 74 (* {1, 3, 6} *);
+		WM_CANCELJOURNAL* = 75 (* {0, 1, 3, 6} *);
+		WM_NOTIFY* = 78 (* {1..3, 6} *);
+		WM_INPUTLANGCHANGEREQUEST* = 80 (* {4, 6} *);
+		WM_INPUTLANGCHANGE* = 81 (* {0, 4, 6} *);
+		WM_TCARD* = 82 (* {1, 4, 6} *);
+		WM_HELP* = 83 (* {0, 1, 4, 6} *);
+		WM_USERCHANGED* = 84 (* {2, 4, 6} *);
+		WM_NOTIFYFORMAT* = 85 (* {0, 2, 4, 6} *);
+		NFR_ANSI* = 1 (* {0} *);
+		NFR_UNICODE* = 2 (* {1} *);
+		NF_QUERY* = 3 (* {0, 1} *);
+		NF_REQUERY* = 4 (* {2} *);
+		WM_CONTEXTMENU* = 123 (* {0, 1, 3..6} *);
+		WM_STYLECHANGING* = 124 (* {2..6} *);
+		WM_STYLECHANGED* = 125 (* {0, 2..6} *);
+		WM_DISPLAYCHANGE* = 126 (* {1..6} *);
+		WM_GETICON* = 127 (* {0..6} *);
+		WM_SETICON* = 128 (* {7} *);
+		WM_NCCREATE* = 129 (* {0, 7} *);
+		WM_NCDESTROY* = 130 (* {1, 7} *);
+		WM_NCCALCSIZE* = 131 (* {0, 1, 7} *);
+		WM_NCHITTEST* = 132 (* {2, 7} *);
+		WM_NCPAINT* = 133 (* {0, 2, 7} *);
+		WM_NCACTIVATE* = 134 (* {1, 2, 7} *);
+		WM_GETDLGCODE* = 135 (* {0..2, 7} *);
+		WM_NCMOUSEMOVE* = 160 (* {5, 7} *);
+		WM_NCLBUTTONDOWN* = 161 (* {0, 5, 7} *);
+		WM_NCLBUTTONUP* = 162 (* {1, 5, 7} *);
+		WM_NCLBUTTONDBLCLK* = 163 (* {0, 1, 5, 7} *);
+		WM_NCRBUTTONDOWN* = 164 (* {2, 5, 7} *);
+		WM_NCRBUTTONUP* = 165 (* {0, 2, 5, 7} *);
+		WM_NCRBUTTONDBLCLK* = 166 (* {1, 2, 5, 7} *);
+		WM_NCMBUTTONDOWN* = 167 (* {0..2, 5, 7} *);
+		WM_NCMBUTTONUP* = 168 (* {3, 5, 7} *);
+		WM_NCMBUTTONDBLCLK* = 169 (* {0, 3, 5, 7} *);
+		WM_KEYFIRST* = 256 (* {8} *);
+		WM_KEYDOWN* = 256 (* {8} *);
+		WM_KEYUP* = 257 (* {0, 8} *);
+		WM_CHAR* = 258 (* {1, 8} *);
+		WM_DEADCHAR* = 259 (* {0, 1, 8} *);
+		WM_SYSKEYDOWN* = 260 (* {2, 8} *);
+		WM_SYSKEYUP* = 261 (* {0, 2, 8} *);
+		WM_SYSCHAR* = 262 (* {1, 2, 8} *);
+		WM_SYSDEADCHAR* = 263 (* {0..2, 8} *);
+		WM_UNICHAR* = 265;
+		WM_KEYLAST* = 265;
+		WM_IME_STARTCOMPOSITION* = 269 (* {0, 2, 3, 8} *);
+		WM_IME_ENDCOMPOSITION* = 270 (* {1..3, 8} *);
+		WM_IME_COMPOSITION* = 271 (* {0..3, 8} *);
+		WM_IME_KEYLAST* = 271 (* {0..3, 8} *);
+		WM_INITDIALOG* = 272 (* {4, 8} *);
+		WM_COMMAND* = 273 (* {0, 4, 8} *);
+		WM_SYSCOMMAND* = 274 (* {1, 4, 8} *);
+		WM_TIMER* = 275 (* {0, 1, 4, 8} *);
+		WM_HSCROLL* = 276 (* {2, 4, 8} *);
+		WM_VSCROLL* = 277 (* {0, 2, 4, 8} *);
+		WM_INITMENU* = 278 (* {1, 2, 4, 8} *);
+		WM_INITMENUPOPUP* = 279 (* {0..2, 4, 8} *);
+		WM_MENUSELECT* = 287 (* {0..4, 8} *);
+		WM_MENUCHAR* = 288 (* {5, 8} *);
+		WM_ENTERIDLE* = 289 (* {0, 5, 8} *);
+		WM_CTLCOLORMSGBOX* = 306 (* {1, 4, 5, 8} *);
+		WM_CTLCOLOREDIT* = 307 (* {0, 1, 4, 5, 8} *);
+		WM_CTLCOLORLISTBOX* = 308 (* {2, 4, 5, 8} *);
+		WM_CTLCOLORBTN* = 309 (* {0, 2, 4, 5, 8} *);
+		WM_CTLCOLORDLG* = 310 (* {1, 2, 4, 5, 8} *);
+		WM_CTLCOLORSCROLLBAR* = 311 (* {0..2, 4, 5, 8} *);
+		WM_CTLCOLORSTATIC* = 312 (* {3..5, 8} *);
+		WM_MOUSEFIRST* = 512 (* {9} *);
+		WM_MOUSEMOVE* = 512 (* {9} *);
+		WM_LBUTTONDOWN* = 513 (* {0, 9} *);
+		WM_LBUTTONUP* = 514 (* {1, 9} *);
+		WM_LBUTTONDBLCLK* = 515 (* {0, 1, 9} *);
+		WM_RBUTTONDOWN* = 516 (* {2, 9} *);
+		WM_RBUTTONUP* = 517 (* {0, 2, 9} *);
+		WM_RBUTTONDBLCLK* = 518 (* {1, 2, 9} *);
+		WM_MBUTTONDOWN* = 519 (* {0..2, 9} *);
+		WM_MBUTTONUP* = 520 (* {3, 9} *);
+		WM_MBUTTONDBLCLK* = 521 (* {0, 3, 9} *);
+		WM_MOUSELAST* = 521 (* {0, 3, 9} *);
+		WM_MOUSEWHEEL* = 522;
+		WM_PARENTNOTIFY* = 528 (* {4, 9} *);
+		MENULOOP_WINDOW* = 0 (* {} *);
+		MENULOOP_POPUP* = 1 (* {0} *);
+		WM_ENTERMENULOOP* = 529 (* {0, 4, 9} *);
+		WM_EXITMENULOOP* = 530 (* {1, 4, 9} *);
+		WM_NEXTMENU* = 531 (* {0, 1, 4, 9} *);
 		WM_SIZING* = 532 (* {2, 4, 9} *);
+		WM_CAPTURECHANGED* = 533 (* {0, 2, 4, 9} *);
+		WM_MOVING* = 534 (* {1, 2, 4, 9} *);
+		WM_POWERBROADCAST* = 536 (* {3, 4, 9} *);
+		WM_DEVICECHANGE* = 537 (* {0, 3, 4, 9} *);
+		WM_IME_SETCONTEXT* = 641 (* {0, 7, 9} *);
+		WM_IME_NOTIFY* = 642 (* {1, 7, 9} *);
+		WM_IME_CONTROL* = 643 (* {0, 1, 7, 9} *);
+		WM_IME_COMPOSITIONFULL* = 644 (* {2, 7, 9} *);
+		WM_IME_SELECT* = 645 (* {0, 2, 7, 9} *);
+		WM_IME_CHAR* = 646 (* {1, 2, 7, 9} *);
+		WM_IME_KEYDOWN* = 656 (* {4, 7, 9} *);
+		WM_IME_KEYUP* = 657 (* {0, 4, 7, 9} *);
+		WM_MDICREATE* = 544 (* {5, 9} *);
+		WM_MDIDESTROY* = 545 (* {0, 5, 9} *);
+		WM_MDIACTIVATE* = 546 (* {1, 5, 9} *);
+		WM_MDIRESTORE* = 547 (* {0, 1, 5, 9} *);
+		WM_MDINEXT* = 548 (* {2, 5, 9} *);
+		WM_MDIMAXIMIZE* = 549 (* {0, 2, 5, 9} *);
+		WM_MDITILE* = 550 (* {1, 2, 5, 9} *);
+		WM_MDICASCADE* = 551 (* {0..2, 5, 9} *);
+		WM_MDIICONARRANGE* = 552 (* {3, 5, 9} *);
+		WM_MDIGETACTIVE* = 553 (* {0, 3, 5, 9} *);
+		WM_MDISETMENU* = 560 (* {4, 5, 9} *);
+		WM_ENTERSIZEMOVE* = 561 (* {0, 4, 5, 9} *);
+		WM_EXITSIZEMOVE* = 562 (* {1, 4, 5, 9} *);
+		WM_DROPFILES* = 563 (* {0, 1, 4, 5, 9} *);
+		WM_MDIREFRESHMENU* = 564 (* {2, 4, 5, 9} *);
+		WM_CUT* = 768 (* {8, 9} *);
+		WM_COPY* = 769 (* {0, 8, 9} *);
+		WM_PASTE* = 770 (* {1, 8, 9} *);
+		WM_CLEAR* = 771 (* {0, 1, 8, 9} *);
+		WM_UNDO* = 772 (* {2, 8, 9} *);
+		WM_RENDERFORMAT* = 773 (* {0, 2, 8, 9} *);
+		WM_RENDERALLFORMATS* = 774 (* {1, 2, 8, 9} *);
+		WM_DESTROYCLIPBOARD* = 775 (* {0..2, 8, 9} *);
+		WM_DRAWCLIPBOARD* = 776 (* {3, 8, 9} *);
+		WM_PAINTCLIPBOARD* = 777 (* {0, 3, 8, 9} *);
+		WM_VSCROLLCLIPBOARD* = 778 (* {1, 3, 8, 9} *);
+		WM_SIZECLIPBOARD* = 779 (* {0, 1, 3, 8, 9} *);
+		WM_ASKCBFORMATNAME* = 780 (* {2, 3, 8, 9} *);
+		WM_CHANGECBCHAIN* = 781 (* {0, 2, 3, 8, 9} *);
+		WM_HSCROLLCLIPBOARD* = 782 (* {1..3, 8, 9} *);
+		WM_QUERYNEWPALETTE* = 783 (* {0..3, 8, 9} *);
+		WM_PALETTEISCHANGING* = 784 (* {4, 8, 9} *);
+		WM_PALETTECHANGED* = 785 (* {0, 4, 8, 9} *);
+		WM_HOTKEY* = 786 (* {1, 4, 8, 9} *);
+		WM_PRINT* = 791 (* {0..2, 4, 8, 9} *);
+		WM_PRINTCLIENT* = 792 (* {3, 4, 8, 9} *);
+		WM_HANDHELDFIRST* = 856 (* {3, 4, 6, 8, 9} *);
+		WM_HANDHELDLAST* = 863 (* {0..4, 6, 8, 9} *);
+		WM_AFXFIRST* = 864 (* {5, 6, 8, 9} *);
+		WM_AFXLAST* = 895 (* {0..6, 8, 9} *);
+		WM_PENWINFIRST* = 896 (* {7..9} *);
+		WM_PENWINLAST* = 911 (* {0..3, 7..9} *);
+		WM_APP* = 32768 (* {15} *);
+		WM_USER* = 1024 (* {10} *);
+		WMSZ_LEFT* = 1 (* {0} *);
+		WMSZ_RIGHT* = 2 (* {1} *);
+		WMSZ_TOP* = 3 (* {0, 1} *);
+		WMSZ_TOPLEFT* = 4 (* {2} *);
+		WMSZ_TOPRIGHT* = 5 (* {0, 2} *);
+		WMSZ_BOTTOM* = 6 (* {1, 2} *);
+		WMSZ_BOTTOMLEFT* = 7 (* {0..2} *);
+		WMSZ_BOTTOMRIGHT* = 8 (* {3} *);
+
 
 
 (* Font system *)
@@ -349,7 +563,51 @@ CONST
 		FW_DEMIBOLD* = 600 (* {3, 4, 6, 9} *);
 		FW_ULTRABOLD* = 800 (* {5, 8, 9} *);
 		FW_BLACK* = 900 (* {2, 7..9} *);
+
+
+	(*! Display Modes*)
+		DM_SPECVERSION* = {0, 10};
+		DM_ORIENTATION* = {0};
+		DM_PAPERSIZE* = {1};
+		DM_PAPERLENGTH* = {2};
+		DM_PAPERWIDTH* = {3};
+		DM_SCALE* = {4};
+		DM_COPIES* = {8};
+		DM_DEFAULTSOURCE* = {9};
+		DM_PRINTQUALITY* = {10};
+		DM_COLOR* = {11};
+		DM_DUPLEX* = {12};
+		DM_YRESOLUTION* = {13};
+		DM_TTOPTION* = {14};
+		DM_COLLATE* = {15};
+		DM_FORMNAME* = {16};
+		DM_LOGPIXELS* = {17};
+		DM_BITSPERPEL* = {18};
+		DM_PELSWIDTH* = {19};
+		DM_PELSHEIGHT* = {20};
+		DM_DISPLAYFLAGS* = {21};
+		DM_DISPLAYFREQUENCY* = {22};
+		DM_PANNINGWIDTH* = {23};
+		DM_PANNINGHEIGHT* = {24};
+		DM_ICMMETHOD* = {25};
+		DM_ICMINTENT* = {26};
+		DM_MEDIATYPE* = {27};
+		DM_DITHERTYPE* = {28};
+		DM_ICCMANUFACTURER* = {29};
+		DM_ICCMODEL* = {30};
+
+		CDS_UPDATEREGISTRY* = {0};
+		CDS_TEST* = {1};
+		CDS_FULLSCREEN* = {2};
 		
+		DISP_CHANGE_SUCCESSFUL* = 0 (* {} *);
+		DISP_CHANGE_RESTART* = 1 (* {0} *);
+		DISP_CHANGE_FAILED* = -1 (* {0..31} *);
+		DISP_CHANGE_BADMODE* = -2 (* {1..31} *);
+		DISP_CHANGE_NOTUPDATED* = -3 (* {0, 2..31} *);
+		DISP_CHANGE_BADFLAGS* = -4 (* {2..31} *);
+					
+	
   TYPE
   
 		HANDLE* = Kernel32.HANDLE;
@@ -511,6 +769,86 @@ CONST
 		crTransparent*: LONGINT;
 	END;
 
+(*! Screen DeviceMode *)
+
+		DEVMODEA* = RECORD 
+			dmDeviceName*: ARRAY  32 OF CHAR;
+			dmSpecVersion*: INTEGER;
+			dmDriverVersion*: INTEGER;
+			dmSize*: INTEGER;
+			dmDriverExtra*: INTEGER;
+			dmFields*: SET;
+			dmOrientation*: INTEGER;
+			dmPaperSize*: INTEGER;
+			dmPaperLength*: INTEGER;
+			dmPaperWidth*: INTEGER;
+			dmScale*: INTEGER;
+			dmCopies*: INTEGER;
+			dmDefaultSource*: INTEGER;
+			dmPrintQuality*: INTEGER;
+			dmColor*: INTEGER;
+			dmDuplex*: INTEGER;
+			dmYResolution*: INTEGER;
+			dmTTOption*: INTEGER;
+			dmCollate*: INTEGER;
+			dmFormName*: ARRAY 32 OF CHAR;
+			dmLogPixels*: INTEGER;
+			dmBitsPerPel*: LONGINT;
+			dmPelsWidth*: LONGINT;
+			dmPelsHeight*: LONGINT;
+			dmDisplayFlags*: SET;
+			dmDisplayFrequency*: LONGINT;
+			dmICMMethod*: LONGINT;
+			dmICMIntent*: LONGINT;
+			dmMediaType*: LONGINT;
+			dmDitherType*: LONGINT;
+			dmICCManufacturer*: LONGINT;
+			dmICCModel*: LONGINT;
+			dmPanningWidth*: LONGINT;
+			dmPanningHeight*: LONGINT;
+		END;
+		PtrDEVMODEA* = POINTER TO DEVMODEA;
+		
+		DEVMODEW* = RECORD 
+			dmDeviceName*: ARRAY 32 OF CHAR16;
+			dmSpecVersion*: INTEGER;
+			dmDriverVersion*: INTEGER;
+			dmSize*: INTEGER;
+			dmDriverExtra*: INTEGER;
+			dmFields*: SET;
+			dmOrientation*: INTEGER;
+			dmPaperSize*: INTEGER;
+			dmPaperLength*: INTEGER;
+			dmPaperWidth*: INTEGER;
+			dmScale*: INTEGER;
+			dmCopies*: INTEGER;
+			dmDefaultSource*: INTEGER;
+			dmPrintQuality*: INTEGER;
+			dmColor*: INTEGER;
+			dmDuplex*: INTEGER;
+			dmYResolution*: INTEGER;
+			dmTTOption*: INTEGER;
+			dmCollate*: INTEGER;
+			dmFormName*: ARRAY 32 OF CHAR16;
+			dmLogPixels*: INTEGER;
+			dmBitsPerPel*: LONGINT;
+			dmPelsWidth*: LONGINT;
+			dmPelsHeight*: LONGINT;
+			dmDisplayFlags*: SET;
+			dmDisplayFrequency*: LONGINT;
+			dmICMMethod*: LONGINT;
+			dmICMIntent*: LONGINT;
+			dmMediaType*: LONGINT;
+			dmDitherType*: LONGINT;
+			dmICCManufacturer*: LONGINT;
+			dmICCModel*: LONGINT;
+			dmPanningWidth*: LONGINT;
+			dmPanningHeight*: LONGINT;
+		END;
+		PtrDEVMODEW* = POINTER TO DEVMODEW;
+		DEVMODE* = DEVMODEA;
+		PtrDEVMODE* = PtrDEVMODEA;
+
 VAR
 
 	(* GDI32.dll *)
@@ -538,6 +876,11 @@ VAR
 	FindWindow- : PROCEDURE {WINAPI} (CONST lpClassName: ARRAY OF CHAR; CONST lpWindowName: ARRAY OF CHAR): HWND;
 	GetDesktopWindow-: PROCEDURE {WINAPI} (): HWND;
 	GetWindowDC- : PROCEDURE {WINAPI} (hwin: HWND): HDC;
+
+(*	ChangeDisplaySettingsA-: PROCEDURE {WINAPI} (lpDevMode: ADDRESS; (*DEVMODEA*) dwFlags: SET): LONGINT;
+	ChangeDisplaySettingsW- : PROCEDURE {WINAPI} (lpDevMode: ADDRESS (*DEVMODEW*); dwFlags: SET): LONGINT;
+*)
+	ChangeDisplaySettings-: PROCEDURE{WINAPI} (lpDevMode: ADDRESS (*DEVMODEA*); dwFlags: SET): LONGINT;
 
 	PROCEDURE GetDC*(hwn: HANDLE): HDC;
 	BEGIN
@@ -598,6 +941,11 @@ BEGIN
 	Kernel32.GetProcAddress(libuser, "GetDesktopWindow", S.VAL(ADDRESS,GetDesktopWindow ));
 	Kernel32.GetProcAddress(libuser, "GetWindowDC", S.VAL(ADDRESS, GetWindowDC ));
 	Kernel32.GetProcAddress(libuser, "PeekMessageA", S.VAL(ADDRESS, PeekMessage ));
+	
+	Kernel32.GetProcAddress(libuser, "ChangeDisplaySettingsA", S.VAL(ADDRESS, ChangeDisplaySettings ));
+(*	Kernel32.GetProcAddress(libuser, "ChangeDisplaySettingsW", S.VAL(ADDRESS, ChangeDisplaySettingsW ));*)
+
+		
 
 END InitWinApiLibs;
 
