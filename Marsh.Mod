@@ -286,7 +286,7 @@ BEGIN
       rand:=Base.rand;	
 
   	w10:=Base.VoxelFromName("NM2");	
- 	z10:=Base.VoxelFromName("NM3");	
+ 	z10:=Base.VoxelFromName("NM2");	
     
 	Out.String("EEEEP!");
 	xot:=Base.VoxelFromName("Nharrisonavatar"); 
@@ -328,7 +328,7 @@ BEGIN
   	push(ash);
 	dotz:=Base.VoxelFromName("Nahf6T7P6CYGfcImQTejDpg");	
 	btx:=Base.VoxelFromName("NVY1hEGnyr7z8DtULRMOZIQ");	
-	conglomerate:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZOQ"); 			
+	conglomerate:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7"); 			
 	
 	GREEN:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODg");	
 	grass:=Base.VoxelFromName("NJOFc7qhMXMly3lot71bNUw"); 	
@@ -386,7 +386,7 @@ BEGIN
 	push(greenball);
 	rat:=Base.VoxelFromName("NGJBlQ95mTkoMhozr6XOJYg"); 	
 	push(rat);
-	conglo2:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZOZ"); 	
+	conglo2:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZOq"); 	
 	push(conglo2);
 	sky1:=Base.VoxelFromName("N5a2g4M6HYjPJxYSNQvYyvw"); 	
 	push(sky1);
@@ -407,7 +407,7 @@ BEGIN
 	tnoise.b:=2;
 	tnoise.c:=2;		
 	tnoise.octaves:=4;
-	tnoise.persistence:=3.5;
+	tnoise.persistence:=3.1;
 	tnoise.setvoxel(dotz);
 	tnoise.va[0]:=sand;
 	tnoise.va[1]:=axolotl;
@@ -422,21 +422,21 @@ BEGIN
 	noise.b:=5;
 	noise.c:=5;		
 	noise.octaves:=4;
-	noise.setvoxel(tigerlily);
-	noise.persistence:=3.8;
+	noise.setvoxel(granite);
+	noise.persistence:=3.1;
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,-1);
 	Base.setPT(center,1/2,1/2,11/12);
 	NEW(plane,center,up);
-	plane.vox:=granite;	
+	plane.vox:=tigerlily;	
 	z10.FRaster(plane,32); 		
-	z10.FRaster(tnoise,128); 	
-(*	z10.FRaster(tnoise,128); 			
-*)	z10.setcolor(1,0,0,2,0); 
+	z10.FRaster(noise,64); 	
+	z10.FRaster(tnoise,128); 			
+	z10.setcolor(0,1,0,1,0); 
 	gorge.setcolor(0,0,0,0,0);
 	Base.world:=z10; 
-	Base.avatar:=lobster;
-	Base.avatarsize:=100000;
+	Base.avatar:=xot2;
+	Base.avatarsize:=1000;
 	Out.String("EEEEP!");
 END dawn;
 

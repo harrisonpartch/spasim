@@ -8,8 +8,8 @@ TYPE
 CONST
 	T=2;        
 	TS=16*4;   (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=6;
-	TH=4;
+	TW=5;
+	TH=3;
 	W*=TS*TW;
 	H*=TS*TH;
 

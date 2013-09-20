@@ -90,7 +90,7 @@ BEGIN
 	NEW(mip1);
 	
 	Raster.Create(mip0,64,64,Raster.BGRA8888);
-	Raster.Create(mip1,256,256,Raster.BGRA8888);		
+	Raster.Create(mip1,1024,1024,Raster.BGRA8888);		
 	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height),mip0,
 		WMRectangles.MakeRect(0,0, mip0.width, mip0.height),WMRectangles.MakeRect(0,0,mip0.width, mip0.height),
 			WMRasterScale.ModeCopy, WMRasterScale.ScaleBilinear);
@@ -349,6 +349,10 @@ END touch;
 
 PROCEDURE free*;
 END free; 
+
+PROCEDURE freerec*;
+END freerec; 
+
 
 
 END Voxel; 

@@ -98,7 +98,7 @@ PROCEDURE & init*(n: Name);
 BEGIN
 	NEW(texcube,n,FALSE);
 	name:=n;
-	tscale:=100;
+	tscale:=200;
 	texscale:=900;
 END init;
 
@@ -211,24 +211,23 @@ BEGIN
 		END
 	END;
 	IF ray.length>0.051 THEN
-		rlm:=TRUE;
 		color:=texcube.side[ray.face].pixelmip0(lx,ly);
-		color1:=texcube.side[ray.face].pixelmip1(lx,ly);	
 	ELSE
-		color:=texcube.side[ray.face].pixelmip1(lx,ly);
-		color1:=texcube.side[ray.face].pixel(lx,ly);	
-	END;	
-	IF mip>1 THEN mip:=1 END; 
-	mipverse:=1-mip;
-	color.red:=(color1.red*mipverse+mip*color.red);
-	color.green:=(color1.green*mipverse+mip*color.green);
-	color.blue:=(color1.blue*mipverse+mip*color.blue);
-	color.alpha:=(color1.alpha*mipverse+mip*color.alpha);
+		color:=texcube.side[ray.face].pixel(lx,ly);
+		color1:=texcube.side[ray.face].pixelmip1(lx,ly);	
+		mip:=ray.length*1000;
+		IF mip>1 THEN mip:=1 END; 
+		mipverse:=1-mip;
+		color.red:=(color1.red*mipverse+mip*color.red);
+		color.green:=(color1.green*mipverse+mip*color.green);
+		color.blue:=(color1.blue*mipverse+mip*color.blue);
+		color.alpha:=(color1.alpha*mipverse+mip*color.alpha);
+	END;
 	dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
 	dr:=color.red*dot*ray.ra;
 	dg:=color.green*dot*ray.ra;
 	db:=color.blue*dot*ray.ra;	
-	IF ~rlm & (color.alpha<0.9) THEN
+	IF color.alpha<0.9 THEN
 		ray.ra:=ray.ra-0.1;
 		ray.ga:=ray.ga-0.1;
 		ray.ba:=ray.ba-0.1;

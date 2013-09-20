@@ -41,7 +41,17 @@ BEGIN
 END grow;
 
 PROCEDURE add(c : cell);
+VAR
+	i,j,k: INTEGER;
 BEGIN 
+	FOR i:=0 TO MMO DO
+		FOR j:=0 TO MMO DO
+			FOR k:=0 TO MMO DO
+				c.blox[i,j,k]:=NIL;
+				c.nbloxTF[i,j,k]:=FALSE  
+			END
+		END
+	END;	
 	IF count < LEN(pool) THEN 
 		pool[0]:= c;
 		INC(count)	
@@ -148,7 +158,9 @@ BEGIN
 	xyz.z := ABS(ray.lxyz.z-offset.z)* M;	
 	pushxyz:=xyz;	
 	IF DTL>ray.dtl THEN
-		ray.dtl:=DTL;
+		dtl:=DTL
+	ELSE
+		dtl:=ray.dtl
 	END;
 	IF (ray.length*ray.scale>ray.dtl) THEN
 		IF imposter#NIL THEN
@@ -427,16 +439,30 @@ BEGIN
 		FOR j:=0 TO MMO DO
 			FOR k:=0 TO MMO DO
 				IF blox[i,j,k]#NIL THEN
+					blox[i,j,k].freerec();
+					blox[i,j,k]:=NIL;
+				END;
+			END
+		END
+	END;
+END free; 
+
+PROCEDURE freerec*;
+VAR
+	i,j,k: INTEGER;
+BEGIN
+	FOR i:=0 TO MMO DO
+		FOR j:=0 TO MMO DO
+			FOR k:=0 TO MMO DO
+				IF blox[i,j,k]#NIL THEN
 					blox[i,j,k].free();
 					blox[i,j,k]:=NIL;
 				END;
-				imposter:=NIL;
-				nbloxTF[i,j,k]:=FALSE;
 			END
 		END
 	END;
 	pool.add(SELF);
-END free; 
+END freerec; 
 
 PROCEDURE copyclear*;
 VAR

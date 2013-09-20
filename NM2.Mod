@@ -36,12 +36,22 @@ BEGIN
 	old := pool;
 	NEW(pool, LEN(pool)*2);
 	FOR i := 0 TO count-1 DO pool[i] := old[i] END;
-	Out.String("NM3 pool growing to ");
+	Out.String("NM2 pool growing to ");
 	Out.Int(count*2,10);
 END grow;
 
 PROCEDURE add(c : cell);
+VAR
+	i,j,k: INTEGER;
 BEGIN 
+	FOR i:=0 TO MMO DO
+		FOR j:=0 TO MMO DO
+			FOR k:=0 TO MMO DO
+				c.blox[i,j,k]:=NIL;
+				c.nbloxTF[i,j,k]:=FALSE  
+			END
+		END
+	END;	
 	IF count < LEN(pool) THEN 
 		pool[0]:= c;
 		INC(count)	
@@ -51,9 +61,9 @@ BEGIN
 	END;
 END add;
 
+
 PROCEDURE new(VAR c: cell);
 BEGIN
-
 	IF count>0 THEN 
 		c:=pool[count]
 	ELSE
@@ -92,7 +102,7 @@ BEGIN
 	old := wipe;
 	NEW(wipe, count*2);
 	FOR i := 0 TO LEN(old)-1 DO wipe[i] := old[i] END;
-	Out.String("NM3 wipe growing to ");
+	Out.String("NM2 wipe growing to ");
 	Out.Int(count*2,10);
 END grow;
 
@@ -113,9 +123,10 @@ VAR
 BEGIN
 	FOR i:=0 TO count-1 DO
 		IF  wipe[i].c#NIL THEN
-			wipe[i].c.blox[wipe[i].i,wipe[i].j,wipe[i].k]:=wipe[i].restore
+			wipe[i].c.blox[wipe[i].i,wipe[i].j,wipe[i].k]:=wipe[i].restore;
 		END
 	END;
+	count:=0;
 END tick;
 
 END Wiper;
@@ -381,7 +392,6 @@ BEGIN
 	blox[1,1,0]:=w;
 	blox[1,0,1]:=w;	
 	blox[0,1,1]:=w;	
-
 END fillsierp;
 
 PROCEDURE fillcqr2*(v,w: Voxel);
@@ -423,6 +433,22 @@ BEGIN
 		FOR j:=0 TO MMO DO
 			FOR k:=0 TO MMO DO
 				IF blox[i,j,k]#NIL THEN
+					IF blox[i,j,k].code=code THEN blox[i,j,k].freerec() END;
+					blox[i,j,k]:=NIL;
+				END;
+			END
+		END
+	END;
+END free; 
+
+PROCEDURE freerec*;
+VAR
+	i,j,k: INTEGER;
+BEGIN
+	FOR i:=0 TO MMO DO
+		FOR j:=0 TO MMO DO
+			FOR k:=0 TO MMO DO
+				IF blox[i,j,k]#NIL THEN
 					blox[i,j,k].free();
 					blox[i,j,k]:=NIL;
 				END;
@@ -432,7 +458,7 @@ BEGIN
 		END
 	END;
 	pool.add(SELF);
-END free; 
+END freerec; 
 
 PROCEDURE copyclear*;
 VAR

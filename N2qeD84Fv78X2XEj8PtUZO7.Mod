@@ -17,8 +17,9 @@ BEGIN
 	reddott.copyonstroke:=TRUE;
 	Base.setPT(center,1/2,1/2,1/2);
 	NEW(ball,center,1/2);	
-	ball.setcolor(0,0,1);		
-	reddott.FRaster(ball,9);
+	ball.setcolor(0,1,0);		
+	reddott.FRaster(ball,32);
+	reddot.DTL:=2500;
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;
@@ -29,5 +30,5 @@ END thisvox;
 
  END N2qeD84Fv78X2XEj8PtUZO7. 
  
-XNXLMarsh.Rez N2qeD84Fv78X2XEj8PtUZOQ ~
+XNXLMarsh.Rez N2qeD84Fv78X2XEj8PtUZO7 ~
  

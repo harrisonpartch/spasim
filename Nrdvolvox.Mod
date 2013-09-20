@@ -291,7 +291,7 @@ BEGIN
 END thisvox;
 
 BEGIN
-	r:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU342"); 	
+	r:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 	
 	b:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODh");
 	y:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ");
 	NEW(vox,r,NIL,b);

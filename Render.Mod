@@ -267,7 +267,7 @@ BEGIN
 	gravity:=Base.gravity;
 	gravityvector:=Base.mulPT(gravityvector,Base.gravity);
 	a:=Retina.fward.x*Base.cursordist; b:=Retina.fward.y*Base.cursordist; c:=Retina.fward.z*Base.cursordist;
-	d:=Retina.fward.x*0.0003; e:=Retina.fward.y*0.0003;  f:=Retina.fward.z*0.0003; 
+	d:=-Retina.fward.x*0.001; e:=-Retina.fward.y*0.001;  f:=Retina.fward.z*0.001; 
 	Base.updatecamera(cx,cy,cz,a,b,c,d,e,f);	
 	IF avaTF THEN Marsh.drawavatar END;
 	GLIDE:=0.99;	
@@ -336,7 +336,7 @@ BEGIN
 	camrotinertia:=100;
 	Base.DTL:=2500;
 	Base.DTL2:=2500;
-	Base.gravity:=0.0000000;
+	Base.gravity:=0.00001;
 	Base.speed:=0.001;
 	Base.maxspeed:=0.0001;
 	Base.cursordist:=0.01;
@@ -348,7 +348,7 @@ BEGIN
 	leftsticky:=10.0;
 	upsticky:=10.0;	
 	Out.String('*line 1217!*');
-	msd:=65;
+	msd:=50;
 END OnLoad;
 
 PROCEDURE Reshape(w, h: LONGINT);

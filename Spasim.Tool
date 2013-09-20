@@ -25,8 +25,8 @@ WGLinfo.Do ~
 	OpenGLConst.Mod
 	Unix.OpenGL.Mod
 	Unix.GLU.Mod
-	]]></Span><Span style="Normal"><![CDATA[Unix.XF86VMode.Mod]]></Span><Span style="Normal"><![CDATA[
-]]></Span><Span style="Normal"><![CDATA[ 	Unix.X11KeySymDef.Mod]]></Span><Span style="Normal"><![CDATA[
+	Unix.XF86VMode.Mod
+ 	Unix.X11KeySymDef.Mod
 	Unix.OGLWindow.Mod
 	GLShaderUtils.Mod 	
  	Unix.GLContext.Mod
@@ -110,6 +110,7 @@ Nharrisonavatar.Mod
 N2qeD84Fv78X2XEj8PtUZO8.Mod
 NH6nvNlOJNlCtpkDB56ljSx.Mod
 N2qeD84Fv78X2XEj8PtU342.Mod
-]]></Span>
+N2qeD84Fv78X2XEj8PtUZO7.Mod
+]]></Span><Span style="Normal"><![CDATA[N2qeD84Fv78X2XEj8PtU667.Mod]]></Span>
 
 </Text>
