@@ -1,6 +1,6 @@
 MODULE TestOpenALWav; (** AUTHOR "fnecati"; PURPOSE "test WAV file playing using OpenAL"; *)
 (* uses Audio codecs modules  in Aos *)
-IMPORT  AL:=OpenAL, SYSTEM, KernelLog, SoundDevices, Codecs, Kernel, Files, Streams, Strings,Commands, Modules;
+IMPORT  AL:=OpenAL, KernelLog, SoundDevices, Codecs, Kernel, Files, Streams, Strings,Commands, Modules;
 
 CONST 
 	debug = TRUE;
@@ -86,8 +86,8 @@ BEGIN
 	secondsElapsed := 0.000005;  (* needed to work out a doppler effect *)
 	totalTime := 0.0;
 	timeSincePlay := 0.0;
-	AL.alListenerfv(AL.AL_POSITION, SYSTEM.ADR(listenerPos[0]));
-	AL.alListenerfv(AL.AL_ORIENTATION, SYSTEM.ADR(directionVect[0]));
+	AL.alListenerfv(AL.AL_POSITION, ADDRESSOF(listenerPos[0]));
+	AL.alListenerfv(AL.AL_ORIENTATION, ADDRESSOF(directionVect[0]));
 END Play3D;
 			
 PROCEDURE LoadWav*(fname: ARRAY OF CHAR);
@@ -154,26 +154,26 @@ BEGIN
 	END;	
 		
   (* Clear the source and buffers if they are not empty *)
-	 IF source # 0 THEN AL.alDeleteSources(1, SYSTEM.ADR(source)); source := 0; END;
-	 IF buffer # 0 THEN AL.alDeleteBuffers(1, SYSTEM.ADR(buffer)); buffer := 0; END;
+	 IF source # 0 THEN AL.alDeleteSources(1, ADDRESSOF(source)); source := 0; END;
+	 IF buffer # 0 THEN AL.alDeleteBuffers(1, ADDRESSOF(buffer)); buffer := 0; END;
 		
-	AL.alGenBuffers(1, SYSTEM.ADR(buffer)); 
+	AL.alGenBuffers(1, ADDRESSOF(buffer)); 
 	ALWriteError("0- loadwav: ");
 		
-		AL.alBufferData(buffer, fmt, SYSTEM.ADR(sbuffer.data[0]), sizeBytes, samplePerSecond); 
+		AL.alBufferData(buffer, fmt, ADDRESSOF(sbuffer.data[0]), sizeBytes, samplePerSecond); 
 	ALWriteError("1- loadwav: ");
 	
-	 AL.alGenSources(1, SYSTEM.ADR(source));
+	 AL.alGenSources(1, ADDRESSOF(source));
 	 	
 	 AL.alSourcef(source, AL.AL_PITCH, pitch);
 	AL.alSourcef(source, AL.AL_GAIN, gain); 
 	sourcePos := [0.0, 0.0, 0.0];
-	AL.alSourcefv(source, AL.AL_POSITION, SYSTEM.ADR(sourcePos[0]));
+	AL.alSourcefv(source, AL.AL_POSITION, ADDRESSOF(sourcePos[0]));
 	AL.alSourcei(source, AL.AL_LOOPING, AL.AL_FALSE); 
 	 AL.alSourcei(source, AL.AL_BUFFER, buffer);
  
 	listenerPos := [0.0, 0.0, 0.0];
-	AL.alListenerfv(AL.AL_POSITION, SYSTEM.ADR(listenerPos[0]));
+	AL.alListenerfv(AL.AL_POSITION, ADDRESSOF(listenerPos[0]));
 	ALWriteError("2-loadwav: ");
 END LoadWav;
 
@@ -276,8 +276,8 @@ BEGIN
 		RETURN 
 	END;
   (* Clear the source and buffers if they are not empty *)  	
-	 IF source # 0 THEN AL.alDeleteSources(1, SYSTEM.ADR(source)); source := 0;  END;
-	 IF buffer # 0 THEN AL.alDeleteBuffers(1, SYSTEM.ADR(buffer)); buffer := 0;  END;
+	 IF source # 0 THEN AL.alDeleteSources(1, ADDRESSOF(source)); source := 0;  END;
+	 IF buffer # 0 THEN AL.alDeleteBuffers(1, ADDRESSOF(buffer)); buffer := 0;  END;
 	 
 	res := AL.alcMakeContextCurrent(0);
 	AL.alcDestroyContext(context); context := 0;
@@ -304,17 +304,17 @@ PROCEDURE Do*;
 VAR
 BEGIN
 	OpenDevice;
-	LoadWav("test.wav");
+	LoadWav("openaloberon/test.wav");
 	Play;
 (*	CloseDevice;*)
 	
 	(*OpenDevice;*)
-		LoadWav("desktoplogin.wav");
+		LoadWav("openaloberon/desktoplogin.wav");
 		Play;
 (*	CloseDevice;*)
 	
 (*	OpenDevice;*)
-	LoadWav("rugby.wav");
+	LoadWav("openaloberon/rugby.wav");
 	Play;	
 	CloseDevice;
 END Do;
@@ -333,17 +333,17 @@ END TestOpenALWav.
 
 TestOpenALWav.OpenDevice ~      TestOpenALWav.CloseDevice ~ 
 
-TestOpenALWav.Open "grollard.wav" ~
-TestOpenALWav.Open "test.wav" ~
-TestOpenALWav.Open "s11k16bitpcm.wav" ~
-TestOpenALWav.Open "s11k8bitpcm.wav" ~
-TestOpenALWav.Open "s11kulaw.wav" ~
- TestOpenALWav.Open "s8k16bitpcm.wav" ~
-TestOpenALWav.Open "s8k8bitpcm.wav" ~
-TestOpenALWav.Open "s8kulaw.wav" ~
-TestOpenALWav.Open "Wave4.WAV" ~
+TestOpenALWav.Open "openaloberon/test.wav" ~
+TestOpenALWav.Open "openaloberon/rugby.wav" ~
+TestOpenALWav.Open "openaloberon/s11k16bitpcm.wav" ~
+TestOpenALWav.Open "openaloberon/s11k8bitpcm.wav" ~
+TestOpenALWav.Open "openaloberon/s11kulaw.wav" ~
+ TestOpenALWav.Open "openaloberon/s8k16bitpcm.wav" ~
+TestOpenALWav.Open "openaloberon/s8k8bitpcm.wav" ~
+TestOpenALWav.Open "openaloberon/s8kulaw.wav" ~
+TestOpenALWav.Open "openaloberon/Wave4.WAV" ~
 
-TestOpenALWav.Open "desktoplogin.wav" ~
+TestOpenALWav.Open "grain.wav" ~
 
 TestOpenALWav.Play ~  
 

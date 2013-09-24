@@ -3,7 +3,7 @@ IMPORT Base, XNXLE, Noise:=XNXLNoise, XNXLFRep, Math, Out := KernelLog, Debuggin
 
 CONST M=2;
 	MMO=M-1;
-	CUBERADIUS=0.65;   (*change to sqrt(3)/2 ???*)
+	CUBERADIUS=0.75;   (*change to sqrt(3)/2 ???*)
 	NCODE="NM2";
 	NL=Base.NL;
 
@@ -61,15 +61,14 @@ BEGIN
 	END;
 END add;
 
-
 PROCEDURE new(VAR c: cell);
 BEGIN
 	IF count>0 THEN 
-		c:=pool[count]
+		c:=pool[count];
+		DEC(count);
 	ELSE
 		NEW(c);
 	END;
-	DEC(count);
 END new;
 
 END Pool;
@@ -123,10 +122,9 @@ VAR
 BEGIN
 	FOR i:=0 TO count-1 DO
 		IF  wipe[i].c#NIL THEN
-			wipe[i].c.blox[wipe[i].i,wipe[i].j,wipe[i].k]:=wipe[i].restore;
+			wipe[i].c.blox[wipe[i].i,wipe[i].j,wipe[i].k]:=wipe[i].restore
 		END
 	END;
-	count:=0;
 END tick;
 
 END Wiper;
@@ -159,7 +157,9 @@ BEGIN
 	xyz.z := ABS(ray.lxyz.z-offset.z)* M;	
 	pushxyz:=xyz;	
 	IF DTL>ray.dtl THEN
-		ray.dtl:=DTL;
+		dtl:=DTL
+	ELSE
+		dtl:=ray.dtl
 	END;
 	IF (ray.length*ray.scale>ray.dtl) THEN
 		IF imposter#NIL THEN
@@ -170,13 +170,16 @@ BEGIN
 	bounds(ijk.i,ijk.j,ijk.k,out);
 	IF ~out THEN
 		v:= blox[ijk.i,ijk.j,ijk.k];
-		IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal; ray.normalTF:= TRUE ELSE ray.normal:=ray.fnormal; ray.normalTF:=FALSE  END;
 		IF (v#NIL) THEN
 			ray.lxyz.x := ABS(xyz.x - ijk.i);  
 			ray.lxyz.y := ABS(xyz.y - ijk.j);
 			ray.lxyz.z := ABS(xyz.z - ijk.k);
 			ray.popdelta := Base.Origin; 
-			ray.normalTF:=nbloxTF[ijk.i,ijk.j,ijk.k];
+			ray.normalTF:=FALSE;
+			IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
+				ray.normalTF:=TRUE;
+				ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal
+			END;
 			v.Shade(ray);	
 			xyz.x := xyz.x + ray.popdelta.x;    
 			xyz.y := xyz.y + ray.popdelta.y;
@@ -275,18 +278,21 @@ BEGIN
 				ray.ga := (ray.ga-gr)-blr;
 				ray.ba := (ray.ba-br)-blr; 				
 				out:=TRUE
-			END;
+			END;	
 			bounds(ijk.i,ijk.j,ijk.k, out);			
 			IF ~out THEN
 				v := blox[ijk.i,ijk.j,ijk.k];		
-				IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal; ray.normalTF:= TRUE ELSE ray.normal:=ray.fnormal; ray.normalTF:=FALSE  END;
 				IF (v#NIL) THEN
 					ray.lxyz.x := ABS(xyz.x - ijk.i);  
 					ray.lxyz.y := ABS(xyz.y - ijk.j);
 					ray.lxyz.z := ABS(xyz.z - ijk.k);
 					ray.popdelta := Base.Origin; (* because many shaders don't set it and it *)
-					ray.ncube:=nblox[ijk.i,ijk.j,ijk.k];
-					ray.ncubeTF:=nbloxTF[ijk.i,ijk.j,ijk.k];
+					ray.normalTF:=FALSE;
+					ray.normal:=ray.fnormal;
+					IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
+						ray.normalTF:=TRUE;
+						ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal
+					END;
 					v.Shade(ray);	
 					xyz.x := xyz.x + ray.popdelta.x;    
 					xyz.y := xyz.y + ray.popdelta.y;
@@ -295,8 +301,9 @@ BEGIN
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);	
 				END;
 			END;
-		IF (ray.bla<0.1)OR((ray.ra<0.01)OR(ray.ga<0.01)OR(ray.ba<0.01))THEN ray.terminate:=TRUE 
+		IF (ray.bla<0.1)OR((ray.ra<0.01)&(ray.ga<0.01)&(ray.ba<0.01))THEN ray.terminate:=TRUE 
 		END;
+(*		out:=out OR (ray.length>0.02);		*)
 		UNTIL  out OR ray.terminate;
 	END 		END;
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
@@ -390,8 +397,12 @@ VAR
 BEGIN
 	fill(v);
 	blox[1,1,0]:=w;
-	blox[1,0,1]:=w;	
+
 	blox[0,1,1]:=w;	
+
+	blox[1,0,1]:=w;	
+
+	blox[1,1,1]:=w;	
 END fillsierp;
 
 PROCEDURE fillcqr2*(v,w: Voxel);
@@ -433,7 +444,7 @@ BEGIN
 		FOR j:=0 TO MMO DO
 			FOR k:=0 TO MMO DO
 				IF blox[i,j,k]#NIL THEN
-					IF blox[i,j,k].code=code THEN blox[i,j,k].freerec() END;
+					blox[i,j,k].freerec();
 					blox[i,j,k]:=NIL;
 				END;
 			END
@@ -452,12 +463,9 @@ BEGIN
 					blox[i,j,k].free();
 					blox[i,j,k]:=NIL;
 				END;
-				imposter:=NIL;
-				nbloxTF[i,j,k]:=FALSE;
 			END
 		END
 	END;
-	pool.add(SELF);
 END freerec; 
 
 PROCEDURE copyclear*;
@@ -811,12 +819,16 @@ BEGIN
 				v:=f.voxel(p);
 				IF v#NIL THEN 
 					(* IF v IS cell THEN v:=v.deepcopy() END; *)
-					nblox[i,j,k].normal:=f.normal(p);
-					nbloxTF[i,j,k]:=TRUE;
+					IF f.normaltf(p) THEN
+						nbloxTF[i,j,k]:=TRUE;
+						nblox[i,j,k].normal:=f.normal(p)
+					END;
 					blox[i,j,k]:=v;	
 				ELSE
-					nbloxTF[i,j,k]:=TRUE;
-					nblox[i,j,k].normal:=f.normal(p);
+					IF f.normaltf(p) THEN
+						nbloxTF[i,j,k]:=TRUE;
+						nblox[i,j,k].normal:=f.normal(p)
+					END;
 					nblox[i,j,k].color:=f.color(p);
 				END
 			END	
@@ -875,10 +887,17 @@ BEGIN
 				v:=f.voxel(p);
 			IF v#NIL THEN 
 					(* IF v IS cell THEN v:=v.deepcopy() END; *)
+					IF f.normaltf(p) THEN
+						nbloxTF[i,j,k]:=TRUE;
+						nblox[i,j,k].normal:=f.normal(p)
+					END;
+					blox[i,j,k]:=v;	
 					blox[i,j,k]:=v;	
 				ELSE
-					nbloxTF[i,j,k]:=TRUE;
-					nblox[i,j,k].normal:=f.normal(p);
+					IF f.normaltf(p) THEN
+						nbloxTF[i,j,k]:=TRUE;
+						nblox[i,j,k].normal:=f.normal(p)
+					END;
 					nblox[i,j,k].color:=f.color(p);
 				END
 			END 	

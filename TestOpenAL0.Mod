@@ -24,11 +24,11 @@ NEW(test, 1000);
   END;  
   
 
-  AL.alGenBuffers(1, SYSTEM.ADR(buffer));
-  AL.alBufferData(buffer, AL.AL_FORMAT_MONO8, SYSTEM.ADR(test[0]), 1000, 11024);
+  AL.alGenBuffers(1, ADDRESSOF(buffer));
+  AL.alBufferData(buffer, AL.AL_FORMAT_MONO8, ADDRESSOF(test[0]), 1000, 11024);
   	KernelLog.String("1-- alGetError= "); KernelLog.Hex(AL.alGetError(), 4); KernelLog.Ln; 
 
-  AL.alGenSources(1, SYSTEM.ADR(source));
+  AL.alGenSources(1, ADDRESSOF(source));
 
   AL.alSourcef(source, AL.AL_PITCH, 1.0);
   AL.alSourcef(source, AL.AL_GAIN, 1.0);
@@ -43,8 +43,8 @@ NEW(test, 1000);
 
  AL.alSourceStop(source);
  
-  AL.alDeleteSources(1, SYSTEM.ADR(source));
-  AL.alDeleteBuffers(1, SYSTEM.ADR(buffer));
+  AL.alDeleteSources(1, ADDRESSOF(source));
+  AL.alDeleteBuffers(1, ADDRESSOF(buffer));
   KernelLog.String("-------- Ok ------- "); KernelLog.Ln; 
 
 END Play1;
@@ -65,7 +65,7 @@ VAR
 	
 BEGIN 
  
-  AL.alGenBuffers(1, SYSTEM.ADR(buffer));
+  AL.alGenBuffers(1, ADDRESSOF(buffer));
   
   IF AL.alIsBuffer(buffer) THEN
 	  KernelLog.String("isbuffer"); KernelLog.Ln; 
@@ -93,10 +93,10 @@ freq := samples * frequency;
    data[i]  := CHR(SHORT(ENTIER(128*Math.sin(x * D2R)  + 128))) ; (* Clamp to [0,255] *)
   END;    
     
-  AL.alBufferData(buffer, AL.AL_FORMAT_MONO8, SYSTEM.ADR(data), samples, freq);
+  AL.alBufferData(buffer, AL.AL_FORMAT_MONO8, ADDRESSOF(data), samples, freq);
   	KernelLog.String("1-- alGetError= "); KernelLog.Hex(AL.alGetError(), 4); KernelLog.Ln; 
 
-  AL.alGenSources(1, SYSTEM.ADR(source));
+  AL.alGenSources(1, ADDRESSOF(source));
   IF AL.alIsSource(source) THEN
 	  KernelLog.String("issource"); KernelLog.Ln; 
   ELSE
@@ -109,12 +109,12 @@ freq := samples * frequency;
 AL.alSourcef(source, AL.AL_PITCH, 1.0);
 AL.alSourcef(source, AL.AL_GAIN, 1.0);
  
- AL.alSourcefv(source, AL.AL_POSITION, SYSTEM.ADR(srcPos[0]));
+ AL.alSourcefv(source, AL.AL_POSITION, ADDRESSOF(srcPos[0]));
  AL.alSourcei(source, AL.AL_LOOPING, AL.AL_TRUE);
  AL.alSourcei(source, AL.AL_BUFFER, buffer);
   
  lstPos := [0.0, 0.0, -3.0];
- AL.alListenerfv(AL.AL_POSITION, SYSTEM.ADR(lstPos[0]));
+ AL.alListenerfv(AL.AL_POSITION, ADDRESSOF(lstPos[0]));
 
  AL.alSourcePlay(source);
   timer.Sleep(2000);
@@ -122,8 +122,8 @@ AL.alSourcef(source, AL.AL_GAIN, 1.0);
 
 (* AL.alSourceStop(source); *)
   (* Clear the things *)
- AL.alDeleteSources(1, SYSTEM.ADR(source));
- AL.alDeleteBuffers(1, SYSTEM.ADR(buffer));
+ AL.alDeleteSources(1, ADDRESSOF(source));
+ AL.alDeleteBuffers(1, ADDRESSOF(buffer));
  KernelLog.String("-------- Ok ------- "); KernelLog.Ln; 
 END Play2;
 
@@ -149,13 +149,13 @@ BEGIN
     test[z] := SHORT(ENTIER(32760*(y-0.5)));
   END;  
 
-  AL.alGenBuffers(1, SYSTEM.ADR(buffer));
-  sizeBytes := LEN(test)*SYSTEM.SIZEOF(INTEGER);
+  AL.alGenBuffers(1, ADDRESSOF(buffer));
+  sizeBytes := LEN(test)*SIZEOF(INTEGER);
   
-  AL.alBufferData(buffer, AL.AL_FORMAT_MONO16, SYSTEM.ADR(test[0]), sizeBytes, freq);
+  AL.alBufferData(buffer, AL.AL_FORMAT_MONO16, ADDRESSOF(test[0]), sizeBytes, freq);
   	KernelLog.String("1-- alGetError= "); KernelLog.Hex(AL.alGetError(), 4); KernelLog.Ln; 
 
-  AL.alGenSources(1, SYSTEM.ADR(source));
+  AL.alGenSources(1, ADDRESSOF(source));
 
   AL.alSourcef(source, AL.AL_PITCH, 1.0);
   AL.alSourcef(source, AL.AL_GAIN, 1.0);
@@ -173,8 +173,8 @@ BEGIN
    
  (* AL.alSourceStop(source);*)
  
-  AL.alDeleteSources(1, SYSTEM.ADR(source));
-  AL.alDeleteBuffers(1, SYSTEM.ADR(buffer));
+  AL.alDeleteSources(1, ADDRESSOF(source));
+  AL.alDeleteBuffers(1, ADDRESSOF(buffer));
     
  KernelLog.String("-------- Ok ------- "); KernelLog.Ln; 
 

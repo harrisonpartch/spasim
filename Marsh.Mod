@@ -403,9 +403,9 @@ BEGIN
 	Base.setPT(center,1/2,1/2,1/12);
 	NEW(tnoise);
 	tnoise.seed:=123666;	
-	tnoise.a:=2;
-	tnoise.b:=2;
-	tnoise.c:=2;		
+	tnoise.a:=5;
+	tnoise.b:=5;
+	tnoise.c:=5;		
 	tnoise.octaves:=4;
 	tnoise.persistence:=3.1;
 	tnoise.setvoxel(dotz);
@@ -418,9 +418,9 @@ BEGIN
 
 	NEW(noise);		
 	noise.seed:=123666;		
-	noise.a:=5;
-	noise.b:=5;
-	noise.c:=5;		
+	noise.a:=1;
+	noise.b:=1;
+	noise.c:=1;		
 	noise.octaves:=4;
 	noise.setvoxel(granite);
 	noise.persistence:=3.1;
@@ -431,11 +431,11 @@ BEGIN
 	plane.vox:=tigerlily;	
 	z10.FRaster(plane,32); 		
 	z10.FRaster(noise,64); 	
-	z10.FRaster(tnoise,128); 			
-	z10.setcolor(0,1,0,1,0); 
+	z10.FRaster(tnoise,64); 			
+	z10.setcolor(1,1,2,3,0); 
 	gorge.setcolor(0,0,0,0,0);
 	Base.world:=z10; 
-	Base.avatar:=xot2;
+	Base.avatar:=harrison;
 	Base.avatarsize:=1000;
 	Out.String("EEEEP!");
 END dawn;

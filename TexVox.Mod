@@ -98,7 +98,7 @@ PROCEDURE & init*(n: Name);
 BEGIN
 	NEW(texcube,n,FALSE);
 	name:=n;
-	tscale:=200;
+	tscale:=10;
 	texscale:=900;
 END init;
 
@@ -210,7 +210,7 @@ BEGIN
 			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 		END
 	END;
-	IF ray.length>0.051 THEN
+	IF ray.length*ray.scale>100 THEN
 		color:=texcube.side[ray.face].pixelmip0(lx,ly);
 	ELSE
 		color:=texcube.side[ray.face].pixel(lx,ly);
@@ -223,7 +223,11 @@ BEGIN
 		color.blue:=(color1.blue*mipverse+mip*color.blue);
 		color.alpha:=(color1.alpha*mipverse+mip*color.alpha);
 	END;
-	dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
+	IF ray.normalTF THEN
+		dot:= ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z); 
+	ELSE	
+		dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z)
+	END;
 	dr:=color.red*dot*ray.ra;
 	dg:=color.green*dot*ray.ra;
 	db:=color.blue*dot*ray.ra;	

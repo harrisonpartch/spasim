@@ -13,9 +13,9 @@ VAR
 	i: LONGINT;
 BEGIN
 	free;
-	FOR i:=0 TO 10 DO
+	FOR i:=0 TO 100 DO
 		p1:=Base.randPT();
-		strokephemeral(p1,3,bludot,v);
+		strokephemeral(p1,9,bludot,v);
 	END;	
 END tick;
 
@@ -35,22 +35,33 @@ PROCEDURE draw(VAR dot: Voxel);
 BEGIN
 	bludot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7");	 
 	NEW(av);
-	dot:=Base.VoxelFromName("NM2");
+	dot:=Base.VoxelFromName("NM3");
 	dot.tick:=av.tick;
-	dot.register; 
-	dot.setcolor(0,0,0,250,0);	
+
+(*	dot.register; *)
+	dot.setcolor(10,0,0,10,0);	
 	Base.setPT(center,1/2,1/2,1/2);
-	tigerlily:=Base.VoxelFromName("NznGx2ySiHIGrO5t9Pzcw5Q");  
-	NEW(ball,center,8/12);	
+	tigerlily:=Base.VoxelFromName("NCjgzkmiTyecI5x6eOgYqpQ");  
+	NEW(ball,center,2/12);	
 	ball.setcolor(0.9,0.9,1);			
-	ball.setvoxel(tigerlily);
-	dot.FRaster(ball,32);
-	dot.DTL:=1000;
-	FOR i:=0 TO 100 DO
+	ball.setvoxel(tigerlily); 
+	dot.FRaster(ball,27);
+	FOR i:=0 TO 10 DO
 		p1:=Base.randPT();
-		dot.stroke(p1,8,bludot,v);
+		p1.x:=(p1.x+1/2)/2;
+		p1.y:=(p1.y+1/2)/2;
+		p1.z:=(p1.z+1/2)/2;
+		dot.stroke(p1,3,dot,v);
 	END;
-	dot.DTL:=25000
+	FOR i:=0 TO 10 DO
+		p1:=Base.randPT();
+		p1.x:=(p1.x+1/2)/2;
+		p1.y:=(p1.y+1/2)/2;
+		p1.z:=(p1.z+1/2)/2;		
+		dot.stroke(p1,9,bludot,v);
+	END;		
+	dot.lockTF:=TRUE;
+	bludot.DTL:=25000
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;

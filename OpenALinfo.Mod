@@ -41,8 +41,8 @@ PROCEDURE printALCInfo(device: AL.ALCdevice );
 VAR
     major, minor: AL.ALCint;    
 BEGIN
-    AL.alcGetIntegerv(device, AL.ALC_MAJOR_VERSION, 1, SYSTEM.ADR(major));
-    AL.alcGetIntegerv(device, AL.ALC_MINOR_VERSION, 1, SYSTEM.ADR(minor));
+    AL.alcGetIntegerv(device, AL.ALC_MAJOR_VERSION, 1, ADDRESSOF(major));
+    AL.alcGetIntegerv(device, AL.ALC_MINOR_VERSION, 1, ADDRESSOF(minor));
     IF (checkALCErrors(device) = AL.ALC_NO_ERROR) THEN
         KernelLog.String("ALC version: "); KernelLog.Int(major, 0); KernelLog.String(".");  KernelLog.Int(minor, 0); KernelLog.Ln; 
     END;
@@ -113,13 +113,13 @@ BEGIN
         RETURN;
    END;
 
-    AL.alcGetIntegerv(device, EFX.ALC_EFX_MAJOR_VERSION, 1, SYSTEM.ADR(major));
-    AL.alcGetIntegerv(device, EFX.ALC_EFX_MINOR_VERSION, 1, SYSTEM.ADR(minor));
+    AL.alcGetIntegerv(device, EFX.ALC_EFX_MAJOR_VERSION, 1, ADDRESSOF(major));
+    AL.alcGetIntegerv(device, EFX.ALC_EFX_MINOR_VERSION, 1, ADDRESSOF(minor));
     IF (checkALCErrors(device) = AL.ALC_NO_ERROR) THEN
         KernelLog.String("EFX version: "); KernelLog.Int(major, 0); KernelLog.String("."); KernelLog.Int(minor, 0); KernelLog.Ln; 
     END;    
 
-    AL.alcGetIntegerv(device, EFX.ALC_MAX_AUXILIARY_SENDS, 1, SYSTEM.ADR(sends));
+    AL.alcGetIntegerv(device, EFX.ALC_MAX_AUXILIARY_SENDS, 1, ADDRESSOF(sends));
     IF (checkALCErrors(device) = AL.ALC_NO_ERROR) THEN
         KernelLog.String("Max auxiliary sends: "); KernelLog.Int(sends, 0); KernelLog.Ln; 
     END;
@@ -133,13 +133,13 @@ IF (checkALErrors(2) # AL.AL_NO_ERROR)       OR
  END;   
  
 (* *************************** *)
-	EFX.alGenFilters(1, SYSTEM.ADR(obj));
+	EFX.alGenFilters(1, ADDRESSOF(obj));
 	IF (checkALErrors(3) = AL.AL_NO_ERROR) THEN
 		FOR i := 0 TO LEN(filters,0)-1 DO
 			EFX.alFilteri(obj, EFX.AL_FILTER_TYPE, filters[i]);
 			IF (AL.alGetError() # AL.AL_NO_ERROR) THEN filterNames[i] := "-"; END;
 		END;    
-		EFX.alDeleteFilters(1, SYSTEM.ADR(obj));
+		EFX.alDeleteFilters(1, ADDRESSOF(obj));
 		i := checkALErrors(4);
 
 		KernelLog.String("Supported filters:"); KernelLog.Ln; 
@@ -150,13 +150,13 @@ IF (checkALErrors(2) # AL.AL_NO_ERROR)       OR
 	END;
 	
 	(* *************************** *)
-	EFX.alGenEffects(1, SYSTEM.ADR(obj));
+	EFX.alGenEffects(1, ADDRESSOF(obj));
 	IF (checkALErrors(5) = AL.AL_NO_ERROR) THEN
 		FOR i := 0 TO LEN(effects,0)-1 DO
 			EFX.alEffecti(obj, EFX.AL_EFFECT_TYPE, effects[i]);
 			IF (AL.alGetError() # AL.AL_NO_ERROR) THEN effectNames[i] := "-"; END;
 		END;	
-		EFX.alDeleteEffects(1, SYSTEM.ADR(obj));
+		EFX.alDeleteEffects(1, ADDRESSOF(obj));
 		i:= checkALErrors(6);
 
 		KernelLog.String("Supported effects:"); KernelLog.Ln; 

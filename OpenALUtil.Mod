@@ -134,10 +134,10 @@ BEGIN
 	END;
 	
 	(* create a buffer and load wav data into buffer *)
-	AL.alGenBuffers(1, SYSTEM.ADR(buffer)); 
+	AL.alGenBuffers(1, ADDRESSOF(buffer)); 
 	ALWriteError("LoadWaveFile: alGenBuffers error: ");
 	
-	AL.alBufferData(buffer, fmt, SYSTEM.ADR(sbuffer.data[0]), sizeBytes, samplePerSecond); 
+	AL.alBufferData(buffer, fmt, ADDRESSOF(sbuffer.data[0]), sizeBytes, samplePerSecond); 
 	
 	err := AL.alGetError();
 	IF err # AL.AL_NO_ERROR THEN  RETURN 0; END;
@@ -155,7 +155,7 @@ END SetListenerPosition;
 (** set position of the listener to pos vector *)
 PROCEDURE SetListenerPositionv*(pos: ARRAY 3 OF REAL);
 BEGIN
-	AL.alListenerfv(AL.AL_POSITION, SYSTEM.ADR(pos[0]));
+	AL.alListenerfv(AL.AL_POSITION, ADDRESSOF(pos[0]));
 END SetListenerPositionv;
 
 (** set velocity of the listener to x,y,z*)
@@ -167,7 +167,7 @@ END SetListenerVelocity;
 (** set velocity of the listener to vel vector *)
 PROCEDURE SetListenerVelocityv*(vel: ARRAY 3 OF REAL);
 BEGIN
-	AL.alListenerfv(AL.AL_VELOCITY, SYSTEM.ADR(vel[0]));
+	AL.alListenerfv(AL.AL_VELOCITY, ADDRESSOF(vel[0]));
 END SetListenerVelocityv;
 
 (** set velocity of the listener to vel vector *)
@@ -179,7 +179,7 @@ END SetListenerOrientation;
 (** set orientation of the listener to dir vector *)
 PROCEDURE SetListenerOrientationv*(dir: ARRAY 3 OF REAL);
 BEGIN
-	AL.alListenerfv(AL.AL_ORIENTATION, SYSTEM.ADR(dir[0]));
+	AL.alListenerfv(AL.AL_ORIENTATION, ADDRESSOF(dir[0]));
 END SetListenerOrientationv;
 
 (* source procedures *)
@@ -202,7 +202,7 @@ END SetSourcePosition;
 (** set position of the source to pos vector *)
 PROCEDURE SetSourcePositionv*(source: AL.ALuint; pos: ARRAY 3 OF REAL);
 BEGIN
-	AL.alSourcefv(source, AL.AL_POSITION, SYSTEM.ADR(pos[0]));
+	AL.alSourcefv(source, AL.AL_POSITION, ADDRESSOF(pos[0]));
 END SetSourcePositionv;
 
 
@@ -257,25 +257,25 @@ END Rewind;
 (** play the sources *)
 PROCEDURE Playv*(sources: ARRAY OF AL.ALuint);
 BEGIN
-	AL.alSourcePlayv(LEN(sources), SYSTEM.ADR(sources[0]));
+	AL.alSourcePlayv(LEN(sources), ADDRESSOF(sources[0]));
 END Playv;
 
 (** pause the sources *)
 PROCEDURE Pausev*(sources: ARRAY OF AL.ALuint);
 BEGIN
-	AL.alSourcePausev(LEN(sources), SYSTEM.ADR(sources[0]));
+	AL.alSourcePausev(LEN(sources), ADDRESSOF(sources[0]));
 END Pausev;
 
 (** stop the sources *)
 PROCEDURE Stopv*(sources: ARRAY OF AL.ALuint);
 BEGIN
-	AL.alSourceStopv(LEN(sources), SYSTEM.ADR(sources[0]));
+	AL.alSourceStopv(LEN(sources), ADDRESSOF(sources[0]));
 END Stopv;
 
 (** rewind the sources position to beginning *)
 PROCEDURE Rewindv*(sources: ARRAY OF AL.ALuint);
 BEGIN
-	AL.alSourceRewindv(LEN(sources), SYSTEM.ADR(sources[0]));
+	AL.alSourceRewindv(LEN(sources), ADDRESSOF(sources[0]));
 END Rewindv;
 
 

@@ -6,7 +6,6 @@ VAR vox: XNXLHalfSpace.halfvox; v: TexVox.TexVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	 NEW(v, 'mipmap.png'); 
-	 v.tscale:=10;
 	 NEW(vox,v,Base.randPT(),Base.randPT());
 	RETURN v
 END thisvox;

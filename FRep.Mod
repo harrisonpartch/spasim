@@ -157,7 +157,6 @@ END tilednoise;
 
 TYPE noise*= OBJECT(FR)
 VAR
-
 	seed*:LONGINT;
 	octaves*:INTEGER;
 	persistence*:LONGREAL;
