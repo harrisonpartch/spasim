@@ -1,6 +1,6 @@
 MODULE Base;
 
-IMPORT  Math:=Math, Random, Kernel, Out:=KernelLog (*DebugLog*), Objects, XNXLAudio,  
+IMPORT  Math:=Math, Random, Kernel, Out:=KernelLog (*DebugLog*), Objects, AL:=OpenAL, ALUT := OpenALUtil,  
 Strings, Streams, WMFontManager, Raster, WMRasterScale, WMRectangles, Graphics := WMGraphics, Commands(*, XNXLAudio*);
 
 CONST
@@ -340,8 +340,10 @@ END showcode;
 
 PROCEDURE play*();
 BEGIN
-	XNXLAudio.LoadWav("grain.wav");
+(*	XNXLAudio.LoadWav("grain.wav");
 	XNXLAudio.Play 
+*)
+	ALUT.Play(basesource);	
 END play;
 
 PROCEDURE touch*;
@@ -532,6 +534,11 @@ VAR
 	rnf*:REAL; (*random number for frame*);
 	sniperay*:Ray;
 
+	basesource*, texsound*, grainsound*: AL.ALuint;
+	listenerPos*: ARRAY [3] OF AL.ALfloat; (* global position *)
+	sourcePos: ARRAY 3 OF AL.ALfloat;
+	buffer1*, buffer2*, buffer3* : AL.ALuint;	
+	
 PROCEDURE VoxelFromName*(modname: Name): Voxel;
 	VAR voxel: Voxel;  fackery: VoxelFackery;
 	BEGIN
@@ -1043,6 +1050,42 @@ BEGIN
 	RETURN(exit);
 END Exit;
 
+PROCEDURE InitSounds;
+
+BEGIN
+	ALUT.OpenPlayDevice();
+	buffer1 := ALUT.LoadWavFileToBuffer("grain.wav");
+	
+	 AL.alGenSources(1, ADDRESSOF(basesource));
+	 AL.alSourcef(basesource, AL.AL_PITCH, 1.0);
+	AL.alSourcef(basesource, AL.AL_GAIN, 1.0); 
+	sourcePos := [0.0, 0.0, 0.0];
+	AL.alSourcefv(basesource, AL.AL_POSITION, ADDRESSOF(sourcePos[0]));
+	AL.alSourcei(basesource, AL.AL_LOOPING, AL.AL_FALSE); 
+	 AL.alSourcei(basesource, AL.AL_BUFFER, buffer1);
+	 
+	 (* the same sound, wav *)
+	buffer2 := buffer1;
+	grainsound := basesource;
+	
+	(* sound for TexVox *)
+	buffer3 := ALUT.LoadWavFileToBuffer("test.wav");		
+	 AL.alGenSources(1, ADDRESSOF(texsound));
+	 	
+	 AL.alSourcef(texsound, AL.AL_PITCH, 1.0);
+	AL.alSourcef(texsound, AL.AL_GAIN, 1.0); 
+	sourcePos := [0.0, 0.0, 0.0];
+	AL.alSourcefv(texsound, AL.AL_POSITION, ADDRESSOF(sourcePos[0]));
+	AL.alSourcei(texsound, AL.AL_LOOPING, AL.AL_FALSE); 
+	AL.alSourcei(texsound, AL.AL_BUFFER, buffer3);
+ 
+ 	
+ 	(* finally create one listener *)
+	listenerPos := [0.0, 0.0, 0.0];
+	AL.alListenerfv(AL.AL_POSITION, ADDRESSOF(listenerPos[0]));
+	ALUT.ALWriteError("2-loadwav: ");	
+END InitSounds;
+
 BEGIN
 	Out.String("Base loading...");
 	WMFontManager.Install;
@@ -1083,4 +1126,5 @@ BEGIN
 	skydistance:=1.0;
 	Out.String("loaded.");
 	Out.Ln;
+	InitSounds();	
 END Base.
