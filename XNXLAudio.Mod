@@ -153,8 +153,8 @@ BEGIN
 (** *)
 PROCEDURE Play*;
 BEGIN
-(*	AL.alSourcePlay(source);
-	ALWriteError("Playing Error: "); *)
+	AL.alSourcePlay(source);
+(*	ALWriteError("Playing Error: "); *)
 END Play;
 
 PROCEDURE IncGain*;

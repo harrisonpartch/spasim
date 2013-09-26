@@ -1,5 +1,5 @@
 MODULE Render;
-IMPORT Kernel, Objects, Random, Marsh, 
+IMPORT Kernel, Objects, Random, Marsh, XNXLAudio,
  Out := KernelLog, Math,XNXLMath, Base,  Retina, GLW := OGLWindow, 
 	 GL:=OpenGL, GLC := OpenGLConst,  GLSL:= GLShaderUtils,
 	 Inputs,  Raster, Strings,Streams;
@@ -107,6 +107,9 @@ BEGIN
 	pass := Base.world.passprobe(p);
 
 	IF ~pass THEN
+		XNXLAudio.LoadWav("grain.wav");
+		XNXLAudio.Play ;	
+		Out.String("grain!");
 		x := cx + cvx; y := cy + cvy; z := cz;	
 		q:=Base.mkPT(x,y,z);
 		pass := Base.world.passprobe(q);
@@ -132,6 +135,7 @@ BEGIN
 		cx:=x; cy:=y; cz:=z 
 	ELSE
 		Out.String("nopass");
+
 		Base.world.Shade(proberay);
 		normalize(cvx,cvy,cvz,d);
 		reflect(cvx, cvy, cvz, proberay.normal.x, proberay.normal.y, proberay.normal.z);

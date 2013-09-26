@@ -1,6 +1,6 @@
 MODULE Base;
 
-IMPORT  Math:=Math, Random, Kernel, Out:=KernelLog (*DebugLog*), Objects,  
+IMPORT  Math:=Math, Random, Kernel, Out:=KernelLog (*DebugLog*), Objects, XNXLAudio,  
 Strings, Streams, WMFontManager, Raster, WMRasterScale, WMRectangles, Graphics := WMGraphics, Commands(*, XNXLAudio*);
 
 CONST
@@ -340,8 +340,8 @@ END showcode;
 
 PROCEDURE play*();
 BEGIN
-(*	XNXLAudio.LoadWav("grain.wav");
-	XNXLAudio.Play *)
+	XNXLAudio.LoadWav("grain.wav");
+	XNXLAudio.Play 
 END play;
 
 PROCEDURE touch*;

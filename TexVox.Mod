@@ -1,5 +1,5 @@
 MODULE TexVox;
-IMPORT Base, (*XNXLAudio, *)XNXLMath, Noise:=XNXLNoise, XNXLFilmLoop, Raster, Graphics := WMGraphics, Random, Math,Out := KernelLog; 
+IMPORT Base,  XNXLAudio, XNXLMath, Noise:=XNXLNoise, XNXLFilmLoop, Raster, Graphics := WMGraphics, Random, Math,Out := KernelLog; 
 
 TYPE PT = Base.PT;
 	Color = Base.Color;
@@ -268,8 +268,8 @@ END mirror;
 
 PROCEDURE play*();
 BEGIN
-(*	XNXLAudio.LoadWav("test.wav");
-	XNXLAudio.Play **)
+	XNXLAudio.LoadWav("test.wav");
+	XNXLAudio.Play 
 END play;
 
 END TexVox;
