@@ -1,5 +1,5 @@
 MODULE TexVox;
-IMPORT Base,  XNXLAudio, XNXLMath, Noise:=XNXLNoise, XNXLFilmLoop, Raster, Graphics := WMGraphics, Random, Math,Out := KernelLog; 
+IMPORT Base, ALUT := OpenALUtil,  XNXLMath, Noise:=XNXLNoise, XNXLFilmLoop, Raster, Graphics := WMGraphics, Random, Math,Out := KernelLog; 
 
 TYPE PT = Base.PT;
 	Color = Base.Color;
@@ -94,6 +94,7 @@ VAR
 	texscale*:LONGINT;
 	name: Name;
 
+	
 PROCEDURE & init*(n: Name);
 BEGIN
 	NEW(texcube,n,FALSE);
@@ -268,8 +269,10 @@ END mirror;
 
 PROCEDURE play*();
 BEGIN
-	XNXLAudio.LoadWav("test.wav");
+(*	XNXLAudio.LoadWav("test.wav");
 	XNXLAudio.Play 
+*)
+	ALUT.Play(Base.texsound);	
 END play;
 
 END TexVox;
@@ -564,6 +567,7 @@ END Shade;
 
 END NoiseVox;
 
+
 PROCEDURE nshade(CONST nc: NCube; VAR ray: Ray);
 VAR
 	mix,dot,dot1,dot2: REAL;	
@@ -579,7 +583,5 @@ BEGIN
 	ray.b := ray.b + nc.color.blue * ray.ba*dot; 		
 	ray.terminate:=TRUE
 END nshade;
-
-
 
 END TexVox.
