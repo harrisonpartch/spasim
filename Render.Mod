@@ -1,5 +1,5 @@
 MODULE Render;
-IMPORT Kernel, Objects, Random, Marsh, XNXLAudio,
+IMPORT Kernel, Objects, Random, Marsh, ALUT := OpenALUtil, (*XNXLAudio,*)
  Out := KernelLog, Math,XNXLMath, Base,  Retina, GLW := OGLWindow, 
 	 GL:=OpenGL, GLC := OpenGLConst,  GLSL:= GLShaderUtils,
 	 Inputs,  Raster, Strings,Streams;
@@ -107,8 +107,10 @@ BEGIN
 	pass := Base.world.passprobe(p);
 
 	IF ~pass THEN
-		XNXLAudio.LoadWav("grain.wav");
-		XNXLAudio.Play ;	
+	(*	XNXLAudio.LoadWav("grain.wav");
+		XNXLAudio.Play ;	*)
+		ALUT.Play(Base.grainsound);
+		
 		Out.String("grain!");
 		x := cx + cvx; y := cy + cvy; z := cz;	
 		q:=Base.mkPT(x,y,z);
@@ -697,6 +699,7 @@ VAR
 	GLIDE:REAL;
 		
 	msd: REAL;	
+	
 
 PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
 VAR d: REAL;
