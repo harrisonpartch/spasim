@@ -38,6 +38,7 @@ GLXinfo.Do ~
 #Linux or Windows:
 
 ]]></Span><Span style="Bold"><![CDATA[Compiler.Compile]]></Span><Span style="Normal"><![CDATA[
+]]></Span><Span style="Normal"><![CDATA[XNXLAudio.Mod]]></Span><Span style="Normal"><![CDATA[
 Base.Mod
 XNXLE.Mod 
 XNXLMath.Mod
