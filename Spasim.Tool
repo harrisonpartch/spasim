@@ -32,13 +32,22 @@ WGLinfo.Do ~
  	Unix.GLContext.Mod
  	Unix.GLXinfo.Mod 	
 	~
-
-GLXinfo.Do ~ 
+	]]></Span><Span style="Normal"><![CDATA[
+]]></Span><Span style="Bold"><![CDATA[Compiler.Compile]]></Span><Span style="Normal"><![CDATA[
+Unix.OpenAL.Mod 
+Unix.OpenALefx.Mod 
+Unix.OpenALext.Mod 
+OpenALinfo.Mod
+OpenALUtil.Mod
+TestOpenAL0.Mod
+TestOpenALWav.Mod 
+TestOpenALWav3.Mod
+]]></Span><Span style="Normal"><![CDATA[XNXLAudio.Mod
+~
 
 #Linux or Windows:
 
 ]]></Span><Span style="Bold"><![CDATA[Compiler.Compile]]></Span><Span style="Normal"><![CDATA[
-]]></Span><Span style="Normal"><![CDATA[XNXLAudio.Mod]]></Span><Span style="Normal"><![CDATA[
 Base.Mod
 XNXLE.Mod 
 XNXLMath.Mod
