@@ -12,7 +12,6 @@ TYPE PT = Base.PT;
 
 (* pseudosolid texture *)
 
-
 TYPE AvaVox* = OBJECT(Voxel);
 VAR
 	texcube*: TexCube;
@@ -233,9 +232,12 @@ BEGIN
 	dg:=color.green*dot*ray.ra;
 	db:=color.blue*dot*ray.ra;	
 	IF color.alpha<0.9 THEN
-		ray.ra:=ray.ra-0.1;
-		ray.ga:=ray.ga-0.1;
-		ray.ba:=ray.ba-0.1;
+		ray.r := ray.r + dr/2;
+		ray.ra:=ray.ra-dr/2-0.1;
+		ray.g := ray.g + dg/2;
+		ray.ga:=ray.ga-dg/2-0.1;
+		ray.b := ray.b + db/2;
+		ray.ba:=ray.ba-db/2-0.1;
 		mirror(ray)
 	ELSE
 		ray.r := ray.r + dr;
@@ -271,8 +273,8 @@ PROCEDURE play*();
 BEGIN
 (*	XNXLAudio.LoadWav("test.wav");
 	XNXLAudio.Play 
-*)
-	ALUT.Play(Base.texsound);	
+
+	ALUT.Play(Base.texsound);	*)
 END play;
 
 END TexVox;

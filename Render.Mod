@@ -408,8 +408,8 @@ BEGIN
 			| "m": leftsticky:=leftsticky/1.3; upsticky:=upsticky/1.3;
 			| "o":
 			| "t": camera.glidetoggle 
-			| "v":Marsh.engrain
-			| "c":  
+			| "v":Marsh.engrain; Marsh.sprout 
+			| "c": 
 			| "x": Marsh.incVN
 			| "z": Marsh.decVN		
 			| "p":  camera.stop			

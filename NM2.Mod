@@ -947,7 +947,7 @@ VAR
 	cv,child:Voxel;
 	i,j,k: INTEGER;
 BEGIN
-	IF code=NCODE THEN
+	IF  ~copymarker & (code=NCODE) THEN
 		copymarker:=TRUE;
 		pool.new(c);
 		c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; c.alpha:=alpha;
@@ -1002,7 +1002,7 @@ BEGIN
 			IF b THEN
 				r.Bytes(name,0,NL,len);
 				blox[i,j,k]:=Base.VoxelFromName(name);
-				IF blox[i,j,k]#NIL THEN blox[i,j,k].sprout(r) END		
+				IF blox[i,j,k]#NIL THEN blox[i,j,k].sprout(r) END	
 			END;	
 		END END END	
 	END					

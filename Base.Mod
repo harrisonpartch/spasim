@@ -342,8 +342,8 @@ PROCEDURE play*();
 BEGIN
 (*	XNXLAudio.LoadWav("grain.wav");
 	XNXLAudio.Play 
-*)
-	ALUT.Play(basesource);	
+
+	ALUT.Play(basesource);	*)
 END play;
 
 PROCEDURE touch*;
@@ -542,7 +542,6 @@ VAR
 PROCEDURE VoxelFromName*(modname: Name): Voxel;
 	VAR voxel: Voxel;  fackery: VoxelFackery;
 	BEGIN
-		Out.String(".... ");	 
 		IF modname[0]='N' THEN
 			GETPROCEDURE(modname, "thisvox", fackery );
 			IF (fackery # NIL) THEN  

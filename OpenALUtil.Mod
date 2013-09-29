@@ -1,5 +1,5 @@
 MODULE OpenALUtil; (** AUTHOR "fnecati"; PURPOSE "OpenAL utilities"; *)
-IMPORT  AL:=OpenAL, SYSTEM, KernelLog, SoundDevices, Codecs, Streams, Files, Modules, Strings;
+IMPORT  AL:=OpenAL, KernelLog, SoundDevices, Codecs, Streams, Files, Modules, Strings;
 
 (* todo: 
 	can be wrapped as oberon objects, if you like; 

@@ -21,7 +21,8 @@ BEGIN
 		voxel.engrain(w);
 		IF (w.res = Streams.Ok) THEN
 			w.Update;
-			GZip.Deflate(f,fgz,GZip.BestSpeed,GZip.DefaultStrategy,GZip.NoFlush);
+			GZip.Deflate(f,fgz,GZip.BestSpeed,GZip.DefaultStrategy,GZip.NoFlush); 
+			Files.Register(f);
 			Files.Register(fgz);
 			Out.String("sprout saved");
 			Out.Ln
@@ -41,7 +42,7 @@ BEGIN
 	fgz:= Files.Old("sprout");
 	f:=Files.New("cotyledon");
 	IF (fgz # NIL) THEN
-		GZip.Inflate(fgz,f); 
+		 GZip.Inflate(fgz,f); 
 		NEW(r,f,0);
 		Files.OpenReader(r, f, 0);
 		r.Bytes(name,0,NL,len);

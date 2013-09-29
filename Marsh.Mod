@@ -286,7 +286,7 @@ BEGIN
       rand:=Base.rand;	
 
   	w10:=Base.VoxelFromName("NM2");	
- 	z10:=Base.VoxelFromName("NM2");	
+ 	z10:=Base.VoxelFromName("NM3");	
     
 	Out.String("EEEEP!");
 	xot:=Base.VoxelFromName("Nharrisonavatar"); 
@@ -429,10 +429,10 @@ BEGIN
 	Base.setPT(center,1/2,1/2,11/12);
 	NEW(plane,center,up);
 	plane.vox:=tigerlily;	
-	z10.FRaster(plane,32); 		
-	z10.FRaster(noise,64); 	
-	z10.FRaster(tnoise,64); 			
-	z10.setcolor(1,1,2,3,0); 
+	z10.FRaster(plane,2); 		
+(*	z10.FRaster(noise,16); 	
+	z10.FRaster(tnoise,16); 			
+*)	z10.setcolor(1,1,2,3,0); 
 	gorge.setcolor(0,0,0,0,0);
 	Base.world:=z10; 
 	Base.avatar:=harrison;

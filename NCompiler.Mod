@@ -1,7 +1,5 @@
 MODULE NCompiler;
-IMPORT Base, Files, Texts, TextUtilities, Diagnostics, CompilerInterface, Commands;
-
-(* Base is never used and imported only so that NCompiler is freed by SystemTools.FreeDownTo	Base *)
+IMPORT Files, Texts, TextUtilities, Diagnostics, CompilerInterface, Commands;
 
 PROCEDURE ncompile*(context : Commands.Context);
 VAR
@@ -16,7 +14,7 @@ VAR
 BEGIN
        NEW(e);
        e.Open("./N*Mod", {});
-       compiler:=CompilerInterface.GetCompiler("Mod");
+       compiler:=CompilerInterface.GetCompilerByName("Fox");
        context.out.String("compiling all N*Mod ");
        context.out.Ln;
        IF compiler#NIL THEN

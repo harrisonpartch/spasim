@@ -16,8 +16,6 @@ Compiler.Compile]]></Span><Span style="Normal"><![CDATA[
 	 Win32.GLContext.Mod
 	 Win32.WGLinfo.Mod
 	~
-
-WGLinfo.Do ~
 	
 
 # LinuxAos
@@ -32,7 +30,7 @@ WGLinfo.Do ~
  	Unix.GLContext.Mod
  	Unix.GLXinfo.Mod 	
 	~
-	]]></Span><Span style="Normal"><![CDATA[
+	
 ]]></Span><Span style="Bold"><![CDATA[Compiler.Compile]]></Span><Span style="Normal"><![CDATA[
 Unix.OpenAL.Mod 
 Unix.OpenALefx.Mod 
@@ -41,8 +39,9 @@ OpenALinfo.Mod
 OpenALUtil.Mod
 TestOpenAL0.Mod
 TestOpenALWav.Mod 
+XNXLAudio.Mod
 TestOpenALWav3.Mod
-]]></Span><Span style="Normal"><![CDATA[XNXLAudio.Mod
+
 ~
 
 #Linux or Windows:
@@ -95,7 +94,7 @@ XNXLSierp.Mod		''	''
 OpenAL.Tool
 OpenGL.Tool
 
-
+OpenALinfo.Do 
 ======
 
 XNXLAudio.Mod

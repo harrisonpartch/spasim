@@ -1,6 +1,6 @@
 MODULE OpenALinfo; (** AUTHOR "fnecati"; PURPOSE "show OpenAL device infos"; *)
 
-IMPORT  AL:=OpenAL, EFX:=OpenALefx, SYSTEM, Files, Strings,  KernelLog;
+IMPORT  AL:=OpenAL, EFX:=OpenALefx, Files, Strings,  KernelLog;
 CONST
 	openalPlayFile ="openalplay.ini"; (* configuration file for available list of play devices *) 
 	openalCapFile ="openalcap.ini"    (* configuration file for available list of capture devices *) 

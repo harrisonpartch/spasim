@@ -196,6 +196,7 @@ BEGIN
 	w.RawReal(b);	
 	w.RawReal(black);	
 END engrain;
+
 PROCEDURE sprout(rdr: Streams.Reader);
 BEGIN
 	rdr.RawReal(r);
