@@ -282,7 +282,7 @@ VAR
 BEGIN
 	NEW(ms);
 	NEW(EMPTY);
-(*	EMPTY.passable:=TRUE;
+	EMPTY.passable:=TRUE;
       rand:=Base.rand;	
 
   	w10:=Base.VoxelFromName("NM2");	
@@ -429,14 +429,15 @@ BEGIN
 	Base.setPT(center,1/2,1/2,11/12);
 	NEW(plane,center,up);
 	plane.vox:=tigerlily;	
-	z10.FRaster(plane,2); 		
-	z10.FRaster(noise,16); 	
-	z10.FRaster(tnoise,16); 			
+	z10.FRaster(plane,9); 		
+	z10.FRaster(noise,81); 	
+	z10.FRaster(tnoise,81); 			
 	z10.setcolor(1,1,2,3,0); 
 	gorge.setcolor(0,0,0,0,0);
 	Base.world:=z10; 
-*)	sprout;
-	Base.avatar:=harrison;
+(*	engrain;
+	sprout;
+*)	Base.avatar:=harrison;
 	Base.avatarsize:=1000;
 	Out.String("EEEEP!");
 END dawn;
