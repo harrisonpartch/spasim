@@ -285,7 +285,7 @@ BEGIN
 	EMPTY.passable:=TRUE;
       rand:=Base.rand;	
 
-  	w10:=Base.VoxelFromName("NM2");	
+  	w10:=Base.VoxelFromName("NM3");	
  	z10:=Base.VoxelFromName("NM3");	
     
 	Out.String("EEEEP!");
@@ -297,7 +297,7 @@ BEGIN
 	push(msphere);	
  	volvox:=Base.VoxelFromName("Nrdvolvox");  	
        push(volvox);
-	beatrix:=Base.VoxelFromName("NwPicBWw4NfcserX4ELaQ3A"); 
+	beatrix:=Base.VoxelFromName("NwPicBWw4NfcserX4ELaQ3b"); 
 	push(beatrix);
        lobster:=Base.VoxelFromName("NznGx2ySiHIGrO5t9Pzcw5Q"); 
 	push(lobster);
@@ -429,10 +429,10 @@ BEGIN
 	Base.setPT(center,1/2,1/2,11/12);
 	NEW(plane,center,up);
 	plane.vox:=tigerlily;	
-	z10.FRaster(plane,9); 		
-	z10.FRaster(noise,81); 	
+	z10.FRaster(plane,3); 		
+(*	z10.FRaster(noise,81); 	
 	z10.FRaster(tnoise,81); 			
-	z10.setcolor(1,1,2,3,0); 
+*)	z10.setcolor(1,1,2,3,0); 
 	gorge.setcolor(0,0,0,0,0);
 	Base.world:=z10; 
 (*	engrain;

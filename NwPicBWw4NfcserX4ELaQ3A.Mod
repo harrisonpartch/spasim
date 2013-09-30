@@ -5,7 +5,7 @@ IMPORT Base, TexVox;
 VAR vox: TexVox.TexCubeVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	IF vox=NIL THEN NEW(vox,"beatabeatrix.jpg")  END;
+	IF vox=NIL THEN NEW(vox,"grain.png")  END;
 	RETURN vox
 END thisvox;
 

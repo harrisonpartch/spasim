@@ -6,10 +6,10 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=2;        
-	TS=16*4;   (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=5;
-	TH=3;
+	T=3;        
+	TS=16*8;   (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
+	TW=3;
+	TH=2;
 	W*=TS*TW;
 	H*=TS*TH;
 
@@ -360,7 +360,7 @@ VAR
 	aperture*: Base.Aperture;
 	image*: Raster.Image;
 	rtheta,rphi: REAL; (* camera pitch,roll. global variables because they are the same for all rays in a frame *)
-	fward*, dward*, rward*: PT;  
+	fward*, dward*, rward*,camrward*: PT;  
 	foveaparameter:INTEGER;
 	copy: Raster.Mode;
 
@@ -515,7 +515,7 @@ BEGIN
 	XNXLMath.orrot(fward, Base.dward,rtheta);   
 	XNXLMath.orrot(rward, Base.dward,rtheta);   		
 	XNXLMath.orrot(fward, Base.rward,rphi);  	
-	XNXLMath.orrot(dward, rward,rphi);  
+	XNXLMath.orrot(dward, Base.rward,rphi);  
 	angletoray(Base.sniperay,0,0);	
 	BEGIN{EXCLUSIVE}
 		gotiles;

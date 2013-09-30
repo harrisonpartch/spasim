@@ -108,15 +108,15 @@ BEGIN
 
 	IF ~pass THEN
 	(*	XNXLAudio.LoadWav("grain.wav");
-		XNXLAudio.Play ;	*)
+		XNXLAudio.Play ;	
 		ALUT.Play(Base.grainsound);
 		
-		Out.String("grain!");
+		Out.String("grain!");*)
 		x := cx + cvx; y := cy + cvy; z := cz;	
 		q:=Base.mkPT(x,y,z);
 		pass := Base.world.passprobe(q);
 		IF pass THEN 
-			cvz:=-cvz/2
+			cvz:=0 (* -cvz/2 *)
 		ELSE
 			x := cx + cvx; y := cy; z := cz+cvz;	
 			q:=Base.mkPT(x,y,z);
@@ -136,8 +136,6 @@ BEGIN
 	IF  pass THEN 
 		cx:=x; cy:=y; cz:=z 
 	ELSE
-		Out.String("nopass");
-
 		Base.world.Shade(proberay);
 		normalize(cvx,cvy,cvz,d);
 		reflect(cvx, cvy, cvz, proberay.normal.x, proberay.normal.y, proberay.normal.z);
@@ -153,7 +151,6 @@ BEGIN
 	IF cz<0 THEN cz:=cz+1
 	ELSIF cz>1 THEN cz:=cz-1
 	END;	
-
 END move; 
 
 PROCEDURE stop;
@@ -408,8 +405,8 @@ BEGIN
 			| "m": leftsticky:=leftsticky/1.3; upsticky:=upsticky/1.3;
 			| "o":
 			| "t": camera.glidetoggle 
-			| "v":Marsh.engrain; Marsh.sprout 
-			| "c": 
+			| "v":Marsh.engrain
+			| "c": Marsh.sprout 
 			| "x": Marsh.incVN
 			| "z": Marsh.decVN		
 			| "p":  camera.stop			

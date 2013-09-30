@@ -232,13 +232,13 @@ BEGIN
 	dg:=color.green*dot*ray.ra;
 	db:=color.blue*dot*ray.ra;	
 	IF color.alpha<0.9 THEN
-		ray.r := ray.r + dr/2;
-		ray.ra:=ray.ra-dr/2-0.1;
-		ray.g := ray.g + dg/2;
-		ray.ga:=ray.ga-dg/2-0.1;
-		ray.b := ray.b + db/2;
-		ray.ba:=ray.ba-db/2-0.1;
-		mirror(ray)
+			ray.r := ray.r + dr*color.alpha;
+			ray.ra:=ray.ra-dr*color.alpha-0.1;
+			ray.g := ray.g + dg*color.alpha;
+			ray.ga:=ray.ga-dg*color.alpha-0.1;
+			ray.b := ray.b + db*color.alpha;
+			ray.ba:=ray.ba-db*color.alpha-0.1;
+			IF color.alpha>0.5 THEN mirror(ray) END
 	ELSE
 		ray.r := ray.r + dr;
 		ray.g := ray.g + dg;
@@ -288,7 +288,6 @@ BEGIN
 	tscale:=1;
 	texscale:=1;
 END init;
-
 
 PROCEDURE Shade (VAR ray: Ray);
 VAR
@@ -390,12 +389,46 @@ BEGIN
 	dg:=color.green*dot*ray.ra;
 	db:=color.blue*dot*ray.ra;	
 	IF color.alpha<0.9 THEN
-		IF color.alpha>0.1 THEN
-			ray.ra:=ray.ra-0.031;
-			ray.ga:=ray.ga-0.031;
-			ray.ba:=ray.ba-0.031;
-			mirror(ray)
-		END			
+			ray.r := ray.r + dr*color.alpha;
+			ray.ra:=ray.ra-dr*color.alpha-0.1;
+			ray.g := ray.g + dg*color.alpha;
+			ray.ga:=ray.ga-dg*color.alpha-0.1;
+			ray.b := ray.b + db*color.alpha;
+			ray.ba:=ray.ba-db*color.alpha-0.1;
+			IF color.alpha>0.5 THEN 
+				mirror(ray) 
+			ELSE (* if the pixel is transparent, trace to the back side of the cube *)
+				Base.ExitF(ray,lxyz,face);
+				CASE face OF
+					 0: lx := lxyz.y; ly := 1-lxyz.z; 
+					|1: lx := lxyz.x; ly := 1-lxyz.z; 
+					|2: lx := lxyz.x; ly := lxyz.y;
+					|3: lx := lxyz.y; ly := 1-lxyz.z; 
+					|4: lx := lxyz.x; ly := 1-lxyz.z; 
+					|5: lx := lxyz.x; ly := lxyz.y;  
+				END;
+				color:=texcube.side[ray.face].pixel(lx,ly);	
+				dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
+				dr:=color.red*dot*ray.ra;
+				dg:=color.green*dot*ray.ra;
+				db:=color.blue*dot*ray.ra;	
+				IF color.alpha<0.9 THEN
+					ray.r := ray.r + dr*color.alpha;
+					ray.ra:=ray.ra-dr*color.alpha-0.1;
+					ray.g := ray.g + dg*color.alpha;
+					ray.ga:=ray.ga-dg*color.alpha-0.1;
+					ray.b := ray.b + db*color.alpha;
+					ray.ba:=ray.ba-db*color.alpha-0.1;
+					IF color.alpha>0.5 THEN 
+						mirror(ray) 	
+					END	
+				ELSE
+					ray.r := ray.r + dr;
+					ray.g := ray.g + dg;
+					ray.b := ray.b + db;	
+					ray.terminate:=TRUE
+				END			
+			END			
 	ELSE
 		ray.r := ray.r + dr;
 		ray.g := ray.g + dg;

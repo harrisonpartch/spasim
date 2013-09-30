@@ -81,14 +81,14 @@ BEGIN
 	Raster.InitMode(copy,Raster.srcCopy);
 	img :=Graphics.LoadImage(n, TRUE); (* img format is BGRA8888 *)
 	IF img=NIL THEN 
+		Out.String(n);
+		Out.String(" not found: loading grain.png instead");
+		Out.Ln;
 		img := Graphics.LoadImage("grain.png", TRUE); 
-		IF img=NIL THEN Out.String("NIL TEXTURE  FAULT") END;
+		ASSERT(img#NIL);
 	END;
-(*	mip0:=Graphics.LoadImage("mip0.png", TRUE); 
-	mip1:= Graphics.LoadImage("mip1.png",TRUE); 
-*)	NEW(mip0);
-	NEW(mip1);
-	
+	NEW(mip0);
+	NEW(mip1);	
 	Raster.Create(mip0,64,64,Raster.BGRA8888);
 	Raster.Create(mip1,1024,1024,Raster.BGRA8888);		
 	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height),mip0,
@@ -1048,6 +1048,63 @@ BEGIN
 	END;
 	RETURN(exit);
 END Exit;
+
+PROCEDURE ExitF*(ray: Ray; VAR exit: PT; VAR face: INTEGER);
+VAR
+	drx, dry, drz: REAL;
+BEGIN
+	clamPT(ray.lxyz);
+	IF ray.dxyz.x>0 THEN
+		drx:= (1-ray.lxyz.x)/ ray.dxyz.x
+	ELSE
+		drx :=  (-ray.lxyz.x) / ray.dxyz.x
+	END;
+	IF ray.dxyz.y > 0 THEN
+		dry := (1 - ray.lxyz.y) / ray.dxyz.y
+	ELSE
+		dry :=  (-ray.lxyz.y) / ray.dxyz.y
+	END;
+	IF ray.dxyz.z > 0 THEN
+		drz := (1-ray.lxyz.z) / ray.dxyz.z
+	ELSE
+		drz :=  (-ray.lxyz.z) / ray.dxyz.z
+	END;
+	IF (drx < dry) THEN
+		IF (drx < drz ) THEN
+			IF ray.dxyz.x>0 THEN
+				exit.x:=1; exit.y:=ray.lxyz.y+drx*ray.dxyz.y; exit.z:=ray.lxyz.z+ drx*ray.dxyz.z;
+				face := 0
+			ELSE
+				exit.x:=0; exit.y:=ray.lxyz.y+drx*ray.dxyz.y; exit.z:=ray.lxyz.z+ drx*ray.dxyz.z;
+				face := 3
+			END;	
+		ELSE
+			IF ray.dxyz.z>0 THEN
+				exit.x:=ray.lxyz.x+drz*ray.dxyz.x; exit.y:=ray.lxyz.y+drz*ray.dxyz.y; exit.z:=1;
+				face := 2
+			ELSE
+				exit.x:=ray.lxyz.x+drz*ray.dxyz.x; exit.y:=ray.lxyz.y+drz*ray.dxyz.y; exit.z:=0;
+				face := 5
+			END;		
+		END;
+	ELSIF (dry < drz) THEN
+		IF ray.dxyz.y>0 THEN
+			exit.x:=ray.lxyz.x+dry*ray.dxyz.x; exit.y:=1; exit.z:=ray.lxyz.z+dry*ray.dxyz.z;
+			face := 1
+		ELSE
+			exit.x:=ray.lxyz.x+dry*ray.dxyz.x; exit.y:=0; exit.z:=ray.lxyz.z+dry*ray.dxyz.z;
+			face := 4
+		END;
+	ELSE
+		IF ray.dxyz.z>0 THEN
+			exit.x:=ray.lxyz.x+drz*ray.dxyz.x; exit.y:=ray.lxyz.y+drz*ray.dxyz.y; exit.z:=1;
+			face := 2
+		ELSE
+			exit.x:=ray.lxyz.x+drz*ray.dxyz.x; exit.y:=ray.lxyz.y+drz*ray.dxyz.y; exit.z:=0;
+			face := 5
+		END;		
+	END
+END ExitF;
 
 PROCEDURE InitSounds;
 

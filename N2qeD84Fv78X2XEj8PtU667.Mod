@@ -44,7 +44,7 @@ BEGIN
 	tigerlily:=Base.VoxelFromName("NCjgzkmiTyecI5x6eOgYqpQ");  
 	NEW(ball,center,2/12);	
 	ball.setcolor(0.9,0.9,1);			
-	ball.setvoxel(tigerlily); 
+(*	ball.setvoxel(tigerlily); *)
 	dot.FRaster(ball,27);
 	FOR i:=0 TO 10 DO
 		p1:=Base.randPT();
