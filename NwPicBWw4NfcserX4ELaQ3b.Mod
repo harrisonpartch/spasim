@@ -6,7 +6,6 @@ VAR vox: TexVox.TexCubeVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	IF vox=NIL THEN NEW(vox,"grain.png")  END;
-	vox.passable:=TRUE;
 	RETURN vox
 END thisvox;
 
