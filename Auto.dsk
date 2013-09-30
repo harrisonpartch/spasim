@@ -1,6 +1,7 @@
 <Desktop>
-	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="840" t="105" r="1095" b="498" flags="{0..2}"/>
 	<Window name="WMSearchTool" loader="WMSearchTool.Restore" l="377" t="271" r="1077" b="771" flags="{0..2}"/>
+	<Window name="FileManager" loader="WMFileManager.Restore" l="81" t="328" r="581" b="728" flags="{0..2}"/>
+	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="840" t="105" r="1095" b="498" flags="{0..2}"/>
 	<Window name="PET" loader="PET.Restore" l="81" t="222" r="881" b="822" flags="{0..2}">
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>
@@ -13,11 +14,11 @@
 			</Tab>
 		</PETData>
 	</Window>
-	<Window name="PET" loader="PET.Restore" l="14" t="86" r="814" b="686" flags="{0..2}">
+	<Window name="PET" loader="PET.Restore" l="237" t="105" r="983" b="717" flags="{0..2}">
 		<PETData>
-			<General SelectedPageNr="0" ProjectTextFile=""/>
+			<General SelectedPageNr="9" ProjectTextFile=""/>
 			<Tab file="Spasim.Tool" codecFormat="BBT" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="49" cursorPos="1191"/>
+				<Editor firstLine="34" cursorPos="769"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
