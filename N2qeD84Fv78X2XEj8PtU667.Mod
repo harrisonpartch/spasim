@@ -42,8 +42,8 @@ BEGIN
 	dot.setcolor(10,0,0,10,0);	
 	Base.setPT(center,1/2,1/2,1/2);
 	tigerlily:=Base.VoxelFromName("NCjgzkmiTyecI5x6eOgYqpQ");  
-	NEW(ball,center,2/12);	
-	ball.setcolor(0.9,0.9,1);			
+	NEW(ball,center,5/12);	
+	ball.setcolor(0.4,0.9,0.2);			
 (*	ball.setvoxel(tigerlily); *)
 	dot.FRaster(ball,27);
 	FOR i:=0 TO 10 DO
@@ -61,7 +61,7 @@ BEGIN
 		dot.stroke(p1,9,bludot,v);
 	END;		
 	dot.lockTF:=TRUE;
-	bludot.DTL:=25000
+	dot.DTL:=25
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;

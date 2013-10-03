@@ -56,12 +56,12 @@ BEGIN
 	serp:=Base.VoxelFromName("NM3"); 	
 
 
-	subserp.DTL:=300;
-	subserp.imposter:=greenball;		
+	subserp.DTL:=30;
+(*	subserp.imposter:=greenball;		*)
 
-	serp.DTL:=300;	
+	serp.DTL:=10;	
 
-(*	subserp.fill(subserp);*)
+	subserp.fill(blue);
 
 	subserp.stroke(Base.mkPT(1/2,1/2,1/4),1,subserp,v);
 	subserp.stroke(Base.mkPT(1/2,1/2,3/4),1,subserp,v);
@@ -70,7 +70,7 @@ BEGIN
 	subserp.stroke(Base.mkPT(1/2,1/4,1/2),1,subserp,v);
 	subserp.stroke(Base.mkPT(1/2,3/4,1/2),1,subserp,v);
 	subserp.stroke(Base.mkPT(1/2,1/2,1/2),1,beatrix,v);		
-	subserp.stroke(Base.mkPT(0,0,0),1,beatrix,v);		
+(*	subserp.stroke(Base.mkPT(0,0,0),1,beatrix,v);		
 	subserp.stroke(Base.mkPT(1,0,0),1,greenball,v);		
 	subserp.stroke(Base.mkPT(0,0,1),1,beatrix,v);		
 	subserp.stroke(Base.mkPT(0,1,1),1,greenball,v);	
@@ -78,15 +78,15 @@ BEGIN
 	subserp.stroke(Base.mkPT(0,1,0),1,greenball,v);		
 	subserp.stroke(Base.mkPT(1,0,1),1,beatrix,v);		
 	subserp.stroke(Base.mkPT(1,1,1),1,greenball,v);	
-	serp.fill(serp);	
+*)	serp.fill(serp);	
 	serp.imposter:=blue;
-	serp.stroke(Base.mkPT(1/2,1/2,1/2),1,greenball,v);
-	serp.stroke(Base.mkPT(1/2,0,1),1,greenball,v);
-	serp.stroke(Base.mkPT(1/2,1,0),1,greenball,v);
-	serp.stroke(Base.mkPT(0,0,1/2),1,greenball,v);	
-	serp.stroke(Base.mkPT(0,1,1/2),1,greenball,v);
-	serp.stroke(Base.mkPT(1,0,1/2),1,greenball,v);	
-	serp.stroke(Base.mkPT(1,1,1/2),1,greenball,v);
+	serp.stroke(Base.mkPT(1/2,1/2,1/2),1,lobster,v);
+	serp.stroke(Base.mkPT(1/2,0,1),1,lobster,v);
+	serp.stroke(Base.mkPT(1/2,1,0),1,lobster,v);
+	serp.stroke(Base.mkPT(0,0,1/2),1,lobster,v);	
+	serp.stroke(Base.mkPT(0,1,1/2),1,lobster,v);
+	serp.stroke(Base.mkPT(1,0,1/2),1,lobster,v);	
+	serp.stroke(Base.mkPT(1,1,1/2),1,lobster,v);
 	subserp.copyonstroke:=TRUE;	
 	serp.copyonstroke:=TRUE;	
 	beatrix.copyonstroke:=TRUE;

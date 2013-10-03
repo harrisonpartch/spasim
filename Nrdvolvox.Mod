@@ -3,7 +3,7 @@ MODULE Nrdvolvox;
 IMPORT Base, XNXLE, XNXLFRep;
 
 CONST	
-	M=20;
+	M=10;
 	A = 80;
 	B = 20;
 	C = 0.03;
@@ -34,7 +34,7 @@ BEGIN
 	IF YELLOW=NIL THEN NEW(YELLOW) END;
 	clere;
 	seed;
-(*	register; *)
+	register; 
 	tock := 1;
 END init;
 			

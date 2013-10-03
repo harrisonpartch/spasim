@@ -167,69 +167,46 @@ END glidetoggle;
 
 PROCEDURE forward(x:REAL);
 VAR
-	fward:PT;
+	fward,dward,rward:PT;
 BEGIN
+(*	fward:=Base.mkPT(1,0,0);
+	dward:=Base.mkPT(0,0,1);
+	rward:=Base.mkPT(0,1,0);	
+	XNXLMath.orrot(fward, dward,cameraphi);   
+	XNXLMath.orrot(rward, dward,cameraphi);   		
+	XNXLMath.orrot(fward, rward,cameratheta);  	*)
 	fward:=Retina.fward;
-	cvx :=cvx+(x*fward.x * Base.speed); 
-	cvy :=cvy+(x*fward.y * Base.speed); 	
-	cvz :=cvz+(x*fward.z * Base.speed);
+	cvx :=cvx+(x*fward.x); 
+	cvy :=cvy+(x*fward.y); 	
+	cvz :=cvz+(x*fward.z);
 END forward;
-
-PROCEDURE backward(x:REAL);
-VAR	
-	fward:PT;
-BEGIN
-	fward:=Retina.fward;	
-	cvx :=cvx-(x*fward.x * Base.speed); 
-	cvy :=cvy-(x*fward.y * Base.speed); 	
-	cvz :=cvz-(x*fward.z * Base.speed); 	
-END backward;
 
 PROCEDURE rightstrafe(x:REAL);
 VAR
-	rward:PT;
+	rward,dward:PT;
 	ray: Base.Ray;
 BEGIN
-	rward:=Retina.rward;
-	rward:=Base.mulPT(rward,-1);
-	cvx :=cvx+(x*rward.x * Base.speed); 
-	cvy :=cvy+(x*rward.y * Base.speed); 	
-	cvz :=cvz+(x*rward.z * Base.speed); 	
+	rward:=Retina.fward;
+	dward:=Base.mkPT(0,1,0);
+	XNXLMath.orrot(rward, dward,3.14159/2);   		
+	cvx :=cvx+(x*rward.x); 
+	cvy :=cvy+(x*rward.y); 	
+	cvz :=cvz+(x*rward.z); 	
 END rightstrafe;
 
-PROCEDURE leftstrafe(x:REAL);
+PROCEDURE upstrafe(x:REAL); 
 VAR
-	lward:PT;
+	rward,dward,fward:PT;
 	ray: Base.Ray;
 BEGIN
-	lward:= Retina.rward;
-	cvx :=cvx+(x*lward.x * Base.speed); 
-	cvy :=cvy+(x*lward.y * Base.speed); 	
-	cvz :=cvz+(x*lward.z * Base.speed); 	
-END leftstrafe;
-
-PROCEDURE upstrafe(x:REAL); (* strafe up perpendicular to look *)
-VAR
-	up:PT;
-	ray: Base.Ray;
-BEGIN
-	up:=Retina.dward;
-	up:=Base.mulPT(up,-1);
-	cvx :=cvx+(x*up.x * Base.speed); 
-	cvy :=cvy+(x*up.y * Base.speed); 	
-	cvz :=cvz+(x*up.z * Base.speed); 	
+	dward:=Base.mkPT(0,0,1);
+	rward:=Base.mkPT(0,1,0);	
+	XNXLMath.orrot(rward, dward,cameratheta);   		
+	XNXLMath.orrot(dward, rward,cameraphi);  		
+	cvx :=cvx+(x*dward.x); 
+	cvy :=cvy+(x*dward.y); 	
+	cvz :=cvz+(x*dward.z); 	
 END upstrafe;
-
-PROCEDURE downstrafe(x:REAL);
-VAR
-	down:PT;
-	ray: Base.Ray;
-BEGIN
-	down:=Retina.dward;
-	cvx :=cvx+(x*down.x * Base.speed); 
-	cvy :=cvy+(x*down.y * Base.speed); 	
-	cvz :=cvz+(x*down.z * Base.speed); 	
-END downstrafe;
 
 PROCEDURE trace;
 VAR
@@ -395,12 +372,12 @@ BEGIN
 		Out.String(chatvoxel.chat(CHR(ucs))^)
 	ELSE
 		CASE CHR(ucs) OF		
-			   "s" : camera.backward(0.51)
-			| "w" :camera.forward(0.51) 
-			| "a" :camera.leftstrafe(0.5)	
-			| "d" :camera.rightstrafe(0.5)
-			| "e": camera.upstrafe(0.51)
-			| "q": camera.downstrafe(0.51)	
+			   "s" : camera.forward(-0.51*Base.speed)
+			| "w" :camera.forward(0.51*Base.speed) 
+			| "a" :camera.rightstrafe(-0.5*Base.speed)	
+			| "d" :camera.rightstrafe(0.5*Base.speed)
+			| "e": camera.upstrafe(0.51*Base.speed)
+			| "q": camera.upstrafe(-0.51*Base.speed)	
 			| "n": leftsticky:=leftsticky*1.3; upsticky:=upsticky*1.3;
 			| "m": leftsticky:=leftsticky/1.3; upsticky:=upsticky/1.3;
 			| "o":

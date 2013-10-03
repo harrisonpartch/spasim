@@ -430,9 +430,9 @@ BEGIN
 	NEW(plane,center,up);
 	plane.vox:=tigerlily;	
 	z10.FRaster(plane,3); 		
-(*	z10.FRaster(noise,81); 	
+	z10.FRaster(noise,81); 	
 	z10.FRaster(tnoise,81); 			
-*)	z10.setcolor(1,1,2,3,0); 
+	z10.setcolor(0,0,1,1,0); 
 	gorge.setcolor(0,0,0,0,0);
 	Base.world:=z10; 
 (*	engrain;
