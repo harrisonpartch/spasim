@@ -287,6 +287,7 @@ BEGIN
 
   	w10:=Base.VoxelFromName("NM3");	
  	z10:=Base.VoxelFromName("NM3");	
+ 	
     
 	Out.String("EEEEP!");
 	xot:=Base.VoxelFromName("Nharrisonavatar"); 
@@ -409,7 +410,7 @@ BEGIN
 	tnoise.octaves:=4;
 	tnoise.persistence:=3.1;
 	tnoise.setvoxel(dotz);
-	tnoise.va[0]:=sand;
+	tnoise.va[0]:=w10;
 	tnoise.va[1]:=axolotl;
 	tnoise.va[2]:=lobster;
 	tnoise.va[3]:=tigerlily;
@@ -429,7 +430,9 @@ BEGIN
 	Base.setPT(center,1/2,1/2,11/12);
 	NEW(plane,center,up);
 	plane.vox:=tigerlily;	
-	z10.FRaster(plane,3); 		
+	z10.FRaster(plane,9); 	
+	w10.FRaster(plane,9); 
+	w10.FRaster(noise,9); 		
 	z10.FRaster(noise,81); 	
 	z10.FRaster(tnoise,81); 			
 	z10.setcolor(0,0,1,1,0); 

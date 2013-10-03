@@ -227,6 +227,7 @@ BEGIN
 				ray.r:= ray.r + ray.ra/2;
 				ray.g:= ray.g + ray.ga/2;	
 			END;
+			Base.clamp3(ray.r,ray.g,ray.b);
 			Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255)); 
 			Raster.Fill(image,cam.imx+i-1,cam.imy+j-1,cam.imx+i+1,cam.imy+j+1,pixel,copy);
 		END;
@@ -253,7 +254,8 @@ BEGIN
 				ray.b:= ray.b + ray.ba;
 				ray.r:= ray.r + ray.ra/2;
 				ray.g:= ray.g + ray.ga/2;	
-			END;
+			END;	
+			Base.clamp3(ray.r,ray.g,ray.b);
 			Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255)); 
 			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
 			phi:=phi+dphi;
