@@ -1,4 +1,4 @@
-MODULE XNXLNoise;
+MODULE Noise;
 
 IMPORT SYSTEM, BIT;
 
@@ -189,5 +189,5 @@ BEGIN
 	RETURN SHORT(a);
 END noise3dperlinabs;
 
-END XNXLNoise.
+END Noise.
 

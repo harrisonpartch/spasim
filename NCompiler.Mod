@@ -12,8 +12,8 @@ VAR
        format,res: LONGINT;
        name : ARRAY 256 OF CHAR; flags : SET; time, date, size : LONGINT;
 BEGIN
-       NEW(e);
-       e.Open("./N*Mod", {});
+        NEW(e);
+      e.Open("./N*Mod", {}); 
        compiler:=CompilerInterface.GetCompilerByName("Fox");
        context.out.String("compiling all N*Mod ");
        context.out.Ln;

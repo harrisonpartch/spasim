@@ -3,19 +3,7 @@
 <?xml-stylesheet type="text/xsl" href="http://bluebottle.ethz.ch/bluebottle.xsl" ?>
 <Text>
 <Span style="Bold"><![CDATA[
-
-]]></Span><Span style="Normal"><![CDATA[# for WinAos add spasim directory to aos.ini or myaos.ini search path:
-# Paths.Search = Work;spasim;obj;../source;PELinker;../UnixAos;vy.ants/source;vy.ants/documents]]></Span><Span style="Bold"><![CDATA[
-Compiler.Compile]]></Span><Span style="Normal"><![CDATA[
-	 OpenGLConst.Mod
-	 Win32.OpenGL.Mod
-	 Win32.GLU.Mod
-	 WinApi.Mod
-	 Win32.OGLWindow.Mod
-	 GLShaderUtils.Mod
-	 Win32.GLContext.Mod
-	 Win32.WGLinfo.Mod
-	~
+]]></Span><Span style="Normal"><![CDATA[
 	
 
 # LinuxAos
@@ -66,6 +54,7 @@ Engrainer.Mod
 Saboteur.Mod
 FRep.Mod
 NCompiler.Mod
+NanonyPET.Mod
 Marsh.Mod
 Render.Mod ~
 
@@ -87,7 +76,7 @@ Modules must be freed to force their reloading after being changed and recompile
 
 ~
 
-NanonyPET.Open NanonyPET.Mod ~  does not compile
+NanonyPET.Open NanonyPET.Mod ~  
 XNXLLifeVox.Mod		''	''
 XNXLSierp.Mod		''	''
 
@@ -120,6 +109,33 @@ N2qeD84Fv78X2XEj8PtUZO8.Mod
 NH6nvNlOJNlCtpkDB56ljSx.Mod
 N2qeD84Fv78X2XEj8PtU342.Mod
 N2qeD84Fv78X2XEj8PtUZO7.Mod
-N2qeD84Fv78X2XEj8PtU667.Mod]]></Span>
+N2qeD84Fv78X2XEj8PtU667.Mod]]></Span><Span style="Normal"><![CDATA[
+
+
+
+
+
+
+
+
+
+Windows:
+# for WinAos add spasim directory to aos.ini or myaos.ini search path:
+# Paths.Search = Work;spasim;obj;../source;PELinker;../UnixAos;vy.ants/source;vy.ants/documents
+Compiler.Compile
+	 OpenGLConst.Mod
+	 Win32.OpenGL.Mod
+	 Win32.GLU.Mod
+	 WinApi.Mod
+	 Win32.OGLWindow.Mod
+	 GLShaderUtils.Mod
+	 Win32.GLContext.Mod
+	 Win32.WGLinfo.Mod
+	~]]></Span><Span style="Normal"><![CDATA[
+
+
+
+
+]]></Span>
 
 </Text>

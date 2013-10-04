@@ -376,8 +376,8 @@ BEGIN
 			| "w" :camera.forward(0.51*Base.speed) 
 			| "a" :camera.rightstrafe(-0.5*Base.speed)	
 			| "d" :camera.rightstrafe(0.5*Base.speed)
-			| "e": camera.upstrafe(0.51*Base.speed)
-			| "q": camera.upstrafe(-0.51*Base.speed)	
+			| "e": camera.upstrafe(-0.51*Base.speed)
+			| "q": camera.upstrafe(0.51*Base.speed)	
 			| "n": leftsticky:=leftsticky*1.3; upsticky:=upsticky*1.3;
 			| "m": leftsticky:=leftsticky/1.3; upsticky:=upsticky/1.3;
 			| "o":

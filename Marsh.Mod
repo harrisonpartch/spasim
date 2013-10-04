@@ -431,12 +431,12 @@ BEGIN
 	NEW(plane,center,up);
 	plane.vox:=tigerlily;	
 	z10.FRaster(plane,9); 	
-	w10.FRaster(plane,9); 
+(*	w10.FRaster(plane,9); 
 	w10.FRaster(noise,9); 		
 	z10.FRaster(noise,81); 	
 	z10.FRaster(tnoise,81); 			
 	z10.setcolor(0,0,1,1,0); 
-	gorge.setcolor(0,0,0,0,0);
+*)	gorge.setcolor(0,0,0,0,0);
 	Base.world:=z10; 
 (*	engrain;
 	sprout;
