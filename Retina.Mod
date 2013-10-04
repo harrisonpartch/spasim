@@ -6,8 +6,8 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=3;        
-	TS=16*8;   (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
+	T=2;        
+	TS=16*4;   (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
 	TW=3;
 	TH=2;
 	W*=TS*TW;

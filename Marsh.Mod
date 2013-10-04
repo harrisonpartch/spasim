@@ -459,7 +459,7 @@ END lighten
 
 BEGIN
 	NEW(marshv);
-	cursorsize:=243*9;
+	cursorsize:=512;
 	cursorTF:=TRUE;
 	SNIPEINTO:=TRUE;
 END Marsh.
