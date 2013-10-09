@@ -677,6 +677,14 @@ BEGIN
 	RETURN(c);
 END mkcolor;
 
+PROCEDURE avgcolor*(a,b: Color): Color;
+VAR
+	c:Color;
+BEGIN
+	c.red:=(a.red+b.red)/2; c.green:=(a.green+b.green)/2; c.blue:=(a.blue+b.blue)/2;
+	RETURN(c);
+END avgcolor;
+
 PROCEDURE mkPT*(x,y,z: REAL): PT;
 VAR
 	p:PT;

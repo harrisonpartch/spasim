@@ -876,7 +876,15 @@ BEGIN
 				 			v.FRasterrecSolid(f,resolution,o,nextscale);
 				 		END
 				 	END
-				 END
+				 END;
+			ELSIF d2s<0 THEN
+				v:=f.voxel(p);
+				IF v#NIL THEN 
+					(* IF v IS cell THEN v:=v.deepcopy() END; *)
+					blox[i,j,k]:=v;
+				ELSE
+					nblox[i,j,k].color:=f.color(p);
+				END	
 			END	
 		END END END
 	END;
@@ -891,8 +899,7 @@ BEGIN
 						nbloxTF[i,j,k]:=TRUE;
 						nblox[i,j,k].normal:=f.normal(p)
 					END;
-					blox[i,j,k]:=v;	
-					blox[i,j,k]:=v;	
+					blox[i,j,k]:=v;
 				ELSE
 					IF f.normaltf(p) THEN
 						nbloxTF[i,j,k]:=TRUE;

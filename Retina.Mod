@@ -6,10 +6,10 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=2;        
-	TS=16*4;   (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=3;
-	TH=2;
+	T=3;        
+	TS=8*8;   (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
+	TW=6;
+	TH=4;
 	W*=TS*TW;
 	H*=TS*TH;
 
@@ -264,6 +264,64 @@ BEGIN
 	END;
 END tessad16;
 
+PROCEDURE tessa8(cam: Camera);
+VAR
+	i,j: LONGINT;
+	theta,phi,dtheta,dphi: REAL;
+	ray: Base.Ray;
+	pixel: Raster.Pixel;
+BEGIN
+	dtheta:=cam.dtheta/8;
+	dphi:=cam.dphi/8;
+	FOR i:= 1 TO 7 BY 2 DO
+		theta:=cam.theta+dtheta*i;	
+		FOR j :=  1 TO 7 BY 2 DO 
+			phi:=cam.phi+dphi*j;
+			ray:=Base.blankray;
+			angletoray(ray,theta,phi);
+			Base.world.Shade(ray);
+			IF ~ray.terminate THEN
+				ray.b:= ray.b + ray.ba;
+				ray.r:= ray.r + ray.ra/2;
+				ray.g:= ray.g + ray.ga/2;	
+			END;
+			Base.clamp3(ray.r,ray.g,ray.b);
+			Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255)); 
+			Raster.Fill(image,cam.imx+i-1,cam.imy+j-1,cam.imx+i+1,cam.imy+j+1,pixel,copy);
+		END;
+	END;
+END tessa8;
+
+PROCEDURE tessad8(cam: Camera);
+VAR
+	i,j: LONGINT;
+	theta,phi,dtheta,dphi: REAL;
+	ray: Base.Ray;
+	pixel: Raster.Pixel;
+BEGIN
+	theta:=cam.theta;
+	dtheta:=cam.dtheta/8;
+	dphi:=cam.dphi/8;
+	FOR i:= 0 TO 7 DO
+		phi:=cam.phi;
+		FOR j :=  0 TO 7 DO 
+			ray:=Base.blankray;
+			angletoray(ray,theta,phi);
+			Base.world.Shade(ray);
+			IF ~ray.terminate THEN
+				ray.b:= ray.b + ray.ba;
+				ray.r:= ray.r + ray.ra/2;
+				ray.g:= ray.g + ray.ga/2;	
+			END;	
+			Base.clamp3(ray.r,ray.g,ray.b);
+			Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255)); 
+			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
+			phi:=phi+dphi;
+		END;
+		theta:=theta+dtheta;
+	END;
+END tessad8;
+
 PROCEDURE ztrace(cam: Camera; level: INTEGER);
 VAR
 	a,b,c,d: Camera;
@@ -275,30 +333,30 @@ BEGIN
 			x:=a.imx - W/2;
 			y:=a.imy-H/2;		
 			IF (x*x+y*y)<(W*W/foveaparameter) THEN	
-				tessad16(a); 
+				tessad8(a); 
 			ELSE
-				tessa16(a); 
+				tessa8(a); 
 			END;
 			x:=b.imx - W/2;
 			y:=b.imy-H/2;		
 			IF (x*x+y*y)<(W*W/foveaparameter) THEN	
-				tessad16(b); 
+				tessad8(b); 
 			ELSE
-				tessa16(b); 			
+				tessa8(b); 			
 			END;			
 			x:=b.imx - W/2;
 			y:=b.imy-H/2;		
 			IF (x*x+y*y)<(W*W/foveaparameter) THEN	
-				tessad16(c); 
+				tessad8(c); 
 			ELSE
-				tessa16(c); 
+				tessa8(c); 
 			END;
 			x:=d.imx - W/2;
 			y:=d.imy-H/2;		
 			IF (x*x+y*y)<(W*W/foveaparameter) THEN	
-				tessad16(d); 
+				tessad8(d); 
 			ELSE
-				tessa16(d); 
+				tessa8(d); 
 			END;
 	ELSE
 		l:=level-1;

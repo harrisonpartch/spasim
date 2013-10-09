@@ -34,15 +34,11 @@ END in;
 END rprism;
 
 TYPE sphere*= OBJECT(FR)
-CONST
-	N=30;
-	NMO=N-1
 VAR 
 	radius*, rsquared*: REAL;
 	center*:PT;
 	cxf*:BOOLEAN;
-	NC: ARRAY N,N OF NCube;
-
+	
 PROCEDURE &init*(c:PT; r: REAL);
 VAR
 	i,j: INTEGER;
@@ -61,15 +57,6 @@ BEGIN
 	bbc2.z:=c.z+r;	
 	center:=c;	
 	mir:=0.8;
-	FOR i:=0 TO NMO DO 
-		theta := twopi*i/N;
-		FOR j:=0 TO NMO DO
-			phi := twopi*j/N;
-			normal.x := Math.cos(theta)*Math.sin(phi);
-			normal.y := Math.sin(theta)*Math.sin(phi);
-			normal.z := Math.cos(theta);
-		END
-	END				
 END init;
 
 PROCEDURE color*(p:PT):Color;
@@ -532,6 +519,41 @@ BEGIN
 END d2s;
 		
 END hexgrid;
+
+TYPE bifr*=OBJECT(FR)
+VAR
+	fr1,fr2: FR;	
+
+PROCEDURE&init*(a,b: FR);
+BEGIN
+	IF a# NIL THEN fr1:=a ELSE NEW(fr1) END;
+	IF b# NIL THEN fr2:=b ELSE NEW(fr2) END
+END init;
+
+PROCEDURE color(p:PT):Color;
+VAR
+	a,b,c: Color;
+BEGIN
+	RETURN Base.avgcolor(fr1.color(p),fr2.color(p));
+END color;
+
+PROCEDURE d2s*(p:PT):REAL;  (* distance to surface *)
+BEGIN
+	RETURN (fr1.d2s(p)+fr2.d2s(p))/2
+END d2s;
+
+PROCEDURE voxel(p:PT):Voxel;
+BEGIN
+	RETURN fr1.vox
+END voxel;
+
+PROCEDURE normal*(p:PT):PT;
+BEGIN
+	Base.normalizePT(fr1.norml);		(* norml is often calculated in d2s but not normalized there *)
+	RETURN fr1.norml					(* this is the normal for the most recent point handed to d2s *)
+END normal;
+		
+END bifr;
 
 
 END FRep.

@@ -124,7 +124,7 @@ BEGIN
 			IF pass THEN 
 				cvy:=0
 			ELSE			
-				x := cx; y := cy + cvy; z := cz+cvz;	
+				x := cx; y := cy + cvy; z := cz+cvz+0.0001;	
 				q:=Base.mkPT(x,y,z);
 				pass := Base.world.passprobe(q);
 				IF pass THEN 

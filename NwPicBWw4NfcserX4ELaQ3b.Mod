@@ -6,6 +6,7 @@ VAR vox: TexVox.TexCubeVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	IF vox=NIL THEN NEW(vox,"grain.png")  END;
+	vox.tscale:=1000;
 	RETURN vox
 END thisvox;
 

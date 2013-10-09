@@ -2,11 +2,7 @@
 <?bluebottle format version="0.1" ?>
 <?xml-stylesheet type="text/xsl" href="http://bluebottle.ethz.ch/bluebottle.xsl" ?>
 <Text>
-<Span style="Bold"><![CDATA[
-]]></Span><Span style="Normal"><![CDATA[
-	
-
-# LinuxAos
+<Span style="Normal"><![CDATA[# LinuxAos
 ]]></Span><Span style="Bold"><![CDATA[Compiler.Compile]]></Span><Span style="Normal"><![CDATA[
 	OpenGLConst.Mod
 	Unix.OpenGL.Mod
@@ -109,13 +105,7 @@ N2qeD84Fv78X2XEj8PtUZO8.Mod
 NH6nvNlOJNlCtpkDB56ljSx.Mod
 N2qeD84Fv78X2XEj8PtU342.Mod
 N2qeD84Fv78X2XEj8PtUZO7.Mod
-N2qeD84Fv78X2XEj8PtU667.Mod]]></Span><Span style="Normal"><![CDATA[
-
-
-
-
-
-
+N2qeD84Fv78X2XEj8PtU667.Mod
 
 
 
@@ -131,7 +121,7 @@ Compiler.Compile
 	 GLShaderUtils.Mod
 	 Win32.GLContext.Mod
 	 Win32.WGLinfo.Mod
-	~]]></Span><Span style="Normal"><![CDATA[
+	~
 
 
 

@@ -36,7 +36,7 @@ BEGIN
 	old := pool;
 	NEW(pool, LEN(pool)*2);
 	FOR i := 0 TO count-1 DO pool[i] := old[i] END;
-	Out.String("NM2 pool growing to ");
+	Out.String("NM3 pool growing to ");
 	Out.Int(count*2,10);
 END grow;
 
@@ -101,7 +101,7 @@ BEGIN
 	old := wipe;
 	NEW(wipe, count*2);
 	FOR i := 0 TO LEN(old)-1 DO wipe[i] := old[i] END;
-	Out.String("NM2 wipe growing to ");
+	Out.String("NM3 wipe growing to ");
 	Out.Int(count*2,10);
 END grow;
 
@@ -301,7 +301,7 @@ BEGIN
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);	
 				END;
 			END;
-		IF (ray.bla<0.1)OR((ray.ra<0.01)&(ray.ga<0.01)&(ray.ba<0.01))THEN ray.terminate:=TRUE 
+		IF (ray.bla<0.1)OR((ray.ra<0.01)OR(ray.ga<0.01)OR(ray.ba<0.01))THEN ray.terminate:=TRUE 
 		END;
 (*		out:=out OR (ray.length>0.02);		*)
 		UNTIL  out OR ray.terminate;
@@ -397,7 +397,7 @@ VAR
 BEGIN
 	fill(v);
 	blox[1,1,0]:=w;
-
+	
 	blox[0,1,1]:=w;	
 
 	blox[1,0,1]:=w;	
@@ -876,7 +876,15 @@ BEGIN
 				 			v.FRasterrecSolid(f,resolution,o,nextscale);
 				 		END
 				 	END
-				 END
+				 END;
+			ELSIF d2s<0 THEN
+				v:=f.voxel(p);
+				IF v#NIL THEN 
+					(* IF v IS cell THEN v:=v.deepcopy() END; *)
+					blox[i,j,k]:=v;
+				ELSE
+					nblox[i,j,k].color:=f.color(p);
+				END	
 			END	
 		END END END
 	END;
@@ -891,8 +899,7 @@ BEGIN
 						nbloxTF[i,j,k]:=TRUE;
 						nblox[i,j,k].normal:=f.normal(p)
 					END;
-					blox[i,j,k]:=v;	
-					blox[i,j,k]:=v;	
+					blox[i,j,k]:=v;
 				ELSE
 					IF f.normaltf(p) THEN
 						nbloxTF[i,j,k]:=TRUE;
@@ -947,7 +954,7 @@ VAR
 	cv,child:Voxel;
 	i,j,k: INTEGER;
 BEGIN
-	IF  ~copymarker & (code=NCODE) THEN
+	IF code=NCODE THEN
 		copymarker:=TRUE;
 		pool.new(c);
 		c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; c.alpha:=alpha;
@@ -1002,7 +1009,7 @@ BEGIN
 			IF b THEN
 				r.Bytes(name,0,NL,len);
 				blox[i,j,k]:=Base.VoxelFromName(name);
-				IF blox[i,j,k]#NIL THEN blox[i,j,k].sprout(r) END	
+				IF blox[i,j,k]#NIL THEN blox[i,j,k].sprout(r) END		
 			END;	
 		END END END	
 	END					

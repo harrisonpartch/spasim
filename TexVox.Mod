@@ -210,23 +210,22 @@ BEGIN
 			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 		END
 	END;
-	IF ray.length*ray.scale>100 THEN
+	IF ray.length*ray.scale>20 THEN
 		color:=texcube.side[ray.face].pixelmip0(lx,ly);
+		dot:= ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z); 
 	ELSE
 		color:=texcube.side[ray.face].pixel(lx,ly);
 		color1:=texcube.side[ray.face].pixelmip1(lx,ly);	
-		mip:=ray.length*1000;
+		mip:=ABS(ray.length*1000);
 		IF mip>1 THEN mip:=1 END; 
 		mipverse:=1-mip;
 		color.red:=(color1.red*mipverse+mip*color.red);
 		color.green:=(color1.green*mipverse+mip*color.green);
 		color.blue:=(color1.blue*mipverse+mip*color.blue);
 		color.alpha:=(color1.alpha*mipverse+mip*color.alpha);
-	END;
-	IF ray.normalTF THEN
-		dot:= ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z); 
-	ELSE	
-		dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z)
+		dot1:= ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z); 
+		dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
+		dot:=(dot1*mipverse+dot2*mip)
 	END;
 	dr:=color.red*dot*ray.ra;
 	dg:=color.green*dot*ray.ra;

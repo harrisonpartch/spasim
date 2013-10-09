@@ -1,6 +1,6 @@
 MODULE Marsh;
 IMPORT  Base , Retina, Engrainer, Random, CellAuto,
- XNXLFRep, Files, Streams, Commands, Out:=KernelLog;
+ FRep, Files, Streams, Commands, Out:=KernelLog;
 
 CONST sfile="marshstrokes.text"
 TYPE Voxel=Base.Voxel;
@@ -100,10 +100,12 @@ VAR
 	i,j,k,ii,jj,kk,iii,jjj,kkk,t,s: LONGINT;
 	cost: REAL;
 	up,flat,down,right,away,slant,p,pp,q,qq,center,undercenter, normal,xaxis,yaxis,zaxis: PT;
-	tnoise: XNXLFRep.tilednoise;
-	noise: XNXLFRep.noise;
-	gorgeplane: XNXLFRep.landscape;
-	plane: XNXLFRep.plane;
+	tnoise: FRep.tilednoise;
+	noise: FRep.noise;
+	bifr: FRep.bifr;;
+	gorgeplane: FRep.landscape;
+	plane: FRep.plane;
+	sphere: FRep.sphere;	
 	r,g,b: Base.Color;
 	red,blue,green: REAL;
 	EMPTY,cursormark:Voxel;
@@ -285,13 +287,14 @@ BEGIN
 	EMPTY.passable:=TRUE;
       rand:=Base.rand;	
 
-  	w10:=Base.VoxelFromName("NM3");	
- 	z10:=Base.VoxelFromName("NM3");	
+  	w10:=Base.VoxelFromName("NM2");	
+ 	z10:=Base.VoxelFromName("NM2");	
  	
-    
 	Out.String("EEEEP!");
-	xot:=Base.VoxelFromName("Nharrisonavatar"); 
+	xot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7"); 
 	push(xot);
+	gorge:=Base.VoxelFromName("NxxxGAernhjFK40xASZZVoQ"); 
+	push(gorge);
 	xot2:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 	
 	push(xot2);
 	msphere:=Base.VoxelFromName("NBsHFiBKkSckXBAd46Zbsss"); 	
@@ -306,8 +309,6 @@ BEGIN
        push(tigerlily);
  	iml:=Base.VoxelFromName("Niml");  
        push(iml);      
-	floop:=Base.VoxelFromName("NFLOOP");	
- 	push(floop);
      life:=Base.VoxelFromName("Nlife");  
        push(life);
   	MCUBE:=Base.VoxelFromName("Nr3kPtbyEYLFK3AN2UUVrqg");
@@ -395,8 +396,7 @@ BEGIN
 	push(sky2);
 	tigerlily:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  				
 	push(tigerlily);
-	gorge:=Base.VoxelFromName("NxxxGAernhjFK40xASZZVoQ"); 
-	push(gorge);
+
       harrison:=Base.VoxelFromName("Nharrisonavatar"); 
 	push(harrison);
  
@@ -423,21 +423,48 @@ BEGIN
 	noise.b:=1;
 	noise.c:=1;		
 	noise.octaves:=4;
-	noise.setvoxel(granite);
+	noise.setvoxel(axolotl);
 	noise.persistence:=3.1;
 	Out.String("EEEEP!");
-	Base.setPT(up,0,0,-1);
-	Base.setPT(center,1/2,1/2,11/12);
+	Base.setPT(up,0,0,1);
+	Base.setPT(center,1/2,1/2,1/2);
+	NEW(sphere,center,5/9);
+	sphere.vox:=lobster;	
+	NEW(bifr,sphere,noise);
+	w10.FRaster(sphere,8); 
+	Base.setPT(up,0,1,0);
+	NEW(plane,center,up);
+	plane.vox:=tigerlily;
+	w10.FRaster(plane,9); 
+	Base.setPT(up,1,0,0);
 	NEW(plane,center,up);
 	plane.vox:=tigerlily;	
-	z10.FRaster(plane,9); 	
-(*	w10.FRaster(plane,9); 
-	w10.FRaster(noise,9); 		
-	z10.FRaster(noise,81); 	
-	z10.FRaster(tnoise,81); 			
+	w10.FRaster(plane,9); 	
+	w10.copyonstroke:=FALSE;	
+	Base.setPT(up,0,0,1);
+	NEW(plane,center,up);
+	plane.vox:=w10;	
+	z10.FRaster(plane,9); 
+	Base.setPT(up,0,1,0);
+	NEW(plane,center,up);
+	plane.vox:=w10;
+	z10.FRaster(plane,9); 
+	Base.setPT(up,1,0,0);
+	NEW(plane,center,up);
+	plane.vox:=w10;	
+	z10.FRaster(plane,9); 			
+(*	z10.FRaster(noise,64); 	
+	NEW(noise);		
+	noise.seed:=666;		
+	noise.a:=3;
+	noise.b:=3;
+	noise.c:=3;		
+	noise.octaves:=3;
+	noise.setvoxel(w10);
+	noise.persistence:=3.1;
+	z10.FRaster(noise,27); 	
 	z10.setcolor(0,0,1,1,0); 
-*)	gorge.setcolor(0,0,0,0,0);
-	Base.world:=z10; 
+*)	Base.world:=z10; 
 (*	engrain;
 	sprout;
 *)	Base.avatar:=harrison;
