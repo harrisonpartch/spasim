@@ -1,5 +1,5 @@
 MODULE Retina;
-IMPORT  Base, Objects, Kernel, Out:=KernelLog, XNXLNoise,
+IMPORT  Base, Objects, Kernel, Out:=KernelLog, Noise,
 Math, XNXLMath, Raster, Graphics:=WMGraphics;
 
 TYPE
@@ -8,8 +8,8 @@ TYPE
 CONST
 	T=3;        
 	TS=8*8;   (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=6;
-	TH=4;
+	TW=4;
+	TH=3;
 	W*=TS*TW;
 	H*=TS*TH;
 

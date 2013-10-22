@@ -1,5 +1,5 @@
 MODULE XNXLVoxel;
-IMPORT Base, Random, Math, XNXLMath, XNXLE, XNXLHex, Noise:=XNXLNoise, Streams;
+IMPORT Base, Random, Math, XNXLMath, XNXLE, XNXLHex, Noise, Streams;
 
 CONST 	
 		NL=Base.NL;

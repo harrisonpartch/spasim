@@ -1,7 +1,7 @@
 MODULE NtxxZorqH5oWxECOCwH59AQ;(*anonymous module created by saboteur*)
   
 
-IMPORT Base,  Noise:=XNXLNoise;
+IMPORT Base,  Noise;
 
 TYPE Ray = Base.Ray;
 	Voxel = Base.Voxel;  

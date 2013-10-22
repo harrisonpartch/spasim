@@ -1,5 +1,5 @@
 MODULE TexVox;
-IMPORT Base, ALUT := OpenALUtil,  XNXLMath, Noise:=XNXLNoise, XNXLFilmLoop, Raster, Graphics := WMGraphics, Random, Math,Out := KernelLog; 
+IMPORT Base, ALUT := OpenALUtil,  XNXLMath, Noise, FilmLoop, Raster, Graphics := WMGraphics, Random, Math,Out := KernelLog; 
 
 TYPE PT = Base.PT;
 	Color = Base.Color;
@@ -449,7 +449,7 @@ END TexCubeVox;
 
 TYPE FloopVox* = OBJECT(Voxel);
 VAR
-	fl: XNXLFilmLoop.floop;
+	fl: FilmLoop.floop;
 	tscale: REAL;
 
 PROCEDURE&init*(fname: Name);

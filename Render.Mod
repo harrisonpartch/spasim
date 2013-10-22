@@ -387,8 +387,8 @@ BEGIN
 			| "x": Marsh.incVN
 			| "z": Marsh.decVN		
 			| "p":  camera.stop			
-			| "2" : msd:= msd*10/9
-			| "3" : 	msd:= msd*9/10
+			| "2" : 
+			| "3" : Base.gravity:= Base.gravity/1.5	
 			| "4" : Base.gravity:= 1.5*Base.gravity		
 			| "5" : Base.STOPGO
 			| "6" : avaTF:=~avaTF
@@ -764,7 +764,6 @@ VAR w: GLWindow;
 
 BEGIN
 	NEW(w, Retina.W*2,Retina.H*2);
-
 END Open;
 
 BEGIN

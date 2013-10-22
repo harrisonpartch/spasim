@@ -1,6 +1,6 @@
 MODULE Nrdvolvox;
 
-IMPORT Base, XNXLE, XNXLFRep;
+IMPORT Base, XNXLE, FRep;
 
 CONST	
 	M=10;
@@ -283,7 +283,7 @@ VAR
 	vox: RDVolVox; 
 	r,b,y: Base.Voxel;
 	center: Base.PT;
-	ball: XNXLFRep.sphere;
+	ball: FRep.sphere;
 	
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN	

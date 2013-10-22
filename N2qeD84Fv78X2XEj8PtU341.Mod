@@ -118,13 +118,12 @@ END OutlineVox;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
+	NEW(cage);
+	cage.setoutline(1/3,0,1/3,1/5);
 	RETURN cage
 END thisvox;
 
-BEGIN
-	NEW(cage);
-	cage.setoutline(1/3,0,1/3,1/3);
-	cage.copyonstroke:=TRUE;
+	
 END N2qeD84Fv78X2XEj8PtU341. 
  
 XNXLMarsh.Rez N2qeD84Fv78X2XEj8PtUZOQ ~

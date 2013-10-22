@@ -287,7 +287,7 @@ BEGIN
 	EMPTY.passable:=TRUE;
       rand:=Base.rand;	
 
-  	w10:=Base.VoxelFromName("NM2");	
+  	w10:=Base.VoxelFromName("Ngrollard");	
  	z10:=Base.VoxelFromName("NM2");	
  	
 	Out.String("EEEEP!");
@@ -315,6 +315,7 @@ BEGIN
 	push(MCUBE);
   	
 	cage:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");
+	cage.copyonstroke:=TRUE;
   	push(cage);
  	fuse:=Base.VoxelFromName("NFuse");
  	ASSERT(fuse#NIL);
@@ -422,9 +423,9 @@ BEGIN
 	noise.a:=1;
 	noise.b:=1;
 	noise.c:=1;		
-	noise.octaves:=4;
-	noise.setvoxel(axolotl);
-	noise.persistence:=3.1;
+	noise.octaves:=3;
+	noise.setvoxel(lobster);
+	noise.persistence:=3.8;
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,1/2);
@@ -440,7 +441,7 @@ BEGIN
 	NEW(plane,center,up);
 	plane.vox:=tigerlily;	
 	w10.FRaster(plane,9); 	
-	w10.copyonstroke:=FALSE;	
+	w10.copyonstroke:=TRUE;	
 	Base.setPT(up,0,0,1);
 	NEW(plane,center,up);
 	plane.vox:=w10;	
@@ -453,8 +454,8 @@ BEGIN
 	NEW(plane,center,up);
 	plane.vox:=w10;	
 	z10.FRaster(plane,9); 			
-(*	z10.FRaster(noise,64); 	
-	NEW(noise);		
+	z10.FRaster(noise,128); 	
+(*	NEW(noise);		
 	noise.seed:=666;		
 	noise.a:=3;
 	noise.b:=3;

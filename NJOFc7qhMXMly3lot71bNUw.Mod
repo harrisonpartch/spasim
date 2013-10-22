@@ -5,7 +5,7 @@ VAR vox: TexVox.TexVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	IF vox=NIL THEN NEW(vox,"rock.png")  END;
-	vox.tscale:=0;
+	vox.tscale:=10000;
 	RETURN vox
 END thisvox;
 

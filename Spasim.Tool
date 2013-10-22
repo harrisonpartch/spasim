@@ -35,12 +35,12 @@ Base.Mod
 XNXLE.Mod 
 XNXLMath.Mod
 XNXLHex.Mod
-XNXLNoise.Mod
+Noise.Mod
 XNXLVoxel.Mod
-XNXLFRep.Mod
+FRep.Mod
 Retina.Mod
-XNXLMPEG.Mod
-XNXLFilmLoop.Mod
+MPEG.Mod
+FilmLoop.Mod
 TexVox.Mod
 CellAuto.Mod
 XNXLVoxel4.Mod

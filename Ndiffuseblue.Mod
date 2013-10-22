@@ -1,6 +1,6 @@
 MODULE Ndiffuseblue;(*anonymous module created by saboteur*)
   
-IMPORT Base,  XNXLFRep;
+IMPORT Base, FRep;
 
 TYPE Ray = Base.Ray;
 	Voxel = Base.Voxel;  
@@ -41,7 +41,7 @@ END Shade;
 END DiffuseVox;	
 
 VAR 
-	ball: XNXLFRep.sphere;
+	ball: FRep.sphere;
 	n3ball, bb,v:Voxel;
 	blue:DiffuseVox;
 	center:  PT;

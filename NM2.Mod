@@ -1,5 +1,5 @@
 MODULE NM2; (*! This module may be either imported or used anonymously *)
-IMPORT Base, XNXLE, Noise:=XNXLNoise, XNXLFRep, Math, Out := KernelLog, Debugging, Streams,Strings;
+IMPORT Base, XNXLE, Noise, FRep, Math, Out := KernelLog, Debugging, Streams,Strings;
 
 CONST M=2;
 	MMO=M-1;
@@ -148,7 +148,6 @@ VAR
 	v: Voxel;
 	vdepth: REAL;
 	last:BOOLEAN;
-	dtl:REAL;
 BEGIN
 	ray.scale := ray.scale*M;
 	scaleInv := 1/ray.scale;
@@ -156,14 +155,13 @@ BEGIN
 	xyz.y := ABS(ray.lxyz.y-offset.y) * M;		
 	xyz.z := ABS(ray.lxyz.z-offset.z)* M;	
 	pushxyz:=xyz;	
-	IF DTL>ray.dtl THEN
-		dtl:=DTL
-	ELSE
-		dtl:=ray.dtl
-	END;
 	IF (ray.length*ray.scale>ray.dtl) THEN
 		IF imposter#NIL THEN
 			imposter.Shade(ray)
+		ELSIF nposterTF THEN
+			ray.normalTF:=TRUE;
+			ray.normal:=nposter.normal;
+			nshade(nposter,ray);
 		END	
 	ELSE	
 	XNXLE.E(xyz,ijk);
@@ -309,7 +307,6 @@ BEGIN
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
 	ray.popdelta.y := (xyz.y-pushxyz.y)/M;
 	ray.popdelta.z := (xyz.z-pushxyz.z)/M; 
-(*	ray.dtl:=Base.DTL;  *)
 	ray.scale := ray.scale/M;
 END Shade;
 
@@ -320,7 +317,8 @@ VAR
 BEGIN
 	dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z); 
 	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-	dot2:=dot2*0.7+0.3;
+	dot1:=dot1*0.7+0.3;
+	dot2:=dot*0.7+0.3;
 	IF ray.length*ray.scale<3 THEN mix:=1-(ray.length*ray.scale/6) ELSE mix:=0 END;
 	dot:=mix*dot2+(1-mix)*dot1;
 	dr:=nc.color.red*dot*ray.ra;
@@ -397,7 +395,7 @@ VAR
 BEGIN
 	fill(v);
 	blox[1,1,0]:=w;
-	
+
 	blox[0,1,1]:=w;	
 
 	blox[1,0,1]:=w;	
@@ -634,7 +632,8 @@ BEGIN
 			IF blox[i,j,k]#NIL THEN 
 				IF voxundo= NIL THEN voxundo:=blox[i,j,k] END;  
 				IF  blox[i,j,k].copyonstroke THEN
-					copy:=blox[i,j,k].deepcopy(); 
+					copy:=Base.VoxelFromName(blox[i,j,k].code);
+					copy.code:="";
 					copy.copyonstroke:=FALSE; 
 					copy.strokerec(p, resolution,nextscale,voxel,vu);					
 					blox[i,j,k]:=copy;
@@ -798,14 +797,22 @@ BEGIN
 				IF blox[i,j,k]=NIL THEN 
 					pool.new(newcell);
 					blox[i,j,k]:=newcell;
-					newcell.setcolor(red,green,blue,black,alpha);
+					IF f.normaltf(p) THEN
+						newcell.nposterTF:=TRUE;
+						newcell.nposter.normal:=f.normal(p)
+					END;
+					newcell.nposter.color:=f.color(p);
 					newcell.imposter:=f.getimposter(p);
 					newcell.FRasterrec(f,resolution,o,nextscale);
 				ELSE
-				 	v:=blox[i,j,k];  (* compiler disallows type tests and guards on array elements *)
-				 	IF v IS Voxel THEN
-				 		WITH v:Voxel DO
-				 			v.FRasterrec(f,resolution,o,nextscale);
+				 	v:=blox[i,j,k];  	 	  
+				 	IF v IS cell THEN
+				 		WITH v:cell DO
+				 			v.imposter:=f.voxel(p);
+							v.nposterTF:=TRUE;
+							v.nposter.normal:=f.normal(p);
+							v.nposter.color:=f.color(p);
+							v.FRasterrecSolid(f,resolution,o,nextscale)
 				 		END
 				 	END
 				 END
@@ -813,30 +820,19 @@ BEGIN
 		END END END
 	ELSE
 		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
-			p.x:=origin.x+(i+1/2)/MS; p.y:=origin.y+(j+1/2)/MS; p.z:=origin.z+(k+1/2)/MS;
-			d2s:=f.d2s(p);		
-			IF ABS(d2s)<CRDNS THEN 
-				v:=f.voxel(p);
-				IF v#NIL THEN 
-					(* IF v IS cell THEN v:=v.deepcopy() END; *)
-					IF f.normaltf(p) THEN
-						nbloxTF[i,j,k]:=TRUE;
-						nblox[i,j,k].normal:=f.normal(p)
-					END;
-					blox[i,j,k]:=v;	
-				ELSE
-					IF f.normaltf(p) THEN
-						nbloxTF[i,j,k]:=TRUE;
-						nblox[i,j,k].normal:=f.normal(p)
-					END;
-					nblox[i,j,k].color:=f.color(p);
-				END
-			END	
-		END END END
+			p.x:=origin.x+(i+1/2)/MS; p.y:=origin.y+(j+1/2)/MS; p.z:=origin.z+(k+1/2)/MS; 
+			d2s:=f.d2s(p);
+			IF ABS(d2s) < CRDNS THEN	
+				nbloxTF[i,j,k]:=TRUE;		
+				nblox[i,j,k].color:=f.color(p);
+				nblox[i,j,k].normal:=f.normal(p);
+				blox[i,j,k]:=f.voxel(p);
+			END
+		END END END		
 	END; 
 END FRasterrec;
 
-PROCEDURE FRasterrecSolid(f: FR; resolution: LONGINT; origin: PT; scale: LONGINT); (*origin is always in world space*)
+PROCEDURE FRasterrecSolid(f: FR; resolution: LONGINT; origin: PT; scale: LONGINT); 
 VAR
 	i,j,k,ii,jj,kk: INTEGER;
 	o,p:PT;
@@ -860,55 +856,43 @@ BEGIN
 				o.x:=p.x-1/TWOMS; o.y:=p.y-1/TWOMS; o.z:=p.z-1/TWOMS; (* p is center, o is corner *)
 				IF blox[i,j,k]=NIL THEN
 					pool.new(newcell);
-					IF f.in(p) THEN 
-						newcell.imposter:=f.getimposter(p);
-						newcell.nposterTF:=TRUE;
-						newcell.nposter.normal:=f.normal(p);
-						newcell.nposter.color:=f.color(p);
-						newcell.setcolor(red,green,blue,black,alpha);
-						newcell.FRasterrecSolid(f,resolution,o,nextscale)
-					END;	
+					newcell.imposter:=f.voxel(p);
+					newcell.nposterTF:=TRUE;
+					newcell.nposter.normal:=f.normal(p);
+					newcell.nposter.color:=f.color(p);
+					newcell.FRasterrecSolid(f,resolution,o,nextscale);
 					blox[i,j,k]:=newcell
 				ELSE
-				 	v:=blox[i,j,k];  (* compiler disallows type tests and guards on array elements *)
-				 	IF v IS Voxel THEN
-				 		WITH v:Voxel DO
-				 			v.FRasterrecSolid(f,resolution,o,nextscale);
+				 	v:=blox[i,j,k];		 	  
+				 	IF v IS cell THEN
+				 		WITH v:cell DO
+				 			v.imposter:=f.voxel(p);
+							v.nposterTF:=TRUE;
+							v.nposter.normal:=f.normal(p);
+							v.nposter.color:=f.color(p);
+							v.FRasterrecSolid(f,resolution,o,nextscale)
 				 		END
 				 	END
 				 END;
 			ELSIF d2s<0 THEN
-				v:=f.voxel(p);
-				IF v#NIL THEN 
-					(* IF v IS cell THEN v:=v.deepcopy() END; *)
-					blox[i,j,k]:=v;
-				ELSE
-					nblox[i,j,k].color:=f.color(p);
-				END	
+				nbloxTF[i,j,k]:=TRUE;	
+				nblox[i,j,k].color:=f.color(p);
+				nblox[i,j,k].normal:=f.normal(p);
+				blox[i,j,k]:=f.voxel(p);
 			END	
 		END END END
+	ELSE
+		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
+			p.x:=origin.x+(i+1/2)/MS; p.y:=origin.y+(j+1/2)/MS; p.z:=origin.z+(k+1/2)/MS; 
+			d2s:=f.d2s(p);
+			IF ABS(d2s) < CRDNS THEN	
+				nbloxTF[i,j,k]:=TRUE;		
+				nblox[i,j,k].color:=f.color(p);
+				nblox[i,j,k].normal:=f.normal(p);
+				blox[i,j,k]:=f.voxel(p);
+			END
+		END END END		
 	END;
-	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
-			p.x:=origin.x+(i+1/2)/MS; p.y:=origin.y+(j+1/2)/MS; p.z:=origin.z+(k+1/2)/MS;
-			d2s:=f.d2s(p);		
-			IF ABS(d2s)<CRDNS THEN 
-				v:=f.voxel(p);
-			IF v#NIL THEN 
-					(* IF v IS cell THEN v:=v.deepcopy() END; *)
-					IF f.normaltf(p) THEN
-						nbloxTF[i,j,k]:=TRUE;
-						nblox[i,j,k].normal:=f.normal(p)
-					END;
-					blox[i,j,k]:=v;
-				ELSE
-					IF f.normaltf(p) THEN
-						nbloxTF[i,j,k]:=TRUE;
-						nblox[i,j,k].normal:=f.normal(p)
-					END;
-					nblox[i,j,k].color:=f.color(p);
-				END
-			END 	
-		END END END
 END FRasterrecSolid;
 
 PROCEDURE FRaster*( f: FR; resolution: LONGINT); 

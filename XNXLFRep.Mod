@@ -1,6 +1,6 @@
 MODULE XNXLFRep;
 
-IMPORT Math, XNXLMath, Base, XNXLVoxel, Raster, Graphics:=WMGraphics, Noise:=XNXLNoise;
+IMPORT Math, XNXLMath, Base, XNXLVoxel, Raster, Graphics:=WMGraphics, Noise;
 	
 CONST
 	twopi = 2*Math.pi;
