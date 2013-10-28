@@ -124,7 +124,7 @@ BEGIN
 			IF pass THEN 
 				cvy:=0
 			ELSE			
-				x := cx; y := cy + cvy; z := cz+cvz+0.0001;	
+				x := cx; y := cy + cvy; z := cz+cvz+0.001;	
 				q:=Base.mkPT(x,y,z);
 				pass := Base.world.passprobe(q);
 				IF pass THEN 
@@ -316,14 +316,13 @@ BEGIN
 	camrotinertia:=100;
 	Base.DTL:=2500;
 	Base.DTL2:=2500;
-	Base.gravity:=0.00001;
+	Base.gravity:=0.000001;
 	Base.speed:=0.001;
 	Base.maxspeed:=0.0001;
 	Base.cursordist:=0.01;
 	R1:=100;
 	R2:=150;
 	Base.worldalive := TRUE;	
-
 	fogdensity:=0.11;
 	leftsticky:=10.0;
 	upsticky:=10.0;	
@@ -380,14 +379,15 @@ BEGIN
 			| "q": camera.upstrafe(0.51*Base.speed)	
 			| "n": leftsticky:=leftsticky*1.3; upsticky:=upsticky*1.3;
 			| "m": leftsticky:=leftsticky/1.3; upsticky:=upsticky/1.3;
-			| "o":
-			| "t": camera.glidetoggle 
+			| "o": GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_NEAREST)
+			| "t": GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR)
 			| "v":Marsh.engrain
 			| "c": Marsh.sprout 
 			| "x": Marsh.incVN
 			| "z": Marsh.decVN		
-			| "p":  camera.stop			
-			| "2" : 
+			| "p":  camera.stop	
+			| "1": Marsh.lighten		
+			| "2" : Marsh.darken
 			| "3" : Base.gravity:= Base.gravity/1.5	
 			| "4" : Base.gravity:= 1.5*Base.gravity		
 			| "5" : Base.STOPGO

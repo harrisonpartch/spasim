@@ -1,5 +1,5 @@
 MODULE NM2; (*! This module may be either imported or used anonymously *)
-IMPORT Base, XNXLE, Noise, FRep, Math, Out := KernelLog, Debugging, Streams,Strings;
+IMPORT Base, XNXLE, Noise, Math, Out := KernelLog, Debugging, Streams,Strings;
 
 CONST M=2;
 	MMO=M-1;
@@ -36,7 +36,7 @@ BEGIN
 	old := pool;
 	NEW(pool, LEN(pool)*2);
 	FOR i := 0 TO count-1 DO pool[i] := old[i] END;
-	Out.String("NM3 pool growing to ");
+	Out.String("NM2 pool growing to ");
 	Out.Int(count*2,10);
 END grow;
 
@@ -101,7 +101,7 @@ BEGIN
 	old := wipe;
 	NEW(wipe, count*2);
 	FOR i := 0 TO LEN(old)-1 DO wipe[i] := old[i] END;
-	Out.String("NM3 wipe growing to ");
+	Out.String("NM2 wipe growing to ");
 	Out.Int(count*2,10);
 END grow;
 
@@ -246,7 +246,8 @@ BEGIN
 				END;
 				newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
 			END;	
-			vdepth:=Base.distance(newxyz,xyz)*scaleInv; 
+			vdepth:=Base.distance(newxyz,xyz);
+			vdepth:=vdepth*scaleInv; 
 			ray.xyz.x:=ray.xyz.x +((newxyz.x-xyz.x)+ray.ddxyz.x)*scaleInv;
 			ray.xyz.y:=ray.xyz.y +((newxyz.y-xyz.y)+ray.ddxyz.y)*scaleInv;			
 			ray.xyz.z:=ray.xyz.z +((newxyz.z-xyz.z)+ray.ddxyz.z)*scaleInv;			
@@ -254,7 +255,8 @@ BEGIN
 			ray.length:=ray.length+vdepth;
 			blr:=black*vdepth;
 			ray.bla := ray.bla-blr; 
-			IF ray.bla>0.01 THEN	
+			IF ray.length<1/13  THEN	
+				out:=FALSE;
 				rr := red*vdepth*ray.ra; 
 				gr := green*vdepth*ray.ga; 
 				br := blue*vdepth*ray.ba; 	
@@ -265,19 +267,13 @@ BEGIN
 				ray.ga := (ray.ga-gr)-blr;
 				ray.ba := (ray.ba-br)-blr; 
 			ELSE
-				vdepth:=vdepth*(blr-(0.01-ray.bla)/blr);
-				rr := red*vdepth*ray.ra*ray.length; 
-				gr := green*vdepth*ray.ga*ray.length; 
-				br := blue*vdepth*ray.ba*ray.length; 	
-				ray.r := ray.r+rr;
-				ray.g:= ray.g+gr;
-				ray.b := ray.b+br; 
-				ray.ra := (ray.ra-rr)-blr;
-				ray.ga := (ray.ga-gr)-blr;
-				ray.ba := (ray.ba-br)-blr; 				
-				out:=TRUE
+				out:=TRUE;			
+				ray.terminate:=TRUE;
+				ray.b:= ray.b + ray.ba;
+				ray.r:= ray.r + ray.ra/2;
+				ray.g:= ray.g + ray.ga/2;	
 			END;	
-			bounds(ijk.i,ijk.j,ijk.k, out);			
+			IF ~out THEN bounds(ijk.i,ijk.j,ijk.k, out) END;	
 			IF ~out THEN
 				v := blox[ijk.i,ijk.j,ijk.k];		
 				IF (v#NIL) THEN
@@ -299,9 +295,6 @@ BEGIN
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);	
 				END;
 			END;
-		IF (ray.bla<0.1)OR((ray.ra<0.01)OR(ray.ga<0.01)OR(ray.ba<0.01))THEN ray.terminate:=TRUE 
-		END;
-(*		out:=out OR (ray.length>0.02);		*)
 		UNTIL  out OR ray.terminate;
 	END 		END;
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
@@ -796,6 +789,7 @@ BEGIN
 				o.x:=p.x-1/TWOMS; o.y:=p.y-1/TWOMS; o.z:=p.z-1/TWOMS; (* p is center, o is corner *)
 				IF blox[i,j,k]=NIL THEN 
 					pool.new(newcell);
+					newcell.setcolor(red,green,blue,black,alpha);
 					blox[i,j,k]:=newcell;
 					IF f.normaltf(p) THEN
 						newcell.nposterTF:=TRUE;
@@ -856,6 +850,7 @@ BEGIN
 				o.x:=p.x-1/TWOMS; o.y:=p.y-1/TWOMS; o.z:=p.z-1/TWOMS; (* p is center, o is corner *)
 				IF blox[i,j,k]=NIL THEN
 					pool.new(newcell);
+					newcell.setcolor(red,green,blue,black,alpha);
 					newcell.imposter:=f.voxel(p);
 					newcell.nposterTF:=TRUE;
 					newcell.nposter.normal:=f.normal(p);

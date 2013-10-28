@@ -318,7 +318,7 @@ BEGIN
 	cage.copyonstroke:=TRUE;
   	push(cage);
  	fuse:=Base.VoxelFromName("NFuse");
- 	ASSERT(fuse#NIL);
+
  	push(fuse);
 
 	gxy:=Base.VoxelFromName("NmOgKSH5ZXYP3DODELOkO7g"); 	
@@ -420,12 +420,12 @@ BEGIN
 
 	NEW(noise);		
 	noise.seed:=123666;		
-	noise.a:=1;
-	noise.b:=1;
-	noise.c:=1;		
-	noise.octaves:=3;
+	noise.a:=2;
+	noise.b:=2;
+	noise.c:=2;		
+	noise.octaves:=4;
 	noise.setvoxel(lobster);
-	noise.persistence:=3.8;
+	noise.persistence:=3.1;
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,1/2);
@@ -434,6 +434,7 @@ BEGIN
 	NEW(bifr,sphere,noise);
 	w10.FRaster(sphere,8); 
 	Base.setPT(up,0,1,0);
+	Base.setPT(center,1/2,0,1/2);
 	NEW(plane,center,up);
 	plane.vox:=tigerlily;
 	w10.FRaster(plane,9); 
@@ -446,16 +447,18 @@ BEGIN
 	NEW(plane,center,up);
 	plane.vox:=w10;	
 	z10.FRaster(plane,9); 
-	Base.setPT(up,0,1,0);
+	z10.FRaster(noise,64); 	
+(*	Base.setPT(up,0,1,0);
 	NEW(plane,center,up);
 	plane.vox:=w10;
 	z10.FRaster(plane,9); 
 	Base.setPT(up,1,0,0);
 	NEW(plane,center,up);
-	plane.vox:=w10;	
+	plane.vox:=w10;
+	z10.setcolor(0,0,1,0.021,0); 	
 	z10.FRaster(plane,9); 			
-	z10.FRaster(noise,128); 	
-(*	NEW(noise);		
+	
+	NEW(noise);		
 	noise.seed:=666;		
 	noise.a:=3;
 	noise.b:=3;
@@ -464,31 +467,31 @@ BEGIN
 	noise.setvoxel(w10);
 	noise.persistence:=3.1;
 	z10.FRaster(noise,27); 	
-	z10.setcolor(0,0,1,1,0); 
+	
 *)	Base.world:=z10; 
 (*	engrain;
 	sprout;
 *)	Base.avatar:=harrison;
 	Base.avatarsize:=1000;
-	Out.String("EEEEP!");
 END dawn;
 
 PROCEDURE darken*;
 BEGIN
 	atmdark:= atmdark*1.5;
-	Base.world.setcolor(0,0,atmdark,atmdark,atmdark);	
+	Base.world.setcolor(atmdark,0,0,atmdark,0);	
 END darken;
 
 PROCEDURE lighten*;
 BEGIN
 	IF atmdark>0.11 THEN atmdark:= atmdark/1.5 END;
-	Base.world.setcolor(0,0,atmdark,atmdark,atmdark);	
+	Base.world.setcolor(atmdark,0,0,atmdark,0);	
 END lighten
 
 BEGIN
 	NEW(marshv);
 	cursorsize:=512;
 	cursorTF:=TRUE;
+	atmdark:=1.2;
 	SNIPEINTO:=TRUE;
 END Marsh.
 

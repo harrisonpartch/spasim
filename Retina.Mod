@@ -8,8 +8,8 @@ TYPE
 CONST
 	T=3;        
 	TS=8*8;   (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=4;
-	TH=3;
+	TW=5;
+	TH=4;
 	W*=TS*TW;
 	H*=TS*TH;
 
@@ -281,8 +281,8 @@ BEGIN
 			angletoray(ray,theta,phi);
 			Base.world.Shade(ray);
 			IF ~ray.terminate THEN
-				ray.b:= ray.b + ray.ba;
-				ray.r:= ray.r + ray.ra/2;
+				ray.b:= ray.b + ray.ba/2;
+				ray.r:= ray.r + ray.ra;
 				ray.g:= ray.g + ray.ga/2;	
 			END;
 			Base.clamp3(ray.r,ray.g,ray.b);
@@ -309,8 +309,8 @@ BEGIN
 			angletoray(ray,theta,phi);
 			Base.world.Shade(ray);
 			IF ~ray.terminate THEN
-				ray.b:= ray.b + ray.ba;
-				ray.r:= ray.r + ray.ra/2;
+				ray.b:= ray.b + ray.ba/2;
+				ray.r:= ray.r + ray.ra;
 				ray.g:= ray.g + ray.ga/2;	
 			END;	
 			Base.clamp3(ray.r,ray.g,ray.b);
