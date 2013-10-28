@@ -146,7 +146,7 @@ VAR
 	scaleInv:REAL; 
 	out,shadenil,A,B,C: BOOLEAN;
 	v: Voxel;
-	vdepth: REAL;
+	vdepth, blainv: REAL;
 	last:BOOLEAN;
 BEGIN
 	ray.scale := ray.scale*M;
@@ -247,6 +247,7 @@ BEGIN
 				newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
 			END;	
 			vdepth:=Base.distance(newxyz,xyz);
+			IF vdepth>1 THEN vdepth:=1 END; 
 			vdepth:=vdepth*scaleInv; 
 			ray.xyz.x:=ray.xyz.x +((newxyz.x-xyz.x)+ray.ddxyz.x)*scaleInv;
 			ray.xyz.y:=ray.xyz.y +((newxyz.y-xyz.y)+ray.ddxyz.y)*scaleInv;			
@@ -255,25 +256,17 @@ BEGIN
 			ray.length:=ray.length+vdepth;
 			blr:=black*vdepth;
 			ray.bla := ray.bla-blr; 
-			IF ray.length<1/13  THEN	
-				out:=FALSE;
-				rr := red*vdepth*ray.ra; 
-				gr := green*vdepth*ray.ga; 
-				br := blue*vdepth*ray.ba; 	
-				ray.r := ray.r+rr;
-				ray.g:= ray.g+gr;
-				ray.b := ray.b+br; 
-				ray.ra := (ray.ra-rr)-blr;
-				ray.ga := (ray.ga-gr)-blr;
-				ray.ba := (ray.ba-br)-blr; 
-			ELSE
-				out:=TRUE;			
-				ray.terminate:=TRUE;
-				ray.b:= ray.b + ray.ba;
-				ray.r:= ray.r + ray.ra/2;
-				ray.g:= ray.g + ray.ga/2;	
-			END;	
-			IF ~out THEN bounds(ijk.i,ijk.j,ijk.k, out) END;	
+			blainv:=1-ray.bla;
+			rr := red*vdepth*ray.ra*blainv; 
+			gr := green*vdepth*ray.ga*blainv; 
+			br := blue*vdepth*ray.ba*blainv; 	
+			ray.r := ray.r+rr;
+			ray.g:= ray.g+gr;
+			ray.b := ray.b+br; 
+			ray.ra := (ray.ra-rr)-blr;
+			ray.ga := (ray.ga-gr)-blr;
+			ray.ba := (ray.ba-br)-blr; 
+			bounds(ijk.i,ijk.j,ijk.k, out);	
 			IF ~out THEN
 				v := blox[ijk.i,ijk.j,ijk.k];		
 				IF (v#NIL) THEN

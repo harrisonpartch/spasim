@@ -288,7 +288,7 @@ BEGIN
       rand:=Base.rand;	
 
   	w10:=Base.VoxelFromName("Ngrollard");	
- 	z10:=Base.VoxelFromName("NM2");	
+ 	z10:=Base.VoxelFromName("NM3");	
  	
 	Out.String("EEEEP!");
 	xot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7"); 
@@ -448,6 +448,7 @@ BEGIN
 	plane.vox:=w10;	
 	z10.FRaster(plane,9); 
 	z10.FRaster(noise,64); 	
+	z10.setcolor(0,0,1,0.021,0); 	
 (*	Base.setPT(up,0,1,0);
 	NEW(plane,center,up);
 	plane.vox:=w10;
@@ -455,7 +456,7 @@ BEGIN
 	Base.setPT(up,1,0,0);
 	NEW(plane,center,up);
 	plane.vox:=w10;
-	z10.setcolor(0,0,1,0.021,0); 	
+		
 	z10.FRaster(plane,9); 			
 	
 	NEW(noise);		
@@ -478,13 +479,13 @@ END dawn;
 PROCEDURE darken*;
 BEGIN
 	atmdark:= atmdark*1.5;
-	Base.world.setcolor(atmdark,0,0,atmdark,0);	
+	Base.world.setcolor(atmdark,0,atmdark,atmdark/3,0);	
 END darken;
 
 PROCEDURE lighten*;
 BEGIN
 	IF atmdark>0.11 THEN atmdark:= atmdark/1.5 END;
-	Base.world.setcolor(atmdark,0,0,atmdark,0);	
+	Base.world.setcolor(atmdark,0,atmdark,atmdark/3,0);	
 END lighten
 
 BEGIN
