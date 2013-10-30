@@ -288,7 +288,7 @@ BEGIN
       rand:=Base.rand;	
 
   	w10:=Base.VoxelFromName("Ngrollard");	
- 	z10:=Base.VoxelFromName("NM3");	
+ 	z10:=Base.VoxelFromName("NM2");	
  	
 	Out.String("EEEEP!");
 	xot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7"); 
@@ -309,7 +309,7 @@ BEGIN
        push(tigerlily);
  	iml:=Base.VoxelFromName("Niml");  
        push(iml);      
-     life:=Base.VoxelFromName("Nlife");  
+     	life:=Base.VoxelFromName("Nlife");  
        push(life);
   	MCUBE:=Base.VoxelFromName("Nr3kPtbyEYLFK3AN2UUVrqg");
 	push(MCUBE);
@@ -425,7 +425,7 @@ BEGIN
 	noise.c:=2;		
 	noise.octaves:=4;
 	noise.setvoxel(lobster);
-	noise.persistence:=3.1;
+	noise.persistence:=3.7;
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,1/2);
@@ -479,13 +479,13 @@ END dawn;
 PROCEDURE darken*;
 BEGIN
 	atmdark:= atmdark*1.5;
-	Base.world.setcolor(atmdark,0,atmdark,atmdark/3,0);	
+	Base.world.setcolor(atmdark,atmdark,atmdark,atmdark/130,0);	
 END darken;
 
 PROCEDURE lighten*;
 BEGIN
 	IF atmdark>0.11 THEN atmdark:= atmdark/1.5 END;
-	Base.world.setcolor(atmdark,0,atmdark,atmdark/3,0);	
+	Base.world.setcolor(atmdark,atmdark,atmdark,atmdark/130,0);	
 END lighten
 
 BEGIN

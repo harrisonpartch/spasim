@@ -247,7 +247,7 @@ BEGIN
 				newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
 			END;	
 			vdepth:=Base.distance(newxyz,xyz);
-			IF vdepth>1 THEN vdepth:=1 END; 
+(*			IF vdepth>1 THEN vdepth:=1 END; *)
 			vdepth:=vdepth*scaleInv; 
 			ray.xyz.x:=ray.xyz.x +((newxyz.x-xyz.x)+ray.ddxyz.x)*scaleInv;
 			ray.xyz.y:=ray.xyz.y +((newxyz.y-xyz.y)+ray.ddxyz.y)*scaleInv;			
@@ -374,20 +374,6 @@ BEGIN
 		IF ODD(i+j+k) THEN blox[i,j,k] := v ELSE blox[i,j,k] := w END
 	END END END
 END fillchequer;
-
-PROCEDURE fillsierp*(v,w: Voxel);
-VAR
-	i,j,k: INTEGER;
-BEGIN
-	fill(v);
-	blox[1,1,0]:=w;
-
-	blox[0,1,1]:=w;	
-
-	blox[1,0,1]:=w;	
-
-	blox[1,1,1]:=w;	
-END fillsierp;
 
 PROCEDURE fillcqr2*(v,w: Voxel);
 VAR
