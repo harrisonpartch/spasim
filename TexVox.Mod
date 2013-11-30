@@ -1,5 +1,5 @@
 MODULE TexVox;
-IMPORT Base, ALUT := OpenALUtil,  XNXLMath, Noise, FilmLoop, Raster, Graphics := WMGraphics, Random, Math,Out := KernelLog; 
+IMPORT Base, (* ALUT := OpenALUtil, *)  XNXLMath, Noise, FilmLoop, Raster, Graphics := WMGraphics, Random, Math,Out := KernelLog; 
 
 TYPE PT = Base.PT;
 	Color = Base.Color;
@@ -48,11 +48,14 @@ BEGIN
 	dr:=color.red*dot*ray.ra;
 	dg:=color.green*dot*ray.ra;
 	db:=color.blue*dot*ray.ra;	
-	IF (color.alpha<0.9) THEN			
-		ray.ra:=ray.ra-0.1;
-		ray.ga:=ray.ga-0.1;
-		ray.ba:=ray.ba-0.1;
-		mirror(ray)
+	IF color.alpha<0.9 THEN
+			ray.r := ray.r + dr*color.alpha;
+			ray.ra:=ray.ra-(dr*color.alpha)-0.1;
+			ray.g := ray.g + dg*color.alpha;
+			ray.ga:=ray.ga-(dg*color.alpha)-0.1;
+			ray.b := ray.b + db*color.alpha;
+			ray.ba:=ray.ba-(db*color.alpha)-0.1;
+			IF TRUE (* color.alpha>0.5 *) THEN mirror(ray) END
 	ELSE
 		ray.r := ray.r + dr;
 		ray.g := ray.g + dg;
@@ -232,12 +235,12 @@ BEGIN
 	db:=color.blue*dot*ray.ra;	
 	IF color.alpha<0.9 THEN
 			ray.r := ray.r + dr*color.alpha;
-			ray.ra:=ray.ra-dr*color.alpha-0.1;
+			ray.ra:=ray.ra-(dr*color.alpha)-0.1;
 			ray.g := ray.g + dg*color.alpha;
-			ray.ga:=ray.ga-dg*color.alpha-0.1;
+			ray.ga:=ray.ga-(dg*color.alpha)-0.1;
 			ray.b := ray.b + db*color.alpha;
-			ray.ba:=ray.ba-db*color.alpha-0.1;
-			IF color.alpha>0.5 THEN mirror(ray) END
+			ray.ba:=ray.ba-(db*color.alpha)-0.1;
+			IF TRUE (* color.alpha>0.5 *) THEN mirror(ray) END
 	ELSE
 		ray.r := ray.r + dr;
 		ray.g := ray.g + dg;
@@ -389,11 +392,11 @@ BEGIN
 	db:=color.blue*dot*ray.ra;	
 	IF color.alpha<0.9 THEN
 			ray.r := ray.r + dr*color.alpha;
-			ray.ra:=ray.ra-dr*color.alpha-0.1;
+			ray.ra:=ray.ra-(dr*color.alpha)-0.1;
 			ray.g := ray.g + dg*color.alpha;
-			ray.ga:=ray.ga-dg*color.alpha-0.1;
+			ray.ga:=ray.ga-(dg*color.alpha)-0.1;
 			ray.b := ray.b + db*color.alpha;
-			ray.ba:=ray.ba-db*color.alpha-0.1;
+			ray.ba:=ray.ba-(db*color.alpha)-0.1;
 			IF color.alpha>0.5 THEN 
 				mirror(ray) 
 			ELSE (* if the pixel is transparent, trace to the back side of the cube *)
@@ -412,12 +415,12 @@ BEGIN
 				dg:=color.green*dot*ray.ra;
 				db:=color.blue*dot*ray.ra;	
 				IF color.alpha<0.9 THEN
-					ray.r := ray.r + dr*color.alpha;
-					ray.ra:=ray.ra-dr*color.alpha-0.1;
-					ray.g := ray.g + dg*color.alpha;
-					ray.ga:=ray.ga-dg*color.alpha-0.1;
-					ray.b := ray.b + db*color.alpha;
-					ray.ba:=ray.ba-db*color.alpha-0.1;
+				ray.r := ray.r + dr*color.alpha;
+				ray.ra:=ray.ra-(dr*color.alpha)-0.1;
+				ray.g := ray.g + dg*color.alpha;
+				ray.ga:=ray.ga-(dg*color.alpha)-0.1;
+				ray.b := ray.b + db*color.alpha;
+				ray.ba:=ray.ba-(db*color.alpha)-0.1;
 					IF color.alpha>0.5 THEN 
 						mirror(ray) 	
 					END	
@@ -450,12 +453,13 @@ END TexCubeVox;
 TYPE FloopVox* = OBJECT(Voxel);
 VAR
 	fl: FilmLoop.floop;
-	tscale: REAL;
+	tscale*: REAL;
 
 PROCEDURE&init*(fname: Name);
 BEGIN
 	NEW(fl,fname);
 	tscale:=81;
+	lock;
 END init;
 
 PROCEDURE Shade (VAR ray: Ray);

@@ -1,5 +1,5 @@
 MODULE Render;
-IMPORT Kernel, Objects, Random, Marsh, ALUT := OpenALUtil, (*XNXLAudio,*)
+IMPORT Kernel, Objects, Random, Marsh,(* ALUT := OpenALUtil, XNXLAudio,*)
  Out := KernelLog, Math,XNXLMath, Base,  Retina, GLW := OGLWindow, 
 	 GL:=OpenGL, GLC := OpenGLConst,  GLSL:= GLShaderUtils,
 	 Inputs,  Raster, Strings,Streams;
@@ -314,7 +314,7 @@ BEGIN
 	foveasize := 100;
 	multicore:=TRUE;
 	camrotinertia:=100;
-	Base.DTL:=2500;
+	Base.DTL:=25000;
 	Base.DTL2:=2500;
 	Base.gravity:=0.000001;
 	Base.speed:=0.001;
@@ -327,7 +327,7 @@ BEGIN
 	leftsticky:=10.0;
 	upsticky:=10.0;	
 	Out.String('*line 1217!*');
-	msd:=50;
+	msd:=40;
 END OnLoad;
 
 PROCEDURE Reshape(w, h: LONGINT);
@@ -514,7 +514,7 @@ BEGIN
 	GL.GenTextures(1, ADDRESSOF(image));
 	GL.BindTexture(GLC.GL_TEXTURE_2D, image); 
 	(* These determine how interpolation is made when image scaled down on up *)
-	GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_NEAREST);
+	GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER,  GLC.GL_LINEAR);
 	GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_NEAREST);
 	GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height, 0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr);
 
@@ -764,6 +764,7 @@ VAR w: GLWindow;
 
 BEGIN
 	NEW(w, Retina.W*2,Retina.H*2);
+	Base.STOPGO
 END Open;
 
 BEGIN

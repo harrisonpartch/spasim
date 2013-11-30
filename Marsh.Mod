@@ -277,7 +277,7 @@ PROCEDURE dawn*;
 VAR
 	z10: Voxel;
 	sfish,gxy,w10,w11,v,lobster, btx,ash, dotz, GREEN,PURPLE,MCUBE:Voxel;
-	undo,rd,blu, die,gren,granite,sand,whiteblock,lazy,pdestroyer,axolotl,xen,sky1,sky2,tigerlily,cloud: Voxel;
+	undo,rd, rdpseudosolid, blu, die,gren,granite,sand,whiteblock,lazy,pdestroyer,axolotl,xen,sky1,sky2,tigerlily,cloud: Voxel;
 	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison,fuse:Voxel;
 	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,cage,floop,volvox,life,iml: Voxel;
 	 
@@ -289,7 +289,7 @@ BEGIN
 
   	w10:=Base.VoxelFromName("Ngrollard");	
  	z10:=Base.VoxelFromName("NM2");	
- 	
+ 	push(z10);
 	Out.String("EEEEP!");
 	xot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7"); 
 	push(xot);
@@ -298,11 +298,13 @@ BEGIN
 	xot2:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 	
 	push(xot2);
 	msphere:=Base.VoxelFromName("NBsHFiBKkSckXBAd46Zbsss"); 	
-	push(msphere);	
+	(* push(msphere);	*)
  	volvox:=Base.VoxelFromName("Nrdvolvox");  	
        push(volvox);
+       rdpseudosolid:=Base.VoxelFromName("Nrdpseudosolid"); 
+       push(rdpseudosolid);
 	beatrix:=Base.VoxelFromName("NwPicBWw4NfcserX4ELaQ3b"); 
-	push(beatrix);
+
        lobster:=Base.VoxelFromName("NznGx2ySiHIGrO5t9Pzcw5Q"); 
 	push(lobster);
 	tigerlily:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  
@@ -311,7 +313,9 @@ BEGIN
        push(iml);      
      	life:=Base.VoxelFromName("Nlife");  
        push(life);
-  	MCUBE:=Base.VoxelFromName("Nr3kPtbyEYLFK3AN2UUVrqg");
+(*      	floop:=Base.VoxelFromName("NFLOOP");  
+       push(floop);
+*)     	MCUBE:=Base.VoxelFromName("Nr3kPtbyEYLFK3AN2UUVrqg");
 	push(MCUBE);
   	
 	cage:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");
@@ -405,27 +409,27 @@ BEGIN
 	Base.setPT(center,1/2,1/2,1/12);
 	NEW(tnoise);
 	tnoise.seed:=123666;	
-	tnoise.a:=5;
-	tnoise.b:=5;
-	tnoise.c:=5;		
+	tnoise.a:=3;
+	tnoise.b:=3;
+	tnoise.c:=3;		
 	tnoise.octaves:=4;
-	tnoise.persistence:=3.1;
+	tnoise.persistence:=3.9;
 	tnoise.setvoxel(dotz);
-	tnoise.va[0]:=w10;
-	tnoise.va[1]:=axolotl;
+	tnoise.va[0]:=cthulhu;
+	tnoise.va[1]:=sparx;
 	tnoise.va[2]:=lobster;
-	tnoise.va[3]:=tigerlily;
-	tnoise.va[4]:=granite;
-	tnoise.va[5]:=btx;	
+	tnoise.va[3]:=blacksun;
+	tnoise.va[4]:=floop;
+	tnoise.va[5]:=sky;	
 
 	NEW(noise);		
 	noise.seed:=123666;		
-	noise.a:=2;
-	noise.b:=2;
-	noise.c:=2;		
+	noise.a:=3;
+	noise.b:=3;
+	noise.c:=3;		
 	noise.octaves:=4;
-	noise.setvoxel(lobster);
-	noise.persistence:=3.7;
+	noise.setvoxel(sky1);
+	noise.persistence:=3.2;
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,1/2);
@@ -436,7 +440,7 @@ BEGIN
 	Base.setPT(up,0,1,0);
 	Base.setPT(center,1/2,0,1/2);
 	NEW(plane,center,up);
-	plane.vox:=tigerlily;
+	plane.vox:=floop;
 	w10.FRaster(plane,9); 
 	Base.setPT(up,1,0,0);
 	NEW(plane,center,up);
@@ -445,10 +449,10 @@ BEGIN
 	w10.copyonstroke:=TRUE;	
 	Base.setPT(up,0,0,1);
 	NEW(plane,center,up);
-	plane.vox:=w10;	
-	z10.FRaster(plane,9); 
+	plane.vox:=floop;	
+(*	z10.FRaster(plane,64); *)
 	z10.FRaster(noise,64); 	
-	z10.setcolor(0,0,1,0.021,0); 	
+	z10.setcolor(3,0,0,0,0); 	
 (*	Base.setPT(up,0,1,0);
 	NEW(plane,center,up);
 	plane.vox:=w10;
@@ -479,13 +483,13 @@ END dawn;
 PROCEDURE darken*;
 BEGIN
 	atmdark:= atmdark*1.5;
-	Base.world.setcolor(atmdark,atmdark,atmdark,atmdark/130,0);	
+	Base.world.setcolor(atmdark,0,0,atmdark/3,0);	
 END darken;
 
 PROCEDURE lighten*;
 BEGIN
 	IF atmdark>0.11 THEN atmdark:= atmdark/1.5 END;
-	Base.world.setcolor(atmdark,atmdark,atmdark,atmdark/130,0);	
+	Base.world.setcolor(atmdark,0,0,atmdark/3,0);	
 END lighten
 
 BEGIN

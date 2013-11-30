@@ -1,6 +1,6 @@
 MODULE Base;
 
-IMPORT  Math:=Math, Random, Kernel, Out:=KernelLog (*DebugLog*), Objects, AL:=OpenAL, ALUT := OpenALUtil,  
+IMPORT  Math:=Math, Random, Kernel, Out:=KernelLog (*DebugLog*), Objects, (* AL:=OpenAL, ALUT := OpenALUtil,  *)
 Strings, Streams, WMFontManager, Raster, WMRasterScale, WMRectangles, Graphics := WMGraphics, Commands(*, XNXLAudio*);
 
 CONST
@@ -534,11 +534,11 @@ VAR
 	rnf*:REAL; (*random number for frame*);
 	sniperay*:Ray;
 
-	basesource*, texsound*, grainsound*: AL.ALuint;
+(*	basesource*, texsound*, grainsound*: AL.ALuint;
 	listenerPos*: ARRAY [3] OF AL.ALfloat; (* global position *)
 	sourcePos: ARRAY 3 OF AL.ALfloat;
 	buffer1*, buffer2*, buffer3* : AL.ALuint;	
-	
+*)	
 PROCEDURE VoxelFromName*(modname: Name): Voxel;
 	VAR voxel: Voxel;  fackery: VoxelFackery;
 	BEGIN
@@ -1116,8 +1116,8 @@ END ExitF;
 
 PROCEDURE InitSounds;
 
-BEGIN
-	ALUT.OpenPlayDevice();
+(*BEGIN
+*(	ALUT.OpenPlayDevice();
 	buffer1 := ALUT.LoadWavFileToBuffer("grain.wav");
 	
 	 AL.alGenSources(1, ADDRESSOF(basesource));
@@ -1148,6 +1148,7 @@ BEGIN
 	listenerPos := [0.0, 0.0, 0.0];
 	AL.alListenerfv(AL.AL_POSITION, ADDRESSOF(listenerPos[0]));
 	ALUT.ALWriteError("2-loadwav: ");	
+*)
 END InitSounds;
 
 BEGIN

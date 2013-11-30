@@ -5,8 +5,8 @@ VAR
 	vox: TexVox.TexVox; 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN	
-	IF vox=NIL THEN NEW(vox,"lobster.png");
-	vox.tscale:=64
+	IF vox=NIL THEN NEW(vox,"mule.png");
+	vox.tscale:=666
  END;
 	RETURN vox
 END thisvox;
