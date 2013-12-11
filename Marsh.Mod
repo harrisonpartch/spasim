@@ -291,7 +291,7 @@ BEGIN
  	z10:=Base.VoxelFromName("NM2");	
  	push(z10);
 	Out.String("EEEEP!");
-	xot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7"); 
+	xot:=Base.VoxelFromName("N5a2g4M6HYjPJxYSNQvYyv7"); 
 	push(xot);
 	gorge:=Base.VoxelFromName("NxxxGAernhjFK40xASZZVoQ"); 
 	push(gorge);
@@ -395,9 +395,9 @@ BEGIN
 	push(rat);
 	conglo2:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZOq"); 	
 	push(conglo2);
-	sky1:=Base.VoxelFromName("N5a2g4M6HYjPJxYSNQvYyvw"); 	
+	sky1:=Base.VoxelFromName("N5a2g4M6HYjPJxYSNQvYy7"); 	
 	push(sky1);
-	sky2:=Base.VoxelFromName("NUzl1lqmBmaKyswkc70kO3w"); 	
+	sky2:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXXBiQ"); 	
 	push(sky2);
 	tigerlily:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  				
 	push(tigerlily);
@@ -428,7 +428,7 @@ BEGIN
 	noise.b:=3;
 	noise.c:=3;		
 	noise.octaves:=4;
-	noise.setvoxel(sky1);
+	noise.setvoxel(sky2);
 	noise.persistence:=3.2;
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);

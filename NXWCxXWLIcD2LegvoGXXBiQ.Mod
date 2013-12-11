@@ -49,7 +49,7 @@ blue: Voxel;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	beatrix:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw"); 
-	lobster:=Base.VoxelFromName("NznGx2ySiHIGrO5t9Pzcw5Q"); 
+	lobster:=Base.VoxelFromName("N5a2g4M6HYjPJxYSNQvYyv7"); 
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	blue:=Base.VoxelFromName("Ndiffuseblue"); 
 	subserp:=Base.VoxelFromName("NM3"); 	
@@ -59,7 +59,7 @@ BEGIN
 	subserp.DTL:=30;
 (*	subserp.imposter:=greenball;		*)
 
-	serp.DTL:=10;	
+	serp.DTL:=30;	
 
 	subserp.fill(blue);
 
@@ -79,17 +79,18 @@ BEGIN
 	subserp.stroke(Base.mkPT(1,0,1),1,beatrix,v);		
 	subserp.stroke(Base.mkPT(1,1,1),1,greenball,v);	
 *)	serp.fill(serp);	
-	serp.imposter:=blue;
-	serp.stroke(Base.mkPT(1/2,1/2,1/2),1,lobster,v);
-	serp.stroke(Base.mkPT(1/2,0,1),1,lobster,v);
-	serp.stroke(Base.mkPT(1/2,1,0),1,lobster,v);
-	serp.stroke(Base.mkPT(0,0,1/2),1,lobster,v);	
-	serp.stroke(Base.mkPT(0,1,1/2),1,lobster,v);
-	serp.stroke(Base.mkPT(1,0,1/2),1,lobster,v);	
-	serp.stroke(Base.mkPT(1,1,1/2),1,lobster,v);
+	serp.imposter:=lobster;
+	serp.stroke(Base.mkPT(1/2,1/2,1/2),1,NIL,v);
+	serp.stroke(Base.mkPT(1/2,0,1),1,NIL,v);
+	serp.stroke(Base.mkPT(1/2,1,0),1,NIL,v);
+	serp.stroke(Base.mkPT(0,0,1/2),1,NIL,v);	
+	serp.stroke(Base.mkPT(0,1,1/2),1,NIL,v);
+	serp.stroke(Base.mkPT(1,0,1/2),1,NIL,v);	
+	serp.stroke(Base.mkPT(1,1,1/2),1,NIL,v);
 	subserp.copyonstroke:=TRUE;	
 	serp.copyonstroke:=TRUE;	
 	beatrix.copyonstroke:=TRUE;
+	serp.probelock:=TRUE;
 	RETURN serp
 END thisvox;
  END NXWCxXWLIcD2LegvoGXXBiQ. 

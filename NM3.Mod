@@ -155,7 +155,7 @@ BEGIN
 	xyz.y := ABS(ray.lxyz.y-offset.y) * M;		
 	xyz.z := ABS(ray.lxyz.z-offset.z)* M;	
 	pushxyz:=xyz;	
-	IF (ray.length*ray.scale>ray.dtl) THEN
+	IF (ray.length*ray.scale>DTL) THEN
 		IF imposter#NIL THEN
 			imposter.Shade(ray)
 		ELSIF nposterTF THEN
@@ -998,6 +998,7 @@ VAR
 	v: cell;  
 BEGIN
 	pool.new(v);
+	v.DTL:=1000;
 	RETURN v
 END thisvox;
 

@@ -92,11 +92,10 @@ TYPE TexVox* = OBJECT(Voxel);
 VAR
 	txTF*: BOOLEAN;
 	texcube*: TexCube;
-	tscale*: INTEGER;
+	tscale*: LONGINT;
 	texscale*:LONGINT;
 	name: Name;
 
-	
 PROCEDURE & init*(n: Name);
 BEGIN
 	NEW(texcube,n,FALSE);
