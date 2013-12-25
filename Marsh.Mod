@@ -305,7 +305,7 @@ BEGIN
        push(rdpseudosolid);
 	beatrix:=Base.VoxelFromName("NwPicBWw4NfcserX4ELaQ3b"); 
 
-       lobster:=Base.VoxelFromName("NznGx2ySiHIGrO5t9Pzcw5Q"); 
+       lobster:=Base.VoxelFromName("Ndiffuseblue"); 
 	push(lobster);
 	tigerlily:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  
        push(tigerlily);
@@ -428,13 +428,13 @@ BEGIN
 	noise.b:=3;
 	noise.c:=3;		
 	noise.octaves:=4;
-	noise.setvoxel(sky2);
-	noise.persistence:=3.2;
+	noise.setvoxel(lobster);
+	noise.persistence:=3/2;
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,1/2);
 	NEW(sphere,center,5/9);
-	sphere.vox:=lobster;	
+	sphere.vox:=lobster;
 	NEW(bifr,sphere,noise);
 	w10.FRaster(sphere,8); 
 	Base.setPT(up,0,1,0);
@@ -444,15 +444,16 @@ BEGIN
 	w10.FRaster(plane,9); 
 	Base.setPT(up,1,0,0);
 	NEW(plane,center,up);
-	plane.vox:=tigerlily;	
+	plane.vox:=cthulhu;	
 	w10.FRaster(plane,9); 	
 	w10.copyonstroke:=TRUE;	
 	Base.setPT(up,0,0,1);
 	NEW(plane,center,up);
-	plane.vox:=floop;	
-(*	z10.FRaster(plane,64); *)
-	z10.FRaster(noise,64); 	
-	z10.setcolor(3,0,0,0,0); 	
+	plane.vox:=axolotl;	
+
+	z10.setcolor(1/2,0,0,1/3,0); 	
+	z10.FRaster(plane,8); 
+	z10.FRaster(noise,64); 		
 (*	Base.setPT(up,0,1,0);
 	NEW(plane,center,up);
 	plane.vox:=w10;

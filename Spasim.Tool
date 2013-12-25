@@ -106,6 +106,7 @@ NH6nvNlOJNlCtpkDB56ljSx.Mod
 N2qeD84Fv78X2XEj8PtU342.Mod
 N2qeD84Fv78X2XEj8PtUZO7.Mod
 N2qeD84Fv78X2XEj8PtU667.Mod
+]]></Span><Span style="Normal"><![CDATA[Ndiffuseblue]]></Span><Span style="Normal"><![CDATA[.Mod
 
 Windows:
 # for WinAos add spasim directory to aos.ini or myaos.ini search path:

@@ -327,7 +327,7 @@ BEGIN
 	leftsticky:=10.0;
 	upsticky:=10.0;	
 	Out.String('*line 1217!*');
-	msd:=40;
+	msd:=100;
 END OnLoad;
 
 PROCEDURE Reshape(w, h: LONGINT);

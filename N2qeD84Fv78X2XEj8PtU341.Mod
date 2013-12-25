@@ -80,10 +80,11 @@ VAR
 	inside: BOOLEAN;
 	ecount:INTEGER;
 	a: REAL;
+	exit:PT;
 BEGIN
-	IF (ray.lxyz.x< 0.031) OR (ray.lxyz.x > 0.97) THEN INC(ecount) END;
-	IF (ray.lxyz.y <0.031) OR (ray.lxyz.y > 0.97) THEN INC(ecount) END;
-	IF (ray.lxyz.z < 0.031) OR (ray.lxyz.z > 0.97) THEN INC(ecount) END;
+	IF (ray.lxyz.x< 0.011) OR (ray.lxyz.x > 0.989) THEN INC(ecount) END;
+	IF (ray.lxyz.y <0.011) OR (ray.lxyz.y > 0.989) THEN INC(ecount) END;
+	IF (ray.lxyz.z < 0.011) OR (ray.lxyz.z > 0.989) THEN INC(ecount) END;
 	IF (ecount > 1) THEN
 		ray.r := ray.r + or * ray.ra*oa;
 		ray.g := ray.g + og * ray.ga*oa;
@@ -92,11 +93,11 @@ BEGIN
 		ray.ga:=ray.ga-oa;
 		ray.ba:=ray.ba-oa;
 	END;
-	innard.Shade(ray);
+	exit:= Base.Exit(ray);
 	ecount:=0;
-	IF (ray.lxyz.x< 0.031) OR (ray.lxyz.x > 0.97) THEN INC(ecount) END;
-	IF (ray.lxyz.y <0.031) OR (ray.lxyz.y > 0.97) THEN INC(ecount) END;
-	IF (ray.lxyz.z < 0.031) OR (ray.lxyz.z > 0.97) THEN INC(ecount) END;
+	IF (exit.x< 0.011) OR (exit.x > 0.989) THEN INC(ecount) END;
+	IF (exit.y <0.011) OR (exit.y > 0.989) THEN INC(ecount) END;
+	IF (exit.z < 0.011) OR (exit.z > 0.989) THEN INC(ecount) END;
 	IF (ecount > 1) THEN
 		a:=1/2;
 		ray.r := ray.r + or * ray.ra*a;
@@ -119,7 +120,7 @@ END OutlineVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	NEW(cage);
-	cage.setoutline(1/3,0,1/3,1/5);
+	cage.setoutline(0,0,0,1);
 	RETURN cage
 END thisvox;
 

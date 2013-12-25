@@ -229,6 +229,7 @@ BEGIN
 		dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
 		dot:=(dot1*mipverse+dot2*mip)
 	END;
+	IF dot<0.25 THEN dot:=0.25 END;
 	dr:=color.red*dot*ray.ra;
 	dg:=color.green*dot*ray.ra;
 	db:=color.blue*dot*ray.ra;	

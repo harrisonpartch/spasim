@@ -32,7 +32,7 @@ VAR
 	dot: REAL;
 	inside: BOOLEAN;
 BEGIN
-	dot := ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
+	dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
 	ray.r := ray.r + (r*dot)*ray.ra;
 	ray.g := ray.g + (g*dot)*ray.ga;
 	ray.b := ray.b + (b*dot)*ray.ba;
@@ -49,6 +49,7 @@ PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	NEW(blue);
 	blue.setcolor(0.3,0.3,0.9,0,0);
+	blue.probelock:=TRUE;
 	RETURN blue
 END thisvox;
 

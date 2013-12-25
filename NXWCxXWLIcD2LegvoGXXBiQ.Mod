@@ -5,61 +5,64 @@ TYPE PT = Base.PT;
 	Ray = Base.Ray;
 	Voxel = Base.Voxel;  
 	
-TYPE AlphaVox* = OBJECT(Voxel);
+TYPE TransparaVox*=OBJECT(Base.Voxel);
 VAR
-	r, g, b : REAL;
-PROCEDURE setcolor* (red, green, blue, black,alpha : REAL);
+	r, g, b, black: REAL;	
+PROCEDURE setcolor* (red, green, blue,bl , a : REAL); 
 BEGIN
-	r := red * alpha;
-	g := green * alpha;
-	b := blue * alpha;
+	r := red;
+	g := green;
+	b := blue;
+	black:=bl;
+	passable := TRUE;
 END setcolor;
-PROCEDURE Shade(VAR ray: Ray);
+
+PROCEDURE Shade (VAR ray: Ray);
 VAR 
-	dr, dg, db: REAL;
+	depth: REAL;
+	exit:PT;
+	dr,dg,db,dbl: REAL;
 BEGIN
-	dr :=  r*ray.ra;
-	dg :=  g*ray.ga;
-	db :=  b*ray.ba;
+	exit:=Base.Exit(ray);
+	depth:=Base.dist(ray.lxyz,exit);
+	dr := r*depth;
+	dg := g*depth;
+	db := b*depth;
+	dbl:=black*depth;
 	ray.r := ray.r + dr;
 	ray.g := ray.g + dg;
-	ray.b := ray.b + db;
-	ray.ra := ray.ra - (dg+db)/2;
-	ray.ga := ray.ga - (dr+db)/2;
-	ray.ba := ray.ba - (dr+dg)/2;
-	ray.bla := ray.bla -(dr+dg+db)/3;
-	IF (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1) THEN ray.terminate:=TRUE END;
+	ray.b := ray.b + db; 
+	ray.ra := (ray.ra - dr);
+	ray.ga := (ray.ga - dg);
+	ray.ba := (ray.ba - db); 
+	ray.bla:=ray.bla-dbl;
+	IF (ray.bla<0.1) THEN ray.terminate:=TRUE END;
 END Shade;
 
-PROCEDURE deepcopy*():Voxel;
-VAR	v:AlphaVox;
-BEGIN
-	NEW(v);
-	v.setcolor(r,g,b,0,1);
-	RETURN(v)
-END deepcopy;
-END AlphaVox; 
+END TransparaVox;  
 
 VAR 
 	serp, subserp, beatrix,lobster,sparx: Voxel;
 	greenball: Voxel;
 	v: Voxel;
-blue: Voxel;
+	blue: Voxel;
+	alphablue: TransparaVox
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	beatrix:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw"); 
 	lobster:=Base.VoxelFromName("N5a2g4M6HYjPJxYSNQvYyv7"); 
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
-	blue:=Base.VoxelFromName("Ndiffuseblue"); 
+	blue:=Base.VoxelFromName("N5a2g4M6HYjPJxYSNQvYy7"); 
 	subserp:=Base.VoxelFromName("NM3"); 	
 	serp:=Base.VoxelFromName("NM3"); 	
+	NEW(alphablue);
+	alphablue.setcolor(1/4,0,0,1/4,0);
 
-
-	subserp.DTL:=30;
+	subserp.DTL:=90;
 (*	subserp.imposter:=greenball;		*)
 
-	serp.DTL:=30;	
+	serp.DTL:=60;	
 
 	subserp.fill(blue);
 
@@ -79,18 +82,18 @@ BEGIN
 	subserp.stroke(Base.mkPT(1,0,1),1,beatrix,v);		
 	subserp.stroke(Base.mkPT(1,1,1),1,greenball,v);	
 *)	serp.fill(serp);	
-	serp.imposter:=lobster;
-	serp.stroke(Base.mkPT(1/2,1/2,1/2),1,NIL,v);
-	serp.stroke(Base.mkPT(1/2,0,1),1,NIL,v);
-	serp.stroke(Base.mkPT(1/2,1,0),1,NIL,v);
-	serp.stroke(Base.mkPT(0,0,1/2),1,NIL,v);	
-	serp.stroke(Base.mkPT(0,1,1/2),1,NIL,v);
-	serp.stroke(Base.mkPT(1,0,1/2),1,NIL,v);	
-	serp.stroke(Base.mkPT(1,1,1/2),1,NIL,v);
+	serp.imposter:=blue;
+	serp.stroke(Base.mkPT(1/2,1/2,1/2),1,alphablue,v);
+	serp.stroke(Base.mkPT(1/2,0,1),1,alphablue,v);
+	serp.stroke(Base.mkPT(1/2,1,0),1,alphablue,v);
+	serp.stroke(Base.mkPT(0,0,1/2),1,alphablue,v);	
+	serp.stroke(Base.mkPT(0,1,1/2),1,alphablue,v);
+	serp.stroke(Base.mkPT(1,0,1/2),1,alphablue,v);	
+	serp.stroke(Base.mkPT(1,1,1/2),1,alphablue,v);
 	subserp.copyonstroke:=TRUE;	
 	serp.copyonstroke:=TRUE;	
-	beatrix.copyonstroke:=TRUE;
-	serp.probelock:=TRUE;
+	lobster.copyonstroke:=TRUE;
+	serp.probelock:=FALSE;
 	RETURN serp
 END thisvox;
  END NXWCxXWLIcD2LegvoGXXBiQ. 
