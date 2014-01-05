@@ -279,7 +279,8 @@ VAR
 	sfish,gxy,w10,w11,v,lobster, btx,ash, dotz, GREEN,PURPLE,MCUBE:Voxel;
 	undo,rd, rdpseudosolid, blu, die,gren,granite,sand,whiteblock,lazy,pdestroyer,axolotl,xen,sky1,sky2,tigerlily,cloud: Voxel;
 	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison,fuse:Voxel;
-	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,cage,floop,volvox,life,iml: Voxel;
+	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,
+	cage,floop,volvox,life,iml,speckle: Voxel;
 	 
 BEGIN
 	NEW(ms);
@@ -288,7 +289,7 @@ BEGIN
       rand:=Base.rand;	
 
   	w10:=Base.VoxelFromName("Ngrollard");	
- 	z10:=Base.VoxelFromName("NM2");	
+ 	z10:=Base.VoxelFromName("NM3");	
  	push(z10);
 	Out.String("EEEEP!");
 	xot:=Base.VoxelFromName("N5a2g4M6HYjPJxYSNQvYyv7"); 
@@ -304,7 +305,9 @@ BEGIN
        rdpseudosolid:=Base.VoxelFromName("Nrdpseudosolid"); 
        push(rdpseudosolid);
 	beatrix:=Base.VoxelFromName("NwPicBWw4NfcserX4ELaQ3b"); 
-
+       speckle:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7"); 
+       push(speckle);
+       
        lobster:=Base.VoxelFromName("Ndiffuseblue"); 
 	push(lobster);
 	tigerlily:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  
@@ -409,11 +412,11 @@ BEGIN
 	Base.setPT(center,1/2,1/2,1/12);
 	NEW(tnoise);
 	tnoise.seed:=123666;	
-	tnoise.a:=3;
-	tnoise.b:=3;
-	tnoise.c:=3;		
+	tnoise.a:=1;
+	tnoise.b:=1;
+	tnoise.c:=1;		
 	tnoise.octaves:=4;
-	tnoise.persistence:=3.9;
+	tnoise.persistence:=3;
 	tnoise.setvoxel(dotz);
 	tnoise.va[0]:=cthulhu;
 	tnoise.va[1]:=sparx;
@@ -428,8 +431,8 @@ BEGIN
 	noise.b:=3;
 	noise.c:=3;		
 	noise.octaves:=4;
-	noise.setvoxel(lobster);
-	noise.persistence:=3/2;
+	noise.setvoxel(tigerlily);
+	noise.persistence:=3.2;
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,1/2);
@@ -452,7 +455,7 @@ BEGIN
 	plane.vox:=axolotl;	
 
 	z10.setcolor(1/2,0,0,1/3,0); 	
-	z10.FRaster(plane,8); 
+	z10.FRaster(plane,32); 
 	z10.FRaster(noise,64); 		
 (*	Base.setPT(up,0,1,0);
 	NEW(plane,center,up);

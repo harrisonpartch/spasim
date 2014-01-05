@@ -35,29 +35,21 @@ PROCEDURE draw(VAR dot: Voxel);
 BEGIN
 	bludot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7");	 
 	NEW(av);
-	dot:=Base.VoxelFromName("NM3");
+	dot:=Base.VoxelFromName("NM2");
 	dot.setcolor(10,0,0,10,0);	
 	Base.setPT(center,1/2,1/2,1/2);
 	tigerlily:=Base.VoxelFromName("NCjgzkmiTyecI5x6eOgYqpQ");  
 	NEW(ball,center,5/12);	
-	ball.setcolor(0.4,0.9,0.2);			
-	dot.FRaster(ball,27);
+	ball.setcolor(0.01,0.99,0.0);			
+	dot.FRaster(ball,128);
 	FOR i:=0 TO 10 DO
 		p1:=Base.randPT();
 		p1.x:=(p1.x+1/2)/2;
 		p1.y:=(p1.y+1/2)/2;
 		p1.z:=(p1.z+1/2)/2;
-		dot.stroke(p1,3,dot,v);
-	END;
-	FOR i:=0 TO 10 DO
-		p1:=Base.randPT();
-		p1.x:=(p1.x+1/2)/2;
-		p1.y:=(p1.y+1/2)/2;
-		p1.z:=(p1.z+1/2)/2;		
-		dot.stroke(p1,9,bludot,v);
-	END;		
+		dot.stroke(p1,4,dot,v);
+	END;	
 	dot.lockTF:=TRUE;
-	dot.DTL:=0
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;

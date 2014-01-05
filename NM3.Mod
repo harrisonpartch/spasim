@@ -156,7 +156,7 @@ BEGIN
 	xyz.y := ABS(ray.lxyz.y-offset.y) * M;		
 	xyz.z := ABS(ray.lxyz.z-offset.z)* M;	
 	pushxyz:=xyz;	
-	IF DTL>0 THEN ray.dtl:=DTL END;
+(*	IF DTL>0 THEN ray.dtl:=DTL END; *)
 	IF (ray.length*ray.scale>ray.dtl) THEN
 		IF imposter#NIL THEN
 			imposter.Shade(ray)
@@ -305,8 +305,6 @@ VAR
 BEGIN
 	dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z); 
 	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-	dot1:=dot1*0.7+0.3;
-	dot2:=dot*0.7+0.3;
 	IF ray.length*ray.scale<3 THEN mix:=1-(ray.length*ray.scale/6) ELSE mix:=0 END;
 	dot:=mix*dot2+(1-mix)*dot1;
 	dr:=nc.color.red*dot*ray.ra;
