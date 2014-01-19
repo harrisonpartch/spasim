@@ -84,6 +84,9 @@ BEGIN
 	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
+	ray.popdelta.x:=2*ray.dxyz.x;
+	ray.popdelta.y:=2*ray.dxyz.y;	
+	ray.popdelta.z:=2*ray.dxyz.z;	
 END mirror;
 
 END AvaVox;
@@ -212,35 +215,37 @@ BEGIN
 			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 		END
 	END;
-	IF ray.length*ray.scale>20 THEN
-		color:=texcube.side[ray.face].pixelmip0(lx,ly);
-		dot:= ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z); 
-	ELSE
-		color:=texcube.side[ray.face].pixel(lx,ly);
-		color1:=texcube.side[ray.face].pixelmip1(lx,ly);	
-		mip:=ABS(ray.length*1000);
-		IF mip>1 THEN mip:=1 END; 
-		mipverse:=1-mip;
-		color.red:=(color1.red*mipverse+mip*color.red);
-		color.green:=(color1.green*mipverse+mip*color.green);
-		color.blue:=(color1.blue*mipverse+mip*color.blue);
-		color.alpha:=(color1.alpha*mipverse+mip*color.alpha);
-		dot1:= ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z); 
-		dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-		dot:=(dot1*mipverse+dot2*mip)
-	END;
-	IF dot<0.25 THEN dot:=0.25 END;
+	color:=texcube.side[ray.face].pixel(lx,ly);
+	color1:=texcube.side[ray.face].pixelmip1(lx,ly);	
+	mip:=ABS(ray.length*100);
+	IF mip>1 THEN mip:=1 END; 
+	mipverse:=1-mip;
+	color.red:=(color1.red*mipverse+mip*color.red);
+	color.green:=(color1.green*mipverse+mip*color.green);
+	color.blue:=(color1.blue*mipverse+mip*color.blue);
+	color.alpha:=(color1.alpha*mipverse+mip*color.alpha);
+	dot1:= ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z); 
+	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
+	mix:= (ray.length*ray.scale)/10;
+	IF mix>1 THEN mix:=1 END;
+	dot:=(dot1*mix+dot2*(1-mix));
+	IF dot<0.2 THEN dot:=0.2 END;
 	dr:=color.red*dot*ray.ra;
 	dg:=color.green*dot*ray.ra;
 	db:=color.blue*dot*ray.ra;	
 	IF color.alpha<0.9 THEN
-			ray.r := ray.r + dr*color.alpha;
-			ray.ra:=ray.ra-(dr*color.alpha)-0.1;
-			ray.g := ray.g + dg*color.alpha;
-			ray.ga:=ray.ga-(dg*color.alpha)-0.1;
-			ray.b := ray.b + db*color.alpha;
-			ray.ba:=ray.ba-(db*color.alpha)-0.1;
-			IF TRUE (* color.alpha>0.5 *) THEN mirror(ray) END
+			IF mix>1/2 THEN 
+				ray.ra:=ray.ra-0.1;
+				ray.ga:=ray.ga-0.1;
+				ray.ba:=ray.ba-0.1;						
+				mirror(ray,dot)
+			ELSE
+				mix:=1;
+				ray.r := ray.r + dr*mix;
+				ray.g := ray.g + dg*mix;
+				ray.b := ray.b + db*mix;
+				ray.terminate:=TRUE;
+			END			
 	ELSE
 		ray.r := ray.r + dr;
 		ray.g := ray.g + dg;
@@ -258,7 +263,7 @@ BEGIN
 	p.x := p.x-a; p.y := p.y-b; p.z := p.z-c;
 END reflect;
 
-PROCEDURE mirror(VAR ray: Ray);
+PROCEDURE mirror(VAR ray: Ray; CONST dot: REAL);
 BEGIN
 	ray.hitmirrorTF := TRUE;
 	ray.hitxyz:=ray.xyz;
@@ -269,6 +274,9 @@ BEGIN
 	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
+(*	ray.popdelta.x:=ray.dxyz.x*3.0;
+	ray.popdelta.y:=ray.dxyz.z*3.0;	
+	ray.popdelta.z:=ray.dxyz.z*3.0;	*)
 END mirror;
 
 PROCEDURE play*();
@@ -398,7 +406,7 @@ BEGIN
 			ray.b := ray.b + db*color.alpha;
 			ray.ba:=ray.ba-(db*color.alpha)-0.1;
 			IF color.alpha>0.5 THEN 
-				mirror(ray) 
+				mirror(ray,dot) 
 			ELSE (* if the pixel is transparent, trace to the back side of the cube *)
 				Base.ExitF(ray,lxyz,face);
 				CASE face OF
@@ -422,7 +430,7 @@ BEGIN
 				ray.b := ray.b + db*color.alpha;
 				ray.ba:=ray.ba-(db*color.alpha)-0.1;
 					IF color.alpha>0.5 THEN 
-						mirror(ray) 	
+						mirror(ray,dot) 	
 					END	
 				ELSE
 					ray.r := ray.r + dr;

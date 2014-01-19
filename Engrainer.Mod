@@ -9,24 +9,22 @@ Name=Base.Name;
 PROCEDURE engrain*(voxel: Voxel);
 VAR 
 	f,fgz: Files.File; 
-	fnamegz: Strings.String;
 	w: Files.Writer;
 BEGIN
 	voxel.copyclear;
 	f := Files.New("grain");
 	fgz := Files.New("sprout");
-	IF (f # NIL) THEN
-		Files.OpenWriter(w, f, 0);
-		voxel.copyclear;
-		voxel.engrain(w);
-		IF (w.res = Streams.Ok) THEN
-			w.Update;
-			GZip.Deflate(f,fgz,GZip.BestSpeed,GZip.DefaultStrategy,GZip.NoFlush); 
-			Files.Register(f);
-			Files.Register(fgz);
-			Out.String("sprout saved");
-			Out.Ln
-		END
+	Files.OpenWriter(w, f, 0);
+	Base.engrain(w);
+	voxel.copyclear;
+	voxel.engrain(w);
+	IF (w.res = Streams.Ok) THEN
+		w.Update;
+		GZip.Deflate(f,fgz,GZip.BestSpeed,GZip.DefaultStrategy,GZip.NoFlush); 
+		Files.Register(f);
+		Files.Register(fgz);
+		Out.String("sprout saved");
+		Out.Ln
 	END;
 END engrain;
 
@@ -45,6 +43,7 @@ BEGIN
 		 GZip.Inflate(fgz,f); 
 		NEW(r,f,0);
 		Files.OpenReader(r, f, 0);
+		Base.sprout(r);
 		r.Bytes(name,0,NL,len);
 		Out.String(name); 
 		cell:=Base.VoxelFromName(name);
@@ -52,10 +51,12 @@ BEGIN
 			cell.sprout(r);
 			Out.String("germination succeeded")
 		ELSE
-			Out.String("germination failed")
+			Out.String("germination failed");
+			Base.world:=Base.VoxelFromName("NM3")
 		END
 	ELSE
-		Out.String("nonesuch file ");
+		Out.String("germination failed: nonesuch file");
+		Base.world:=Base.VoxelFromName("NM3")
 	END;
 	RETURN cell
 END sprout;

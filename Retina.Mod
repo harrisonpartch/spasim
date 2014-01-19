@@ -6,10 +6,10 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=4;        
-	TS=8*16 ;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=4;
-	TH=3;
+	T=3;        
+	TS=8*8 ;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
+	TW=8;
+	TH=6;
 	W*=TS*TW;
 	H*=TS*TH;
 
@@ -509,7 +509,7 @@ END splitcam;
 
 PROCEDURE lessdetail*;
 BEGIN
-	IF foveaparameter<70 THEN INC(foveaparameter) END
+	IF foveaparameter<25 THEN INC(foveaparameter) END
 END lessdetail;
 
 PROCEDURE moredetail*;

@@ -288,9 +288,9 @@ BEGIN
 	EMPTY.passable:=TRUE;
       rand:=Base.rand;	
 
-  	w10:=Base.VoxelFromName("Ngrollard");	
- 	z10:=Base.VoxelFromName("NM3");	
- 	push(z10);
+  	w10:=Base.VoxelFromName("NM3");	
+ 	z10:=Base.VoxelFromName("NM2");	
+ 	push(w10);
 	Out.String("EEEEP!");
 	xot:=Base.VoxelFromName("N5a2g4M6HYjPJxYSNQvYyv7"); 
 	push(xot);
@@ -299,9 +299,9 @@ BEGIN
 	xot2:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 	
 	push(xot2);
 	msphere:=Base.VoxelFromName("NBsHFiBKkSckXBAd46Zbsss"); 	
-	(* push(msphere);	*)
- 	volvox:=Base.VoxelFromName("Nrdvolvox");  	
-       push(volvox);
+	 push(msphere);	
+ (*	volvox:=Base.VoxelFromName("Nrdvolvox");  	
+       push(volvox);*)
        rdpseudosolid:=Base.VoxelFromName("Nrdpseudosolid"); 
        push(rdpseudosolid);
 	beatrix:=Base.VoxelFromName("NwPicBWw4NfcserX4ELaQ3b"); 
@@ -340,7 +340,7 @@ BEGIN
 	btx:=Base.VoxelFromName("NVY1hEGnyr7z8DtULRMOZIQ");	
 	conglomerate:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7"); 			
 	
-	GREEN:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODg");	
+	GREEN:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODg");	(*actually blue atm*)
 	grass:=Base.VoxelFromName("NJOFc7qhMXMly3lot71bNUw"); 	
 	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXXBiQ"); 	
 	cloud:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODh"); 		
@@ -421,15 +421,15 @@ BEGIN
 	tnoise.va[0]:=cthulhu;
 	tnoise.va[1]:=sparx;
 	tnoise.va[2]:=lobster;
-	tnoise.va[3]:=blacksun;
-	tnoise.va[4]:=floop;
+	tnoise.va[3]:=xot;
+	tnoise.va[4]:=xot2;
 	tnoise.va[5]:=sky;	
 
 	NEW(noise);		
 	noise.seed:=123666;		
-	noise.a:=3;
-	noise.b:=3;
-	noise.c:=3;		
+	noise.a:=1;
+	noise.b:=1;
+	noise.c:=1;		
 	noise.octaves:=4;
 	noise.setvoxel(tigerlily);
 	noise.persistence:=3.2;
@@ -439,45 +439,10 @@ BEGIN
 	NEW(sphere,center,5/9);
 	sphere.vox:=lobster;
 	NEW(bifr,sphere,noise);
-	w10.FRaster(sphere,8); 
-	Base.setPT(up,0,1,0);
-	Base.setPT(center,1/2,0,1/2);
-	NEW(plane,center,up);
-	plane.vox:=floop;
-	w10.FRaster(plane,9); 
-	Base.setPT(up,1,0,0);
-	NEW(plane,center,up);
-	plane.vox:=cthulhu;	
-	w10.FRaster(plane,9); 	
-	w10.copyonstroke:=TRUE;	
 	Base.setPT(up,0,0,1);
 	NEW(plane,center,up);
-	plane.vox:=axolotl;	
-
-	z10.setcolor(1/2,0,0,1/3,0); 	
-	z10.FRaster(plane,32); 
-	z10.FRaster(noise,64); 		
-(*	Base.setPT(up,0,1,0);
-	NEW(plane,center,up);
-	plane.vox:=w10;
-	z10.FRaster(plane,9); 
-	Base.setPT(up,1,0,0);
-	NEW(plane,center,up);
-	plane.vox:=w10;
-		
-	z10.FRaster(plane,9); 			
-	
-	NEW(noise);		
-	noise.seed:=666;		
-	noise.a:=3;
-	noise.b:=3;
-	noise.c:=3;		
-	noise.octaves:=3;
-	noise.setvoxel(w10);
-	noise.persistence:=3.1;
-	z10.FRaster(noise,27); 	
-	
-*)	Base.world:=z10; 
+	plane.vox:=sky;	
+	Base.world:=Base.VoxelFromName("NWorld"); 
 (*	engrain;
 	sprout;
 *)	Base.avatar:=harrison;
@@ -498,6 +463,7 @@ END lighten
 
 BEGIN
 	NEW(marshv);
+	dawn;
 	cursorsize:=512;
 	cursorTF:=TRUE;
 	atmdark:=1.2;

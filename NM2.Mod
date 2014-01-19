@@ -3,7 +3,7 @@ IMPORT Base, XNXLE, Noise, Math, Out := KernelLog, Debugging, Streams,Strings;
 
 CONST M=2;
 	MMO=M-1;
-	CUBERADIUS=0.75;   (*change to sqrt(3)/2 ???*)
+	CUBERADIUS=0.8;   (*change to sqrt(3)/2 ???*)
 	NCODE="NM2";
 	NL=Base.NL;
 
@@ -305,7 +305,7 @@ VAR
 BEGIN
 	dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z); 
 	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-	IF ray.length*ray.scale<3 THEN mix:=1-(ray.length*ray.scale/6) ELSE mix:=0 END;
+	IF ray.length*ray.scale>100 THEN mix:=1 ELSE mix:=0 END;
 	dot:=mix*dot2+(1-mix)*dot1;
 	dr:=nc.color.red*dot*ray.ra;
 	dg:=nc.color.green*dot*ray.ga;
@@ -342,6 +342,9 @@ BEGIN
 	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
+	ray.popdelta.x:=ray.dxyz.x*3.0;
+	ray.popdelta.y:=ray.dxyz.z*3.0;	
+	ray.popdelta.z:=ray.dxyz.z*3.0;	
 END mirror;
 
 PROCEDURE tick*;
@@ -380,13 +383,6 @@ VAR
 	i,j,k: INTEGER;
 BEGIN
 	fill(v);
-	blox[1,1,0]:=w;
-
-	blox[0,1,1]:=w;	
-
-	blox[1,0,1]:=w;	
-	
-	blox[1,1,1]:=w;	
 END fillsierp;
 
 PROCEDURE fillcqr2*(v,w: Voxel);
@@ -955,6 +951,7 @@ VAR
 	i,j,k: INTEGER;
 BEGIN
 	w.Bytes(code,0,NL);	 
+	copyclear;
 	IF (code=NCODE)  &(~copymarker) THEN	
 		copymarker:=TRUE;
 		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
@@ -998,7 +995,6 @@ VAR
 	v: cell;  
 BEGIN
 	pool.new(v);
-	v.DTL:=1000;
 	RETURN v
 END thisvox;
 

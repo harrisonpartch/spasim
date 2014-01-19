@@ -55,6 +55,7 @@ BEGIN
 	Base.setPT(yaxis,0,1,0);	
 	Base.setPT(zaxis,0,0,-1);	
 	Base.setPT(worldcenter,1/2,1/2,1/2);	
+	cx:=1/2; cy:=1/2; cz:=1/2;
 	fisheye:=1;
 	GLIDE:=0.98;
 	hop; 
@@ -68,7 +69,9 @@ END aperjust;
 PROCEDURE hop;
 BEGIN
 	stop;
-	cx :=1/2+Base.rand.Uniform()/2; cy:=1/2+Base.rand.Uniform()/2; cz := 1/2+Base.rand.Uniform()/2;
+	cx :=cx+Base.rand.Uniform()/500-1/1000; 
+	cy :=cy+Base.rand.Uniform()/500-1/1000; 
+	cz :=cz+Base.rand.Uniform()/500-1/1000; 
 END hop;
 
 PROCEDURE move;
@@ -303,8 +306,6 @@ BEGIN
 	IF ~InitGL() THEN Close; RETURN END;	
 	Display; (* display splash screen *)
 	
-	Marsh.dawn;
-	
 	NEW(Retina.image);
 	Raster.Create(Retina.image,Retina.W,Retina.H,Raster.BGRA8888);
 	
@@ -381,9 +382,9 @@ BEGIN
 			| "m": leftsticky:=leftsticky/1.3; upsticky:=upsticky/1.3;
 			| "o": GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_NEAREST)
 			| "t": GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR)
-			| "v":Marsh.engrain
+(*			| "v":Marsh.engrain
 			| "c": Marsh.sprout 
-			| "x": Marsh.incVN
+*)			| "x": Marsh.incVN
 			| "z": Marsh.decVN		
 			| "p":  camera.stop	
 			| "1": Marsh.lighten		
@@ -418,7 +419,7 @@ BEGIN
 							(* Out.String("KsEscape.."); Out.Ln;*)
 			|	Inputs.KsF1:
 					Out.String("F1- Close"); Out.Ln;
-					(* Marsh.engrain; *)
+					Marsh.engrain; 
 					Close();	
 					
 					
@@ -507,9 +508,6 @@ BEGIN
 	
 	GL.ClearColor(0.0, 0.0, 0.0, 0.0);
 	
-(*	NEW(Retina.image);
-	Raster.Create(Retina.image,Retina.W,Retina.H,Raster.BGRA8888);
-*)
 	(* create texture object for image *)
 	GL.GenTextures(1, ADDRESSOF(image));
 	GL.BindTexture(GLC.GL_TEXTURE_2D, image); 
@@ -761,8 +759,8 @@ END cursorsizeminus;
 
 PROCEDURE Open* ;
 VAR w: GLWindow;
-
 BEGIN
+(*	Marsh.sprout; *)
 	NEW(w, Retina.W*2,Retina.H*2);
 	Base.STOPGO
 END Open;

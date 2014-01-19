@@ -1,64 +1,76 @@
 MODULE N2qeD84Fv78X2XEj8PtU667;(*anonymous module created by saboteur*)
   
-IMPORT Objects, Base,  FRep, Out:=KernelLog, Random;
+IMPORT Objects, Base,  FRep, RotaVox, Out:=KernelLog, Random;
 
 TYPE Ray = Base.Ray;
 	Voxel = Base.Voxel;  
 	PT =Base.PT;
 	
-TYPE animvox=OBJECT(Voxel)
+TYPE anim=OBJECT(Base.V)
+VAR
+	target: Voxel;
+	i: LONGINT;
 
-PROCEDURE tick*;
+PROCEDURE tick;
 VAR 
 	i: LONGINT;
 BEGIN
-	free;
-	FOR i:=0 TO 100 DO
+	FOR i:=0 TO 10 DO
 		p1:=Base.randPT();
-		strokephemeral(p1,9,bludot,v);
+		target.strokephemeral(p1,8,greendot,v);
 	END;	
 END tick;
 
-END animvox;
+BEGIN
+	register;
+END anim
 	
 VAR 
 	ball: FRep.sphere;
-	av: animvox;
 	noise: FRep.noise;
 	cyl: FRep.hexgrid;
-	reddot,bludot,tigerlily,v: Voxel;
-	center, p1, p2,n:  PT;
+	tblue: Voxel;
+	dot,bdot,rdot,gdot,reddot,bluedot,greendot, tigerlily,v: Voxel;
+	center, p,p1, p2,n:  PT;
 	i:LONGINT;
 	rand: Random.Generator;
-	
-PROCEDURE draw(VAR dot: Voxel);
-BEGIN
-	bludot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7");	 
-	NEW(av);
-	dot:=Base.VoxelFromName("NM2");
-	dot.setcolor(10,0,0,10,0);	
+	shell: RotaVox.RVox;
+	an: anim
+PROCEDURE draw;
+BEGIN	 
+	bluedot:=Base.VoxelFromName("NM2");
+	reddot:=Base.VoxelFromName("NM2");
+	greendot:=Base.VoxelFromName("NM2");
 	Base.setPT(center,1/2,1/2,1/2);
-	tigerlily:=Base.VoxelFromName("NCjgzkmiTyecI5x6eOgYqpQ");  
-	NEW(ball,center,5/12);	
-	ball.setcolor(0.01,0.99,0.0);			
-	dot.FRaster(ball,128);
-	FOR i:=0 TO 10 DO
-		p1:=Base.randPT();
-		p1.x:=(p1.x+1/2)/2;
-		p1.y:=(p1.y+1/2)/2;
-		p1.z:=(p1.z+1/2)/2;
-		dot.stroke(p1,4,dot,v);
+	rdot:=Base.VoxelFromName("Nreddot");  
+	bdot:=Base.VoxelFromName("Nbluedot");
+	gdot:=Base.VoxelFromName("Ngreendot");	
+	tblue:=Base.VoxelFromName("Ntblue");	
+	NEW(ball,center,0.45);	
+	ball.setvoxel(tblue);	
+	reddot.FRaster(ball,32);	
+	NEW(ball,center,0.33);
+	ball.setvoxel(bdot);	
+	bluedot.FRaster(ball,32);
+	ball.setvoxel(rdot);	
+	reddot.FRaster(ball,32);	
+	ball.setvoxel(gdot);	
+	greendot.FRaster(ball,32);	
+	NEW(shell,reddot,Base.mkPT(0,1,0),Base.mkPT(0,0,1),0.03,0.01);
+	FOR i:=0 TO 1000 DO
+		Base.randsphPT(p,n,center,0.45);
+		reddot.stroke(p,32,greendot,v);
 	END;	
-	dot.lockTF:=TRUE;
+	reddot.copyonstroke:=FALSE;
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	draw(reddot);
-	RETURN reddot
+	RETURN shell
 END thisvox;
 
 BEGIN
+	draw
 END N2qeD84Fv78X2XEj8PtU667. 
  
 XNXLMarsh.Rez N2qeD84Fv78X2XEj8PtUZOQ ~

@@ -43,12 +43,13 @@ MPEG.Mod
 FilmLoop.Mod
 TexVox.Mod
 CellAuto.Mod
-XNXLVoxel4.Mod
+Voxel4.Mod
 XNXLHalfSpace.Mod
 XNXLRotaVox.Mod
 Engrainer.Mod
 Saboteur.Mod
 FRep.Mod
+RotaVox.Mod
 NCompiler.Mod
 NanonyPET.Mod
 Marsh.Mod
@@ -60,7 +61,8 @@ Render.Mod ~
 ]]></Span><Span style="AdHoc Oberon 10 0 0 F00BFFF 0000000"><![CDATA[
 ncompile compiles the "anonymous" modules]]></Span><Span style="Normal"><![CDATA[ 
 
-]]></Span><Span style="Bold"><![CDATA[Render.Open]]></Span><Span style="Normal"><![CDATA[ ~
+
+]]></Span><Span style="Bold"><![CDATA[Render.]]></Span><Span style="Normal"><![CDATA[Open
 ]]></Span><Span style="Bold"><![CDATA[
 
 **********************************************************************************************************

@@ -11,7 +11,7 @@ VAR
 	center,p,n:  PT;
 	i:LONGINT;
 	
-PROCEDURE draw(VAR dott: Voxel);
+PROCEDURE draw;
 VAR
 	fractaldot, greendot,reddot: Voxel;
 BEGIN
@@ -38,16 +38,17 @@ BEGIN
 		Base.randsphPT(p,n,center,7/12);
 		fractaldot.stroke(p,32,reddot,v);
 	END;
-	dott:=fractaldot;
+	dot:=fractaldot;
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	draw(dot);
 	RETURN dot
 END thisvox;
 
- END N2qeD84Fv78X2XEj8PtUZO7. 
+BEGIN
+	draw
+END N2qeD84Fv78X2XEj8PtUZO7. 
  
 XNXLMarsh.Rez N2qeD84Fv78X2XEj8PtUZO7 ~
  

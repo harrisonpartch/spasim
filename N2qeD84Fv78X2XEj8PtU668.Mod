@@ -9,12 +9,12 @@ VAR
 	ball: FRep.sphere;
 	noise: FRep.noise;
 	cyl: FRep.hexgrid;
-	reddot,bludot,tigerlily,v: Voxel;
+	dot,bludot,tigerlily,v: Voxel;
 	center, p1, p2,n:  PT;
 	i:LONGINT;
 	rand: Random.Generator;
 	
-PROCEDURE draw(VAR dot: Voxel);
+PROCEDURE draw;
 BEGIN
 	dot:=Base.VoxelFromName("NM3");
 	dot.setcolor(120,100,0,150,0);
@@ -35,11 +35,11 @@ END draw;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	draw(reddot);
-	RETURN reddot
+	RETURN dot
 END thisvox;
 
 BEGIN
+	draw
 END N2qeD84Fv78X2XEj8PtU668. 
  
 XNXLMarsh.Rez N2qeD84Fv78X2XEj8PtU668~

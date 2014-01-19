@@ -1151,6 +1151,20 @@ PROCEDURE InitSounds;
 *)
 END InitSounds;
 
+PROCEDURE engrain*(w: Streams.Writer); 
+BEGIN
+	w.RawReal(cameraPT.x);
+	w.RawReal(cameraPT.y);
+	w.RawReal(cameraPT.z);
+END engrain;
+
+PROCEDURE sprout*(r: Streams.Reader);
+BEGIN
+	r.RawReal(cameraPT.x);
+	r.RawReal(cameraPT.y);
+	r.RawReal(cameraPT.z);
+END sprout;
+
 BEGIN
 	Out.String("Base loading...");
 	WMFontManager.Install;
