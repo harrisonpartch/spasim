@@ -442,10 +442,10 @@ BEGIN
 	Base.setPT(up,0,0,1);
 	NEW(plane,center,up);
 	plane.vox:=sky;	
-(*	Base.world:=Base.VoxelFromName("NWorld"); 
-	engrain;
-*)	sprout;
-	Base.avatar:=harrison;
+	Base.world:=Base.VoxelFromName("NWorld"); 
+(*	engrain;
+	sprout;
+*)	Base.avatar:=harrison;
 	Base.avatarsize:=1000;
 END dawn;
 

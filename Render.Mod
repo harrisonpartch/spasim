@@ -623,11 +623,11 @@ END Display;
 (* change detail according to frame speed, called in GLWindow.MainLoop *)
 PROCEDURE GameLogic();
 BEGIN
-	IF GetCurrentFrameMs() <msd THEN 
+(*	IF GetCurrentFrameMs() <msd THEN 
 		Retina.moredetail;
 	ELSIF GetCurrentFrameMs() >(msd+10) THEN 
 		Retina.lessdetail;
-	END;
+	END; *)
 END GameLogic;
 
 BEGIN
