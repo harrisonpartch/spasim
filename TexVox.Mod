@@ -43,19 +43,18 @@ BEGIN
 		|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
 		|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 	END;	
-	color:=texcube.side[ray.face].pixelmip0(1-lx,1-ly);
+	color:=texcube.side[ray.face].pixel(1-lx,1-ly);
 	dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
-	dr:=color.red*dot*ray.ra;
-	dg:=color.green*dot*ray.ra;
-	db:=color.blue*dot*ray.ra;	
+	dr:=color.red*dot*ray.ra*color.alpha;
+	dg:=color.green*dot*ray.ra*color.alpha;
+	db:=color.blue*dot*ray.ra*color.alpha;	
 	IF color.alpha<0.9 THEN
-			ray.r := ray.r + dr*color.alpha;
-			ray.ra:=ray.ra-(dr*color.alpha)-0.1;
-			ray.g := ray.g + dg*color.alpha;
-			ray.ga:=ray.ga-(dg*color.alpha)-0.1;
-			ray.b := ray.b + db*color.alpha;
-			ray.ba:=ray.ba-(db*color.alpha)-0.1;
-			IF TRUE (* color.alpha>0.5 *) THEN mirror(ray) END
+		ray.r := ray.r + dr;
+		ray.ra:=ray.ra-dg;
+		ray.g := ray.g + dg;
+		ray.ga:=ray.ga-dg;
+		ray.b := ray.b + db;
+		ray.ba:=ray.ba-db;
 	ELSE
 		ray.r := ray.r + dr;
 		ray.g := ray.g + dg;
@@ -73,7 +72,7 @@ BEGIN
 	p.x := p.x-a; p.y := p.y-b; p.z := p.z-c;
 END reflect;
 
-PROCEDURE mirror(VAR ray: Ray);
+PROCEDURE mirror(VAR ray: Ray; CONST dot: REAL);
 BEGIN
 	ray.hitmirrorTF := TRUE;
 	ray.hitxyz:=ray.xyz;
@@ -84,9 +83,6 @@ BEGIN
 	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
-	ray.popdelta.x:=2*ray.dxyz.x;
-	ray.popdelta.y:=2*ray.dxyz.y;	
-	ray.popdelta.z:=2*ray.dxyz.z;	
 END mirror;
 
 END AvaVox;
@@ -226,7 +222,7 @@ BEGIN
 	color.alpha:=(color1.alpha*mipverse+mip*color.alpha);
 	dot1:= ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z); 
 	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-	mix:= (ray.length*ray.scale)/10;
+	mix:= (ray.length*ray.scale)/100;
 	IF mix>1 THEN mix:=1 END;
 	dot:=(dot1*mix+dot2*(1-mix));
 	IF dot<0.2 THEN dot:=0.2 END;

@@ -1,9 +1,9 @@
 MODULE NM4; (*! This module may be either imported or used anonymously *)
-IMPORT Base, XNXLE, Noise, FRep, Math, Out := KernelLog, Debugging, Streams,Strings;
+IMPORT Base, XNXLE, Noise, Math, Out := KernelLog, Debugging, Streams,Strings;
 
 CONST M=4;
 	MMO=M-1;
-	CUBERADIUS=0.75;   (*change to sqrt(3)/2 ???*)
+	CUBERADIUS=0.8;   (*change to sqrt(3)/2 ???*)
 	NCODE="NM4";
 	NL=Base.NL;
 
@@ -36,7 +36,7 @@ BEGIN
 	old := pool;
 	NEW(pool, LEN(pool)*2);
 	FOR i := 0 TO count-1 DO pool[i] := old[i] END;
-	Out.String("NM4 pool growing to ");
+	Out.String("NM3 pool growing to ");
 	Out.Int(count*2,10);
 END grow;
 
@@ -146,8 +146,9 @@ VAR
 	scaleInv:REAL; 
 	out,shadenil,A,B,C: BOOLEAN;
 	v: Voxel;
-	vdepth: REAL;
+	vdepth, blainv: REAL;
 	last:BOOLEAN;
+	dtl: REAL;
 BEGIN
 	ray.scale := ray.scale*M;
 	scaleInv := 1/ray.scale;
@@ -155,6 +156,7 @@ BEGIN
 	xyz.y := ABS(ray.lxyz.y-offset.y) * M;		
 	xyz.z := ABS(ray.lxyz.z-offset.z)* M;	
 	pushxyz:=xyz;	
+(*	IF DTL>0 THEN ray.dtl:=DTL END; *)
 	IF (ray.length*ray.scale>ray.dtl) THEN
 		IF imposter#NIL THEN
 			imposter.Shade(ray)
@@ -246,7 +248,9 @@ BEGIN
 				END;
 				newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
 			END;	
-			vdepth:=Base.distance(newxyz,xyz)*scaleInv; 
+			vdepth:=Base.distance(newxyz,xyz);
+			IF vdepth>1 THEN vdepth:=1 END; 
+			vdepth:=vdepth*scaleInv; 
 			ray.xyz.x:=ray.xyz.x +((newxyz.x-xyz.x)+ray.ddxyz.x)*scaleInv;
 			ray.xyz.y:=ray.xyz.y +((newxyz.y-xyz.y)+ray.ddxyz.y)*scaleInv;			
 			ray.xyz.z:=ray.xyz.z +((newxyz.z-xyz.z)+ray.ddxyz.z)*scaleInv;			
@@ -254,30 +258,17 @@ BEGIN
 			ray.length:=ray.length+vdepth;
 			blr:=black*vdepth;
 			ray.bla := ray.bla-blr; 
-			IF ray.bla>0.01 THEN	
-				rr := red*vdepth*ray.ra; 
-				gr := green*vdepth*ray.ga; 
-				br := blue*vdepth*ray.ba; 	
-				ray.r := ray.r+rr;
-				ray.g:= ray.g+gr;
-				ray.b := ray.b+br; 
-				ray.ra := (ray.ra-rr)-blr;
-				ray.ga := (ray.ga-gr)-blr;
-				ray.ba := (ray.ba-br)-blr; 
-			ELSE
-				vdepth:=vdepth*(blr-(0.01-ray.bla)/blr);
-				rr := red*vdepth*ray.ra*ray.length; 
-				gr := green*vdepth*ray.ga*ray.length; 
-				br := blue*vdepth*ray.ba*ray.length; 	
-				ray.r := ray.r+rr;
-				ray.g:= ray.g+gr;
-				ray.b := ray.b+br; 
-				ray.ra := (ray.ra-rr)-blr;
-				ray.ga := (ray.ga-gr)-blr;
-				ray.ba := (ray.ba-br)-blr; 				
-				out:=TRUE
-			END;	
-			bounds(ijk.i,ijk.j,ijk.k, out);			
+			blainv:=1-ray.bla;
+			rr := red*vdepth*ray.ra*blainv; 
+			gr := green*vdepth*ray.ga*blainv; 
+			br := blue*vdepth*ray.ba*blainv; 	
+			ray.r := ray.r+rr;
+			ray.g:= ray.g+gr;
+			ray.b := ray.b+br; 
+			ray.ra := (ray.ra-rr)-blr;
+			ray.ga := (ray.ga-gr)-blr;
+			ray.ba := (ray.ba-br)-blr; 
+			bounds(ijk.i,ijk.j,ijk.k, out);	
 			IF ~out THEN
 				v := blox[ijk.i,ijk.j,ijk.k];		
 				IF (v#NIL) THEN
@@ -299,9 +290,6 @@ BEGIN
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);	
 				END;
 			END;
-		IF (ray.bla<0.1)OR((ray.ra<0.01)OR(ray.ga<0.01)OR(ray.ba<0.01))THEN ray.terminate:=TRUE 
-		END;
-(*		out:=out OR (ray.length>0.02);		*)
 		UNTIL  out OR ray.terminate;
 	END 		END;
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
@@ -317,10 +305,9 @@ VAR
 BEGIN
 	dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z); 
 	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-	dot1:=dot1*0.7+0.3;
-	dot2:=dot*0.7+0.3;
-	IF ray.length*ray.scale<3 THEN mix:=1-(ray.length*ray.scale/6) ELSE mix:=0 END;
-	dot:=mix*dot2+(1-mix)*dot1;
+	mix:=ray.length*ray.scale/100;
+	IF mix>1 THEN mix:=1 END;
+	dot:=mix*dot1+(1-mix)*dot2;
 	dr:=nc.color.red*dot*ray.ra;
 	dg:=nc.color.green*dot*ray.ga;
 	db:=nc.color.blue*dot*ray.ba;	
@@ -356,6 +343,9 @@ BEGIN
 	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
+	ray.popdelta.x:=ray.dxyz.x*3.0;
+	ray.popdelta.y:=ray.dxyz.z*3.0;	
+	ray.popdelta.z:=ray.dxyz.z*3.0;	
 END mirror;
 
 PROCEDURE tick*;
@@ -395,11 +385,11 @@ VAR
 BEGIN
 	fill(v);
 	blox[1,1,0]:=w;
-
+	blox[1,1,2]:=w;	
 	blox[0,1,1]:=w;	
-
+	blox[2,1,1]:=w;
 	blox[1,0,1]:=w;	
-
+	blox[1,2,1]:=w;		
 	blox[1,1,1]:=w;	
 END fillsierp;
 
@@ -796,6 +786,7 @@ BEGIN
 				o.x:=p.x-1/TWOMS; o.y:=p.y-1/TWOMS; o.z:=p.z-1/TWOMS; (* p is center, o is corner *)
 				IF blox[i,j,k]=NIL THEN 
 					pool.new(newcell);
+					newcell.setcolor(red,green,blue,black,alpha);
 					blox[i,j,k]:=newcell;
 					IF f.normaltf(p) THEN
 						newcell.nposterTF:=TRUE;
@@ -856,6 +847,7 @@ BEGIN
 				o.x:=p.x-1/TWOMS; o.y:=p.y-1/TWOMS; o.z:=p.z-1/TWOMS; (* p is center, o is corner *)
 				IF blox[i,j,k]=NIL THEN
 					pool.new(newcell);
+					newcell.setcolor(red,green,blue,black,alpha);
 					newcell.imposter:=f.voxel(p);
 					newcell.nposterTF:=TRUE;
 					newcell.nposter.normal:=f.normal(p);
@@ -966,7 +958,12 @@ PROCEDURE engrain(w: Streams.Writer);
 VAR
 	i,j,k: INTEGER;
 BEGIN
-	w.Bytes(code,0,NL);	 
+	w.Bytes(code,0,NL);	
+	w.RawReal(red);
+	w.RawReal(green);
+	w.RawReal(blue);
+	w.RawReal(black);	
+	copyclear;
 	IF (code=NCODE)  &(~copymarker) THEN	
 		copymarker:=TRUE;
 		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
@@ -985,9 +982,14 @@ VAR
 	i,j,k: INTEGER;
 	b: BOOLEAN;
 	name: Name;
+	anothercell: cell;
 	len: LONGINT;
 BEGIN
 	IF code=NCODE THEN
+		r.RawReal(red);
+		r.RawReal(green);		
+		r.RawReal(blue);		
+		r.RawReal(black);	
 		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 			r.RawBool(b);
 			IF b THEN

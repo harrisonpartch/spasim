@@ -196,12 +196,12 @@ TYPE BPATCH*=ARRAY BPS,BPS OF BPE;
 TYPE Ray* = RECORD
 	xyz*, dxyz*, ddxyz*, lxyz*, txyz*, origin*, oxyz*, popdelta*, hitxyz*, hitdxyz*: PT;	
 	theta*,phi*, dtheta*,dphi*: REAL;
-	cellred*,cellgreen*,cellblue*,cellblack*: REAL;
+(*	cellred*,cellgreen*,cellblue*,cellblack*: REAL; *)
 	texcube*:TexCube;
 	texcubeTF*:BOOLEAN;
 	ncube*: NCube;
 	ncubeTF*: BOOLEAN;
-	r*, g*, b*, ra*, ga*, ba*, bla*,ulfire*: REAL; (* ulfire is an invisible color *)
+	r*, g*, b*, ra*, ga*, ba*, bla*,alpha*: REAL; 
 	rgb*: ARRAY 3,3 OF BPE;
 	terminate*: BOOLEAN;
 	scale*,tscale*: REAL;
@@ -1192,7 +1192,7 @@ BEGIN
 	blankray.scale := 1; 
 	blankray.length := 0;
 	blankray.tscale:=1;
-	blankray.dtl:=300;	
+	blankray.dtl:=30;	
 	Face[0].x := -1; Face[0].y := 0; Face[0].z := 0; 
 	Face[3].x := 1; Face[3].y := 0; Face[3].z := 0; 
 	Face[1].x := 0; Face[1].y := 1; Face[1].z := 0; 

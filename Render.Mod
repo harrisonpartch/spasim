@@ -245,12 +245,12 @@ VAR
 BEGIN
 	move;	
 	cam.x := cx; cam.y := cy; cam.z := cz;
-(*	gravityvector:=Base.subPT(worldcenter,cam);	*)
-	gravityvector:=Base.mkPT(0,0,1);		
+	gravityvector:=Base.subPT(worldcenter,cam);	
+(*	gravityvector:=Base.mkPT(0,0,1);	*)	
 	gravity:=Base.gravity;
 	gravityvector:=Base.mulPT(gravityvector,Base.gravity);
 	a:=Retina.fward.x*Base.cursordist; b:=Retina.fward.y*Base.cursordist; c:=Retina.fward.z*Base.cursordist;
-	d:=-Retina.fward.x*0.001; e:=-Retina.fward.y*0.001;  f:=Retina.fward.z*0.001; 
+	d:=Retina.fward.x*0.0021; e:=Retina.fward.y*0.0021;  f:=Retina.fward.z*0.0021; 
 	Base.updatecamera(cx,cy,cz,a,b,c,d,e,f);	
 	IF avaTF THEN Marsh.drawavatar END;
 	GLIDE:=0.99;	
@@ -328,7 +328,7 @@ BEGIN
 	leftsticky:=10.0;
 	upsticky:=10.0;	
 	Out.String('*line 1217!*');
-	msd:=50;
+	msd:=40;
 END OnLoad;
 
 PROCEDURE Reshape(w, h: LONGINT);
@@ -472,9 +472,7 @@ BEGIN
 			up:=-ABS(yr)*yr; 
 			camera.up(-up/(60000*leftsticky)); 
 			camera.left(left/(30000*leftsticky));
-				
-			(*SetMousePosition(centerx, centery);
-			Api.WarpPointer( display, 0,mne.window, 0,0, 1000,1000, centerx,centery);*)
+			
 			WarpPointer(1000,1000, centerx,centery);
 		END
 END PointerMove;

@@ -38,9 +38,9 @@ VAR
 	an: anim
 PROCEDURE draw;
 BEGIN	 
-	bluedot:=Base.VoxelFromName("NM2");
-	reddot:=Base.VoxelFromName("NM2");
-	greendot:=Base.VoxelFromName("NM2");
+	bluedot:=Base.VoxelFromName("NM3");
+	reddot:=Base.VoxelFromName("NM4");
+	greendot:=Base.VoxelFromName("NM3");
 	Base.setPT(center,1/2,1/2,1/2);
 	rdot:=Base.VoxelFromName("Nreddot");  
 	bdot:=Base.VoxelFromName("Nbluedot");
@@ -59,14 +59,16 @@ BEGIN
 	NEW(shell,reddot,Base.mkPT(0,1,0),Base.mkPT(0,0,1),0.03,0.01);
 	FOR i:=0 TO 1000 DO
 		Base.randsphPT(p,n,center,0.45);
-		reddot.stroke(p,32,greendot,v);
+		reddot.stroke(p,16,greendot,v);
+		Base.randsphPT(p,n,center,0.45);
+		reddot.stroke(p,16,shell,v);
 	END;	
 	reddot.copyonstroke:=FALSE;
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	RETURN shell
+	RETURN reddot
 END thisvox;
 
 BEGIN
