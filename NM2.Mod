@@ -36,7 +36,7 @@ BEGIN
 	old := pool;
 	NEW(pool, LEN(pool)*2);
 	FOR i := 0 TO count-1 DO pool[i] := old[i] END;
-	Out.String("NM2 pool growing to ");
+	Out.String("NM3 pool growing to ");
 	Out.Int(count*2,10);
 END grow;
 
@@ -101,7 +101,7 @@ BEGIN
 	old := wipe;
 	NEW(wipe, count*2);
 	FOR i := 0 TO LEN(old)-1 DO wipe[i] := old[i] END;
-	Out.String("NM2 wipe growing to ");
+	Out.String("NM3 wipe growing to ");
 	Out.Int(count*2,10);
 END grow;
 
@@ -156,7 +156,7 @@ BEGIN
 	xyz.y := ABS(ray.lxyz.y-offset.y) * M;		
 	xyz.z := ABS(ray.lxyz.z-offset.z)* M;	
 	pushxyz:=xyz;	
-(*	IF DTL>0 THEN ray.dtl:=DTL END; *)
+	IF DTL>0 THEN ray.dtl:=DTL END; 
 	IF (ray.length*ray.scale>ray.dtl) THEN
 		IF imposter#NIL THEN
 			imposter.Shade(ray)
@@ -171,24 +171,19 @@ BEGIN
 	IF ~out THEN
 		v:= blox[ijk.i,ijk.j,ijk.k];
 		IF (v#NIL) THEN
+			ray.inside:=TRUE;
 			ray.lxyz.x := ABS(xyz.x - ijk.i);  
 			ray.lxyz.y := ABS(xyz.y - ijk.j);
 			ray.lxyz.z := ABS(xyz.z - ijk.k);
 			ray.popdelta := Base.Origin; 
-			ray.normalTF:=FALSE;
-			IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
-				ray.normalTF:=TRUE;
-				ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal
-			END;
 			v.Shade(ray);	
 			xyz.x := xyz.x + ray.popdelta.x;    
 			xyz.y := xyz.y + ray.popdelta.y;
 			xyz.z := xyz.z + ray.popdelta.z;
-		ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
-			nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
+			ray.inside:=FALSE
 		END
 	END;	 
-	IF (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1) THEN ray.terminate:=TRUE END;	
+	IF (ray.alpha<0.1) OR ( (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1))THEN ray.terminate:=TRUE END;	
 	IF ~ray.terminate THEN
 		REPEAT
 			IF ray.di  THEN
@@ -247,9 +242,13 @@ BEGIN
 					ray.face := 5; ray.fnormal:= Base.Face[5]
 				END;
 				newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
-			END;	
+			END;
+			bounds(ijk.i,ijk.j,ijk.k, out);	
+			IF ~out THEN
+				v := blox[ijk.i,ijk.j,ijk.k];  (*moved up here for cache latency *)
+			END;
 			vdepth:=Base.distance(newxyz,xyz);
-			IF vdepth>1 THEN vdepth:=1 END; 
+			IF vdepth>1 THEN vdepth:=1 END;
 			vdepth:=vdepth*scaleInv; 
 			ray.xyz.x:=ray.xyz.x +((newxyz.x-xyz.x)+ray.ddxyz.x)*scaleInv;
 			ray.xyz.y:=ray.xyz.y +((newxyz.y-xyz.y)+ray.ddxyz.y)*scaleInv;			
@@ -257,30 +256,33 @@ BEGIN
 			xyz:=newxyz;
 			ray.length:=ray.length+vdepth;
 			blr:=black*vdepth;
-			ray.bla := ray.bla-blr; 
+(*			ray.bla := ray.bla-blr; 
 			blainv:=1-ray.bla;
 			rr := red*vdepth*ray.ra*blainv; 
 			gr := green*vdepth*ray.ga*blainv; 
-			br := blue*vdepth*ray.ba*blainv; 	
+			br := blue*vdepth*ray.ba*blainv; *)
+			rr := red*vdepth*ray.ra; 
+			gr := green*vdepth*ray.ga; 
+			br := blue*vdepth*ray.ba; 			 	
 			ray.r := ray.r+rr;
 			ray.g:= ray.g+gr;
 			ray.b := ray.b+br; 
 			ray.ra := (ray.ra-rr)-blr;
 			ray.ga := (ray.ga-gr)-blr;
 			ray.ba := (ray.ba-br)-blr; 
-			bounds(ijk.i,ijk.j,ijk.k, out);	
+			ray.alpha:=ray.alpha-alpha*vdepth;		
 			IF ~out THEN
-				v := blox[ijk.i,ijk.j,ijk.k];		
 				IF (v#NIL) THEN
 					ray.lxyz.x := ABS(xyz.x - ijk.i);  
 					ray.lxyz.y := ABS(xyz.y - ijk.j);
 					ray.lxyz.z := ABS(xyz.z - ijk.k);
-					ray.popdelta := Base.Origin; (* because many shaders don't set it and it *)
-					ray.normalTF:=FALSE;
-					ray.normal:=ray.fnormal;
+					ray.popdelta := Base.Origin; (* because many shaders don't set it *)
 					IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 						ray.normalTF:=TRUE;
 						ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal
+					ELSE
+					ray.normalTF:=FALSE;
+					ray.normal:=ray.fnormal;						
 					END;
 					v.Shade(ray);	
 					xyz.x := xyz.x + ray.popdelta.x;    
@@ -290,7 +292,8 @@ BEGIN
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);	
 				END;
 			END;
-		UNTIL  out OR ray.terminate;
+			IF (ray.alpha<0.1) OR ( (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1)) THEN ray.terminate:=TRUE END;
+		UNTIL out OR ray.terminate;
 	END 		END;
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
 	ray.popdelta.y := (xyz.y-pushxyz.y)/M;
@@ -305,8 +308,9 @@ VAR
 BEGIN
 	dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z); 
 	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-	IF ray.length*ray.scale>100 THEN mix:=1 ELSE mix:=0 END;
-	dot:=mix*dot2+(1-mix)*dot1;
+	mix:=ray.length*ray.scale/100;
+	IF mix>1 THEN mix:=1 END;
+	dot:=mix*dot1+(1-mix)*dot2;
 	dr:=nc.color.red*dot*ray.ra;
 	dg:=nc.color.green*dot*ray.ga;
 	db:=nc.color.blue*dot*ray.ba;	
@@ -411,7 +415,7 @@ BEGIN
 	passable:=TRUE;
 	complex:=TRUE;
 	imposter:=Base.EMPTY;
-	DTL:=Base.DTL;
+	DTL:=0;
 	code:=NCODE; 
 	ncode:=NCODE
 END init;
@@ -950,7 +954,11 @@ PROCEDURE engrain(w: Streams.Writer);
 VAR
 	i,j,k: INTEGER;
 BEGIN
-	w.Bytes(code,0,NL);	 
+	w.Bytes(code,0,NL);	
+	w.RawReal(red);
+	w.RawReal(green);
+	w.RawReal(blue);
+	w.RawReal(black);	
 	copyclear;
 	IF (code=NCODE)  &(~copymarker) THEN	
 		copymarker:=TRUE;
@@ -970,9 +978,14 @@ VAR
 	i,j,k: INTEGER;
 	b: BOOLEAN;
 	name: Name;
+	anothercell: cell;
 	len: LONGINT;
 BEGIN
 	IF code=NCODE THEN
+		r.RawReal(red);
+		r.RawReal(green);		
+		r.RawReal(blue);		
+		r.RawReal(black);	
 		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 			r.RawBool(b);
 			IF b THEN

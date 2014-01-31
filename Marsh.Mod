@@ -280,7 +280,7 @@ VAR
 	undo,rd, rdpseudosolid, blu, die,gren,granite,sand,whiteblock,lazy,pdestroyer,axolotl,xen,sky1,sky2,tigerlily,cloud: Voxel;
 	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison,fuse:Voxel;
 	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,
-	cage,floop,volvox,life,iml,speckle: Voxel;
+	cage,floop,volvox,life,iml,speckle, doge, reddot: Voxel;
 	 
 BEGIN
 	NEW(ms);
@@ -298,6 +298,8 @@ BEGIN
 	push(gorge);
 	xot2:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 	
 	push(xot2);
+	reddot:=Base.VoxelFromName("Nreddot"); 	
+	push(reddot);
 	msphere:=Base.VoxelFromName("NBsHFiBKkSckXBAd46Zbsss"); 	
 	 push(msphere);	
  (*	volvox:=Base.VoxelFromName("Nrdvolvox");  	
@@ -316,6 +318,10 @@ BEGIN
        push(iml);      
      	life:=Base.VoxelFromName("Nlife");  
        push(life);
+	harrison:=Base.VoxelFromName("Nharrisonavatar"); 
+	push(harrison);
+	doge:=Base.VoxelFromName("Ndogepearl"); 
+	push(doge);	
 (*      	floop:=Base.VoxelFromName("NFLOOP");  
        push(floop);
 *)     	MCUBE:=Base.VoxelFromName("Nr3kPtbyEYLFK3AN2UUVrqg");
@@ -404,10 +410,7 @@ BEGIN
 	push(sky2);
 	tigerlily:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  				
 	push(tigerlily);
-
-      harrison:=Base.VoxelFromName("Nharrisonavatar"); 
-	push(harrison);
- 
+	
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,1/12);
 	NEW(tnoise);

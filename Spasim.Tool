@@ -92,25 +92,6 @@ Compiler.Compile XNXLRender.Mod ~
 
 alice.png
 
-NanonyTextView.Mod
-NanonyPET.Mod
-NM3.Mod
-CellAuto.Mod
-
-NnviGAernhjFK40xASZZVoQ.Mod
-NXWCxXWLIcD2LegvoGXXBiQ.Mod
-NnKyXYNiHwdxuM6wHrbxwuQ.Mod
-NBsHFiBKkSckXBAd46ZbEQw.Mod
-NBsHFiBKkSckXBAd46Zbsss.Mod
-Nharrisonavatar.Mod
-N2qeD84Fv78X2XEj8PtUZO8.Mod
-NH6nvNlOJNlCtpkDB56ljSx.Mod
-N2qeD84Fv78X2XEj8PtU342.Mod
-N2qeD84Fv78X2XEj8PtUZO7.Mod
-N2qeD84Fv78X2XEj8PtU667.Mod
-Ntblue.Mod
-NM5speckle.Mod
-
 Windows:
 # for WinAos add spasim directory to aos.ini or myaos.ini search path:
 # Paths.Search = Work;spasim;obj;../source;PELinker;../UnixAos;vy.ants/source;vy.ants/documents

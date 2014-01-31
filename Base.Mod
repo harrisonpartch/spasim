@@ -89,8 +89,8 @@ BEGIN
 	END;
 	NEW(mip0);
 	NEW(mip1);	
-	Raster.Create(mip0,64,64,Raster.BGRA8888);
-	Raster.Create(mip1,1024,1024,Raster.BGRA8888);		
+	Raster.Create(mip0,8,8,Raster.BGRA8888);
+	Raster.Create(mip1,64,64,Raster.BGRA8888);		
 	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height),mip0,
 		WMRectangles.MakeRect(0,0, mip0.width, mip0.height),WMRectangles.MakeRect(0,0,mip0.width, mip0.height),
 			WMRasterScale.ModeCopy, WMRasterScale.ScaleBilinear);
@@ -212,6 +212,7 @@ TYPE Ray* = RECORD
 	changed*: BOOLEAN; 
 	face*: INTEGER;
 	mirrortf*:BOOLEAN;	
+	inside*: BOOLEAN;
 	normal*,fnormal*: PT;  
 	normalTF*: BOOLEAN;
 	corner*:PT;
@@ -230,11 +231,11 @@ VAR
 	lockTF*,copymarker*,emptysplit*: BOOLEAN;
 	DTL*: REAL;
 	code*,ncode*:Name;  
-	tscale*: PT;
+	tscale*: LONGINT;
 	red*,green*,blue*,black*,alpha*: REAL;
 	colored*,frozen*,probelock*,copyonstroke*,copyonstrokerecursion*:BOOLEAN;
 	offset*:PT;
-	lightcube*:LightCube;
+
 PROCEDURE Shade*(VAR ray: Ray);
 END Shade;
 PROCEDURE proberay*(VAR ray: Ray):Voxel;
@@ -533,6 +534,7 @@ VAR
 	skydistance*:REAL;
 	rnf*:REAL; (*random number for frame*);
 	sniperay*:Ray;
+	blackspeed*:REAL;
 
 (*	basesource*, texsound*, grainsound*: AL.ALuint;
 	listenerPos*: ARRAY [3] OF AL.ALfloat; (* global position *)
@@ -1031,27 +1033,35 @@ BEGIN
 		IF (drx < drz ) THEN
 			IF ray.dxyz.x>0 THEN
 				exit.x:=1; exit.y:=ray.lxyz.y+drx*ray.dxyz.y; exit.z:=ray.lxyz.z+ drx*ray.dxyz.z;
+				ray.face := 0; ray.fnormal:= Face[0] 
 			ELSE
 				exit.x:=0; exit.y:=ray.lxyz.y+drx*ray.dxyz.y; exit.z:=ray.lxyz.z+ drx*ray.dxyz.z;
+				ray.face := 0; ray.fnormal:= Face[0] 
 			END;	
 		ELSE
 			IF ray.dxyz.z>0 THEN
 				exit.x:=ray.lxyz.x+drz*ray.dxyz.x; exit.y:=ray.lxyz.y+drz*ray.dxyz.y; exit.z:=1;
+				ray.face := 2; ray.fnormal:= Face[2] 
 			ELSE
 				exit.x:=ray.lxyz.x+drz*ray.dxyz.x; exit.y:=ray.lxyz.y+drz*ray.dxyz.y; exit.z:=0;
+				ray.face := 5; ray.fnormal:= Face[5]
 			END;		
 		END;
 	ELSIF (dry < drz) THEN
 		IF ray.dxyz.y>0 THEN
 			exit.x:=ray.lxyz.x+dry*ray.dxyz.x; exit.y:=1; exit.z:=ray.lxyz.z+dry*ray.dxyz.z;
+			ray.face := 1; ray.fnormal:= Face[1] 
 		ELSE
 			exit.x:=ray.lxyz.x+dry*ray.dxyz.x; exit.y:=0; exit.z:=ray.lxyz.z+dry*ray.dxyz.z;
+			ray.face := 4; ray.fnormal:= Face[4] 
 		END;
 	ELSE
 		IF ray.dxyz.z>0 THEN
 			exit.x:=ray.lxyz.x+drz*ray.dxyz.x; exit.y:=ray.lxyz.y+drz*ray.dxyz.y; exit.z:=1;
+			ray.face := 2; ray.fnormal:= Face[2] 
 		ELSE
 			exit.x:=ray.lxyz.x+drz*ray.dxyz.x; exit.y:=ray.lxyz.y+drz*ray.dxyz.y; exit.z:=0;
+			ray.face := 5; ray.fnormal:= Face[5]
 		END;		
 	END;
 	RETURN(exit);
@@ -1189,10 +1199,11 @@ BEGIN
 	blankray.ra := 1;
 	blankray.ga := 1;
 	blankray.ba := 1;
+	blankray.alpha:=1;
 	blankray.scale := 1; 
 	blankray.length := 0;
 	blankray.tscale:=1;
-	blankray.dtl:=30;	
+	blankray.dtl:=1000;	
 	Face[0].x := -1; Face[0].y := 0; Face[0].z := 0; 
 	Face[3].x := 1; Face[3].y := 0; Face[3].z := 0; 
 	Face[1].x := 0; Face[1].y := 1; Face[1].z := 0; 

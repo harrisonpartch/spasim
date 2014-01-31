@@ -2,7 +2,7 @@ MODULE Render;
 IMPORT Kernel, Objects, Random, Marsh,(* ALUT := OpenALUtil, XNXLAudio,*)
  Out := KernelLog, Math,XNXLMath, Base,  Retina, GLW := OGLWindow, 
 	 GL:=OpenGL, GLC := OpenGLConst,  GLSL:= GLShaderUtils,
-	 Inputs,  Raster, Strings,Streams;
+	 Inputs,  Raster, Strings, Streams, Debugging;
 
 TYPE 
 	Aperture = Base.Aperture;
@@ -328,7 +328,7 @@ BEGIN
 	leftsticky:=10.0;
 	upsticky:=10.0;	
 	Out.String('*line 1217!*');
-	msd:=40;
+	msd:=45;
 END OnLoad;
 
 PROCEDURE Reshape(w, h: LONGINT);
@@ -623,11 +623,11 @@ END Display;
 (* change detail according to frame speed, called in GLWindow.MainLoop *)
 PROCEDURE GameLogic();
 BEGIN
-(*	IF GetCurrentFrameMs() <msd THEN 
+	IF GetCurrentFrameMs() <msd THEN 
 		Retina.moredetail;
 	ELSIF GetCurrentFrameMs() >(msd+10) THEN 
 		Retina.lessdetail;
-	END; *)
+	END; 
 END GameLogic;
 
 BEGIN
@@ -758,8 +758,8 @@ END cursorsizeminus;
 PROCEDURE Open* ;
 VAR w: GLWindow;
 BEGIN
-(*	Marsh.sprout; *)
 	NEW(w, Retina.W*2,Retina.H*2);
+(*	Debugging.DisableGC; *)
 	Base.STOPGO
 END Open;
 

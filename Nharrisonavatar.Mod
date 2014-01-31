@@ -11,8 +11,9 @@ PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	IF vox=NIL THEN
 		NEW(cv,"harrisonavatar.png");
-		vox:=cv;
-		vox.passable:=TRUE
+		vox:=cv;		
+		vox.passable:=TRUE;
+		vox.tscale:=100;	
 	END;
 	RETURN vox
 END thisvox;

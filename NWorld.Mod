@@ -1,6 +1,6 @@
 MODULE NWorld;(*anonymous module created by saboteur*)
   
-IMPORT Objects, Base,  FRep, Out:=KernelLog, Random;
+IMPORT Objects, Base,  FRep, Out:=KernelLog, Random,Debugging;
 
 TYPE Ray = Base.Ray;
 	Voxel = Base.Voxel;  
@@ -17,31 +17,31 @@ VAR
 PROCEDURE draw;
 BEGIN
 	w3:=Base.VoxelFromName("NM3");	 
-	z3:=Base.VoxelFromName("NM4");	
-	z2:=Base.VoxelFromName("NM2");
-	z3.setcolor(1,0,0,1,1);
-	z2.setcolor(0,18,0,30,3);	
-	sky:=Base.VoxelFromName("Ndiffuseblue"); 
+	z3:=Base.VoxelFromName("NM3");	
+	z2:=Base.VoxelFromName("NM3");
+	z3.setcolor(0,1,0,2,1);
+	z2.setcolor(0,0,0,1,1);	
+	sky:=Base.VoxelFromName("Ngreendot"); 
 	Base.setPT(center,1/2,1/2,1/2);
 	w3.fill(sky);
-	w3.stroke(center,3,z3,v);
+	w3.stroke(center,1,z3,v);
 	Base.setPT(center,1/2,1/2,1/2);
-	z3.stroke(center,0,z2,v);
-	NEW(ball,center,0.5);
+	z3.stroke(center,1,z2,v);
+(*	NEW(ball,center,0.5);
 	ball.setcolor(0.9, 0.7,0.7);
-	ball.setvoxel(sky);
-	z3.FRaster(ball,27);
-	NEW(noise);		
+	ball.setvoxel(sky); 
+	z3.FRaster(ball,81);
+*)	NEW(noise);		
 	noise.seed:=123666;		
-	noise.a:=2;
+	noise.a:=1;
 	noise.b:=1;
 	noise.c:=1;		
-	noise.persistence:=3.2;
+	noise.persistence:=3.1;
 	noise.octaves:=4;	
 	tigerlily:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  
-	noise.setvoxel(tigerlily);
+	noise.setvoxel(sky);
 	noise.persistence:=4;
-	z2.FRaster(noise,64);
+	z3.FRaster(noise,27);
 	sky.lockTF:=TRUE;	
 END draw;
 
@@ -51,7 +51,9 @@ BEGIN
 END thisvox;
 
 BEGIN
-	draw
+	Debugging.DisableGC; 
+	draw;
+	Debugging.EnableGC; 
 END NWorld. 
  
 XNXLMarsh.Rez NWorld ~

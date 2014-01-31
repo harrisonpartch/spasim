@@ -35,8 +35,8 @@ BEGIN
 	ray.ra := (ray.ra - dr)-dbl;
 	ray.ga := (ray.ga - dg)-dbl;
 	ray.ba := (ray.ba - db)-dbl; 
-	ray.alpha:=ray.alpha+alpha;
-	IF ray.alpha>=1 THEN ray.terminate:=TRUE END
+	ray.alpha:=ray.alpha-alpha;
+	IF ray.alpha<0.1 THEN ray.terminate:=TRUE END
 END Shade;
 
 END TransparaVox;  
@@ -49,5 +49,5 @@ END thisvox;
 
 BEGIN
 NEW(vox); 
-vox.setcolor(0,0,0.05,0.05,0.1);
+vox.setcolor(0,0,0.05,0.05,0.016);
 END Ntblue. 

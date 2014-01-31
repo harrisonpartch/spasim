@@ -156,7 +156,7 @@ BEGIN
 	xyz.y := ABS(ray.lxyz.y-offset.y) * M;		
 	xyz.z := ABS(ray.lxyz.z-offset.z)* M;	
 	pushxyz:=xyz;	
-(*	IF DTL>0 THEN ray.dtl:=DTL END; *)
+	IF DTL>0 THEN ray.dtl:=DTL END; 
 	IF (ray.length*ray.scale>ray.dtl) THEN
 		IF imposter#NIL THEN
 			imposter.Shade(ray)
@@ -171,24 +171,19 @@ BEGIN
 	IF ~out THEN
 		v:= blox[ijk.i,ijk.j,ijk.k];
 		IF (v#NIL) THEN
+			ray.inside:=TRUE;
 			ray.lxyz.x := ABS(xyz.x - ijk.i);  
 			ray.lxyz.y := ABS(xyz.y - ijk.j);
 			ray.lxyz.z := ABS(xyz.z - ijk.k);
 			ray.popdelta := Base.Origin; 
-			ray.normalTF:=FALSE;
-			IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
-				ray.normalTF:=TRUE;
-				ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal
-			END;
 			v.Shade(ray);	
 			xyz.x := xyz.x + ray.popdelta.x;    
 			xyz.y := xyz.y + ray.popdelta.y;
 			xyz.z := xyz.z + ray.popdelta.z;
-		ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
-			nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
+			ray.inside:=FALSE
 		END
 	END;	 
-	IF (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1) THEN ray.terminate:=TRUE END;	
+	IF (ray.alpha<0.1) OR ( (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1))THEN ray.terminate:=TRUE END;	
 	IF ~ray.terminate THEN
 		REPEAT
 			IF ray.di  THEN
@@ -247,9 +242,13 @@ BEGIN
 					ray.face := 5; ray.fnormal:= Base.Face[5]
 				END;
 				newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
-			END;	
+			END;
+			bounds(ijk.i,ijk.j,ijk.k, out);	
+			IF ~out THEN
+				v := blox[ijk.i,ijk.j,ijk.k];  (*moved up here for cache latency *)
+			END;
 			vdepth:=Base.distance(newxyz,xyz);
-	(*		IF vdepth>1 THEN vdepth:=1 END; *)
+			IF vdepth>1 THEN vdepth:=1 END;
 			vdepth:=vdepth*scaleInv; 
 			ray.xyz.x:=ray.xyz.x +((newxyz.x-xyz.x)+ray.ddxyz.x)*scaleInv;
 			ray.xyz.y:=ray.xyz.y +((newxyz.y-xyz.y)+ray.ddxyz.y)*scaleInv;			
@@ -257,30 +256,33 @@ BEGIN
 			xyz:=newxyz;
 			ray.length:=ray.length+vdepth;
 			blr:=black*vdepth;
-			ray.bla := ray.bla-blr; 
+(*			ray.bla := ray.bla-blr; 
 			blainv:=1-ray.bla;
 			rr := red*vdepth*ray.ra*blainv; 
 			gr := green*vdepth*ray.ga*blainv; 
-			br := blue*vdepth*ray.ba*blainv; 	
+			br := blue*vdepth*ray.ba*blainv; *)
+			rr := red*vdepth*ray.ra; 
+			gr := green*vdepth*ray.ga; 
+			br := blue*vdepth*ray.ba; 			 	
 			ray.r := ray.r+rr;
 			ray.g:= ray.g+gr;
 			ray.b := ray.b+br; 
 			ray.ra := (ray.ra-rr)-blr;
 			ray.ga := (ray.ga-gr)-blr;
 			ray.ba := (ray.ba-br)-blr; 
-			bounds(ijk.i,ijk.j,ijk.k, out);	
+			ray.alpha:=ray.alpha-alpha*vdepth;		
 			IF ~out THEN
-				v := blox[ijk.i,ijk.j,ijk.k];		
 				IF (v#NIL) THEN
 					ray.lxyz.x := ABS(xyz.x - ijk.i);  
 					ray.lxyz.y := ABS(xyz.y - ijk.j);
 					ray.lxyz.z := ABS(xyz.z - ijk.k);
-					ray.popdelta := Base.Origin; (* because many shaders don't set it and it *)
-					ray.normalTF:=FALSE;
-					ray.normal:=ray.fnormal;
+					ray.popdelta := Base.Origin; (* because many shaders don't set it *)
 					IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 						ray.normalTF:=TRUE;
 						ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal
+					ELSE
+					ray.normalTF:=FALSE;
+					ray.normal:=ray.fnormal;						
 					END;
 					v.Shade(ray);	
 					xyz.x := xyz.x + ray.popdelta.x;    
@@ -290,7 +292,8 @@ BEGIN
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);	
 				END;
 			END;
-		UNTIL  out OR ray.terminate;
+			IF (ray.alpha<0.1) OR ( (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1)) THEN ray.terminate:=TRUE END;
+		UNTIL out OR ray.terminate;
 	END 		END;
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
 	ray.popdelta.y := (xyz.y-pushxyz.y)/M;
@@ -419,7 +422,7 @@ BEGIN
 	passable:=TRUE;
 	complex:=TRUE;
 	imposter:=Base.EMPTY;
-	DTL:=Base.DTL;
+	DTL:=0;
 	code:=NCODE; 
 	ncode:=NCODE
 END init;

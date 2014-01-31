@@ -7,9 +7,9 @@ TYPE
 	PT=Base.PT;
 CONST
 	T=4;        
-	TS=2*16 ;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=9;
-	TH=7;
+	TS=2*16;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
+	TW=6;
+	TH=4;
 	W*=TS*TW;
 	H*=TS*TH;
 
@@ -146,28 +146,28 @@ BEGIN
 	IF level<2 THEN
 			x:=a.imx - W/2;
 			y:=a.imy-H/2;		
-			IF (x*x+y*y)<(W*W/foveaparameter) THEN	
+			IF (x*x+y*y)<FV THEN	
 				tessad(a); 
 			ELSE
 				tessa(a); 
 			END;
 			x:=b.imx - W/2;
 			y:=b.imy-H/2;		
-			IF (x*x+y*y)<(W*W/foveaparameter) THEN	
+			IF (x*x+y*y)<FV THEN	
 				tessad(b); 
 			ELSE
 				tessa(b); 			
 			END;			
 			x:=b.imx - W/2;
 			y:=b.imy-H/2;		
-			IF (x*x+y*y)<(W*W/foveaparameter) THEN	
+			IF (x*x+y*y)<FV THEN	
 				tessad(c); 
 			ELSE
 				tessa(c); 
 			END;
 			x:=d.imx - W/2;
 			y:=d.imy-H/2;		
-			IF (x*x+y*y)<(W*W/foveaparameter) THEN	
+			IF (x*x+y*y)<FV THEN	
 				tessad(d); 
 			ELSE
 				tessa(d); 
@@ -236,6 +236,7 @@ VAR
 	rtheta,rphi: REAL; (* camera pitch,roll. global variables because they are the same for all rays in a frame *)
 	fward*, dward*, rward*,camrward*: PT;  
 	foveaparameter:INTEGER;
+	FV: REAL;
 	copy: Raster.Mode;
 
 PROCEDURE reflect(VAR p: PT; n: PT);
@@ -323,12 +324,14 @@ END splitcam;
 
 PROCEDURE lessdetail*;
 BEGIN
-	IF foveaparameter<25 THEN INC(foveaparameter) END
+	IF foveaparameter<50 THEN foveaparameter:=foveaparameter+3  END;
+	FV:=W*W/foveaparameter
 END lessdetail;
 
 PROCEDURE moredetail*;
 BEGIN
-	foveaparameter:=ABS(foveaparameter-1)
+	foveaparameter:=ABS(foveaparameter-1);
+	FV:=W*W/foveaparameter	 
 END moredetail;
 
 PROCEDURE incTD;
