@@ -248,6 +248,8 @@ PROCEDURE probe*(p:PT; resolution: LONGINT):Voxel;
 BEGIN
 	RETURN(SELF);
 END probe;
+PROCEDURE touchcache*;
+END touchcache;
 PROCEDURE passprobe*(p:PT):BOOLEAN;
 BEGIN
 	RETURN(passable);

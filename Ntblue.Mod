@@ -24,7 +24,9 @@ VAR
 	exit:PT;
 	dr,dg,db,dbl: REAL;
 BEGIN
-	depth:=Base.dist(ray.lxyz,Base.Exit(ray));
+
+(*	depth:=Base.dist(ray.lxyz,Base.Exit(ray));
+*)	depth:=1;
 	dr := r*depth;
 	dg := g*depth;
 	db := b*depth;
@@ -49,5 +51,5 @@ END thisvox;
 
 BEGIN
 NEW(vox); 
-vox.setcolor(0,0,0.05,0.05,0.016);
+vox.setcolor(0,0,0.05,0.07,0.07);
 END Ntblue. 

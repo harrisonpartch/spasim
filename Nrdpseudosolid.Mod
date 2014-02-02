@@ -5,7 +5,7 @@ IMPORT Base, XNXLE, FRep;
 CONST	
 	M=200;
 	M2 = M DIV 2;
-	A = 80;
+	A = 60;
 	B = 20;
 	C = 0.03;
 
@@ -78,7 +78,7 @@ BEGIN
 	FOR i := 0 TO M - 1 DO
 		FOR j := 0 TO M - 1 DO
 			(*  HERE ARE THE DIFFERENCE RULES! *)	
-			mesh1[i, j] := mesh1[i, j] + n1[i, j]/73 - mesh2[i, j];
+			mesh1[i, j] := mesh1[i, j] + n1[i, j]/A - mesh2[i, j];
 			mesh2[i, j] := ABS(mesh2[i, j] +  mesh1[i, j]/100 - 0.0081);   
 			IF mesh1[i, j] < 0 THEN mesh1[i, j] := 0 END;
 			IF mesh2[i, j] < 0 THEN mesh2[i, j] := 0 END;

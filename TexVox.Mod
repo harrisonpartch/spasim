@@ -62,50 +62,19 @@ BEGIN
 				mirror(ray)
 			ELSE
 				ray.r := ray.r + dr;
-				ray.ra:=ray.ra-dr-0.1;
-				ray.g := ray.g + dg;
-				ray.ga:=ray.ga-dg-0.1;
-				ray.b := ray.b + db;
-				ray.ba:=ray.ba-db-0.1;
-			END
-		ELSE
-			ray.r := ray.r + dr;
-			ray.g := ray.g + dg;
-			ray.b := ray.b + db;	
-			ray.terminate:=TRUE
-		END;
-		exit:= Base.Exit(ray);
-		CASE ray.face OF
-			 0: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
-			|1: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
-			|2: lx := ray.lxyz.x; ly := ray.lxyz.y;
-			|3: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
-			|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
-			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
-		END;	
-		color:=texcube.side[ray.face].pixel(1-lx,1-ly);
-		dot := ABS(ray.fnormal.x*exit.x + ray.fnormal.y*exit.y+ ray.fnormal.z*exit.z); 
-		dr:=color.red*dot*ray.ra*color.alpha;
-		dg:=color.green*dot*ray.ga*color.alpha;
-		db:=color.blue*dot*ray.ba*color.alpha;	
-		IF color.alpha<0.98 THEN
-			IF color.alpha>0.7 THEN
-				mirror(ray)
-			ELSE
-				ray.r := ray.r + dr;
 				ray.ra:=ray.ra-dr;
 				ray.g := ray.g + dg;
 				ray.ga:=ray.ga-dg;
 				ray.b := ray.b + db;
-				ray.ba:=ray.ba-db-;
+				ray.ba:=ray.ba-db;
 			END
 		ELSE
 			ray.r := ray.r + dr;
 			ray.g := ray.g + dg;
 			ray.b := ray.b + db;	
 			ray.terminate:=TRUE
-		END;
-		END;		
+		END
+	END
 END Shade;
 
 PROCEDURE reflect(VAR p: PT; n: PT);
@@ -269,7 +238,7 @@ BEGIN
 		color.alpha:=(color1.alpha*mipverse+mip*color.alpha);		
 	ELSE
 		color:=texcube.side[ray.face].pixel(lx,ly);
-		CASE ray.face OF
+(*		CASE ray.face OF
 			 0: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
 			|1: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
 			|2: lx := ray.lxyz.x; ly := ray.lxyz.y;
@@ -277,25 +246,21 @@ BEGIN
 			|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
 			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 		END;		
-		color1:=texcube.side[ray.face].pixel(lx,ly);	
+*)		color1:=texcube.side[ray.face].pixel(lx,ly);	
 		mipverse:=1-mip;			
 		color.red:=(color1.red*mipverse+mip*color.red);
 		color.green:=(color1.green*mipverse+mip*color.green);
 		color.blue:=(color1.blue*mipverse+mip*color.blue);	
 		color.alpha:=(color1.alpha*mipverse+mip*color.alpha);	
 	END; 	
-	color.red:=(ray.alpha*color.red+(1-ray.alpha));	
-	color.green:=(ray.alpha*color.green+(1-ray.alpha));			
-	color.blue:=(ray.alpha*color.blue+(1-ray.alpha));	
 	dot1:= ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z); 
 	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-	mix:= (ray.length*ray.scale)/100;
+	mix:= (ray.length*ray.scale)/10;
 	IF mix>1 THEN mix:=1 END;
 	dot:=(dot1*mix+dot2*(1-mix));
-	IF dot<0.2 THEN dot:=0.2 END;
-	dr:=color.red*dot*ray.ra;
-	dg:=color.green*dot*ray.ra;
-	db:=color.blue*dot*ray.ra;	
+	dr:=color.red*dot*color.alpha;
+	dg:=color.green*dot*color.alpha;
+	db:=color.blue*dot*color.alpha;	
 	IF color.alpha<0.99 THEN
 			IF color.alpha>0.75 THEN 
 				ray.ra:=ray.ra-0.1;
@@ -307,7 +272,6 @@ BEGIN
 				ray.r := ray.r + dr*mix;
 				ray.g := ray.g + dg*mix;
 				ray.b := ray.b + db*mix;
-				ray.terminate:=TRUE;
 			END			
 	ELSE
 		ray.r := ray.r + dr;

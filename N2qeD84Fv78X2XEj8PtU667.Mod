@@ -38,9 +38,9 @@ VAR
 	an: anim
 PROCEDURE draw;
 BEGIN	 
-	bluedot:=Base.VoxelFromName("NM3");
-	reddot:=Base.VoxelFromName("NM3");
-	greendot:=Base.VoxelFromName("NM3");
+	bluedot:=Base.VoxelFromName("NM2");
+	reddot:=Base.VoxelFromName("NM2");
+	greendot:=Base.VoxelFromName("NM2");
 	Base.setPT(center,1/2,1/2,1/2);
 	rdot:=Base.VoxelFromName("Nreddot");  
 	bdot:=Base.VoxelFromName("Nbluedot");
@@ -48,14 +48,15 @@ BEGIN
 	tblue:=Base.VoxelFromName("Ntblue");	
 	NEW(ball,center,0.45);	
 	ball.setvoxel(tblue);	
-	reddot.FRaster(ball,32);	
+	reddot.FRaster(ball,16);	
 	NEW(ball,center,0.33);
 	ball.setvoxel(bdot);	
-	bluedot.FRaster(ball,32);
-	ball.setvoxel(rdot);	
-	reddot.FRaster(ball,32);	
+	bluedot.FRaster(ball,16);
+	ball.setvoxel(NIL);	
+	ball.setcolor(1,1,1);
+	reddot.FRaster(ball,256);	
 	ball.setvoxel(gdot);	
-	greendot.FRaster(ball,32);	
+	greendot.FRaster(ball,64);	
 	NEW(shell,reddot,Base.mkPT(0,1,0),Base.mkPT(0,0,1),0.03,0.01);
 	FOR i:=0 TO 1 DO
 		Base.randsphPT(p,n,center,0.45);

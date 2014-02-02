@@ -137,7 +137,6 @@ VAR
 	lblox*: ARRAY M,M,M OF LCube;
 	nposterTF*:BOOLEAN;
 	nposter*: NCube;
-	
 PROCEDURE Shade (VAR ray: Ray);
 VAR
 	pushxyz, newxyz, xyz: Base.PT;
@@ -245,7 +244,7 @@ BEGIN
 			END;
 			bounds(ijk.i,ijk.j,ijk.k, out);	
 			IF ~out THEN
-				v := blox[ijk.i,ijk.j,ijk.k];  (*moved up here for cache latency *)
+				v := blox[ijk.i,ijk.j,ijk.k];  (*moved up here for cache latency --stupid idea*)
 			END;
 			vdepth:=Base.distance(newxyz,xyz);
 			IF vdepth>1 THEN vdepth:=1 END;
