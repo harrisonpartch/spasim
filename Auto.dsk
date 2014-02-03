@@ -1,10 +1,23 @@
 <Desktop>
 	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="46" t="234" r="335" b="664" flags="{0..2}"/>
-	<Window name="PET" loader="PET.Restore" l="466" t="71" r="1408" b="926" flags="{0..2}">
+	<Window name="FileManager" loader="WMFileManager.Restore" l="36" t="110" r="536" b="510" flags="{0..2}"/>
+	<Window name="PET" loader="PET.Restore" l="40" t="128" r="840" b="728" flags="{0..2}">
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>
+			<Tab file="WMGLShaderGITDemo.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="262" cursorPos="8336"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="true" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="MyDemos/blur2/" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="10"/>
+			</Tab>
+		</PETData>
+	</Window>
+	<Window name="PET" loader="PET.Restore" l="462" t="38" r="1404" b="893" flags="{0..2}">
+		<PETData>
+			<General SelectedPageNr="6" ProjectTextFile=""/>
 			<Tab file="Spasim.Tool" codecFormat="BBT" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="54" cursorPos="854"/>
+				<Editor firstLine="0" cursorPos="261"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
@@ -45,7 +58,7 @@
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="10"/>
 			</Tab>
-			<Tab file="Render.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
+			<Tab file="Render2.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
 				<Editor firstLine="0" cursorPos="0"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>

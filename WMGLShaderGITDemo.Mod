@@ -1,8 +1,12 @@
-MODULE WMGLShaderGITDemo; (** AUTHOR "fnecati"; PURPOSE "Gauss-blurring by shaders"; *)
-
+MODULE WMGLShaderGITDemo; (** AUTHOR "fnecati"; PURPOSE "opengl image processing by shaders"; *)
+(* 
+	adopted from:
+	https://github.com/tijutv/Project4-IntroGLSL
+	
+*)
 IMPORT
 	WMRectangles, Strings, GLSL := GLShaderUtils,  KernelLog, GLTextures,
-	WM := WMWindowManager, WMGraphics, WMDialogs,
+	WM := WMWindowManager, WMGraphics, WMDialogs, Commands,
 	gl := OpenGL, glc := OpenGLConst, WMGL := WMGLWindow;
 
 CONST 
@@ -28,13 +32,13 @@ TYPE
 		weirdProgram: Uint;
 		progname: ARRAY 32 OF CHAR;
 		
-	PROCEDURE &New(w, h: LONGINT);
+	PROCEDURE &New(filename: ARRAY OF CHAR; w, h: LONGINT);
 	BEGIN		
 		Init(w, h, FALSE);
 				
 		WM.DefaultAddWindow(SELF);
 		SetTitle(Strings.NewString("Image Processing"));
-		IF ~InitGL() THEN Close; RETURN END;
+		IF ~InitGL(filename) THEN Close; RETURN END;
 		Reshape(w, h);			
 		UpdateImage;
 	END New;
@@ -65,7 +69,7 @@ TYPE
 		vertexBufferObjID: ARRAY [3] OF Uint;
 		
 	BEGIN
-		vertices := [
+(*		vertices := [
 	 			-1.0, -1.0,
 	 			1.0, -1.0,
 	 			1.0, 1.0,
@@ -81,7 +85,15 @@ TYPE
 
 		indices := [ 0, 1, 3, 3, 1, 2 ];
 
-
+*)
+		(* A2 Image origin is top-left, opengl's image left-bottom; so, flip indices in horizontal  *)
+		
+		vertices := [-1.0, -1.0, 	1.0, -1.0, 1.0, 1.0, -1.0, 1.0  ];
+(*		texcoords := [1.0, 1.0,  0.0, 1.0,  0.0, 0.0,	1.0, 0.0 ]; *)
+		texcoords := [0.0, 1.0,  1.0, 1.0,  1.0, 0.0,	0.0, 0.0 ];
+		
+		indices := [ 0, 1, 3, 3, 1, 2 ]; 
+		
 		gl.GenVertexArrays(1, ADDRESSOF(vao));
 		gl.BindVertexArray(vao);
 
@@ -102,34 +114,34 @@ TYPE
 
 	END InitVAO;
 
-	PROCEDURE InitTextures();
+	PROCEDURE InitTextures(CONST filename: ARRAY OF CHAR);
 	VAR image: Uint;
 	BEGIN
-		image := GLTextures.LoadTextureCustom("Lenna.png");
+		image := GLTextures.LoadTextureCustom(filename);
 	(*	gl.BindTexture(glc.GL_TEXTURE_2D, image);*)
 	(*	gl.TexParameteri(glc.GL_TEXTURE_2D, glc.GL_TEXTURE_MAG_FILTER, glc.GL_NEAREST);
 		gl.TexParameteri(glc.GL_TEXTURE_2D, glc.GL_TEXTURE_MIN_FILTER, glc.GL_NEAREST); *)
 		GLSL.PrintOpenGLError("Init Textures-N");	
 	END InitTextures;
 
-	PROCEDURE  InitGL(): BOOLEAN;
+	PROCEDURE  InitGL(CONST filename: ARRAY OF CHAR): BOOLEAN;
  	BEGIN	
 		
  		MakeCurrent();
 		gl.ReadExtensions();
 
  		gl.ReadCoreVersion;
- 		IF ~gl.GL_VERSION_3_3 THEN
- 			KernelLog.String("Error: your graphic card does not support OpenGL 3.3"); KernelLog.Ln; 
+ 		IF ~gl.GL_VERSION_2_1 THEN
+ 			KernelLog.String("Error: your graphic card does not support OpenGL 2.1"); KernelLog.Ln; 
 		 	RETURN FALSE;
 		 END;
 
 		positionLocation := 0;
 		texcoordsLocation := 1;
-		progname:="boxBlurProgram";
+		progname:="passthroughProgram";
 		
 		InitVAO();
-		InitTextures();
+		InitTextures(filename);
 
 		passthroughProgram := InitShader("passthroughVS.glsl", "passthroughFS.glsl");
 		boxBlurProgram := InitShader("passthroughVS.glsl", "boxBlurFS.glsl");
@@ -145,8 +157,8 @@ TYPE
 		nightVisionProgram := InitShader("passthroughVS.glsl", "nightVisionFS.glsl");
 		weirdProgram := InitShader("weirdVS.glsl", "passthroughFS.glsl");
 				
-		gl.UseProgram(boxBlurProgram);
-	(*	gl.ActiveTexture(glc.GL_TEXTURE0); *)
+		gl.UseProgram(passthroughProgram);
+		gl.ActiveTexture(glc.GL_TEXTURE0);
 		
 		DeActivate;
 		RETURN TRUE;
@@ -154,31 +166,28 @@ TYPE
 		
 		
 	PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
-	VAR
-		t: BOOLEAN;
 	BEGIN
 		MakeCurrent();
 		CASE CHR(ucs) OF
 			 "x" : Close; RETURN;
 			| "s" : SaveImage; RETURN;
-			| "i" :	t:=InitGL();
-			| "1" :	gl.UseProgram(passthroughProgram); progname:="passthroughProgram";
-			| "2" :	gl.UseProgram(boxBlurProgram); progname:="boxBlurProgram";
-			| "3" :	gl.UseProgram(negativeProgram); progname:="negativeProgram";
-			| "4" :	gl.UseProgram(gaussianBlurProgram); progname:="gaussianBlurProgram";
-			| "5" :	gl.UseProgram(grayscaleProgram); progname:="grayscaleProgram";
-			| "6" :	gl.UseProgram(edgeDetectionProgram); progname:="edgeDetectionProgram";
-			| "7" :	gl.UseProgram(toonShadingProgram); progname:="toonShadingProgram";
-			| "8" :	gl.UseProgram(vintageProgram); progname:="vintageProgram";
-			| "9" :	gl.UseProgram(brightnessProgram); progname:="brightnessProgram";
-			| "0" :	gl.UseProgram(unsharpMaskProgram); progname:="unsharpMaskProgram";
-			| "-" :	gl.UseProgram(sharpenProgram); progname:="sharpenProgram";
-			| "q" :	gl.UseProgram(nightVisionProgram); progname:="nightVisionProgram";
-			| "w" :	gl.UseProgram(weirdProgram); progname:="weirdProgram";
+			| "1" :	gl.UseProgram(passthroughProgram); 	progname:="passthroughProgram";
+			| "2" :	gl.UseProgram(boxBlurProgram); 		progname:="boxBlurProgram";
+			| "3" :	gl.UseProgram(negativeProgram); 		progname:="negativeProgram";
+			| "4" :	gl.UseProgram(gaussianBlurProgram); 	progname:="gaussianBlurProgram";
+			| "5" :	gl.UseProgram(grayscaleProgram); 		progname:="grayscaleProgram";
+			| "6" :	gl.UseProgram(edgeDetectionProgram);	progname:="edgeDetectionProgram";
+			| "7" :	gl.UseProgram(toonShadingProgram);	progname:="toonShadingProgram";
+			| "8" :	gl.UseProgram(vintageProgram); 		progname:="vintageProgram";
+			| "9" :	gl.UseProgram(brightnessProgram); 		progname:="brightnessProgram";
+			| "0" :	gl.UseProgram(unsharpMaskProgram); 	progname:="unsharpMaskProgram";
+			| "-" :	gl.UseProgram(sharpenProgram); 		progname:="sharpenProgram";
+			| "q" :	gl.UseProgram(nightVisionProgram); 		progname:="nightVisionProgram";
+			| "w" :	gl.UseProgram(weirdProgram); 			progname:="weirdProgram";
 
 		ELSE	
 		END;
-		DeActivate();
+		(* DeActivate();*)
 		UpdateImage();
 	END KeyEvent;
 
@@ -226,7 +235,7 @@ TYPE
 		MakeCurrent();
 		Display();				
 		SwapGLBuffer();
-		DeActivate();
+		(* DeActivate();*)
 		canvas.SetColor(WMGraphics.White);
 		canvas.GetFont().GetStringSize(progname, dw, dh);
 		canvas.DrawString(GetWidth() DIV 2- dw DIV 2 , 20, progname);
@@ -238,17 +247,20 @@ TYPE
 	BEGIN
 	 MakeCurrent();
 	 	gl.Viewport(0, 0, w, h);
-	DeActivate;
+	(* DeActivate; *)
 	END Reshape;
 
 BEGIN 
 END GLWindow;
 
-PROCEDURE Open*;
+PROCEDURE Open*(context: Commands.Context);
 VAR
 	window: GLWindow;
+	filename: ARRAY 64 OF CHAR;
 BEGIN
-	NEW(window, width, height);
+	IF context.arg.GetString(filename) THEN
+		NEW(window, filename, width, height);
+	END;	
 END Open;
 
 BEGIN
@@ -260,4 +272,4 @@ SystemTools.Free  WMGLShaderGITDemo  WMGLWindow ~
 SystemTools.FreeDownTo OpenGL ~ 
 
 
-WMGLShaderGITDemo.Open ~
+WMGLShaderGITDemo.Open "Lenna.png" ~

@@ -276,8 +276,9 @@ TYPE GLWindow=OBJECT(GLW.Window)
 VAR
 	vertexbuffer, uvbuffer: Uint; (* GL buffers *)
 	image: Uint; (* image texture name *)
-	passthroughProgram: GL.Uint;
-	splashscreen,fullwindow: BOOLEAN;
+	programs: ARRAY 13 OF Uint;
+	curprogram: Uint;
+	splashscreen, fullwindow: BOOLEAN;
 	
 PROCEDURE &openwincam(w,h: INTEGER);
 BEGIN
@@ -300,7 +301,7 @@ BEGIN
 END IdleDisplay;
 
 (* is called by OGLWindow before MainLoop started *)
-PROCEDURE OnLoad* ;
+PROCEDURE OnLoad ;
 BEGIN
 	
 	IF ~InitGL() THEN Close; RETURN END;	
@@ -337,13 +338,17 @@ BEGIN
 	centerx:= w DIV 2; centery:= h DIV 2;	
 END Reshape;
 
-PROCEDURE Close*;
+PROCEDURE Close;
+VAR i: LONGINT;
 BEGIN
 	Base.worldalive:=FALSE;
 	Out.String("Spasim Closing.."); Out.Ln;
 	
 	(* cleanup gl buffers *)
-	GL.DeleteProgram(passthroughProgram);
+	
+	FOR i:=0 TO LEN(programs)-1 DO
+		GL.DeleteProgram(programs[i]);
+	END;
 	
 	GL.DisableVertexAttribArray(0);
 	GL.DisableVertexAttribArray(1);
@@ -355,7 +360,7 @@ BEGIN
 	Close^;
 END Close;
   
-PROCEDURE KeyEvent* (ucs : LONGINT; flags : SET; keysym : LONGINT);
+PROCEDURE KeyEvent (ucs : LONGINT; flags : SET; keysym : LONGINT);
 
 VAR
 	v: Voxel;   
@@ -404,7 +409,11 @@ BEGIN
 			| "7": Base.cursordist:=Base.cursordist*1.3
 			| "8": Base.cursordist:=Base.cursordist/1.3
 			| "l": Marsh.lines:=~Marsh.lines
-			| "b": Marsh.showcode;  
+			| "b": Marsh.showcode;
+			
+			| "f": curprogram := (curprogram +1 ) MOD 13; 
+					Out.String("curprogram="); Out.Int(curprogram,0); Out.Ln;
+					
 		ELSE (* use keysm *)
 			Out.String("ucs: "); Out.Hex(ucs,4); Out.String("keysym: "); Out.Hex(keysym,4); Out.Ln;
 			CASE keysym OF
@@ -437,202 +446,176 @@ BEGIN
 	END
 END KeyEvent;
 
-PROCEDURE PointerDown*(x, y: LONGINT; keys: SET);
-BEGIN
-	IF ~CAPTUREMOUSE THEN SetIdleTime(0); HideMousePointer(TRUE); CAPTUREMOUSE:=TRUE;	 END;
-	PAUSE:=FALSE;
-	MOUSEDOWN:=TRUE;	
-	MB := keys;
-	IF GLW.ML IN MB THEN Out.String("ML");
-	ELSIF  GLW.MM IN MB THEN Out.String("MM");
-	ELSIF  GLW.MR IN MB THEN Out.String("MR");
-	END;	
-END PointerDown;
-
-	(** called when mouse button up  *)
-PROCEDURE PointerUp*(x, y: LONGINT; keys: SET);
-BEGIN
-	MOUSEDOWN:=FALSE
-END PointerUp;
-	
-PROCEDURE PointerMove* (x, y : LONGINT; keys : SET);
-VAR
-	up,left: REAL;
-	xr,yr: LONGINT;
-	temporaljust: REAL;
-BEGIN
+	PROCEDURE PointerDown(x, y: LONGINT; keys: SET);
+	BEGIN
+		IF ~CAPTUREMOUSE THEN SetIdleTime(0); HideMousePointer(TRUE); CAPTUREMOUSE:=TRUE;	 END;
+		PAUSE:=FALSE;
+		MOUSEDOWN:=TRUE;	
 		MB := keys;
-		temporaljust := msd/GetCurrentFrameMs();
+		IF GLW.ML IN MB THEN Out.String("ML");
+		ELSIF  GLW.MM IN MB THEN Out.String("MM");
+		ELSIF  GLW.MR IN MB THEN Out.String("MR");
+		END;	
+	END PointerDown;
+
+		(** called when mouse button up  *)
+	PROCEDURE PointerUp(x, y: LONGINT; keys: SET);
+	BEGIN
+		MOUSEDOWN:=FALSE
+	END PointerUp;
 		
-		xr := ENTIER((x-centerx)*temporaljust); yr :=ENTIER((y-centery)*temporaljust);
-	
-	
-		IF CAPTUREMOUSE & (ABS(xr)+ABS(yr)>5) THEN
-			left:=ABS(xr)*xr;
-			up:=-ABS(yr)*yr; 
-			camera.up(-up/(60000*leftsticky)); 
-			camera.left(left/(30000*leftsticky));
+	PROCEDURE PointerMove (x, y : LONGINT; keys : SET);
+	VAR
+		up,left: REAL;
+		xr,yr: LONGINT;
+		temporaljust: REAL;
+	BEGIN
+			MB := keys;
+			temporaljust := msd/GetCurrentFrameMs();
 			
-			WarpPointer(1000,1000, centerx,centery);
-		END
-END PointerMove;
- 
-PROCEDURE WheelMove*(dz: LONGINT);
-BEGIN
-IF TRUE  THEN
-	IF dz > 0 THEN slowdown; Out.String("slowdown dz="); Out.Int(dz, 0); Out.Ln;
-	ELSE speedup; Out.String("speedup dz="); Out.Int(dz, 0); Out.Ln;
-	END;
-END;	
-END WheelMove;
-
-
-PROCEDURE  InitGL(): BOOLEAN;
-VAR 	vs, fs: Strings.String;
-		vertexPosition, vertexUVID: Uint;
-		imageID: Uint;	
-		vertices, texcoords: ARRAY [*] OF Float;
+			xr := ENTIER((x-centerx)*temporaljust); yr :=ENTIER((y-centery)*temporaljust);
+		
+		
+			IF CAPTUREMOUSE & (ABS(xr)+ABS(yr)>5) THEN
+				left:=ABS(xr)*xr;
+				up:=-ABS(yr)*yr; 
+				camera.up(-up/(60000*leftsticky)); 
+				camera.left(left/(30000*leftsticky));
 				
-BEGIN		
-	GL.ReadImplementationProperties;
-	IF ~GL.GL_VERSION_2_0 THEN
-		Out.String("Error: your graphic card does not support OpenGL 2.0"); 
-		Out.Ln;
-	 	RETURN FALSE;
-	 END;
-		 	
-	GL.ActiveTexture(GLC.GL_TEXTURE0);	
-	GL.Enable(GLC.GL_TEXTURE_2D);
-	
-	GL.ClearColor(0.0, 0.0, 0.0, 0.0);
-	
-	(* create texture object for image *)
-	GL.GenTextures(1, ADDRESSOF(image));
-	GL.BindTexture(GLC.GL_TEXTURE_2D, image); 
-	(* These determine how interpolation is made when image scaled down on up *)
-	GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER,  GLC.GL_LINEAR);
-	GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_NEAREST);
-	GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height, 0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr);
+				WarpPointer(1000,1000, centerx,centery);
+			END
+	END PointerMove;
+	 
+	PROCEDURE WheelMove(dz: LONGINT);
+	BEGIN
+	IF TRUE  THEN
+		IF dz > 0 THEN slowdown; Out.String("slowdown dz="); Out.Int(dz, 0); Out.Ln;
+		ELSE speedup; Out.String("speedup dz="); Out.Int(dz, 0); Out.Ln;
+		END;
+	END;	
+	END WheelMove;
 
-	vs := VertexSource();
-	fs := FragmentSource();
-	IF  ~GLSL.LoadTheseShaders(vs, fs, passthroughProgram) THEN RETURN FALSE END;
-	GL.UseProgram(passthroughProgram);
-		
+	PROCEDURE InitShader(CONST vertexShaderPath, fragmentShaderPath: ARRAY OF CHAR): Uint;
+	VAR program: Uint;
+		location: Int;
+		w, h: REAL;
+	BEGIN
+		program := GLSL.LoadShaders(vertexShaderPath, fragmentShaderPath);
+		GL.UseProgram(program);
 
-	(* Get a handle for our buffers *)
-		vertexPosition := GL.GetAttribLocation(passthroughProgram,  "Position");
-		vertexUVID := GL.GetAttribLocation(passthroughProgram, "Texcoords");	
-		
-		(* Get a handle for our "myTextureSampler" uniform *)
-		imageID  := GL.GetUniformLocation(passthroughProgram, "u_image");
-		GL.Uniform1i(imageID, 0); 
-		
-		(* A2 Image origin is top-left, opengl's image left-bottom; so, flip it *)
-	
-		vertices := [-1.0, -1.0,   1.0, -1.0,   1.0, 1.0,
-					 -1.0, -1.0,   1.0, 1.0, -1.0, 1.0  ];
+		location := GL.GetUniformLocation(program, "u_image");
+		IF location # -1 THEN GL.Uniform1i(location, 0); END;
 
-		texcoords := [0.0, 1.0,   1.0, 1.0,   1.0, 0.0,
-					 0.0, 1.0,    1.0, 0.0,   0.0, 0.0  ];
-		
-		(* create VBO handles *)
-		GL.GenBuffers(1, ADDRESSOF(vertexbuffer));
-		GL.BindBuffer(GLC.GL_ARRAY_BUFFER, vertexbuffer);
+		location := GL.GetUniformLocation(program, "u_step") ;
+		w :=1.0/Retina.W; h := 1.0/ Retina.H;
+		IF location # -1 THEN GL.Uniform2f(location, w, h);  END;
+
+		RETURN program;
+	END InitShader;
+
+	(* init Vertex Array Objects *)
+	PROCEDURE InitVAO();
+	VAR
+		vertices, texcoords: ARRAY [8] OF Float;
+		indices: ARRAY [6] OF Ushort;
+		vao:  Uint;
+		vertexBufferObjID: ARRAY [3] OF Uint;
+		positionLocation, texcoordsLocation: Uint;
+	BEGIN
+		(* A2 Image origin is top-left, opengl's image left-bottom; so, flip indices in horizontal  *)
+		vertices := [-1.0, -1.0, 	1.0, -1.0, 1.0, 1.0, -1.0, 1.0  ];
+		texcoords := [0.0, 1.0,  1.0, 1.0,  1.0, 0.0,	0.0, 0.0 ];
+		indices := [ 0, 1, 3, 3, 1, 2 ]; 
+
+		positionLocation := 0;
+		texcoordsLocation := 1;
+				
+		GL.GenVertexArrays(1, ADDRESSOF(vao));
+		GL.BindVertexArray(vao);
+
+		GL.GenBuffers(3, ADDRESSOF(vertexBufferObjID[0]));
+
+		GL.BindBuffer(GLC.GL_ARRAY_BUFFER, vertexBufferObjID[0]);
 		GL.BufferData(GLC.GL_ARRAY_BUFFER, LEN(vertices,0)*SIZEOF(Float), ADDRESSOF(vertices[0]), GLC.GL_STATIC_DRAW);
+		GL.VertexAttribPointer(positionLocation, 2, GLC.GL_FLOAT, GLC.GL_FALSE, 0, 0);
+		GL.EnableVertexAttribArray(positionLocation);
 
-		GL.GenBuffers(1, ADDRESSOF(uvbuffer));
-		GL.BindBuffer(GLC.GL_ARRAY_BUFFER, uvbuffer);
+		GL.BindBuffer(GLC.GL_ARRAY_BUFFER, vertexBufferObjID[1]);
 		GL.BufferData(GLC.GL_ARRAY_BUFFER, LEN(texcoords,0)*SIZEOF(Float), ADDRESSOF(texcoords[0]), GLC.GL_STATIC_DRAW);
+		GL.VertexAttribPointer(texcoordsLocation, 2, GLC.GL_FLOAT, GLC.GL_FALSE, 0, 0);
+		GL.EnableVertexAttribArray(texcoordsLocation);
 
-		(* 1rst attribute buffer : vertices *)
+		GL.BindBuffer(GLC.GL_ELEMENT_ARRAY_BUFFER, vertexBufferObjID[2]);
+		GL.BufferData(GLC.GL_ELEMENT_ARRAY_BUFFER, LEN(indices,0)*SIZEOF(Ushort), ADDRESSOF(indices[0]), GLC.GL_STATIC_DRAW);
 
-	GL.EnableVertexAttribArray(0);
-		GL.BindBuffer(GLC.GL_ARRAY_BUFFER, vertexbuffer);
-		GL.VertexAttribPointer(
-			vertexPosition, (* The attribute we want to configure *)
-			2, (*size *)
-			GLC.GL_FLOAT, (* type *)
-			GLC.GL_FALSE,  (* normalized ? *)
-			0, (* stride *)
-			0); (* array buffer offset *)
+	END InitVAO;
 
-		(* 2nd attribute buffer : UVs *)
-		GL.EnableVertexAttribArray(1);
-		GL.BindBuffer(GLC.GL_ARRAY_BUFFER, uvbuffer);
+
+	PROCEDURE  InitGL(): BOOLEAN;
+	BEGIN
+		GL.ReadExtensions();
+		GL.ReadImplementationProperties;
+		IF ~GL.GL_VERSION_2_0 THEN
+			Out.String("Error: your graphic card does not support OpenGL 2.0"); 
+			Out.Ln;
+		 	RETURN FALSE;
+		 END;
+
+		GL.ClearColor(0.0, 0.0, 0.0, 0.0);
+
+		(* create texture object for image *)
+		GL.GenTextures(1, ADDRESSOF(image));
+		GL.BindTexture(GLC.GL_TEXTURE_2D, image); 
+		(* These determine how interpolation is made when image scaled down on up *)
+		GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER,  GLC.GL_LINEAR);
+		GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_NEAREST);
+		GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height, 0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr);
 		
-		GL.VertexAttribPointer(
-			vertexUVID, (* The attribute we want to configure *)
-			2, (* size : U+V => 2 *)
-			GLC.GL_FLOAT, (* type *)
-			GLC.GL_FALSE,  (* normalized ? *)
-			0, (* stride *)
-			0); (* array buffer offset *)
+		InitVAO();
+			(* load shader programs *)
+			programs[0] := InitShader("passthroughVS.glsl", "passthroughFS.glsl");
+			programs[1] := InitShader("passthroughVS.glsl", "boxBlurFS.glsl");
+			programs[2] := InitShader("passthroughVS.glsl", "negativeFS.glsl");
+			programs[3] := InitShader("passthroughVS.glsl", "gaussianBlurFS.glsl");
+			programs[4] := InitShader("passthroughVS.glsl", "grayscaleFS.glsl");
+			programs[5] := InitShader("passthroughVS.glsl", "edgeDetectionFS.glsl");
+			programs[6] := InitShader("passthroughVS.glsl", "toonShadingFS.glsl");
+			programs[7] := InitShader("passthroughVS.glsl", "vintageFS.glsl");
+			programs[8] := InitShader("passthroughVS.glsl", "brightnessFS.glsl");
+			programs[9] := InitShader("passthroughVS.glsl", "unsharpMaskFS.glsl");
+			programs[10] := InitShader("passthroughVS.glsl", "sharpenFS.glsl");
+			programs[11] := InitShader("passthroughVS.glsl", "nightVisionFS.glsl");
+			programs[12] := InitShader("weirdVS.glsl", "passthroughFS.glsl");
+			curprogram := 0;
 			  
-	SwapBuffers();
-			  
-	RETURN TRUE;
-END InitGL;
+		RETURN TRUE;
+	END InitGL;
 
-PROCEDURE VertexSource():Strings.String;
-VAR sw: Streams.StringWriter;
-      buf: Strings.String;
-BEGIN
-	NEW(sw,256);
+	PROCEDURE Display();
+	BEGIN
+		IF ~splashscreen THEN	camera.tick; END;
+		GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT) ;
+		
+		GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height,  0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr);
+		GL.UseProgram(programs[curprogram]);
+			GL.DrawElements(GLC.GL_TRIANGLES, 6, GLC.GL_UNSIGNED_SHORT, 0);
+		GL.UseProgram(0);	
+		SwapBuffers();	
+	END Display;
 
-	sw.String("attribute vec2 Position;"); sw.Ln;
-	sw.String("attribute vec2 Texcoords;"); 	sw.Ln;
-	sw.String("varying vec2 v_Texcoords;"); 	sw.Ln;
-	
-	sw.String("void main(void) {"); 		sw.Ln;
-	sw.String("  v_Texcoords = Texcoords;"); 	sw.Ln;
-	sw.String("  gl_Position = vec4(Position,0,1);"); 		sw.Ln;
-	sw.String("}"); sw.Ln;
-	
-	NEW(buf, sw.Pos());
-	sw.Get(buf^);
-	RETURN buf;
-END VertexSource;
+	(* change detail according to frame speed, called in GLWindow.MainLoop *)
+	PROCEDURE GameLogic();
+	BEGIN
+		IF GetCurrentFrameMs() <msd THEN 
+			Retina.moredetail;
+		ELSIF GetCurrentFrameMs() >(msd+10) THEN 
+			Retina.lessdetail;
+		END; 
+	END GameLogic;
 
-PROCEDURE FragmentSource():Strings.String;
-VAR sw: Streams.StringWriter;
-      buf: Strings.String;
-BEGIN
-	NEW(sw,256);
-
-	sw.String("varying vec2 v_Texcoords;"); sw.Ln;
-	sw.String("uniform sampler2D u_image;"); 	sw.Ln;
-
-	sw.String("void main(void) { "); 	sw.Ln;
-	sw.String("  gl_FragColor = texture2D(u_image, v_Texcoords);"); sw.Ln;	
-	sw.String("} "); 	sw.Ln;
-	NEW(buf, sw.Pos());
-	sw.Get(buf^);
-	RETURN buf;
-END FragmentSource;
-
-PROCEDURE Display();
-BEGIN
-	IF ~splashscreen THEN	camera.tick; END;
-	GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT) ;
-	GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height,  0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr);
-	GL.DrawArrays(GLC.GL_TRIANGLES, 0, 2*3);  (* 2*3 indices starting at 0 -> 2 triangles *)	     		
-	SwapBuffers();	
-END Display;
-
-(* change detail according to frame speed, called in GLWindow.MainLoop *)
-PROCEDURE GameLogic();
-BEGIN
-	IF GetCurrentFrameMs() <msd THEN 
-		Retina.moredetail;
-	ELSIF GetCurrentFrameMs() >(msd+10) THEN 
-		Retina.lessdetail;
-	END; 
-END GameLogic;
-
-BEGIN
-	MainLoop; (* run this window's main loop *)
-END GLWindow;
+	BEGIN {ACTIVE}
+		MainLoop; (* run this window's main loop *)
+	END GLWindow;
 
 
 VAR
