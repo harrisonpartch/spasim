@@ -280,7 +280,7 @@ VAR
 	undo,rd, rdpseudosolid, blu, die,gren,granite,sand,whiteblock,lazy,pdestroyer,axolotl,xen,sky1,sky2,tigerlily,cloud: Voxel;
 	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison,fuse:Voxel;
 	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,
-	cage,floop,volvox,life,iml,speckle, doge, reddot: Voxel;
+	cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp: Voxel;
 	 
 BEGIN
 	NEW(ms);
@@ -290,10 +290,19 @@ BEGIN
 
   	w10:=Base.VoxelFromName("NM3");	
  	z10:=Base.VoxelFromName("NM2");	
- 	push(w10);
-	Out.String("EEEEP!");
+
+	harrison:=Base.VoxelFromName("Nharrisonavatar"); 
+	push(harrison);
+	doge:=Base.VoxelFromName("Ndogepearl"); 
+	push(doge);		
 	xot:=Base.VoxelFromName("N5a2g4M6HYjPJxYSNQvYyv7"); 
 	push(xot);
+     floop:=Base.VoxelFromName("NFLOOP");  
+     push(floop);
+ 	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXXBiQ"); 	
+	push(serp);
+	treeserp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX666"); 	
+	push(treeserp);	
 	gorge:=Base.VoxelFromName("NxxxGAernhjFK40xASZZVoQ"); 
 	push(gorge);
 	xot2:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 	
@@ -322,9 +331,7 @@ BEGIN
 	push(harrison);
 	doge:=Base.VoxelFromName("Ndogepearl"); 
 	push(doge);	
-(*      	floop:=Base.VoxelFromName("NFLOOP");  
-       push(floop);
-*)     	MCUBE:=Base.VoxelFromName("Nr3kPtbyEYLFK3AN2UUVrqg");
+    	MCUBE:=Base.VoxelFromName("Nr3kPtbyEYLFK3AN2UUVrqg");
 	push(MCUBE);
   	
 	cage:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");
@@ -348,14 +355,13 @@ BEGIN
 	
 	GREEN:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODg");	(*actually blue atm*)
 	grass:=Base.VoxelFromName("NJOFc7qhMXMly3lot71bNUw"); 	
-	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXXBiQ"); 	
 	cloud:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODh"); 		
 	
   	push(dotz);
 	push(btx);
 	push(GREEN);
 	push(grass);	
-	push(serp);
+
 	push(conglomerate);
 	push(xot);	
 	push(cloud);	
@@ -455,13 +461,13 @@ END dawn;
 PROCEDURE darken*;
 BEGIN
 	atmdark:= atmdark*1.5;
-	Base.world.setcolor(atmdark,0,0,atmdark/3,0);	
+	Base.world.setcolor(0,0,0,atmdark,0);	
 END darken;
 
 PROCEDURE lighten*;
 BEGIN
 	IF atmdark>0.11 THEN atmdark:= atmdark/1.5 END;
-	Base.world.setcolor(atmdark,0,0,atmdark/3,0);	
+	Base.world.setcolor(0,0,0,atmdark,0);	
 END lighten
 
 BEGIN

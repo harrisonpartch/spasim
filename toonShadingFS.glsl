@@ -3,7 +3,7 @@ varying vec2 v_Texcoords;
 uniform sampler2D u_image;
 uniform vec2 u_step;
 
-const int KERNEL_WIDTH = 3; // Odd
+const int KERNEL_WIDTH = 7; // Odd
 const float offset = 1.0;
 const vec3 W = vec3(0.3, 0.3, 0.3);
 const mat3 vert = mat3(vec3(-1,-2,-1), vec3(0,0,0), vec3(1,2,1));

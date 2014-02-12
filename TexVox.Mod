@@ -54,9 +54,9 @@ BEGIN
 		END;	
 		color:=texcube.side[ray.face].pixel(1-lx,1-ly);
 		dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
-		dr:=color.red*dot*ray.ra*color.alpha;
-		dg:=color.green*dot*ray.ga*color.alpha;
-		db:=color.blue*dot*ray.ba*color.alpha;	
+		dr:=color.red*dot;
+		dg:=color.green*dot;
+		db:=color.blue*dot;	
 		IF color.alpha<0.98 THEN
 			IF color.alpha>0.7 THEN
 				mirror(ray)
@@ -257,7 +257,7 @@ BEGIN
 	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
 	mix:= (ray.length*ray.scale)/10;
 	IF mix>1 THEN mix:=1 END;
-	dot:=(dot1*mix+dot2*(1-mix));
+	dot:=(dot2*mix+dot1*(1-mix));
 	dr:=color.red*dot*color.alpha;
 	dg:=color.green*dot*color.alpha;
 	db:=color.blue*dot*color.alpha;	

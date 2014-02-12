@@ -2,22 +2,19 @@ MODULE Nharrisonavatar;
 IMPORT Base, TexVox, XNXLRotaVox;
   
 VAR 
-	cv: TexVox.AvaVox;
-	rv: XNXLRotaVox.RVox;
-	up,right: Base.PT;
+	cv: TexVox.TexVox;
 	sabot, vox,v,sphere: Base.Voxel;
 	center: Base.PT;
+
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	IF vox=NIL THEN
-		NEW(cv,"harrisonavatar.png");
-		vox:=cv;		
-		vox.passable:=TRUE;
-		vox.tscale:=100;	
-	END;
-	RETURN vox
+	RETURN cv
 END thisvox;
 
- END Nharrisonavatar. 
+BEGIN
+	NEW(cv,"harrisonavatar.png");
+	cv.passable:=TRUE;
+	cv.tscale:=0;	
+END Nharrisonavatar. 
  
  XNXLMarsh.Rez Nharrisonavtar ~

@@ -36,7 +36,7 @@ BEGIN
 	old := pool;
 	NEW(pool, LEN(pool)*2);
 	FOR i := 0 TO count-1 DO pool[i] := old[i] END;
-	Out.String("NM3 pool growing to ");
+	Out.String("NM2 pool growing to ");
 	Out.Int(count*2,10);
 END grow;
 
@@ -101,7 +101,7 @@ BEGIN
 	old := wipe;
 	NEW(wipe, count*2);
 	FOR i := 0 TO LEN(old)-1 DO wipe[i] := old[i] END;
-	Out.String("NM3 wipe growing to ");
+	Out.String("NM2 wipe growing to ");
 	Out.Int(count*2,10);
 END grow;
 
@@ -137,7 +137,6 @@ VAR
 	lblox*: ARRAY M,M,M OF LCube;
 	nposterTF*:BOOLEAN;
 	nposter*: NCube;
-	
 PROCEDURE Shade (VAR ray: Ray);
 VAR
 	pushxyz, newxyz, xyz: Base.PT;
@@ -245,7 +244,7 @@ BEGIN
 			END;
 			bounds(ijk.i,ijk.j,ijk.k, out);	
 			IF ~out THEN
-				v := blox[ijk.i,ijk.j,ijk.k];  (*moved up here for cache latency *)
+				v := blox[ijk.i,ijk.j,ijk.k];  (*moved up here for cache latency --stupid idea*)
 			END;
 			vdepth:=Base.distance(newxyz,xyz);
 			IF vdepth>1 THEN vdepth:=1 END;
@@ -255,15 +254,13 @@ BEGIN
 			ray.xyz.z:=ray.xyz.z +((newxyz.z-xyz.z)+ray.ddxyz.z)*scaleInv;			
 			xyz:=newxyz;
 			ray.length:=ray.length+vdepth;
+	(*		IF ray.length>0.1 THEN ray.terminate:=TRUE END; *)
 			blr:=black*vdepth;
-(*			ray.bla := ray.bla-blr; 
+			ray.bla := ray.bla-blr; 
 			blainv:=1-ray.bla;
 			rr := red*vdepth*ray.ra*blainv; 
 			gr := green*vdepth*ray.ga*blainv; 
-			br := blue*vdepth*ray.ba*blainv; *)
-			rr := red*vdepth*ray.ra; 
-			gr := green*vdepth*ray.ga; 
-			br := blue*vdepth*ray.ba; 			 	
+			br := blue*vdepth*ray.ba*blainv; 	 	
 			ray.r := ray.r+rr;
 			ray.g:= ray.g+gr;
 			ray.b := ray.b+br; 
@@ -292,7 +289,7 @@ BEGIN
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);	
 				END;
 			END;
-			IF (ray.alpha<0.1) OR ( (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1)) THEN ray.terminate:=TRUE END;
+			IF (ray.alpha<0.1) (* OR ( (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1)) *)THEN ray.terminate:=TRUE END;
 		UNTIL out OR ray.terminate;
 	END 		END;
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
@@ -387,6 +384,13 @@ VAR
 	i,j,k: INTEGER;
 BEGIN
 	fill(v);
+	blox[1,1,0]:=w;
+
+	blox[0,1,1]:=w;	
+
+	blox[1,0,1]:=w;	
+
+	blox[1,1,1]:=w;	
 END fillsierp;
 
 PROCEDURE fillcqr2*(v,w: Voxel);
@@ -473,7 +477,7 @@ BEGIN
 	setcolorrec(r,g,b,bl,a)
 END setcolor;
 
-PROCEDURE setcolorrec (r,g,b,bl,a: REAL); 
+PROCEDURE setcolorrec(r,g,b,bl,a: REAL); 
 VAR
 	v: Voxel;
 	i,j,k: INTEGER;
@@ -487,9 +491,9 @@ BEGIN
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 		v:=blox[i,j,k];
 		IF v#NIL THEN
-			IF v IS Voxel THEN
-				IF ~v.copymarker THEN
-					WITH v: Voxel DO
+			IF v IS cell THEN
+				IF (~v.copymarker) & (v.code=code) THEN
+					WITH v: cell DO
 						v.setcolorrec(r,g,b,bl,a);
 					END
 				END

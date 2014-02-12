@@ -8,8 +8,8 @@ TYPE
 CONST
 	T=4;        
 	TS=2*16;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=8;
-	TH=6;
+	TW=12;
+	TH=10;
 	W*=TS*TW;
 	H*=TS*TH;
 
@@ -94,14 +94,15 @@ VAR
 	pixel: Raster.Pixel;
 BEGIN
 	ray:=Base.blankray;
+	ray.dtl:=10;
 	angletoray(ray,cam.theta+cam.dtheta/2,cam.phi+cam.dphi/2);
 	Base.world.Shade(ray);
-(*	IF ~ray.terminate THEN
+	IF ~ray.terminate THEN
 			ray.b:= ray.b + ray.ba;
 			ray.r:= ray.r + ray.ra/2;
 			ray.g:= ray.g + ray.ga/2;	
 	END;
-*)	Base.clamp3(ray.r,ray.g,ray.b);
+	Base.clamp3(ray.r,ray.g,ray.b);
 	Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255)); 
 	Raster.Fill(image,cam.imx,cam.imy,cam.imx+2,cam.imy+2,pixel,copy);
 END tessa;
@@ -120,14 +121,15 @@ BEGIN;
 		phi:=cam.phi;
 		FOR j :=  0 TO 1 DO 
 			ray:=Base.blankray;
+			ray.dtl:=60;
 			angletoray(ray,theta,phi);
 			Base.world.Shade(ray);
-(*			IF ~ray.terminate THEN
+			IF ~ray.terminate THEN
 				ray.b:= ray.b + ray.ba;
 				ray.r:= ray.r + ray.ra/2;
 				ray.g:= ray.g + ray.ga/2;	
 			END;	
-*)			Base.clamp3(ray.r,ray.g,ray.b);
+			Base.clamp3(ray.r,ray.g,ray.b);
 			Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255)); 
 			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
 			phi:=phi+dphi;

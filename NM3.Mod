@@ -246,23 +246,18 @@ BEGIN
 			IF ~out THEN
 				v := blox[ijk.i,ijk.j,ijk.k];  (*moved up here for cache latency --stupid idea*)
 			END;
-			vdepth:=Base.distance(newxyz,xyz);
-			IF vdepth>1 THEN vdepth:=1 END;
-			vdepth:=vdepth*scaleInv; 
+			vdepth:=Base.distance(newxyz,xyz)*scaleInv;
 			ray.xyz.x:=ray.xyz.x +((newxyz.x-xyz.x)+ray.ddxyz.x)*scaleInv;
 			ray.xyz.y:=ray.xyz.y +((newxyz.y-xyz.y)+ray.ddxyz.y)*scaleInv;			
 			ray.xyz.z:=ray.xyz.z +((newxyz.z-xyz.z)+ray.ddxyz.z)*scaleInv;			
 			xyz:=newxyz;
 			ray.length:=ray.length+vdepth;
 			blr:=black*vdepth;
-(*			ray.bla := ray.bla-blr; 
+			ray.bla := ray.bla-blr; 
 			blainv:=1-ray.bla;
 			rr := red*vdepth*ray.ra*blainv; 
 			gr := green*vdepth*ray.ga*blainv; 
-			br := blue*vdepth*ray.ba*blainv; *)
-			rr := red*vdepth*ray.ra; 
-			gr := green*vdepth*ray.ga; 
-			br := blue*vdepth*ray.ba; 			 	
+			br := blue*vdepth*ray.ba*blainv; 	 	
 			ray.r := ray.r+rr;
 			ray.g:= ray.g+gr;
 			ray.b := ray.b+br; 
@@ -291,7 +286,7 @@ BEGIN
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);	
 				END;
 			END;
-			IF (ray.alpha<0.1) OR ( (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1)) THEN ray.terminate:=TRUE END;
+			IF (ray.alpha<0.1) (* OR ( (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1)) *)THEN ray.terminate:=TRUE END;
 		UNTIL out OR ray.terminate;
 	END 		END;
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
@@ -479,7 +474,7 @@ BEGIN
 	setcolorrec(r,g,b,bl,a)
 END setcolor;
 
-PROCEDURE setcolorrec (r,g,b,bl,a: REAL); 
+PROCEDURE setcolorrec(r,g,b,bl,a: REAL); 
 VAR
 	v: Voxel;
 	i,j,k: INTEGER;
@@ -493,9 +488,9 @@ BEGIN
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 		v:=blox[i,j,k];
 		IF v#NIL THEN
-			IF v IS Voxel THEN
-				IF ~v.copymarker THEN
-					WITH v: Voxel DO
+			IF v IS cell THEN
+				IF (~v.copymarker) & (v.code=code) THEN
+					WITH v: cell DO
 						v.setcolorrec(r,g,b,bl,a);
 					END
 				END

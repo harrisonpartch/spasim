@@ -9,7 +9,7 @@ TYPE Ray = Base.Ray;
 VAR 
 	ball: FRep.sphere;
 	noise: FRep.noise;
-	w3,z3,z2,v,tigerlily,sky: Voxel;
+	w3,z3,z2,v,tigerlily,sky,serp: Voxel;
 	center, p1, p2,n:  PT;
 	i:LONGINT;
 	rand: Random.Generator;
@@ -17,11 +17,12 @@ VAR
 PROCEDURE draw;
 BEGIN
 	w3:=Base.VoxelFromName("NM3");	 
-	z3:=Base.VoxelFromName("NM3");	
-	z2:=Base.VoxelFromName("NM3");
-	z3.setcolor(0,1,0,2,1);
-	z2.setcolor(0,0,0,1,1);	
-	sky:=Base.VoxelFromName("Ngreendot"); 
+	z3:=Base.VoxelFromName("NM2");	
+	z2:=Base.VoxelFromName("NM2");
+	z3.setcolor(0,10,0,10,10);
+	z2.setcolor(10,10,0,0,10);	
+	sky:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw"); 
+	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXXBiQ"); 	
 	Base.setPT(center,1/2,1/2,1/2);
 	w3.fill(sky);
 	w3.stroke(center,1,z3,v);
@@ -39,9 +40,9 @@ BEGIN
 	noise.persistence:=3.1;
 	noise.octaves:=4;	
 	tigerlily:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  
-	noise.setvoxel(sky);
+	noise.setvoxel(serp);
 	noise.persistence:=4;
-	z3.FRaster(noise,27);
+	z3.FRaster(noise,64);
 	sky.lockTF:=TRUE;	
 END draw;
 
