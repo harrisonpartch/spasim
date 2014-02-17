@@ -45,7 +45,7 @@ VAR
 	subserp, beatrix,lobster, tree: Voxel;
 	greenball: Voxel;
 	v: Voxel;
-	blue,red: Voxel;
+	blue,red,reddot: Voxel;
 	alphablue: TransparaVox;
 	s0,s1,s2,s3,s4: NM3.cell;
 
@@ -56,6 +56,7 @@ BEGIN
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	blue:=Base.VoxelFromName("Ndiffuseblue"); 
 	red:=Base.VoxelFromName("Ndiffusered"); 	
+	reddot:=Base.VoxelFromName("Ndiffusereddot"); 
 	blue.passable:=FALSE;
 	subserp:=Base.VoxelFromName("NM3"); 	
 	tree:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX666"); 	
@@ -65,7 +66,7 @@ BEGIN
 	NEW(s3);
 	NEW(s4);	
 	NEW(alphablue);
-	alphablue.setcolor(1/10,0,0,1/4,0);
+	alphablue.setcolor(0,0,0,1/4,1/4);
 
 	tree.imposter:=blue;
 	s0.fillsierp(s1,tree);	
@@ -75,10 +76,12 @@ BEGIN
 	
 	s1.fillsierp(s2,alphablue);	
 	s1.imposter:=blue;
-	s1.lockTF:=TRUE;
+	s1.copyonstroke:=TRUE;
+	s1.DTL:=120;
 
-	s2.fillsierp(s2,red);	
+	s2.fillsierp(s2,reddot);	
 	s2.imposter:=blue;
+	s2.DTL:=120;
 	s2.lockTF:=TRUE;
 
 

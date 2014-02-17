@@ -76,7 +76,8 @@ Modules must be freed to force their reloading after being changed and recompile
 
 NM3.Mod
 NWorld.Mod
-]]></Span><Span style="Normal"><![CDATA[NXWCxXWLIcD2LegvoGXXBiQ]]></Span><Span style="Normal"><![CDATA[.Mod
+NXWCxXWLIcD2LegvoGXXBiQ.Mod
+Ndiffusereddot.Mod
 
 NanonyPET.Open NanonyPET.Mod ~  
 XNXLLifeVox.Mod		''	''

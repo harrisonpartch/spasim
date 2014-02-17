@@ -17,8 +17,8 @@ VAR
 PROCEDURE draw;
 BEGIN
 	w3:=Base.VoxelFromName("NM3");	 
-	z3:=Base.VoxelFromName("NM2");	
-	z2:=Base.VoxelFromName("NM2");
+	z3:=Base.VoxelFromName("NM3");	
+	z2:=Base.VoxelFromName("NM3");
 	z3.setcolor(0,10,0,10,10);
 	z2.setcolor(10,10,0,0,10);	
 	sky:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw"); 
@@ -39,10 +39,8 @@ BEGIN
 	noise.c:=1;		
 	noise.persistence:=3.1;
 	noise.octaves:=4;	
-	tigerlily:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  
-	noise.setvoxel(serp);
-	noise.persistence:=4;
-	z3.FRaster(noise,64);
+	noise.setvoxel(Base.VoxelFromName("NXWCxXWLIcD2LegvoGXXBiQ"));
+	z3.FRaster(noise,27);
 	sky.lockTF:=TRUE;	
 END draw;
 

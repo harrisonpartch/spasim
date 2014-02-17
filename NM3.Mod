@@ -147,14 +147,15 @@ VAR
 	v: Voxel;
 	vdepth, blainv: REAL;
 	last:BOOLEAN;
-	dtl: REAL;
+	dtl,rdtl: REAL;
 BEGIN
 	ray.scale := ray.scale*M;
 	scaleInv := 1/ray.scale;
 	xyz.x := ABS(ray.lxyz.x-offset.x) * M;  
 	xyz.y := ABS(ray.lxyz.y-offset.y) * M;		
 	xyz.z := ABS(ray.lxyz.z-offset.z)* M;	
-	pushxyz:=xyz;	
+	pushxyz:=xyz;
+	rdtl:=ray.dtl;
 	IF DTL>0 THEN ray.dtl:=DTL END; 
 	IF (ray.length*ray.scale>ray.dtl) THEN
 		IF imposter#NIL THEN
@@ -292,6 +293,7 @@ BEGIN
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
 	ray.popdelta.y := (xyz.y-pushxyz.y)/M;
 	ray.popdelta.z := (xyz.z-pushxyz.z)/M; 
+	ray.dtl:=rdtl;
 	ray.scale := ray.scale/M;
 END Shade;
 
@@ -479,24 +481,26 @@ VAR
 	v: Voxel;
 	i,j,k: INTEGER;
 BEGIN
-	copymarker:=TRUE;
-	red:= r;
-	green := g;
-	blue := b;
-	black:= bl;
-	alpha:=a;
-	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
-		v:=blox[i,j,k];
-		IF v#NIL THEN
-			IF v IS cell THEN
-				IF (~v.copymarker) & (v.code=code) THEN
-					WITH v: cell DO
-						v.setcolorrec(r,g,b,bl,a);
+	IF ~copymarker THEN
+		copymarker:=TRUE;
+		red:= r;
+		green := g;
+		blue := b;
+		black:= bl;
+		alpha:=a;
+		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
+			v:=blox[i,j,k];
+			IF v#NIL THEN
+				IF v IS cell THEN
+					IF v.code=code THEN
+						WITH v: cell DO
+							v.setcolorrec(r,g,b,bl,a);
+						END
 					END
 				END
 			END
-		END
-	END END END	
+		END END END
+	END	
 END setcolorrec;
 
 PROCEDURE bounds*(i, j, k: LONGINT; VAR out: BOOLEAN);

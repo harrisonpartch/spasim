@@ -59,6 +59,7 @@ BEGIN
 		db:=color.blue*dot;	
 		IF color.alpha<0.98 THEN
 			IF color.alpha>0.7 THEN
+				ray.alpha:=ray.alpha-0.2;
 				mirror(ray)
 			ELSE
 				ray.r := ray.r + dr;
@@ -263,9 +264,7 @@ BEGIN
 	db:=color.blue*dot*color.alpha;	
 	IF color.alpha<0.99 THEN
 			IF color.alpha>0.75 THEN 
-				ray.ra:=ray.ra-0.1;
-				ray.ga:=ray.ga-0.1;
-				ray.ba:=ray.ba-0.1;						
+				ray.alpha:=ray.alpha-0.2;
 				mirror(ray,mix)
 			ELSE
 				mix:=1;
