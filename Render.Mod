@@ -555,11 +555,7 @@ END KeyEvent;
 	BEGIN
 		GL.ReadExtensions();
 		GL.ReadImplementationProperties;
-		IF ~GL.GL_VERSION_2_0 THEN
-			Out.String("Error: your graphic card does not support OpenGL 2.0"); 
-			Out.Ln;
-		 	RETURN FALSE;
-		 END;
+
 
 		GL.ClearColor(0.0, 0.0, 0.0, 0.0);
 
@@ -573,7 +569,7 @@ END KeyEvent;
 		
 		InitVAO();
 			(* load shader programs *)
-			programs[0] := InitShader("passthroughVS.glsl", "passthroughFS.glsl");
+(*			programs[0] := InitShader("passthroughVS.glsl", "passthroughFS.glsl");
 			programs[1] := InitShader("passthroughVS.glsl", "boxBlurFS.glsl");
 			programs[2] := InitShader("passthroughVS.glsl", "negativeFS.glsl");
 			programs[3] := InitShader("passthroughVS.glsl", "gaussianBlurFS.glsl");
@@ -586,7 +582,7 @@ END KeyEvent;
 			programs[10] := InitShader("passthroughVS.glsl", "sharpenFS.glsl");
 			programs[11] := InitShader("passthroughVS.glsl", "nightVisionFS.glsl");
 			programs[12] := InitShader("weirdVS.glsl", "passthroughFS.glsl");
-			curprogram := 0;
+*)			curprogram := 0;
 			  
 		RETURN TRUE;
 	END InitGL;
