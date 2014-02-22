@@ -245,8 +245,7 @@ VAR
 BEGIN
 	move;	
 	cam.x := cx; cam.y := cy; cam.z := cz;
-	gravityvector:=Base.subPT(worldcenter,cam);	
-(*	gravityvector:=Base.mkPT(0,0,1);	*)	
+	gravityvector:=Base.mkPT(0,0,1);		
 	gravity:=Base.gravity;
 	gravityvector:=Base.mulPT(gravityvector,Base.gravity);
 	a:=Retina.fward.x*Base.cursordist; b:=Retina.fward.y*Base.cursordist; c:=Retina.fward.z*Base.cursordist;
@@ -553,7 +552,15 @@ END KeyEvent;
 
 	PROCEDURE  InitGL(): BOOLEAN;
 	BEGIN
-		GL.ReadExtensions();
+	GL.ReadCoreVersion(); (* read default version of opengl *)
+
+	IF ~GL.GL_VERSION_2_0 THEN
+		Out.String("Error: your graphic card does not support OpenGL 2.0"); 
+		Out.Ln;
+
+	 	RETURN FALSE;
+	 END;
+         GL.ReadExtensions(); (* read all opengl extension functions *)	
 		GL.ReadImplementationProperties;
 
 
@@ -569,7 +576,7 @@ END KeyEvent;
 		
 		InitVAO();
 			(* load shader programs *)
-(*			programs[0] := InitShader("passthroughVS.glsl", "passthroughFS.glsl");
+			programs[0] := InitShader("passthroughVS.glsl", "passthroughFS.glsl");
 			programs[1] := InitShader("passthroughVS.glsl", "boxBlurFS.glsl");
 			programs[2] := InitShader("passthroughVS.glsl", "negativeFS.glsl");
 			programs[3] := InitShader("passthroughVS.glsl", "gaussianBlurFS.glsl");
@@ -582,7 +589,7 @@ END KeyEvent;
 			programs[10] := InitShader("passthroughVS.glsl", "sharpenFS.glsl");
 			programs[11] := InitShader("passthroughVS.glsl", "nightVisionFS.glsl");
 			programs[12] := InitShader("weirdVS.glsl", "passthroughFS.glsl");
-*)			curprogram := 0;
+			curprogram := 0;
 			  
 		RETURN TRUE;
 	END InitGL;
@@ -610,7 +617,7 @@ END KeyEvent;
 	END GameLogic;
 
 	BEGIN {ACTIVE}
-		MainLoop; (* run this window's main loop *)
+		MainLoop; 
 	END GLWindow;
 
 
