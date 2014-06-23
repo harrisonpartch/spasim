@@ -1,7 +1,7 @@
 MODULE XF86VMode; (** AUTHOR "fnecati"; PURPOSE "unix <X/xf86vmode.h>"; *)
 
 IMPORT
-  X11 , Unix, SYSTEM, Modules, Trace;
+  X11 , Unix, SYSTEM, Modules, KernelLog;
 
 CONST
   libXxf86vm = 'libXxf86vm.so.1';
@@ -188,7 +188,6 @@ VAR
       res: LONGINT;
       i: LONGINT;
 BEGIN
-X11.Lock;
 
 (* get  TXF86VidModeModeInfo*** info   C structure array  *)
 res := XF86VidModeGetAllModeLines(display, screen, mcount, ADDRESSOF(mlinesadr));
@@ -203,7 +202,7 @@ NEW(vidlines, mcount); (* create oberon friendly array, and copy to it*)
  FOR i:=0 TO mcount-1 DO vidlines[i] := mlines1[i];  END;
 
  X11.Free(mlinesadr);
- X11.Unlock;
+
  mlines1 := NIL;
  RETURN res;
 END VidModeGetAllModeLines;
@@ -237,14 +236,14 @@ BEGIN {EXCLUSIVE}
 	Unix.Dlsym( xlib, "XF86VidModeGetGammaRampSize", ADDRESSOF( XF86VidModeGetGammaRampSize));
 	Unix.Dlsym( xlib, "XF86VidModeGetPermissions", ADDRESSOF( XF86VidModeGetPermissions));
 
-	Trace.String(libXxf86vm); Trace.StringLn(' loaded.');
+	KernelLog.String(libXxf86vm); KernelLog.String(' loaded.'); KernelLog.Ln; 
 END LoadX11Functions;
 
 PROCEDURE OnClose;
 BEGIN {EXCLUSIVE}
  IF xlib # 0 THEN
        Unix.Dlclose(xlib);
-       Trace.String(libXxf86vm); Trace.StringLn(' unloaded.');
+       KernelLog.String(libXxf86vm); KernelLog.String(' unloaded.'); KernelLog.Ln; 
 END;
 END OnClose;
 

@@ -1,7 +1,7 @@
 MODULE WMGLSLBricks; (** AUTHOR "fnecati"; PURPOSE "opengl GLSL bricks shading example from OrangeBook"; *)
 
 IMPORT
-	WMRectangles, WMGraphics, Strings,  Inputs,
+	WMRectangles, WMGraphics, Strings,  Inputs, Modules,
 	WM := WMWindowManager,  WMMessages, WMDialogs, KernelLog,
 	GL := OpenGL, GLC := OpenGLConst, GLU, WMGL := WMGLWindow, 
 	GLLib, GLSUtil := GLShaderUtils;
@@ -45,6 +45,7 @@ TYPE
 			IF ~initGL() THEN Close; RETURN; END;
 			Reshape(w, h);
 			UpdateImage;
+			IncCount
 		END New;
 
 		PROCEDURE initGL(): BOOLEAN;
@@ -94,7 +95,7 @@ TYPE
 		END;
 		END KeyEvent;
 
-		PROCEDURE WheelMove*(dz : LONGINT);
+		PROCEDURE WheelMove(dz : LONGINT);
 		BEGIN
 			fScale := fScale + dz*0.5*0.2;
 			UpdateImage;
@@ -108,9 +109,10 @@ TYPE
 			END
 		END Handle;
 
-		PROCEDURE Close*;
-		BEGIN {EXCLUSIVE}
+		PROCEDURE Close;
+		BEGIN
 			Close^;
+			DecCount
 		END Close;
 
 		PROCEDURE UpdateImage;
@@ -307,7 +309,7 @@ TYPE
 		BEGIN
 		    (* Create a vertex shader object and a fragment shader object,
 		    	install program object as part of current state *)
-			brickProg :=  GLSUtil.LoadShaders("brick.vert", "brick.frag" );
+			brickProg :=  GLSUtil.LoadShadersFromFile("opengloberon/brick.vert", "opengloberon/brick.frag" );
 			IF brickProg = 0 THEN
 				KernelLog.String("LoadShader Error"); KernelLog.Ln;
 				RETURN FALSE;
@@ -327,6 +329,9 @@ TYPE
 
 END GLWindow;
 
+VAR
+	nofWindows : LONGINT;
+	
 PROCEDURE Open*;
 VAR
 	window: GLWindow;
@@ -334,11 +339,34 @@ BEGIN
 	NEW(window, 256, 256);
 END Open;
 
-BEGIN
+PROCEDURE IncCount;
+BEGIN {EXCLUSIVE}
+	INC(nofWindows)
+END IncCount;
 
+PROCEDURE DecCount;
+BEGIN {EXCLUSIVE}
+	DEC(nofWindows)
+END DecCount;
+
+PROCEDURE Cleanup;
+VAR die : KillerMsg;
+	 msg : WMMessages.Message;
+	 m : WM.WindowManager;
+BEGIN {EXCLUSIVE}
+	NEW(die);
+	msg.ext := die;
+	msg.msgType := WMMessages.MsgExt;
+	m := WM.GetDefaultManager();
+	m.Broadcast(msg);
+	AWAIT(nofWindows = 0)
+END Cleanup;
+
+BEGIN
+	Modules.InstallTermHandler(Cleanup)
 END WMGLSLBricks.
 
-SystemTools.Free  WMGLSLBricks GLShaderUtils GLLib WMGLWindow~ ~
+SystemTools.Free  WMGLSLBricks ~
 
 WMGLSLBricks.Open ~
 

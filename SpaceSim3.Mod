@@ -105,16 +105,8 @@ TYPE
 				deltaZrotation := 0.0;
 				  ReDisplay;
 			| 'r', 'R':
-
-				IF filling = 0 THEN
-					GL.PolygonMode (GLC.GL_FRONT_AND_BACK, GLC.GL_FILL);  (* Polygon rasterization mode (polygon filled) *)
-					filling:=1;
-					  ReDisplay;
-				ELSE
-					GL.PolygonMode (GLC.GL_FRONT_AND_BACK, GLC.GL_LINE);  (* Polygon rasterization mode (polygon outlined) *)
-					filling:=0;
-					  ReDisplay;
-				END;
+				IF filling = 0 THEN filling := 1 ELSE filling := 0; END;
+				  ReDisplay;
 		ELSE
 			CASE keysym OF
 				Inputs.KsLeft:       deltaYrotation := deltaYrotation + 0.05;   ReDisplay;
@@ -191,6 +183,11 @@ TYPE
 
 	BEGIN
 		GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT);  (* This clear the background color to dark blue *)
+		IF filling = 1 THEN
+			GL.PolygonMode (GLC.GL_FRONT_AND_BACK, GLC.GL_FILL);  (* Polygon rasterization mode (polygon filled) *)
+		ELSE
+			GL.PolygonMode (GLC.GL_FRONT_AND_BACK, GLC.GL_LINE);  (* Polygon rasterization mode (polygon outlined) *)
+		END;		
 		GL.MatrixMode(GLC.GL_MODELVIEW);  (* Modeling transformation *)
 		GL.LoadIdentity;  (* Initialize the model matrix as identity *)
 

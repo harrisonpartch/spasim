@@ -1,7 +1,7 @@
 MODULE WMGLDemo4; (** AUTHOR "fnecati"; PURPOSE "opengl triangle using vertex arrays"; *)
 
 IMPORT
-	WMRectangles, WMGraphics, Strings, Kernel, KernelLog,
+	WMRectangles, WMGraphics, Strings, Kernel, KernelLog, Modules,
 	WM := WMWindowManager,  WMMessages, WMDialogs,
 	GL := OpenGL, GLC := OpenGLConst, GLU, WMGL := WMGLWindow;
 
@@ -47,12 +47,13 @@ TYPE
 			IF ~ initGL() THEN Close; END;
 			DrawMode(0);
 			UpdateImage;
+			IncCount
 		END New;
 
 		PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
 		BEGIN
 			CASE CHR(ucs) OF
-				"a", "A": animated := ~ animated;
+				"a", "A": BEGIN {EXCLUSIVE} animated := ~ animated; END;
 				| "d": drawMode := (drawMode+1) MOD 3; DrawMode(drawMode); UpdateImage;
 				| "-" : angle := angle - 1.0; UpdateImage;
 				| "+" : angle := angle + 1.0; UpdateImage;
@@ -63,7 +64,7 @@ TYPE
 			END;
 		END KeyEvent;
 
-		PROCEDURE WheelMove*(dz : LONGINT);
+		PROCEDURE WheelMove(dz : LONGINT);
 		BEGIN
 			lookatz := lookatz + dz;
 			Reshape(GetWidth(), GetHeight());
@@ -79,7 +80,7 @@ TYPE
 		END Handle;
 
 		(** *)
-		PROCEDURE DeleteBuffers*;
+		PROCEDURE DeleteBuffers;
 		BEGIN
 			MakeCurrent();
 				GL.DeleteBuffersARB(1, ADDRESSOF(vertexVBOID));
@@ -88,11 +89,12 @@ TYPE
 			DeActivate();
 		END DeleteBuffers;
 
-		PROCEDURE Close*;
-		BEGIN {EXCLUSIVE}
-			alive := FALSE;
+		PROCEDURE Close;
+		BEGIN 
+			BEGIN {EXCLUSIVE} alive := FALSE; animated := FALSE END;
 			DeleteBuffers;
 			Close^;
+			DecCount
 		END Close;
 
 
@@ -242,17 +244,18 @@ TYPE
 BEGIN  {ACTIVE}
 	Kernel.SetTimer(timer, waittime);
 	WHILE alive DO
-		IF animated THEN
-			 IF Kernel.Expired(timer) THEN
-			 	 UpdateImage();
-			 	  angle := angle + 1.0;
-				Kernel.SetTimer(timer, waittime);
-			END;
+		BEGIN {EXCLUSIVE} AWAIT(animated) END;
+		 IF Kernel.Expired(timer) THEN
+		 	 UpdateImage();
+		 	  angle := angle + 1.0;
+			Kernel.SetTimer(timer, waittime);
 		END;
 	END;
 END GLWindow;
 
 
+VAR
+	nofWindows : LONGINT;
 
 PROCEDURE Open*;
 VAR
@@ -261,10 +264,33 @@ BEGIN
 	NEW(window, 256, 256);
 END Open;
 
-BEGIN
+PROCEDURE IncCount;
+BEGIN {EXCLUSIVE}
+	INC(nofWindows)
+END IncCount;
 
+PROCEDURE DecCount;
+BEGIN {EXCLUSIVE}
+	DEC(nofWindows)
+END DecCount;
+
+PROCEDURE Cleanup;
+VAR die : KillerMsg;
+	 msg : WMMessages.Message;
+	 m : WM.WindowManager;
+BEGIN {EXCLUSIVE}
+	NEW(die);
+	msg.ext := die;
+	msg.msgType := WMMessages.MsgExt;
+	m := WM.GetDefaultManager();
+	m.Broadcast(msg);
+	AWAIT(nofWindows = 0)
+END Cleanup;
+
+BEGIN
+	Modules.InstallTermHandler(Cleanup)
 END WMGLDemo4.
 
-SystemTools.Free  WMGLDemo4  WMGLWindow  ~
+SystemTools.Free  WMGLDemo4   ~
 
 WMGLDemo4.Open ~

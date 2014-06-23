@@ -106,7 +106,7 @@ TYPE
 		mkeys: SET; (* current mouse keys *)
 		screenSettings: WinApi.DEVMODE;
 		
-	(** constructor, initlialize window object, fs: fullscale: true/false *)
+	(** constructor, initlialize window object, fs: fullscreen: true/false *)
 	PROCEDURE &Init*( w, h, left, top: LONGINT; fs: BOOLEAN );
 	VAR
 		str: ARRAY 8 OF CHAR;
@@ -138,6 +138,16 @@ TYPE
 		height := h;
 	END Init;
 
+	PROCEDURE GetWidth*(): LONGINT;
+	BEGIN
+		RETURN width;
+	END GetWidth;
+
+	PROCEDURE GetHeight*(): LONGINT;
+	BEGIN
+		RETURN height;
+	END GetHeight;
+	
 	(** sets title of window *)
 	PROCEDURE SetTitle*(tit: ARRAY OF CHAR);
 	VAR res: LONGINT;
@@ -787,11 +797,11 @@ END GameLogic;
 		GL.Read_WGL_EXT_swap_control; (* needed for swap interval *)
 		(* SetSwapInterval(0); *)
 		
-		active := TRUE;
-
-		Reshape(width, height);
 		OnLoad();	
-				
+		Reshape(width, height);
+		Display();
+		active := TRUE;
+		
 		WHILE active DO (* loop until WMQuit received *)
 			i:=(i+1)MOD 10;
 			Kernel.SetTimer(fpstimer, 1000);

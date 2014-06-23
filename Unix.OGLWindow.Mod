@@ -71,7 +71,7 @@ VAR
 	wmDelete : X11.Atom;
 (*	wmstate, wmfullscreen: X11.Atom; *)
 	
-	(** constructor, initlialize window object, fs: fullscale: true/false *)
+	(** constructor, initlialize window object, fs: fullscreen: true/false *)
 	PROCEDURE & Init*(w, h, l, t: LONGINT; fs: BOOLEAN);
 	BEGIN
 		width := w; height := h;
@@ -86,6 +86,16 @@ VAR
 		IF ~ InitWindow() THEN Close; RETURN END;
 	END Init;
 
+	PROCEDURE GetWidth*(): LONGINT;
+	BEGIN
+		RETURN width;
+	END GetWidth;
+
+	PROCEDURE GetHeight*(): LONGINT;
+	BEGIN
+		RETURN height;
+	END GetHeight;
+			
 	(** Close the window *)
 	PROCEDURE Close*;
 	BEGIN
@@ -107,7 +117,9 @@ VAR
 		res: LONGINT;
 	BEGIN
 		xev.typ := Api.Expose;
+		xev.window := win;
 		res := Api.SendEvent(display, win, Api.False, Api.ExposureMask, ADDRESSOF(xev));
+		X11.Flush(display);
 	END ReDisplay;
 
 	(** abstract: called when window opened and GL context created *)
@@ -121,18 +133,18 @@ VAR
 
 	(** make GL context current *)
 	PROCEDURE MakeCurrent*();
-	VAR res: LONGINT;
+	VAR resb: GL.Boolean;
 	BEGIN
-		res := GL.glXMakeCurrent(display, win, glctx);
-		IF debug THEN KernelLog.String(" MakeCurrent:"); KernelLog.Boolean(res=1); KernelLog.Ln; END;
+		resb := GL.glXMakeCurrent(display, win, glctx);
+		IF debug THEN KernelLog.String(" MakeCurrent:"); KernelLog.Boolean(resb=1); KernelLog.Ln; END;
 	END MakeCurrent;
 
 	(** deactivate the current GL context *)
 	PROCEDURE DeActivate*();
-	VAR res: LONGINT;
+	VAR resb: GL.Boolean;
 	 BEGIN
-		res := GL.glXMakeCurrent(display, 0, 0);
-		IF debug THEN KernelLog.String(" DeActivate:"); KernelLog.Boolean(res=1); KernelLog.Ln; END;
+		resb := GL.glXMakeCurrent(display, 0, 0);
+		IF debug THEN KernelLog.String(" DeActivate:"); KernelLog.Boolean(resb=1); KernelLog.Ln; END;
 	END DeActivate;
 
 	(** swap the GL context contents to the window *)
@@ -196,12 +208,13 @@ VAR
 
 	(* close the window and its resources *)
 	 PROCEDURE CloseWindow*();
-	  VAR res: LONGINT;
+	  VAR resb: GL.Boolean;
+	  	    res: LONGINT;
 	 BEGIN
 		(* do we have a rendering context *)
 		IF glctx # 0 THEN
 			(* Release the context *)
-		    	res := GL.glXMakeCurrent(display, 0, 0);
+		    	resb := GL.glXMakeCurrent(display, 0, 0);
 		    	(* Delete the context *)
 			GL.glXDestroyContext(display, glctx);
 			glctx := 0;
@@ -360,6 +373,7 @@ VAR
 	PROCEDURE  InitWindow*(): BOOLEAN;
 	VAR
 		masks, res: LONGINT;
+		resb: GL.Boolean;
 		attrib : POINTER TO ARRAY OF GL.Int;  (* attributes of GL window *)
 		swa : Api.XSetWindowAttributes; (* set window attributes*)
 		visinfoptr : Api.VisualInfoPtr; (* pointer to X11 VisualInfo *)
@@ -429,6 +443,7 @@ VAR
 		END;
 
 (* ======================================= *)
+
 		NEW(attrib, 13);
 		attrib[0] := GLC.GLX_RGBA;
 		attrib[1] := GLC.GLX_DOUBLEBUFFER;
@@ -436,8 +451,25 @@ VAR
 		attrib[4] := GLC.GLX_STENCIL_SIZE;	attrib[5] := 8;
 		attrib[6] := GLC.GLX_RED_SIZE;  	attrib[7] := 8;
 		attrib[8] := GLC.GLX_GREEN_SIZE;	attrib[9] := 8;
-		attrib[10] := GLC.GLX_RED_SIZE;	attrib[11] := 8;
+		attrib[10] := GLC.GLX_RED_SIZE;	attrib[11] := 8;		
 		attrib[12] := 0 ;
+
+(*
+		NEW(attrib, 17);
+		attrib[0] := GLC.GLX_RGBA;
+		attrib[1] := GLC.GLX_DOUBLEBUFFER;
+		attrib[2] := GLC.GLX_DEPTH_SIZE;	attrib[3] := 24;
+		attrib[4] := GLC.GLX_STENCIL_SIZE;	attrib[5] := 8;
+		attrib[6] := GLC.GLX_RED_SIZE;  	attrib[7] := 8;
+		attrib[8] := GLC.GLX_GREEN_SIZE;	attrib[9] := 8;
+		attrib[10] := GLC.GLX_RED_SIZE;	attrib[11] := 8;
+		
+		attrib[12] := GLC.GLX_SAMPLE_BUFFERS;	attrib[13] := 1; (* MSAA *)
+		attrib[14] := GLC.GLX_SAMPLES;	attrib[15] := 4; (* MSAA *)
+		
+		attrib[16] := 0 ;
+
+*)
 
 		(* try to find a visual with this attribs *)
 		visinfoptr := GL.glXChooseVisual(display, screen , ADDRESSOF(attrib[0]));
@@ -452,7 +484,7 @@ VAR
 			KernelLog.String("visinfoptr.visual ");  KernelLog.Int(visinfoptr.visualID, 0); KernelLog.Ln;
 		END;
 
-		res := GL.glXQueryVersion(display, glxMajor, glxMinor);
+		resb := GL.glXQueryVersion(display, glxMajor, glxMinor);
 		IF debug THEN
 			KernelLog.String("GLX-Version "); KernelLog.Int(glxMajor,0); 
 			KernelLog.Char("."); KernelLog.Int(glxMinor,0); KernelLog.Ln;
@@ -578,7 +610,7 @@ VAR
 		events: LONGINT;
 	BEGIN
 		events := Api.Pending(display);
-		WHILE events > 0 DO
+		WHILE  events > 0 DO
 			Api.NextEvent(display, event);
 			CASE event.typ OF
 
@@ -652,15 +684,15 @@ VAR
 				END;
 
 			| Api.MotionNotify: Wr("MotionNotify");
-				me := SYSTEM.VAL(Api.XMotionEvent, event);
-				PointerMove( me.x, height-me.y-1,  xbuttons );
+				me := SYSTEM.VAL(Api.XMotionEvent, event);					
+				PointerMove( me.x, height-me.y-1,  xbuttons );				
 
 			| Api.Expose, Api.GraphicsExpose:
 				em := SYSTEM.VAL( Api.XExposeEvent, event );
 				IF em.count = 0 THEN (* wait until last message*)
 					Display;
 				END;
-
+			
 			| Api.ConfigureNotify: Wr("ConfigureNotify");
 				cn := SYSTEM.VAL(Api.XConfigureEvent, event);
 				(* call Reshape only if our window-size changed *)
@@ -766,12 +798,10 @@ END GameLogic;
 		i,ii: LONGINT;	
 	BEGIN
 		MakeCurrent();
- 		
-		active := TRUE;
-
-		Reshape(width, height);
 		OnLoad;
-				
+		Reshape(width, height);
+		Display();
+		active := TRUE;
 		WHILE  active  DO
 			i:=(i+1)MOD 10;
 			Kernel.SetTimer(fpstimer, 1000);

@@ -8,31 +8,34 @@ IMPORT
 CONST debug = FALSE;
 
 TYPE
-	WindowStruct *= RECORD
-		display* : X11.DisplayPtr;
-		win*  : X11.Window ;
-		glctx* : GL.GLXContext;
-		visualInfoPtr* : Api.VisualInfoPtr;
-		wmDeleteWindow*: X11.Atom;
+	WindowStruct = POINTER TO RECORD
+		display: X11.DisplayPtr;
+		win: X11.Window ;		
+		glctx: GL.GLXContext;
+		width, height: LONGINT; (* size of GL window *)
+		visualInfoPtr: Api.VisualInfoPtr;
+		wmDeleteWindow : X11.Atom;
 	END;
 
 	Buffer = POINTER TO ARRAY OF CHAR;
 
 TYPE Context* = OBJECT
 	VAR
-		width*, height*: LONGINT; (* size of GL window *)
-		glWin* {UNTRACED}  : WindowStruct;
-		doublebuffered*: BOOLEAN; (* is context doublebuffered *)
+		
+		glWin : WindowStruct;
+		doublebuffered: BOOLEAN; (* is context doublebuffered *)
 	 	buffer: Buffer; (* for speedup flip image in y*)
 	 	rastermode: Raster.Mode;
 
 	PROCEDURE Init*(w, h: LONGINT);
 	VAR
 		res: LONGINT;
+		resb: GL.Boolean;
 		att: POINTER TO  ARRAY OF GL.Int;
 	  	masks, dumy1, dumy2: LONGINT;
 	BEGIN
-		width := w; height := h;
+		NEW(glWin);	
+		glWin.width := w; glWin.height := h;
 		Machine.Acquire( Machine.X11 );
 
 	(*  get a connection *)
@@ -45,7 +48,7 @@ TYPE Context* = OBJECT
 		END;
 
 		(* Check if GLX is supported on this display *)
-		IF ( GL.glXQueryExtension( glWin.display, dumy1, dumy2 ) =  0 ) THEN
+		IF ( GL.glXQueryExtension( glWin.display, dumy1, dumy2 ) = 0 ) THEN
 			Machine.Release( Machine.X11 );
 		       KernelLog.String("GLX is NOT supported on this display"); KernelLog.Ln;
 		       Close;
@@ -81,7 +84,7 @@ TYPE Context* = OBJECT
 			 END;
 		END;
 
-		glWin.win := X11.CreateSimpleWindow(glWin.display, X11.DefaultRootWindow(glWin.display), 0, 0, width, height, 0, 0, 0);
+		glWin.win := X11.CreateSimpleWindow(glWin.display, X11.DefaultRootWindow(glWin.display), 0, 0, glWin.width, glWin.height, 0, 0, 0);
 		IF debug THEN
 			KernelLog.String("win opened: "); KernelLog.Int(glWin.win,0); KernelLog.Ln;
 		END;
@@ -114,7 +117,7 @@ TYPE Context* = OBJECT
 			KernelLog.String("context1 created: "); KernelLog.Int(glWin.win,0); KernelLog.Ln;
 		END;
 
-	 	res := GL.glXMakeCurrent(glWin.display, glWin.win, glWin.glctx);
+	 	resb := GL.glXMakeCurrent(glWin.display, glWin.win, glWin.glctx);
 	 	IF debug THEN
 			KernelLog.String("glXMakeCurrent res= "); KernelLog.Int(res, 0); KernelLog.Ln;
 	 	END;
@@ -132,56 +135,9 @@ TYPE Context* = OBJECT
 	(*	GL.ReadOpenGLCore(); *)
 	END Init;
 
- 	(** *)
- 	PROCEDURE GetDisplay*(): X11.DisplayPtr;
- 	BEGIN
- 		RETURN glWin.display;
- 	END GetDisplay;
-
- 	(** *)
- 	PROCEDURE GetScreen*(): LONGINT;
- 	BEGIN
- 	 RETURN 0
- 	END GetScreen;
-
-	PROCEDURE MakeCurrent*();
-	 VAR res: LONGINT;
-	 BEGIN
-		Machine.Acquire( Machine.X11 );
-(*		GL.glXWaitX();
-		X11.Sync(glWin.display,X11.False);
-*)
-		res := GL.glXMakeCurrent(glWin.display, glWin.win, glWin.glctx);
-		 IF debug THEN KernelLog.String(" MakeCurrent:"); KernelLog.Boolean(res=1); KernelLog.Ln; END;
-
- 		Machine.Release( Machine.X11 );
-	END MakeCurrent;
-
-	PROCEDURE SwapBuffers*;
-	 BEGIN
-		Machine.Acquire( Machine.X11 );
-		IF doublebuffered THEN
-			GL.glXSwapBuffers(glWin.display, glWin.win);
-		ELSE
-	 		GL.Flush();
-		END;
- 		Machine.Release( Machine.X11 );
-	END SwapBuffers;
-
-	PROCEDURE DeActivate*();
- 	VAR res: LONGINT;
- 	BEGIN
-		Machine.Acquire( Machine.X11 );
-(*		GL.glXWaitX();
-		X11.Sync(glWin.display,X11.False);
-*)
-		res := GL.glXMakeCurrent(glWin.display, 0, 0);
-		IF debug THEN KernelLog.String(" DeActivate:"); KernelLog.Boolean(res=1); KernelLog.Ln; END;
-		Machine.Release( Machine.X11 );
-	END DeActivate;
-
 	PROCEDURE Close*;
-	VAR res: LONGINT;
+	VAR resb: GL.Boolean;
+		  res: LONGINT;
 	BEGIN
 		Machine.Acquire( Machine.X11 );
 		GL.glXWaitX();
@@ -190,7 +146,7 @@ TYPE Context* = OBJECT
 		(* do we have a rendering context *)
 		IF glWin.glctx # 0 THEN
 			(* Release the context *)
-		    	res := GL.glXMakeCurrent(glWin.display, 0, 0);
+		    	resb := GL.glXMakeCurrent(glWin.display, 0, 0);
 		    	(* Delete the context *)
 			GL.glXDestroyContext(glWin.display, glWin.glctx);
 			IF debug THEN KernelLog.String("context deleted"); KernelLog.Ln; END;
@@ -213,12 +169,77 @@ TYPE Context* = OBJECT
 
 		Machine.Release( Machine.X11 );
  	END Close;
+ 	
+	PROCEDURE GetWidth*(): LONGINT;
+	BEGIN
+		RETURN glWin.width;
+	END GetWidth;
+	
+	PROCEDURE GetHeight*(): LONGINT;
+	BEGIN
+		RETURN glWin.height;
+	END GetHeight;
+
+	PROCEDURE GetDisplay*(): LONGINT;
+	BEGIN
+		RETURN glWin.display;
+	END GetDisplay;
+
+	PROCEDURE GetContext*(): LONGINT;
+	BEGIN
+		RETURN glWin.glctx;
+	END GetContext;
+
+	PROCEDURE GetScreen*(): LONGINT;
+	BEGIN
+		RETURN 0; (*context.glWin.screen*)
+	END GetScreen;
+		
+	(** move the window to x,y and  resize width,height *)
+	PROCEDURE MoveResizeWindow(left0, top0, w, h: LONGINT);
+	BEGIN
+		X11.MoveResizeWindow(glWin.display, glWin.win, left0, top0, ABS(w) ,ABS(h));
+	END MoveResizeWindow;
+	
+	PROCEDURE Resize*(w, h: LONGINT);
+	BEGIN
+		buffer := NIL;
+		NEW(buffer, w*h*4);
+		MoveResizeWindow(0,0, w, h);
+		glWin.width := w; glWin.height := h;		
+	END Resize;
+	
+	PROCEDURE MakeCurrent*();
+	 VAR resb: GL.Boolean;
+	 BEGIN
+		Machine.Acquire( Machine.X11 );
+(*		GL.glXWaitX();
+		X11.Sync(glWin.display,X11.False);
+*)
+		resb := GL.glXMakeCurrent(glWin.display, glWin.win, glWin.glctx);
+		 IF debug THEN KernelLog.String(" MakeCurrent:"); KernelLog.Boolean(resb=1); KernelLog.Ln; END;
+
+ 		Machine.Release( Machine.X11 );
+	END MakeCurrent;
+
+	PROCEDURE DeActivate*();
+ 	VAR res: GL.Boolean;
+ 	BEGIN
+		Machine.Acquire( Machine.X11 );
+(*		GL.glXWaitX();
+		X11.Sync(glWin.display,X11.False);
+*)
+		res := GL.glXMakeCurrent(glWin.display, 0, 0);
+		IF debug THEN KernelLog.String(" DeActivate:"); KernelLog.Boolean(res=1); KernelLog.Ln; END;
+		Machine.Release( Machine.X11 );
+	END DeActivate;
 
 	PROCEDURE RenderInto*(image: Raster.Image);
 	VAR
 		i: LONGINT;
 		w, h: LONGINT;
 	BEGIN (*{EXCLUSIVE}*)
+		IF (image = NIL) OR (image.adr = NIL) THEN RETURN END;
 		w := image.width;
 		h := image.height;
 		Machine.Acquire( Machine.X11 );
@@ -232,6 +253,18 @@ TYPE Context* = OBJECT
 			Raster.PutPixels(image, 0, h-1-i, w, Raster.BGRA8888, buffer^, i * w * 4, rastermode)
 		END
 	END RenderInto;
+
+	PROCEDURE SwapBuffers*;
+	 BEGIN
+		Machine.Acquire( Machine.X11 );
+		IF doublebuffered THEN
+			GL.glXSwapBuffers(glWin.display, glWin.win);
+		ELSE
+	 		GL.Flush();
+		END;
+ 		Machine.Release( Machine.X11 );
+	END SwapBuffers;
+		
 BEGIN
 END Context;
 

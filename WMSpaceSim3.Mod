@@ -1,9 +1,13 @@
 MODULE WMSpaceSim3;
 
 	IMPORT KernelLog := KernelLog, Inputs, Strings, WMRectangles,
-	WM := WMWindowManager, GLU,
+	WM := WMWindowManager, GLU, Modules, WMMessages,
 	GL:=OpenGL, GLC:=OpenGLConst, WMGL := WMGLWindow, ML := Decoder3DS;
 
+TYPE
+	KillerMsg = OBJECT
+	END KillerMsg;
+	
 TYPE
 	(* our space simulation window object *)
 	SpaceWindow = OBJECT(WMGL.Window)
@@ -25,7 +29,7 @@ TYPE
 	BEGIN
 		Init(640, 480, FALSE);
 		WM.AddWindow(SELF, 100, 100);
-
+		IncCount;
 		rotationX := 0.0; deltaXrotation := 0.1;
 		rotationY := 0.0;  deltaYrotation := 0.05;
 		rotationZ := 0.0;  deltaZrotation := 0.03;
@@ -35,12 +39,12 @@ TYPE
 
 		fname := "opengloberon/spaceship.3ds";
 		SetTitle(Strings.NewString(fname));
-		OnLoad();
-		UpdateImage();
+		IF ~OnLoad() THEN Close; RETURN END;
+		UpdateImage();		
 	END New;
 
 	(* Used to initialize OpenGL and to setup our world *)
-	PROCEDURE OnLoad;
+	PROCEDURE OnLoad(): BOOLEAN;
 	VAR loadok: BOOLEAN;
 		ratio: LONGREAL;
 	BEGIN
@@ -68,17 +72,18 @@ TYPE
 		loadok := ML.Import3DS(model, fname);
 		IF ~loadok THEN
 			KernelLog.String(fname);  KernelLog.String(' model file not loaded'); KernelLog.Ln;
-			Close;
+			RETURN FALSE;
 		END;
 
 		textureId:=ML.LoadImage('opengloberon/spaceshiptexture.bmp');  (* The Function LoadImage() return the current texture ID *)
 
 		(* If the last function returns -1 it means the file was not found so we exit from the program *)
 		IF (textureId = -1) THEN
-			KernelLog.String('Image file: spaceshiptexture.bmp not found'); KernelLog.Ln;
-			Close;
+			KernelLog.String('Image file: spaceshiptexture.bmp not found'); KernelLog.Ln;			
+			RETURN FALSE;
 		END;
 		DeActivate();
+		RETURN TRUE;
 	END OnLoad;
 
 	(* This routine must be called everytime we resize our window.*)
@@ -99,7 +104,7 @@ TYPE
 	END Reshape;
 
 	(* Used to handle the keyboard input *)
-	PROCEDURE KeyEvent* (ucs : LONGINT; flags : SET; keysym : LONGINT);
+	PROCEDURE KeyEvent (ucs : LONGINT; flags : SET; keysym : LONGINT);
 	BEGIN
 		CASE CHR(ucs) OF
 			"q": Close;
@@ -110,16 +115,8 @@ TYPE
 				deltaZrotation := 0.0;
 				  UpdateImage();
 			| 'r', 'R':
-
-				IF filling = 0 THEN
-					GL.PolygonMode (GLC.GL_FRONT_AND_BACK, GLC.GL_FILL);  (* Polygon rasterization mode (polygon filled) *)
-					filling:=1;
-					  UpdateImage();
-				ELSE
-					GL.PolygonMode (GLC.GL_FRONT_AND_BACK, GLC.GL_LINE);  (* Polygon rasterization mode (polygon outlined) *)
-					filling:=0;
-					  UpdateImage();
-				END;
+				IF filling = 0 THEN filling := 1 ELSE filling := 0; END;
+				  UpdateImage();
 		ELSE
 			CASE keysym OF
 				Inputs.KsLeft:       deltaYrotation := deltaYrotation + 0.05;   UpdateImage();
@@ -127,12 +124,26 @@ TYPE
 				| Inputs.KsUp:      deltaXrotation := deltaXrotation + 0.05;   UpdateImage();
 				| Inputs.KsDown:  deltaXrotation := deltaXrotation - 0.05; 	  UpdateImage();
 
-		ELSE
-		END;
+			ELSE
+			END;
 		END;
 
 	END KeyEvent;
 
+	PROCEDURE Close;
+	BEGIN
+		Close^;
+		DecCount
+	END Close;
+
+	PROCEDURE Handle(VAR m: WMMessages.Message);
+	BEGIN
+		IF (m.msgType = WMMessages.MsgExt) & (m.ext # NIL) & (m.ext IS KillerMsg) THEN
+			Close;
+		ELSE Handle^(m)
+		END
+	END Handle;
+			
 	PROCEDURE DrawObjectVert(object: ML.Object3D );
 		VAR  i: LONGINT;
 	BEGIN
@@ -192,15 +203,19 @@ TYPE
 
 	(* This is our main rendering subroutine, called each frame *)
 	PROCEDURE Display;
-	VAR i, j: LONGINT;
-
+	VAR j: LONGINT;
 	BEGIN
+		IF filling = 1 THEN
+			GL.PolygonMode (GLC.GL_FRONT_AND_BACK, GLC.GL_FILL);  (* Polygon rasterization mode (polygon filled) *)
+		ELSE
+			GL.PolygonMode (GLC.GL_FRONT_AND_BACK, GLC.GL_LINE);  (* Polygon rasterization mode (polygon outlined) *)
+		END;	
+		
 		GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT);  (* This clear the background color to dark blue *)
 		GL.MatrixMode(GLC.GL_MODELVIEW);  (* Modeling transformation *)
 		GL.LoadIdentity;  (* Initialize the model matrix as identity *)
 
-
-		GL.Translatef(0.0,0.0,-300);  (* We move the object forward (the model matrix is multiplied by the translation matrix) *)
+		GL.Translatef(0.0, 0.0, -300);  (* We move the object forward (the model matrix is multiplied by the translation matrix) *)
 
 		rotationX := rotationX + deltaXrotation;
 		rotationY := rotationY + deltaYrotation;
@@ -230,12 +245,10 @@ TYPE
 				DrawObjectTextured(object);
 			END;
 		END;
-
-		GL.Flush;  (* This force the execution of OpenGL commands *)
 	END Display;
 
 	(** *)
-	PROCEDURE UpdateImage*;
+	PROCEDURE UpdateImage;
 	VAR
 	BEGIN
 		MakeCurrent();
@@ -250,6 +263,9 @@ BEGIN
 
 END SpaceWindow;
 
+VAR
+	nofWindows : LONGINT;
+	
 (** Open window command procedure *)
 PROCEDURE Open*;
 VAR win : SpaceWindow;
@@ -257,13 +273,36 @@ BEGIN
 	NEW(win);
 END Open;
 
-BEGIN
+PROCEDURE IncCount;
+BEGIN {EXCLUSIVE}
+	INC(nofWindows)
+END IncCount;
 
+PROCEDURE DecCount;
+BEGIN {EXCLUSIVE}
+	DEC(nofWindows)
+END DecCount;
+
+PROCEDURE Cleanup;
+VAR die : KillerMsg;
+	 msg : WMMessages.Message;
+	 m : WM.WindowManager;
+BEGIN {EXCLUSIVE}
+	NEW(die);
+	msg.ext := die;
+	msg.msgType := WMMessages.MsgExt;
+	m := WM.GetDefaultManager();
+	m.Broadcast(msg);
+	AWAIT(nofWindows = 0)
+END Cleanup;
+
+BEGIN
+	Modules.InstallTermHandler(Cleanup);
 END WMSpaceSim3.
 
 
 WMSpaceSim3.Open ~
 
 
-SystemTools.Free WMSpaceSim3 Decoder3DS WMGLWindow ~
+SystemTools.Free WMSpaceSim3 ~
 

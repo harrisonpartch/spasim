@@ -499,7 +499,10 @@ END KeyEvent;
 		location: Int;
 		w, h: REAL;
 	BEGIN
-		program := GLSL.LoadShaders(vertexShaderPath, fragmentShaderPath);
+		Out.String("Loading Shaders: "); Out.String(vertexShaderPath);
+		Out.String(" and "); Out.String(fragmentShaderPath); Out.Ln;
+		
+		program := GLSL.LoadShadersFromFile(vertexShaderPath, fragmentShaderPath);
 		GL.UseProgram(program);
 
 		location := GL.GetUniformLocation(program, "u_image");
@@ -755,6 +758,6 @@ END Render.
 
 Render.Open ~ 
 
-SystemTools.Free.Render ~ 
+SystemTools.Free Render ~ 
 
 

@@ -3,9 +3,14 @@ MODULE GLShaderUtils; (** AUTHOR "fnecati"; PURPOSE "OpenGL GLSL utils "; *)
 IMPORT
 	gl := OpenGL, glc := OpenGLConst, Files, Strings, Streams, KernelLog;
 
+CONST 
+	debug = FALSE;
+
 TYPE
 
 	Uint = gl.Uint;
+	Int = gl.Int;
+
 	Vector16f = ARRAY 16 OF REAL; (* 4x4 GLfloat Matrix *)
 
 VAR
@@ -115,8 +120,6 @@ VAR infologLength, charsWritten: LONGINT;
 	info: Strings.String;
 
 BEGIN
-	infologLength := 0;
-	charsWritten  := 0;
 	gl.GetShaderiv(obj, glc.GL_INFO_LOG_LENGTH, ADDRESSOF(infologLength));
 	IF infologLength > 0 THEN
 		NEW(info, infologLength);
@@ -136,8 +139,6 @@ PROCEDURE PrintProgramInfoLog*(obj: Uint);
 VAR infologLength, charsWritten: LONGINT;
 	infoLog: Strings.String;
 BEGIN
-	infologLength := 0;
-	charsWritten  := 0;
 	gl.GetProgramiv(obj, glc.GL_INFO_LOG_LENGTH, ADDRESSOF(infologLength));
 	IF infologLength > 0 THEN
 		NEW(infoLog, infologLength);
@@ -147,17 +148,17 @@ BEGIN
 	END;
 END PrintProgramInfoLog;
 
-PROCEDURE CompileVertexShader*(vertshader : Strings.String): Uint;
+PROCEDURE CompileVertexShader*(CONST vertshader : ARRAY OF CHAR): Uint;
 VAR
 	vs: Uint;
-	vertcompiled: Uint;
+	vertcompiled: Int;
 	adr : ADDRESS;
 BEGIN
-	IF vertshader = NIL THEN RETURN -1 END;
+	IF Strings.Length(vertshader) = 0 THEN RETURN -1 END;
 	vs := gl.CreateShader(glc.GL_VERTEX_SHADER);
 
 	(* Load source code strings into shaders *)
-	adr := ADDRESSOF(vertshader^[0]);
+	adr := ADDRESSOF(vertshader[0]);
 	gl.ShaderSource(vs, 1, ADDRESSOF(adr), 0);
 
 	gl.CompileShader(vs);
@@ -168,19 +169,21 @@ BEGIN
 			gl.DeleteShader(vs);
 			RETURN -1;
 	END;
-	(* PrintShaderSource(vs); *)
+	IF debug THEN
+		PrintShaderSource(vs);
+	END;	
 	RETURN vs;
 END CompileVertexShader;
 
-PROCEDURE CompileFragmentShader*(fragshader: Strings.String): Uint;
+PROCEDURE CompileFragmentShader*(CONST fragshader: ARRAY OF CHAR): Uint;
 VAR
 	fs: Uint;
-	fragcompiled: Uint;
+	fragcompiled: Int;;
 	adr: ADDRESS;
 BEGIN
-	IF fragshader = NIL THEN RETURN -1 END;
+	IF Strings.Length(fragshader) = 0 THEN RETURN -1 END;
 	fs := gl.CreateShader(glc.GL_FRAGMENT_SHADER);
-	adr := ADDRESSOF(fragshader^[0]);
+	adr := ADDRESSOF(fragshader[0]);
 	gl.ShaderSource(fs, 1, ADDRESSOF(adr), 0);
 
 	 (* Compile the fragment shader and print out the compiler log *)
@@ -192,13 +195,15 @@ BEGIN
 		gl.DeleteShader(fs);
 		RETURN -1;
 	END;
-
-	(* PrintShaderSource(fs);*)
+	IF debug THEN
+		PrintShaderSource(fs);
+	END;
+		
 	RETURN fs;
 END CompileFragmentShader;
 
 PROCEDURE AttachAndLinkProgram*(prog, vs, fs: Uint): BOOLEAN;
-VAR 	linked: Uint;
+VAR 	linked: Int;
 BEGIN
 	gl.AttachShader(prog, vs);
 	gl.AttachShader(prog, fs);
@@ -216,7 +221,7 @@ BEGIN
 	RETURN linked # glc.GL_FALSE;
 END AttachAndLinkProgram;
 
-PROCEDURE LoadTheseShaders*( vertshader, fragshader: Strings.String;  VAR prog: Uint): BOOLEAN;
+PROCEDURE LoadTheseShaders*( CONST vertshader, fragshader: ARRAY OF CHAR;  VAR prog: Uint): BOOLEAN;
 VAR
 	vs, fs: Uint;
 	res: BOOLEAN;
@@ -236,7 +241,7 @@ BEGIN
 	RETURN res;
 END LoadTheseShaders;
 
-PROCEDURE LoadShaders*( CONST vertshaderFile, fragshaderFile: ARRAY OF CHAR): Uint;
+PROCEDURE LoadShadersFromFile*( CONST vertshaderFile, fragshaderFile: ARRAY OF CHAR): Uint;
 VAR
 	vss, fss: Strings.String; (* shader source pointers *)
 	program: Uint;
@@ -247,17 +252,16 @@ BEGIN
 	IF vss # NIL THEN
 		fss :=TextFileRead(fragshaderFile);
 		IF fss # NIL THEN
-			ok := LoadTheseShaders(vss, fss, program);
-			IF ~ ok THEN program := 0 END;
+			ok := LoadTheseShaders(vss^, fss^, program);
 		END;
 	END;
 	RETURN program
-END LoadShaders;
+END LoadShadersFromFile;
 
-PROCEDURE LoadTheseShaders2*( vertshader, fragshader: Strings.String; CONST locat0, locat1: ARRAY OF CHAR;  VAR prog: Uint): BOOLEAN;
+PROCEDURE LoadTheseShaders2*( CONST vertshader, fragshader: ARRAY OF CHAR; CONST locat0, locat1: ARRAY OF CHAR;  VAR prog: Uint): BOOLEAN;
 VAR
 	vs, fs: Uint;
-	linked: Uint;
+	linked: Int;
 BEGIN
 	(* Create shaders *)
 	linked := glc.GL_FALSE;
@@ -287,7 +291,7 @@ BEGIN
 	RETURN linked # glc.GL_FALSE;
 END LoadTheseShaders2;
 
-PROCEDURE LoadShaders2*( CONST vertshaderFile, fragshaderFile, locat0, locat1: ARRAY OF CHAR): Uint;
+PROCEDURE LoadShadersFromFile2*( CONST vertshaderFile, fragshaderFile, locat0, locat1: ARRAY OF CHAR): Uint;
 VAR
 	vss, fss: Strings.String; (* shader source pointers *)
 	program: Uint;
@@ -297,12 +301,12 @@ BEGIN
 	IF vss # NIL THEN
 		fss :=TextFileRead(fragshaderFile);
 		IF fss # NIL THEN
-			ok := LoadTheseShaders2(vss, fss, locat0, locat1, program);
+			ok := LoadTheseShaders2(vss^, fss^, locat0, locat1, program);
 			IF ~ ok THEN program := 0 END;
 		END;
 	END;
 	RETURN program
-END LoadShaders2;
+END LoadShadersFromFile2;
 
 
 BEGIN

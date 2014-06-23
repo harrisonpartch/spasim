@@ -1,7 +1,7 @@
 MODULE  GLTest; (** AUTHOR "fnecati"; PURPOSE "Simple GL rendering with commands"; *)
 
 IMPORT  GL := OpenGL, GLC := OpenGLConst, KernelLog,
-			Math, GLContext, GLU, WMGraphics, Raster ;
+			Math, Context:=GLContext, GLU, WMGraphics, Raster ;
 
 (* Note:
 	Since GL is state machine, drawing with different commands may leave
@@ -21,7 +21,7 @@ TYPE
 
 VAR
 	 w, h: LONGINT; (* size of window *)
-	 ctx : GLContext.Context;  (* GL context *)
+	 ctx : Context.Context;  (* GL context *)
 	 image: Raster.Image; (* for saving the rendered image *)
 
 
@@ -599,7 +599,7 @@ END BezSurf;
 
 PROCEDURE  Accum*;
 VAR
-	thing1, thing2: GL.Int;
+	thing1, thing2: GL.Uint;
 BEGIN
 IF ctx = NIL THEN Error; RETURN END;
 
@@ -991,6 +991,7 @@ GLTest.BezSurf ~         GLTest.Accum ~    GLTest.Bounce ~ GLTest.Cube ~
 
 GLTest.Quadric ~
 
-SystemTools.Free GLTest  GLContext  ~
+SystemTools.Free GLTest  GLContextFB  ~
 
+SystemTools.FreeDownTo OpenGL ~ 
 
