@@ -6,22 +6,24 @@ IMPORT
 
 CONST
 	debug = FALSE;
-	debugevent = FALSE;
 
+CONST
+	WMSetup = User32.WMUser + 1;
+	
 CONST
 	opDoubleBuffered = 0;
 	opStereo = 1;
 
 TYPE
-	WindowStruct*= POINTER TO RECORD
-		windowClassName, title*: ARRAY 32 OF CHAR;
+	WindowStruct = POINTER TO RECORD
+		windowClassName, title: ARRAY 32 OF CHAR;
 		Instance: Kernel32.HMODULE;
-		hWind*: WinApi.HWND;   (* handle of this window *)
-		hDC*: WinApi.HDC; (* drawing context of this window*)
-		hGLRC* : WinApi.HGLRC; (* GL render context handles for this window *)
-		width*, height*: LONGINT; (* size of window *)
-		doublebuffer*: BOOLEAN;
-
+		hWind: WinApi.HWND;   (* handle of this window *)
+		hDC: WinApi.HDC; (* drawing context of this window*)
+		hGLRC : WinApi.HGLRC; (* GL render context handles for this window *)
+		width, height: LONGINT; (* size of window *)
+		doublebuffer: BOOLEAN;
+		context: Context;
 	END;
 
 	Buffer = POINTER TO ARRAY OF CHAR;
@@ -30,14 +32,14 @@ TYPE
 TYPE
 	Context= OBJECT
 	VAR
-		glWin- : WindowStruct;
+		glWin : WindowStruct;
 		wincreated: BOOLEAN;
 		initialized: BOOLEAN;
 		res: BOOLEAN;
 		buffer: Buffer;	(* for speedup flip image in y*)
 		mode: Raster.Mode;
-
-    	PROCEDURE Init*(w, h: LONGINT);
+		
+    	PROCEDURE Init(w, h: LONGINT);
     	BEGIN  {EXCLUSIVE}
     		wincreated := FALSE;
 		initialized := FALSE;
@@ -46,36 +48,38 @@ TYPE
     		glWin.width := w; glWin.height := h;
 
     		glWin.title:="GLContext.Window";
-		(* Resize(w, h); *)
+		glWin.context := SELF;
+		
     		NEW(buffer, w*h*4);
 		Raster.InitMode(mode, Raster.srcCopy);
     		initialized := TRUE;
+    		
 		AWAIT (wincreated);
     	END Init;
 
-	PROCEDURE Close*;
+	PROCEDURE Close;
 	VAR res: LONGINT;
-	BEGIN {EXCLUSIVE}
+	BEGIN 
 		 wincreated := FALSE;
-		 res := User32.SendMessage(glWin.hWind, User32.WMClose, 0, 0);
+		 res := User32.SendMessage(glWin.hWind, User32.WMQuit, 0, 0);
 
 		IF debug THEN KernelLog.String("Close SendMessage res = "); KernelLog.Int(res, 0); KernelLog.Ln; END;
 
 	END Close;
 
-	PROCEDURE MakeCurrent*();
+	PROCEDURE MakeCurrent();
 	BEGIN
 		res := GL.wglMakeCurrent(glWin.hDC, glWin.hGLRC);
 		IF debug THEN KernelLog.String("ctx MakeCurrent res= "); KernelLog.Boolean(res); KernelLog.Ln; END;
 	END MakeCurrent;
 
-	PROCEDURE DeActivate*;
+	PROCEDURE DeActivate();
 	BEGIN
 		res := GL.wglMakeCurrent(0, 0);
 		IF debug THEN KernelLog.String("ctx DeActivate res= "); KernelLog.Boolean(res); KernelLog.Ln; END;
 	END DeActivate;
 
-	PROCEDURE SwapBuffers*;
+	PROCEDURE SwapBuffers();
 	VAR res: WinApi.BOOL;
 	BEGIN {EXCLUSIVE}
 		IF glWin.doublebuffer THEN
@@ -86,30 +90,46 @@ TYPE
 	END SwapBuffers;
 
 		(** move the window to x,y and  resize width,height *)
-	PROCEDURE MoveResizeWindow*(x, y, w, h: LONGINT);
+	PROCEDURE MoveResizeWindow(x, y, w, h: LONGINT);
 	BEGIN
 		User32.MoveWindow(glWin.hWind, x, y, w, h, 1); (* repaint *)
 	END MoveResizeWindow;
 
-	PROCEDURE Resize*(w, h: LONGINT);
+	PROCEDURE Resize(w, h: LONGINT);
 	BEGIN
 		buffer := NIL;
 		NEW(buffer, w*h*4);
 		MoveResizeWindow(0,0, w, h);
+		glWin.width := w; glWin.height := h;
 	END Resize;
 
-	PROCEDURE RenderInto*(image: Raster.Image);
+	PROCEDURE RenderInto(image: Raster.Image);
 	VAR
 		i: LONGINT;
 		w, h: LONGINT;
 	BEGIN
-			w := image.width; h := image.height;
-			GL.ReadPixels(0, 0, w, h, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, ADDRESSOF(buffer^[0]));
-			(* flip vertical, y *)
-			FOR i := 0 TO h - 1 DO
-				Raster.PutPixels(image, 0, h-1-i, w, Raster.BGRA8888, buffer^, i * w * 4, mode)
-			END;
+		IF (image = NIL) OR (image.adr = NIL) THEN RETURN END;
+		w := image.width; h := image.height;
+		GL.ReadPixels(0, 0, w, h, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, ADDRESSOF(buffer^[0]));
+		(* flip vertical, y *)
+		FOR i := 0 TO h - 1 DO
+			Raster.PutPixels(image, 0, h-1-i, w, Raster.BGRA8888, buffer^, i * w * 4, mode)
+		END;
 	END RenderInto;
+
+	(* handler for this context's window *)
+	PROCEDURE WindowHandler( uMsg: LONGINT;  wParam: User32.WParam;
+													  lParam: User32.LParam ): User32.LResult;
+	BEGIN
+		CASE uMsg OF
+			User32.WMQuit: 
+			IF debug THEN KernelLog.String("Get WMQuit message"); KernelLog.Ln; END;
+			CloseWindow(glWin);
+			RETURN 1;
+		ELSE
+		END;
+		RETURN User32.DefWindowProc(glWin.hWind, uMsg, wParam, lParam );  
+	END WindowHandler;
 
 	PROCEDURE MyLoop;
 	VAR
@@ -130,26 +150,16 @@ TYPE
 		LOOP
 
 			(* Check for new window messages *)
-			WHILE User32.GetMessage(msg, 0, 0, 0) # 0 DO
-				IF msg.message=User32.WMQuit THEN
-						(* QUIT-message (from close window) *)
-						IF debugevent THEN KernelLog.String("MainLoop: Got WMQuit message"); KernelLog.Ln; END;
-
+			IF User32.GetMessage(msg, 0, 0, 0) # 0 THEN 
+				IF msg.message=User32.WMClose THEN					
+						EXIT;
 				ELSE
 					res := User32.DispatchMessage(msg);
 				END;
 				Kernel32.Sleep( 1 );
 			END;
-
-			 IF ~wincreated THEN
-			 		IF debug THEN KernelLog.String("message loop exiting"); KernelLog.Ln; END;
-			  	EXIT;
-			  END;
 		END;
-		BEGIN {EXCLUSIVE} AWAIT(~wincreated) END;
-		CloseWindow(glWin);
-		glWin := NIL;
-		IF debug THEN KernelLog.String( "Display: closed" ); KernelLog.Ln; END;
+
 	END MyLoop;
 
 BEGIN {ACTIVE}
@@ -161,7 +171,7 @@ TYPE
 	VAR
 		context : Context;
 
-		PROCEDURE &Init(w, h: LONGINT; alpha: BOOLEAN);
+		PROCEDURE &Init*(w, h: LONGINT; alpha: BOOLEAN);
 		BEGIN
 			Init^(w, h, alpha); (* use alpha, for 32bpp img *)
 			NEW(context);
@@ -172,7 +182,7 @@ TYPE
 		PROCEDURE Close*();
 		BEGIN
 			context.Close();
-			context := NIL;
+			(*context := NIL;*)
 			Close^;
 		END Close;
 
@@ -217,7 +227,7 @@ TYPE
 
 		PROCEDURE GetScreen*(): LONGINT;
 		BEGIN
-			RETURN 0; (*context.glWin.screen*)
+			RETURN 0; (* unnecessary for windows; context.glWin.screen*)
 		END GetScreen;
 
 	END Window;
@@ -237,7 +247,7 @@ VAR
 		glWin.Instance := Kernel32.GetModuleHandle( NIL );
 
 		(* to create multiple GLContext with different window, change class name by appending and increasing counter value  *)
-		INC(ctxtcounter); Strings.IntToStr(ctxtcounter, scnt);
+		ctxtcounter:=Kernel32.GetTickCount(); Strings.IntToStr(ctxtcounter, scnt);
 		glWin.windowClassName := "WinAos.GLWindow";
 		Strings.Append(glWin.windowClassName, scnt);
 		IF debug THEN KernelLog.String("glWin.windowClassName= "); KernelLog.String(glWin.windowClassName); KernelLog.Ln; END;
@@ -269,7 +279,7 @@ VAR
 		dwStyle := WinApi.WS_POPUP +  WinApi.WS_CLIPSIBLINGS + WinApi.WS_CLIPCHILDREN;
 
 		 (* create the window *)
-		glWin.hWind := User32.CreateWindowEx(dwExStyle , glWin.windowClassName, glWin.title, dwStyle , 10, 10, glWin.width, glWin.height, 0, 0,  glWin.Instance, 0);
+		glWin.hWind := User32.CreateWindowEx(SYSTEM.VAL(LONGINT, dwExStyle) , glWin.windowClassName, glWin.title, dwStyle , 10, 10, glWin.width, glWin.height, 0, 0,  glWin.Instance, SYSTEM.VAL( User32.LParam, glWin));
 		IF glWin.hWind = 0 THEN
 			IF debug THEN
 				KernelLog.String("CreateWindowEx hWind= "); KernelLog.Int(glWin.hWind, 0); KernelLog.Ln;
@@ -299,7 +309,7 @@ VAR
 	PROCEDURE CloseWindow(VAR glWin: WindowStruct);
 	VAR res: Kernel32.BOOL;
 		bres : BOOLEAN;
-	BEGIN {EXCLUSIVE}
+	BEGIN (*{EXCLUSIVE}*)
 
 	   (* do we have a rendering context *)
     IF  glWin.hGLRC # 0 THEN
@@ -323,6 +333,8 @@ VAR
       IF debug THEN KernelLog.String("release hdc .."); KernelLog.Ln; END;
     END;
 
+
+    
     (* Do we have a window *)
     IF glWin.hWind # 0 THEN
         (* Destroy the window *)
@@ -338,8 +350,8 @@ VAR
         glWin.Instance := Kernel32.NULL;
         IF debug THEN KernelLog.String("unregister class .."); KernelLog.Ln; END;
     END;
-
-	IF debugevent THEN KernelLog.String("CloseWindow Ok."); KernelLog.Ln; END;
+		
+	IF debug THEN KernelLog.String("CloseWindow Ok."); KernelLog.Ln; END;
 	END CloseWindow;
 
 PROCEDURE CreateGLRC(VAR glWin: WindowStruct; Options: SET; colorbits, depthbits, stencilbits, accumbits, auxbuffers: LONGINT; layer: LONGINT): BOOLEAN;
@@ -409,27 +421,35 @@ END CreateGLRC;
 
 PROCEDURE {WINAPI} WindowProc( wnd: User32.HWND;  uMsg: LONGINT;  wParam: User32.WParam;
 															    lParam: User32.LParam ): User32.LResult;
-VAR res: LONGINT;
+VAR 
+	glWin: WindowStruct;
+	context: Context;
+	ret: Kernel32.BOOL;
 BEGIN
+	context := SYSTEM.VAL( Context, User32.GetWindowLong( wnd, WinApi.GWL_USERDATA));
+
+	IF context # NIL THEN
+		RETURN context.WindowHandler( uMsg, wParam, lParam );
+	END;
+
+
 	CASE uMsg OF
-
-	User32.WMActivate: (* Window activate message? (iconification) *)
-		res := User32.ShowWindow(wnd, User32.SWShow );
-		(* Did we receive a close message *)
-		|  User32.WMClose: User32.PostQuitMessage(0);
-			  IF debugevent THEN  KernelLog.String("WindowProc: Got WMClose message"); KernelLog.Ln; END;
-			  RETURN 0;
-
-		| User32.WMSize:
-				RETURN User32.DefWindowProc(wnd, uMsg, wParam, lParam)
+		 User32.WMCreate:			 	
+			SYSTEM.GET( lParam, glWin );  wParam := SYSTEM.VAL( User32.WParam, glWin );
+			lParam := SYSTEM.VAL( User32.LParam, glWin.context );
+			ret := User32.PostMessage( wnd, WMSetup, wParam, lParam );
+			RETURN 0;
+		| WMSetup:
+			context := SYSTEM.VAL( Context, lParam );  ret := User32.SetWindowLong( wnd, WinApi.GWL_USERDATA, lParam );
+			glWin := SYSTEM.VAL( WindowStruct, wParam );
+			RETURN 0;
 	ELSE
 	END;
-  RETURN User32.DefWindowProc(wnd, uMsg, wParam, lParam)
+	RETURN User32.DefWindowProc(wnd, uMsg, wParam, lParam)
 END WindowProc;
 
-
 BEGIN
-ctxtcounter := 0;
+	ctxtcounter := 0;
 END WMGLWindow.
 
 SystemTools.Free WMGLWindow ~

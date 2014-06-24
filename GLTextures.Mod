@@ -209,7 +209,7 @@ BEGIN
 	RETURN textureNumber; (*  Returns the current texture OpenGL ID *)
 END LoadTextureCustomFlipped;
 
-PROCEDURE LoadDDS*(CONST imagepath: ARRAY OF CHAR): LONGINT;
+PROCEDURE LoadDDS*(CONST imagepath: ARRAY OF CHAR): gl.Uint;
 VAR
 
 	file: Files.File;

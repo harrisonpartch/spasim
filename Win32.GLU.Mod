@@ -16,8 +16,8 @@ TYPE
   Int = GL.Int;
   Float = GL.Float;
   Double = GL.Double;
-  Pointer = GL.Pointer;
-  PPointer = GL.PPointer;
+  Pointer = ADDRESS;
+  PPointer = ADDRESS;
 
   PFloat = ADDRESS; (*POINTER TO ARRAY OF Float; *)
   PDouble = ADDRESS; (* POINTER TO ARRAY OF Double;*)
@@ -313,63 +313,71 @@ BEGIN
 	END;
 END ReadVersion;
 
+(** Wrapper for Kernel32.getProcAddress. *)
+PROCEDURE GetProcAddress*( hModule: Kernel32.HMODULE;  CONST procName: ARRAY OF CHAR;  adr: ADDRESS );
+VAR padr: ADDRESS;
+BEGIN
+	padr := Kernel32.getProcAddress( hModule, procName );
+	SYSTEM.PUT(adr, padr);
+END GetProcAddress;
+
 PROCEDURE InitGLU();
 BEGIN
 	lib := Kernel32.LoadLibrary(libname);
 	ASSERT(lib # 0,102);
 
 	(* load GLU functions *)
-     Kernel32.GetProcAddress(lib,  'gluBeginCurve', SYSTEM.VAL(ADDRESS, BeginCurve ));
-     Kernel32.GetProcAddress(lib,  'gluBeginPolygon', SYSTEM.VAL(ADDRESS, BeginPolygon ));
-     Kernel32.GetProcAddress(lib,  'gluBeginSurface', SYSTEM.VAL(ADDRESS, BeginSurface ));
-     Kernel32.GetProcAddress(lib,  'gluBeginTrim', SYSTEM.VAL(ADDRESS,  BeginTrim));
-     Kernel32.GetProcAddress(lib,  'gluBuild1DMipmaps', SYSTEM.VAL(ADDRESS, Build1DMipmaps ));
-     Kernel32.GetProcAddress(lib,  'gluBuild2DMipmaps', SYSTEM.VAL(ADDRESS, Build2DMipmaps ));
-     Kernel32.GetProcAddress(lib,  'gluCylinder', SYSTEM.VAL(ADDRESS, Cylinder ));
-     Kernel32.GetProcAddress(lib,  'gluDeleteNurbsRenderer', SYSTEM.VAL(ADDRESS, DeleteNurbsRenderer ));
-     Kernel32.GetProcAddress(lib,  'gluDeleteQuadric', SYSTEM.VAL(ADDRESS, DeleteQuadric ));
-     Kernel32.GetProcAddress(lib,  'gluDeleteTess', SYSTEM.VAL(ADDRESS, DeleteTess ));
-     Kernel32.GetProcAddress(lib,  'gluDisk', SYSTEM.VAL(ADDRESS, Disk ));
-     Kernel32.GetProcAddress(lib,  'gluEndCurve', SYSTEM.VAL(ADDRESS, EndCurve ));
-     Kernel32.GetProcAddress(lib,  'gluEndPolygon', SYSTEM.VAL(ADDRESS, EndPolygon ));
-     Kernel32.GetProcAddress(lib,  'gluEndSurface', SYSTEM.VAL(ADDRESS, EndSurface ));
-     Kernel32.GetProcAddress(lib,  'gluEndTrim', SYSTEM.VAL(ADDRESS, EndTrim ));
-     Kernel32.GetProcAddress(lib,  'gluErrorString', SYSTEM.VAL(ADDRESS, XgluErrorString ));
-     Kernel32.GetProcAddress(lib,  'gluGetNurbsProperty', SYSTEM.VAL(ADDRESS, GetNurbsProperty ));
-     Kernel32.GetProcAddress(lib,  'gluGetString', SYSTEM.VAL(ADDRESS, XgluGetString ));
-     Kernel32.GetProcAddress(lib,  'gluGetTessProperty', SYSTEM.VAL(ADDRESS, GetTessProperty ));
-     Kernel32.GetProcAddress(lib,  'gluLoadSamplingMatrices', SYSTEM.VAL(ADDRESS, LoadSamplingMatrices ));
-     Kernel32.GetProcAddress(lib,  'gluLookAt', SYSTEM.VAL(ADDRESS, LookAt ));
-     Kernel32.GetProcAddress(lib,  'gluNewNurbsRenderer', SYSTEM.VAL(ADDRESS, NewNurbsRenderer ));
-     Kernel32.GetProcAddress(lib,  'gluNewQuadric', SYSTEM.VAL(ADDRESS, NewQuadric ));
-     Kernel32.GetProcAddress(lib,  'gluNewTess', SYSTEM.VAL(ADDRESS, NewTess ));
-     Kernel32.GetProcAddress(lib,  'gluNextContour', SYSTEM.VAL(ADDRESS, NextContour ));
-     Kernel32.GetProcAddress(lib,  'gluNurbsCallback', SYSTEM.VAL(ADDRESS, NurbsCallback ));
-     Kernel32.GetProcAddress(lib,  'gluNurbsCurve', SYSTEM.VAL(ADDRESS, NurbsCurve ));
-     Kernel32.GetProcAddress(lib,  'gluNurbsProperty', SYSTEM.VAL(ADDRESS, NurbsProperty ));
-     Kernel32.GetProcAddress(lib,  'gluNurbsSurface', SYSTEM.VAL(ADDRESS, NurbsSurface ));
-     Kernel32.GetProcAddress(lib,  'gluOrtho2D', SYSTEM.VAL(ADDRESS, Ortho2D ));
-     Kernel32.GetProcAddress(lib,  'gluPartialDisk', SYSTEM.VAL(ADDRESS, PartialDisk ));
-     Kernel32.GetProcAddress(lib,  'gluPerspective', SYSTEM.VAL(ADDRESS, Perspective ));
-     Kernel32.GetProcAddress(lib,  'gluPickMatrix', SYSTEM.VAL(ADDRESS, PickMatrix ));
-     Kernel32.GetProcAddress(lib,  'gluProject', SYSTEM.VAL(ADDRESS, Project ));
-     Kernel32.GetProcAddress(lib,  'gluPwlCurve', SYSTEM.VAL(ADDRESS, PwlCurve ));
-     Kernel32.GetProcAddress(lib,  'gluQuadricCallback', SYSTEM.VAL(ADDRESS, QuadricCallback ));
-     Kernel32.GetProcAddress(lib,  'gluQuadricDrawStyle', SYSTEM.VAL(ADDRESS, QuadricDrawStyle ));
-     Kernel32.GetProcAddress(lib,  'gluQuadricNormals', SYSTEM.VAL(ADDRESS, QuadricNormals ));
-     Kernel32.GetProcAddress(lib,  'gluQuadricOrientation', SYSTEM.VAL(ADDRESS, QuadricOrientation ));
-     Kernel32.GetProcAddress(lib,  'gluQuadricTexture', SYSTEM.VAL(ADDRESS, QuadricTexture ));
-     Kernel32.GetProcAddress(lib,  'gluScaleImage', SYSTEM.VAL(ADDRESS, ScaleImage ));
-     Kernel32.GetProcAddress(lib,  'gluSphere', SYSTEM.VAL(ADDRESS, Sphere ));
-     Kernel32.GetProcAddress(lib,  'gluTessBeginContour', SYSTEM.VAL(ADDRESS, TessBeginContour ));
-     Kernel32.GetProcAddress(lib,  'gluTessBeginPolygon', SYSTEM.VAL(ADDRESS, TessBeginPolygon ));
-     Kernel32.GetProcAddress(lib,  'gluTessCallback', SYSTEM.VAL(ADDRESS, TessCallback ));
-     Kernel32.GetProcAddress(lib,  'gluTessEndContour', SYSTEM.VAL(ADDRESS, TessEndContour ));
-     Kernel32.GetProcAddress(lib,  'gluTessEndPolygon', SYSTEM.VAL(ADDRESS, TessEndPolygon ));
-     Kernel32.GetProcAddress(lib,  'gluTessNormal', SYSTEM.VAL(ADDRESS, TessNormal ));
-     Kernel32.GetProcAddress(lib,  'gluTessProperty', SYSTEM.VAL(ADDRESS, TessProperty ));
-     Kernel32.GetProcAddress(lib,  'gluTessVertex', SYSTEM.VAL(ADDRESS, TessVertex ));
-     Kernel32.GetProcAddress(lib,  'gluUnProject', SYSTEM.VAL(ADDRESS, UnProject ));
+     GetProcAddress(lib, 'gluBeginCurve', ADDRESSOF( BeginCurve ));
+     GetProcAddress(lib, 'gluBeginPolygon', ADDRESSOF( BeginPolygon ));
+     GetProcAddress(lib, 'gluBeginSurface', ADDRESSOF( BeginSurface ));
+     GetProcAddress(lib, 'gluBeginTrim', ADDRESSOF(  BeginTrim));
+     GetProcAddress(lib, 'gluBuild1DMipmaps', ADDRESSOF( Build1DMipmaps ));
+     GetProcAddress(lib, 'gluBuild2DMipmaps', ADDRESSOF( Build2DMipmaps ));
+     GetProcAddress(lib, 'gluCylinder', ADDRESSOF( Cylinder ));
+     GetProcAddress(lib, 'gluDeleteNurbsRenderer', ADDRESSOF( DeleteNurbsRenderer ));
+     GetProcAddress(lib, 'gluDeleteQuadric', ADDRESSOF( DeleteQuadric ));
+     GetProcAddress(lib, 'gluDeleteTess', ADDRESSOF( DeleteTess ));
+     GetProcAddress(lib, 'gluDisk', ADDRESSOF( Disk ));
+     GetProcAddress(lib, 'gluEndCurve', ADDRESSOF( EndCurve ));
+     GetProcAddress(lib, 'gluEndPolygon', ADDRESSOF( EndPolygon ));
+     GetProcAddress(lib, 'gluEndSurface', ADDRESSOF( EndSurface ));
+     GetProcAddress(lib, 'gluEndTrim', ADDRESSOF( EndTrim ));
+     GetProcAddress(lib, 'gluErrorString', ADDRESSOF( XgluErrorString ));
+     GetProcAddress(lib, 'gluGetNurbsProperty', ADDRESSOF( GetNurbsProperty ));
+     GetProcAddress(lib, 'gluGetString', ADDRESSOF( XgluGetString ));
+     GetProcAddress(lib, 'gluGetTessProperty', ADDRESSOF( GetTessProperty ));
+     GetProcAddress(lib, 'gluLoadSamplingMatrices', ADDRESSOF( LoadSamplingMatrices ));
+     GetProcAddress(lib, 'gluLookAt', ADDRESSOF( LookAt ));
+     GetProcAddress(lib, 'gluNewNurbsRenderer', ADDRESSOF( NewNurbsRenderer ));
+     GetProcAddress(lib, 'gluNewQuadric', ADDRESSOF( NewQuadric ));
+     GetProcAddress(lib, 'gluNewTess', ADDRESSOF( NewTess ));
+     GetProcAddress(lib, 'gluNextContour', ADDRESSOF( NextContour ));
+     GetProcAddress(lib, 'gluNurbsCallback', ADDRESSOF( NurbsCallback ));
+     GetProcAddress(lib, 'gluNurbsCurve', ADDRESSOF( NurbsCurve ));
+     GetProcAddress(lib, 'gluNurbsProperty', ADDRESSOF( NurbsProperty ));
+     GetProcAddress(lib, 'gluNurbsSurface', ADDRESSOF( NurbsSurface ));
+     GetProcAddress(lib, 'gluOrtho2D', ADDRESSOF( Ortho2D ));
+     GetProcAddress(lib, 'gluPartialDisk', ADDRESSOF( PartialDisk ));
+     GetProcAddress(lib, 'gluPerspective', ADDRESSOF( Perspective ));
+     GetProcAddress(lib, 'gluPickMatrix', ADDRESSOF( PickMatrix ));
+     GetProcAddress(lib, 'gluProject', ADDRESSOF( Project ));
+     GetProcAddress(lib, 'gluPwlCurve', ADDRESSOF( PwlCurve ));
+     GetProcAddress(lib, 'gluQuadricCallback', ADDRESSOF( QuadricCallback ));
+     GetProcAddress(lib, 'gluQuadricDrawStyle', ADDRESSOF( QuadricDrawStyle ));
+     GetProcAddress(lib, 'gluQuadricNormals', ADDRESSOF( QuadricNormals ));
+     GetProcAddress(lib, 'gluQuadricOrientation', ADDRESSOF( QuadricOrientation ));
+     GetProcAddress(lib, 'gluQuadricTexture', ADDRESSOF( QuadricTexture ));
+     GetProcAddress(lib, 'gluScaleImage', ADDRESSOF( ScaleImage ));
+     GetProcAddress(lib, 'gluSphere', ADDRESSOF( Sphere ));
+     GetProcAddress(lib, 'gluTessBeginContour', ADDRESSOF( TessBeginContour ));
+     GetProcAddress(lib, 'gluTessBeginPolygon', ADDRESSOF( TessBeginPolygon ));
+     GetProcAddress(lib, 'gluTessCallback', ADDRESSOF( TessCallback ));
+     GetProcAddress(lib, 'gluTessEndContour', ADDRESSOF( TessEndContour ));
+     GetProcAddress(lib, 'gluTessEndPolygon', ADDRESSOF( TessEndPolygon ));
+     GetProcAddress(lib, 'gluTessNormal', ADDRESSOF( TessNormal ));
+     GetProcAddress(lib, 'gluTessProperty', ADDRESSOF( TessProperty ));
+     GetProcAddress(lib, 'gluTessVertex', ADDRESSOF( TessVertex ));
+     GetProcAddress(lib, 'gluUnProject', ADDRESSOF( UnProject ));
 
       KernelLog.String(libname); KernelLog.String(" loaded."); KernelLog.Ln;
 END InitGLU;

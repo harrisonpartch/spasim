@@ -1,7 +1,7 @@
 MODULE WMGLDemo9; (** AUTHOR "fnecati"; PURPOSE "a demo using opengl Frame Buffer Object FBO and texture "; *)
 
 IMPORT
-	WMRectangles, WMGraphics, Strings, Kernel, Raster, Inputs, KernelLog,
+	WMRectangles, WMGraphics, Strings, Kernel, Raster, Inputs, Modules, KernelLog,
 	WM := WMWindowManager,  WMMessages, WMDialogs,
 	GL := OpenGL, GLC := OpenGLConst, GLU, WMGL := WMGLWindow;
 
@@ -21,8 +21,9 @@ TYPE
 		tu, tv: REAL;
     		x, y, z: REAL;
 	END;
-	VertexArray = POINTER TO ARRAY OF Vertex;
-
+	(*VertexArray = POINTER TO ARRAY OF Vertex;*)
+	Vector = ARRAY [*] OF REAL;
+	
 	GLWindow* =  OBJECT(WMGL.Window)
 	VAR
 		 timer: Kernel.MilliTimer;
@@ -35,98 +36,97 @@ TYPE
 		testTextureID, dynamicTextureID: GL.Uint;
 		frameBuffer, depthRenderBuffer: GL.Uint;
 
-	(*	cubeVertices: Vector; *)
-		cubeVertices: VertexArray;
+		cubeVertices: Vector; 
+		(*cubeVertices: VertexArray;*)
 
 		PROCEDURE &New(w, h: LONGINT);
 		BEGIN
 			Init(w, h, FALSE); (* use alpha, for 32bpp img *)
 			WM.DefaultAddWindow(SELF);
 			SetTitle(Strings.NewString("WMGLDemo9: FBO"));
-
+			IncCount;
 			eyeposz := 1.0;
 			drawMode := 0;
 			animated := FALSE;
 			alive := TRUE;
 			IF ~initGL() THEN Close END;
 			UpdateImage;
+			
 		  END New;
 
+		PROCEDURE NewVertex(u,v,x, y, z: REAL):Vertex;
+		VAR vert: Vertex;
+		BEGIN
+			vert.tu := u; vert.tv := v;
+			vert.x := x; vert.y := y; vert.z := z;
+			RETURN vert;
+		END NewVertex;
 
+		PROCEDURE InitVertex;
+		BEGIN
+			 cubeVertices :=
+			   [ 0.0,0.0, -1.0,-1.0, 1.0,
+			    1.0,0.0,  1.0,-1.0, 1.0,
+			    1.0,1.0,  1.0, 1.0, 1.0,
+			    0.0,1.0, -1.0, 1.0, 1.0,
 
-PROCEDURE NewVertex(u,v,x, y, z: REAL):Vertex;
-VAR vert: Vertex;
-BEGIN
-	vert.tu := u; vert.tv := v;
-	vert.x := x; vert.y := y; vert.z := z;
-	RETURN vert;
-END NewVertex;
+			    1.0,0.0, -1.0,-1.0,-1.0,
+			    1.0,1.0, -1.0, 1.0,-1.0,
+			    0.0,1.0,  1.0, 1.0,-1.0,
+			    0.0,0.0,  1.0,-1.0,-1.0,
 
-PROCEDURE InitVertex;
-BEGIN
-(* cubeVertices :=
-   [ 0.0,0.0, -1.0,-1.0, 1.0,
-    1.0,0.0,  1.0,-1.0, 1.0,
-    1.0,1.0,  1.0, 1.0, 1.0,
-    0.0,1.0, -1.0, 1.0, 1.0,
+			    0.0,1.0, -1.0, 1.0,-1.0,
+			    0.0,0.0, -1.0, 1.0, 1.0,
+			    1.0,0.0,  1.0, 1.0, 1.0,
+			    1.0,1.0,  1.0, 1.0,-1.0,
 
-    1.0,0.0, -1.0,-1.0,-1.0,
-    1.0,1.0, -1.0, 1.0,-1.0,
-    0.0,1.0,  1.0, 1.0,-1.0,
-    0.0,0.0,  1.0,-1.0,-1.0,
+			    1.0,1.0, -1.0,-1.0,-1.0,
+			    0.0,1.0,  1.0,-1.0,-1.0,
+			    0.0,0.0,  1.0,-1.0, 1.0,
+			    1.0,0.0, -1.0,-1.0, 1.0,
 
-    0.0,1.0, -1.0, 1.0,-1.0,
-    0.0,0.0, -1.0, 1.0, 1.0,
-    1.0,0.0,  1.0, 1.0, 1.0,
-    1.0,1.0,  1.0, 1.0,-1.0,
+			    1.0,0.0,  1.0,-1.0,-1.0,
+			    1.0,1.0,  1.0, 1.0,-1.0,
+			    0.0,1.0,  1.0, 1.0, 1.0,
+			    0.0,0.0,  1.0,-1.0, 1.0,
 
-    1.0,1.0, -1.0,-1.0,-1.0,
-    0.0,1.0,  1.0,-1.0,-1.0,
-    0.0,0.0,  1.0,-1.0, 1.0,
-    1.0,0.0, -1.0,-1.0, 1.0,
+			    0.0,0.0, -1.0,-1.0,-1.0,
+			    1.0,0.0, -1.0,-1.0, 1.0,
+			    1.0,1.0, -1.0, 1.0, 1.0,
+			    0.0,1.0, -1.0, 1.0,-1.0];
+			(*
+			NEW(cubeVertices, 24);
+			cubeVertices[0]:=NewVertex( 0.0,0.0, -1.0,-1.0, 1.0);
+			cubeVertices[1]:=NewVertex( 1.0,0.0,  1.0,-1.0, 1.0);
+			cubeVertices[2]:=NewVertex(1.0,1.0,  1.0, 1.0, 1.0);
+			cubeVertices[3]:=NewVertex(0.0,1.0, -1.0, 1.0, 1.0);
 
-    1.0,0.0,  1.0,-1.0,-1.0,
-    1.0,1.0,  1.0, 1.0,-1.0,
-    0.0,1.0,  1.0, 1.0, 1.0,
-    0.0,0.0,  1.0,-1.0, 1.0,
+			cubeVertices[4]:=NewVertex( 1.0,0.0, -1.0,-1.0,-1.0);
+			cubeVertices[5]:=NewVertex( 1.0,1.0, -1.0, 1.0,-1.0);
+			cubeVertices[6]:=NewVertex( 0.0,1.0,  1.0, 1.0,-1.0);
+			cubeVertices[7]:=NewVertex(0.0,0.0,  1.0,-1.0,-1.0);
 
-    0.0,0.0, -1.0,-1.0,-1.0,
-    1.0,0.0, -1.0,-1.0, 1.0,
-    1.0,1.0, -1.0, 1.0, 1.0,
-    0.0,1.0, -1.0, 1.0,-1.0];
+			cubeVertices[8]:=NewVertex(0.0,1.0, -1.0, 1.0,-1.0);
+			cubeVertices[9]:=NewVertex( 0.0,0.0, -1.0, 1.0, 1.0);
+			cubeVertices[10]:=NewVertex(1.0,0.0,  1.0, 1.0, 1.0);
+			cubeVertices[11]:=NewVertex(1.0,1.0,  1.0, 1.0,-1.0);
+
+			cubeVertices[12]:=NewVertex(  1.0,1.0, -1.0,-1.0,-1.0);
+			cubeVertices[13]:=NewVertex(  0.0,1.0,  1.0,-1.0,-1.0);
+			cubeVertices[14]:=NewVertex( 0.0,0.0,  1.0,-1.0, 1.0);
+			cubeVertices[15]:=NewVertex( 1.0,0.0, -1.0,-1.0, 1.0);
+
+			cubeVertices[16]:=NewVertex(1.0,0.0,  1.0,-1.0,-1.0);
+			cubeVertices[17]:=NewVertex(1.0,1.0,  1.0, 1.0,-1.0);
+			cubeVertices[18]:=NewVertex(0.0,1.0,  1.0, 1.0, 1.0);
+			cubeVertices[19]:=NewVertex(0.0,0.0,  1.0,-1.0, 1.0);
+
+			cubeVertices[20]:=NewVertex( 0.0,0.0, -1.0,-1.0,-1.0);
+			cubeVertices[21]:=NewVertex( 1.0,0.0, -1.0,-1.0, 1.0);
+			cubeVertices[22]:=NewVertex(1.0,1.0, -1.0, 1.0, 1.0);
+			cubeVertices[23]:=NewVertex( 0.0,1.0, -1.0, 1.0,-1.0);
 *)
-NEW(cubeVertices, 24);
-cubeVertices[0]:=NewVertex( 0.0,0.0, -1.0,-1.0, 1.0);
-cubeVertices[1]:=NewVertex( 1.0,0.0,  1.0,-1.0, 1.0);
-cubeVertices[2]:=NewVertex(1.0,1.0,  1.0, 1.0, 1.0);
-cubeVertices[3]:=NewVertex(0.0,1.0, -1.0, 1.0, 1.0);
-
-cubeVertices[4]:=NewVertex( 1.0,0.0, -1.0,-1.0,-1.0);
-cubeVertices[5]:=NewVertex( 1.0,1.0, -1.0, 1.0,-1.0);
-cubeVertices[6]:=NewVertex( 0.0,1.0,  1.0, 1.0,-1.0);
-cubeVertices[7]:=NewVertex(0.0,0.0,  1.0,-1.0,-1.0);
-
-cubeVertices[8]:=NewVertex(0.0,1.0, -1.0, 1.0,-1.0);
-cubeVertices[9]:=NewVertex( 0.0,0.0, -1.0, 1.0, 1.0);
-cubeVertices[10]:=NewVertex(1.0,0.0,  1.0, 1.0, 1.0);
-cubeVertices[11]:=NewVertex(1.0,1.0,  1.0, 1.0,-1.0);
-
-cubeVertices[12]:=NewVertex(  1.0,1.0, -1.0,-1.0,-1.0);
-cubeVertices[13]:=NewVertex(  0.0,1.0,  1.0,-1.0,-1.0);
-cubeVertices[14]:=NewVertex( 0.0,0.0,  1.0,-1.0, 1.0);
-cubeVertices[15]:=NewVertex( 1.0,0.0, -1.0,-1.0, 1.0);
-
-cubeVertices[16]:=NewVertex(1.0,0.0,  1.0,-1.0,-1.0);
-cubeVertices[17]:=NewVertex(1.0,1.0,  1.0, 1.0,-1.0);
-cubeVertices[18]:=NewVertex(0.0,1.0,  1.0, 1.0, 1.0);
-cubeVertices[19]:=NewVertex(0.0,0.0,  1.0,-1.0, 1.0);
-
-cubeVertices[20]:=NewVertex( 0.0,0.0, -1.0,-1.0,-1.0);
-cubeVertices[21]:=NewVertex( 1.0,0.0, -1.0,-1.0, 1.0);
-cubeVertices[22]:=NewVertex(1.0,1.0, -1.0, 1.0, 1.0);
-cubeVertices[23]:=NewVertex( 0.0,1.0, -1.0, 1.0,-1.0);
-
-END InitVertex;
+		END InitVertex;
 
 		PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
 		BEGIN
@@ -136,12 +136,12 @@ END InitVertex;
 			ELSIF keysym = Inputs.KsUp THEN  spinYR := spinYR + 5.0;   UpdateImage; (* Cursor Up *)
 			ELSIF ucs = ORD("s") THEN SaveImage;
 			ELSIF  ucs = ORD("q") THEN Close;
-			ELSIF  ucs = ORD("a") THEN animated := ~ animated;
+			ELSIF  ucs = ORD("a") THEN BEGIN {EXCLUSIVE} animated := ~ animated; END;
 			ELSE
 			END;
 		END KeyEvent;
 
-		PROCEDURE WheelMove*(dz : LONGINT);
+		PROCEDURE WheelMove(dz : LONGINT);
 		BEGIN
 			eyeposz := eyeposz + dz;
 			Reshape(GetWidth(), GetHeight());
@@ -156,12 +156,12 @@ END InitVertex;
 			END
 		END Handle;
 
-
-		PROCEDURE Close*;
-		BEGIN {EXCLUSIVE}
-			alive := FALSE;
+		PROCEDURE Close;
+		BEGIN
+			BEGIN {EXCLUSIVE} alive := FALSE; animated := FALSE; END;
 			CleanBuffers;
 			Close^;
+			DecCount
 		END Close;
 
 		PROCEDURE UpdateImage;
@@ -191,9 +191,7 @@ END InitVertex;
 			GL.Viewport(0, 0, w, h);
 			GL.MatrixMode(GLC.GL_MODELVIEW);
 			GL.LoadIdentity();
-
 				GLU.LookAt(5, 5, eyeposz,   0, 0, 0,   0, 1, 0); (* eye(x,y,z), focal(x,y,z), up(x,y,z) *)
-
 			  DeActivate();
 		END Reshape;
 
@@ -289,7 +287,7 @@ IF teximg # NIL THEN
 	GL.TexParameteri(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_LINEAR);
 
 	GL.TexImage2D( GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA8, teximg.width, teximg.height, 0,
-	GLC.GL_RGBA, GLC.GL_UNSIGNED_BYTE, teximg.adr );
+	GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, teximg.adr );
 ELSE
  	KernelLog.String("teximg= NIL"); KernelLog.Ln;
 END;
@@ -356,9 +354,9 @@ BEGIN
 	GL.BindFramebufferEXT( GLC.GL_FRAMEBUFFER_EXT, 0 );
 	 GL.BindRenderbufferEXT(GLC. GL_RENDERBUFFER_EXT, 0 );
 
-	(* --------------------------------------------------------------------------
+	(* ------------------------------------------------
 	 Now, set up the regular window for rendering...
-	-------------------------------------------------------------------------- *)
+	-------------------------------------------------- *)
 
 	GL.Viewport( 0, 0, GetWidth(), GetHeight() );
 	GL.ClearColor( 0.0, 0.0, 0.0, 1.0 );
@@ -375,7 +373,7 @@ BEGIN
     (* Finally, we'll use the dynamic texture like a regular static texture.*)
 
 	GL.BindTexture( GLC.GL_TEXTURE_2D, dynamicTextureID );
-	GL.InterleavedArrays( GLC.GL_T2F_V3F, 0, ADDRESSOF(cubeVertices[0].tu));
+	GL.InterleavedArrays( GLC.GL_T2F_V3F, 0, ADDRESSOF(cubeVertices[0]));
 	GL.DrawArrays( GLC.GL_QUADS, 0, 24 );
 END displayCB;
 
@@ -383,16 +381,17 @@ END displayCB;
 BEGIN  { ACTIVE }
 	Kernel.SetTimer(timer, waittime);
 	WHILE alive DO
-		IF animated THEN
-			 IF Kernel.Expired(timer) THEN
-			 	 UpdateImage();
-			 	  spinXR := spinXR + 1.0;
-				Kernel.SetTimer(timer, waittime);
-			END;
+		BEGIN {EXCLUSIVE} AWAIT(animated) END;
+		IF Kernel.Expired(timer) THEN
+			UpdateImage();
+			spinXR := spinXR + 1.0;
+			Kernel.SetTimer(timer, waittime);
 		END;
 	END;
-
 END GLWindow;
+
+VAR
+	nofWindows : LONGINT;
 
 
 PROCEDURE FramebufferStatusToString(status: GL.Enum): Str256;
@@ -420,9 +419,33 @@ BEGIN
 	NEW(window, 256, 256);
 END Open;
 
+PROCEDURE IncCount;
+BEGIN {EXCLUSIVE}
+	INC(nofWindows)
+END IncCount;
+
+PROCEDURE DecCount;
+BEGIN {EXCLUSIVE}
+	DEC(nofWindows)
+END DecCount;
+
+PROCEDURE Cleanup;
+VAR die : KillerMsg;
+	 msg : WMMessages.Message;
+	 m : WM.WindowManager;
+BEGIN {EXCLUSIVE}
+	NEW(die);
+	msg.ext := die;
+	msg.msgType := WMMessages.MsgExt;
+	m := WM.GetDefaultManager();
+	m.Broadcast(msg);
+	AWAIT(nofWindows = 0)
+END Cleanup;
+
 BEGIN
+	Modules.InstallTermHandler(Cleanup)
 END WMGLDemo9.
 
-SystemTools.Free  WMGLDemo9  WMGLWindow ~ OpenGL OpenGLConst ~
+SystemTools.Free  WMGLDemo9  ~
 
 WMGLDemo9.Open ~

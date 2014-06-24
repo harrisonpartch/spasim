@@ -7,7 +7,7 @@ MODULE WMGLSteamEngine; (** AUTHOR "fnecati"; PURPOSE "opengl steam engine demo"
 
 
 IMPORT
-	WMRectangles, WMGraphics, Strings, Kernel, Math:=MathL,
+	WMRectangles, WMGraphics, Strings, Kernel, Math:=MathL, Modules,
 	WM := WMWindowManager,  WMMessages, WMDialogs, Inputs, GLLib,
 	GL := OpenGL, GLC := OpenGLConst, WMGL:=WMGLWindow,
 	GLU;
@@ -50,6 +50,7 @@ TYPE
 			UpdateImage();
 
 			alive := TRUE;
+			IncCount
 		END New;
 
 
@@ -65,7 +66,7 @@ TYPE
 		PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
 		BEGIN
 			CASE CHR(ucs) OF
-				"a", "A": animated := ~ animated;
+				"a", "A": BEGIN {EXCLUSIVE} animated := ~ animated; END;
 				| "s": SaveImage;
 				| "q" : Close;
 				| " ": ChangeAngle();
@@ -79,7 +80,7 @@ TYPE
 
 		END KeyEvent;
 
-		PROCEDURE WheelMove*(dz : LONGINT);
+		PROCEDURE WheelMove(dz : LONGINT);
 		BEGIN
 			eyeposz := eyeposz + dz;
 			IF eyeposz < -100 THEN eyeposz:= -100.0; END;
@@ -96,10 +97,11 @@ TYPE
 			END
 		END Handle;
 
-		PROCEDURE Close*;
-		BEGIN {EXCLUSIVE}
-			alive := FALSE;
+		PROCEDURE Close;
+		BEGIN 
+			BEGIN {EXCLUSIVE} alive := FALSE; animated := FALSE END;			
 			Close^;
+			DecCount
 		END Close;
 
 
@@ -126,12 +128,10 @@ TYPE
 		VAR res: LONGINT;
 			fname: ARRAY 128 OF CHAR;
 		BEGIN
-
-		fname:="mywmgltest.bmp";
-		IF WMDialogs.QueryString(" Save File name: ",fname)=WMDialogs.ResOk THEN
+			fname:="mywmgltest.bmp";
+			IF WMDialogs.QueryString(" Save File name: ",fname)=WMDialogs.ResOk THEN
 				WMGraphics.StoreImage(img, fname,res);
-		END;
-
+			END;
 		END SaveImage;
 
 
@@ -387,21 +387,19 @@ END Reshape;
 
 
 BEGIN {ACTIVE}
-
-
 	Kernel.SetTimer(timer, waittime);
 	WHILE alive DO
-		BEGIN {EXCLUSIVE}  AWAIT(animated)  END;
-			IF Kernel.Expired(timer) THEN
-				ChangeAngle();
-				Kernel.SetTimer(timer, waittime);
-			END;
-		(* END;*)
-	END;
-
+		BEGIN {EXCLUSIVE} AWAIT(animated) END;
+		IF Kernel.Expired(timer) THEN
+			ChangeAngle();
+			Kernel.SetTimer(timer, waittime);
+		END
+	END
 END GLWindow;
 
-VAR  angles: ARRAY 360 OF REAL;
+VAR  
+	angles: ARRAY 360 OF REAL;
+	nofWindows : LONGINT;
 
 PROCEDURE Open*;
 VAR
@@ -419,11 +417,35 @@ BEGIN
 	END
 END InitAngleTable;
 
+PROCEDURE IncCount;
+BEGIN {EXCLUSIVE}
+	INC(nofWindows)
+END IncCount;
+
+PROCEDURE DecCount;
+BEGIN {EXCLUSIVE}
+	DEC(nofWindows)
+END DecCount;
+
+PROCEDURE Cleanup;
+VAR die : KillerMsg;
+	 msg : WMMessages.Message;
+	 m : WM.WindowManager;
+BEGIN {EXCLUSIVE}
+	NEW(die);
+	msg.ext := die;
+	msg.msgType := WMMessages.MsgExt;
+	m := WM.GetDefaultManager();
+	m.Broadcast(msg);
+	AWAIT(nofWindows = 0)
+END Cleanup;
+
 BEGIN
+	Modules.InstallTermHandler(Cleanup);
 	InitAngleTable;
 END WMGLSteamEngine.
 
-SystemTools.Free  WMGLSteamEngine WMGLWindow ~
+SystemTools.Free  WMGLSteamEngine ~
 
 WMGLSteamEngine.Open ~
 

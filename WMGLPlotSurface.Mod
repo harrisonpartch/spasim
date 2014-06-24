@@ -1,7 +1,7 @@
 MODULE WMGLPlotSurface; (** AUTHOR "fnecati"; PURPOSE "a test for 3D function plotting with light"; *)
 
 IMPORT
-	WMRectangles, WMGraphics, Strings, Math:=MathL, Inputs,
+	WMRectangles, WMGraphics, Strings, Math:=MathL, Inputs, Modules,
 	WM := WMWindowManager,  WMMessages,  WMDialogs,
 	GL := OpenGL, GLC := OpenGLConst, GLU, WMGL := WMGLWindow;
 
@@ -43,6 +43,7 @@ TYPE
 		initGL;
 		Reshape(w, h);
 		UpdateImage;
+		IncCount
 	END New;
 
 
@@ -65,7 +66,7 @@ TYPE
 		END;
 	END KeyEvent;
 
-	PROCEDURE WheelMove*(dz : LONGINT);
+	PROCEDURE WheelMove(dz : LONGINT);
 	BEGIN
 		IF dz < 0 THEN
 			MakeCurrent();
@@ -88,9 +89,10 @@ TYPE
 		END
 	END Handle;
 
-	PROCEDURE Close*;
-	BEGIN {EXCLUSIVE}
+	PROCEDURE Close;
+	BEGIN 
 		Close^;
+		DecCount
 	END Close;
 
 	PROCEDURE UpdateImage;
@@ -141,14 +143,14 @@ TYPE
 		END
 	END VLength3;
 
-	PROCEDURE VScaled3*(a:TVector3d; factor:LONGREAL):TVector3d;
+	PROCEDURE VScaled3(a:TVector3d; factor:LONGREAL):TVector3d;
 	VAR result : TVector3d;
 	BEGIN
 	       result := factor*a;
 		RETURN result
 	END VScaled3;
 
-	PROCEDURE VNormed3*(a: TVector3d):TVector3d;
+	PROCEDURE VNormed3(a: TVector3d):TVector3d;
 	BEGIN
 		RETURN VScaled3(a, 1/VLength3(a))
 	END VNormed3;
@@ -250,62 +252,62 @@ TYPE
 	BEGIN
 		MakeCurrent();
 		GL.Viewport (0, 0, w, h);
+
 		GL.MatrixMode (GLC.GL_PROJECTION);
 		GL.LoadIdentity ();
-
-			GLU.Perspective (30, 1.0, 1.0, 100.0);
+		GLU.Perspective (30, 1.0, 1.0, 100.0);
 
 		GL.MatrixMode (GLC.GL_MODELVIEW);
 		GL.LoadIdentity();
-
-			GLU.LookAt (5.0, 5.0, 7.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0);
+		GLU.LookAt (5.0, 5.0, 7.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0);
 		DeActivate;
 	END Reshape;
 
 	PROCEDURE DrawMode(dm: LONGINT);
 	VAR drawMode: LONGINT;
 	BEGIN
-	(*	drawMode := dm;
+		drawMode := dm;
 		MakeCurrent();
 
 		IF drawMode = 0 THEN       (* fill mode*)
-		(*	GL.PolygonMode(GLC.GL_FRONT_AND_BACK, GLC.GL_FILL);
+			GL.PolygonMode(GLC.GL_FRONT_AND_BACK, GLC.GL_FILL);
 			GL.Enable(GLC.GL_DEPTH_TEST);
-			GL.Enable(GLC.GL_CULL_FACE);*)
+			(*GL.Enable(GLC.GL_CULL_FACE);*)
 		ELSIF drawMode = 1 THEN  (* wireframe mode *)
 			GL.PolygonMode(GLC.GL_FRONT_AND_BACK, GLC.GL_LINE);
 			GL.Disable(GLC.GL_DEPTH_TEST);
-			GL.Disable(GLC.GL_CULL_FACE);
+			(*GL.Disable(GLC.GL_CULL_FACE);*)
 		ELSE                    (* point mode *)
 			GL.PolygonMode(GLC.GL_FRONT_AND_BACK, GLC.GL_POINT);
 			GL.Disable(GLC.GL_DEPTH_TEST);
-			GL.Disable(GLC.GL_CULL_FACE);
+			(*GL.Disable(GLC.GL_CULL_FACE);*)
 		END;
-		DeActivate(); *)
+		DeActivate(); 
 	END DrawMode;
 
 	PROCEDURE initGL;
 	BEGIN
 		MakeCurrent();
+		
 		(* Setup the lighting *)
-		ambientLight[0] :=  1.0; ambientLight[1] :=  1.0; ambientLight[2] :=  1.0; ambientLight[3] :=  1.0;
-		diffuseLight[0] := 1.0; diffuseLight[1] := 0.9; diffuseLight[2] := 0.8; diffuseLight[3] := 1.0;
-		specularLight[0] :=  0.0; specularLight[1] :=  1.0; specularLight[2] :=  0.0; specularLight[3] :=  1.0;
+		ambientLight := [1.0, 1.0, 1.0, 1.0];
+		diffuseLight := [1.0, 0.9, 0.8, 1.0];
+		specularLight := [ 0.0, 1.0,  0.0, 1.0];
 		(* Position the light somewhere close over the top of the figure*)
-		position[0] := 1.0; position[1] := 1.0; position[2] := 1.0; position[3] := 1.0;
+		position := [1.0, 1.0, 1.0,  1.0];
 
 		(* Call the actual options for light0 *)
 		GL.Lightfv(GLC.GL_LIGHT0, GLC.GL_AMBIENT, ambientLight);
-		(* GL.Lightfv(GLC.GL_LIGHT0, GLC.GL_DIFFUSE, diffuseLight);*)
+		GL.Lightfv(GLC.GL_LIGHT0, GLC.GL_DIFFUSE, diffuseLight);
 		GL.Lightfv(GLC.GL_LIGHT0, GLC.GL_SPECULAR, specularLight);
 		GL.Lightfv(GLC.GL_LIGHT0, GLC.GL_POSITION, position);
 
 		GL.Enable (GLC.GL_DEPTH_TEST);
 		GL.Enable (GLC.GL_LIGHTING);
 		GL.Enable (GLC.GL_LIGHT0);
-		GL.ShadeModel (GLC.GL_FLAT);  (* can be GL_SMOOTH if you dont want to see edges *)
+		(* GL.ShadeModel (GLC.GL_FLAT);*)  (* can be GL_SMOOTH if you dont want to see edges *)
 		GL.ShadeModel (GLC.GL_SMOOTH);
-		(*  GL.Enable(GLC.GL_CULL_FACE);*)
+		(* GL.Enable(GLC.GL_CULL_FACE);*)
 		GL.ClearColor (0.0,0.0,0.0,1.0);
 
 		(* make the plane *)
@@ -320,7 +322,7 @@ TYPE
 	PROCEDURE Display;
 	BEGIN
 		GL.Clear (GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT);
-		(*  Grid(); *)
+(*		  Grid(); *)
 		(*  render(); *)
 		GL.CallList(funcplane);
 	END Display;
@@ -328,6 +330,9 @@ TYPE
 BEGIN
 END GLWindow;
 
+VAR
+	nofWindows : LONGINT;
+	
 PROCEDURE Open*;
 VAR
 	window: GLWindow;
@@ -335,10 +340,33 @@ BEGIN
 	NEW(window, 256, 256);
 END Open;
 
-BEGIN
+PROCEDURE IncCount;
+BEGIN {EXCLUSIVE}
+	INC(nofWindows)
+END IncCount;
 
+PROCEDURE DecCount;
+BEGIN {EXCLUSIVE}
+	DEC(nofWindows)
+END DecCount;
+
+PROCEDURE Cleanup;
+VAR die : KillerMsg;
+	 msg : WMMessages.Message;
+	 m : WM.WindowManager;
+BEGIN {EXCLUSIVE}
+	NEW(die);
+	msg.ext := die;
+	msg.msgType := WMMessages.MsgExt;
+	m := WM.GetDefaultManager();
+	m.Broadcast(msg);
+	AWAIT(nofWindows = 0)
+END Cleanup;
+
+BEGIN
+	Modules.InstallTermHandler(Cleanup)
 END WMGLPlotSurface.
 
-SystemTools.Free  WMGLPlotSurface  WMGLWindow ~    OpenGL   OpenGLConst ~
+SystemTools.Free  WMGLPlotSurface ~
 
 WMGLPlotSurface.Open ~

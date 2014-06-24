@@ -1,7 +1,7 @@
 MODULE WMGLDemo6;  (** AUTHOR "fnecati"; PURPOSE "simple radar sweep example "; *)
 
 IMPORT
-	WMRectangles, WMGraphics, Strings, Kernel, Math,
+	WMRectangles, WMGraphics, Strings, Kernel, Math, Modules,
 	WM := WMWindowManager,  WMMessages, WMDialogs,
 	GL := OpenGL, GLC := OpenGLConst, WMGL:=WMGLWindow;
 
@@ -35,12 +35,13 @@ TYPE
 			DrawMode(0);
 			Reshape(w, h);
 			UpdateImage;
+			IncCount
 		END New;
 
 		PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
 		BEGIN
 			CASE CHR(ucs) OF
-				"a", "A": animated := ~ animated;
+				"a", "A": BEGIN {EXCLUSIVE} animated := ~ animated; END;
 				| "d": drawMode := (drawMode+1) MOD 3; DrawMode(drawMode); UpdateImage;
 				| "-" : angle := angle - 3.0; UpdateImage;
 				| "+" : angle := angle + 3.0; UpdateImage;
@@ -59,10 +60,11 @@ TYPE
 			END
 		END Handle;
 
-		PROCEDURE Close*;
-		BEGIN {EXCLUSIVE}
-			alive := FALSE;
+		PROCEDURE Close;
+		BEGIN 
+			BEGIN {EXCLUSIVE} alive := FALSE; animated := FALSE END;
 			Close^;
+			DecCount
 		END Close;
 
 		PROCEDURE UpdateImage;
@@ -191,16 +193,18 @@ TYPE
 BEGIN {ACTIVE}
 	Kernel.SetTimer(timer, waittime);
 	WHILE alive DO
-		IF animated THEN
-			 IF Kernel.Expired(timer) THEN
-			 	 UpdateImage();
-			 	  angle := angle + 5.0;
-				Kernel.SetTimer(timer, waittime);
-			END;
+		BEGIN {EXCLUSIVE} AWAIT(animated) END;
+		 IF Kernel.Expired(timer) THEN
+		 	 UpdateImage();
+		 	  angle := angle + 5.0;
+			Kernel.SetTimer(timer, waittime);
 		END;
 	END;
 END GLWindow;
 
+VAR
+	nofWindows : LONGINT;
+	
 PROCEDURE Open*;
 VAR
 	window: GLWindow;
@@ -208,10 +212,33 @@ BEGIN
 	NEW(window, 256, 256);
 END Open;
 
-BEGIN
+PROCEDURE IncCount;
+BEGIN {EXCLUSIVE}
+	INC(nofWindows)
+END IncCount;
 
+PROCEDURE DecCount;
+BEGIN {EXCLUSIVE}
+	DEC(nofWindows)
+END DecCount;
+
+PROCEDURE Cleanup;
+VAR die : KillerMsg;
+	 msg : WMMessages.Message;
+	 m : WM.WindowManager;
+BEGIN {EXCLUSIVE}
+	NEW(die);
+	msg.ext := die;
+	msg.msgType := WMMessages.MsgExt;
+	m := WM.GetDefaultManager();
+	m.Broadcast(msg);
+	AWAIT(nofWindows = 0)
+END Cleanup;
+
+BEGIN
+	Modules.InstallTermHandler(Cleanup)
 END WMGLDemo6.
 
-SystemTools.Free  WMGLDemo6 WMGLWindow ~
+SystemTools.Free  WMGLDemo6  ~
 
 WMGLDemo6.Open ~

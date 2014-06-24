@@ -27,41 +27,35 @@ TYPE
 
 	AnsiChar* = POINTER TO ARRAY OF CHAR;
 	PAnsiChar* = ADDRESS;
-	THandle* = LONGINT;
 	XID* = X11Api.XID;
 
 	(* GL data types *)
-	Enum* = LONGINT;  	(* 4 bytes *)
-	Boolean* = LONGINT; 	(*  *)
-	Bitfield* = LONGINT; 	(* SET *)
-	Byte* = CHAR; 		(* 1 byte signed *)
+	Enum* = UNSIGNED32;  	(* 4 bytes *)
+	Boolean* = UNSIGNED8; 	(*  *)
+	Bitfield* = UNSIGNED32; 	(* SET *)
+	Byte* = SIGNED8; 		(* 1 byte signed *)
 	Short* = INTEGER;  	(* 2 bytes signed *)
 	Int* = LONGINT; 	(* 4 bytes signed *)
-	Sizei* = LONGINT;  	(* 4 bytes signed *)
-	Ubyte* = CHAR; 		(* 1 byte unsigned *)
-	Ushort* = INTEGER;	(* 2 bytes unsigned *)
-	Uint* = LONGINT;	(* 4 bytes unsigned *)
+	Sizei* = SIZE;  	(* 4 bytes signed *)
+	Ubyte* = UNSIGNED8; 		(* 1 byte unsigned *)
+	Ushort* = UNSIGNED16;	(* 2 bytes unsigned *)
+	Uint* = UNSIGNED32;	(* 4 bytes unsigned *)
 	Float* = REAL;		(* single precision real *)
 	Clampf* = REAL;		(* single precision real in [0,1] *)
 	Double* = LONGREAL;	(* double precision real *)
 	Clampd* = LONGREAL;	(* double precision real in [0,1] *)
 	Void* = LONGINT;
 	Int64* = HUGEINT;
-	Uint64* = HUGEINT;
-
-	Pointer* = ADDRESS;
-	PPointer* = ADDRESS;
-	WORD* = INTEGER;
-	DWORD* = LONGINT;
+	Uint64* = UNSIGNED64;
 
 	PBoolean* = ADDRESS; 	(* POINTER TO ARRAY OF Boolean; *)
 	PByte* = ADDRESS; 	(* POINTER TO ARRAY OF Byte; *)
 	PShort* = ADDRESS; 	(* POINTER TO ARRAY OF Short; *)
-	Pint* =  ADDRESS; 	(* POINTER TO ARRAY OF Int; *)
+	PInt* =  ADDRESS; 	(* POINTER TO ARRAY OF Int; *)
 	PSizei* = ADDRESS; 	(* POINTER TO ARRAY OF Sizei; *)
 	PUbyte* = ADDRESS; 	(* POINTER TO ARRAY OF Ubyte; *)
 	PUshort* = ADDRESS; 	(* POINTER TO ARRAY OF Ushort; *)
-	PInt* = ADDRESS; 	(* POINTER TO ARRAY OF Uint; *)
+	PUint* = ADDRESS; 	(* POINTER TO ARRAY OF Uint; *)
 	PClampf* = ADDRESS; 	(* POINTER TO ARRAY OF Clampf; *)
 	PFloat* =  ADDRESS; 	(* POINTER TO ARRAY OF Float; *)
 	PDouble* = ADDRESS; 	(* POINTER TO ARRAY OF Double; *)
@@ -69,16 +63,16 @@ TYPE
 	PEnum* =  ADDRESS; 	(* POINTER TO ARRAY OF Enum *);
 	PVoid* = ADDRESS; 	(* Void *);
 	PPVoid* = ADDRESS; 	(* POINTER TO ARRAY OF PVoid; *)
-	Pint64* =  ADDRESS; 	(* POINTER TO ARRAY OF Int64; *)
-	PInt64* = ADDRESS; 	(* POINTER TO ARRAY OF Uint64; *)
+	PInt64* =  ADDRESS; 	(* POINTER TO ARRAY OF Int64; *)
+	PUint64* = ADDRESS; 	(* POINTER TO ARRAY OF Uint64; *)
 
+	
 	(* GL_NV_half_float *)
-	HalfNV* = WORD;
+	HalfNV* = Ushort;
 	PHalfNV* = ADDRESS; (* POINTER TO ARRAY OF HalfNV; *)
 
 	(* GL_ARB_shader_objects  *)
 	PHandleARB* = ADDRESS ;
-	HandleARB* = ADDRESS;
 	CharARB* = AnsiChar;
 	PCharARB* = PAnsiChar;
 	PPCharARB* =  ADDRESS; (* POINTER TO ARRAY OF PCharARB; *)
@@ -92,20 +86,19 @@ TYPE
 	SizeiptrARB* = Sizei;
 
 	(* GL_VERSION_2_0 *)
-	Handle* = Uint;
 	PChar* = PAnsiChar;
 	PPChar* = ADDRESS; (* POINTER TO ARRAY OF PChar *)
 
 	(* GL_EXT_timer_query *)
 	Int64EXT* = Int64;
-	Pint64EXT* = ADDRESS; (* POINTER TO ARRAY OF Int64EXT *)
+	PInt64EXT* = ADDRESS; (* POINTER TO ARRAY OF Int64EXT *)
 
 
 	Uint64EXT* = Uint64;
-	PInt64EXT* = ADDRESS; (* POINTER TO ARRAY OF Uint64EXT *)
+	PUint64EXT* = ADDRESS; (* POINTER TO ARRAY OF Uint64EXT *)
 
 	(* ARB_sync *)
-	GLsync* = Pointer;
+	GLsync* = ADDRESS;
 
 	(* GL_ARB_cl_event *)
 	(* These incomplete types let us declare types compatible with OpenCL's cl_context and cl_event *)
@@ -634,7 +627,7 @@ TYPE
 	TglTexParameterf* = PROCEDURE{C}(target: Enum; pname: Enum; param: Float);
 	TglTexParameterfv* = PROCEDURE{C}(target: Enum; pname: Enum;  params: PFloat);
 	TglTexParameteri* = PROCEDURE{C}(target: Enum; pname: Enum; param: Int);
-	TglTexParameteriv* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint);
+	TglTexParameteriv* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
 	TglTexImage1D* = PROCEDURE{C}(target: Enum; level: Int; internalformat: Int; width: Sizei; border: Int; format: Enum; xtype: Enum;  pixels: PVoid);
 	TglTexImage2D* = PROCEDURE{C}(target: Enum; level: Int; internalformat: Int; width: Sizei; height: Sizei; border: Int; format: Enum; xtype: Enum; pixels: PVoid);
 	TglDrawBuffer* = PROCEDURE{C}(mode: Enum);
@@ -662,13 +655,13 @@ TYPE
 	TglGetDoublev* = PROCEDURE{C}(pname: Enum; params: PDouble);
 	TglGetError* = PROCEDURE{C}(): Enum;
 	TglGetFloatv* = PROCEDURE{C}(pname: Enum; params: PFloat);
-	TglGetIntegerv* = PROCEDURE{C}(pname: Enum; params: Pint);
+	TglGetIntegerv* = PROCEDURE{C}(pname: Enum; params: PInt);
 	TglGetString* = PROCEDURE{C}(name: Enum): ADDRESS;
 	TglGetTexImage* = PROCEDURE{C}(target: Enum; level: Int; format: Enum; xtype: Enum; pixels: PVoid);
-	TglGetTexParameteriv* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint);
+	TglGetTexParameteriv* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
 	TglGetTexParameterfv* = PROCEDURE{C}(target: Enum; pname: Enum; params: PFloat);
 	TglGetTexLevelParameterfv* = PROCEDURE{C}(target: Enum; level: Int; pname: Enum; params: PFloat);
-	TglGetTexLevelParameteriv* = PROCEDURE{C}(target: Enum; level: Int; pname: Enum; params: Pint);
+	TglGetTexLevelParameteriv* = PROCEDURE{C}(target: Enum; level: Int; pname: Enum; params: PInt);
 	TglIsEnabled* = PROCEDURE{C}(cap: Enum): Boolean;
 	TglDepthRange* = PROCEDURE{C}(zNear: Clampd; zFar: Clampd);
 	TglViewport* = PROCEDURE{C}(x: Int; y: Int; width: Sizei; height: Sizei);
@@ -684,13 +677,13 @@ TYPE
 	TglTexSubImage1D* = PROCEDURE{C}(target: Enum; level: Int; xoffset: Int; width: Sizei; format: Enum; xtype: Enum;  pixels: PVoid);
 	TglTexSubImage2D* = PROCEDURE{C}(target: Enum; level: Int; xoffset: Int; yoffset: Int; width: Sizei; height: Sizei; format: Enum; xtype: Enum;  pixels: PVoid);
 	TglBindTexture* = PROCEDURE{C}(target: Enum; texture: Uint);
-	TglDeleteTextures* = PROCEDURE{C}(n: Sizei;  textures: PInt);
-	TglGenTextures* = PROCEDURE{C}(n: Sizei; textures: PInt);
+	TglDeleteTextures* = PROCEDURE{C}(n: Sizei;  textures: PUint);
+	TglGenTextures* = PROCEDURE{C}(n: Sizei; textures: PUint);
 
 	(*! ifdef DEPRECATED  *)
 	TglAccum* = PROCEDURE{C}(op: Enum; value: Float);
 	TglAlphaFunc* = PROCEDURE{C}(func: Enum; ref: Clampf);
-	TglAreTexturesResident* = PROCEDURE{C}(n: Sizei;  textures: PInt; residences: PBoolean): Boolean;
+	TglAreTexturesResident* = PROCEDURE{C}(n: Sizei;  textures: PUint; residences: PBoolean): Boolean;
 	TglArrayElement* = PROCEDURE{C}(i: Int);
 	TglBegin* = PROCEDURE{C}(mode: Enum);
 	TglBitmap* = PROCEDURE{C}(width: Sizei; height: Sizei; xorig: Float; yorig: Float; xmove: Float; ymove: Float;  bitmap: PUbyte);
@@ -706,13 +699,13 @@ TYPE
 	TglColor3f* = PROCEDURE{C}(red: Float; green: Float; blue: Float);
 	TglColor3fv* = PROCEDURE{C}( v: PFloat);
 	TglColor3i* = PROCEDURE{C}(red: Int; green: Int; blue: Int);
-	TglColor3iv* = PROCEDURE{C}( v: Pint);
+	TglColor3iv* = PROCEDURE{C}( v: PInt);
 	TglColor3s* = PROCEDURE{C}(red: Short; green: Short; blue: Short);
 	TglColor3sv* = PROCEDURE{C}( v: PShort);
 	TglColor3ub* = PROCEDURE{C}(red: Ubyte; green: Ubyte; blue: Ubyte);
 	TglColor3ubv* = PROCEDURE{C}( v: PUbyte);
 	TglColor3ui* = PROCEDURE{C}(red: Uint; green: Uint; blue: Uint);
-	TglColor3uiv* = PROCEDURE{C}( v: PInt);
+	TglColor3uiv* = PROCEDURE{C}( v: PUint);
 	TglColor3us* = PROCEDURE{C}(red: Ushort; green: Ushort; blue: Ushort);
 	TglColor3usv* = PROCEDURE{C}( v: PUshort);
 	TglColor4b* = PROCEDURE{C}(red: Byte; green: Byte; blue: Byte; alpha: Byte);
@@ -722,13 +715,13 @@ TYPE
 	TglColor4f* = PROCEDURE{C}(red: Float; green: Float; blue: Float; alpha: Float);
 	TglColor4fv* = PROCEDURE{C}( v: PFloat);
 	TglColor4i* = PROCEDURE{C}(red: Int; green: Int; blue: Int; alpha: Int);
-	TglColor4iv* = PROCEDURE{C}( v: Pint);
+	TglColor4iv* = PROCEDURE{C}( v: PInt);
 	TglColor4s* = PROCEDURE{C}(red: Short; green: Short; blue: Short; alpha: Short);
 	TglColor4sv* = PROCEDURE{C}( v: PShort);
 	TglColor4ub* = PROCEDURE{C}(red: Ubyte; green: Ubyte; blue: Ubyte; alpha: Ubyte);
 	TglColor4ubv* = PROCEDURE{C}( v: PUbyte);
 	TglColor4ui* = PROCEDURE{C}(red: Uint; green: Uint; blue: Uint; alpha: Uint);
-	TglColor4uiv* = PROCEDURE{C}( v: PInt);
+	TglColor4uiv* = PROCEDURE{C}( v: PUint);
 	TglColor4us* = PROCEDURE{C}(red: Ushort; green: Ushort; blue: Ushort; alpha: Ushort);
 	TglColor4usv* = PROCEDURE{C}( v: PUshort);
 	TglColorMaterial* = PROCEDURE{C}(face: Enum; mode: Enum);
@@ -759,26 +752,26 @@ TYPE
 	TglFogf* = PROCEDURE{C}(pname: Enum; param: Float);
 	TglFogfv* = PROCEDURE{C}(pname: Enum;  params: PFloat);
 	TglFogi* = PROCEDURE{C}(pname: Enum; param: Int);
-	TglFogiv* = PROCEDURE{C}(pname: Enum;  params: Pint);
+	TglFogiv* = PROCEDURE{C}(pname: Enum;  params: PInt);
 	TglFrustum* = PROCEDURE{C}(left, right, bottom, top, zNear, zFar: Double);
 	TglGenLists* = PROCEDURE{C}(range: Sizei): Uint;
 	TglGetClipPlane* = PROCEDURE{C}(plane: Enum; equation: PDouble);
 	TglGetLightfv* = PROCEDURE{C}(light: Enum; pname: Enum; params: PFloat);
-	TglGetLightiv* = PROCEDURE{C}(light: Enum; pname: Enum; params: Pint);
+	TglGetLightiv* = PROCEDURE{C}(light: Enum; pname: Enum; params: PInt);
 	TglGetMapdv* = PROCEDURE{C}(target: Enum; query: Enum; v: PDouble);
 	TglGetMapfv* = PROCEDURE{C}(target: Enum; query: Enum; v: PFloat);
-	TglGetMapiv* = PROCEDURE{C}(target: Enum; query: Enum; v: Pint);
+	TglGetMapiv* = PROCEDURE{C}(target: Enum; query: Enum; v: PInt);
 	TglGetMaterialfv* = PROCEDURE{C}(face: Enum; pname: Enum; params: PFloat);
-	TglGetMaterialiv* = PROCEDURE{C}(face: Enum; pname: Enum; params: Pint);
+	TglGetMaterialiv* = PROCEDURE{C}(face: Enum; pname: Enum; params: PInt);
 	TglGetPixelMapfv* = PROCEDURE{C}(map: Enum; values: PFloat);
-	TglGetPixelMapuiv* = PROCEDURE{C}(map: Enum; values: PInt);
+	TglGetPixelMapuiv* = PROCEDURE{C}(map: Enum; values: PUint);
 	TglGetPixelMapusv* = PROCEDURE{C}(map: Enum; values: PUshort);
 	TglGetPolygonStipple* = PROCEDURE{C}(mask: PUbyte);
 	TglGetTexEnvfv* = PROCEDURE{C}(target: Enum; pname: Enum; params: PFloat);
-	TglGetTexEnviv* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint);
+	TglGetTexEnviv* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
 	TglGetTexGendv* = PROCEDURE{C}(coord: Enum; pname: Enum; params: PDouble);
 	TglGetTexGenfv* = PROCEDURE{C}(coord: Enum; pname: Enum; params: PFloat);
-	TglGetTexGeniv* = PROCEDURE{C}(coord: Enum; pname: Enum; params: Pint);
+	TglGetTexGeniv* = PROCEDURE{C}(coord: Enum; pname: Enum; params: PInt);
 	TglIndexMask* = PROCEDURE{C}(mask: Uint);
 	TglIndexPointer* = PROCEDURE{C}(xtype: Enum; stride: Sizei; xpointer: PVoid);
 	TglIndexd* = PROCEDURE{C}(c: Double);
@@ -786,7 +779,7 @@ TYPE
 	TglIndexf* = PROCEDURE{C}(c: Float);
 	TglIndexfv* = PROCEDURE{C}( c: PFloat);
 	TglIndexi* = PROCEDURE{C}(c: Int);
-	TglIndexiv* = PROCEDURE{C}( c: Pint);
+	TglIndexiv* = PROCEDURE{C}( c: PInt);
 	TglIndexs* = PROCEDURE{C}(c: Short);
 	TglIndexsv* = PROCEDURE{C}( c: PShort);
 	TglIndexub* = PROCEDURE{C}(c: Ubyte);
@@ -798,11 +791,11 @@ TYPE
 	TglLightModelf* = PROCEDURE{C}(pname: Enum; param: Float);
 	TglLightModelfv* = PROCEDURE{C}(pname: Enum;  params: PFloat);
 	TglLightModeli* = PROCEDURE{C}(pname: Enum; param: Int);
-	TglLightModeliv* = PROCEDURE{C}(pname: Enum;  params: Pint);
+	TglLightModeliv* = PROCEDURE{C}(pname: Enum;  params: PInt);
 	TglLightf* = PROCEDURE{C}(light: Enum; pname: Enum; param: Float);
 	TglLightfv* = PROCEDURE{C}(light: Enum; pname: Enum;   params: PFloat);
 	TglLighti* = PROCEDURE{C}(light: Enum; pname: Enum; param: Int);
-	TglLightiv* = PROCEDURE{C}(light: Enum; pname: Enum;  params: Pint);
+	TglLightiv* = PROCEDURE{C}(light: Enum; pname: Enum;  params: PInt);
 	TglLineStipple* = PROCEDURE{C}(factor: Int; pattern: Ushort);
 	TglListBase* = PROCEDURE{C}(base: Uint);
 	TglLoadIdentity* = PROCEDURE{C}();
@@ -820,7 +813,7 @@ TYPE
 	TglMaterialf* = PROCEDURE{C}(face: Enum; pname: Enum; param: Float);
 	TglMaterialfv* = PROCEDURE{C}(face: Enum; pname: Enum;  params: PFloat);
 	TglMateriali* = PROCEDURE{C}(face: Enum; pname: Enum; param: Int);
-	TglMaterialiv* = PROCEDURE{C}(face: Enum; pname: Enum;  params: Pint);
+	TglMaterialiv* = PROCEDURE{C}(face: Enum; pname: Enum;  params: PInt);
 	TglMatrixMode* = PROCEDURE{C}(mode: Enum);
 	TglMultMatrixd* = PROCEDURE{C}( m: PDouble);
 	TglMultMatrixf* = PROCEDURE{C}( m: PFloat);
@@ -832,14 +825,14 @@ TYPE
 	TglNormal3f* = PROCEDURE{C}(nx: Float; ny: Float; nz: Float);
 	TglNormal3fv* = PROCEDURE{C}( v: PFloat);
 	TglNormal3i* = PROCEDURE{C}(nx: Int; ny: Int; nz: Int);
-	TglNormal3iv* = PROCEDURE{C}( v: Pint);
+	TglNormal3iv* = PROCEDURE{C}( v: PInt);
 	TglNormal3s* = PROCEDURE{C}(nx: Short; ny: Short; nz: Short);
 	TglNormal3sv* = PROCEDURE{C}( v: PShort);
 	TglNormalPointer* = PROCEDURE{C}(xtype: Enum; stride: Sizei;  xpointer: PVoid);
 	TglOrtho* = PROCEDURE{C}(left: Double; right: Double; bottom: Double; top: Double; zNear: Double; zFar: Double);
 	TglPassThrough* = PROCEDURE{C}(token: Float);
 	TglPixelMapfv* = PROCEDURE{C}(map: Enum; mapsize: Sizei;  values: PFloat);
-	TglPixelMapuiv* = PROCEDURE{C}(map: Enum; mapsize: Sizei;  values: PInt);
+	TglPixelMapuiv* = PROCEDURE{C}(map: Enum; mapsize: Sizei;  values: PUint);
 	TglPixelMapusv* = PROCEDURE{C}(map: Enum; mapsize: Sizei;  values: PUshort);
 	TglPixelTransferf* = PROCEDURE{C}(pname: Enum; param: Float);
 	TglPixelTransferi* = PROCEDURE{C}(pname: Enum; param: Int);
@@ -849,7 +842,7 @@ TYPE
 	TglPopClientAttrib* = PROCEDURE{C}();
 	TglPopMatrix* = PROCEDURE{C}();
 	TglPopName* = PROCEDURE{C}();
-	TglPrioritizeTextures* = PROCEDURE{C}(n: Sizei;  textures: PInt;  priorities: PClampf);
+	TglPrioritizeTextures* = PROCEDURE{C}(n: Sizei;  textures: PUint;  priorities: PClampf);
 	TglPushAttrib* = PROCEDURE{C}(mask: Bitfield);
 	TglPushClientAttrib* = PROCEDURE{C}(mask: Bitfield);
 	TglPushMatrix* = PROCEDURE{C}();
@@ -859,7 +852,7 @@ TYPE
 	TglRasterPos2f* = PROCEDURE{C}(x: Float; y: Float);
 	TglRasterPos2fv* = PROCEDURE{C}( v: PFloat);
 	TglRasterPos2i* = PROCEDURE{C}(x: Int; y: Int);
-	TglRasterPos2iv* = PROCEDURE{C}( v: Pint);
+	TglRasterPos2iv* = PROCEDURE{C}( v: PInt);
 	TglRasterPos2s* = PROCEDURE{C}(x: Short; y: Short);
 	TglRasterPos2sv* = PROCEDURE{C}( v: PShort);
 	TglRasterPos3d* = PROCEDURE{C}(x: Double; y: Double; z: Double);
@@ -867,7 +860,7 @@ TYPE
 	TglRasterPos3f* = PROCEDURE{C}(x: Float; y: Float; z: Float);
 	TglRasterPos3fv* = PROCEDURE{C}( v: PFloat);
 	TglRasterPos3i* = PROCEDURE{C}(x: Int; y: Int; z: Int);
-	TglRasterPos3iv* = PROCEDURE{C}( v: Pint);
+	TglRasterPos3iv* = PROCEDURE{C}( v: PInt);
 	TglRasterPos3s* = PROCEDURE{C}(x: Short; y: Short; z: Short);
 	TglRasterPos3sv* = PROCEDURE{C}( v: PShort);
 	TglRasterPos4d* = PROCEDURE{C}(x: Double; y: Double; z: Double; w: Double);
@@ -875,7 +868,7 @@ TYPE
 	TglRasterPos4f* = PROCEDURE{C}(x: Float; y: Float; z: Float; w: Float);
 	TglRasterPos4fv* = PROCEDURE{C}( v: PFloat);
 	TglRasterPos4i* = PROCEDURE{C}(x: Int; y: Int; z: Int; w: Int);
-	TglRasterPos4iv* = PROCEDURE{C}( v: Pint);
+	TglRasterPos4iv* = PROCEDURE{C}( v: PInt);
 	TglRasterPos4s* = PROCEDURE{C}(x: Short; y: Short; z: Short; w: Short);
 	TglRasterPos4sv* = PROCEDURE{C}( v: PShort);
 	TglRectd* = PROCEDURE{C}(x1: Double; y1: Double; x2: Double; y2: Double);
@@ -883,7 +876,7 @@ TYPE
 	TglRectf* = PROCEDURE{C}(x1: Float; y1: Float; x2: Float; y2: Float);
 	TglRectfv* = PROCEDURE{C}( v1: PFloat;  v2: PFloat);
 	TglRecti* = PROCEDURE{C}(x1: Int; y1: Int; x2: Int; y2: Int);
-	TglRectiv* = PROCEDURE{C}( v1: Pint;  v2: Pint);
+	TglRectiv* = PROCEDURE{C}( v1: PInt;  v2: PInt);
 	TglRects* = PROCEDURE{C}(x1: Short; y1: Short; x2: Short; y2: Short);
 	TglRectsv* = PROCEDURE{C}( v1: PShort;  v2: PShort);
 	TglRenderMode* = PROCEDURE{C}(mode: Enum): Int;
@@ -891,14 +884,14 @@ TYPE
 	TglRotatef* = PROCEDURE{C}( angle, x, y, z: Float);
 	TglScaled* = PROCEDURE{C}(x, y, z: Double);
 	TglScalef* = PROCEDURE{C}(x, y, z: Float);
-	TglSelectBuffer* = PROCEDURE{C}(size: Sizei; buffer: PInt);
+	TglSelectBuffer* = PROCEDURE{C}(size: Sizei; buffer: PUint);
 	TglShadeModel* = PROCEDURE{C}(mode: Enum);
 	TglTexCoord1d* = PROCEDURE{C}(s: Double);
 	TglTexCoord1dv* = PROCEDURE{C}( v: PDouble);
 	TglTexCoord1f* = PROCEDURE{C}(s: Float);
 	TglTexCoord1fv* = PROCEDURE{C}( v: PFloat);
 	TglTexCoord1i* = PROCEDURE{C}(s: Int);
-	TglTexCoord1iv* = PROCEDURE{C}( v: Pint);
+	TglTexCoord1iv* = PROCEDURE{C}( v: PInt);
 	TglTexCoord1s* = PROCEDURE{C}(s: Short);
 	TglTexCoord1sv* = PROCEDURE{C}( v: PShort);
 	TglTexCoord2d* = PROCEDURE{C}(s: Double; t: Double);
@@ -906,7 +899,7 @@ TYPE
 	TglTexCoord2f* = PROCEDURE{C}(s: Float; t: Float);
 	TglTexCoord2fv* = PROCEDURE{C}( v: PFloat);
 	TglTexCoord2i* = PROCEDURE{C}(s: Int; t: Int);
-	TglTexCoord2iv* = PROCEDURE{C}( v: Pint);
+	TglTexCoord2iv* = PROCEDURE{C}( v: PInt);
 	TglTexCoord2s* = PROCEDURE{C}(s: Short; t: Short);
 	TglTexCoord2sv* = PROCEDURE{C}( v: PShort);
 	TglTexCoord3d* = PROCEDURE{C}(s: Double; t: Double; r: Double);
@@ -914,7 +907,7 @@ TYPE
 	TglTexCoord3f* = PROCEDURE{C}(s: Float; t: Float; r: Float);
 	TglTexCoord3fv* = PROCEDURE{C}( v: PFloat);
 	TglTexCoord3i* = PROCEDURE{C}(s: Int; t: Int; r: Int);
-	TglTexCoord3iv* = PROCEDURE{C}( v: Pint);
+	TglTexCoord3iv* = PROCEDURE{C}( v: PInt);
 	TglTexCoord3s* = PROCEDURE{C}(s: Short; t: Short; r: Short);
 	TglTexCoord3sv* = PROCEDURE{C}( v: PShort);
 	TglTexCoord4d* = PROCEDURE{C}(s: Double; t: Double; r: Double; q: Double);
@@ -922,20 +915,20 @@ TYPE
 	TglTexCoord4f* = PROCEDURE{C}(s: Float; t: Float; r: Float; q: Float);
 	TglTexCoord4fv* = PROCEDURE{C}( v: PFloat);
 	TglTexCoord4i* = PROCEDURE{C}(s: Int; t: Int; r: Int; q: Int);
-	TglTexCoord4iv* = PROCEDURE{C}( v: Pint);
+	TglTexCoord4iv* = PROCEDURE{C}( v: PInt);
 	TglTexCoord4s* = PROCEDURE{C}(s: Short; t: Short; r: Short; q: Short);
 	TglTexCoord4sv* = PROCEDURE{C}( v: PShort);
 	TglTexCoordPointer* = PROCEDURE{C}(size: Int; xtype: Enum; stride: Sizei; xpointer: PVoid);
 	TglTexEnvf* = PROCEDURE{C}(target: Enum; pname: Enum; param: Float);
 	TglTexEnvfv* = PROCEDURE{C}(target: Enum; pname: Enum;  params: PFloat);
 	TglTexEnvi* = PROCEDURE{C}(target: Enum; pname: Enum; param: Int);
-	TglTexEnviv* = PROCEDURE{C}(target: Enum; pname: Enum;  params: Pint);
+	TglTexEnviv* = PROCEDURE{C}(target: Enum; pname: Enum;  params: PInt);
 	TglTexGend* = PROCEDURE{C}(coord: Enum; pname: Enum; param: Double);
 	TglTexGendv* = PROCEDURE{C}(coord: Enum; pname: Enum;  params: PDouble);
 	TglTexGenf* = PROCEDURE{C}(coord: Enum; pname: Enum; param: Float);
 	TglTexGenfv* = PROCEDURE{C}(coord: Enum; pname: Enum;  params: PFloat);
 	TglTexGeni* = PROCEDURE{C}(coord: Enum; pname: Enum; param: Int);
-	TglTexGeniv* = PROCEDURE{C}(coord: Enum; pname: Enum;  params: Pint);
+	TglTexGeniv* = PROCEDURE{C}(coord: Enum; pname: Enum;  params: PInt);
 	TglTranslated* = PROCEDURE{C}(x: Double; y: Double; z: Double);
 	TglTranslatef* = PROCEDURE{C}(x: Float; y: Float; z: Float);
 	TglVertex2d* = PROCEDURE{C}(x: Double; y: Double);
@@ -943,7 +936,7 @@ TYPE
 	TglVertex2f* = PROCEDURE{C}(x: Float; y: Float);
 	TglVertex2fv* = PROCEDURE{C}( v: PFloat);
 	TglVertex2i* = PROCEDURE{C}(x: Int; y: Int);
-	TglVertex2iv* = PROCEDURE{C}( v: Pint);
+	TglVertex2iv* = PROCEDURE{C}( v: PInt);
 	TglVertex2s* = PROCEDURE{C}(x: Short; y: Short);
 	TglVertex2sv* = PROCEDURE{C}( v: PShort);
 	TglVertex3d* = PROCEDURE{C}(x: Double; y: Double; z: Double);
@@ -951,7 +944,7 @@ TYPE
 	TglVertex3f* = PROCEDURE{C}(x: Float; y: Float; z: Float);
 	TglVertex3fv* = PROCEDURE{C}( v: PFloat);
 	TglVertex3i* = PROCEDURE{C}(x: Int; y: Int; z: Int);
-	TglVertex3iv* = PROCEDURE{C}( v: Pint);
+	TglVertex3iv* = PROCEDURE{C}( v: PInt);
 	TglVertex3s* = PROCEDURE{C}(x: Short; y: Short; z: Short);
 	TglVertex3sv* = PROCEDURE{C}( v: PShort);
 	TglVertex4d* = PROCEDURE{C}(x: Double; y: Double; z: Double; w: Double);
@@ -959,7 +952,7 @@ TYPE
 	TglVertex4f* = PROCEDURE{C}(x: Float; y: Float; z: Float; w: Float);
 	TglVertex4fv* = PROCEDURE{C}( v: PFloat);
 	TglVertex4i* = PROCEDURE{C}(x: Int; y: Int; z: Int; w: Int);
-	TglVertex4iv* = PROCEDURE{C}( v: Pint);
+	TglVertex4iv* = PROCEDURE{C}( v: PInt);
 	TglVertex4s* = PROCEDURE{C}(x: Short; y: Short; z: Short; w: Short);
 	TglVertex4sv* = PROCEDURE{C}( v: PShort);
 	TglVertexPointer* = PROCEDURE{C}(size: Int; xtype: Enum; stride: Sizei;  xpointer: PVoid);
@@ -976,11 +969,11 @@ TYPE
 	(*! ifdef DEPRECATED 1.2  *)
 	TglColorTable* = PROCEDURE{C}(target: Enum; internalformat: Enum; width: Sizei; format: Enum; xtype: Enum;  table: PVoid);
 	TglColorTableParameterfv* = PROCEDURE{C}(target: Enum; pname: Enum;  params: PFloat);
-	TglColorTableParameteriv* = PROCEDURE{C}(target: Enum; pname: Enum;  params: Pint);
+	TglColorTableParameteriv* = PROCEDURE{C}(target: Enum; pname: Enum;  params: PInt);
 	TglCopyColorTable* = PROCEDURE{C}(target: Enum; internalformat: Enum; x: Int; y: Int; width: Sizei);
 	TglGetColorTable* = PROCEDURE{C}(target: Enum; format: Enum; xtype: Enum; table: PVoid);
 	TglGetColorTableParameterfv* = PROCEDURE{C}(target: Enum; pname: Enum; params: PFloat);
-	TglGetColorTableParameteriv* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint);
+	TglGetColorTableParameteriv* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
 	TglColorSubTable* = PROCEDURE{C}(target: Enum; start: Sizei; count: Sizei; format: Enum; xtype: Enum;  data: PVoid);
 	TglCopyColorSubTable* = PROCEDURE{C}(target: Enum; start: Sizei; x: Int; y: Int; width: Sizei);
 	TglConvolutionFilter1D* = PROCEDURE{C}(target: Enum; internalformat: Enum; width: Sizei; format: Enum; xtype: Enum;  image: PVoid);
@@ -988,20 +981,20 @@ TYPE
 	TglConvolutionParameterf* = PROCEDURE{C}(target: Enum; pname: Enum; params: Float);
 	TglConvolutionParameterfv* = PROCEDURE{C}(target: Enum; pname: Enum;  params: PFloat);
 	TglConvolutionParameteri* = PROCEDURE{C}(target: Enum; pname: Enum; params: Int);
-	TglConvolutionParameteriv* = PROCEDURE{C}(target: Enum; pname: Enum;  params: Pint);
+	TglConvolutionParameteriv* = PROCEDURE{C}(target: Enum; pname: Enum;  params: PInt);
 	TglCopyConvolutionFilter1D* = PROCEDURE{C}(target: Enum; internalformat: Enum; x: Int; y: Int; width: Sizei);
 	TglCopyConvolutionFilter2D* = PROCEDURE{C}(target: Enum; internalformat: Enum; x: Int; y: Int; width: Sizei; height: Sizei);
 	TglGetConvolutionFilter* = PROCEDURE{C}(target: Enum; format: Enum; xtype: Enum; image: PVoid);
 	TglGetConvolutionParameterfv* = PROCEDURE{C}(target: Enum; pname: Enum; params: PFloat);
-	TglGetConvolutionParameteriv* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint);
+	TglGetConvolutionParameteriv* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
 	TglGetSeparableFilter* = PROCEDURE{C}(target: Enum; format: Enum; xtype: Enum; row: PVoid; column: PVoid; span: PVoid);
 	TglSeparableFilter2D* = PROCEDURE{C}(target: Enum; internalformat: Enum; width: Sizei; height: Sizei; format: Enum; xtype: Enum;  row: PVoid;  column: PVoid);
 	TglGetHistogram* = PROCEDURE{C}(target: Enum; reset: Boolean; format: Enum; xtype: Enum; values: PVoid);
 	TglGetHistogramParameterfv* = PROCEDURE{C}(target: Enum; pname: Enum; params: PFloat);
-	TglGetHistogramParameteriv* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint);
+	TglGetHistogramParameteriv* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
 	TglGetMinmax* = PROCEDURE{C}(target: Enum; reset: Boolean; format: Enum; xtype: Enum; values: PVoid);
 	TglGetMinmaxParameterfv* = PROCEDURE{C}(target: Enum; pname: Enum; params: PFloat);
-	TglGetMinmaxParameteriv* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint);
+	TglGetMinmaxParameteriv* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
 	TglHistogram* = PROCEDURE{C}(target: Enum; width: Sizei; internalformat: Enum; sink: Boolean);
 	TglMinmax* = PROCEDURE{C}(target: Enum; internalformat: Enum; sink: Boolean);
 	TglResetHistogram* = PROCEDURE{C}(target: Enum);
@@ -1026,7 +1019,7 @@ TYPE
 	TglMultiTexCoord1f* = PROCEDURE{C}(target: Enum; s: Float);
 	TglMultiTexCoord1fv* = PROCEDURE{C}(target: Enum;  v: PFloat);
 	TglMultiTexCoord1i* = PROCEDURE{C}(target: Enum; s: Int);
-	TglMultiTexCoord1iv* = PROCEDURE{C}(target: Enum;  v: Pint);
+	TglMultiTexCoord1iv* = PROCEDURE{C}(target: Enum;  v: PInt);
 	TglMultiTexCoord1s* = PROCEDURE{C}(target: Enum; s: Short);
 	TglMultiTexCoord1sv* = PROCEDURE{C}(target: Enum;  v: PShort);
 	TglMultiTexCoord2d* = PROCEDURE{C}(target: Enum; s: Double; t: Double);
@@ -1034,7 +1027,7 @@ TYPE
 	TglMultiTexCoord2f* = PROCEDURE{C}(target: Enum; s: Float; t: Float);
 	TglMultiTexCoord2fv* = PROCEDURE{C}(target: Enum;  v: PFloat);
 	TglMultiTexCoord2i* = PROCEDURE{C}(target: Enum; s: Int; t: Int);
-	TglMultiTexCoord2iv* = PROCEDURE{C}(target: Enum;  v: Pint);
+	TglMultiTexCoord2iv* = PROCEDURE{C}(target: Enum;  v: PInt);
 	TglMultiTexCoord2s* = PROCEDURE{C}(target: Enum; s: Short; t: Short);
 	TglMultiTexCoord2sv* = PROCEDURE{C}(target: Enum;  v: PShort);
 	TglMultiTexCoord3d* = PROCEDURE{C}(target: Enum; s: Double; t: Double; r: Double);
@@ -1042,7 +1035,7 @@ TYPE
 	TglMultiTexCoord3f* = PROCEDURE{C}(target: Enum; s: Float; t: Float; r: Float);
 	TglMultiTexCoord3fv* = PROCEDURE{C}(target: Enum;  v: PFloat);
 	TglMultiTexCoord3i* = PROCEDURE{C}(target: Enum; s: Int; t: Int; r: Int);
-	TglMultiTexCoord3iv* = PROCEDURE{C}(target: Enum;  v: Pint);
+	TglMultiTexCoord3iv* = PROCEDURE{C}(target: Enum;  v: PInt);
 	TglMultiTexCoord3s* = PROCEDURE{C}(target: Enum; s: Short; t: Short; r: Short);
 	TglMultiTexCoord3sv* = PROCEDURE{C}(target: Enum;  v: PShort);
 	TglMultiTexCoord4d* = PROCEDURE{C}(target: Enum; s: Double; t: Double; r: Double; q: Double);
@@ -1050,7 +1043,7 @@ TYPE
 	TglMultiTexCoord4f* = PROCEDURE{C}(target: Enum; s: Float; t: Float; r: Float; q: Float);
 	TglMultiTexCoord4fv* = PROCEDURE{C}(target: Enum;  v: PFloat);
 	TglMultiTexCoord4i* = PROCEDURE{C}(target: Enum; s: Int; t: Int; r: Int; q: Int);
-	TglMultiTexCoord4iv* = PROCEDURE{C}(target: Enum;  v: Pint);
+	TglMultiTexCoord4iv* = PROCEDURE{C}(target: Enum;  v: PInt);
 	TglMultiTexCoord4s* = PROCEDURE{C}(target: Enum; s: Short; t: Short; r: Short; q: Short);
 	TglMultiTexCoord4sv* = PROCEDURE{C}(target: Enum;  v: PShort);
 	TglLoadTransposeMatrixf* = PROCEDURE{C}( m: PFloat);
@@ -1061,12 +1054,12 @@ TYPE
 
       (*! GL_VERSION_1_4  *)
 	TglBlendFuncSeparate* = PROCEDURE{C}(sfactorRGB: Enum; dfactorRGB: Enum; sfactorAlpha: Enum; dfactorAlpha: Enum);
-	TglMultiDrawArrays* = PROCEDURE{C}(mode: Enum; first: Pint; count: PSizei; primcount: Sizei);
+	TglMultiDrawArrays* = PROCEDURE{C}(mode: Enum; first: PInt; count: PSizei; primcount: Sizei);
 	TglMultiDrawElements* = PROCEDURE{C}(mode: Enum;  count: PSizei; xtype: Enum;  indices: PVoid; primcount: Sizei);
 	TglPointParameterf* = PROCEDURE{C}(pname: Enum; param: Float);
 	TglPointParameterfv* = PROCEDURE{C}(pname: Enum;  params: PFloat);
 	TglPointParameteri* = PROCEDURE{C}(pname: Enum; param: Int);
-	TglPointParameteriv* = PROCEDURE{C}(pname: Enum;  params: Pint);
+	TglPointParameteriv* = PROCEDURE{C}(pname: Enum;  params: PInt);
 
 	(*! ifdef DEPRECATED 1.4  *)
 	TglFogCoordf* = PROCEDURE{C}(coord: Float);
@@ -1081,13 +1074,13 @@ TYPE
 	TglSecondaryColor3f* = PROCEDURE{C}(red: Float; green: Float; blue: Float);
 	TglSecondaryColor3fv* = PROCEDURE{C}( v: PFloat);
 	TglSecondaryColor3i* = PROCEDURE{C}(red: Int; green: Int; blue: Int);
-	TglSecondaryColor3iv* = PROCEDURE{C}( v: Pint);
+	TglSecondaryColor3iv* = PROCEDURE{C}( v: PInt);
 	TglSecondaryColor3s* = PROCEDURE{C}(red: Short; green: Short; blue: Short);
 	TglSecondaryColor3sv* = PROCEDURE{C}( v: PShort);
 	TglSecondaryColor3ub* = PROCEDURE{C}(red: Ubyte; green: Ubyte; blue: Ubyte);
 	TglSecondaryColor3ubv* = PROCEDURE{C}( v: PUbyte);
 	TglSecondaryColor3ui* = PROCEDURE{C}(red: Uint; green: Uint; blue: Uint);
-	TglSecondaryColor3uiv* = PROCEDURE{C}( v: PInt);
+	TglSecondaryColor3uiv* = PROCEDURE{C}( v: PUint);
 	TglSecondaryColor3us* = PROCEDURE{C}(red: Ushort; green: Ushort; blue: Ushort);
 	TglSecondaryColor3usv* = PROCEDURE{C}( v: PUshort);
 	TglSecondaryColorPointer* = PROCEDURE{C}(size: Int; xtype: Enum; stride: Sizei; xpointer: PVoid);
@@ -1096,7 +1089,7 @@ TYPE
 	TglWindowPos2f* = PROCEDURE{C}(x: Float; y: Float);
 	TglWindowPos2fv* = PROCEDURE{C}( v: PFloat);
 	TglWindowPos2i* = PROCEDURE{C}(x: Int; y: Int);
-	TglWindowPos2iv* = PROCEDURE{C}( v: Pint);
+	TglWindowPos2iv* = PROCEDURE{C}( v: PInt);
 	TglWindowPos2s* = PROCEDURE{C}(x: Short; y: Short);
 	TglWindowPos2sv* = PROCEDURE{C}( v: PShort);
 	TglWindowPos3d* = PROCEDURE{C}(x: Double; y: Double; z: Double);
@@ -1104,30 +1097,30 @@ TYPE
 	TglWindowPos3f* = PROCEDURE{C}(x: Float; y: Float; z: Float);
 	TglWindowPos3fv* = PROCEDURE{C}( v: PFloat);
 	TglWindowPos3i* = PROCEDURE{C}(x: Int; y: Int; z: Int);
-	TglWindowPos3iv* = PROCEDURE{C}( v: Pint);
+	TglWindowPos3iv* = PROCEDURE{C}( v: PInt);
 	TglWindowPos3s* = PROCEDURE{C}(x: Short; y: Short; z: Short);
 	TglWindowPos3sv* = PROCEDURE{C}( v: PShort);
 	(*! endif  *)
 
 	(*! GL_VERSION_1_5  *)
-	TglGenQueries* = PROCEDURE{C}(n: Sizei; ids: PInt);
-	TglDeleteQueries* = PROCEDURE{C}(n: Sizei;  ids: PInt);
+	TglGenQueries* = PROCEDURE{C}(n: Sizei; ids: PUint);
+	TglDeleteQueries* = PROCEDURE{C}(n: Sizei;  ids: PUint);
 	TglIsQuery* = PROCEDURE{C}(id: Uint): BOOLEAN;
 	TglBeginQuery* = PROCEDURE{C}(target: Enum; id: Uint);
 	TglEndQuery* = PROCEDURE{C}(target: Enum);
-	TglGetQueryiv* = PROCEDURE{C}(target, pname: Enum; params: Pint);
-	TglGetQueryObjectiv* = PROCEDURE{C}(id: Uint; pname: Enum; params: Pint);
-	TglGetQueryObjectuiv* = PROCEDURE{C}(id: Uint; pname: Enum; params: PInt);
+	TglGetQueryiv* = PROCEDURE{C}(target, pname: Enum; params: PInt);
+	TglGetQueryObjectiv* = PROCEDURE{C}(id: Uint; pname: Enum; params: PInt);
+	TglGetQueryObjectuiv* = PROCEDURE{C}(id: Uint; pname: Enum; params: PUint);
 	TglBindBuffer* = PROCEDURE{C}(target: Enum; buffer: Uint);
-	TglDeleteBuffers* = PROCEDURE{C}(n: Sizei;  buffers: PInt );
-	TglGenBuffers* = PROCEDURE{C}(n: Sizei;  buffers: PInt);
+	TglDeleteBuffers* = PROCEDURE{C}(n: Sizei;  buffers: PUint );
+	TglGenBuffers* = PROCEDURE{C}(n: Sizei;  buffers: PUint);
 	TglIsBuffer* = PROCEDURE{C}(buffer: Uint): Boolean;
 	TglBufferData* = PROCEDURE{C}(target: Enum; size: Sizei;  data: ADDRESS; usage: Enum);
 	TglBufferSubData* = PROCEDURE{C}(target: Enum; offset: Sizei; size: Sizei;  data: PVoid);
 	TglGetBufferSubData* = PROCEDURE{C}(target: Enum; offset: Sizei; size: Sizei; data: PVoid);
 	TglMapBuffer* = PROCEDURE{C}(target: Enum; access: Enum): PVoid;
 	TglUnmapBuffer* = PROCEDURE{C}(target: Enum): Boolean;
-	TglGetBufferParameteriv* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint);
+	TglGetBufferParameteriv* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
 	TglGetBufferPointerv* = PROCEDURE{C}(target: Enum; pname: Enum; params: PVoid);
 
 	(*! GL_VERSION_2_0  *)
@@ -1136,36 +1129,36 @@ TYPE
 	TglStencilOpSeparate* = PROCEDURE{C}(face: Enum; sfail: Enum; dpfail: Enum; dppass: Enum);
 	TglStencilFuncSeparate* = PROCEDURE{C}(frontfunc: Enum; backfunc: Enum; ref: Int; mask: Uint);
 	TglStencilMaskSeparate* = PROCEDURE{C}(face: Enum; mask: Uint);
-	TglAttachShader* = PROCEDURE{C}(programObj, shaderObj: Handle);
-	TglBindAttribLocation* = PROCEDURE{C}(programObj: Handle; index: Uint;  name: ADDRESS);
-	TglCompileShader* = PROCEDURE{C}(shaderObj: Handle);
-	TglCreateProgram* = PROCEDURE{C}(): Handle;
-	TglCreateShader* = PROCEDURE{C}(shaderType: Enum): Handle;
-	TglDeleteProgram* = PROCEDURE{C}(programObj: Handle);
-	TglDeleteShader* = PROCEDURE{C}(shaderObj: Handle);
-	TglDetachShader* = PROCEDURE{C}(programObj, shaderObj: Handle);
+	TglAttachShader* = PROCEDURE{C}(programObj, shaderObj: Uint);
+	TglBindAttribLocation* = PROCEDURE{C}(programObj: Uint; index: Uint;  name: ADDRESS);
+	TglCompileShader* = PROCEDURE{C}(shaderObj: Uint);
+	TglCreateProgram* = PROCEDURE{C}(): Uint;
+	TglCreateShader* = PROCEDURE{C}(shaderType: Enum): Uint;
+	TglDeleteProgram* = PROCEDURE{C}(programObj: Uint);
+	TglDeleteShader* = PROCEDURE{C}(shaderObj: Uint);
+	TglDetachShader* = PROCEDURE{C}(programObj, shaderObj: Uint);
 	TglDisableVertexAttribArray* = PROCEDURE{C}(index: Uint);
 	TglEnableVertexAttribArray* = PROCEDURE{C}(index: Uint);
-	TglGetActiveAttrib* = PROCEDURE{C}(programObj: Handle; index: Uint; maxlength: Sizei; VAR length: Int; VAR size: Int; VAR xtype: Enum; name: PChar);
-	TglGetActiveUniform* = PROCEDURE{C}(programObj: Handle; index: Uint; maxLength: Sizei; VAR length: Sizei; VAR size: Int; VAR xtype: Enum; name: PChar);
-	TglGetAttachedShaders* = PROCEDURE{C}(programObj: Handle; MaxCount: Sizei; VAR Count: Int; shaders: PInt);
-	TglGetAttribLocation* = PROCEDURE{C}(programObj: Handle;  chars: ADDRESS): Int;
-	TglGetProgramiv* = PROCEDURE{C}(programObj: Handle; pname: Enum; params: Pint);
-	TglGetProgramInfoLog* = PROCEDURE{C}(programObj: Handle; maxLength: Sizei; VAR length: Int; infoLog: PChar);
-	TglGetShaderiv* = PROCEDURE{C}(shaderObj: Handle; pname: Enum; params: Pint);
-	TglGetShaderInfoLog* = PROCEDURE{C}(shaderObj: Handle; maxLength: Sizei; VAR length: Int; infoLog: PChar);
-	TglGetShaderSource* = PROCEDURE{C}(shaderObj: Handle; maxlength: Sizei; VAR length: Sizei; source: PChar);
-	TglGetUniformLocation* = PROCEDURE{C}(programObj: Handle;  chars: ADDRESS): Int;
-	TglGetUniformfv* = PROCEDURE{C}(programObj: Handle; location: Int; params: PFloat);
-	TglGetUniformiv* = PROCEDURE{C}(programObj: Handle; location: Int; params: Pint);
+	TglGetActiveAttrib* = PROCEDURE{C}(programObj: Uint; index: Uint; maxlength: Sizei; VAR length: Int; VAR size: Int; VAR xtype: Enum; name: PChar);
+	TglGetActiveUniform* = PROCEDURE{C}(programObj: Uint; index: Uint; maxLength: Sizei; VAR length: Sizei; VAR size: Int; VAR xtype: Enum; name: PChar);
+	TglGetAttachedShaders* = PROCEDURE{C}(programObj: Uint; MaxCount: Sizei; VAR Count: Int; shaders: PInt);
+	TglGetAttribLocation* = PROCEDURE{C}(programObj: Uint;  chars: ADDRESS): Int;
+	TglGetProgramiv* = PROCEDURE{C}(programObj: Uint; pname: Enum; params: PInt);
+	TglGetProgramInfoLog* = PROCEDURE{C}(programObj: Uint; maxLength: Sizei; VAR length: Int; infoLog: PChar);
+	TglGetShaderiv* = PROCEDURE{C}(shaderObj: Uint; pname: Enum; params: PInt);
+	TglGetShaderInfoLog* = PROCEDURE{C}(shaderObj: Uint; maxLength: Sizei; VAR length: Int; infoLog: PChar);
+	TglGetShaderSource* = PROCEDURE{C}(shaderObj: Uint; maxlength: Sizei; VAR length: Sizei; source: PChar);
+	TglGetUniformLocation* = PROCEDURE{C}(programObj: Uint;  chars: ADDRESS): Int;
+	TglGetUniformfv* = PROCEDURE{C}(programObj: Uint; location: Int; params: PFloat);
+	TglGetUniformiv* = PROCEDURE{C}(programObj: Uint; location: Int; params: PInt);
 	TglGetVertexAttribfv* = PROCEDURE{C}(index: Uint; pname: Enum; params: PFloat);
-	TglGetVertexAttribiv* = PROCEDURE{C}(index: Uint; pname: Enum; params: Pint);
+	TglGetVertexAttribiv* = PROCEDURE{C}(index: Uint; pname: Enum; params: PInt);
 	TglGetVertexAttribPointerv* = PROCEDURE{C}(index: Uint; pname: Enum; xpointer: PVoid);
-	TglIsProgram* = PROCEDURE{C}(programObj: Handle) : Boolean;
-	TglIsShader* = PROCEDURE{C}(shaderObj: Handle) : Boolean;
-	TglLinkProgram* = PROCEDURE{C}(programObj: Handle);
-	TglShaderSource* = PROCEDURE{C}(shaderObj: Handle; count: Sizei; xstring: PChar; lengths: Pint);
-	TglUseProgram* = PROCEDURE{C}(programObj: Handle);
+	TglIsProgram* = PROCEDURE{C}(programObj: Uint) : Boolean;
+	TglIsShader* = PROCEDURE{C}(shaderObj: Uint) : Boolean;
+	TglLinkProgram* = PROCEDURE{C}(programObj: Uint);
+	TglShaderSource* = PROCEDURE{C}(shaderObj: Uint; count: Sizei; xstring: PChar; lengths: PInt);
+	TglUseProgram* = PROCEDURE{C}(programObj: Uint);
 	TglUniform1f* = PROCEDURE{C}(location: Int; v0: Float);
 	TglUniform2f* = PROCEDURE{C}(location: Int; v0, v1: Float);
 	TglUniform3f* = PROCEDURE{C}(location: Int; v0, v1, v2: Float);
@@ -1178,14 +1171,14 @@ TYPE
 	TglUniform2fv* = PROCEDURE{C}(location: Int; count: Sizei; value: PFloat);
 	TglUniform3fv* = PROCEDURE{C}(location: Int; count: Sizei; value: PFloat);
 	TglUniform4fv* = PROCEDURE{C}(location: Int; count: Sizei; value: PFloat);
-	TglUniform1iv* = PROCEDURE{C}(location: Int; count: Sizei; value: Pint);
-	TglUniform2iv* = PROCEDURE{C}(location: Int; count: Sizei; value: Pint);
-	TglUniform3iv* = PROCEDURE{C}(location: Int; count: Sizei; value: Pint);
-	TglUniform4iv* = PROCEDURE{C}(location: Int; count: Sizei; value: Pint);
+	TglUniform1iv* = PROCEDURE{C}(location: Int; count: Sizei; value: PInt);
+	TglUniform2iv* = PROCEDURE{C}(location: Int; count: Sizei; value: PInt);
+	TglUniform3iv* = PROCEDURE{C}(location: Int; count: Sizei; value: PInt);
+	TglUniform4iv* = PROCEDURE{C}(location: Int; count: Sizei; value: PInt);
 	TglUniformMatrix2fv* = PROCEDURE{C}(location: Int; count: Sizei; transpose: Boolean; value: PFloat);
 	TglUniformMatrix3fv* = PROCEDURE{C}(location: Int; count: Sizei; transpose: Boolean; value: PFloat);
 	TglUniformMatrix4fv* = PROCEDURE{C}(location: Int; count: Sizei; transpose: Boolean; value: PFloat);
-	TglValidateProgram* = PROCEDURE{C}(programObj: Handle);
+	TglValidateProgram* = PROCEDURE{C}(programObj: Uint);
 	TglVertexAttrib1d* = PROCEDURE{C}(index: Uint; x: Double);
 	TglVertexAttrib1dv* = PROCEDURE{C}(index: Uint;   v: PDouble);
 	TglVertexAttrib1f* = PROCEDURE{C}(index: Uint; x: Float);
@@ -1205,22 +1198,22 @@ TYPE
 	TglVertexAttrib3s* = PROCEDURE{C}(index: Uint; x: Short; y: Short; z: Short);
 	TglVertexAttrib3sv* = PROCEDURE{C}(index: Uint;  v: PShort);
 	TglVertexAttrib4Nbv* = PROCEDURE{C}(index: Uint;  v: PByte);
-	TglVertexAttrib4Niv* = PROCEDURE{C}(index: Uint;  v: Pint);
+	TglVertexAttrib4Niv* = PROCEDURE{C}(index: Uint;  v: PInt);
 	TglVertexAttrib4Nsv* = PROCEDURE{C}(index: Uint;  v: PShort);
 	TglVertexAttrib4Nub* = PROCEDURE{C}(index: Uint; x: Ubyte; y: Ubyte; z: Ubyte; w: Ubyte);
 	TglVertexAttrib4Nubv* = PROCEDURE{C}(index: Uint;  v: PUbyte);
-	TglVertexAttrib4Nuiv* = PROCEDURE{C}(index: Uint;  v: PInt);
+	TglVertexAttrib4Nuiv* = PROCEDURE{C}(index: Uint;  v: PUint);
 	TglVertexAttrib4Nusv* = PROCEDURE{C}(index: Uint;  v: PUshort);
 	TglVertexAttrib4bv* = PROCEDURE{C}(index: Uint;  v: PByte);
 	TglVertexAttrib4d* = PROCEDURE{C}(index: Uint; x: Double; y: Double; z: Double; w: Double);
 	TglVertexAttrib4dv* = PROCEDURE{C}(index: Uint;  v: PDouble);
 	TglVertexAttrib4f* = PROCEDURE{C}(index: Uint; x: Float; y: Float; z: Float; w: Float);
 	TglVertexAttrib4fv* = PROCEDURE{C}(index: Uint;  v: PFloat);
-	TglVertexAttrib4iv* = PROCEDURE{C}(index: Uint;  v: Pint);
+	TglVertexAttrib4iv* = PROCEDURE{C}(index: Uint;  v: PInt);
 	TglVertexAttrib4s* = PROCEDURE{C}(index: Uint; x: Short; y: Short; z: Short; w: Short);
 	TglVertexAttrib4sv* = PROCEDURE{C}(index: Uint;  v: PShort);
 	TglVertexAttrib4ubv* = PROCEDURE{C}(index: Uint;  v: PUbyte);
-	TglVertexAttrib4uiv* = PROCEDURE{C}(index: Uint;  v: PInt);
+	TglVertexAttrib4uiv* = PROCEDURE{C}(index: Uint;  v: PUint);
 	TglVertexAttrib4usv* = PROCEDURE{C}(index: Uint;  v: PUshort);
 	TglVertexAttribPointer* = PROCEDURE{C}(index: Uint; size: Int; xtype: Enum; normalized: Boolean; stride: Sizei;  xpointer: PVoid);
 
@@ -1239,7 +1232,7 @@ TYPE
 	(* ARB_vertex_array_object *)
 	TglColorMaski* = PROCEDURE{C}(index: Uint; r: Boolean; g: Boolean; b: Boolean; a: Boolean);
 	TglGetBooleani_v* = PROCEDURE{C}(target: Enum; index: Uint; data: PBoolean);
-	TglGetIntegeri_v* = PROCEDURE{C}(target: Enum; index: Uint; data: Pint);
+	TglGetIntegeri_v* = PROCEDURE{C}(target: Enum; index: Uint; data: PInt);
 	TglEnablei* = PROCEDURE{C}(target: Enum; index: Uint);
 	TglDisablei* = PROCEDURE{C}(target: Enum; index: Uint);
 	TglIsEnabledi* = PROCEDURE{C}(target: Enum; index: Uint): Boolean;
@@ -1253,8 +1246,8 @@ TYPE
 	TglBeginConditionalRender* = PROCEDURE{C}(id: Uint; mode: Enum);
 	TglEndConditionalRender* = PROCEDURE{C}();
 	TglVertexAttribIPointer* = PROCEDURE{C}(index: Uint; size: Int; xtype: Enum; stride: Sizei;  pointer: PVoid);
-	TglGetVertexAttribIiv* = PROCEDURE{C}(index: Uint; pname: Enum; params: Pint);
-	TglGetVertexAttribIuiv* = PROCEDURE{C}(index: Uint; pname: Enum; params: PInt);
+	TglGetVertexAttribIiv* = PROCEDURE{C}(index: Uint; pname: Enum; params: PInt);
+	TglGetVertexAttribIuiv* = PROCEDURE{C}(index: Uint; pname: Enum; params: PUint);
 	TglVertexAttribI1i* = PROCEDURE{C}(index: Uint; x: Int);
 	TglVertexAttribI2i* = PROCEDURE{C}(index: Uint; x: Int; y: Int);
 	TglVertexAttribI3i* = PROCEDURE{C}(index: Uint; x: Int; y: Int; z: Int);
@@ -1263,35 +1256,35 @@ TYPE
 	TglVertexAttribI2ui* = PROCEDURE{C}(index: Uint; x: Uint; y: Uint);
 	TglVertexAttribI3ui* = PROCEDURE{C}(index: Uint; x: Uint; y: Uint; z: Uint);
 	TglVertexAttribI4ui* = PROCEDURE{C}(index: Uint; x: Uint; y: Uint; z: Uint; w: Uint);
-	TglVertexAttribI1iv* = PROCEDURE{C}(index: Uint;  v: Pint);
-	TglVertexAttribI2iv* = PROCEDURE{C}(index: Uint;  v: Pint);
-	TglVertexAttribI3iv* = PROCEDURE{C}(index: Uint;  v: Pint);
-	TglVertexAttribI4iv* = PROCEDURE{C}(index: Uint;  v: Pint);
-	TglVertexAttribI1uiv* = PROCEDURE{C}(index: Uint;  v: PInt);
-	TglVertexAttribI2uiv* = PROCEDURE{C}(index: Uint;  v: PInt);
-	TglVertexAttribI3uiv* = PROCEDURE{C}(index: Uint;  v: PInt);
-	TglVertexAttribI4uiv* = PROCEDURE{C}(index: Uint;  v: PInt);
+	TglVertexAttribI1iv* = PROCEDURE{C}(index: Uint;  v: PInt);
+	TglVertexAttribI2iv* = PROCEDURE{C}(index: Uint;  v: PInt);
+	TglVertexAttribI3iv* = PROCEDURE{C}(index: Uint;  v: PInt);
+	TglVertexAttribI4iv* = PROCEDURE{C}(index: Uint;  v: PInt);
+	TglVertexAttribI1uiv* = PROCEDURE{C}(index: Uint;  v: PUint);
+	TglVertexAttribI2uiv* = PROCEDURE{C}(index: Uint;  v: PUint);
+	TglVertexAttribI3uiv* = PROCEDURE{C}(index: Uint;  v: PUint);
+	TglVertexAttribI4uiv* = PROCEDURE{C}(index: Uint;  v: PUint);
 	TglVertexAttribI4bv* = PROCEDURE{C}(index: Uint;  v: PByte);
 	TglVertexAttribI4sv* = PROCEDURE{C}(index: Uint;  v: PShort);
 	TglVertexAttribI4ubv* = PROCEDURE{C}(index: Uint;  v: PUbyte);
 	TglVertexAttribI4usv* = PROCEDURE{C}(index: Uint;  v: PUshort);
-	TglGetUniformuiv* = PROCEDURE{C}(xprogram: Uint; location: Int; params: PInt);
+	TglGetUniformuiv* = PROCEDURE{C}(xprogram: Uint; location: Int; params: PUint);
 	TglBindFragDataLocation* = PROCEDURE{C}(xprogram: Uint; color: Uint;  name: ADDRESS);
 	TglGetFragDataLocation* = PROCEDURE{C}(xprogram: Uint;  name: ADDRESS): Int;
 	TglUniform1ui* = PROCEDURE{C}(location: Int; v0: Uint);
 	TglUniform2ui* = PROCEDURE{C}(location: Int; v0: Uint; v1: Uint);
 	TglUniform3ui* = PROCEDURE{C}(location: Int; v0: Uint; v1: Uint; v2: Uint);
 	TglUniform4ui* = PROCEDURE{C}(location: Int; v0: Uint; v1: Uint; v2: Uint; v3: Uint);
-	TglUniform1uiv* = PROCEDURE{C}(location: Int; count: Sizei;  value: PInt);
-	TglUniform2uiv* = PROCEDURE{C}(location: Int; count: Sizei;  value: PInt);
-	TglUniform3uiv* = PROCEDURE{C}(location: Int; count: Sizei;  value: PInt);
-	TglUniform4uiv* = PROCEDURE{C}(location: Int; count: Sizei;  value: PInt);
-	TglTexParameterIiv* = PROCEDURE{C}(target: Enum; pname: Enum;  params: Pint);
-	TglTexParameterIuiv* = PROCEDURE{C}(target: Enum; pname: Enum;  params: PInt);
-	TglGetTexParameterIiv* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint);
-	TglGetTexParameterIuiv* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
-	TglClearBufferiv* = PROCEDURE{C}(buffer: Enum; drawbuffer: Int;  value: Pint);
-	TglClearBufferuiv* = PROCEDURE{C}(buffer: Enum; drawbuffer: Int;  value: PInt);
+	TglUniform1uiv* = PROCEDURE{C}(location: Int; count: Sizei;  value: PUint);
+	TglUniform2uiv* = PROCEDURE{C}(location: Int; count: Sizei;  value: PUint);
+	TglUniform3uiv* = PROCEDURE{C}(location: Int; count: Sizei;  value: PUint);
+	TglUniform4uiv* = PROCEDURE{C}(location: Int; count: Sizei;  value: PUint);
+	TglTexParameterIiv* = PROCEDURE{C}(target: Enum; pname: Enum;  params: PInt);
+	TglTexParameterIuiv* = PROCEDURE{C}(target: Enum; pname: Enum;  params: PUint);
+	TglGetTexParameterIiv* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
+	TglGetTexParameterIuiv* = PROCEDURE{C}(target: Enum; pname: Enum; params: PUint);
+	TglClearBufferiv* = PROCEDURE{C}(buffer: Enum; drawbuffer: Int;  value: PInt);
+	TglClearBufferuiv* = PROCEDURE{C}(buffer: Enum; drawbuffer: Int;  value: PUint);
 	TglClearBufferfv* = PROCEDURE{C}(buffer: Enum; drawbuffer: Int;  value: PFloat);
 	TglClearBufferfi* = PROCEDURE{C}(buffer: Enum; drawbuffer: Int; depth: Float; stencil: Int);
 	TglGetStringi* = PROCEDURE{C}(name: Enum; index: Uint): PUbyte;
@@ -1311,8 +1304,8 @@ TYPE
 	(* ARB_provoking_vertex *)
 	(* ARB_sync *)
 	(* ARB_texture_multisample *)
-	TglGetInteger64i_v* = PROCEDURE{C}(target: Enum; index: Uint; data: Pint64);
-	TglGetBufferParameteri64v* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint64);
+	TglGetInteger64i_v* = PROCEDURE{C}(target: Enum; index: Uint; data: PInt64);
+	TglGetBufferParameteri64v* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt64);
 	TglFramebufferTexture* = PROCEDURE{C}(target: Enum; attachment: Enum; texture: Uint; level: Int);
 	(* TglFramebufferTextureFace  = PROCEDURE{C}(target: Enum; attachment: Enum; texture: Uint; level: Int; face: Enum);  *)
 
@@ -1362,11 +1355,11 @@ TYPE
 	TglElementPointerAPPLE* = PROCEDURE{C}(xtype:  Enum; xpointer: PVoid);
 	TglDrawElementArrayAPPLE* = PROCEDURE{C}(mode: Enum; first: Int; count: Sizei);
 	TglDrawRangeElementArrayAPPLE* = PROCEDURE{C}(mode: Enum; start: Uint; xend: Uint; first: Int; count: Sizei);
-	TglMultiDrawElementArrayAPPLE* = PROCEDURE{C}(mode: Enum;  first: Pint;  count: PSizei; primcount: Sizei);
-	TglMultiDrawRangeElementArrayAPPLE* = PROCEDURE{C}(mode: Enum; start: Uint; xend: Uint;  first: Pint; count: PSizei; primcount: Sizei);
+	TglMultiDrawElementArrayAPPLE* = PROCEDURE{C}(mode: Enum;  first: PInt;  count: PSizei; primcount: Sizei);
+	TglMultiDrawRangeElementArrayAPPLE* = PROCEDURE{C}(mode: Enum; start: Uint; xend: Uint;  first: PInt; count: PSizei; primcount: Sizei);
 	(* GL_APPLE_fence  *)
-	TglGenFencesAPPLE* = PROCEDURE{C}(n: Sizei; fences: PInt);
-	TglDeleteFencesAPPLE* = PROCEDURE{C}(n: Sizei; fences: PInt);
+	TglGenFencesAPPLE* = PROCEDURE{C}(n: Sizei; fences: PUint);
+	TglDeleteFencesAPPLE* = PROCEDURE{C}(n: Sizei; fences: PUint);
 	TglSetFenceAPPLE* = PROCEDURE{C}(fence: Uint);
 	TglIsFenceAPPLE* = PROCEDURE{C}(fence: Uint): Boolean;
 	TglTestFenceAPPLE* = PROCEDURE{C}(fence: Uint): Boolean;
@@ -1375,8 +1368,8 @@ TYPE
 	TglFinishObjectAPPLE* = PROCEDURE{C}(xobject: Enum; name: Int);
 	(* GL_APPLE_vertex_array_object  *)
 	TglBindVertexArrayAPPLE* = PROCEDURE{C}(xarray: Uint);
-	TglDeleteVertexArraysAPPLE* = PROCEDURE{C}(n: Sizei; xarrays: PInt);
-	TglGenVertexArraysAPPLE* = PROCEDURE{C}(n: Sizei; xarrays: PInt);
+	TglDeleteVertexArraysAPPLE* = PROCEDURE{C}(n: Sizei; xarrays: PUint);
+	TglGenVertexArraysAPPLE* = PROCEDURE{C}(n: Sizei; xarrays: PUint);
 	TglIsVertexArrayAPPLE* = PROCEDURE{C}(narray: Uint): Boolean;
 	(*  GL_APPLE_vertex_array_range  *)
 	TglVertexArrayRangeAPPLE* = PROCEDURE{C}(length: Sizei; xpointer: PVoid);
@@ -1396,12 +1389,12 @@ TYPE
 	(*  GL_APPLE_object_purgeable  *)
 	TglObjectPurgeableAPPLE* = PROCEDURE{C}(objectType: Enum; name: Uint; option: Enum): Enum;
 	TglObjectUnpurgeableAPPLE* = PROCEDURE{C}(objectType: Enum; name: Uint; option: Enum): Enum;
-	TglGetObjectParameterivAPPLE* = PROCEDURE{C}(objectType: Enum; name: Uint; pname: Enum; params: Pint);
+	TglGetObjectParameterivAPPLE* = PROCEDURE{C}(objectType: Enum; name: Uint; pname: Enum; params: PInt);
 	(* GL_ARB_matrix_palette  *)
 	TglCurrentPaletteMatrixARB* = PROCEDURE{C}(index: Int);
 	TglMatrixIndexubvARB* = PROCEDURE{C}(size: Int;  indices: PUbyte);
 	TglMatrixIndexusvARB* = PROCEDURE{C}(size: Int;  indices: PUshort);
-	TglMatrixIndexuivARB* = PROCEDURE{C}(size: Int;  indices: PInt);
+	TglMatrixIndexuivARB* = PROCEDURE{C}(size: Int;  indices: PUint);
 	TglMatrixIndexPointerARB* = PROCEDURE{C}(size: Int; xtype: Enum; stride: Sizei;  xpointer: PVoid);
 	(* GL_ARB_multisample  *)
 	TglSampleCoverageARB* = PROCEDURE{C}(value: Clampf; invert: Boolean);
@@ -1413,7 +1406,7 @@ TYPE
 	TglMultiTexCoord1fARB* = PROCEDURE{C}(target: Enum; s: Float);
 	TglMultiTexCoord1fvARB* = PROCEDURE{C}(target: Enum;  v: PFloat);
 	TglMultiTexCoord1iARB* = PROCEDURE{C}(target: Enum; s: Int);
-	TglMultiTexCoord1ivARB* = PROCEDURE{C}(target: Enum;  v: Pint);
+	TglMultiTexCoord1ivARB* = PROCEDURE{C}(target: Enum;  v: PInt);
 	TglMultiTexCoord1sARB* = PROCEDURE{C}(target: Enum; s: Short);
 	TglMultiTexCoord1svARB* = PROCEDURE{C}(target: Enum;  v: PShort);
 	TglMultiTexCoord2dARB* = PROCEDURE{C}(target: Enum; s: Double; t: Double);
@@ -1421,7 +1414,7 @@ TYPE
 	TglMultiTexCoord2fARB* = PROCEDURE{C}(target: Enum; s: Float; t: Float);
 	TglMultiTexCoord2fvARB* = PROCEDURE{C}(target: Enum;  v: PFloat);
 	TglMultiTexCoord2iARB* = PROCEDURE{C}(target: Enum; s: Int; t: Int);
-	TglMultiTexCoord2ivARB* = PROCEDURE{C}(target: Enum;  v: Pint);
+	TglMultiTexCoord2ivARB* = PROCEDURE{C}(target: Enum;  v: PInt);
 	TglMultiTexCoord2sARB* = PROCEDURE{C}(target: Enum; s: Short; t: Short);
 	TglMultiTexCoord2svARB* = PROCEDURE{C}(target: Enum;  v: PShort);
 	TglMultiTexCoord3dARB* = PROCEDURE{C}(target: Enum; s: Double; t: Double; r: Double);
@@ -1429,7 +1422,7 @@ TYPE
 	TglMultiTexCoord3fARB* = PROCEDURE{C}(target: Enum; s: Float; t: Float; r: Float);
 	TglMultiTexCoord3fvARB* = PROCEDURE{C}(target: Enum;  v: PFloat);
 	TglMultiTexCoord3iARB* = PROCEDURE{C}(target: Enum; s: Int; t: Int; r: Int);
-	TglMultiTexCoord3ivARB* = PROCEDURE{C}(target: Enum;  v: Pint);
+	TglMultiTexCoord3ivARB* = PROCEDURE{C}(target: Enum;  v: PInt);
 	TglMultiTexCoord3sARB* = PROCEDURE{C}(target: Enum; s: Short; t: Short; r: Short);
 	TglMultiTexCoord3svARB* = PROCEDURE{C}(target: Enum;  v: PShort);
 	TglMultiTexCoord4dARB* = PROCEDURE{C}(target: Enum; s: Double; t: Double; r: Double; q: Double);
@@ -1437,7 +1430,7 @@ TYPE
 	TglMultiTexCoord4fARB* = PROCEDURE{C}(target: Enum; s: Float; t: Float; r: Float; q: Float);
 	TglMultiTexCoord4fvARB* = PROCEDURE{C}(target: Enum;  v: PFloat);
 	TglMultiTexCoord4iARB* = PROCEDURE{C}(target: Enum; s: Int; t: Int; r: Int; q: Int);
-	TglMultiTexCoord4ivARB* = PROCEDURE{C}(target: Enum;  v: Pint);
+	TglMultiTexCoord4ivARB* = PROCEDURE{C}(target: Enum;  v: PInt);
 	TglMultiTexCoord4sARB* = PROCEDURE{C}(target: Enum; s: Short; t: Short; r: Short; q: Short);
 	TglMultiTexCoord4svARB* = PROCEDURE{C}(target: Enum;  v: PShort);
 	(* GL_ARB_point_parameters  *)
@@ -1459,25 +1452,25 @@ TYPE
 	(* GL_ARB_vertex_blend  *)
 	TglWeightbvARB* = PROCEDURE{C}(size: Int;  weights: PByte);
 	TglWeightsvARB* = PROCEDURE{C}(size: Int;  weights: PShort);
-	TglWeightivARB* = PROCEDURE{C}(size: Int;  weights: Pint);
+	TglWeightivARB* = PROCEDURE{C}(size: Int;  weights: PInt);
 	TglWeightfvARB* = PROCEDURE{C}(size: Int;  weights: PFloat);
 	TglWeightdvARB* = PROCEDURE{C}(size: Int;  weights: PDouble);
 	TglWeightubvARB* = PROCEDURE{C}(size: Int;  weights: PUbyte);
 	TglWeightusvARB* = PROCEDURE{C}(size: Int;  weights: PUshort);
-	TglWeightuivARB* = PROCEDURE{C}(size: Int;  weights: PInt);
+	TglWeightuivARB* = PROCEDURE{C}(size: Int;  weights: PUint);
 	TglWeightPointerARB* = PROCEDURE{C}(size: Int; xtype: Enum; stride: Sizei; xpointer: PVoid);
 	TglVertexBlendARB* = PROCEDURE{C}(count: Int);
 	(* GL_ARB_vertex_buffer_object  *)
 	TglBindBufferARB* = PROCEDURE{C}(target: Enum; buffer: Uint);
-	TglDeleteBuffersARB* = PROCEDURE{C}(n: Sizei;  buffers: PInt);
-	TglGenBuffersARB* = PROCEDURE{C}(n: Sizei; buffers: PInt );
+	TglDeleteBuffersARB* = PROCEDURE{C}(n: Sizei;  buffers: PUint);
+	TglGenBuffersARB* = PROCEDURE{C}(n: Sizei; buffers: PUint );
 	TglIsBufferARB* = PROCEDURE{C}(buffer: Uint): Boolean;
 	TglBufferDataARB* = PROCEDURE{C}(target: Enum; size: Sizei;  data: PVoid; usage: Enum);
 	TglBufferSubDataARB* = PROCEDURE{C}(target: Enum; offset: Sizei; size: Sizei;  data: PVoid);
 	TglGetBufferSubDataARB* = PROCEDURE{C}(target: Enum; offset: Sizei; size: Sizei; data: PVoid);
 	TglMapBufferARB* = PROCEDURE{C}(target: Enum; access: Enum): PVoid;
 	TglUnmapBufferARB* = PROCEDURE{C}( target: Enum): Boolean;
-	TglGetBufferParameterivARB* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint);
+	TglGetBufferParameterivARB* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
 	TglGetBufferPointervARB* = PROCEDURE{C}(target: Enum; pname: Enum; params: PVoid);
 	(* GL_ARB_vertex_program  *)
 	TglVertexAttrib1dARB* = PROCEDURE{C}(index: Uint; x: Double);
@@ -1499,30 +1492,30 @@ TYPE
 	TglVertexAttrib3sARB* = PROCEDURE{C}(index: Uint; x: Short; y: Short; z: Short);
 	TglVertexAttrib3svARB* = PROCEDURE{C}(index: Uint;  v: PShort);
 	TglVertexAttrib4NbvARB* = PROCEDURE{C}(index: Uint;  v: PByte);
-	TglVertexAttrib4NivARB* = PROCEDURE{C}(index: Uint;  v: Pint);
+	TglVertexAttrib4NivARB* = PROCEDURE{C}(index: Uint;  v: PInt);
 	TglVertexAttrib4NsvARB* = PROCEDURE{C}(index: Uint;  v: PShort);
 	TglVertexAttrib4NubARB* = PROCEDURE{C}(index: Uint; x: Ubyte; y: Ubyte; z: Ubyte; w: Ubyte);
 	TglVertexAttrib4NubvARB* = PROCEDURE{C}(index: Uint;  v: PUbyte);
-	TglVertexAttrib4NuivARB* = PROCEDURE{C}(index: Uint;  v: PInt);
+	TglVertexAttrib4NuivARB* = PROCEDURE{C}(index: Uint;  v: PUint);
 	TglVertexAttrib4NusvARB* = PROCEDURE{C}(index: Uint;  v: PUshort);
 	TglVertexAttrib4bvARB* = PROCEDURE{C}(index: Uint;  v: PByte);
 	TglVertexAttrib4dARB* = PROCEDURE{C}(index: Uint; x: Double; y: Double; z: Double; w: Double);
 	TglVertexAttrib4dvARB* = PROCEDURE{C}(index: Uint;  v: PDouble);
 	TglVertexAttrib4fARB* = PROCEDURE{C}(index: Uint; x: Float; y: Float; z: Float; w: Float);
 	TglVertexAttrib4fvARB* = PROCEDURE{C}(index: Uint;  v: PFloat);
-	TglVertexAttrib4ivARB* = PROCEDURE{C}(index: Uint;  v: Pint);
+	TglVertexAttrib4ivARB* = PROCEDURE{C}(index: Uint;  v: PInt);
 	TglVertexAttrib4sARB* = PROCEDURE{C}(index: Uint; x: Short; y: Short; z: Short; w: Short);
 	TglVertexAttrib4svARB* = PROCEDURE{C}(index: Uint;  v: PShort);
 	TglVertexAttrib4ubvARB* = PROCEDURE{C}(index: Uint;  v: PUbyte);
-	TglVertexAttrib4uivARB* = PROCEDURE{C}(index: Uint;  v: PInt);
+	TglVertexAttrib4uivARB* = PROCEDURE{C}(index: Uint;  v: PUint);
 	TglVertexAttrib4usvARB* = PROCEDURE{C}(index: Uint;  v: PUshort);
 	TglVertexAttribPointerARB* = PROCEDURE{C}(index: Uint; size: Int; xtype: Enum; normalized: Boolean; stride: Sizei; xpointer: PVoid);
 	TglEnableVertexAttribArrayARB* = PROCEDURE{C}(index: Uint);
 	TglDisableVertexAttribArrayARB* = PROCEDURE{C}(index: Uint);
 	TglProgramStringARB* = PROCEDURE{C}(target: Enum; format: Enum; len: Sizei;  xstring: PVoid);
 	TglBindProgramARB* = PROCEDURE{C}(target: Enum; xprogram: Uint);
-	TglDeleteProgramsARB* = PROCEDURE{C}(n: Sizei;  programs: PInt);
-	TglGenProgramsARB* = PROCEDURE{C}(n: Sizei; programs: PInt);
+	TglDeleteProgramsARB* = PROCEDURE{C}(n: Sizei;  programs: PUint);
+	TglGenProgramsARB* = PROCEDURE{C}(n: Sizei; programs: PUint);
 	TglProgramEnvParameter4dARB* = PROCEDURE{C}(target: Enum; index: Uint; x: Double; y: Double; z: Double; w: Double);
 	TglProgramEnvParameter4dvARB* = PROCEDURE{C}(target: Enum; index: Uint;  params: PDouble);
 	TglProgramEnvParameter4fARB* = PROCEDURE{C}(target: Enum; index: Uint; x: Float; y: Float; z: Float; w: Float);
@@ -1535,11 +1528,11 @@ TYPE
 	TglGetProgramEnvParameterfvARB* = PROCEDURE{C}(target: Enum; index: Uint; params: PFloat);
 	TglGetProgramLocalParameterdvARB* = PROCEDURE{C}(target: Enum; index: Uint; params: PDouble);
 	TglGetProgramLocalParameterfvARB* = PROCEDURE{C}(target: Enum; index: Uint; params: PFloat);
-	TglGetProgramivARB* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint);
+	TglGetProgramivARB* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
 	TglGetProgramStringARB* = PROCEDURE{C}(target: Enum; pname: Enum; xstring: PVoid);
 	TglGetVertexAttribdvARB* = PROCEDURE{C}(index: Uint; pname: Enum; params: PDouble);
 	TglGetVertexAttribfvARB* = PROCEDURE{C}(index: Uint; pname: Enum; params: PFloat);
-	TglGetVertexAttribivARB* = PROCEDURE{C}(index: Uint; pname: Enum; params: Pint);
+	TglGetVertexAttribivARB* = PROCEDURE{C}(index: Uint; pname: Enum; params: PInt);
 	TglGetVertexAttribPointervARB* = PROCEDURE{C}(index: Uint; pname: Enum; xpointer: PVoid);
 	TglIsProgramARB* = PROCEDURE{C}(xprogram: Uint): Boolean;
 	(* GL_ARB_window_pos  *)
@@ -1548,7 +1541,7 @@ TYPE
 	TglWindowPos2fARB* = PROCEDURE{C}(x: Float; y: Float);
 	TglWindowPos2fvARB* = PROCEDURE{C}( v: PFloat);
 	TglWindowPos2iARB* = PROCEDURE{C}(x: Int; y: Int);
-	TglWindowPos2ivARB* = PROCEDURE{C}( v: Pint);
+	TglWindowPos2ivARB* = PROCEDURE{C}( v: PInt);
 	TglWindowPos2sARB* = PROCEDURE{C}(x: Short; y: Short);
 	TglWindowPos2svARB* = PROCEDURE{C}( v: PShort);
 	TglWindowPos3dARB* = PROCEDURE{C}(x: Double; y: Double; z: Double);
@@ -1556,7 +1549,7 @@ TYPE
 	TglWindowPos3fARB* = PROCEDURE{C}(x: Float; y: Float; z: Float);
 	TglWindowPos3fvARB* = PROCEDURE{C}( v: PFloat);
 	TglWindowPos3iARB* = PROCEDURE{C}(x: Int; y: Int; z: Int);
-	TglWindowPos3ivARB* = PROCEDURE{C}( v: Pint);
+	TglWindowPos3ivARB* = PROCEDURE{C}( v: PInt);
 	TglWindowPos3sARB* = PROCEDURE{C}(x: Short; y: Short; z: Short);
 	TglWindowPos3svARB* = PROCEDURE{C}( v: PShort);
 	(* GL_ARB_draw_buffers  *)
@@ -1564,21 +1557,21 @@ TYPE
 	(* GL_ARB_color_buffer_float  *)
 	TglClampColorARB* = PROCEDURE{C}(target: Enum; clamp: Enum);
 	(* GL_ARB_vertex_shader  *)
-	TglGetActiveAttribARB* = PROCEDURE{C}(programobj: HandleARB; index: Uint; maxLength: Sizei; VAR length: Sizei; VAR size: Int; VAR xtype: Enum; name: PCharARB);
-	TglGetAttribLocationARB* = PROCEDURE{C}(programObj: HandleARB; chars: ADDRESS): Int;
-	TglBindAttribLocationARB* = PROCEDURE{C}(programObj: HandleARB; index: Uint; name: ADDRESS);
+	TglGetActiveAttribARB* = PROCEDURE{C}(programobj: Uint; index: Uint; maxLength: Sizei; VAR length: Sizei; VAR size: Int; VAR xtype: Enum; name: PCharARB);
+	TglGetAttribLocationARB* = PROCEDURE{C}(programObj: Uint; chars: ADDRESS): Int;
+	TglBindAttribLocationARB* = PROCEDURE{C}(programObj: Uint; index: Uint; name: ADDRESS);
 	(* GL_ARB_shader_objects  *)
-	TglDeleteObjectARB* = PROCEDURE{C}(Obj: HandleARB);
-	TglGetHandleARB* = PROCEDURE{C}(pname: Enum): HandleARB;
-	TglDetachObjectARB* = PROCEDURE{C}(container, attached: HandleARB);
-	TglCreateShaderObjectARB* = PROCEDURE{C}(shaderType: Enum): HandleARB;
-	TglShaderSourceARB* = PROCEDURE{C}(shaderObj: HandleARB; count: Sizei; xstring: PPCharARB; lengths: Pint);
-	TglCompileShaderARB* = PROCEDURE{C}(shaderObj: HandleARB);
-	TglCreateProgramObjectARB* = PROCEDURE{C}(): HandleARB;
-	TglAttachObjectARB* = PROCEDURE{C}(programObj, shaderObj: HandleARB);
-	TglLinkProgramARB* = PROCEDURE{C}(programObj: HandleARB);
-	TglUseProgramObjectARB* = PROCEDURE{C}(programObj: HandleARB);
-	TglValidateProgramARB* = PROCEDURE{C}(programObj: HandleARB);
+	TglDeleteObjectARB* = PROCEDURE{C}(Obj: Uint);
+	TglGetHandleARB* = PROCEDURE{C}(pname: Enum): Uint;
+	TglDetachObjectARB* = PROCEDURE{C}(container, attached: Uint);
+	TglCreateShaderObjectARB* = PROCEDURE{C}(shaderType: Enum): Uint;
+	TglShaderSourceARB* = PROCEDURE{C}(shaderObj: Uint; count: Sizei; xstring: PPCharARB; lengths: PInt);
+	TglCompileShaderARB* = PROCEDURE{C}(shaderObj: Uint);
+	TglCreateProgramObjectARB* = PROCEDURE{C}(): Uint;
+	TglAttachObjectARB* = PROCEDURE{C}(programObj, shaderObj: Uint);
+	TglLinkProgramARB* = PROCEDURE{C}(programObj: Uint);
+	TglUseProgramObjectARB* = PROCEDURE{C}(programObj: Uint);
+	TglValidateProgramARB* = PROCEDURE{C}(programObj: Uint);
 	TglUniform1fARB* = PROCEDURE{C}(location: Int; v0: Float);
 	TglUniform2fARB* = PROCEDURE{C}(location: Int; v0, v1: Float);
 	TglUniform3fARB* = PROCEDURE{C}(location: Int; v0, v1, v2: Float);
@@ -1591,51 +1584,51 @@ TYPE
 	TglUniform2fvARB* = PROCEDURE{C}(location: Int; count: Sizei; value: PFloat);
 	TglUniform3fvARB* = PROCEDURE{C}(location: Int; count: Sizei; value: PFloat);
 	TglUniform4fvARB* = PROCEDURE{C}(location: Int; count: Sizei; value: PFloat);
-	TglUniform1ivARB* = PROCEDURE{C}(location: Int; count: Sizei; value: Pint);
-	TglUniform2ivARB* = PROCEDURE{C}(location: Int; count: Sizei; value: Pint);
-	TglUniform3ivARB* = PROCEDURE{C}(location: Int; count: Sizei; value: Pint);
-	TglUniform4ivARB* = PROCEDURE{C}(location: Int; count: Sizei; value: Pint);
+	TglUniform1ivARB* = PROCEDURE{C}(location: Int; count: Sizei; value: PInt);
+	TglUniform2ivARB* = PROCEDURE{C}(location: Int; count: Sizei; value: PInt);
+	TglUniform3ivARB* = PROCEDURE{C}(location: Int; count: Sizei; value: PInt);
+	TglUniform4ivARB* = PROCEDURE{C}(location: Int; count: Sizei; value: PInt);
 	TglUniformMatrix2fvARB* = PROCEDURE{C}(location: Int; count: Sizei; transpose: Boolean; value: PFloat);
 	TglUniformMatrix3fvARB* = PROCEDURE{C}(location: Int; count: Sizei; transpose: Boolean; value: PFloat);
 	TglUniformMatrix4fvARB* = PROCEDURE{C}(location: Int; count: Sizei; transpose: Boolean; value: PFloat);
-	TglGetObjectParameterfvARB* = PROCEDURE{C}(Obj: HandleARB; pname: Enum; params: PFloat);
-	TglGetObjectParameterivARB* = PROCEDURE{C}(Obj: HandleARB; pname: Enum; params: Pint);
-	TglGetInfoLogARB* = PROCEDURE{C}(shaderObj: HandleARB; maxLength: Sizei; VAR length: Int; infoLog: PCharARB);
-	TglGetAttachedObjectsARB* = PROCEDURE{C}(programobj: HandleARB; maxCount: Sizei; VAR count: Sizei; objects: PHandleARB);
-	TglGetUniformLocationARB* = PROCEDURE{C}(programObj: HandleARB; chars: ADDRESS): Int;
-	TglGetActiveUniformARB* = PROCEDURE{C}(programobj: HandleARB; index: Uint; maxLength: Sizei; VAR length: Sizei; VAR size: Int; VAR xtype: Enum; name: PCharARB);
-	TglGetUniformfvARB* = PROCEDURE{C}(programObj: HandleARB; location: Int; params: PFloat);
-	TglGetUniformivARB* = PROCEDURE{C}(programObj: HandleARB; location: Int; params: Pint);
-	TglGetShaderSourceARB* = PROCEDURE{C}(shader: HandleARB; maxLength: Sizei; VAR length: Sizei; source: PCharARB);
+	TglGetObjectParameterfvARB* = PROCEDURE{C}(Obj: Uint; pname: Enum; params: PFloat);
+	TglGetObjectParameterivARB* = PROCEDURE{C}(Obj: Uint; pname: Enum; params: PInt);
+	TglGetInfoLogARB* = PROCEDURE{C}(shaderObj: Uint; maxLength: Sizei; VAR length: Int; infoLog: PCharARB);
+	TglGetAttachedObjectsARB* = PROCEDURE{C}(programobj: Uint; maxCount: Sizei; VAR count: Sizei; objects: PHandleARB);
+	TglGetUniformLocationARB* = PROCEDURE{C}(programObj: Uint; chars: ADDRESS): Int;
+	TglGetActiveUniformARB* = PROCEDURE{C}(programobj: Uint; index: Uint; maxLength: Sizei; VAR length: Sizei; VAR size: Int; VAR xtype: Enum; name: PCharARB);
+	TglGetUniformfvARB* = PROCEDURE{C}(programObj: Uint; location: Int; params: PFloat);
+	TglGetUniformivARB* = PROCEDURE{C}(programObj: Uint; location: Int; params: PInt);
+	TglGetShaderSourceARB* = PROCEDURE{C}(shader: Uint; maxLength: Sizei; VAR length: Sizei; source: PCharARB);
 	(* GL_ARB_Occlusion_Query  *)
-	TglGenQueriesARB* = PROCEDURE{C}(n: Sizei; ids: PInt);
-	TglDeleteQueriesARB* = PROCEDURE{C}(n: Sizei;  ids: PInt);
+	TglGenQueriesARB* = PROCEDURE{C}(n: Sizei; ids: PUint);
+	TglDeleteQueriesARB* = PROCEDURE{C}(n: Sizei;  ids: PUint);
 	TglIsQueryARB* = PROCEDURE{C}(id: Uint): BOOLEAN;
 	TglBeginQueryARB* = PROCEDURE{C}(target: Enum; id: Uint);
 	TglEndQueryARB* = PROCEDURE{C}(target: Enum);
-	TglGetQueryivARB* = PROCEDURE{C}(target, pname: Enum; params: Pint);
-	TglGetQueryObjectivARB* = PROCEDURE{C}(id: Uint; pname: Enum; params: Pint);
-	TglGetQueryObjectuivARB* = PROCEDURE{C}(id: Uint; pname: Enum; params: PInt);
+	TglGetQueryivARB* = PROCEDURE{C}(target, pname: Enum; params: PInt);
+	TglGetQueryObjectivARB* = PROCEDURE{C}(id: Uint; pname: Enum; params: PInt);
+	TglGetQueryObjectuivARB* = PROCEDURE{C}(id: Uint; pname: Enum; params: PUint);
 	(* GL_ARB_draw_instanced  *)
 	TglDrawArraysInstancedARB* = PROCEDURE{C}(mode: Enum; first: Int; count: Sizei; primcount: Sizei);
 	TglDrawElementsInstancedARB* = PROCEDURE{C}(mode: Enum; count: Sizei; xtype: Enum;  indices: PVoid; primcount: Sizei);
 	(* GL_ARB_framebuffer_object  *)
 	TglIsRenderbuffer* = PROCEDURE{C}(renderbuffer: Uint): Boolean;
 	TglBindRenderbuffer* = PROCEDURE{C}(target: Enum; renderbuffer: Uint);
-	TglDeleteRenderbuffers* = PROCEDURE{C}(n: Sizei;  renderbuffers: PInt);
-	TglGenRenderbuffers* = PROCEDURE{C}(n: Sizei; renderbuffers: PInt);
+	TglDeleteRenderbuffers* = PROCEDURE{C}(n: Sizei;  renderbuffers: PUint);
+	TglGenRenderbuffers* = PROCEDURE{C}(n: Sizei; renderbuffers: PUint);
 	TglRenderbufferStorage* = PROCEDURE{C}(target: Enum; internalformat: Enum; width: Sizei; height: Sizei);
-	TglGetRenderbufferParameteriv* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint);
+	TglGetRenderbufferParameteriv* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
 	TglIsFramebuffer* = PROCEDURE{C}(framebuffer: Uint): Boolean;
 	TglBindFramebuffer* = PROCEDURE{C}(target: Enum; framebuffer: Uint);
-	TglDeleteFramebuffers* = PROCEDURE{C}(n: Sizei;  framebuffers: PInt);
-	TglGenFramebuffers* = PROCEDURE{C}(n: Sizei; framebuffers: PInt);
+	TglDeleteFramebuffers* = PROCEDURE{C}(n: Sizei;  framebuffers: PUint);
+	TglGenFramebuffers* = PROCEDURE{C}(n: Sizei; framebuffers: PUint);
 	TglCheckFramebufferStatus* = PROCEDURE{C}(target: Enum): Enum;
 	TglFramebufferTexture1D* = PROCEDURE{C}(target: Enum; attachment: Enum; textarget: Enum; texture: Uint; level: Int);
 	TglFramebufferTexture2D* = PROCEDURE{C}(target: Enum; attachment: Enum; textarget: Enum; texture: Uint; level: Int);
 	TglFramebufferTexture3D* = PROCEDURE{C}(target: Enum; attachment: Enum; textarget: Enum; texture: Uint; level: Int; zoffset: Int);
 	TglFramebufferRenderbuffer* = PROCEDURE{C}(target: Enum; attachment: Enum; renderbuffertarget: Enum; renderbuffer: Uint);
-	TglGetFramebufferAttachmentParameteriv* = PROCEDURE{C}(target: Enum; attachment: Enum; pname: Enum; params: Pint);
+	TglGetFramebufferAttachmentParameteriv* = PROCEDURE{C}(target: Enum; attachment: Enum; pname: Enum; params: PInt);
 	TglGenerateMipmap* = PROCEDURE{C}(target: Enum);
 	TglBlitFramebuffer* = PROCEDURE{C}(srcX0: Int; srcY0: Int; srcX1: Int; srcY1: Int; dstX0: Int; dstY0: Int; dstX1: Int; dstY1: Int; mask: Bitfield; filter: Enum);
 	TglRenderbufferStorageMultisample* = PROCEDURE{C}(target: Enum; samples: Sizei; internalformat: Enum; width: Sizei; height: Sizei);
@@ -1654,15 +1647,15 @@ TYPE
 	TglTexBufferARB* = PROCEDURE{C}(target: Enum; internalformat: Enum; buffer: Uint);
 	(* GL_ARB_vertex_array_object  *)
 	TglBindVertexArray* = PROCEDURE{C}(xarray: Uint);
-	TglDeleteVertexArrays* = PROCEDURE{C}(n: Sizei;  arrays: PInt);
-	TglGenVertexArrays* = PROCEDURE{C}(n: Sizei; arrays: PInt);
+	TglDeleteVertexArrays* = PROCEDURE{C}(n: Sizei;  arrays: PUint);
+	TglGenVertexArrays* = PROCEDURE{C}(n: Sizei; arrays: PUint);
 	TglIsVertexArray* = PROCEDURE{C}(xarray: Uint): Boolean;
 	(* GL_ARB_uniform_buffer_object  *)
-	TglGetUniformIndices* = PROCEDURE{C}(xprogram: Uint; uniformCount: Sizei;  uniformNames: PPChar; uniformIndices: PInt);
-	TglGetActiveUniformsiv* = PROCEDURE{C}(xprogram: Uint; uniformCount: Sizei;  uniformIndices: PInt; pname: Enum; params: Pint);
+	TglGetUniformIndices* = PROCEDURE{C}(xprogram: Uint; uniformCount: Sizei;  uniformNames: PPChar; uniformIndices: PUint);
+	TglGetActiveUniformsiv* = PROCEDURE{C}(xprogram: Uint; uniformCount: Sizei;  uniformIndices: PUint; pname: Enum; params: PInt);
 	TglGetActiveUniformName* = PROCEDURE{C}(xprogram: Uint; uniformIndex: Uint; bufSize: Sizei; length: PSizei; uniformName: PChar);
 	TglGetUniformBlockIndex* = PROCEDURE{C}(xprogram: Uint;  uniformBlockName: ADDRESS): Uint;
-	TglGetActiveUniformBlockiv* = PROCEDURE{C}(xprogram: Uint; uniformBlockIndex: Uint; pname: Enum; params: Pint);
+	TglGetActiveUniformBlockiv* = PROCEDURE{C}(xprogram: Uint; uniformBlockIndex: Uint; pname: Enum; params: PInt);
 	TglGetActiveUniformBlockName* = PROCEDURE{C}(xprogram: Uint; uniformBlockIndex: Uint; bufSize: Sizei; length: PSizei; uniformBlockName: PChar);
 	TglUniformBlockBinding* = PROCEDURE{C}(xprogram: Uint; uniformBlockIndex: Uint; uniformBlockBinding: Uint);
 	(* GL_ARB_copy_buffer  *)
@@ -1671,7 +1664,7 @@ TYPE
 	TglDrawElementsBaseVertex* = PROCEDURE{C}(mode: Enum; count: Sizei; xtype: Enum;  indices: PVoid; basevertex: Int);
 	TglDrawRangeElementsBaseVertex* = PROCEDURE{C}(mode: Enum; start: Uint; xend: Uint; count: Sizei; xtype: Enum;  indices: PVoid; basevertex: Int);
 	TglDrawElementsInstancedBaseVertex* = PROCEDURE{C}(mode: Enum; count: Sizei; xtype: Enum;  indices: PVoid; primcount: Sizei; basevertex: Int);
-	TglMultiDrawElementsBaseVertex* = PROCEDURE{C}(mode: Enum;  count: PSizei; xtype: Enum;  indices: PPVoid; primcount: Sizei;  basevertex: Pint);
+	TglMultiDrawElementsBaseVertex* = PROCEDURE{C}(mode: Enum;  count: PSizei; xtype: Enum;  indices: PPVoid; primcount: Sizei;  basevertex: PInt);
 	(* GL_ARB_provoking_vertex  *)
 	TglProvokingVertex* = PROCEDURE{C}(mode: Enum);
 	(* GL_ARB_sync  *)
@@ -1680,8 +1673,8 @@ TYPE
 	TglDeleteSync* = PROCEDURE{C}(sync: GLsync);
 	TglClientWaitSync* = PROCEDURE{C}(sync: GLsync; flags: Bitfield; timeout: Uint64): Enum;
 	TglWaitSync* = PROCEDURE{C}(sync: GLsync; flags: Bitfield; timeout: Uint64);
-	TglGetInteger64v* = PROCEDURE{C}(pname: Enum; params: Pint64);
-	TglGetSynciv* = PROCEDURE{C}(sync: GLsync; pname: Enum; butSize: Sizei; length: PSizei; values: Pint);
+	TglGetInteger64v* = PROCEDURE{C}(pname: Enum; params: PInt64);
+	TglGetSynciv* = PROCEDURE{C}(sync: GLsync; pname: Enum; butSize: Sizei; length: PSizei; values: PInt);
 	(* GL_ARB_texture_multisample  *)
 	TglTexImage2DMultisample* = PROCEDURE{C}(target: Enum; samples: Sizei; internalformat: Int; width: Sizei; height: Sizei; fixedsamplelocations: Boolean);
 	TglTexImage3DMultisample* = PROCEDURE{C}(target: Enum; samples: Sizei; internalformat: Int; width: Sizei; height: Sizei; depth: Sizei; fixedsamplelocations: Boolean);
@@ -1697,71 +1690,71 @@ TYPE
 	(*  GL_ARB_shading_language_include  *)
 	TglNamedStringARB* = PROCEDURE{C}(xtype: Enum; namelen: Int;  name: ADDRESS; stringlen: Int;  xstring: ADDRESS);
 	TglDeleteNamedStringARB* = PROCEDURE{C}(namelen: Int;  name: ADDRESS);
-	TglCompileShaderIncludeARB* = PROCEDURE{C}(shader: Uint; count: Sizei;  path: PPChar;  length: Pint);
+	TglCompileShaderIncludeARB* = PROCEDURE{C}(shader: Uint; count: Sizei;  path: PPChar;  length: PInt);
 	TglIsNamedStringARB* = PROCEDURE{C}(namelen: Int;  name: ADDRESS): Boolean;
 	TglGetNamedStringARB* = PROCEDURE{C}(namelen: Int;  name: ADDRESS; bufSize: Sizei; stringlen: Int; xstring: PChar);
-	TglGetNamedStringivARB* = PROCEDURE{C}(namelen: Int;  name: ADDRESS; pname: Enum; params: Pint);
+	TglGetNamedStringivARB* = PROCEDURE{C}(namelen: Int;  name: ADDRESS; pname: Enum; params: PInt);
 	(*  GL_ARB_blend_func_extended  *)
 	TglBindFragDataLocationIndexed* = PROCEDURE{C}(xprogram: Uint; colorNumber: Uint; index: Uint;  name: ADDRESS);
 	TglGetFragDataIndex* = PROCEDURE{C}(xprogram: Uint;  name: ADDRESS): Int;
 	(*  GL_ARB_sampler_objects  *)
-	TglGenSamplers* = PROCEDURE{C}(count: Sizei; samplers: PInt);
-	TglDeleteSamplers* = PROCEDURE{C}(count: Sizei;  samplers: PInt);
+	TglGenSamplers* = PROCEDURE{C}(count: Sizei; samplers: PUint);
+	TglDeleteSamplers* = PROCEDURE{C}(count: Sizei;  samplers: PUint);
 	TglIsSampler* = PROCEDURE{C}(sampler: Uint): Boolean;
 	TglBindSampler* = PROCEDURE{C}(unit: Uint; sampler: Uint);
 	TglSamplerParameteri* = PROCEDURE{C}(sampler: Uint; pname: Enum; param: Int);
-	TglSamplerParameteriv* = PROCEDURE{C}(sampler: Uint; pname: Enum;  param: Pint);
+	TglSamplerParameteriv* = PROCEDURE{C}(sampler: Uint; pname: Enum;  param: PInt);
 	TglSamplerParameterf* = PROCEDURE{C}(sampler: Uint; pname: Enum; param: Float);
 	TglSamplerParameterfv* = PROCEDURE{C}(sampler: Uint; pname: Enum;  param: PFloat);
-	TglSamplerParameterIiv* = PROCEDURE{C}(sampler: Uint; pname: Enum;  param: Pint);
-	TglSamplerParameterIuiv* = PROCEDURE{C}(sampler: Uint; pname: Enum;  param: PInt);
-	TglGetSamplerParameteriv* = PROCEDURE{C}(sampler: Uint; pname: Enum; params: Pint);
-	TglGetSamplerParameterIiv* = PROCEDURE{C}(sampler: Uint; pname: Enum; params: Pint);
+	TglSamplerParameterIiv* = PROCEDURE{C}(sampler: Uint; pname: Enum;  param: PInt);
+	TglSamplerParameterIuiv* = PROCEDURE{C}(sampler: Uint; pname: Enum;  param: PUint);
+	TglGetSamplerParameteriv* = PROCEDURE{C}(sampler: Uint; pname: Enum; params: PInt);
+	TglGetSamplerParameterIiv* = PROCEDURE{C}(sampler: Uint; pname: Enum; params: PInt);
 	TglGetSamplerParameterfv* = PROCEDURE{C}(sampler: Uint; pname: Enum; params: PFloat);
-	TglGetSamplerParameterIuiv* = PROCEDURE{C}(sampler: Uint; pname: Enum; params: PInt);
+	TglGetSamplerParameterIuiv* = PROCEDURE{C}(sampler: Uint; pname: Enum; params: PUint);
 	(*  GL_ARB_timer_query  *)
 	TglQueryCounter* = PROCEDURE{C}(id: Uint; target: Enum);
-	TglGetQueryObjecti64v* = PROCEDURE{C}(id: Uint; pname: Enum; params: Pint64);
-	TglGetQueryObjectui64v* = PROCEDURE{C}(id: Uint; pname: Enum; params: PInt64);
+	TglGetQueryObjecti64v* = PROCEDURE{C}(id: Uint; pname: Enum; params: PInt64);
+	TglGetQueryObjectui64v* = PROCEDURE{C}(id: Uint; pname: Enum; params: PUint64);
 	(*  GL_ARB_vertex_type_2_10_10_10_rev  *)
 	TglVertexP2ui* = PROCEDURE{C}(xtype: Enum; value: Uint);
-	TglVertexP2uiv* = PROCEDURE{C}(xtype: Enum;  value: PInt);
+	TglVertexP2uiv* = PROCEDURE{C}(xtype: Enum;  value: PUint);
 	TglVertexP3ui* = PROCEDURE{C}(xtype: Enum; value: Uint);
-	TglVertexP3uiv* = PROCEDURE{C}(xtype: Enum;  value: PInt);
+	TglVertexP3uiv* = PROCEDURE{C}(xtype: Enum;  value: PUint);
 	TglVertexP4ui* = PROCEDURE{C}(xtype: Enum; value: Uint);
-	TglVertexP4uiv* = PROCEDURE{C}(xtype: Enum;  value: PInt);
+	TglVertexP4uiv* = PROCEDURE{C}(xtype: Enum;  value: PUint);
 	TglTexCoordP1ui* = PROCEDURE{C}(xtype: Enum; coords: Uint);
-	TglTexCoordP1uiv* = PROCEDURE{C}(xtype: Enum;  coords: PInt);
+	TglTexCoordP1uiv* = PROCEDURE{C}(xtype: Enum;  coords: PUint);
 	TglTexCoordP2ui* = PROCEDURE{C}(xtype: Enum; coords: Uint);
-	TglTexCoordP2uiv* = PROCEDURE{C}(xtype: Enum;  coords: PInt);
+	TglTexCoordP2uiv* = PROCEDURE{C}(xtype: Enum;  coords: PUint);
 	TglTexCoordP3ui* = PROCEDURE{C}(xtype: Enum; coords: Uint);
-	TglTexCoordP3uiv* = PROCEDURE{C}(xtype: Enum;  coords: PInt);
+	TglTexCoordP3uiv* = PROCEDURE{C}(xtype: Enum;  coords: PUint);
 	TglTexCoordP4ui* = PROCEDURE{C}(xtype: Enum; coords: Uint);
-	TglTexCoordP4uiv* = PROCEDURE{C}(xtype: Enum;  coords: PInt);
+	TglTexCoordP4uiv* = PROCEDURE{C}(xtype: Enum;  coords: PUint);
 	TglMultiTexCoordP1ui* = PROCEDURE{C}(texture: Enum; xtype: Enum; coords: Uint);
-	TglMultiTexCoordP1uiv* = PROCEDURE{C}(texture: Enum; xtype: Enum;  coords: PInt);
+	TglMultiTexCoordP1uiv* = PROCEDURE{C}(texture: Enum; xtype: Enum;  coords: PUint);
 	TglMultiTexCoordP2ui* = PROCEDURE{C}(texture: Enum; xtype: Enum; coords: Uint);
-	TglMultiTexCoordP2uiv* = PROCEDURE{C}(texture: Enum; xtype: Enum; coords: PInt);
+	TglMultiTexCoordP2uiv* = PROCEDURE{C}(texture: Enum; xtype: Enum; coords: PUint);
 	TglMultiTexCoordP3ui* = PROCEDURE{C}(texture: Enum; xtype: Enum; coords: Uint);
-	TglMultiTexCoordP3uiv* = PROCEDURE{C}(texture: Enum; xtype: Enum; coords: PInt);
+	TglMultiTexCoordP3uiv* = PROCEDURE{C}(texture: Enum; xtype: Enum; coords: PUint);
 	TglMultiTexCoordP4ui* = PROCEDURE{C}(texture: Enum; xtype: Enum; coords: Uint);
-	TglMultiTexCoordP4uiv* = PROCEDURE{C}(texture: Enum; xtype: Enum; coords: PInt);
+	TglMultiTexCoordP4uiv* = PROCEDURE{C}(texture: Enum; xtype: Enum; coords: PUint);
 	TglNormalP3ui* = PROCEDURE{C}(xtype: Enum; coords: Uint);
-	TglNormalP3uiv* = PROCEDURE{C}(xtype: Enum;  coords: PInt);
+	TglNormalP3uiv* = PROCEDURE{C}(xtype: Enum;  coords: PUint);
 	TglColorP3ui* = PROCEDURE{C}(xtype: Enum; color: Uint);
-	TglColorP3uiv* = PROCEDURE{C}(xtype: Enum;  color: PInt);
+	TglColorP3uiv* = PROCEDURE{C}(xtype: Enum;  color: PUint);
 	TglColorP4ui* = PROCEDURE{C}(xtype: Enum; color: Uint);
 	TglColorP4uiv* = PROCEDURE{C}(xtype: Enum;  color: Uint);
 	TglSecondaryColorP3ui* = PROCEDURE{C}(xtype: Enum; color: Uint);
-	TglSecondaryColorP3uiv* = PROCEDURE{C}(xtype: Enum;  color: PInt);
+	TglSecondaryColorP3uiv* = PROCEDURE{C}(xtype: Enum;  color: PUint);
 	TglVertexAttribP1ui* = PROCEDURE{C}(index: Uint; xtype: Enum; normalized: Boolean; value: Uint);
-	TglVertexAttribP1uiv* = PROCEDURE{C}(index: Uint; xtype: Enum; normalized: Boolean;  value: PInt);
+	TglVertexAttribP1uiv* = PROCEDURE{C}(index: Uint; xtype: Enum; normalized: Boolean;  value: PUint);
 	TglVertexAttribP2ui* = PROCEDURE{C}(index: Uint; xtype: Enum; normalized: Boolean; value: Uint);
-	TglVertexAttribP2uiv* = PROCEDURE{C}(index: Uint; xtype: Enum; normalized: Boolean;  value: PInt);
+	TglVertexAttribP2uiv* = PROCEDURE{C}(index: Uint; xtype: Enum; normalized: Boolean;  value: PUint);
 	TglVertexAttribP3ui* = PROCEDURE{C}(index: Uint; xtype: Enum; normalized: Boolean; value: Uint);
-	TglVertexAttribP3uiv* = PROCEDURE{C}(index: Uint; xtype: Enum; normalized: Boolean;  value: PInt);
+	TglVertexAttribP3uiv* = PROCEDURE{C}(index: Uint; xtype: Enum; normalized: Boolean;  value: PUint);
 	TglVertexAttribP4ui* = PROCEDURE{C}(index: Uint; xtype: Enum; normalized: Boolean; value: Uint);
-	TglVertexAttribP4uiv* = PROCEDURE{C}(index: Uint; xtype: Enum; normalized: Boolean;  value: PInt);
+	TglVertexAttribP4uiv* = PROCEDURE{C}(index: Uint; xtype: Enum; normalized: Boolean;  value: PUint);
 	(*  GL_ARB_draw_indirect  *)
 	TglDrawArraysIndirect* = PROCEDURE{C}(mode: Enum;  indirect: PVoid);
 	TglDrawElementsIndirect* = PROCEDURE{C}(mode: Enum; xtype: Enum;  indirect: PVoid);
@@ -1787,19 +1780,19 @@ TYPE
 	(*  GL_ARB_shader_subroutine  *)
 	TglGetSubroutineUniformLocation* = PROCEDURE{C}(xprogram: Uint; shadertype: Enum;  name: ADDRESS): Int;
 	TglGetSubroutineIndex* = PROCEDURE{C}(xprogram: Uint; shadertype: Enum;  name: ADDRESS): Uint;
-	TglGetActiveSubroutineUniformiv* = PROCEDURE{C}(xprogram: Uint; shadertype: Enum; index: Uint; pname: Enum; values: Pint);
+	TglGetActiveSubroutineUniformiv* = PROCEDURE{C}(xprogram: Uint; shadertype: Enum; index: Uint; pname: Enum; values: PInt);
 	TglGetActiveSubroutineUniformName* = PROCEDURE{C}(xprogram: Uint; shadertype: Enum; index: Uint; bufsize: Sizei; length: PSizei; name: PChar);
 	TglGetActiveSubroutineName* = PROCEDURE{C}(xprogram: Uint; shadertype: Enum; index: Uint; bufsize: Sizei; length: PSizei; name: PChar);
-	TglUniformSubroutinesuiv* = PROCEDURE{C}(shadertype: Enum; count: Sizei;  indices: PInt);
-	TglGetUniformSubroutineuiv* = PROCEDURE{C}(shadertype: Enum; location: Int; params: PInt);
-	TglGetProgramStageiv* = PROCEDURE{C}(xprogram: Uint; shadertype: Enum; pname: Enum; values: Pint);
+	TglUniformSubroutinesuiv* = PROCEDURE{C}(shadertype: Enum; count: Sizei;  indices: PUint);
+	TglGetUniformSubroutineuiv* = PROCEDURE{C}(shadertype: Enum; location: Int; params: PUint);
+	TglGetProgramStageiv* = PROCEDURE{C}(xprogram: Uint; shadertype: Enum; pname: Enum; values: PInt);
 	(*  GL_ARB_tessellation_shader  *)
 	TglPatchParameteri* = PROCEDURE{C}(pname: Enum; value: Int);
 	TglPatchParameterfv* = PROCEDURE{C}(pname: Enum;  values: PFloat);
 	(*  GL_ARB_transform_feedback2  *)
 	TglBindTransformFeedback* = PROCEDURE{C}(target: Enum; id: Uint);
-	TglDeleteTransformFeedbacks* = PROCEDURE{C}(n: Sizei;  ids: PInt);
-	TglGenTransformFeedbacks* = PROCEDURE{C}(n: Sizei; ids: PInt);
+	TglDeleteTransformFeedbacks* = PROCEDURE{C}(n: Sizei;  ids: PUint);
+	TglGenTransformFeedbacks* = PROCEDURE{C}(n: Sizei; ids: PUint);
 	TglIsTransformFeedback* = PROCEDURE{C}(id: Uint): Boolean;
 	TglPauseTransformFeedback* = PROCEDURE{C}();
 	TglResumeTransformFeedback* = PROCEDURE{C}();
@@ -1808,11 +1801,11 @@ TYPE
 	TglDrawTransformFeedbackStream* = PROCEDURE{C}(mode: Enum; id: Uint; stream: Uint);
 	TglBeginQueryIndexed* = PROCEDURE{C}(target: Enum; index: Uint; id: Uint);
 	TglEndQueryIndexed* = PROCEDURE{C}(target: Enum; index: Uint);
-	TglGetQueryIndexediv* = PROCEDURE{C}(target: Enum; index: Uint; pname: Enum; params: Pint);
+	TglGetQueryIndexediv* = PROCEDURE{C}(target: Enum; index: Uint; pname: Enum; params: PInt);
 	(*  GL_ARB_ES2_compatibility  *)
 	TglReleaseShaderCompiler* = PROCEDURE{C}();
-	TglShaderBinary* = PROCEDURE{C}(count: Sizei;  shaders: PInt; binaryformat: Enum;  binary: PVoid; length: Sizei);
-	TglGetShaderPrecisionFormat* = PROCEDURE{C}(shadertype: Enum; precisiontype: Enum; range: Pint; precision: Pint);
+	TglShaderBinary* = PROCEDURE{C}(count: Sizei;  shaders: PUint; binaryformat: Enum;  binary: PVoid; length: Sizei);
+	TglGetShaderPrecisionFormat* = PROCEDURE{C}(shadertype: Enum; precisiontype: Enum; range: PInt; precision: PInt);
 	TglDepthRangef* = PROCEDURE{C}(n: Clampf; f: Clampf);
 	TglClearDepthf* = PROCEDURE{C}(d: Clampf);
 	(* GL_ARB_get_program_binary  *)
@@ -1824,42 +1817,42 @@ TYPE
 	TglActiveShaderProgram* = PROCEDURE{C}(pipeline: Uint; xprogram: Uint);
 	TglCreateShaderProgramv* = PROCEDURE{C}(xtype: Enum; count: Sizei;  strings: PPChar): Uint;
 	TglBindProgramPipeline* = PROCEDURE{C}(pipeline: Uint);
-	TglDeleteProgramPipelines* = PROCEDURE{C}(n: Sizei;  pipelines: PInt);
-	TglGenProgramPipelines* = PROCEDURE{C}(n: Sizei; pipelines: PInt);
+	TglDeleteProgramPipelines* = PROCEDURE{C}(n: Sizei;  pipelines: PUint);
+	TglGenProgramPipelines* = PROCEDURE{C}(n: Sizei; pipelines: PUint);
 	TglIsProgramPipeline* = PROCEDURE{C}(pipeline: Uint): Boolean;
-	TglGetProgramPipelineiv* = PROCEDURE{C}(pipeline: Uint; pname: Enum; params: Pint);
+	TglGetProgramPipelineiv* = PROCEDURE{C}(pipeline: Uint; pname: Enum; params: PInt);
 	TglProgramUniform1i* = PROCEDURE{C}(xprogram: Uint; location: Int; v0: Int);
-	TglProgramUniform1iv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: Pint);
+	TglProgramUniform1iv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
 	TglProgramUniform1f* = PROCEDURE{C}(xprogram: Uint; location: Int; v0: Float);
 	TglProgramUniform1fv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PFloat);
 	TglProgramUniform1d* = PROCEDURE{C}(xprogram: Uint; location: Int; v0: Double);
 	TglProgramUniform1dv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PDouble);
 	TglProgramUniform1ui* = PROCEDURE{C}(xprogram: Uint; location: Int; v0: Uint);
-	TglProgramUniform1uiv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
+	TglProgramUniform1uiv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PUint);
 	TglProgramUniform2i* = PROCEDURE{C}(xprogram: Uint; location: Int; v0: Int; v1: Int);
-	TglProgramUniform2iv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: Pint);
+	TglProgramUniform2iv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
 	TglProgramUniform2f* = PROCEDURE{C}(xprogram: Uint; location: Int; v0: Float; v1: Float);
 	TglProgramUniform2fv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PFloat);
 	TglProgramUniform2d* = PROCEDURE{C}(xprogram: Uint; location: Int; v0: Double; v1: Double);
 	TglProgramUniform2dv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PDouble);
 	TglProgramUniform2ui* = PROCEDURE{C}(xprogram: Uint; location: Int; v0: Uint; v1: Uint);
-	TglProgramUniform2uiv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
+	TglProgramUniform2uiv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PUint);
 	TglProgramUniform3i* = PROCEDURE{C}(xprogram: Uint; location: Int; v0: Int; v1: Int; v2: Int);
-	TglProgramUniform3iv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: Pint);
+	TglProgramUniform3iv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
 	TglProgramUniform3f* = PROCEDURE{C}(xprogram: Uint; location: Int; v0: Float; v1: Float; v2: Float);
 	TglProgramUniform3fv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PFloat);
 	TglProgramUniform3d* = PROCEDURE{C}(xprogram: Uint; location: Int; v0: Double; v1: Double; v2: Double);
 	TglProgramUniform3dv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PDouble);
 	TglProgramUniform3ui* = PROCEDURE{C}(xprogram: Uint; location: Int; v0: Uint; v1: Uint; v2: Uint);
-	TglProgramUniform3uiv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
+	TglProgramUniform3uiv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PUint);
 	TglProgramUniform4i* = PROCEDURE{C}(xprogram: Uint; location: Int; v0: Int; v1: Int; v2: Int; v3: Int);
-	TglProgramUniform4iv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: Pint);
+	TglProgramUniform4iv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
 	TglProgramUniform4f* = PROCEDURE{C}(xprogram: Uint; location: Int; v0: Float; v1: Float; v2: Float; v3: Float);
 	TglProgramUniform4fv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PFloat);
 	TglProgramUniform4d* = PROCEDURE{C}(xprogram: Uint; location: Int; v0: Double; v1: Double; v2: Double; v3: Double);
 	TglProgramUniform4dv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PDouble);
 	TglProgramUniform4ui* = PROCEDURE{C}(xprogram: Uint; location: Int; v0: Uint; v1: Uint; v2: Uint; v3: Uint);
-	TglProgramUniform4uiv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
+	TglProgramUniform4uiv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PUint);
 	TglProgramUniformMatrix2fv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei; transpose: Boolean;  value: PFloat);
 	TglProgramUniformMatrix3fv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei; transpose: Boolean;  value: PFloat);
 	TglProgramUniformMatrix4fv* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei; transpose: Boolean;  value: PFloat);
@@ -1895,9 +1888,9 @@ TYPE
 	TglViewportArrayv* = PROCEDURE{C}(first: Uint; count: Sizei;  v: PFloat);
 	TglViewportIndexedf* = PROCEDURE{C}(index: Uint; x: Float; y: Float; w: Float; h: Float);
 	TglViewportIndexedfv* = PROCEDURE{C}(index: Uint;  v: PFloat);
-	TglScissorArrayv* = PROCEDURE{C}(first: Uint; count: Sizei;  v: Pint);
+	TglScissorArrayv* = PROCEDURE{C}(first: Uint; count: Sizei;  v: PInt);
 	TglScissorIndexed* = PROCEDURE{C}(index: Uint; left: Int; bottom: Int; width: Sizei; height: Sizei);
-	TglScissorIndexedv* = PROCEDURE{C}(index: Uint;  v: Pint);
+	TglScissorIndexedv* = PROCEDURE{C}(index: Uint;  v: PInt);
 	TglDepthRangeArrayv* = PROCEDURE{C}(first: Uint; count: Sizei;  v: PClampd);
 	TglDepthRangeIndexed* = PROCEDURE{C}(index: Uint; n: Clampd; f: Clampd);
 	TglGetFloati_v* = PROCEDURE{C}(target: Enum; index: Uint; data: PFloat);
@@ -1912,9 +1905,9 @@ TYPE
 	TglDrawTransformFeedbackInstanced* = PROCEDURE{C}(mode : Enum; id : Uint; primcount : Sizei);
 	TglDrawTransformFeedbackStreamInstanced* = PROCEDURE{C}(mode : Enum; id : Uint; stream : Uint; primcount : Sizei);
 	(*  GL_ARB_internalformat_query  *)
-	TglGetInternalformativ* = PROCEDURE{C}(target : Enum; internalformat : Enum; pname : Enum; bufSize : Sizei; params : Pint);
+	TglGetInternalformativ* = PROCEDURE{C}(target : Enum; internalformat : Enum; pname : Enum; bufSize : Sizei; params : PInt);
 	(*  GL_ARB_shader_atomic_counters  *)
-	TglGetActiveAtomicCounterBufferiv* = PROCEDURE{C}(xprogram : Uint; bufferIndex : Uint; pname : Enum; params : Pint);
+	TglGetActiveAtomicCounterBufferiv* = PROCEDURE{C}(xprogram : Uint; bufferIndex : Uint; pname : Enum; params : PInt);
 	(*  GL_ARB_shader_image_load_store  *)
 	TglBindImageTexture* = PROCEDURE{C}(xunit : Uint; texture : Uint; level :Int; layered : Boolean; layer : Int; access : Enum; format : Enum);
 	TglMemoryBarrier* = PROCEDURE{C}(barriers : Bitfield);
@@ -1928,21 +1921,21 @@ TYPE
 
 	(*! GL 4.3  *)
 	(* GL_KHR_debug  *)
-	TglDebugMessageControl* = PROCEDURE{C}(source : Enum; xtype : Enum; severity : Enum; count : Sizei;  ids : PInt; enabled : Boolean);
+	TglDebugMessageControl* = PROCEDURE{C}(source : Enum; xtype : Enum; severity : Enum; count : Sizei;  ids : PUint; enabled : Boolean);
 	TglDebugMessageInsert* = PROCEDURE{C}(source : Enum;  xtype : Enum; id : Uint; sverity : Enum; length : Sizei;  buf : PChar);
-	TglDebugMessageCallback* = PROCEDURE{C}(callback : Pointer (*TGLDEBUGPROC *);  userParam : Pointer);
-	TglGetDebugMessageLog* = PROCEDURE{C}(count : Uint; bufsize : Sizei; sources : PEnum; types : PEnum; ids : PInt; sverities : PEnum; lengths : PSizei; messagelog : PChar) : Uint;
+	TglDebugMessageCallback* = PROCEDURE{C}(callback : ADDRESS (*TGLDEBUGPROC *);  userParam : ADDRESS);
+	TglGetDebugMessageLog* = PROCEDURE{C}(count : Uint; bufsize : Sizei; sources : PEnum; types : PEnum; ids : PUint; sverities : PEnum; lengths : PSizei; messagelog : PChar) : Uint;
 	TglPushDebugGroup* = PROCEDURE{C}(source : Enum; id : Uint; length : Sizei;  messagex : PChar);
 	TglPopDebugGroup* = PROCEDURE{C}();
 	TglObjectLabel* = PROCEDURE{C}(identifier : Enum; name : Uint; length : Sizei;  labelx : PChar);
 	TglGetObjectLabel* = PROCEDURE{C}(identifier : Enum; name : Uint; bufsize : Sizei; length : PSizei; label_ : PChar);
-	TglObjectPtrLabel* = PROCEDURE{C}( ptr : Pointer; length : Sizei;  labelx : PChar);
-	TglGetObjectPtrLabel* = PROCEDURE{C}( ptr : Pointer; bufSize : Sizei; length : PSizei; labelx : PChar);
+	TglObjectPtrLabel* = PROCEDURE{C}( ptr : ADDRESS; length : Sizei;  labelx : PChar);
+	TglGetObjectPtrLabel* = PROCEDURE{C}( ptr : ADDRESS; bufSize : Sizei; length : PSizei; labelx : PChar);
 	(* GL_ARB_clear_buffer_object  *)
-	TglClearBufferData* = PROCEDURE{C}(target : Enum; internalformat : Enum; format : Enum; xtype : Enum;  data : Pointer);
-	TglClearBufferSubData* = PROCEDURE{C}(target : Enum; internalformat : Enum; offset : Intptr; size : Sizeiptr; format : Enum; xtype : Enum;  data : Pointer);
-	TglClearNamedBufferDataEXT* = PROCEDURE{C}(buffer : Uint; internalformat : Enum; format : Enum; xtype : Enum;  data : Pointer);
-	TglClearNamedBufferSubDataEXT* = PROCEDURE{C}(buffer : Uint; internalformat : Enum; format : Enum; xtype : Enum; offset : Sizeiptr; size : Sizeiptr;  data : Pointer);
+	TglClearBufferData* = PROCEDURE{C}(target : Enum; internalformat : Enum; format : Enum; xtype : Enum;  data : ADDRESS);
+	TglClearBufferSubData* = PROCEDURE{C}(target : Enum; internalformat : Enum; offset : Intptr; size : Sizeiptr; format : Enum; xtype : Enum;  data : ADDRESS);
+	TglClearNamedBufferDataEXT* = PROCEDURE{C}(buffer : Uint; internalformat : Enum; format : Enum; xtype : Enum;  data : ADDRESS);
+	TglClearNamedBufferSubDataEXT* = PROCEDURE{C}(buffer : Uint; internalformat : Enum; format : Enum; xtype : Enum; offset : Sizeiptr; size : Sizeiptr;  data : ADDRESS);
 	(* GL_ARB_compute_shader 1  *)
 	TglDispatchCompute* = PROCEDURE{C}(num_groups_x : Uint; num_groups_y : Uint; num_groups_z : Uint);
 	TglDispatchComputeIndirect* = PROCEDURE{C}(indirect : Intptr);
@@ -1958,11 +1951,11 @@ TYPE
 	(* GL_ARB_fragment_layer_viewport  *)
 	(* GL_ARB_framebuffer_no_attachments  *)
 	TglFramebufferParameteri* = PROCEDURE{C}(target : Enum; pname : Enum; param : Int);
-	TglGetFramebufferParameteriv* = PROCEDURE{C}(target : Enum; pname : Enum; params : Pint);
+	TglGetFramebufferParameteriv* = PROCEDURE{C}(target : Enum; pname : Enum; params : PInt);
 	TglNamedFramebufferParameteriEXT* = PROCEDURE{C}(framebuffer : Uint; pname : Enum; param : Int);
 	TglGetNamedFramebufferParameterivEXT* = PROCEDURE{C}(framebuffer : Uint; pname : Enum; param : Int);
 	(* GL_ARB_internalformat_query2  *)
-	TglGetInternalformati64v* = PROCEDURE{C}(target : Enum; internalformat : Enum; pname : Enum; bufSize : Sizei; params : Pint64);
+	TglGetInternalformati64v* = PROCEDURE{C}(target : Enum; internalformat : Enum; pname : Enum; bufSize : Sizei; params : PInt64);
 	(* GL_ARB_invalidate_subdata  *)
 	TglInvalidateTexSubImage* = PROCEDURE{C}(texture : Uint; level : Int; xoffset : Int; yoffset : Int; zoffset : Int; width : Sizei; height : Sizei; depth : Sizei);
 	TglInvalidateTexImage* = PROCEDURE{C}(texture : Uint; level : Int);
@@ -1971,13 +1964,13 @@ TYPE
 	TglInvalidateFramebuffer* = PROCEDURE{C}(target : Enum; numAttachments : Sizei;  attachments : PEnum);
 	TglInvalidateSubFramebuffer* = PROCEDURE{C}(target : Enum; numAttachments : Sizei;  attachments : PEnum; x : Int; y : Int; width : Sizei; height : Sizei);
 	(* GL_ARB_multi_draw_indirect  *)
-	TglMultiDrawArraysIndirect* = PROCEDURE{C}(mode : Enum;  indirect : Pointer; drawcount : Sizei; stride : Sizei);
-	TglMultiDrawElementsIndirect* = PROCEDURE{C}(mode : Enum; xtype : Enum;  indirect : Pointer; drawcount : Sizei; stride : Sizei);
+	TglMultiDrawArraysIndirect* = PROCEDURE{C}(mode : Enum;  indirect : ADDRESS; drawcount : Sizei; stride : Sizei);
+	TglMultiDrawElementsIndirect* = PROCEDURE{C}(mode : Enum; xtype : Enum;  indirect : ADDRESS; drawcount : Sizei; stride : Sizei);
 	(* GL_ARB_program_interface_query  *)
-	TglGetProgramInterfaceiv* = PROCEDURE{C}(programx : Uint; programInterface : Enum; pname : Enum; params : Pint);
+	TglGetProgramInterfaceiv* = PROCEDURE{C}(programx : Uint; programInterface : Enum; pname : Enum; params : PInt);
 	TglGetProgramResourceIndex* = PROCEDURE{C}(programx : Uint; programInterface : Enum;  name : PChar) : Uint;
 	TglGetProgramResourceName* = PROCEDURE{C}(programx : Uint; programInterface : Enum; index : Uint; bufSize : Sizei; length : PSizei; name : PChar);
-	TglGetProgramResourceiv* = PROCEDURE{C}(programx : Uint; programInterface : Enum; index : Uint; propCount : Sizei;  props : PEnum; bufSize : Sizei; length : PSizei; params : Pint);
+	TglGetProgramResourceiv* = PROCEDURE{C}(programx : Uint; programInterface : Enum; index : Uint; propCount : Sizei;  props : PEnum; bufSize : Sizei; length : PSizei; params : PInt);
 	TglGetProgramResourceLocation* = PROCEDURE{C}(programx : Uint; programInterface : Enum;  name : PChar) : Int;
 	TglGetProgramResourceLocationIndex* = PROCEDURE{C}(programx : Uint; programInterface : Enum;  name : PChar) : Int;
 	(* GL_ARB_robust_buffer_access_behavior  *)
@@ -2013,17 +2006,17 @@ TYPE
 	(* GL_ARB_cl_event  *)
 	TglCreateSyncFromCLeventARB* = PROCEDURE{C}(context: p_cl_context; event: p_cl_event; flags: Bitfield): GLsync;
 	(* GL_ARB_debug_output *)
-	TglDebugMessageControlARB* = PROCEDURE{C}(source: Enum; xtype: Enum; severity: Enum; count: Sizei;  ids: PInt; enabled: Boolean);
+	TglDebugMessageControlARB* = PROCEDURE{C}(source: Enum; xtype: Enum; severity: Enum; count: Sizei;  ids: PUint; enabled: Boolean);
 	TglDebugMessageInsertARB* = PROCEDURE{C}(source: Enum; xtype: Enum; id: Uint; severity: Enum; length: Sizei;  buf: PChar);
 	(* TglDebugMessageCallbackARB  = PROCEDURE{C}(callback: TglDebugProcARB;  userParam: PVoid);  *)
-	TglGetDebugMessageLogARB* = PROCEDURE{C}(count: Uint; bufsize: Sizei; sources: PEnum; types: PEnum; ids: PInt; severities: PEnum; lengths: PSizei; messageLog: PChar): Uint;
+	TglGetDebugMessageLogARB* = PROCEDURE{C}(count: Uint; bufsize: Sizei; sources: PEnum; types: PEnum; ids: PUint; severities: PEnum; lengths: PSizei; messageLog: PChar): Uint;
 	(* GL_ARB_robustness *)
 	TglGetGraphicsResetStatusARB* = PROCEDURE{C}(): Enum;
 	TglGetnMapdvARB* = PROCEDURE{C}(target: Enum; query: Enum; bufSize: Sizei; v: PDouble);
 	TglGetnMapfvARB* = PROCEDURE{C}(target: Enum; query: Enum; bufSize: Sizei; v: PFloat);
-	TglGetnMapivARB* = PROCEDURE{C}(target: Enum; query: Enum; bufSize: Sizei; v: Pint);
+	TglGetnMapivARB* = PROCEDURE{C}(target: Enum; query: Enum; bufSize: Sizei; v: PInt);
 	TglGetnPixelMapfvARB* = PROCEDURE{C}(map: Enum; bufSize: Sizei; values: PFloat);
-	TglGetnPixelMapuivARB* = PROCEDURE{C}(map: Enum; bufSize: Sizei; values: PInt);
+	TglGetnPixelMapuivARB* = PROCEDURE{C}(map: Enum; bufSize: Sizei; values: PUint);
 	TglGetnPixelMapusvARB* = PROCEDURE{C}(map: Enum; bufSize: Sizei; values: PUshort);
 	TglGetnPolygonStippleARB* = PROCEDURE{C}(bufSize: Sizei; pattern: PUbyte);
 	TglGetnColorTableARB* = PROCEDURE{C}(target: Enum; format: Enum; xtype: Enum; bufSize: Sizei; table: PVoid);
@@ -2035,8 +2028,8 @@ TYPE
 	TglReadnPixelsARB* = PROCEDURE{C}(x: Int; y: Int; width: Sizei; height: Sizei; format: Enum; xtype: Enum; bufSize: Sizei; data: PVoid);
 	TglGetnCompressedTexImageARB* = PROCEDURE{C}(target: Enum; lod: Int; bufSize: Sizei; img: PVoid);
 	TglGetnUniformfvARB* = PROCEDURE{C}(xprogram: Uint; location: Int; bufSize: Sizei; params: PFloat);
-	TglGetnUniformivARB* = PROCEDURE{C}(xprogram: Uint; location: Int; bufSize: Sizei; params: Pint);
-	TglGetnUniformuivARB* = PROCEDURE{C}(xprogram: Uint; location: Int; bufSize: Sizei; params: PInt);
+	TglGetnUniformivARB* = PROCEDURE{C}(xprogram: Uint; location: Int; bufSize: Sizei; params: PInt);
+	TglGetnUniformuivARB* = PROCEDURE{C}(xprogram: Uint; location: Int; bufSize: Sizei; params: PUint);
 	TglGetnUniformdvARB* = PROCEDURE{C}(xprogram: Uint; location: Int; bufSize: Sizei; params: PDouble);
 	(* GL_ATI_draw_buffers  *)
 	TglDrawBuffersATI* = PROCEDURE{C}(n: Sizei;  bufs: PEnum);
@@ -2045,9 +2038,9 @@ TYPE
 	TglDrawElementArrayATI* = PROCEDURE{C}(mode: Enum; count: Sizei);
 	TglDrawRangeElementArrayATI* = PROCEDURE{C}(mode: Enum; start: Uint; xend: Uint; count: Sizei);
 	(* GL_ATI_envmap_bumpmap  *)
-	TglTexBumpParameterivATI* = PROCEDURE{C}(pname: Enum;  param: Pint);
+	TglTexBumpParameterivATI* = PROCEDURE{C}(pname: Enum;  param: PInt);
 	TglTexBumpParameterfvATI* = PROCEDURE{C}(pname: Enum;  param: PFloat);
-	TglGetTexBumpParameterivATI* = PROCEDURE{C}(pname: Enum; param: Pint);
+	TglGetTexBumpParameterivATI* = PROCEDURE{C}(pname: Enum; param: PInt);
 	TglGetTexBumpParameterfvATI* = PROCEDURE{C}(pname: Enum; param: PFloat);
 	(* GL_ATI_fragment_shader  *)
 	TglGenFragmentShadersATI* = PROCEDURE{C}(range: Uint): Uint;
@@ -2078,23 +2071,23 @@ TYPE
 	TglIsObjectBufferATI* = PROCEDURE{C}(buffer: Uint): Boolean;
 	TglUpdateObjectBufferATI* = PROCEDURE{C}(buffer: Uint; offset: Uint; size: Sizei;  xpointer: PVoid; preserve: Enum);
 	TglGetObjectBufferfvATI* = PROCEDURE{C}(buffer: Uint; pname: Enum; params: PFloat);
-	TglGetObjectBufferivATI* = PROCEDURE{C}(buffer: Uint; pname: Enum; params: Pint);
+	TglGetObjectBufferivATI* = PROCEDURE{C}(buffer: Uint; pname: Enum; params: PInt);
 	TglFreeObjectBufferATI* = PROCEDURE{C}(buffer: Uint);
 	TglArrayObjectATI* = PROCEDURE{C}(xarray: Enum; size: Int; xtype: Enum; stride: Sizei; buffer: Uint; offset: Uint);
 	TglGetArrayObjectfvATI* = PROCEDURE{C}(xarray: Enum; pname: Enum; params: PFloat);
-	TglGetArrayObjectivATI* = PROCEDURE{C}(xarray: Enum; pname: Enum; params: Pint);
+	TglGetArrayObjectivATI* = PROCEDURE{C}(xarray: Enum; pname: Enum; params: PInt);
 	TglVariantArrayObjectATI* = PROCEDURE{C}(id: Uint; xtype: Enum; stride: Sizei; buffer: Uint; offset: Uint);
 	TglGetVariantArrayObjectfvATI* = PROCEDURE{C}(id: Uint; pname: Enum; params: PFloat);
-	TglGetVariantArrayObjectivATI* = PROCEDURE{C}(id: Uint; pname: Enum; params: Pint);
+	TglGetVariantArrayObjectivATI* = PROCEDURE{C}(id: Uint; pname: Enum; params: PInt);
 	(* GL_ATI_vertex_attrib_array_object  *)
 	TglVertexAttribArrayObjectATI* = PROCEDURE{C}(index: Uint; size: Int; xtype: Enum; normalized: Boolean; stride: Sizei; buffer: Uint; offset: Uint);
 	TglGetVertexAttribArrayObjectfvATI* = PROCEDURE{C}(index: Uint; pname: Enum; params: PFloat);
-	TglGetVertexAttribArrayObjectivATI* = PROCEDURE{C}(index: Uint; pname: Enum; params: Pint);
+	TglGetVertexAttribArrayObjectivATI* = PROCEDURE{C}(index: Uint; pname: Enum; params: PInt);
 	(* GL_ATI_vertex_streams  *)
 	TglVertexStream1sATI* = PROCEDURE{C}(stream: Enum; x: Short);
 	TglVertexStream1svATI* = PROCEDURE{C}(stream: Enum;  coords: PShort);
 	TglVertexStream1iATI* = PROCEDURE{C}(stream: Enum; x: Int);
-	TglVertexStream1ivATI* = PROCEDURE{C}(stream: Enum;  coords: Pint);
+	TglVertexStream1ivATI* = PROCEDURE{C}(stream: Enum;  coords: PInt);
 	TglVertexStream1fATI* = PROCEDURE{C}(stream: Enum; x: Float);
 	TglVertexStream1fvATI* = PROCEDURE{C}(stream: Enum;  coords: PFloat);
 	TglVertexStream1dATI* = PROCEDURE{C}(stream: Enum; x: Double);
@@ -2102,7 +2095,7 @@ TYPE
 	TglVertexStream2sATI* = PROCEDURE{C}(stream: Enum; x: Short; y: Short);
 	TglVertexStream2svATI* = PROCEDURE{C}(stream: Enum;  coords: PShort);
 	TglVertexStream2iATI* = PROCEDURE{C}(stream: Enum; x: Int; y: Int);
-	TglVertexStream2ivATI* = PROCEDURE{C}(stream: Enum;  coords: Pint);
+	TglVertexStream2ivATI* = PROCEDURE{C}(stream: Enum;  coords: PInt);
 	TglVertexStream2fATI* = PROCEDURE{C}(stream: Enum; x: Float; y: Float);
 	TglVertexStream2fvATI* = PROCEDURE{C}(stream: Enum;  coords: PFloat);
 	TglVertexStream2dATI* = PROCEDURE{C}(stream: Enum; x: Double; y: Double);
@@ -2110,7 +2103,7 @@ TYPE
 	TglVertexStream3sATI* = PROCEDURE{C}(stream: Enum; x: Short; y: Short; z: Short);
 	TglVertexStream3svATI* = PROCEDURE{C}(stream: Enum;  coords: PShort);
 	TglVertexStream3iATI* = PROCEDURE{C}(stream: Enum; x: Int; y: Int; z: Int);
-	TglVertexStream3ivATI* = PROCEDURE{C}(stream: Enum;  coords: Pint);
+	TglVertexStream3ivATI* = PROCEDURE{C}(stream: Enum;  coords: PInt);
 	TglVertexStream3fATI* = PROCEDURE{C}(stream: Enum; x: Float; y: Float; z: Float);
 	TglVertexStream3fvATI* = PROCEDURE{C}(stream: Enum;  coords: PFloat);
 	TglVertexStream3dATI* = PROCEDURE{C}(stream: Enum; x: Double; y: Double; z: Double);
@@ -2118,7 +2111,7 @@ TYPE
 	TglVertexStream4sATI* = PROCEDURE{C}(stream: Enum; x: Short; y: Short; z: Short; w: Short);
 	TglVertexStream4svATI* = PROCEDURE{C}(stream: Enum;  coords: PShort);
 	TglVertexStream4iATI* = PROCEDURE{C}(stream: Enum; x: Int; y: Int; z: Int; w: Int);
-	TglVertexStream4ivATI* = PROCEDURE{C}(stream: Enum;  coords: Pint);
+	TglVertexStream4ivATI* = PROCEDURE{C}(stream: Enum;  coords: PInt);
 	TglVertexStream4fATI* = PROCEDURE{C}(stream: Enum; x: Float; y: Float; z: Float; w: Float);
 	TglVertexStream4fvATI* = PROCEDURE{C}(stream: Enum;  coords: PFloat);
 	TglVertexStream4dATI* = PROCEDURE{C}(stream: Enum; x: Double; y: Double; z: Double; w: Double);
@@ -2128,7 +2121,7 @@ TYPE
 	TglNormalStream3sATI* = PROCEDURE{C}(stream: Enum; nx: Short; ny: Short; nz: Short);
 	TglNormalStream3svATI* = PROCEDURE{C}(stream: Enum;  coords: PShort);
 	TglNormalStream3iATI* = PROCEDURE{C}(stream: Enum; nx: Int; ny: Int; nz: Int);
-	TglNormalStream3ivATI* = PROCEDURE{C}(stream: Enum;  coords: Pint);
+	TglNormalStream3ivATI* = PROCEDURE{C}(stream: Enum;  coords: PInt);
 	TglNormalStream3fATI* = PROCEDURE{C}(stream: Enum; nx: Float; ny: Float; nz: Float);
 	TglNormalStream3fvATI* = PROCEDURE{C}(stream: Enum;  coords: PFloat);
 	TglNormalStream3dATI* = PROCEDURE{C}(stream: Enum; nx: Double; ny: Double; nz: Double);
@@ -2137,17 +2130,17 @@ TYPE
 	TglVertexBlendEnviATI* = PROCEDURE{C}(pname: Enum; param: Int);
 	TglVertexBlendEnvfATI* = PROCEDURE{C}(pname: Enum; param: Float);
 	(* GL_AMD_performance_monitor  *)
-	TglGetPerfMonitorGroupsAMD* = PROCEDURE{C}(numGroups: Pint; groupsSize: Sizei; groups: PInt);
-	TglGetPerfMonitorCountersAMD* = PROCEDURE{C}(group: Uint; numCounters: Pint; maxActiveCouters: Pint; counterSize: Sizei; counters: PInt);
+	TglGetPerfMonitorGroupsAMD* = PROCEDURE{C}(numGroups: PInt; groupsSize: Sizei; groups: PUint);
+	TglGetPerfMonitorCountersAMD* = PROCEDURE{C}(group: Uint; numCounters: PInt; maxActiveCouters: PInt; counterSize: Sizei; counters: PUint);
 	TglGetPerfMonitorGroupStringAMD* = PROCEDURE{C}(group: Uint; bufSize: Sizei; length: PSizei; groupString: PChar);
 	TglGetPerfMonitorCounterStringAMD* = PROCEDURE{C}(group: Uint; counter: Uint; bufSize: Sizei; length: PSizei; counterString: PChar);
-	TglGetPerfMonitorCounterInfoAMD* = PROCEDURE{C}(group: Uint; counter: Uint; pname: Enum; data: Pointer);
-	TglGenPerfMonitorsAMD* = PROCEDURE{C}(n: Sizei; monitors: PInt);
-	TglDeletePerfMonitorsAMD* = PROCEDURE{C}(n: Sizei; monitors: PInt);
-	TglSelectPerfMonitorCountersAMD* = PROCEDURE{C}(monitor: Uint; enable: Boolean; group: Uint; numCounters: Int; counterList: PInt);
+	TglGetPerfMonitorCounterInfoAMD* = PROCEDURE{C}(group: Uint; counter: Uint; pname: Enum; data: ADDRESS);
+	TglGenPerfMonitorsAMD* = PROCEDURE{C}(n: Sizei; monitors: PUint);
+	TglDeletePerfMonitorsAMD* = PROCEDURE{C}(n: Sizei; monitors: PUint);
+	TglSelectPerfMonitorCountersAMD* = PROCEDURE{C}(monitor: Uint; enable: Boolean; group: Uint; numCounters: Int; counterList: PUint);
 	TglBeginPerfMonitorAMD* = PROCEDURE{C}(monitor: Uint);
 	TglEndPerfMonitorAMD* = PROCEDURE{C}(monitor: Uint);
-	TglGetPerfMonitorCounterDataAMD* = PROCEDURE{C}(monitor: Uint; pname: Enum; dataSize: Sizei; data: PInt; bytesWritten: Pint);
+	TglGetPerfMonitorCounterDataAMD* = PROCEDURE{C}(monitor: Uint; pname: Enum; dataSize: Sizei; data: PUint; bytesWritten: PInt);
 	(* GL_AMD_vertex_shader_tesselator  *)
 	TglTessellationFactorAMD* = PROCEDURE{C}(factor: Float);
 	TglTessellationModeAMD* = PROCEDURE{C}(mode: Enum);
@@ -2157,14 +2150,14 @@ TYPE
 	TglBlendEquationIndexedAMD* = PROCEDURE{C}(buf: Uint; mode: Enum);
 	TglBlendEquationSeparateIndexedAMD* = PROCEDURE{C}(buf: Uint; modeRGB: Enum; modeAlpha: Enum);
 	(* GL_AMD_name_gen_delete  *)
-	TglGenNamesAMD* = PROCEDURE{C}(identifier: Enum; num: Uint; names: PInt);
-	TglDeleteNamesAMD* = PROCEDURE{C}(identifier: Enum; num: Uint;  names: PInt);
+	TglGenNamesAMD* = PROCEDURE{C}(identifier: Enum; num: Uint; names: PUint);
+	TglDeleteNamesAMD* = PROCEDURE{C}(identifier: Enum; num: Uint;  names: PUint);
 	TglIsNameAMD* = PROCEDURE{C}(identifier: Enum; name: Uint): Boolean;
 	(* GL_AMD_debug_output  *)
-	TglDebugMessageEnableAMD* = PROCEDURE{C}(category: Enum; severity: Enum; count: Sizei;  ids: PInt; enabled: Boolean);
+	TglDebugMessageEnableAMD* = PROCEDURE{C}(category: Enum; severity: Enum; count: Sizei;  ids: PUint; enabled: Boolean);
 	TglDebugMessageInsertAMD* = PROCEDURE{C}(category: Enum; severity: Enum; id: Uint; length: Sizei;  buf: PChar);
 	(* TglDebugMessageCallbackAMD  = PROCEDURE{C}(callback: TGLDebugProcAMD; userParam: PVoid);   *)
-	TglGetDebugMessageLogAMD* = PROCEDURE{C}(count: Uint; bufsize: Sizei; categories: PEnum; severities: PInt; ids: PInt; lengths: PSizei; message: PChar): Uint;
+	TglGetDebugMessageLogAMD* = PROCEDURE{C}(count: Uint; bufsize: Sizei; categories: PEnum; severities: PUint; ids: PUint; lengths: PSizei; message: PChar): Uint;
 	(* GL_EXT_blend_color  *)
 	TglBlendColorEXT* = PROCEDURE{C}(red: Clampf; green: Clampf; blue: Clampf; alpha: Clampf);
 	(* GL_EXT_blend_func_separate  *)
@@ -2183,12 +2176,12 @@ TYPE
 	TglConvolutionParameterfEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: Float);
 	TglConvolutionParameterfvEXT* = PROCEDURE{C}(target: Enum; pname: Enum;  params: PFloat);
 	TglConvolutionParameteriEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: Int);
-	TglConvolutionParameterivEXT* = PROCEDURE{C}(target: Enum; pname: Enum;  params: Pint);
+	TglConvolutionParameterivEXT* = PROCEDURE{C}(target: Enum; pname: Enum;  params: PInt);
 	TglCopyConvolutionFilter1DEXT* = PROCEDURE{C}(target: Enum; internalformat: Enum; x: Int; y: Int; width: Sizei);
 	TglCopyConvolutionFilter2DEXT* = PROCEDURE{C}(target: Enum; internalformat: Enum; x: Int; y: Int; width: Sizei; height: Sizei);
 	TglGetConvolutionFilterEXT* = PROCEDURE{C}(target: Enum; format: Enum; xtype: Enum; image: PVoid);
 	TglGetConvolutionParameterfvEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: PFloat);
-	TglGetConvolutionParameterivEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint);
+	TglGetConvolutionParameterivEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
 	TglGetSeparableFilterEXT* = PROCEDURE{C}(target: Enum; format: Enum; xtype: Enum; row: PVoid; column: PVoid; span: PVoid);
 	TglSeparableFilter2DEXT* = PROCEDURE{C}(target: Enum; internalformat: Enum; width: Sizei; height: Sizei; format: Enum; xtype: Enum;  row: PVoid;  column: PVoid);
 	(* GL_EXT_coordinate_frame  *)
@@ -2199,7 +2192,7 @@ TYPE
 	TglTangent3fEXT* = PROCEDURE{C}(tx: Float; ty: Float; tz: Float);
 	TglTangent3fvEXT* = PROCEDURE{C}( v: PFloat);
 	TglTangent3iEXT* = PROCEDURE{C}(tx: Int; ty: Int; tz: Int);
-	TglTangent3ivEXT* = PROCEDURE{C}( v: Pint);
+	TglTangent3ivEXT* = PROCEDURE{C}( v: PInt);
 	TglTangent3sEXT* = PROCEDURE{C}(tx: Short; ty: Short; tz: Short);
 	TglTangent3svEXT* = PROCEDURE{C}( v: PShort);
 	TglBinormal3bEXT* = PROCEDURE{C}(bx: Byte; by: Byte; bz: Byte);
@@ -2209,7 +2202,7 @@ TYPE
 	TglBinormal3fEXT* = PROCEDURE{C}(bx: Float; by: Float; bz: Float);
 	TglBinormal3fvEXT* = PROCEDURE{C}( v: PFloat);
 	TglBinormal3iEXT* = PROCEDURE{C}(bx: Int; by: Int; bz: Int);
-	TglBinormal3ivEXT* = PROCEDURE{C}( v: Pint);
+	TglBinormal3ivEXT* = PROCEDURE{C}( v: PInt);
 	TglBinormal3sEXT* = PROCEDURE{C}(bx: Short; by: Short; bz: Short);
 	TglBinormal3svEXT* = PROCEDURE{C}( v: PShort);
 	TglTangentPointerEXT* = PROCEDURE{C}(xtype: Enum; stride: Sizei;  xpointer: PVoid);
@@ -2234,28 +2227,28 @@ TYPE
 	(* GL_EXT_framebuffer_object  *)
 	TglIsRenderbufferEXT* = PROCEDURE{C}(renderbuffer: Uint): BOOLEAN;
 	TglBindRenderbufferEXT* = PROCEDURE{C}(target: Enum; renderbuffer: Uint);
-	TglDeleteRenderbuffersEXT* = PROCEDURE{C}(n: Sizei;  renderbuffers: PInt);
-	TglGenRenderbuffersEXT* = PROCEDURE{C}(n: Sizei; renderbuffers: PInt);
+	TglDeleteRenderbuffersEXT* = PROCEDURE{C}(n: Sizei;  renderbuffers: PUint);
+	TglGenRenderbuffersEXT* = PROCEDURE{C}(n: Sizei; renderbuffers: PUint);
 	TglRenderbufferStorageEXT* = PROCEDURE{C}(target: Enum; internalformat: Enum; width: Sizei; height: Sizei);
-	TglGetRenderbufferParameterivEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint);
+	TglGetRenderbufferParameterivEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
 	TglIsFramebufferEXT* = PROCEDURE{C}(framebuffer: Uint): BOOLEAN;
 	TglBindFramebufferEXT* = PROCEDURE{C}(target: Enum; framebuffer: Uint);
-	TglDeleteFramebuffersEXT* = PROCEDURE{C}(n: Sizei;  framebuffers: PInt);
-	TglGenFramebuffersEXT* = PROCEDURE{C}(n: Sizei; framebuffers: PInt);
+	TglDeleteFramebuffersEXT* = PROCEDURE{C}(n: Sizei;  framebuffers: PUint);
+	TglGenFramebuffersEXT* = PROCEDURE{C}(n: Sizei; framebuffers: PUint);
 	TglCheckFramebufferStatusEXT* = PROCEDURE{C}(target: Enum): Enum;
 	TglFramebufferTexture1DEXT* = PROCEDURE{C}(target: Enum; attachment: Enum; textarget: Enum; texture: Uint; level: Int);
 	TglFramebufferTexture2DEXT* = PROCEDURE{C}(target: Enum; attachment: Enum; textarget: Enum; texture: Uint; level: Int);
 	TglFramebufferTexture3DEXT* = PROCEDURE{C}(target: Enum; attachment: Enum; textarget: Enum; texture: Uint; level: Int; zoffset: Int);
 	TglFramebufferRenderbufferEXT* = PROCEDURE{C}(target: Enum; attachment: Enum; renderbuffertarget: Enum; renderbuffer: Uint);
-	TglGetFramebufferAttachmentParameterivEXT* = PROCEDURE{C}(target: Enum; attachment: Enum; pname: Enum; params: Pint);
+	TglGetFramebufferAttachmentParameterivEXT* = PROCEDURE{C}(target: Enum; attachment: Enum; pname: Enum; params: PInt);
 	TglGenerateMipmapEXT* = PROCEDURE{C}(target: Enum);
 	(* GL_EXT_histogram  *)
 	TglGetHistogramEXT* = PROCEDURE{C}(target: Enum; reset: Boolean; format: Enum; xtype: Enum; values: PVoid);
 	TglGetHistogramParameterfvEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: PFloat);
-	TglGetHistogramParameterivEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint);
+	TglGetHistogramParameterivEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
 	TglGetMinmaxEXT* = PROCEDURE{C}(target: Enum; reset: Boolean; format: Enum; xtype: Enum; values: PVoid);
 	TglGetMinmaxParameterfvEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: PFloat);
-	TglGetMinmaxParameterivEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint);
+	TglGetMinmaxParameterivEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
 	TglHistogramEXT* = PROCEDURE{C}(target: Enum; width: Sizei; internalformat: Enum; sink: Boolean);
 	TglMinmaxEXT* = PROCEDURE{C}(target: Enum; internalformat: Enum; sink: Boolean);
 	TglResetHistogramEXT* = PROCEDURE{C}(target: Enum);
@@ -2269,7 +2262,7 @@ TYPE
 	TglTextureLightEXT* = PROCEDURE{C}(pname: Enum);
 	TglTextureMaterialEXT* = PROCEDURE{C}(face: Enum; mode: Enum);
 	(* GL_EXT_multi_draw_arrays  *)
-	TglMultiDrawArraysEXT* = PROCEDURE{C}(mode: Enum; first: Pint; count: PSizei; primcount: Sizei);
+	TglMultiDrawArraysEXT* = PROCEDURE{C}(mode: Enum; first: PInt; count: PSizei; primcount: Sizei);
 	TglMultiDrawElementsEXT* = PROCEDURE{C}(mode: Enum;  count: PSizei; xtype: Enum;  indices: PVoid; primcount: Sizei);
 	(* GL_EXT_multisample  *)
 	TglSampleMaskEXT* = PROCEDURE{C}(value: Clampf; invert: Boolean);
@@ -2277,12 +2270,12 @@ TYPE
 	(* GL_EXT_paletted_texture  *)
 	TglColorTableEXT* = PROCEDURE{C}(target: Enum; internalFormat: Enum; width: Sizei; format: Enum; xtype: Enum;  table: PVoid);
 	TglGetColorTableEXT* = PROCEDURE{C}(target: Enum; format: Enum; xtype: Enum; data: PVoid);
-	TglGetColorTableParameterivEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint);
+	TglGetColorTableParameterivEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
 	TglGetColorTableParameterfvEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: PFloat);
 	(* GL_EXT_pixel_transform  *)
 	TglPixelTransformParameteriEXT* = PROCEDURE{C}(target: Enum; pname: Enum; param: Int);
 	TglPixelTransformParameterfEXT* = PROCEDURE{C}(target: Enum; pname: Enum; param: Float);
-	TglPixelTransformParameterivEXT* = PROCEDURE{C}(target: Enum; pname: Enum;  params: Pint);
+	TglPixelTransformParameterivEXT* = PROCEDURE{C}(target: Enum; pname: Enum;  params: PInt);
 	TglPixelTransformParameterfvEXT* = PROCEDURE{C}(target: Enum; pname: Enum;  params: PFloat);
 	(* GL_EXT_point_parameters  *)
 	TglPointParameterfEXT* = PROCEDURE{C}(pname: Enum; param: Float);
@@ -2297,13 +2290,13 @@ TYPE
 	TglSecondaryColor3fEXT* = PROCEDURE{C}(red: Float; green: Float; blue: Float);
 	TglSecondaryColor3fvEXT* = PROCEDURE{C}( v: PFloat);
 	TglSecondaryColor3iEXT* = PROCEDURE{C}(red: Int; green: Int; blue: Int);
-	TglSecondaryColor3ivEXT* = PROCEDURE{C}( v: Pint);
+	TglSecondaryColor3ivEXT* = PROCEDURE{C}( v: PInt);
 	TglSecondaryColor3sEXT* = PROCEDURE{C}(red: Short; green: Short; blue: Short);
 	TglSecondaryColor3svEXT* = PROCEDURE{C}( v: PShort);
 	TglSecondaryColor3ubEXT* = PROCEDURE{C}(red: Ubyte; green: Ubyte; blue: Ubyte);
 	TglSecondaryColor3ubvEXT* = PROCEDURE{C}( v: PUbyte);
 	TglSecondaryColor3uiEXT* = PROCEDURE{C}(red: Uint; green: Uint; blue: Uint);
-	TglSecondaryColor3uivEXT* = PROCEDURE{C}( v: PInt);
+	TglSecondaryColor3uivEXT* = PROCEDURE{C}( v: PUint);
 	TglSecondaryColor3usEXT* = PROCEDURE{C}(red: Ushort; green: Ushort; blue: Ushort);
 	TglSecondaryColor3usvEXT* = PROCEDURE{C}( v: PUshort);
 	TglSecondaryColorPointerEXT* = PROCEDURE{C}(size: Int; xtype: Enum; stride: Sizei;  xpointer: PVoid);
@@ -2316,12 +2309,12 @@ TYPE
 	TglTexImage3DEXT* = PROCEDURE{C}(target: Enum; level: Int; internalformat: Enum; width: Sizei; height: Sizei; depth: Sizei; border: Int; format: Enum; xtype: Enum;  pixels: PVoid);
 	TglTexSubImage3DEXT* = PROCEDURE{C}(target: Enum; level: Int; xoffset: Int; yoffset: Int; zoffset: Int; width: Sizei; height: Sizei; depth: Sizei; format: Enum; xtype: Enum;  pixels: PVoid);
 	(* GL_EXT_texture_object  *)
-	TglAreTexturesResidentEXT* = PROCEDURE{C}(n: Sizei;  textures: PInt; residences: PBoolean): Boolean;
+	TglAreTexturesResidentEXT* = PROCEDURE{C}(n: Sizei;  textures: PUint; residences: PBoolean): Boolean;
 	TglBindTextureEXT* = PROCEDURE{C}(target: Enum; texture: Uint);
-	TglDeleteTexturesEXT* = PROCEDURE{C}(n: Sizei;  textures: PInt);
-	TglGenTexturesEXT* = PROCEDURE{C}(n: Sizei; textures: PInt);
+	TglDeleteTexturesEXT* = PROCEDURE{C}(n: Sizei;  textures: PUint);
+	TglGenTexturesEXT* = PROCEDURE{C}(n: Sizei; textures: PUint);
 	TglIsTextureEXT* = PROCEDURE{C}(texture: Uint): Boolean;
-	TglPrioritizeTexturesEXT* = PROCEDURE{C}(n: Sizei;  textures: PInt;  priorities: PClampf);
+	TglPrioritizeTexturesEXT* = PROCEDURE{C}(n: Sizei;  textures: PUint;  priorities: PClampf);
 	(* GL_EXT_texture_perturb_normal  *)
 	TglTextureNormalEXT* = PROCEDURE{C}(mode: Enum);
 	(* GL_EXT_vertex_array  *)
@@ -2352,12 +2345,12 @@ TYPE
 	TglSetLocalConstantEXT* = PROCEDURE{C}(id: Uint; xtype: Enum;  addr: PVoid);
 	TglVariantbvEXT* = PROCEDURE{C}(id: Uint;  addr: PByte);
 	TglVariantsvEXT* = PROCEDURE{C}(id: Uint;  addr: PShort);
-	TglVariantivEXT* = PROCEDURE{C}(id: Uint;  addr: Pint);
+	TglVariantivEXT* = PROCEDURE{C}(id: Uint;  addr: PInt);
 	TglVariantfvEXT* = PROCEDURE{C}(id: Uint;  addr: PFloat);
 	TglVariantdvEXT* = PROCEDURE{C}(id: Uint;  addr: PDouble);
 	TglVariantubvEXT* = PROCEDURE{C}(id: Uint;  addr: PUbyte);
 	TglVariantusvEXT* = PROCEDURE{C}(id: Uint;  addr: PUshort);
-	TglVariantuivEXT* = PROCEDURE{C}(id: Uint;  addr: PInt);
+	TglVariantuivEXT* = PROCEDURE{C}(id: Uint;  addr: PUint);
 	TglVariantPointerEXT* = PROCEDURE{C}(id: Uint; xtype: Enum; stride: Uint;  addr: PVoid);
 	TglEnableVariantClientStateEXT* = PROCEDURE{C}(id: Uint);
 	TglDisableVariantClientStateEXT* = PROCEDURE{C}(id: Uint);
@@ -2368,14 +2361,14 @@ TYPE
 	TglBindParameterEXT* = PROCEDURE{C}(value: Enum): Uint;
 	TglIsVariantEnabledEXT* = PROCEDURE{C}(id: Uint; cap: Enum): Boolean;
 	TglGetVariantBooleanvEXT* = PROCEDURE{C}(id: Uint; value: Enum; data: PBoolean);
-	TglGetVariantIntegervEXT* = PROCEDURE{C}(id: Uint; value: Enum; data: Pint);
+	TglGetVariantIntegervEXT* = PROCEDURE{C}(id: Uint; value: Enum; data: PInt);
 	TglGetVariantFloatvEXT* = PROCEDURE{C}(id: Uint; value: Enum; data: PFloat);
 	TglGetVariantPointervEXT* = PROCEDURE{C}(id: Uint; value: Enum; data: PVoid);
 	TglGetInvariantBooleanvEXT* = PROCEDURE{C}(id: Uint; value: Enum; data: PBoolean);
-	TglGetInvariantIntegervEXT* = PROCEDURE{C}(id: Uint; value: Enum; data: Pint);
+	TglGetInvariantIntegervEXT* = PROCEDURE{C}(id: Uint; value: Enum; data: PInt);
 	TglGetInvariantFloatvEXT* = PROCEDURE{C}(id: Uint; value: Enum; data: PFloat);
 	TglGetLocalConstantBooleanvEXT* = PROCEDURE{C}(id: Uint; value: Enum; data: PBoolean);
-	TglGetLocalConstantIntegervEXT* = PROCEDURE{C}(id: Uint; value: Enum; data: Pint);
+	TglGetLocalConstantIntegervEXT* = PROCEDURE{C}(id: Uint; value: Enum; data: PInt);
 	TglGetLocalConstantFloatvEXT* = PROCEDURE{C}(id: Uint; value: Enum; data: PFloat);
 	(* GL_EXT_vertex_weighting  *)
 	TglVertexWeightfEXT* = PROCEDURE{C}(weight: Float);
@@ -2388,25 +2381,25 @@ TYPE
 	(* GL_EXT_framebuffer_multisample  *)
 	TglRenderbufferStorageMultisampleEXT* = PROCEDURE{C}(target: Enum; samples: Sizei; internalformat: Enum; width: Sizei; height: Sizei);
 	(* GL_EXT_timer_query  *)
-	TglGetQueryObjecti64vEXT* = PROCEDURE{C}(id: Uint; pname: Enum; params: Pint64EXT);
-	TglGetQueryObjectui64vEXT* = PROCEDURE{C}(id: Uint; pname: Enum; params: PInt64EXT);
+	TglGetQueryObjecti64vEXT* = PROCEDURE{C}(id: Uint; pname: Enum; params: PInt64EXT);
+	TglGetQueryObjectui64vEXT* = PROCEDURE{C}(id: Uint; pname: Enum; params: PUint64EXT);
 	(* GL_EXT_gpu_program_parameters  *)
 	TglProgramEnvParameters4fvEXT* = PROCEDURE{C}(target: Enum; index: Uint; count: Sizei;  params: PFloat);
 	TglProgramLocalParameters4fvEXT* = PROCEDURE{C}(target: Enum; index: Uint; count: Sizei;  params: PFloat);
 	(* GL_EXT_bindable_uniform  *)
 	TglUniformBufferEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; buffer: Uint);
 	TglGetUniformBufferSizeEXT* = PROCEDURE{C}(xprogram: Uint; location: Int): Int;
-	TglGetUniformOffsetEXT* = PROCEDURE{C}( xprogram: Uint; location: Int): Pint;
+	TglGetUniformOffsetEXT* = PROCEDURE{C}( xprogram: Uint; location: Int): PInt;
 	(* GL_EXT_draw_buffers2  *)
 	TglColorMaskIndexedEXT* = PROCEDURE{C}(buf: Uint; r: Boolean; g: Boolean; b: Boolean; a: Boolean);
 	TglGetBooleanIndexedvEXT* = PROCEDURE{C}(value: Enum; index: Uint; data: PBoolean);
-	TglGetIntegerIndexedvEXT* = PROCEDURE{C}(value: Enum; index: Uint; data: Pint);
+	TglGetIntegerIndexedvEXT* = PROCEDURE{C}(value: Enum; index: Uint; data: PInt);
 	TglEnableIndexedEXT* = PROCEDURE{C}(target: Enum; index: Uint);
 	TglDisableIndexedEXT* = PROCEDURE{C}(target: Enum; index: Uint);
 	TglIsEnabledIndexedEXT* = PROCEDURE{C}(target: Enum; index: Uint): Boolean;
 	(* GL_EXT_draw_instanced  *)
 	TglDrawArraysInstancedEXT* = PROCEDURE{C}(mode: Enum; first: Int; count: Sizei; primcount: Sizei);
-	TglDrawElementsInstancedEXT* = PROCEDURE{C}(mode: Enum; count: Sizei; xtype: Enum;  indices: Pointer; primcount: Sizei);
+	TglDrawElementsInstancedEXT* = PROCEDURE{C}(mode: Enum; count: Sizei; xtype: Enum;  indices: ADDRESS; primcount: Sizei);
 	(* GL_EXT_geometry_shader4  *)
 	TglProgramParameteriEXT* = PROCEDURE{C}(xprogram: Uint; pname: Enum; value: Int);
 	TglFramebufferTextureEXT* = PROCEDURE{C}(target: Enum; attachment: Enum; texture: Uint; level: Int);
@@ -2421,30 +2414,30 @@ TYPE
 	TglVertexAttribI2uiEXT* = PROCEDURE{C}(index: Uint; x: Uint; y: Uint);
 	TglVertexAttribI3uiEXT* = PROCEDURE{C}(index: Uint; x: Uint; y: Uint; z: Uint);
 	TglVertexAttribI4uiEXT* = PROCEDURE{C}(index: Uint; x: Uint; y: Uint; z: Uint; w: Uint);
-	TglVertexAttribI1ivEXT* = PROCEDURE{C}(index: Uint;  v: Pint);
-	TglVertexAttribI2ivEXT* = PROCEDURE{C}(index: Uint;  v: Pint);
-	TglVertexAttribI3ivEXT* = PROCEDURE{C}(index: Uint;  v: Pint);
-	TglVertexAttribI4ivEXT* = PROCEDURE{C}(index: Uint;  v: Pint);
-	TglVertexAttribI1uivEXT* = PROCEDURE{C}(index: Uint;  v: PInt);
-	TglVertexAttribI2uivEXT* = PROCEDURE{C}(index: Uint;  v: PInt);
-	TglVertexAttribI3uivEXT* = PROCEDURE{C}(index: Uint;  v: PInt);
-	TglVertexAttribI4uivEXT* = PROCEDURE{C}(index: Uint;  v: PInt);
+	TglVertexAttribI1ivEXT* = PROCEDURE{C}(index: Uint;  v: PInt);
+	TglVertexAttribI2ivEXT* = PROCEDURE{C}(index: Uint;  v: PInt);
+	TglVertexAttribI3ivEXT* = PROCEDURE{C}(index: Uint;  v: PInt);
+	TglVertexAttribI4ivEXT* = PROCEDURE{C}(index: Uint;  v: PInt);
+	TglVertexAttribI1uivEXT* = PROCEDURE{C}(index: Uint;  v: PUint);
+	TglVertexAttribI2uivEXT* = PROCEDURE{C}(index: Uint;  v: PUint);
+	TglVertexAttribI3uivEXT* = PROCEDURE{C}(index: Uint;  v: PUint);
+	TglVertexAttribI4uivEXT* = PROCEDURE{C}(index: Uint;  v: PUint);
 	TglVertexAttribI4bvEXT* = PROCEDURE{C}(index: Uint;  v: PByte);
 	TglVertexAttribI4svEXT* = PROCEDURE{C}(index: Uint;  v: PShort);
 	TglVertexAttribI4ubvEXT* = PROCEDURE{C}(index: Uint;  v: PUbyte);
 	TglVertexAttribI4usvEXT* = PROCEDURE{C}(index: Uint;  v: PUshort);
-	TglVertexAttribIPointerEXT* = PROCEDURE{C}(index: Uint; size: Int; xtype: Enum; stride: Sizei;  xpointer: Pointer);
-	TglGetVertexAttribIivEXT* = PROCEDURE{C}(index: Uint; pname: Enum; params: Pint);
-	TglGetVertexAttribIuivEXT* = PROCEDURE{C}(index: Uint; pname: Enum; params: PInt);
+	TglVertexAttribIPointerEXT* = PROCEDURE{C}(index: Uint; size: Int; xtype: Enum; stride: Sizei;  xpointer: ADDRESS);
+	TglGetVertexAttribIivEXT* = PROCEDURE{C}(index: Uint; pname: Enum; params: PInt);
+	TglGetVertexAttribIuivEXT* = PROCEDURE{C}(index: Uint; pname: Enum; params: PUint);
 	TglUniform1uiEXT* = PROCEDURE{C}(location: Int; v0: Uint);
 	TglUniform2uiEXT* = PROCEDURE{C}(location: Int; v0: Uint; v1: Uint);
 	TglUniform3uiEXT* = PROCEDURE{C}(location: Int; v0: Uint; v1: Uint; v2: Uint);
 	TglUniform4uiEXT* = PROCEDURE{C}(location: Int; v0: Uint; v1: Uint; v2: Uint; v3: Uint);
-	TglUniform1uivEXT* = PROCEDURE{C}(location: Int; count: Sizei;  value: PInt);
-	TglUniform2uivEXT* = PROCEDURE{C}(location: Int; count: Sizei;  value: PInt);
-	TglUniform3uivEXT* = PROCEDURE{C}(location: Int; count: Sizei;  value: PInt);
-	TglUniform4uivEXT* = PROCEDURE{C}(location: Int; count: Sizei;  value: PInt);
-	TglGetUniformuivEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; params: PInt);
+	TglUniform1uivEXT* = PROCEDURE{C}(location: Int; count: Sizei;  value: PUint);
+	TglUniform2uivEXT* = PROCEDURE{C}(location: Int; count: Sizei;  value: PUint);
+	TglUniform3uivEXT* = PROCEDURE{C}(location: Int; count: Sizei;  value: PUint);
+	TglUniform4uivEXT* = PROCEDURE{C}(location: Int; count: Sizei;  value: PUint);
+	TglGetUniformuivEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; params: PUint);
 	TglBindFragDataLocationEXT* = PROCEDURE{C}(xprogram: Uint; colorNumber: Uint; name: ADDRESS);
 	TglGetFragDataLocationEXT* = PROCEDURE{C}(xprogram: Uint; name: ADDRESS): Int;
 	(* GL_EXT_texture_array  *)
@@ -2454,16 +2447,16 @@ TYPE
 	(* GL_EXT_texture_integer  *)
 	TglClearColorIiEXT* = PROCEDURE{C}(r: Int; g: Int; b: Int; a: Int);
 	TglClearColorIuiEXT* = PROCEDURE{C}(r: Uint; g: Uint; b: Uint; a: Uint);
-	TglTexParameterIivEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint);
-	TglTexParameterIuivEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
-	TglGetTexParameterIivEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint);
-	TglGetTexParameterIiuvEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
+	TglTexParameterIivEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
+	TglTexParameterIuivEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: PUint);
+	TglGetTexParameterIivEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
+	TglGetTexParameterIiuvEXT* = PROCEDURE{C}(target: Enum; pname: Enum; params: PUint);
 	(* GL_HP_image_transform  *)
 	TglImageTransformParameteriHP* = PROCEDURE{C}(target: Enum; pname: Enum; param: Int);
 	TglImageTransformParameterfHP* = PROCEDURE{C}(target: Enum; pname: Enum; param: Float);
-	TglImageTransformParameterivHP* = PROCEDURE{C}(target: Enum; pname: Enum;  params: Pint);
+	TglImageTransformParameterivHP* = PROCEDURE{C}(target: Enum; pname: Enum;  params: PInt);
 	TglImageTransformParameterfvHP* = PROCEDURE{C}(target: Enum; pname: Enum;  params: PFloat);
-	TglGetImageTransformParameterivHP* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint);
+	TglGetImageTransformParameterivHP* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
 	TglGetImageTransformParameterfvHP* = PROCEDURE{C}(target: Enum; pname: Enum; params: PFloat);
 	(* GL_EXT_depth_bounds_test  *)
 	TglDepthBoundsEXT* = PROCEDURE{C}(zmin: Clampd; zmax: Clampd);
@@ -2475,8 +2468,8 @@ TYPE
 	TglBindBufferRangeEXT* = PROCEDURE{C}(target: Enum; index: Uint; buffer: Uint; offset: Sizei; size: Sizei);
 	TglBindBufferOffsetEXT* = PROCEDURE{C}(target: Enum; index: Uint; buffer: Uint; offset: Sizei);
 	TglBindBufferBaseEXT* = PROCEDURE{C}(target: Enum; index: Uint; buffer: Uint);
-	TglTransformFeedbackVaryingsEXT* = PROCEDURE{C}(xprogram: Uint; count: Sizei;  locations: Pint; bufferMode: Enum);
-	TglGetTransformFeedbackVaryingEXT* = PROCEDURE{C}(xprogram: Uint; index: Uint; location: Pint);
+	TglTransformFeedbackVaryingsEXT* = PROCEDURE{C}(xprogram: Uint; count: Sizei;  locations: PInt; bufferMode: Enum);
+	TglGetTransformFeedbackVaryingEXT* = PROCEDURE{C}(xprogram: Uint; index: Uint; location: PInt);
 	(* GL_EXT_direct_state_access  *)
 	TglClientAttribDefaultEXT* = PROCEDURE{C}(mask: Bitfield);
 	TglPushClientAttribDefaultEXT* = PROCEDURE{C}(mask: Bitfield);
@@ -2502,7 +2495,7 @@ TYPE
 	TglTextureParameterfEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum; param: Float);
 	TglTextureParameterfvEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum;  params: PFloat);
 	TglTextureParameteriEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum; param: Int);
-	TglTextureParameterivEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum;  params: Pint);
+	TglTextureParameterivEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum;  params: PInt);
 	TglTextureImage1DEXT* = PROCEDURE{C}(texture: Uint; target: Enum; level: Int; internalformat: Enum; width: Sizei; border: Int; format: Enum; xtype: Enum;  pixels: PVoid);
 	TglTextureImage2DEXT* = PROCEDURE{C}(texture: Uint; target: Enum; level: Int; internalformat: Enum; width: Sizei; height: Sizei; border: Int; format: Enum; xtype: Enum;  pixels: PVoid);
 	TglTextureSubImage1DEXT* = PROCEDURE{C}(texture: Uint; target: Enum; level: Int; xoffset: Int; width: Sizei; format: Enum; xtype: Enum;  pixels: PVoid);
@@ -2513,7 +2506,7 @@ TYPE
 	TglCopyTextureSubImage2DEXT* = PROCEDURE{C}(texture: Uint; target: Enum; level: Int; xoffset: Int; yoffset: Int; x: Int; y: Int; width: Sizei; height: Sizei);
 	TglGetTextureImageEXT* = PROCEDURE{C}(texture: Uint; target: Enum; level: Int; format: Enum; xtype: Enum; pixels: PVoid);
 	TglGetTextureParameterfvEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum; params: PFloat);
-	TglGetTextureParameterivEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum; params: Pint);
+	TglGetTextureParameterivEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum; params: PInt);
 	TglGetTextureLevelParameterfvEXT* = PROCEDURE{C}(texture: Uint; target: Enum; level: Int; pname: Enum; params: PFloat);
 	TglGetTextureLevelParameterivEXT* = PROCEDURE{C}(texture: Uint; target: Enum; level: Int; pname: Enum; params: Int);
 	TglTextureImage3DEXT* = PROCEDURE{C}(texture: Uint; target: Enum; level: Int; internalformat: Enum; width: Sizei; height: Sizei; depth: Sizei; border: Int; format: Enum; xtype: Enum;  pixels: PVoid);
@@ -2522,7 +2515,7 @@ TYPE
 	TglMultiTexParameterfEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; pname: Enum; param: Float);
 	TglMultiTexParameterfvEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; pname: Enum;  params: PFloat);
 	TglMultiTexParameteriEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; pname: Enum; param: Int);
-	TglMultiTexParameterivEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; pname: Enum;  params: Pint);
+	TglMultiTexParameterivEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; pname: Enum;  params: PInt);
 	TglMultiTexImage1DEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; level: Int; internalformat: Enum; width: Sizei; border: Int; format: Enum; xtype: Enum;  pixels: PVoid);
 	TglMultiTexImage2DEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; level: Int; internalformat: Enum; width: Sizei; height: Sizei; border: Int; format: Enum; xtype: Enum;  pixels: PVoid);
 	TglMultiTexSubImage1DEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; level: Int; xoffset: Int; width: Sizei; format: Enum; xtype: Enum;  pixels: PVoid);
@@ -2533,9 +2526,9 @@ TYPE
 	TglCopyMultiTexSubImage2DEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; level: Int; xoffset: Int; yoffset: Int; x: Int; y: Int; width: Sizei; height: Sizei);
 	TglGetMultiTexImageEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; level: Int; format: Enum; xtype: Enum; pixels: PVoid);
 	TglGetMultiTexParameterfvEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; pname: Enum; params: PFloat);
-	TglGetMultiTexParameterivEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; pname: Enum; params: Pint);
+	TglGetMultiTexParameterivEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; pname: Enum; params: PInt);
 	TglGetMultiTexLevelParameterfvEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; level: Int; pname: Enum; params: PFloat);
-	TglGetMultiTexLevelParameterivEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; level: Int; pname: Enum; params: Pint);
+	TglGetMultiTexLevelParameterivEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; level: Int; pname: Enum; params: PInt);
 	TglMultiTexImage3DEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; level: Int; internalformat: Enum; width: Sizei; height: Sizei; depth: Sizei; border: Int; format: Enum; xtype: Enum;  pixels: PVoid);
 	TglMultiTexSubImage3DEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; level: Int; xoffset: Int; yoffset: Int; zoffset: Int; width: Sizei; height: Sizei; depth: Sizei; format: Enum; xtype: Enum;  pixels:PVoid);
 	TglCopyMultiTexSubImage3DEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; level: Int; xoffset: Int; yoffset: Int; zoffset: Int; x: Int; y: Int; width: Sizei; height: Sizei);
@@ -2546,18 +2539,18 @@ TYPE
 	TglMultiTexEnvfEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; pname: Enum; param: Float);
 	TglMultiTexEnvfvEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; pname: Enum;  params: PFloat);
 	TglMultiTexEnviEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; pname: Enum; param: Int);
-	TglMultiTexEnvivEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; pname: Enum;  params: Pint);
+	TglMultiTexEnvivEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; pname: Enum;  params: PInt);
 	TglMultiTexGendEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; pname: Enum; param: Double);
 	TglMultiTexGendvEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; pname: Enum;  params: PDouble);
 	TglMultiTexGenfEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; pname: Enum; param: Float);
 	TglMultiTexGenfvEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; pname: Enum;  params: PFloat);
 	TglMultiTexGeniEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; pname: Enum; param: Int);
-	TglMultiTexGenivEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; pname: Enum;  params: Pint);
+	TglMultiTexGenivEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; pname: Enum;  params: PInt);
 	TglGetMultiTexEnvfvEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; pname: Enum; params: PFloat);
-	TglGetMultiTexEnvivEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; pname: Enum; params: Pint);
+	TglGetMultiTexEnvivEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; pname: Enum; params: PInt);
 	TglGetMultiTexGendvEXT* = PROCEDURE{C}(texunit: Enum; coord: Enum; pname: Enum; params: PDouble);
 	TglGetMultiTexGenfvEXT* = PROCEDURE{C}(texunit: Enum; coord: Enum; pname: Enum; params: PFloat);
-	TglGetMultiTexGenivEXT* = PROCEDURE{C}(texunit: Enum; coord: Enum; pname: Enum; params: Pint);
+	TglGetMultiTexGenivEXT* = PROCEDURE{C}(texunit: Enum; coord: Enum; pname: Enum; params: PInt);
 	TglGetFloatIndexedvEXT* = PROCEDURE{C}(target: Enum; index: Uint; data: PFloat);
 	TglGetDoubleIndexedvEXT* = PROCEDURE{C}(target: Enum; index: Uint; data: PDouble);
 	TglGetPointerIndexedvEXT* = PROCEDURE{C}(target: Enum; index: Uint; data: PPVoid);
@@ -2582,25 +2575,25 @@ TYPE
 	TglNamedProgramLocalParameter4fvEXT* = PROCEDURE{C}(xprogram: Uint; target: Enum; index: Uint;  params: PFloat);
 	TglGetNamedProgramLocalParameterdvEXT* = PROCEDURE{C}(xprogram: Uint; target: Enum; index: Uint; params: PDouble);
 	TglGetNamedProgramLocalParameterfvEXT* = PROCEDURE{C}(xprogram: Uint; target: Enum; index: Uint; params: PFloat);
-	TglGetNamedProgramivEXT* = PROCEDURE{C}(xprogram: Uint; target: Enum; pname: Enum; params: Pint);
+	TglGetNamedProgramivEXT* = PROCEDURE{C}(xprogram: Uint; target: Enum; pname: Enum; params: PInt);
 	TglGetNamedProgramStringEXT* = PROCEDURE{C}(xprogram: Uint; target: Enum; pname: Enum; xstring: PVoid);
 	TglNamedProgramLocalParameters4fvEXT* = PROCEDURE{C}(xprogram: Uint; target: Enum; index: Uint; count: Sizei;  params: PFloat);
 	TglNamedProgramLocalParameterI4iEXT* = PROCEDURE{C}(xprogram: Uint; target: Enum; index: Uint; x: Int; y: Int; z: Int; w: Int);
-	TglNamedProgramLocalParameterI4ivEXT* = PROCEDURE{C}(xprogram: Uint; target: Enum; index: Uint;  params: Pint);
-	TglNamedProgramLocalParametersI4ivEXT* = PROCEDURE{C}(xprogram: Uint; target: Enum; index: Uint; count: Sizei;  params: Pint);
+	TglNamedProgramLocalParameterI4ivEXT* = PROCEDURE{C}(xprogram: Uint; target: Enum; index: Uint;  params: PInt);
+	TglNamedProgramLocalParametersI4ivEXT* = PROCEDURE{C}(xprogram: Uint; target: Enum; index: Uint; count: Sizei;  params: PInt);
 	TglNamedProgramLocalParameterI4uiEXT* = PROCEDURE{C}(xprogram: Uint; target: Enum; index: Uint; x: Uint; y: Uint; z: Uint; w: Uint);
-	TglNamedProgramLocalParameterI4uivEXT* = PROCEDURE{C}(xprogram: Uint; target: Enum; index: Uint;  params: PInt);
-	TglNamedProgramLocalParametersI4uivEXT* = PROCEDURE{C}(xprogram: Uint; target: Enum; index: Uint; count: Sizei;  params: PInt);
-	TglGetNamedProgramLocalParameterIivEXT* = PROCEDURE{C}(xprogram: Uint; target: Enum; index: Uint; params: Pint);
-	TglGetNamedProgramLocalParameterIuivEXT* = PROCEDURE{C}(xprogram: Uint; target: Enum; index: Uint; params: PInt);
-	TglTextureParameterIivEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum;  params: Pint);
-	TglTextureParameterIuivEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum;  params: PInt);
-	TglGetTextureParameterIivEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum; params: Pint);
-	TglGetTextureParameterIuivEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum; params: PInt);
-	TglMultiTexParameterIivEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum;  params: Pint);
-	TglMultiTexParameterIuivEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum;  params: PInt);
-	TglGetMultiTexParameterIivEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum; params: Pint);
-	TglGetMultiTexParameterIuivEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum; params: PInt);
+	TglNamedProgramLocalParameterI4uivEXT* = PROCEDURE{C}(xprogram: Uint; target: Enum; index: Uint;  params: PUint);
+	TglNamedProgramLocalParametersI4uivEXT* = PROCEDURE{C}(xprogram: Uint; target: Enum; index: Uint; count: Sizei;  params: PUint);
+	TglGetNamedProgramLocalParameterIivEXT* = PROCEDURE{C}(xprogram: Uint; target: Enum; index: Uint; params: PInt);
+	TglGetNamedProgramLocalParameterIuivEXT* = PROCEDURE{C}(xprogram: Uint; target: Enum; index: Uint; params: PUint);
+	TglTextureParameterIivEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum;  params: PInt);
+	TglTextureParameterIuivEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum;  params: PUint);
+	TglGetTextureParameterIivEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum; params: PInt);
+	TglGetTextureParameterIuivEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum; params: PUint);
+	TglMultiTexParameterIivEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum;  params: PInt);
+	TglMultiTexParameterIuivEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum;  params: PUint);
+	TglGetMultiTexParameterIivEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum; params: PInt);
+	TglGetMultiTexParameterIuivEXT* = PROCEDURE{C}(texture: Uint; target: Enum; pname: Enum; params: PUint);
 	TglProgramUniform1fEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; v0: Float);
 	TglProgramUniform2fEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; v0: Float; v1: Float);
 	TglProgramUniform3fEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; v0: Float; v1: Float; v2: Float);
@@ -2613,10 +2606,10 @@ TYPE
 	TglProgramUniform2fvEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PFloat);
 	TglProgramUniform3fvEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PFloat);
 	TglProgramUniform4fvEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PFloat);
-	TglProgramUniform1ivEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: Pint);
-	TglProgramUniform2ivEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: Pint);
-	TglProgramUniform3ivEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: Pint);
-	TglProgramUniform4ivEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: Pint);
+	TglProgramUniform1ivEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
+	TglProgramUniform2ivEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
+	TglProgramUniform3ivEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
+	TglProgramUniform4ivEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
 	TglProgramUniformMatrix2fvEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei; transpose: Boolean;  value: PFloat);
 	TglProgramUniformMatrix3fvEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei; transpose: Boolean;  value: PFloat);
 	TglProgramUniformMatrix4fvEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei; transpose: Boolean;  value: PFloat);
@@ -2630,10 +2623,10 @@ TYPE
 	TglProgramUniform2uiEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; v0: Uint; v1: Uint);
 	TglProgramUniform3uiEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; v0: Uint; v1: Uint; v2: Uint);
 	TglProgramUniform4uiEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; v0: Uint; v1: Uint; v2: Uint; v3: Uint);
-	TglProgramUniform1uivEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
-	TglProgramUniform2uivEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
-	TglProgramUniform3uivEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
-	TglProgramUniform4uivEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
+	TglProgramUniform1uivEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PUint);
+	TglProgramUniform2uivEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PUint);
+	TglProgramUniform3uivEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PUint);
+	TglProgramUniform4uivEXT* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PUint);
 	TglNamedBufferDataEXT* = PROCEDURE{C}(buffer: Uint; size: Sizei;  data: PVoid; usage: Enum);
 	TglNamedBufferSubDataEXT* = PROCEDURE{C}(buffer: Uint; offset: Intptr; size: Sizeiptr;  data: PVoid);
 	TglMapNamedBufferEXT* = PROCEDURE{C}(buffer: Uint; access: Enum): PVoid;
@@ -2641,25 +2634,25 @@ TYPE
 	TglMapNamedBufferRangeEXT* = PROCEDURE{C}(buffer: Uint; offset: Intptr; length: Sizeiptr; access: Bitfield): PVoid;
 	TglFlushMappedNamedBufferRangeEXT* = PROCEDURE{C}(buffer: Uint; offset: Intptr; length: Sizeiptr);
 	TglNamedCopyBufferSubDataEXT* = PROCEDURE{C}(readBuffer: Uint; writeBuffer: Uint; readOffset: Intptr; writeOffset: Intptr; size: Sizeiptr);
-	TglGetNamedBufferParameterivEXT* = PROCEDURE{C}(buffer: Uint; pname: Enum; params: Pint);
+	TglGetNamedBufferParameterivEXT* = PROCEDURE{C}(buffer: Uint; pname: Enum; params: PInt);
 	TglGetNamedBufferPointervEXT* = PROCEDURE{C}(buffer: Uint; pname: Enum; params: PPVoid);
 	TglGetNamedBufferSubDataEXT* = PROCEDURE{C}(buffer: Uint; offset: Intptr; size: Sizeiptr; data: PVoid);
 	TglTextureBufferEXT* = PROCEDURE{C}(texture: Uint; target: Enum; internalformat: Enum; buffer: Uint);
 	TglMultiTexBufferEXT* = PROCEDURE{C}(texunit: Enum; target: Enum; interformat: Enum; buffer: Uint);
 	TglNamedRenderbufferStorageEXT* = PROCEDURE{C}(renderbuffer: Uint; interformat: Enum; width: Sizei; height: Sizei);
-	TglGetNamedRenderbufferParameterivEXT* = PROCEDURE{C}(renderbuffer: Uint; pname: Enum; params: Pint);
+	TglGetNamedRenderbufferParameterivEXT* = PROCEDURE{C}(renderbuffer: Uint; pname: Enum; params: PInt);
 	TglCheckNamedFramebufferStatusEXT* = PROCEDURE{C}(framebuffer: Uint; target: Enum): Enum;
 	TglNamedFramebufferTexture1DEXT* = PROCEDURE{C}(framebuffer: Uint; attachment: Enum; textarget: Enum; texture: Uint; level: Int);
 	TglNamedFramebufferTexture2DEXT* = PROCEDURE{C}(framebuffer: Uint; attachment: Enum; textarget: Enum; texture: Uint; level: Int);
 	TglNamedFramebufferTexture3DEXT* = PROCEDURE{C}(framebuffer: Uint; attachment: Enum; textarget: Enum; texture: Uint; level: Int; zoffset: Int);
 	TglNamedFramebufferRenderbufferEXT* = PROCEDURE{C}(framebuffer: Uint; attachment: Enum; renderbuffertarget: Enum; renderbuffer: Uint);
-	TglGetNamedFramebufferAttachmentParameterivEXT* = PROCEDURE{C}(framebuffer: Uint; attachment: Enum; pname: Enum; params: Pint);
+	TglGetNamedFramebufferAttachmentParameterivEXT* = PROCEDURE{C}(framebuffer: Uint; attachment: Enum; pname: Enum; params: PInt);
 	TglGenerateTextureMipmapEXT* = PROCEDURE{C}(texture: Uint; target: Enum);
 	TglGenerateMultiTexMipmapEXT* = PROCEDURE{C}(texunit: Enum; target: Enum);
 	TglFramebufferDrawBufferEXT* = PROCEDURE{C}(framebuffer: Uint; mode: Enum);
 	TglFramebufferDrawBuffersEXT* = PROCEDURE{C}(framebuffer: Uint; n: Sizei;  bufs: PEnum);
 	TglFramebufferReadBufferEXT* = PROCEDURE{C}(framebuffer: Uint; mode: Enum);
-	TglGetFramebufferParameterivEXT* = PROCEDURE{C}(framebuffer: Uint; pname: Enum; params: Pint);
+	TglGetFramebufferParameterivEXT* = PROCEDURE{C}(framebuffer: Uint; pname: Enum; params: PInt);
 	TglNamedRenderbufferStorageMultisampleEXT* = PROCEDURE{C}(renderbuffer: Uint; samples: Sizei; internalformat: Enum; width: Sizei; height: Sizei);
 	TglNamedRenderbufferStorageMultisampleCoverageEXT* = PROCEDURE{C}(renderbuffer: Uint; coverageSamples: Sizei; colorSamples: Sizei; internalformat: Enum; width: Sizei; height: Sizei);
 	TglNamedFramebufferTextureEXT* = PROCEDURE{C}(framebuffer: Uint; attachment: Enum; texture: Uint; level: Int);
@@ -2704,7 +2697,7 @@ TYPE
 	TglGetVertexAttribLdvEXT* = PROCEDURE{C}(index: Uint; pname: Enum; params: PDouble);
 	TglVertexArrayVertexAttribLOffsetEXT* = PROCEDURE{C}(vaobj: Uint; buffer: Uint; index: Uint; size: Int; xtype: Enum; stride: Sizei; offset: Intptr);
 	(*  GL_IBM_multimode_draw_arrays  *)
-	TglMultiModeDrawArraysIBM* = PROCEDURE{C}(mode: Enum; first: Pint; count: PSizei; primcount: Sizei; modestride: Int);
+	TglMultiModeDrawArraysIBM* = PROCEDURE{C}(mode: Enum; first: PInt; count: PSizei; primcount: Sizei; modestride: Int);
 	TglMultiModeDrawElementsIBM* = PROCEDURE{C}(mode: PEnum; count: PSizei; xtype:  Enum; indices: PVoid; primcount: Sizei; modestride: Int);
 	(*  GL_IBM_vertex_array_lists  *)
 	TglColorPointerListIBM* = PROCEDURE{C}(size: Int; xtype:  Enum; stride: Int; xpointer: PVoid; ptrstride: Int);
@@ -2730,7 +2723,7 @@ TYPE
 	TglWindowPos2fMESA* = PROCEDURE{C}(x: Float; y: Float);
 	TglWindowPos2fvMESA* = PROCEDURE{C}( v: PFloat);
 	TglWindowPos2iMESA* = PROCEDURE{C}(x: Int; y: Int);
-	TglWindowPos2ivMESA* = PROCEDURE{C}( v: Pint);
+	TglWindowPos2ivMESA* = PROCEDURE{C}( v: PInt);
 	TglWindowPos2sMESA* = PROCEDURE{C}(x: Short; y: Short);
 	TglWindowPos2svMESA* = PROCEDURE{C}( v: PShort);
 	TglWindowPos3dMESA* = PROCEDURE{C}(x: Double; y: Double; z: Double);
@@ -2738,7 +2731,7 @@ TYPE
 	TglWindowPos3fMESA* = PROCEDURE{C}(x: Float; y: Float; z: Float);
 	TglWindowPos3fvMESA* = PROCEDURE{C}( v: PFloat);
 	TglWindowPos3iMESA* = PROCEDURE{C}(x: Int; y: Int; z: Int);
-	TglWindowPos3ivMESA* = PROCEDURE{C}( v: Pint);
+	TglWindowPos3ivMESA* = PROCEDURE{C}( v: PInt);
 	TglWindowPos3sMESA* = PROCEDURE{C}(x: Short; y: Short; z: Short);
 	TglWindowPos3svMESA* = PROCEDURE{C}( v: PShort);
 	TglWindowPos4dMESA* = PROCEDURE{C}(x: Double; y: Double; z: Double; w: Double);
@@ -2746,25 +2739,25 @@ TYPE
 	TglWindowPos4fMESA* = PROCEDURE{C}(x: Float; y: Float; z: Float; w: Float);
 	TglWindowPos4fvMESA* = PROCEDURE{C}( v: PFloat);
 	TglWindowPos4iMESA* = PROCEDURE{C}(x: Int; y: Int; z: Int; w: Int);
-	TglWindowPos4ivMESA* = PROCEDURE{C}( v: Pint);
+	TglWindowPos4ivMESA* = PROCEDURE{C}( v: PInt);
 	TglWindowPos4sMESA* = PROCEDURE{C}(x: Short; y: Short; z: Short; w: Short);
 	TglWindowPos4svMESA* = PROCEDURE{C}( v: PShort);
 	(* GL_NV_evaluators  *)
 	TglMapControlPointsNV* = PROCEDURE{C}(target: Enum; index: Uint; xtype: Enum; ustride: Sizei; vstride: Sizei; uorder: Int; vorder: Int; packed: Boolean;  points: PVoid);
-	TglMapParameterivNV* = PROCEDURE{C}(target: Enum; pname: Enum;  params: Pint);
+	TglMapParameterivNV* = PROCEDURE{C}(target: Enum; pname: Enum;  params: PInt);
 	TglMapParameterfvNV* = PROCEDURE{C}(target: Enum; pname: Enum;  params: PFloat);
 	TglGetMapControlPointsNV* = PROCEDURE{C}(target: Enum; index: Uint; xtype: Enum; ustride: Sizei; vstride: Sizei; packed: Boolean; points: PVoid);
-	TglGetMapParameterivNV* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint);
+	TglGetMapParameterivNV* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
 	TglGetMapParameterfvNV* = PROCEDURE{C}(target: Enum; pname: Enum; params: PFloat);
-	TglGetMapAttribParameterivNV* = PROCEDURE{C}(target: Enum; index: Uint; pname: Enum; params: Pint);
+	TglGetMapAttribParameterivNV* = PROCEDURE{C}(target: Enum; index: Uint; pname: Enum; params: PInt);
 	TglGetMapAttribParameterfvNV* = PROCEDURE{C}(target: Enum; index: Uint; pname: Enum; params: PFloat);
 	TglEvalMapsNV* = PROCEDURE{C}(target: Enum; mode: Enum);
 	(* GL_NV_fence  *)
-	TglDeleteFencesNV* = PROCEDURE{C}(n: Sizei;  fences: PInt);
-	TglGenFencesNV* = PROCEDURE{C}(n: Sizei; fences: PInt);
+	TglDeleteFencesNV* = PROCEDURE{C}(n: Sizei;  fences: PUint);
+	TglGenFencesNV* = PROCEDURE{C}(n: Sizei; fences: PUint);
 	TglIsFenceNV* = PROCEDURE{C}(fence: Uint): Boolean;
 	TglTestFenceNV* = PROCEDURE{C}(fence: Uint): Boolean;
-	TglGetFenceivNV* = PROCEDURE{C}(fence: Uint; pname: Enum; params: Pint);
+	TglGetFenceivNV* = PROCEDURE{C}(fence: Uint; pname: Enum; params: PInt);
 	TglFinishFenceNV* = PROCEDURE{C}(fence: Uint);
 	TglSetFenceNV* = PROCEDURE{C}(fence: Uint; condition: Enum);
 	(* GL_NV_fragment_program  *)
@@ -2822,36 +2815,36 @@ TYPE
 	TglVertexAttribs3hvNV* = PROCEDURE{C}(index: Uint; n: Sizei;  v: PHalfNV);
 	TglVertexAttribs4hvNV* = PROCEDURE{C}(index: Uint; n: Sizei;  v: PHalfNV);
 	(* GL_NV_occlusion_query  *)
-	TglGenOcclusionQueriesNV* = PROCEDURE{C}(n: Sizei; ids: PInt);
-	TglDeleteOcclusionQueriesNV* = PROCEDURE{C}(n: Sizei;  ids: PInt);
+	TglGenOcclusionQueriesNV* = PROCEDURE{C}(n: Sizei; ids: PUint);
+	TglDeleteOcclusionQueriesNV* = PROCEDURE{C}(n: Sizei;  ids: PUint);
 	TglIsOcclusionQueryNV* = PROCEDURE{C}(id: Uint): Boolean;
 	TglBeginOcclusionQueryNV* = PROCEDURE{C}(id: Uint);
 	TglEndOcclusionQueryNV* = PROCEDURE{C}();
-	TglGetOcclusionQueryivNV* = PROCEDURE{C}(id: Uint; pname: Enum; params: Pint);
-	TglGetOcclusionQueryuivNV* = PROCEDURE{C}(id: Uint; pname: Enum; params: PInt);
+	TglGetOcclusionQueryivNV* = PROCEDURE{C}(id: Uint; pname: Enum; params: PInt);
+	TglGetOcclusionQueryuivNV* = PROCEDURE{C}(id: Uint; pname: Enum; params: PUint);
 	(* GL_NV_pixel_data_range  *)
 	TglPixelDataRangeNV* = PROCEDURE{C}(target: Enum; length: Sizei; xpointer: PVoid);
 	TglFlushPixelDataRangeNV* = PROCEDURE{C}(target: Enum);
 	(* GL_NV_point_sprite  *)
 	TglPointParameteriNV* = PROCEDURE{C}(pname: Enum; param: Int);
-	TglPointParameterivNV* = PROCEDURE{C}(pname: Enum;  params: Pint);
+	TglPointParameterivNV* = PROCEDURE{C}(pname: Enum;  params: PInt);
 	(* GL_NV_primitive_restart  *)
 	TglPrimitiveRestartNV* = PROCEDURE{C}();
 	TglPrimitiveRestartIndexNV* = PROCEDURE{C}(index: Uint);
 	(* GL_NV_register_combiners  *)
 	TglCombinerParameterfvNV* = PROCEDURE{C}(pname: Enum;  params: PFloat);
 	TglCombinerParameterfNV* = PROCEDURE{C}(pname: Enum; param: Float);
-	TglCombinerParameterivNV* = PROCEDURE{C}(pname: Enum;  params: Pint);
+	TglCombinerParameterivNV* = PROCEDURE{C}(pname: Enum;  params: PInt);
 	TglCombinerParameteriNV* = PROCEDURE{C}(pname: Enum; param: Int);
 	TglCombinerInputNV* = PROCEDURE{C}(stage: Enum; portion: Enum; variable: Enum; input: Enum; mapping: Enum; componentUsage: Enum);
 	TglCombinerOutputNV* = PROCEDURE{C}(stage: Enum; portion: Enum; abOutput: Enum; cdOutput: Enum; sumOutput: Enum; scale: Enum; bias: Enum; abDotProduct: Boolean; cdDotProduct: Boolean; muxSum: Boolean);
 	TglFinalCombinerInputNV* = PROCEDURE{C}(variable: Enum; input: Enum; mapping: Enum; componentUsage: Enum);
 	TglGetCombinerInputParameterfvNV* = PROCEDURE{C}(stage: Enum; portion: Enum; variable: Enum; pname: Enum; params: PFloat);
-	TglGetCombinerInputParameterivNV* = PROCEDURE{C}(stage: Enum; portion: Enum; variable: Enum; pname: Enum; params: Pint);
+	TglGetCombinerInputParameterivNV* = PROCEDURE{C}(stage: Enum; portion: Enum; variable: Enum; pname: Enum; params: PInt);
 	TglGetCombinerOutputParameterfvNV* = PROCEDURE{C}(stage: Enum; portion: Enum; pname: Enum; params: PFloat);
-	TglGetCombinerOutputParameterivNV* = PROCEDURE{C}(stage: Enum; portion: Enum; pname: Enum; params: Pint);
+	TglGetCombinerOutputParameterivNV* = PROCEDURE{C}(stage: Enum; portion: Enum; pname: Enum; params: PInt);
 	TglGetFinalCombinerInputParameterfvNV* = PROCEDURE{C}(variable: Enum; pname: Enum; params: PFloat);
-	TglGetFinalCombinerInputParameterivNV* = PROCEDURE{C}(variable: Enum; pname: Enum; params: Pint);
+	TglGetFinalCombinerInputParameterivNV* = PROCEDURE{C}(variable: Enum; pname: Enum; params: PInt);
 	(* GL_NV_register_combiners2 *)
 	TglCombinerStageParameterfvNV* = PROCEDURE{C}(stage: Enum; pname: Enum;  params: PFloat);
 	TglGetCombinerStageParameterfvNV* = PROCEDURE{C}(stage: Enum; pname: Enum; params: PFloat);
@@ -2859,19 +2852,19 @@ TYPE
 	TglFlushVertexArrayRangeNV* = PROCEDURE{C}();
 	TglVertexArrayRangeNV* = PROCEDURE{C}(length: Sizei;  xpointer: PVoid);
 	(* GL_NV_vertex_program  *)
-	TglAreProgramsResidentNV* = PROCEDURE{C}(n: Sizei;  programs: PInt; residences: PBoolean): Boolean;
+	TglAreProgramsResidentNV* = PROCEDURE{C}(n: Sizei;  programs: PUint; residences: PBoolean): Boolean;
 	TglBindProgramNV* = PROCEDURE{C}(target: Enum; id: Uint);
-	TglDeleteProgramsNV* = PROCEDURE{C}(n: Sizei;  programs: PInt);
+	TglDeleteProgramsNV* = PROCEDURE{C}(n: Sizei;  programs: PUint);
 	TglExecuteProgramNV* = PROCEDURE{C}(target: Enum; id: Uint;  params: PFloat);
-	TglGenProgramsNV* = PROCEDURE{C}(n: Sizei; programs: PInt);
+	TglGenProgramsNV* = PROCEDURE{C}(n: Sizei; programs: PUint);
 	TglGetProgramParameterdvNV* = PROCEDURE{C}(target: Enum; index: Uint; pname: Enum; params: PDouble);
 	TglGetProgramParameterfvNV* = PROCEDURE{C}(target: Enum; index: Uint; pname: Enum; params: PFloat);
-	TglGetProgramivNV* = PROCEDURE{C}(id: Uint; pname: Enum; params: Pint);
+	TglGetProgramivNV* = PROCEDURE{C}(id: Uint; pname: Enum; params: PInt);
 	TglGetProgramStringNV* = PROCEDURE{C}(id: Uint; pname: Enum; xprogram: PUbyte);
-	TglGetTrackMatrixivNV* = PROCEDURE{C}(target: Enum; address: Uint; pname: Enum; params: Pint);
+	TglGetTrackMatrixivNV* = PROCEDURE{C}(target: Enum; address: Uint; pname: Enum; params: PInt);
 	TglGetVertexAttribdvNV* = PROCEDURE{C}(index: Uint; pname: Enum; params: PDouble);
 	TglGetVertexAttribfvNV* = PROCEDURE{C}(index: Uint; pname: Enum; params: PFloat);
-	TglGetVertexAttribivNV* = PROCEDURE{C}(index: Uint; pname: Enum; params: Pint);
+	TglGetVertexAttribivNV* = PROCEDURE{C}(index: Uint; pname: Enum; params: PInt);
 	TglGetVertexAttribPointervNV* = PROCEDURE{C}(index: Uint; pname: Enum; xpointer: PVoid);
 	TglIsProgramNV* = PROCEDURE{C}(id: Uint): Boolean;
 	TglLoadProgramNV* = PROCEDURE{C}(target: Enum; id: Uint; len: Sizei;  xprogram: PUbyte);
@@ -2881,7 +2874,7 @@ TYPE
 	TglProgramParameter4fvNV* = PROCEDURE{C}(target: Enum; index: Uint;  v: PFloat);
 	TglProgramParameters4dvNV* = PROCEDURE{C}(target: Enum; index: Uint; count: Uint;  v: PDouble);
 	TglProgramParameters4fvNV* = PROCEDURE{C}(target: Enum; index: Uint; count: Uint;  v: PFloat);
-	TglRequestResidentProgramsNV* = PROCEDURE{C}(n: Sizei;  programs: PInt);
+	TglRequestResidentProgramsNV* = PROCEDURE{C}(n: Sizei;  programs: PUint);
 	TglTrackMatrixNV* = PROCEDURE{C}(target: Enum; address: Uint; matrix: Enum; transform: Enum);
 	TglVertexAttribPointerNV* = PROCEDURE{C}(index: Uint; fsize: Int; xtype: Enum; stride: Sizei;  xpointer: PVoid);
 	TglVertexAttrib1dNV* = PROCEDURE{C}(index: Uint; x: Double);
@@ -2933,25 +2926,25 @@ TYPE
 	TglProgramVertexLimitNV* = PROCEDURE{C}(target: Enum; limit: Int);
 	(* GL_NV_gpu_program4  *)
 	TglProgramLocalParameterI4iNV* = PROCEDURE{C}(target: Enum; index: Uint; x: Int; y: Int; z: Int; w: Int);
-	TglProgramLocalParameterI4ivNV* = PROCEDURE{C}(target: Enum; index: Uint;  params: Pint);
-	TglProgramLocalParametersI4ivNV* = PROCEDURE{C}(target: Enum; index: Uint; count: Sizei;  params: Pint);
+	TglProgramLocalParameterI4ivNV* = PROCEDURE{C}(target: Enum; index: Uint;  params: PInt);
+	TglProgramLocalParametersI4ivNV* = PROCEDURE{C}(target: Enum; index: Uint; count: Sizei;  params: PInt);
 	TglProgramLocalParameterI4uiNV* = PROCEDURE{C}(target: Enum; index: Uint; x: Uint; y: Uint; z: Uint; w: Uint);
-	TglProgramLocalParameterI4uivNV* = PROCEDURE{C}(target: Enum; index: Uint;  params: PInt);
-	TglProgramLocalParametersI4uivNV* = PROCEDURE{C}(target: Enum; index: Uint; count: Sizei;  params: PInt);
+	TglProgramLocalParameterI4uivNV* = PROCEDURE{C}(target: Enum; index: Uint;  params: PUint);
+	TglProgramLocalParametersI4uivNV* = PROCEDURE{C}(target: Enum; index: Uint; count: Sizei;  params: PUint);
 	TglProgramEnvParameterI4iNV* = PROCEDURE{C}(target: Enum; index: Uint; x: Int; y: Int; z: Int; w: Int);
-	TglProgramEnvParameterI4ivNV* = PROCEDURE{C}(target: Enum; index: Uint;  params: Pint);
-	TglProgramEnvParametersI4ivNV* = PROCEDURE{C}(target: Enum; index: Uint; count: Sizei;  params: Pint);
+	TglProgramEnvParameterI4ivNV* = PROCEDURE{C}(target: Enum; index: Uint;  params: PInt);
+	TglProgramEnvParametersI4ivNV* = PROCEDURE{C}(target: Enum; index: Uint; count: Sizei;  params: PInt);
 	TglProgramEnvParameterI4uiNV* = PROCEDURE{C}(target: Enum; index: Uint; x: Uint; y: Uint; z: Uint; w: Uint);
-	TglProgramEnvParameterI4uivNV* = PROCEDURE{C}(target: Enum; index: Uint;  params: PInt);
-	TglProgramEnvParametersI4uivNV* = PROCEDURE{C}(target: Enum; index: Uint; count: Sizei;  params: PInt);
-	TglGetProgramLocalParameterIivNV* = PROCEDURE{C}(target: Enum; index: Uint; params: Pint);
-	TglGetProgramLocalParameterIuivNV* = PROCEDURE{C}(target: Enum; index: Uint; params: PInt);
-	TglGetProgramEnvParameterIivNV* = PROCEDURE{C}(target: Enum; index: Uint; params: Pint);
-	TglGetProgramEnvParameterIuivNV* = PROCEDURE{C}(target: Enum; index: Uint; params: PInt);
+	TglProgramEnvParameterI4uivNV* = PROCEDURE{C}(target: Enum; index: Uint;  params: PUint);
+	TglProgramEnvParametersI4uivNV* = PROCEDURE{C}(target: Enum; index: Uint; count: Sizei;  params: PUint);
+	TglGetProgramLocalParameterIivNV* = PROCEDURE{C}(target: Enum; index: Uint; params: PInt);
+	TglGetProgramLocalParameterIuivNV* = PROCEDURE{C}(target: Enum; index: Uint; params: PUint);
+	TglGetProgramEnvParameterIivNV* = PROCEDURE{C}(target: Enum; index: Uint; params: PInt);
+	TglGetProgramEnvParameterIuivNV* = PROCEDURE{C}(target: Enum; index: Uint; params: PUint);
 	(* GL_NV_parameter_buffer_object  *)
 	TglProgramBufferParametersfvNV* = PROCEDURE{C}(target: Enum; buffer: Uint; index: Uint; count: Sizei;  params: PFloat);
 	TglProgramBufferParametersIivNV* = PROCEDURE{C}(target: Enum; buffer: Uint; index: Uint; count: Sizei;  params: Int);
-	TglProgramBufferParametersIuivNV* = PROCEDURE{C}(target: Enum; buffer: Uint; index: Uint; count: Uint;  params: PInt);
+	TglProgramBufferParametersIuivNV* = PROCEDURE{C}(target: Enum; buffer: Uint; index: Uint; count: Uint;  params: PUint);
 	(* GL_NV_transform_feedback  *)
 	TglBeginTransformFeedbackNV* = PROCEDURE{C}(primitiveMode: Enum);
 	TglEndTransformFeedbackNV* = PROCEDURE{C}();
@@ -2963,27 +2956,27 @@ TYPE
 	TglActiveVaryingNV* = PROCEDURE{C}(xprogram: Uint;  name: ADDRESS);
 	TglGetVaryingLocationNV* = PROCEDURE{C}(xprogram: Uint;  name: ADDRESS): Int;
 	TglGetActiveVaryingNV* = PROCEDURE{C}(xprogram: Uint; index: Uint; bufSize: Sizei; length: PSizei; size: PSizei; xtype: PEnum; name: PChar);
-	TglGetTransformFeedbackVaryingNV* = PROCEDURE{C}(xprogram: Uint; index: Uint; location: Pint);
-	TglTransformFeedbackStreamAttribsNV* = PROCEDURE{C}(count: Sizei;  attribs: Pint; nbuffers: Sizei;  bufstreams: Pint; bufferMode: Enum);
+	TglGetTransformFeedbackVaryingNV* = PROCEDURE{C}(xprogram: Uint; index: Uint; location: PInt);
+	TglTransformFeedbackStreamAttribsNV* = PROCEDURE{C}(count: Sizei;  attribs: PInt; nbuffers: Sizei;  bufstreams: PInt; bufferMode: Enum);
 	(* GL_NV_conditional_render  *)
 	TglBeginConditionalRenderNV* = PROCEDURE{C}(id: Uint; mode: Enum);
 	TglEndConditionalRenderNV* = PROCEDURE{C}();
 	(* GL_NV_present_video  *)
 	TglPresentFrameKeyedNV* = PROCEDURE{C}(video_slot: Uint; minPresentTime: Uint64EXT; BeginPresentTimeId: Uint; presentDuratioId: Uint; xtype: Enum; target0: Enum; fill0: Uint; key0: Uint; target1: Enum; fill1: Uint; key1: Uint);
 	TglPresentFrameDualFillNV* = PROCEDURE{C}(video_slot: Uint; minPresentTime: Uint64EXT; BeginPresentTimeId: Uint; presentDurationId: Uint; xtype: Enum; target0: Enum; fill0: Uint; target1: Enum; fill1: Uint; target2: Enum; fill2: Uint; target3: Enum; fill3: Uint);
-	TglGetVideoivNV* = PROCEDURE{C}(video_slot: Uint; pname: Enum; params: Pint);
-	TglGetVideouivNV* = PROCEDURE{C}(video_slot: Uint; pname: Enum; params: PInt);
-	TglGetVideoi64vNV* = PROCEDURE{C}(video_slot: Uint; pname: Enum; params: Pint64EXT);
-	TglGetVideoui64vNV* = PROCEDURE{C}(video_slot: Uint; pname: Enum; params: PInt64EXT);
-	(*  TglVideoParameterivNV  = PROCEDURE{C}(video_slot: Uint; pname: Enum;  params: Pint);   *)
+	TglGetVideoivNV* = PROCEDURE{C}(video_slot: Uint; pname: Enum; params: PInt);
+	TglGetVideouivNV* = PROCEDURE{C}(video_slot: Uint; pname: Enum; params: PUint);
+	TglGetVideoi64vNV* = PROCEDURE{C}(video_slot: Uint; pname: Enum; params: PInt64EXT);
+	TglGetVideoui64vNV* = PROCEDURE{C}(video_slot: Uint; pname: Enum; params: PUint64EXT);
+	(*  TglVideoParameterivNV  = PROCEDURE{C}(video_slot: Uint; pname: Enum;  params: PInt);   *)
 	(* GL_NV_explicit_multisample  *)
 	TglGetMultisamplefvNV* = PROCEDURE{C}(pname: Enum; index: Uint; val: PFloat);
 	TglSampleMaskIndexedNV* = PROCEDURE{C}(index: Uint; mask: Bitfield);
 	TglTexRenderbufferNV* = PROCEDURE{C}(target: Enum; renderbuffer: Uint);
 	(* GL_NV_transform_feedback2  *)
 	TglBindTransformFeedbackNV* = PROCEDURE{C}(target: Enum; id: Uint);
-	TglDeleteTransformFeedbacksNV* = PROCEDURE{C}(n: Sizei; ids: PInt);
-	TglGenTransformFeedbacksNV* = PROCEDURE{C}(n: Sizei; ids: PInt);
+	TglDeleteTransformFeedbacksNV* = PROCEDURE{C}(n: Sizei; ids: PUint);
+	TglGenTransformFeedbacksNV* = PROCEDURE{C}(n: Sizei; ids: PUint);
 	TglIsTransformFeedbackNV* = PROCEDURE{C}(id: Uint): Boolean;
 	TglPauseTransformFeedbackNV* = PROCEDURE{C}();
 	TglResumeTransformFeedbackNV* = PROCEDURE{C}();
@@ -2993,12 +2986,12 @@ TYPE
 	TglBindVideoCaptureStreamBufferNV* = PROCEDURE{C}(video_capture_slot: Uint; stream: Uint; frame_region: Enum; offset: Sizei);
 	TglBindVideoCaptureStreamTextureNV* = PROCEDURE{C}(video_capture_slot: Uint; stream: Uint; frame_region: Enum; target: Enum; texture: Uint);
 	TglEndVideoCaptureNV* = PROCEDURE{C}(video_capture_slot: Uint);
-	TglGetVideoCaptureivNV* = PROCEDURE{C}(video_capture_slot: Uint; pname: Enum; params: Pint);
-	TglGetVideoCaptureStreamivNV* = PROCEDURE{C}(video_capture_slot: Uint; stream: Uint; pname: Enum; params: Pint);
+	TglGetVideoCaptureivNV* = PROCEDURE{C}(video_capture_slot: Uint; pname: Enum; params: PInt);
+	TglGetVideoCaptureStreamivNV* = PROCEDURE{C}(video_capture_slot: Uint; stream: Uint; pname: Enum; params: PInt);
 	TglGetVideoCaptureStreamfvNV* = PROCEDURE{C}(video_capture_slot: Uint; stream: Uint; pname: Enum; params: PFloat);
 	TglGetVideoCaptureStreamdvNV* = PROCEDURE{C}(video_capture_slot: Uint; stream: Uint; pname: Enum; params: PDouble);
-	TglVideoCaptureNV* = PROCEDURE{C}(video_capture_slot: Uint; sequence_num: PInt; capture_time: PInt64EXT): Enum;
-	TglVideoCaptureStreamParameterivNV* = PROCEDURE{C}(video_capture_slot: Uint; stream: Uint; pname: Enum;  params: Pint);
+	TglVideoCaptureNV* = PROCEDURE{C}(video_capture_slot: Uint; sequence_num: PUint; capture_time: PUint64EXT): Enum;
+	TglVideoCaptureStreamParameterivNV* = PROCEDURE{C}(video_capture_slot: Uint; stream: Uint; pname: Enum;  params: PInt);
 	TglVideoCaptureStreamParameterfvNV* = PROCEDURE{C}(video_capture_slot: Uint; stream: Uint; pname: Enum;  params: PFloat);
 	TglVideoCaptureStreamParameterdvNV* = PROCEDURE{C}(video_capture_slot: Uint; stream: Uint; pname: Enum;  params: PDouble);
 	(* GL_NV_copy_image  *)
@@ -3010,14 +3003,14 @@ TYPE
 	TglMakeNamedBufferResidentNV* = PROCEDURE{C}(buffer: Uint; access: Enum);
 	TglMakeNamedBufferNonResidentNV* = PROCEDURE{C}(buffer: Uint);
 	TglIsNamedBufferResidentNV* = PROCEDURE{C}(buffer: Uint): Boolean;
-	TglGetBufferParameterui64vNV* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt64EXT);
-	TglGetNamedBufferParameterui64vNV* = PROCEDURE{C}(buffer: Uint; pname: Enum; params: PInt64EXT);
-	TglGetIntegerui64vNV* = PROCEDURE{C}(value: Enum; result: PInt64EXT);
+	TglGetBufferParameterui64vNV* = PROCEDURE{C}(target: Enum; pname: Enum; params: PUint64EXT);
+	TglGetNamedBufferParameterui64vNV* = PROCEDURE{C}(buffer: Uint; pname: Enum; params: PUint64EXT);
+	TglGetIntegerui64vNV* = PROCEDURE{C}(value: Enum; result: PUint64EXT);
 	TglUniformui64NV* = PROCEDURE{C}(location: Int; value: Uint64EXT);
-	TglUniformui64vNV* = PROCEDURE{C}(location: Int; count: Sizei;  value: PInt64EXT);
-	TglGetUniformui64vNV* = PROCEDURE{C}(xprogram: Uint; location: Int; params: PInt64EXT);
+	TglUniformui64vNV* = PROCEDURE{C}(location: Int; count: Sizei;  value: PUint64EXT);
+	TglGetUniformui64vNV* = PROCEDURE{C}(xprogram: Uint; location: Int; params: PUint64EXT);
 	TglProgramUniformui64NV* = PROCEDURE{C}(xprogram: Uint; location: Int; value: Uint64EXT);
-	TglProgramUniformui64vNV* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt64EXT);
+	TglProgramUniformui64vNV* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PUint64EXT);
 	(* GL_NV_vertex_buffer_unified_memory  *)
 	TglBufferAddressRangeNV* = PROCEDURE{C}(pname: Enum; index: Uint; adress: Uint64EXT; length: Sizei);
 	TglVertexFormatNV* = PROCEDURE{C}(size: Int; xtype: Enum; stride: Sizei);
@@ -3030,72 +3023,72 @@ TYPE
 	TglFogCoordFormatNV* = PROCEDURE{C}(xtype: Enum; stride: Sizei);
 	TglVertexAttribFormatNV* = PROCEDURE{C}(index: Uint; size: Int; xtype: Enum; normalized: Boolean; stride: Sizei);
 	TglVertexAttribIFormatNV* = PROCEDURE{C}(index: Uint; size: Int; xtype: Enum; stride: Sizei);
-	TglGetIntegerui64i_vNV* = PROCEDURE{C}(value: Enum; index: Uint; Result: PInt64EXT);
+	TglGetIntegerui64i_vNV* = PROCEDURE{C}(value: Enum; index: Uint; Result: PUint64EXT);
 	(* GL_NV_gpu_program5  *)
-	TglProgramSubroutineParametersuivNV* = PROCEDURE{C}(target: Enum; count: Sizei;  params: PInt);
-	TglGetProgramSubroutineParameteruivNV* = PROCEDURE{C}(target: Enum; index: Uint; param: PInt);
+	TglProgramSubroutineParametersuivNV* = PROCEDURE{C}(target: Enum; count: Sizei;  params: PUint);
+	TglGetProgramSubroutineParameteruivNV* = PROCEDURE{C}(target: Enum; index: Uint; param: PUint);
 	(*  GL_NV_gpu_shader5  *)
 	TglUniform1i64NV* = PROCEDURE{C}(location: Int; x: Int64EXT);
 	TglUniform2i64NV* = PROCEDURE{C}(location: Int; x: Int64EXT; y: Int64EXT);
 	TglUniform3i64NV* = PROCEDURE{C}(location: Int; x: Int64EXT; y: Int64EXT; z: Int64EXT);
 	TglUniform4i64NV* = PROCEDURE{C}(location: Int; x: Int64EXT; y: Int64EXT; z: Int64EXT; w: Int64EXT);
-	TglUniform1i64vNV* = PROCEDURE{C}(location: Int; count: Sizei;  value: Pint64EXT);
-	TglUniform2i64vNV* = PROCEDURE{C}(location: Int; count: Sizei;  value: Pint64EXT);
-	TglUniform3i64vNV* = PROCEDURE{C}(location: Int; count: Sizei;  value: Pint64EXT);
-	TglUniform4i64vNV* = PROCEDURE{C}(location: Int; count: Sizei;  value: Pint64EXT);
+	TglUniform1i64vNV* = PROCEDURE{C}(location: Int; count: Sizei;  value: PInt64EXT);
+	TglUniform2i64vNV* = PROCEDURE{C}(location: Int; count: Sizei;  value: PInt64EXT);
+	TglUniform3i64vNV* = PROCEDURE{C}(location: Int; count: Sizei;  value: PInt64EXT);
+	TglUniform4i64vNV* = PROCEDURE{C}(location: Int; count: Sizei;  value: PInt64EXT);
 	TglUniform1ui64NV* = PROCEDURE{C}(location: Int; x: Uint64EXT);
 	TglUniform2ui64NV* = PROCEDURE{C}(location: Int; x: Uint64EXT; y: Uint64EXT);
 	TglUniform3ui64NV* = PROCEDURE{C}(location: Int; x: Uint64EXT; y: Uint64EXT; z: Uint64EXT);
 	TglUniform4ui64NV* = PROCEDURE{C}(location: Int; x: Uint64EXT; y: Uint64EXT; z: Uint64EXT; w: Uint64EXT);
-	TglUniform1ui64vNV* = PROCEDURE{C}(location: Int; count: Sizei;  value: PInt64EXT);
-	TglUniform2ui64vNV* = PROCEDURE{C}(location: Int; count: Sizei;  value: PInt64EXT);
-	TglUniform3ui64vNV* = PROCEDURE{C}(location: Int; count: Sizei;  value: PInt64EXT);
-	TglUniform4ui64vNV* = PROCEDURE{C}(location: Int; count: Sizei;  value: PInt64EXT);
-	TglGetUniformi64vNV* = PROCEDURE{C}(xprogram: Uint; location: Int; params: Pint64EXT);
+	TglUniform1ui64vNV* = PROCEDURE{C}(location: Int; count: Sizei;  value: PUint64EXT);
+	TglUniform2ui64vNV* = PROCEDURE{C}(location: Int; count: Sizei;  value: PUint64EXT);
+	TglUniform3ui64vNV* = PROCEDURE{C}(location: Int; count: Sizei;  value: PUint64EXT);
+	TglUniform4ui64vNV* = PROCEDURE{C}(location: Int; count: Sizei;  value: PUint64EXT);
+	TglGetUniformi64vNV* = PROCEDURE{C}(xprogram: Uint; location: Int; params: PInt64EXT);
 	TglProgramUniform1i64NV* = PROCEDURE{C}(xprogram: Uint; location: Int; x: Int64EXT);
 	TglProgramUniform2i64NV* = PROCEDURE{C}(xprogram: Uint; location: Int; x: Int64EXT; y: Int64EXT);
 	TglProgramUniform3i64NV* = PROCEDURE{C}(xprogram: Uint; location: Int; x: Int64EXT; y: Int64EXT; z: Int64EXT);
 	TglProgramUniform4i64NV* = PROCEDURE{C}(xprogram: Uint; location: Int; x: Int64EXT; y: Int64EXT; z: Int64EXT; w: Int64EXT);
-	TglProgramUniform1i64vNV* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: Pint64EXT);
-	TglProgramUniform2i64vNV* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: Pint64EXT);
-	TglProgramUniform3i64vNV* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: Pint64EXT);
-	TglProgramUniform4i64vNV* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: Pint64EXT);
+	TglProgramUniform1i64vNV* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt64EXT);
+	TglProgramUniform2i64vNV* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt64EXT);
+	TglProgramUniform3i64vNV* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt64EXT);
+	TglProgramUniform4i64vNV* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt64EXT);
 	TglProgramUniform1ui64NV* = PROCEDURE{C}(xprogram: Uint; location: Int; x: Uint64EXT);
 	TglProgramUniform2ui64NV* = PROCEDURE{C}(xprogram: Uint; location: Int; x: Uint64EXT; y: Uint64EXT);
 	TglProgramUniform3ui64NV* = PROCEDURE{C}(xprogram: Uint; location: Int; x: Uint64EXT; y: Uint64EXT; z: Uint64EXT);
 	TglProgramUniform4ui64NV* = PROCEDURE{C}(xprogram: Uint; location: Int; x: Uint64EXT; y: Uint64EXT; z: Uint64EXT; w: Uint64EXT);
-	TglProgramUniform1ui64vNV* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt64EXT);
-	TglProgramUniform2ui64vNV* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt64EXT);
-	TglProgramUniform3ui64vNV* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt64EXT);
-	TglProgramUniform4ui64vNV* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PInt64EXT);
+	TglProgramUniform1ui64vNV* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PUint64EXT);
+	TglProgramUniform2ui64vNV* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PUint64EXT);
+	TglProgramUniform3ui64vNV* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PUint64EXT);
+	TglProgramUniform4ui64vNV* = PROCEDURE{C}(xprogram: Uint; location: Int; count: Sizei;  value: PUint64EXT);
 	(* GL_NV_vertex_attrib_integer_64bit  *)
 	TglVertexAttribL1i64NV* = PROCEDURE{C}(index: Uint; x: Int64EXT);
 	TglVertexAttribL2i64NV* = PROCEDURE{C}(index: Uint; x: Int64EXT; y: Int64EXT);
 	TglVertexAttribL3i64NV* = PROCEDURE{C}(index: Uint; x: Int64EXT; y: Int64EXT; z: Int64EXT);
 	TglVertexAttribL4i64NV* = PROCEDURE{C}(index: Uint; x: Int64EXT; y: Int64EXT; z: Int64EXT; w: Int64EXT);
-	TglVertexAttribL1i64vNV* = PROCEDURE{C}(index: Uint;  v: Pint64EXT);
-	TglVertexAttribL2i64vNV* = PROCEDURE{C}(index: Uint;  v: Pint64EXT);
-	TglVertexAttribL3i64vNV* = PROCEDURE{C}(index: Uint;  v: Pint64EXT);
-	TglVertexAttribL4i64vNV* = PROCEDURE{C}(index: Uint;  v: Pint64EXT);
+	TglVertexAttribL1i64vNV* = PROCEDURE{C}(index: Uint;  v: PInt64EXT);
+	TglVertexAttribL2i64vNV* = PROCEDURE{C}(index: Uint;  v: PInt64EXT);
+	TglVertexAttribL3i64vNV* = PROCEDURE{C}(index: Uint;  v: PInt64EXT);
+	TglVertexAttribL4i64vNV* = PROCEDURE{C}(index: Uint;  v: PInt64EXT);
 	TglVertexAttribL1ui64NV* = PROCEDURE{C}(index: Uint; x: Uint64EXT);
 	TglVertexAttribL2ui64NV* = PROCEDURE{C}(index: Uint; x: Uint64EXT; y: Uint64EXT);
 	TglVertexAttribL3ui64NV* = PROCEDURE{C}(index: Uint; x: Uint64EXT; y: Uint64EXT; z: Uint64EXT);
 	TglVertexAttribL4ui64NV* = PROCEDURE{C}(index: Uint; x: Uint64EXT; y: Uint64EXT; z: Uint64EXT; w: Uint64EXT);
-	TglVertexAttribL1ui64vNV* = PROCEDURE{C}(index: Uint;  v: PInt64EXT);
-	TglVertexAttribL2ui64vNV* = PROCEDURE{C}(index: Uint;  v: PInt64EXT);
-	TglVertexAttribL3ui64vNV* = PROCEDURE{C}(index: Uint;  v: PInt64EXT);
-	TglVertexAttribL4ui64vNV* = PROCEDURE{C}(index: Uint;  v: PInt64EXT);
-	TglGetVertexAttribLi64vNV* = PROCEDURE{C}(index: Uint; pname: Enum; params: Pint64EXT);
-	TglGetVertexAttribLui64vNV* = PROCEDURE{C}(index: Uint; pname: Enum; params: PInt64EXT);
+	TglVertexAttribL1ui64vNV* = PROCEDURE{C}(index: Uint;  v: PUint64EXT);
+	TglVertexAttribL2ui64vNV* = PROCEDURE{C}(index: Uint;  v: PUint64EXT);
+	TglVertexAttribL3ui64vNV* = PROCEDURE{C}(index: Uint;  v: PUint64EXT);
+	TglVertexAttribL4ui64vNV* = PROCEDURE{C}(index: Uint;  v: PUint64EXT);
+	TglGetVertexAttribLi64vNV* = PROCEDURE{C}(index: Uint; pname: Enum; params: PInt64EXT);
+	TglGetVertexAttribLui64vNV* = PROCEDURE{C}(index: Uint; pname: Enum; params: PUint64EXT);
 	TglVertexAttribLFormatNV* = PROCEDURE{C}(index: Uint; size: Int; xtype: Enum; stride: Sizei);
 	(* GL_NV_vdpau_interop  *)
 	TglVDPAUInitNV* = PROCEDURE{C}( vdpDevice: PVoid;  getProcAddress: PVoid);
 	TglVDPAUFiniNV* = PROCEDURE{C};
-	TglVDPAURegisterVideoSurfaceNV* = PROCEDURE{C}(vdpSurface: PVoid; target: Enum; numTextureNames: Sizei;  textureNames: PInt): GLvdpauSurfaceNV;
-	TglVDPAURegisterOutputSurfaceNV* = PROCEDURE{C}(vdpSurface: PVoid; target: Enum; numTextureNames: Sizei;  textureNames: PInt): GLvdpauSurfaceNV;
+	TglVDPAURegisterVideoSurfaceNV* = PROCEDURE{C}(vdpSurface: PVoid; target: Enum; numTextureNames: Sizei;  textureNames: PUint): GLvdpauSurfaceNV;
+	TglVDPAURegisterOutputSurfaceNV* = PROCEDURE{C}(vdpSurface: PVoid; target: Enum; numTextureNames: Sizei;  textureNames: PUint): GLvdpauSurfaceNV;
 	TglVDPAUIsSurfaceNV* = PROCEDURE{C}(surface: GLvdpauSurfaceNV);
 	TglVDPAUUnregisterSurfaceNV* = PROCEDURE{C}(surface: GLvdpauSurfaceNV);
-	TglVDPAUGetSurfaceivNV* = PROCEDURE{C}(surface: GLvdpauSurfaceNV; pname: Enum; bufSize: Sizei; length: PSizei; values: Pint);
+	TglVDPAUGetSurfaceivNV* = PROCEDURE{C}(surface: GLvdpauSurfaceNV; pname: Enum; bufSize: Sizei; length: PSizei; values: PInt);
 	TglVDPAUSurfaceAccessNV* = PROCEDURE{C}(surface: GLvdpauSurfaceNV; access: Enum);
 	TglVDPAUMapSurfacesNV* = PROCEDURE{C}(numSurfaces: Sizei;  surfaces: PGLvdpauSurfaceNV);
 	TglVDPAUUnmapSurfacesNV* = PROCEDURE{C}(numSurface: Sizei;  surfaces: PGLvdpauSurfaceNV);
@@ -3113,11 +3106,11 @@ TYPE
 	TglPathStringNV* = PROCEDURE{C}(path : Uint; format : Enum; length : Sizei;  pathString : PVoid);
 	TglPathGlyphsNV* = PROCEDURE{C}(firstPathName : Uint; fontTarget : Enum;  fontName : PVoid; fontStyle : Bitfield; numGlyphs : Sizei; type_ : Enum;  charcodes : PVoid; handleMissingGlyphs : Enum; pathParameterTemplate : Uint; emScale : Float);
 	TglPathGlyphRangeNV* = PROCEDURE{C}(firstPathName : Uint; fontTarget : Enum;  fontName : PVoid; fontStyle : Bitfield; firstGlyph : Uint; numGlyphs : Sizei; handleMissingGlyphs : Enum; pathParameterTemplate : Uint; emScale : Float);
-	TglWeightPathsNV* = PROCEDURE{C}(resultPath : Uint; numPaths : Sizei;  paths : PInt;  weights : PFloat);
+	TglWeightPathsNV* = PROCEDURE{C}(resultPath : Uint; numPaths : Sizei;  paths : PUint;  weights : PFloat);
 	TglCopyPathNV* = PROCEDURE{C}(resultPath : Uint; srcPath : Uint);
 	TglInterpolatePathsNV* = PROCEDURE{C}(resultPath : Uint; pathA : Uint; pathB : Uint; weight : Float);
 	TglTransformPathNV* = PROCEDURE{C}(resultPath : Uint; srcPath : Uint; transformType : Enum;  transformValues : PFloat);
-	TglPathParameterivNV* = PROCEDURE{C}(path : Uint; pname : Enum;  value : Pint);
+	TglPathParameterivNV* = PROCEDURE{C}(path : Uint; pname : Enum;  value : PInt);
 	TglPathParameteriNV* = PROCEDURE{C}(path : Uint; pname : Enum; value : Int);
 	TglPathParameterfvNV* = PROCEDURE{C}(path : Uint; pname : Enum;  value : PFloat);
 	TglPathParameterfNV* = PROCEDURE{C}(path : Uint; pname : Enum; value : Float);
@@ -3136,7 +3129,7 @@ TYPE
 	TglCoverStrokePathNV* = PROCEDURE{C}(path : Uint; coverMode : Enum);
 	TglCoverFillPathInstancedNV* = PROCEDURE{C}(numPaths : Sizei; pathNameType : Enum;  paths : PVoid; pathBase : Uint; coverMode : Enum; transformType : Enum;  transformValues : PFloat);
 	TglCoverStrokePathInstancedNV* = PROCEDURE{C}(numPaths : Sizei; pathNameType : Enum;  paths : PVoid; pathBase : Uint; coverMode : Enum; transformType : Enum;  transformValues : PFloat);
-	TglGetPathParameterivNV* = PROCEDURE{C}(path : Uint; pname : Enum; value : Pint);
+	TglGetPathParameterivNV* = PROCEDURE{C}(path : Uint; pname : Enum; value : PInt);
 	TglGetPathParameterfvNV* = PROCEDURE{C}(path : Uint; pname : Enum; value : PFloat);
 	TglGetPathCommandsNV* = PROCEDURE{C}(path : Uint; commands : PUbyte);
 	TglGetPathCoordsNV* = PROCEDURE{C}(path : Uint; coords : PFloat);
@@ -3144,9 +3137,9 @@ TYPE
 	TglGetPathMetricsNV* = PROCEDURE{C}(metricQueryMask : Bitfield; numPaths : Sizei; pathNameType : Enum;  paths : PVoid; pathBase : Uint; stride : Sizei; metrics : PFloat);
 	TglGetPathMetricRangeNV* = PROCEDURE{C}(metricQueryMask : Bitfield; firstPathName : Uint; numPaths : Sizei; stride : Sizei; metrics : PFloat);
 	TglGetPathSpacingNV* = PROCEDURE{C}(pathListMode : Enum; numPaths : Sizei; pathNameType : Enum;  paths : PVoid; pathBase : Uint; advanceScale : Float; kerningScale : Float; transformType : Enum; returnedSpacing : PFloat);
-	TglGetPathColorGenivNV* = PROCEDURE{C}(color : Enum; pname : Enum; value : Pint);
+	TglGetPathColorGenivNV* = PROCEDURE{C}(color : Enum; pname : Enum; value : PInt);
 	TglGetPathColorGenfvNV* = PROCEDURE{C}(color : Enum; pname : Enum; value : PFloat);
-	TglGetPathTexGenivNV* = PROCEDURE{C}(texCoordSet : Enum; pname : Enum; value : Pint);
+	TglGetPathTexGenivNV* = PROCEDURE{C}(texCoordSet : Enum; pname : Enum; value : PInt);
 	TglGetPathTexGenfvNV* = PROCEDURE{C}(texCoordSet : Enum; pname : Enum; value : PFloat);
 	TglIsPointInFillPathNV* = PROCEDURE{C}(path : Uint; mask : Uint; x : Float; y : Float) : Boolean;
 	TglIsPointInStrokePathNV* = PROCEDURE  {C}(path : Uint; x : Float; y : Float) : Boolean;
@@ -3166,9 +3159,9 @@ TYPE
 	TglMakeImageHandleResidentNV* = PROCEDURE{C}(handle : Uint64; access : Enum);
 	TglMakeImageHandleNonResidentNV* = PROCEDURE{C}(handle : Uint64);
 	TglUniformHandleui64NV* = PROCEDURE{C}(location : Int; value : Uint64);
-	TglUniformHandleui64vNV* = PROCEDURE{C}(location : Int; cowunt : Sizei;  value : PInt64);
+	TglUniformHandleui64vNV* = PROCEDURE{C}(location : Int; cowunt : Sizei;  value : PUint64);
 	TglProgramUniformHandleui64NV* = PROCEDURE{C}(program_ : Uint; location : Int; value : Uint64);
-	TglProgramUniformHandleui64vNV* = PROCEDURE{C}(program_ : Uint; location : Int; count : Sizei;  values : PInt64);
+	TglProgramUniformHandleui64vNV* = PROCEDURE{C}(program_ : Uint; location : Int; count : Sizei;  values : PUint64);
 	TglIsTextureHandleResidentNV* = PROCEDURE{C}(handle : Uint64) : Boolean;
 	TglIsImageHandleResidentNV* = PROCEDURE{C}(handle : Uint64) : Boolean;
 	(* GL_NV_shader_atomic_float  *)
@@ -3187,10 +3180,10 @@ TYPE
 	TglSamplePatternSGIS* = PROCEDURE{C}(pattern: Enum);
 	(*  GL_SGIS_pixel_texture  *)
 	TglPixelTexGenParameteriSGIS* = PROCEDURE{C}(pname: Enum; param: Int);
-	TglPixelTexGenParameterivSGIS* = PROCEDURE{C}(pname: Enum; params: Pint);
+	TglPixelTexGenParameterivSGIS* = PROCEDURE{C}(pname: Enum; params: PInt);
 	TglPixelTexGenParameterfSGIS* = PROCEDURE{C}(pname: Enum; param: Float);
 	TglPixelTexGenParameterfvSGIS* = PROCEDURE{C}(pname: Enum; params: PFloat);
-	TglGetPixelTexGenParameterivSGIS* = PROCEDURE{C}(pname: Enum; params: Pint);
+	TglGetPixelTexGenParameterivSGIS* = PROCEDURE{C}(pname: Enum; params: PInt);
 	TglGetPixelTexGenParameterfvSGIS* = PROCEDURE{C}(pname: Enum; params: PFloat);
 	(*  GL_SGIS_point_parameters  *)
 	TglPointParameterfSGIS* = PROCEDURE{C}(pname: Enum; param: Float);
@@ -3208,8 +3201,8 @@ TYPE
 	TglTexFilterFuncSGIS* = PROCEDURE{C}(target: Enum; filter: Enum; n: Sizei; weights: PFloat);
 	(*  GL_SGIX_async  *)
 	TglAsyncMarkerSGIX* = PROCEDURE{C}(marker: Uint);
-	TglFinishAsyncSGIX* = PROCEDURE{C}(markerp: PInt): Int;
-	TglPollAsyncSGIX* = PROCEDURE{C}(markerp: PInt): Int;
+	TglFinishAsyncSGIX* = PROCEDURE{C}(markerp: PUint): Int;
+	TglPollAsyncSGIX* = PROCEDURE{C}(markerp: PUint): Int;
 	TglGenAsyncMarkersSGIX* = PROCEDURE{C}(range: Sizei): Uint;
 	TglDeleteAsyncMarkersSGIX* = PROCEDURE{C}(marker: Uint; range: Sizei);
 	TglIsAsyncMarkerSGIX* = PROCEDURE{C}(marker: Uint): Boolean;
@@ -3220,19 +3213,19 @@ TYPE
 	TglFragmentLightfSGIX* = PROCEDURE{C}(light: Enum; pname: Enum; param: Float);
 	TglFragmentLightfvSGIX* = PROCEDURE{C}(light: Enum; pname: Enum; params: PFloat);
 	TglFragmentLightiSGIX* = PROCEDURE{C}(light: Enum; pname: Enum; param: Int);
-	TglFragmentLightivSGIX* = PROCEDURE{C}(light: Enum; pname: Enum; params: Pint);
+	TglFragmentLightivSGIX* = PROCEDURE{C}(light: Enum; pname: Enum; params: PInt);
 	TglFragmentLightModelfSGIX* = PROCEDURE{C}(pname: Enum; param: Float);
 	TglFragmentLightModelfvSGIX* = PROCEDURE{C}(pname: Enum; params: PFloat);
 	TglFragmentLightModeliSGIX* = PROCEDURE{C}(pname: Enum; param: Int);
-	TglFragmentLightModelivSGIX* = PROCEDURE{C}(pname: Enum; params: Pint);
+	TglFragmentLightModelivSGIX* = PROCEDURE{C}(pname: Enum; params: PInt);
 	TglFragmentMaterialfSGIX* = PROCEDURE{C}(face: Enum; pname: Enum; param: Float);
 	TglFragmentMaterialfvSGIX* = PROCEDURE{C}(face: Enum; pname: Enum; params: PFloat);
 	TglFragmentMaterialiSGIX* = PROCEDURE{C}(face: Enum; pname: Enum; param: Int);
-	TglFragmentMaterialivSGIX* = PROCEDURE{C}(face: Enum; pname: Enum; params: Pint);
+	TglFragmentMaterialivSGIX* = PROCEDURE{C}(face: Enum; pname: Enum; params: PInt);
 	TglGetFragmentLightfvSGIX* = PROCEDURE{C}(light: Enum; pname: Enum; params: PFloat);
-	TglGetFragmentLightivSGIX* = PROCEDURE{C}(light: Enum; pname: Enum; params: Pint);
+	TglGetFragmentLightivSGIX* = PROCEDURE{C}(light: Enum; pname: Enum; params: PInt);
 	TglGetFragmentMaterialfvSGIX* = PROCEDURE{C}(face: Enum; pname: Enum; params: PFloat);
-	TglGetFragmentMaterialivSGIX* = PROCEDURE{C}(face: Enum; pname: Enum; params: Pint);
+	TglGetFragmentMaterialivSGIX* = PROCEDURE{C}(face: Enum; pname: Enum; params: PInt);
 	TglLightEnviSGIX* = PROCEDURE{C}(pname: Enum; param: Int);
 	(*  GL_SGIX_framezoom  *)
 	TglFrameZoomSGIX* = PROCEDURE{C}(factor: Int);
@@ -3240,18 +3233,18 @@ TYPE
 	TglIglooInterfaceSGIX* = PROCEDURE{C}(pname: Enum; params: PVoid);
 	(*  GL_SGIX_instruments  *)
 	TglGetInstrumentsSGIX* = PROCEDURE{C}(): Int;
-	TglInstrumentsBufferSGIX* = PROCEDURE{C}(size: Sizei; buffer: Pint);
-	TglPollInstrumentsSGIX* = PROCEDURE{C}(marker_p: Pint): Int;
+	TglInstrumentsBufferSGIX* = PROCEDURE{C}(size: Sizei; buffer: PInt);
+	TglPollInstrumentsSGIX* = PROCEDURE{C}(marker_p: PInt): Int;
 	TglReadInstrumentsSGIX* = PROCEDURE{C}(marker: Int);
 	TglStartInstrumentsSGIX* = PROCEDURE{C}();
 	TglStopInstrumentsSGIX* = PROCEDURE{C}(marker: Int);
 	(*  GL_SGIX_list_priority  *)
 	TglGetListParameterfvSGIX* = PROCEDURE{C}(list: Uint; pname: Enum; params: PFloat);
-	TglGetListParameterivSGIX* = PROCEDURE{C}(list: Uint; pname: Enum; params: Pint);
+	TglGetListParameterivSGIX* = PROCEDURE{C}(list: Uint; pname: Enum; params: PInt);
 	TglListParameterfSGIX* = PROCEDURE{C}(list: Uint; pname: Enum; param: Float);
 	TglListParameterfvSGIX* = PROCEDURE{C}(list: Uint; pname: Enum; params: PFloat);
 	TglListParameteriSGIX* = PROCEDURE{C}(list: Uint; pname: Enum; param: Int);
-	TglListParameterivSGIX* = PROCEDURE{C}(list: Uint; pname: Enum; params: Pint);
+	TglListParameterivSGIX* = PROCEDURE{C}(list: Uint; pname: Enum; params: PInt);
 	(*  GL_SGIX_pixel_texture  *)
 	TglPixelTexGenSGIX* = PROCEDURE{C}(mode: Enum);
 	(*  GL_SGIX_polynomial_ffd  *)
@@ -3265,17 +3258,17 @@ TYPE
 	TglSpriteParameterfSGIX* = PROCEDURE{C}(pname: Enum; param: Float);
 	TglSpriteParameterfvSGIX* = PROCEDURE{C}(pname: Enum; params: PFloat);
 	TglSpriteParameteriSGIX* = PROCEDURE{C}(pname: Enum; param: Int);
-	TglSpriteParameterivSGIX* = PROCEDURE{C}(pname: Enum; params: Pint);
+	TglSpriteParameterivSGIX* = PROCEDURE{C}(pname: Enum; params: PInt);
 	(*  GL_SGIX_tag_sample_buffer  *)
 	TglTagSampleBufferSGIX* = PROCEDURE{C}();
 	(*  GL_SGI_color_table  *)
 	TglColorTableSGI* = PROCEDURE{C}(target: Enum; internalformat: Enum; width: Sizei; format: Enum; xtype:  Enum; table: PVoid);
 	TglColorTableParameterfvSGI* = PROCEDURE{C}(target: Enum; pname: Enum; params: PFloat);
-	TglColorTableParameterivSGI* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint);
+	TglColorTableParameterivSGI* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
 	TglCopyColorTableSGI* = PROCEDURE{C}(target: Enum; internalformat: Enum; x: Int; y: Int; width: Sizei);
 	TglGetColorTableSGI* = PROCEDURE{C}(target: Enum; format: Enum; xtype:  Enum; table: PVoid);
 	TglGetColorTableParameterfvSGI* = PROCEDURE{C}(target: Enum; pname: Enum; params: PFloat);
-	TglGetColorTableParameterivSGI* = PROCEDURE{C}(target: Enum; pname: Enum; params: Pint);
+	TglGetColorTableParameterivSGI* = PROCEDURE{C}(target: Enum; pname: Enum; params: PInt);
 	(*  GL_SUNX_constant_data  *)
 	TglFinishTextureSUNX* = PROCEDURE{C}();
 	(*  GL_SUN_global_alpha  *)
@@ -3293,7 +3286,7 @@ TYPE
 	TglReplacementCodeuiSUN* = PROCEDURE{C}(code: Uint);
 	TglReplacementCodeusSUN* = PROCEDURE{C}(code: Ushort);
 	TglReplacementCodeubSUN* = PROCEDURE{C}(code: Ubyte);
-	TglReplacementCodeuivSUN* = PROCEDURE{C}( code: PInt);
+	TglReplacementCodeuivSUN* = PROCEDURE{C}( code: PUint);
 	TglReplacementCodeusvSUN* = PROCEDURE{C}( code: PUshort);
 	TglReplacementCodeubvSUN* = PROCEDURE{C}( code: PUbyte);
 	TglReplacementCodePointerSUN* = PROCEDURE{C}(xtype:  Enum; stride: Sizei; xpointer: PVoid);
@@ -3323,26 +3316,26 @@ TYPE
 	TglTexCoord4fColor4fNormal3fVertex4fSUN* = PROCEDURE{C}(s: Float; t: Float; p: Float; q: Float; r: Float; g: Float; b: Float; a: Float; nx: Float; ny: Float; nz: Float; x: Float; y: Float; z: Float; w: Float);
 	TglTexCoord4fColor4fNormal3fVertex4fvSUN* = PROCEDURE{C}( tc: PFloat;  c: PFloat;  n: PFloat;  v: PFloat);
 	TglReplacementCodeuiVertex3fSUN* = PROCEDURE{C}(rc: Uint; x: Float; y: Float; z: Float);
-	TglReplacementCodeuiVertex3fvSUN* = PROCEDURE{C}( rc: PInt;  v: PFloat);
+	TglReplacementCodeuiVertex3fvSUN* = PROCEDURE{C}( rc: PUint;  v: PFloat);
 	TglReplacementCodeuiColor4ubVertex3fSUN* = PROCEDURE{C}(rc: Uint; r: Ubyte; g: Ubyte; b: Ubyte; a: Ubyte; x: Float; y: Float; z: Float);
-	TglReplacementCodeuiColor4ubVertex3fvSUN* = PROCEDURE{C}( rc: PInt;  c: PUbyte;  v: PFloat);
+	TglReplacementCodeuiColor4ubVertex3fvSUN* = PROCEDURE{C}( rc: PUint;  c: PUbyte;  v: PFloat);
 	TglReplacementCodeuiColor3fVertex3fSUN* = PROCEDURE{C}(rc: Uint; r: Float; g: Float; b: Float; x: Float; y: Float; z: Float);
-	TglReplacementCodeuiColor3fVertex3fvSUN* = PROCEDURE{C}( rc: PInt;  c: PFloat;  v: PFloat);
+	TglReplacementCodeuiColor3fVertex3fvSUN* = PROCEDURE{C}( rc: PUint;  c: PFloat;  v: PFloat);
 	TglReplacementCodeuiNormal3fVertex3fSUN* = PROCEDURE{C}(rc: Uint; nx: Float; ny: Float; nz: Float; x: Float; y: Float; z: Float);
-	TglReplacementCodeuiNormal3fVertex3fvSUN* = PROCEDURE{C}( rc: PInt;  n: PFloat;  v: PFloat);
+	TglReplacementCodeuiNormal3fVertex3fvSUN* = PROCEDURE{C}( rc: PUint;  n: PFloat;  v: PFloat);
 	TglReplacementCodeuiColor4fNormal3fVertex3fSUN* = PROCEDURE{C}(rc: Uint; r: Float; g: Float; b: Float; a: Float; nx: Float; ny: Float; nz: Float; x: Float; y: Float; z: Float);
-	TglReplacementCodeuiColor4fNormal3fVertex3fvSUN* = PROCEDURE{C}( rc: PInt;  c: PFloat;  n: PFloat;  v: PFloat);
+	TglReplacementCodeuiColor4fNormal3fVertex3fvSUN* = PROCEDURE{C}( rc: PUint;  c: PFloat;  n: PFloat;  v: PFloat);
 	TglReplacementCodeuiTexCoord2fVertex3fSUN* = PROCEDURE{C}(rc: Uint; s: Float; t: Float; x: Float; y: Float; z: Float);
-	TglReplacementCodeuiTexCoord2fVertex3fvSUN* = PROCEDURE{C}( rc: PInt;  tc: PFloat;  v: PFloat);
+	TglReplacementCodeuiTexCoord2fVertex3fvSUN* = PROCEDURE{C}( rc: PUint;  tc: PFloat;  v: PFloat);
 	TglReplacementCodeuiTexCoord2fNormal3fVertex3fSUN* = PROCEDURE{C}(rc: Uint; s: Float; t: Float; nx: Float; ny: Float; nz: Float; x: Float; y: Float; z: Float);
-	TglReplacementCodeuiTexCoord2fNormal3fVertex3fvSUN* = PROCEDURE{C}( rc: PInt;  tc: PFloat;  n: PFloat;  v: PFloat);
+	TglReplacementCodeuiTexCoord2fNormal3fVertex3fvSUN* = PROCEDURE{C}( rc: PUint;  tc: PFloat;  n: PFloat;  v: PFloat);
 	TglReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fSUN* = PROCEDURE{C}(rc: Uint; s: Float; t: Float; r: Float; g: Float; b: Float; a: Float; nx: Float; ny: Float; nz: Float; x: Float; y: Float; z: Float);
-	TglReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fvSUN* = PROCEDURE{C}( rc: PInt;  tc: PFloat;  c: PFloat;  n: PFloat;  v: PFloat);
+	TglReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fvSUN* = PROCEDURE{C}( rc: PUint;  tc: PFloat;  c: PFloat;  n: PFloat;  v: PFloat);
 
 	(* -------------------------------------------------  *)
 	(*! window support functions for Linux - GLX  *)
 	(* -------------------------------------------------  *)
-	TglXChooseVisual* = PROCEDURE{C}(dpy: DisplayPtr; screen: Int; attribList: Pint): VisualInfoPtr;
+	TglXChooseVisual* = PROCEDURE{C}(dpy: DisplayPtr; screen: Int; attribList: PInt): VisualInfoPtr;
 	TglXCopyContext* = PROCEDURE{C}(dpy: DisplayPtr; src: GLXContext; dst: GLXContext; mask: Uint);
 	TglXCreateContext* = PROCEDURE{C}(dpy: DisplayPtr; vis: VisualInfoPtr; shareList: GLXContext; direct: Boolean): GLXContext;
 	TglXCreateGLXPixmap* = PROCEDURE{C}(dpy: DisplayPtr; vis: VisualInfoPtr; pixmap: Pixmap): GLXPixmap;
@@ -3364,17 +3357,17 @@ TYPE
 	TglXQueryExtensionsString* = PROCEDURE{C}(dpy: DisplayPtr; screen: Int): PChar;
 
 	(* GLX_VERSION_1_3  *)
-	TglXGetFBConfigs* = PROCEDURE{C}(dpy: DisplayPtr; screen: Int; nelements: Pint): GLXFBConfig;
-	TglXChooseFBConfig* = PROCEDURE{C}(dpy: DisplayPtr; screen: Int; attriblist: Pint; VAR nelements: Int): GLXFBConfig;
-	TglXGetFBConfigAttrib* = PROCEDURE{C}(dpy: DisplayPtr; config: GLXFBConfig; attribute: Int; value: Pint): Int;
+	TglXGetFBConfigs* = PROCEDURE{C}(dpy: DisplayPtr; screen: Int; nelements: PInt): GLXFBConfig;
+	TglXChooseFBConfig* = PROCEDURE{C}(dpy: DisplayPtr; screen: Int; attriblist: PInt; VAR nelements: Int): GLXFBConfig;
+	TglXGetFBConfigAttrib* = PROCEDURE{C}(dpy: DisplayPtr; config: GLXFBConfig; attribute: Int; value: PInt): Int;
 	TglXGetVisualFromFBConfig* = PROCEDURE{C}(dpy: DisplayPtr; config: GLXFBConfig) : VisualInfoPtr;
-	TglXCreateWindow* = PROCEDURE{C}(dpy: DisplayPtr; config: GLXFBConfig; win: Window; attriblist: Pint): GLXWindow;
+	TglXCreateWindow* = PROCEDURE{C}(dpy: DisplayPtr; config: GLXFBConfig; win: Window; attriblist: PInt): GLXWindow;
 	TglXDestroyWindow* = PROCEDURE{C}(dpy: DisplayPtr; win: GLXWindow);
-	TglXCreatePixmap* = PROCEDURE{C}(dpy: DisplayPtr; config: GLXFBConfig; pixmap: Pixmap; attriblist: Pint): GLXPixmap;
+	TglXCreatePixmap* = PROCEDURE{C}(dpy: DisplayPtr; config: GLXFBConfig; pixmap: Pixmap; attriblist: PInt): GLXPixmap;
 	TglXDestroyPixmap* = PROCEDURE{C}(dpy: DisplayPtr; pixmap: GLXPixmap);
-	TglXCreatePbuffer* = PROCEDURE{C}(dpy: DisplayPtr; config: GLXFBConfig; attriblist: Pint): GLXPbuffer;
+	TglXCreatePbuffer* = PROCEDURE{C}(dpy: DisplayPtr; config: GLXFBConfig; attriblist: PInt): GLXPbuffer;
 	TglXDestroyPbuffer* = PROCEDURE{C}(dpy: DisplayPtr; pbuf: GLXPbuffer);
-	TglXQueryDrawable* = PROCEDURE{C}(dpy: DisplayPtr; draw: GLXDrawable; attribute: Int; value: PInt);
+	TglXQueryDrawable* = PROCEDURE{C}(dpy: DisplayPtr; draw: GLXDrawable; attribute: Int; value: PUint);
 	TglXCreateNewContext* = PROCEDURE{C}(dpy: DisplayPtr; config: GLXFBConfig; renderxtype:  Int; sharelist: GLXContext; direct: Boolean): GLXContext ;
 	TglXMakeContextCurrent* = PROCEDURE{C}( display: DisplayPtr; draw: GLXDrawable; readx: GLXDrawable; ctx: GLXContext): Boolean;
 	TglXGetCurrentReadDrawable* = PROCEDURE{C}(): GLXDrawable;
@@ -3384,11 +3377,11 @@ TYPE
 	TglXGetSelectedEvent* = PROCEDURE{C}(dpy: DisplayPtr; draw: GLXDrawable; VAR eventmask: Uint);
 
 	(* GLX_VERSION_1_4  *)
-	TglXGetProcAddress* = PROCEDURE{C}( name: ADDRESS): Pointer;
+	TglXGetProcAddress* = PROCEDURE{C}( name: ADDRESS): ADDRESS;
 	(* GLX_ARB_get_proc_address  *)
-	TglXGetProcAddressARB* = PROCEDURE{C}( name: ADDRESS): Pointer;
+	TglXGetProcAddressARB* = PROCEDURE{C}( name: ADDRESS): ADDRESS;
 	(* GLX_ARB_create_context  *)
-	TglXCreateContextAttribsARB* = PROCEDURE{C}(dpy: DisplayPtr; config: GLXFBConfig; sharecontext: GLXContext; direct: Boolean;  attriblist: Pint): GLXContext;
+	TglXCreateContextAttribsARB* = PROCEDURE{C}(dpy: DisplayPtr; config: GLXFBConfig; sharecontext: GLXContext; direct: Boolean;  attriblist: PInt): GLXContext;
 	(* GLX_EXT_import_context  *)
 	TglXGetCurrentDisplayEXT* = PROCEDURE{C}(): DisplayPtr;
 	TglXQueryContextInfoEXT* = PROCEDURE{C}(dpy: DisplayPtr; context: GLXContext; attribute: Int; VAR value: Int): Int;
@@ -3396,7 +3389,7 @@ TYPE
 	TglXImportContextEXT* = PROCEDURE{C}(dpy: DisplayPtr; contextID: GLXContextID): GLXContext;
 	TglXFreeContextEXT* = PROCEDURE{C}(dpy: DisplayPtr; context: GLXContext);
 	(* GLX_EXT_texture_from_pixmap  *)
-	TglXBindTexImageEXT* = PROCEDURE{C}(dpy: DisplayPtr; drawable: GLXDrawable; buffer: Int;  attriblist: Pint);
+	TglXBindTexImageEXT* = PROCEDURE{C}(dpy: DisplayPtr; drawable: GLXDrawable; buffer: Int;  attriblist: PInt);
 	TglXReleaseTexImageEXT* = PROCEDURE{C}(dpy: DisplayPtr; drawable: GLXDrawable; buffer: Int);
 
   VAR
@@ -9699,8 +9692,8 @@ END ReadExtensions;
 
 (* utilities  *)
 (* Get string from address  *)
-PROCEDURE GetStringFromAddr*(adr: LONGINT): Strings.String;
-VAR  sadr, sadr1: LONGINT;
+PROCEDURE GetStringFromAddr*(adr: ADDRESS): Strings.String;
+VAR  sadr, sadr1: ADDRESS;
 		i, cnt: LONGINT;
 		ch: CHAR;
 		s: Strings.String;
@@ -9746,14 +9739,14 @@ BEGIN
 	RETURN GetStringFromAddr(sadr);
 END GLXQueryExtensionString;
 
-PROCEDURE GLXGetClientString*(display: DisplayPtr; name: Enum): Strings.String;
+PROCEDURE GLXGetClientString*(display: DisplayPtr; name:Int): Strings.String;
 VAR  sadr: ADDRESS;
 BEGIN
   	sadr := glXGetClientString(display, name);
 	RETURN GetStringFromAddr(sadr);
 END GLXGetClientString;
 
-PROCEDURE GLXQueryServerString*(display: DisplayPtr; screen: Int; name: Enum): Strings.String;
+PROCEDURE GLXQueryServerString*(display: DisplayPtr; screen: Int; name: Int): Strings.String;
 VAR  sadr: ADDRESS;
 BEGIN
   	sadr := glXQueryServerString(display, screen, name);
@@ -10380,17 +10373,17 @@ END ReadImplementationProperties;
 
 
 (*! wrapper procedures for darwin compatibility  *)
-PROCEDURE BindAttribLocation*(programObj: Handle; index: Uint; CONST name: ARRAY OF CHAR);
+PROCEDURE BindAttribLocation*(programObj: Uint; index: Uint; CONST name: ARRAY OF CHAR);
 BEGIN
 	XglBindAttribLocation(programObj, index, ADDRESSOF(name[0]));
 END BindAttribLocation;
 
-PROCEDURE GetAttribLocation* (programObj: Handle; CONST chars: ARRAY OF CHAR): Int;
+PROCEDURE GetAttribLocation* (programObj: Uint; CONST chars: ARRAY OF CHAR): Int;
 BEGIN
 	RETURN XglGetAttribLocation(programObj, ADDRESSOF(chars[0]));
 END GetAttribLocation;
 
-PROCEDURE GetUniformLocation* (programObj: Handle; CONST chars: ARRAY OF CHAR): Int;
+PROCEDURE GetUniformLocation* (programObj: Uint; CONST chars: ARRAY OF CHAR): Int;
 BEGIN
 	RETURN XglGetUniformLocation (programObj, ADDRESSOF(chars[0]));
 END GetUniformLocation;
@@ -10405,17 +10398,17 @@ BEGIN
 	RETURN XglGetFragDataLocation(xprogram, ADDRESSOF(name[0]));
 END GetFragDataLocation;
 
-PROCEDURE GetAttribLocationARB*(programObj: HandleARB; CONST chars: ARRAY OF CHAR): Int;
+PROCEDURE GetAttribLocationARB*(programObj: Uint; CONST chars: ARRAY OF CHAR): Int;
 BEGIN
 	RETURN XglGetAttribLocationARB(programObj, ADDRESSOF(chars[0]));
 END GetAttribLocationARB;
 
-PROCEDURE BindAttribLocationARB*(programObj: HandleARB; index: Uint; CONST name: ARRAY OF CHAR);
+PROCEDURE BindAttribLocationARB*(programObj: Uint; index: Uint; CONST name: ARRAY OF CHAR);
 BEGIN
 	XglBindAttribLocationARB(programObj, index,  ADDRESSOF(name[0]));
 END BindAttribLocationARB;
 
-PROCEDURE GetUniformLocationARB*(programObj: HandleARB; CONST chars: ARRAY OF CHAR): Int;
+PROCEDURE GetUniformLocationARB*(programObj: Uint; CONST chars: ARRAY OF CHAR): Int;
 BEGIN
 	RETURN XglGetUniformLocationARB(programObj, ADDRESSOF(chars[0]));
 END GetUniformLocationARB;
@@ -10445,7 +10438,7 @@ BEGIN
 	XglGetNamedStringARB(namelen, ADDRESSOF(name[0]), bufSize, stringlen, xstring);
 END GetNamedStringARB;
 
-PROCEDURE GetNamedStringivARB*(namelen: Int; CONST name: ARRAY OF CHAR; pname: Enum; params: Pint);
+PROCEDURE GetNamedStringivARB*(namelen: Int; CONST name: ARRAY OF CHAR; pname: Enum; params: PInt);
 BEGIN
 	XglGetNamedStringivARB(namelen, ADDRESSOF(name[0]), pname, params);
 END GetNamedStringivARB;

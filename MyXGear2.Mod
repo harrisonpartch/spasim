@@ -463,7 +463,6 @@ BEGIN
 
 
 	IF fullscreen THEN
-		X11.Lock;
 		(* Use the XF86VidMode extension to control video resolution *)
 		(* Change the current video mode, switch to fullscreen *)
 		(* Unlock mode switch if necessary *)
@@ -491,7 +490,6 @@ BEGIN
 		Api.MapWindow(display, win);
 		res := Api.GrabKeyboard(display, win, Api.True, Api.GrabModeAsync , Api.GrabModeAsync, Api.CurrentTime);
 		res := Api.GrabPointer(display, win, Api.True, Api.ButtonPressMask, Api.GrabModeAsync, Api.GrabModeAsync, win, X11.None, Api.CurrentTime);
-		X11.Unlock;
 	ELSE
 		(* create a window in windowed mode *)
 		(* window event masks *)
@@ -539,10 +537,8 @@ BEGIN
 		hints.flags := {1};
  		windecorations := ~windecorations;
  		IF windecorations THEN hints.decorations := 0; ELSE hints.decorations := 1; END;
- 		X11.Lock;
 		property := Api.InternAtom(display, "_MOTIF_WM_HINTS", Api.True);
 		X11.ChangeProperty(display, win, property, property, 32, Api.PropModeReplace, ADDRESSOF(hints), 5);
-		X11.Unlock;
 	END;
 
 END ToggleDecorations;

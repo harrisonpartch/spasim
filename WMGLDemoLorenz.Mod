@@ -30,7 +30,7 @@ MODULE WMGLDemoLorenz; (** AUTHOR "fnecati"; PURPOSE "opengl Lorenz Strange Attr
  *)
 
 IMPORT
-	WMRectangles, WMGraphics, Strings, Kernel, Random, MathL,
+	WMRectangles, WMGraphics, Strings, Kernel, Random, MathL, Modules,
 	WM := WMWindowManager,  WMDialogs, Inputs, WMMessages,
 	gl := OpenGL, glc := OpenGLConst, WMGL := WMGLWindow;
 
@@ -99,6 +99,7 @@ TYPE
 		Reshape(w, h);
 		UpdateImage;
 		alive := TRUE;
+		IncCount
 	END New;
 
 	PROCEDURE ResetPositions;
@@ -128,17 +129,17 @@ TYPE
 	PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
 	BEGIN
 		CASE CHR(ucs) OF
-			"a" :	animated := ~ animated;  IF animated THEN animate := 1; ELSE animate := 0 END;
-					   UpdateImage;
+			"a" :	BEGIN {EXCLUSIVE} animated := ~ animated; END;  
+					IF animated THEN animate := 1; ELSE animate := 0 END;
+					
 			| "-" :	DEC(waittime,5); IF waittime < 10 THEN waittime := 10; END;
 			| "+" :	INC(waittime,5); IF waittime>1000 THEN waittime := 1000; END;
 			| "r" :	ResetPositions; UpdateImage;
 			| " " : 	animate := 2;  UpdateImage;
 			| "s":	SaveImage;
-			| "q" :	Close;
+			| "q" :	Close; RETURN;
 
 		ELSE
-          END;
 			IF  keysym = Inputs.KsLeft  THEN
 				MakeCurrent();
 
@@ -181,15 +182,16 @@ TYPE
 
 				DeActivate();
 				UpdateImage;
-			ELSE
 			END;
+		END;
 
 	END KeyEvent;
 
-	PROCEDURE Close*;
-	BEGIN {EXCLUSIVE}
-		alive := FALSE;
+	PROCEDURE Close;
+	BEGIN
+		BEGIN {EXCLUSIVE} alive := FALSE; animated := FALSE; END;
 		Close^;
+		DecCount
 	END Close;
 
 	PROCEDURE Handle(VAR m: WMMessages.Message);
@@ -380,24 +382,22 @@ TYPE
 
 	END AdvanceInTime;
 
-BEGIN  {ACTIVE}
-
+BEGIN{ACTIVE}
 	Kernel.SetTimer(timer, waittime);
 	WHILE alive DO
-		IF animated THEN
-			 IF Kernel.Expired(timer) THEN
-			 	 UpdateImage();
-				Kernel.SetTimer(timer, waittime);
-			END;
+		BEGIN {EXCLUSIVE} AWAIT(animated) END;
+		IF Kernel.Expired(timer) THEN
+			UpdateImage();
+			Kernel.SetTimer(timer, waittime);
 		END;
 	END;
-	
 END GLWindow;
 
 
 VAR
 	random: Random.Generator;
-
+	nofWindows : LONGINT;
+	
 PROCEDURE Open*;
 VAR
 	window: GLWindow;
@@ -405,12 +405,36 @@ BEGIN
 	NEW(window, 256, 256);
 END Open;
 
+PROCEDURE IncCount;
+BEGIN {EXCLUSIVE}
+	INC(nofWindows)
+END IncCount;
+
+PROCEDURE DecCount;
+BEGIN {EXCLUSIVE}
+	DEC(nofWindows)
+END DecCount;
+
+PROCEDURE Cleanup;
+VAR die : KillerMsg;
+	 msg : WMMessages.Message;
+	 m : WM.WindowManager;
+BEGIN {EXCLUSIVE}
+	NEW(die);
+	msg.ext := die;
+	msg.msgType := WMMessages.MsgExt;
+	m := WM.GetDefaultManager();
+	m.Broadcast(msg);
+	AWAIT(nofWindows = 0)
+END Cleanup;
+
 BEGIN
 	NEW(random);
 	random.InitSeed(12345);
+	Modules.InstallTermHandler(Cleanup)	
 END WMGLDemoLorenz.
 
-SystemTools.Free  WMGLDemoLorenz  WMGLWindow ~  
+SystemTools.Free  WMGLDemoLorenz   ~  
 
 WMGLDemoLorenz.Open ~
 

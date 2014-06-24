@@ -1,12 +1,12 @@
 MODULE WMGLPolyStipple; (** AUTHOR "fnecati"; PURPOSE "a demo using glPolygonStipple"; *)
  (* example from OpenGL redbook pdf *)
 IMPORT
-	WMRectangles, WMGraphics, Strings, Kernel, SYSTEM, KernelLog,
+	WMRectangles, WMGraphics, Strings, Kernel, Modules, SYSTEM, KernelLog,
 	WM := WMWindowManager,  WMMessages, WMDialogs,
 	GL := OpenGL, GLC := OpenGLConst, WMGL := WMGLWindow;
 
 CONST
-	waittime=10;
+	waittime = 50;
 
 TYPE Stipples=ARRAY [*] OF CHAR;
 
@@ -35,7 +35,7 @@ TYPE
    			GLinit;
 			Reshape(w, h);
 			UpdateImage;
-
+			IncCount;
 			alive := TRUE;
 		END New;
 
@@ -43,7 +43,7 @@ TYPE
 		BEGIN
 
 		CASE CHR(ucs) OF
-			"a", "A": animated := ~ animated;   UpdateImage;
+			"a", "A": BEGIN {EXCLUSIVE} animated := ~ animated; END; 
 			| "-" : anglez := anglez - 5.0; UpdateImage;
 			| "+" : anglez := anglez + 5.0; UpdateImage;
 			| "p": PrintVals;
@@ -62,10 +62,11 @@ TYPE
 			END
 		END Handle;
 
-		PROCEDURE Close*;
-		BEGIN {EXCLUSIVE}
-			alive := FALSE;
+		PROCEDURE Close;
+		BEGIN
+			BEGIN {EXCLUSIVE} alive := FALSE; animated := FALSE; END;
 			Close^;
+			DecCount
 		END Close;
 
 		PROCEDURE UpdateImage;
@@ -227,17 +228,18 @@ TYPE
 BEGIN {ACTIVE}
 	Kernel.SetTimer(timer, waittime);
 	WHILE alive DO
-			IF animated THEN
-			 IF Kernel.Expired(timer) THEN
-			 	 UpdateImage();
- 			 	 anglez := anglez + 5;
-
-				Kernel.SetTimer(timer, waittime);
-			END;
-			END;
+		BEGIN {EXCLUSIVE} AWAIT(animated) END;
+		IF Kernel.Expired(timer) THEN
+			UpdateImage();
+ 			anglez := anglez + 5;
+			Kernel.SetTimer(timer, waittime);
+		END;
 	END;
 END GLWindow;
 
+VAR
+	nofWindows : LONGINT;
+	
 PROCEDURE Open*;
 VAR
 	window: GLWindow;
@@ -245,11 +247,34 @@ BEGIN
 	NEW(window, 256, 256);
 END Open;
 
-BEGIN
+PROCEDURE IncCount;
+BEGIN {EXCLUSIVE}
+	INC(nofWindows)
+END IncCount;
 
+PROCEDURE DecCount;
+BEGIN {EXCLUSIVE}
+	DEC(nofWindows)
+END DecCount;
+
+PROCEDURE Cleanup;
+VAR die : KillerMsg;
+	 msg : WMMessages.Message;
+	 m : WM.WindowManager;
+BEGIN {EXCLUSIVE}
+	NEW(die);
+	msg.ext := die;
+	msg.msgType := WMMessages.MsgExt;
+	m := WM.GetDefaultManager();
+	m.Broadcast(msg);
+	AWAIT(nofWindows = 0)
+END Cleanup;
+
+BEGIN
+	Modules.InstallTermHandler(Cleanup)
 END WMGLPolyStipple.
 
-SystemTools.Free  WMGLPolyStipple  WMGLWindow~ ~
+SystemTools.Free  WMGLPolyStipple   ~
 
 WMGLPolyStipple.Open ~
 

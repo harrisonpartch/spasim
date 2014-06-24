@@ -10,36 +10,30 @@ TYPE
 		eyeposz: LONGREAL;
 		anglez: REAL;
 		left : BOOLEAN;
-		time: LONGINT;
+
 	PROCEDURE &New(w, h: LONGINT );
 	BEGIN
 		Init(w,h, 400,300, FALSE);
 			anglez := 30.0;
 			eyeposz := 10.0;
 		SetTitle("OGLDemo2");
-		time := 500;
-		SetIdleTime(time); (* set idle time to 50ms *)
-		SetPrintFPS(TRUE);
+		SetIdleTime(1000); (* set idle time to 50ms *)
+
 		SetGameMode(TRUE);
 	END New;
 
 	(** *)
 	PROCEDURE IdleDisplay();
 	BEGIN
-		ReDisplay();		
-	END IdleDisplay;
-
-	PROCEDURE ChangeAngle();
-	BEGIN
-		IF left THEN
+			IF left THEN
 			anglez := anglez - 5.0;
 			IF anglez < 0 THEN anglez := 360 ; END;
 
 		ELSE  anglez := anglez + 5.0;
 			  IF anglez > 360 THEN anglez := 0; END;
 		END;
-	
-	END ChangeAngle;
+		 ReDisplay();
+	END IdleDisplay;
 
 	(** *)
 	PROCEDURE Close*;
@@ -81,17 +75,15 @@ TYPE
 		CASE keysym OF
 			Inputs.KsLeft: left := TRUE; ReDisplay;
 			| Inputs.KsRight: left := FALSE; ReDisplay;
-			| Inputs.KsUp:  	DEC(time); SetIdleTime(time); (* faster *)
-				KernelLog.String("idletime= "); KernelLog.Int(time, 0); KernelLog.Ln;
-			| Inputs.KsDown: INC(time); SetIdleTime(time); (* slowdown *)
-				KernelLog.String("idletime= "); KernelLog.Int(time, 0); KernelLog.Ln;
+			| Inputs.KsUp:  	SetIdleTime(1+ ENTIER(idletime/1.2)); (* faster *)
+				KernelLog.String("idletime= "); KernelLog.Int(idletime, 0); KernelLog.Ln;
+			| Inputs.KsDown: SetIdleTime(1+ ENTIER(idletime*1.2)); (* slowdown *)
+				KernelLog.String("idletime= "); KernelLog.Int(idletime, 0); KernelLog.Ln;
 
 			| ORD("r") : MoveResizeWindow(10,10, 400, 400);
 			| ORD("d"): SetDecorations(FALSE);
  			| ORD("D"): SetDecorations(TRUE);
 			| ORD("q") : Close;
-			| ORD("g"): SetIdleTime(0);
-			| ORD("G"): SetIdleTime(1000);
 		ELSE
 
 		END;
@@ -177,11 +169,9 @@ TYPE
 	PROCEDURE Display;
 	BEGIN
 		GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT);
-		ChangeAngle();
 		DrawAQuad();
 		Cube();
 		SwapBuffers();
-		
 	END Display;
 
 
@@ -194,7 +184,7 @@ TYPE
 
 		GL.MatrixMode(GLC.GL_PROJECTION);
 		GL.LoadIdentity();
-		GLU.Perspective(45.0, w/h, 0.1, 100.0);
+		GLU.Perspective(45.0, 1.0, 0.1, 100.0);
 
 		GL.MatrixMode(GLC.GL_MODELVIEW);
 		GL.LoadIdentity();
@@ -220,7 +210,3 @@ END OGLDemo2.
 SystemTools.Free OGLDemo2 OGLWindow~
 
 SystemTools.FreeDownTo  OpenGL ~ 
-
-spasim/Win32.WGLinfo.Mod
-
-WGLinfo.Do ~

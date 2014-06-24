@@ -15,69 +15,84 @@
 # LinuxAos:
 
 Compiler.Compile
-	 OpenGLConst.Mod
-	 Unix.OpenGL.Mod
-	 Unix.GLU.Mod
-	 Unix.GLContext.Mod
-	 Unix.GLContextFB.Mod
-	 Unix.OGLWindow.Mod
-	 Unix.WMGLWindow.Mod
-	 Unix.GLXinfo.Mod
-	 GLShaderUtils.Mod
-	 GLShadersBuild.Mod
-	 GLLib.Mod	 
-	~
+	opengloberon/OpenGLConst.Mod
+	opengloberon/Unix.OpenGL.Mod
+	opengloberon/Unix.GLU.Mod
+	opengloberon/Unix.GLContext.Mod
+	opengloberon/Unix.GLContextPB.Mod
+	opengloberon/Unix.XF86VMode.Mod
+	opengloberon/Unix.OGLWindow.Mod
+	opengloberon/Unix.WMGLWindow.Mod
+	opengloberon/Unix.GLXinfo.Mod
+	opengloberon/GLShaderUtils.Mod
+	opengloberon/GLShadersBuild.Mod
+~
 	
 	GLXinfo.Do~  # display opengl info
 	
 # WinAos:
 
 Compiler.Compile
-	OpenGLConst.Mod
-	WinApi.Mod	
-	Win32.OpenGL.Mod
-	Win32.GLU.Mod	
-	Win32.GLContext.Mod
-	Win32.OGLWindow.Mod
-	Win32.WMGLWindow.Mod
-	Win32.WGLinfo.Mod
-	GLShaderUtils.Mod
-	GLShadersBuild.Mod
-	GLLib.Mod	
+	opengloberon/OpenGLConst.Mod
+	opengloberon/WinApi.Mod	
+	opengloberon/Win32.OpenGL.Mod
+	opengloberon/Win32.GLU.Mod	
+	opengloberon/Win32.GLContext.Mod
+	opengloberon/Win32.OGLWindow.Mod
+	opengloberon/Win32.WMGLWindow.Mod
+	opengloberon/Win32.WGLinfo.Mod
+	opengloberon/GLShaderUtils.Mod
+	opengloberon/GLShadersBuild.Mod
 	 ~
 
 	WGLinfo.Do ~ 
-	
+#==========================================
+# utilities
+# =========================================
+Compiler.Compile 
+	opengloberon/GLMatrix.Mod
+	opengloberon/GLTextures.Mod
+	opengloberon/GLMaterials.Mod	
+	opengloberon/GLLib.Mod	
+	opengloberon/GLUTGeometry.Mod	
+	opengloberon/Containers.Mod
+	opengloberon/Decoder3DS.Mod	
+	opengloberon/OBJLoader.Mod
+	opengloberon/OBJLoader2x.Mod
+	opengloberon/GLTexture2D.Mod
+	opengloberon/GLTextureFont2D.Mod
+~
+
+# =========================================
 # 2- Compile platform independent demo examples of GLContext :
 
 Compiler.Compile
-	 GLTest.Mod
-	 WMGLDemo.Mod
-	 WMGLDemo1.Mod
-	 WMGLDemo2.Mod
-	 WMGLDemo3.Mod
-	 WMGLDemo4.Mod
-	 WMGLDemo6.Mod
-	 WMGLDemo7.Mod
-	 WMGLDemo9.Mod
-	 WMGLDemoFlags.Mod
-	 WMGLDemoLorenz.Mod
-	 WMGLPlotSurface.Mod
-	 WMGLSteamEngine.Mod
-	 WMGLPolyStipple.Mod
-	 WMGLSLBricks.Mod
+	 opengloberon/GLTest.Mod
+	 opengloberon/WMGLDemo.Mod
+	 opengloberon/WMGLDemo1.Mod
+	 opengloberon/WMGLDemo2.Mod
+	 opengloberon/WMGLDemo3.Mod
+	 opengloberon/WMGLDemo4.Mod
+	 opengloberon/WMGLDemo6.Mod
+	 opengloberon/WMGLDemo7.Mod
+	 opengloberon/WMGLDemo9.Mod
+	 opengloberon/WMGLDemoFlags.Mod
+	 opengloberon/WMGLDemoLorenz.Mod
+	 opengloberon/WMGLPlotSurface.Mod
+	 opengloberon/WMGLSteamEngine.Mod
+	 opengloberon/WMGLPolyStipple.Mod
+	 opengloberon/WMGLSLBricks.Mod
+	opengloberon/WMSpaceSim3.Mod	 
 	~
-
-
+# =========================================
 
 # LinuxAos specific demos (using linux native X11-Window ):
 Compiler.Compile
-	Unix.X11KeySymDef.Mod
-	Unix.XF86VMode.Mod
-	MyXGear.Mod
-	MyXGear1.Mod
-	MyXGear2.Mod
-	~
+	opengloberon/Unix.X11KeySymDef.Mod
+	opengloberon/MyXGear.Mod
+	opengloberon/MyXGear1.Mod
+	opengloberon/MyXGear2.Mod
+~
 
 
 # WinAos specific version of WMGLDemo7.Mod by tobj..@ .., thanks :
@@ -100,39 +115,25 @@ Compiler.Compile  Win32.WMGLDemo7b.Mod ~  WMGLDemo7b.Open ~
 	WMGLSteamEngine.Open ~
 	WMGLPolyStipple.Open ~
 	WMGLSLBricks.Open ~
-
+	WMSpaceSim3.Open ~ 
  
 # ***************************************
 # 3- Compile demo examples of OGLWindow:
 
 Compiler.Compile
-
-	OGLDemo.Mod
-	OGLDemo1.Mod
-	OGLDemo2.Mod
-
-	OGLDemoFonts.Mod
-	~
+	opengloberon/OGLDemo.Mod
+	opengloberon/OGLDemo1.Mod
+	opengloberon/OGLDemo2.Mod
+	opengloberon/SpaceSim3.Mod 
+~
 
 # Run Demos, click Midle Mouse (MM) on the following commands
 
 	OGLDemo.Open ~
 	OGLDemo1.Open ~
 	OGLDemo2.Open ~
-	OGLDemoFonts.Open ~
-
-# **********************
-# **********************
-# A 3DS model Loader example
-	Compiler.Compile 
-		Containers.Mod 
-		Decoder3DS.Mod 
-		SpaceSim3.Mod 
-		WMSpaceSim3.Mod
-		~
-
 	SpaceSim3.Open ~
-	WMSpaceSim3.Open ~ 
+	
 # **********************
 # **********************
 
