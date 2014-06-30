@@ -1,6 +1,6 @@
 MODULE Marsh;
-IMPORT  Base , Retina, Engrainer, Random,
- XNXLFRep, Files, Streams, Commands, Out:=KernelLog;
+IMPORT  Base , Retina, Engrainer, Random, CellAuto,
+ FRep, Files, Streams, Commands, Out:=KernelLog;
 
 CONST sfile="marshstrokes.text"
 TYPE Voxel=Base.Voxel;
@@ -100,10 +100,12 @@ VAR
 	i,j,k,ii,jj,kk,iii,jjj,kkk,t,s: LONGINT;
 	cost: REAL;
 	up,flat,down,right,away,slant,p,pp,q,qq,center,undercenter, normal,xaxis,yaxis,zaxis: PT;
-	tnoise: XNXLFRep.tilednoise;
-	noise: XNXLFRep.noise;
-	gorgeplane: XNXLFRep.landscape;
-	plane: XNXLFRep.plane;
+	tnoise: FRep.tilednoise;
+	noise: FRep.noise;
+	bifr: FRep.bifr;;
+	gorgeplane: FRep.landscape;
+	plane: FRep.plane;
+	sphere: FRep.sphere;	
 	r,g,b: Base.Color;
 	red,blue,green: REAL;
 	EMPTY,cursormark:Voxel;
@@ -142,7 +144,7 @@ BEGIN
 	IF lines THEN line END
 END stroke;
 
-PROCEDURE drawcursor*;
+PROCEDURE snipeinto*;
 VAR
 	p,dp:PT;
 	ray:Base.Ray;
@@ -156,18 +158,41 @@ BEGIN
 	ELSE
 		p:= ray.xyz; dp:=ray.dxyz
 	END;
-	IF SNIPEINTO THEN
-		p.x:=p.x+dp.x/1000000;
-		p.y:=p.y+dp.y/1000000;
-		p.z:=p.z+dp.z/1000000;
-	ELSE 
-		p.x:=p.x-dp.x/1000000;
-		p.y:=p.y-dp.y/1000000;
-		p.z:=p.z-dp.z/1000000;
-	END;
+	p.x:=p.x+dp.x/1000000;
+	p.y:=p.y+dp.y/1000000;
+	p.z:=p.z+dp.z/1000000;
 	Base.cursorPT:=p; 	
 	stroke(Base.cursorPT,cursorsize,marshv.vox,voxundo)
-END drawcursor;
+END snipeinto;
+
+PROCEDURE snipeonto*;
+VAR
+	p,dp:PT;
+	ray:Base.Ray;
+	v: Voxel;
+	d:REAL;
+BEGIN
+	ray:=Base.sniperay;
+	Base.world.Shade(ray);
+	IF ray.hitmirrorTF THEN 
+		p:=ray.hitxyz; dp:=ray.hitdxyz
+	ELSE
+		p:= ray.xyz; dp:=ray.dxyz
+	END;
+	p.x:=p.x-dp.x/1000000;
+	p.y:=p.y-dp.y/1000000;
+	p.z:=p.z-dp.z/1000000;
+	Base.cursorPT:=p; 	
+	stroke(Base.cursorPT,cursorsize,marshv.vox,voxundo)
+END snipeonto;
+
+PROCEDURE sniprobe*():Voxel;
+VAR
+	v: Voxel;
+BEGIN
+	v:=Base.world.proberay(Base.sniperay);
+	RETURN v
+END sniprobe;
 
 PROCEDURE drawHUD*;
 VAR
@@ -197,9 +222,9 @@ PROCEDURE drawavatar*;
 VAR
 	i: LONGINT;
 	p: PT;
+	v: Voxel;
 BEGIN
-	stroke(Base.previousavatarPT,Base.avatarsize,avatarundo,voxundo);
-	stroke(Base.avatarPT,Base.avatarsize,Base.avatar,avatarundo);
+	Base.world.strokephemeral(Base.avatarPT,Base.avatarsize,Base.avatar,avatarundo)
 END drawavatar;
 
 PROCEDURE Rez*(context: Commands.Context);
@@ -252,9 +277,10 @@ PROCEDURE dawn*;
 VAR
 	z10: Voxel;
 	sfish,gxy,w10,w11,v,lobster, btx,ash, dotz, GREEN,PURPLE,MCUBE:Voxel;
-	undo,rd,blu, die,gren,granite,sand,whiteblock,lazy,pdestroyer,axolotl,xen,sky1,sky2,tigerlily,cloud: Voxel;
-	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison:Voxel;
-	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,cage,floop,volvox,life,iml: Voxel;
+	undo,rd, rdpseudosolid, blu, die,gren,granite,sand,whiteblock,lazy,pdestroyer,axolotl,xen,sky1,sky2,tigerlily,cloud: Voxel;
+	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison,fuse:Voxel;
+	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,
+	cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp: Voxel;
 	 
 BEGIN
 	NEW(ms);
@@ -264,34 +290,56 @@ BEGIN
 
   	w10:=Base.VoxelFromName("NM3");	
  	z10:=Base.VoxelFromName("NM2");	
-    
-	Out.String("EEEEP!");
-	xot:=Base.VoxelFromName("Nharrisonavatar"); 
+
+	harrison:=Base.VoxelFromName("Nharrisonavatar"); 
+	push(harrison);
+	doge:=Base.VoxelFromName("Ndogepearl"); 
+	push(doge);		
+	xot:=Base.VoxelFromName("N5a2g4M6HYjPJxYSNQvYyv7"); 
 	push(xot);
+     floop:=Base.VoxelFromName("NFLOOP");  
+     push(floop);
+ 	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXXBiQ"); 	
+	push(serp);
+	treeserp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX666"); 	
+	push(treeserp);	
+	gorge:=Base.VoxelFromName("NxxxGAernhjFK40xASZZVoQ"); 
+	push(gorge);
 	xot2:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 	
 	push(xot2);
+	reddot:=Base.VoxelFromName("Nreddot"); 	
+	push(reddot);
 	msphere:=Base.VoxelFromName("NBsHFiBKkSckXBAd46Zbsss"); 	
-	push(msphere);	
- 	volvox:=Base.VoxelFromName("Nrdvolvox");  	
-       push(volvox);
-	beatrix:=Base.VoxelFromName("NwPicBWw4NfcserX4ELaQ3A"); 
-	push(beatrix);
-       lobster:=Base.VoxelFromName("NznGx2ySiHIGrO5t9Pzcw5Q"); 
+	 push(msphere);	
+ (*	volvox:=Base.VoxelFromName("Nrdvolvox");  	
+       push(volvox);*)
+       rdpseudosolid:=Base.VoxelFromName("Nrdpseudosolid"); 
+       push(rdpseudosolid);
+	beatrix:=Base.VoxelFromName("NwPicBWw4NfcserX4ELaQ3b"); 
+       speckle:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7"); 
+       push(speckle);
+       
+       lobster:=Base.VoxelFromName("Ndiffuseblue"); 
 	push(lobster);
 	tigerlily:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  
        push(tigerlily);
  	iml:=Base.VoxelFromName("Niml");  
        push(iml);      
-	floop:=Base.VoxelFromName("NFLOOP");	
- 	push(floop);
-     life:=Base.VoxelFromName("Nlife");  
+     	life:=Base.VoxelFromName("Nlife");  
        push(life);
-  	MCUBE:=Base.VoxelFromName("Nr3kPtbyEYLFK3AN2UUVrqg");
+	harrison:=Base.VoxelFromName("Nharrisonavatar"); 
+	push(harrison);
+	doge:=Base.VoxelFromName("Ndogepearl"); 
+	push(doge);	
+    	MCUBE:=Base.VoxelFromName("Nr3kPtbyEYLFK3AN2UUVrqg");
 	push(MCUBE);
   	
 	cage:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");
+	cage.copyonstroke:=TRUE;
   	push(cage);
- 
+ 	fuse:=Base.VoxelFromName("NFuse");
+
+ 	push(fuse);
 
 	gxy:=Base.VoxelFromName("NmOgKSH5ZXYP3DODELOkO7g"); 	
 	push(gxy);
@@ -303,18 +351,17 @@ BEGIN
   	push(ash);
 	dotz:=Base.VoxelFromName("Nahf6T7P6CYGfcImQTejDpg");	
 	btx:=Base.VoxelFromName("NVY1hEGnyr7z8DtULRMOZIQ");	
-	conglomerate:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZOQ"); 			
+	conglomerate:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7"); 			
 	
-	GREEN:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODg");	
+	GREEN:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODg");	(*actually blue atm*)
 	grass:=Base.VoxelFromName("NJOFc7qhMXMly3lot71bNUw"); 	
-	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXXBiQ"); 	
 	cloud:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODh"); 		
 	
   	push(dotz);
 	push(btx);
 	push(GREEN);
 	push(grass);	
-	push(serp);
+
 	push(conglomerate);
 	push(xot);	
 	push(cloud);	
@@ -325,7 +372,7 @@ BEGIN
 	push(gren);
 	die:=Base.VoxelFromName("NCjgzkmiTyecI5x6eOgYqpQ"); 
 	push(die);
-	granite:=Base.VoxelFromName("NH6nvNlOJNlCtpkDB56ljSw"); 	
+	granite:=Base.VoxelFromName("NGNYAfkxmEzxe6ZESmcMJtw"); 	
 	push(granite);
 	sand:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw"); 		
 	push(sand);
@@ -361,80 +408,74 @@ BEGIN
 	push(greenball);
 	rat:=Base.VoxelFromName("NGJBlQ95mTkoMhozr6XOJYg"); 	
 	push(rat);
-	conglo2:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZOZ"); 	
+	conglo2:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZOq"); 	
 	push(conglo2);
-	sky1:=Base.VoxelFromName("N5a2g4M6HYjPJxYSNQvYyvw"); 	
+	sky1:=Base.VoxelFromName("N5a2g4M6HYjPJxYSNQvYy7"); 	
 	push(sky1);
-	sky2:=Base.VoxelFromName("NUzl1lqmBmaKyswkc70kO3w"); 	
+	sky2:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXXBiQ"); 	
 	push(sky2);
 	tigerlily:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  				
 	push(tigerlily);
-	gorge:=Base.VoxelFromName("NxxxGAernhjFK40xASZZVoQ"); 
-	push(gorge);
-      harrison:=Base.VoxelFromName("squeep"); 
-	push(harrison);
- 
+	
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,1/12);
 	NEW(tnoise);
 	tnoise.seed:=123666;	
-	tnoise.a:=3;
-	tnoise.b:=2;
-	tnoise.c:=2;		
+	tnoise.a:=1;
+	tnoise.b:=1;
+	tnoise.c:=1;		
 	tnoise.octaves:=4;
-	tnoise.persistence:=3.5;
+	tnoise.persistence:=3;
 	tnoise.setvoxel(dotz);
-	tnoise.va[0]:=sand;
-	tnoise.va[1]:=axolotl;
-	tnoise.va[2]:=etile0;
-	tnoise.va[3]:=serp;
-	tnoise.va[4]:=greenball;
-	tnoise.va[5]:=btx;	
+	tnoise.va[0]:=cthulhu;
+	tnoise.va[1]:=sparx;
+	tnoise.va[2]:=lobster;
+	tnoise.va[3]:=xot;
+	tnoise.va[4]:=xot2;
+	tnoise.va[5]:=sky;	
 
 	NEW(noise);		
 	noise.seed:=123666;		
 	noise.a:=1;
-	noise.b:=3;
+	noise.b:=1;
 	noise.c:=1;		
 	noise.octaves:=4;
-	noise.setvoxel(axolotl);
-	noise.persistence:=4;
+	noise.setvoxel(tigerlily);
+	noise.persistence:=3.2;
 	Out.String("EEEEP!");
-	Base.setPT(up,0,0,-1);
-	Base.setPT(center,1/2,1/2,11/12);
+	Base.setPT(up,0,0,1);
+	Base.setPT(center,1/2,1/2,1/2);
+	NEW(sphere,center,5/9);
+	sphere.vox:=lobster;
+	NEW(bifr,sphere,noise);
+	Base.setPT(up,0,0,1);
 	NEW(plane,center,up);
-	plane.vox:=sand;
-	Out.String("EEEEP!"); 				
-(*	z10.FRaster(noise,128); 	
-	z10.FRaster(tnoise,128);  
-*)	z10.FRaster(plane,32);
-	z10.setcolor(1,0,0,0,0); 	
-	gorge.setcolor(0,1,0,1,0);
-	z10.stroke(center,30,z10,undo);
-	Base.world:=z10; 	
-	Base.avatar:=conglomerate;
-	Base.avatarsize:=10000;
-(*	engrain; 
-	sprout; *)
-	Out.String("EEEEP!");
+	plane.vox:=sky;	
+	Base.world:=Base.VoxelFromName("NWorld"); 
+(*	engrain;
+	sprout;
+*)	Base.avatar:=harrison;
+	Base.avatarsize:=1000;
 END dawn;
 
 PROCEDURE darken*;
 BEGIN
 	atmdark:= atmdark*1.5;
-	Base.world.setcolor(0,0,atmdark,atmdark,atmdark);	
+	Base.world.setcolor(0,0,0,atmdark,0);	
 END darken;
 
 PROCEDURE lighten*;
 BEGIN
 	IF atmdark>0.11 THEN atmdark:= atmdark/1.5 END;
-	Base.world.setcolor(0,0,atmdark,atmdark,atmdark);	
+	Base.world.setcolor(0,0,0,atmdark,0);	
 END lighten
 
 BEGIN
 	NEW(marshv);
-	cursorsize:=243*9;
+	dawn;
+	cursorsize:=512;
 	cursorTF:=TRUE;
+	atmdark:=1.2;
 	SNIPEINTO:=TRUE;
 END Marsh.
 

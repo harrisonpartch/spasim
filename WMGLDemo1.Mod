@@ -1,7 +1,7 @@
 MODULE WMGLDemo1; (** AUTHOR "fnecati"; PURPOSE "a demo for Vertex Arrays, and lightining"; *)
 
 IMPORT
-	WMRectangles, WMGraphics, Strings, Kernel, KernelLog,
+	WMRectangles, WMGraphics, Strings, Kernel, KernelLog, Modules,
 	WM := WMWindowManager,  WMMessages, WMDialogs,
 	GL := OpenGL, GLC := OpenGLConst, GLU, WMGL := WMGLWindow;
 
@@ -37,24 +37,18 @@ TYPE
 		drawMode := 0;
 		light := TRUE;
 
-		InitContext;
-		alive := TRUE;
-	END New;
-
-	PROCEDURE InitContext;
-	BEGIN
-		MakeCurrent();
-
-			IF ~ initGL() THEN Close END;
-		DeActivate();
+		IF ~ initGL() THEN Close; RETURN END;
+		Reshape(w, h);
 		DrawMode(0);
 		UpdateImage;
-	END InitContext;
+		alive := TRUE;
+		IncCount
+	END New;
 
 	PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
 	BEGIN
 		CASE CHR(ucs) OF
-			 "a", "A":  animated := ~ animated;
+			 "a", "A":  BEGIN{EXCLUSIVE} animated := ~ animated; END;
 			| "d": drawMode := (drawMode+1) MOD 3; DrawMode(drawMode); UpdateImage;
 			| "l": light := ~ light;
 					MakeCurrent();
@@ -70,7 +64,7 @@ TYPE
 		END;
 	END KeyEvent;
 
-	PROCEDURE WheelMove*(dz : LONGINT);
+	PROCEDURE WheelMove(dz : LONGINT);
 	BEGIN
 		eyeposz := eyeposz + dz;
 		Reshape(GetWidth(), GetHeight());
@@ -85,10 +79,11 @@ TYPE
 		END
 	END Handle;
 
-	PROCEDURE Close*;
-	BEGIN {EXCLUSIVE}
-		alive := FALSE;
+	PROCEDURE Close;
+	BEGIN 
+		BEGIN{EXCLUSIVE} alive := FALSE; animated := FALSE END;
 		Close^;
+		DecCount
 	END Close;
 
 	PROCEDURE UpdateImage;
@@ -114,10 +109,16 @@ TYPE
 	PROCEDURE Reshape(w,h: LONGINT);
 	BEGIN
 		MakeCurrent();
+		GL.Viewport(0,0, w, h);
+		
+		GL.MatrixMode(GLC.GL_PROJECTION);
+		GL.LoadIdentity();
+		GLU.Perspective(45, 1, 1, 1000);
+
 		GL.MatrixMode(GLC.GL_MODELVIEW);
 		GL.LoadIdentity();
-			GLU.LookAt(5, 5, eyeposz,   0, 0, 0,   0, 1, 0); (* eye(x,y,z), focal(x,y,z), up(x,y,z) *)
-
+		GLU.LookAt(5, 5, eyeposz,   0, 0, 0,   0, 1, 0); (* eye(x,y,z), focal(x,y,z), up(x,y,z) *)		
+		
 		  DeActivate();
 	END Reshape;
 
@@ -144,6 +145,7 @@ TYPE
 
 	PROCEDURE initGL(): BOOLEAN;
 	BEGIN
+		MakeCurrent();
 		GL.ReadImplementationProperties;
 		IF ~ GL.GL_ARB_vertex_buffer_object THEN
 			KernelLog.String("GL_ARB_vertex_buffer_object extesion not supported" ); KernelLog.Ln;
@@ -228,7 +230,7 @@ TYPE
 		GL.ColorMaterial(GLC.GL_FRONT_AND_BACK, GLC.GL_AMBIENT_AND_DIFFUSE);
 		GL.Enable(GLC.GL_COLOR_MATERIAL);
 
-		GL.MatrixMode(GLC.GL_PROJECTION);
+	(*	GL.MatrixMode(GLC.GL_PROJECTION);
 		GL.LoadIdentity();
 		GLU.Perspective(45, 1, 1, 1000);
 
@@ -237,6 +239,7 @@ TYPE
 
 
 			GLU.LookAt(5, 5, eyeposz,   0, 0, 0,   0, 1, 0); (* eye(x,y,z), focal(x,y,z), up(x,y,z) *)
+		*)	
 		RETURN TRUE;
 	END initGL;
 
@@ -276,33 +279,30 @@ TYPE
 		GL.EnableClientState(GLC.GL_NORMAL_ARRAY);
 
 		GL.PushMatrix();
-
 			GL.Rotatef(angle, 0,0,1);
-
-		GL.DrawArrays(GLC.GL_QUADS, 0, 24);
+			GL.DrawArrays(GLC.GL_QUADS, 0, 24);
 		GL.PopMatrix();
 
 		GL.DisableClientState(GLC.GL_NORMAL_ARRAY);
 		GL.DisableClientState(GLC.GL_COLOR_ARRAY);
 		GL.DisableClientState(GLC.GL_VERTEX_ARRAY);  (* disable vertex arrays *)
-
-		GL.Finish();
 	END displayCB;
-
 
 BEGIN { ACTIVE }
 	Kernel.SetTimer(timer, waittime);
 	WHILE alive DO
-		IF animated THEN
-			 IF Kernel.Expired(timer) THEN
-			 	 UpdateImage();
-			 	  angle := angle + 5.0;
-				Kernel.SetTimer(timer, waittime);
-			END;
+		BEGIN{EXCLUSIVE} AWAIT(animated) END;
+		 IF Kernel.Expired(timer) THEN
+		 	 UpdateImage();
+		 	  angle := angle + 5.0;
+			Kernel.SetTimer(timer, waittime);
 		END;
 	END;
 END GLWindow;
 
+VAR
+	nofWindows : LONGINT;
+	
 PROCEDURE Open*;
 VAR
 	window: GLWindow;
@@ -310,9 +310,33 @@ BEGIN
 	NEW(window, 256, 256);
 END Open;
 
+PROCEDURE IncCount;
+BEGIN {EXCLUSIVE}
+	INC(nofWindows)
+END IncCount;
+
+PROCEDURE DecCount;
+BEGIN {EXCLUSIVE}
+	DEC(nofWindows)
+END DecCount;
+
+PROCEDURE Cleanup;
+VAR die : KillerMsg;
+	 msg : WMMessages.Message;
+	 m : WM.WindowManager;
+BEGIN {EXCLUSIVE}
+	NEW(die);
+	msg.ext := die;
+	msg.msgType := WMMessages.MsgExt;
+	m := WM.GetDefaultManager();
+	m.Broadcast(msg);
+	AWAIT(nofWindows = 0)
+END Cleanup;
+
 BEGIN
+	Modules.InstallTermHandler(Cleanup)
 END WMGLDemo1.
 
-SystemTools.Free  WMGLDemo1 WMGLWindow ~
+SystemTools.Free  WMGLDemo1~
 
 WMGLDemo1.Open ~

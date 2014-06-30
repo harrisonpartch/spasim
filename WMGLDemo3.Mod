@@ -1,12 +1,13 @@
 MODULE WMGLDemo3; (** AUTHOR "fnecati"; PURPOSE "opengl glxgears implementation"; *)
 
 IMPORT
-	WMRectangles, WMGraphics, Strings, Kernel, Math,
-	WM := WMWindowManager,  WMMessages, WMDialogs,
+	WMRectangles, WMGraphics, Strings, Kernel, Math, Modules,
+	WM := WMWindowManager,  WMMessages, WMDialogs, KernelLog,
 	GL := OpenGL, GLC := OpenGLConst, WMGL:=WMGLWindow;
 
-CONST waittime = 20;
-		pi = Math.pi;
+CONST
+	debug = TRUE;	
+	pi = Math.pi;
 
 TYPE
 	KillerMsg = OBJECT
@@ -14,8 +15,12 @@ TYPE
 
 	GLWindow* =  OBJECT(WMGL.Window)
 	VAR
-		 timer: Kernel.MilliTimer;
+		timer: Kernel.MilliTimer;
 		alive, animated: BOOLEAN;
+		font: WMGraphics.Font;
+		frames: LONGINT;
+		fpsstr: ARRAY 30 OF CHAR;
+				
 		ztrans: REAL;
 
 		(* for gears *)
@@ -26,12 +31,13 @@ TYPE
 
 		PROCEDURE &New(w, h: LONGINT);
 		BEGIN
-
 			Init(w, h, FALSE); (* use alpha, for 32bpp img *)
-
 			WM.DefaultAddWindow(SELF);
-
 			SetTitle(Strings.NewString("WMGLDemo3: Gears "));
+			canvas.SetColor(WMGraphics.Green);
+			font := canvas.GetFont();
+			fpsstr := "FPS: ";
+			
 			angle := 0.0;
 			angley := 0.0;
 			ztrans := -40.0;
@@ -40,7 +46,7 @@ TYPE
 			InitGears;
 			Reshape(w,h);
 			UpdateImage;
-
+			IncCount;
 			animated := FALSE;
 			alive := TRUE;
 		END New;
@@ -48,27 +54,27 @@ TYPE
 		PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
 		BEGIN
 
-		CASE CHR(ucs) OF
-			"a", "A": animated := ~ animated;
+			CASE CHR(ucs) OF
+				"a", "A": BEGIN {EXCLUSIVE}  animated := ~ animated; END;
 
-			| "d": drawMode := (drawMode+1) MOD 3; DrawMode(drawMode); UpdateImage;
-			| "l": light := ~ light;
-					MakeCurrent();
-					IF light THEN GL.Enable(GLC.GL_LIGHTING ); ELSE  GL.Disable(GLC.GL_LIGHTING ); END;
-					DeActivate();
-					UpdateImage;
-			| "y": angley := angley + 5.0; UpdateImage;
-			| "-" : angle := angle - 1.0; UpdateImage;
-			| "+" : angle := angle + 1.0; UpdateImage;
+				| "d": drawMode := (drawMode+1) MOD 3; DrawMode(drawMode); UpdateImage;
+				| "l": light := ~ light;
+						MakeCurrent();
+						IF light THEN GL.Enable(GLC.GL_LIGHTING ); ELSE  GL.Disable(GLC.GL_LIGHTING ); END;
+						DeActivate();
+						UpdateImage;
+				| "y": angley := angley + 5.0; UpdateImage;
+				| "-" : angle := angle - 1.0; UpdateImage;
+				| "+" : angle := angle + 1.0; UpdateImage;
 
-			| "s": SaveImage;
-			| "q" : Close;
-		ELSE
+				| "s": SaveImage;
+				| "q" : Close;
+			ELSE
 
-		END;
+			END;
 		END KeyEvent;
 
-		PROCEDURE WheelMove*(dz : LONGINT);
+		PROCEDURE WheelMove(dz : LONGINT);
 		BEGIN
 			ztrans := ztrans + dz;
 			IF ztrans > -1.0 THEN ztrans := -1.0; END;
@@ -85,34 +91,40 @@ TYPE
 			END
 		END Handle;
 
-
-		PROCEDURE Close*;
-		BEGIN {EXCLUSIVE}
-			alive := FALSE;
+		PROCEDURE Close;
+		BEGIN 
+			BEGIN {EXCLUSIVE} alive := FALSE; animated := FALSE END;
 			Close^;
+			DecCount
 		END Close;
 
-
 		PROCEDURE UpdateImage;
+			VAR
+			textWidth, textHeight: LONGINT;
+			rect: WMRectangles.Rectangle;
 		BEGIN
 			MakeCurrent();
 			DrawGears;
 			SwapGLBuffer();
 			DeActivate();
+
+			
+			font.GetStringSize(fpsstr, textWidth, textHeight);
+			canvas.DrawString(4, textHeight, fpsstr);
+			
 			Swap();
 			Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
+			
 		END UpdateImage;
 
 		PROCEDURE SaveImage;
 		VAR res: LONGINT;
 			fname: ARRAY 128 OF CHAR;
 		BEGIN
-
-		fname:="mywmgltest.bmp";
-		IF WMDialogs.QueryString(" Save File name: ",fname)=WMDialogs.ResOk THEN
-				WMGraphics.StoreImage(img, fname,res);
-		END;
-
+			fname:="mywmgltest.bmp";
+			IF WMDialogs.QueryString(" Save File name: ",fname)=WMDialogs.ResOk THEN
+					WMGraphics.StoreImage(img, fname,res);
+			END;
 		END SaveImage;
 
 	PROCEDURE DrawMode(dm: LONGINT);
@@ -157,14 +169,13 @@ TYPE
 
 		(* draw front face *)
 		GL.Begin(GLC.GL_QUAD_STRIP);
-
-		FOR  i := 0 TO teeth DO
+			FOR  i := 0 TO teeth DO
 				angle := i * 2.0 * Math.pi / teeth;
 				GL.Vertex3f(r0 * Math.cos(angle), r0 * Math.sin(angle), width * 0.5);
 				GL.Vertex3f(r1 * Math.cos(angle), r1 * Math.sin(angle), width * 0.5);
 				GL.Vertex3f(r0 * Math.cos(angle), r0 * Math.sin(angle), width * 0.5);
 				GL.Vertex3f(r1 * Math.cos(angle + 3 * da), r1 * Math.sin(angle + 3 * da), width * 0.5);
-		END;
+			END;
 		GL.End;
 
 		(* draw front sides of teeth *)
@@ -183,14 +194,13 @@ TYPE
 
 		(* draw back face *)
 		GL.Begin(GLC.GL_QUAD_STRIP);
-
-		 FOR i := 0 TO teeth DO
-				angle := i * 2.0 * Math.pi / teeth;
-				GL.Vertex3f(r1 * Math.cos(angle), r1 * Math.sin(angle), -width * 0.5);
-				GL.Vertex3f(r0 * Math.cos(angle), r0 * Math.sin(angle), -width * 0.5);
-				GL.Vertex3f(r1 * Math.cos(angle + 3 * da), r1 * Math.sin(angle + 3 * da), -width * 0.5);
-				GL.Vertex3f(r0 * Math.cos(angle), r0 * Math.sin(angle), -width * 0.5);
-		END;
+			 FOR i := 0 TO teeth DO
+					angle := i * 2.0 * Math.pi / teeth;
+					GL.Vertex3f(r1 * Math.cos(angle), r1 * Math.sin(angle), -width * 0.5);
+					GL.Vertex3f(r0 * Math.cos(angle), r0 * Math.sin(angle), -width * 0.5);
+					GL.Vertex3f(r1 * Math.cos(angle + 3 * da), r1 * Math.sin(angle + 3 * da), -width * 0.5);
+					GL.Vertex3f(r0 * Math.cos(angle), r0 * Math.sin(angle), -width * 0.5);
+			END;
 		GL.End;
 
 		(* draw back sides of teeth *)
@@ -202,13 +212,12 @@ TYPE
 				GL.Vertex3f(r2 * Math.cos(angle + 2 * da), r2 * Math.sin(angle + 2 * da), -width * 0.5);
 				GL.Vertex3f(r2 * Math.cos(angle + da), r2 * Math.sin(angle + da), -width * 0.5);
 				GL.Vertex3f(r1 * Math.cos(angle), r1 * Math.sin(angle), -width * 0.5);
-		END;
+			END;
 		GL.End;
 
 		(* draw outward faces of teeth *)
 		GL.Begin(GLC.GL_QUAD_STRIP);
-
-		FOR i := 0 TO teeth - 1 DO
+			FOR i := 0 TO teeth - 1 DO
 				angle := i * 2.0 * Math.pi / teeth;
 				GL.Vertex3f(r1 * Math.cos(angle), r1 * Math.sin(angle), width * 0.5);
 				GL.Vertex3f(r1 * Math.cos(angle), r1 * Math.sin(angle), -width * 0.5);
@@ -228,23 +237,22 @@ TYPE
 				GL.Vertex3f(r1 * Math.cos(angle + 3 * da), r1 * Math.sin(angle + 3 * da), width * 0.5);
 				GL.Vertex3f(r1 * Math.cos(angle + 3 * da), r1 * Math.sin(angle + 3 * da), -width * 0.5);
 				GL.Normal3f(Math.cos(angle), Math.sin(angle), 0.0);
-		END;
+			END;
 
-		GL.Vertex3f(r1 * Math.cos(0), r1 * Math.sin(0), width * 0.5);
-		GL.Vertex3f(r1 * Math.cos(0), r1 * Math.sin(0), -width * 0.5);
-
+			GL.Vertex3f(r1 * Math.cos(0), r1 * Math.sin(0), width * 0.5);
+			GL.Vertex3f(r1 * Math.cos(0), r1 * Math.sin(0), -width * 0.5);
 		GL.End;
 
 		GL.ShadeModel(GLC.GL_SMOOTH);
 
 		(* draw inside radius cylinder *)
 		GL.Begin(GLC.GL_QUAD_STRIP);
-		FOR i := 0 TO teeth DO
+			FOR i := 0 TO teeth DO
 				angle := i * 2.0 * Math.pi / teeth;
 				GL.Normal3f(-Math.cos(angle), -Math.sin(angle), 0.0);
 				GL.Vertex3f(r0 * Math.cos(angle), r0 * Math.sin(angle), -width * 0.5);
 				GL.Vertex3f(r0 * Math.cos(angle), r0 * Math.sin(angle), width * 0.5);
-		END;
+			END;
 		GL.End;
 		GL.Finish();
 
@@ -354,19 +362,27 @@ TYPE
 
 
 BEGIN  {ACTIVE}
-	Kernel.SetTimer(timer, waittime);
+	Kernel.SetTimer(timer, 5000);
 	WHILE alive DO
-
-		IF animated THEN
-			 IF Kernel.Expired(timer) THEN
- 			 	 angle := angle + 2.0;
-			 	 UpdateImage();
-				Kernel.SetTimer(timer, waittime);
+		BEGIN {EXCLUSIVE} AWAIT(animated) END;
+	 	UpdateImage();
+	 	angle := angle + 0.5;
+		INC(frames);
+	
+		IF Kernel.Expired(timer) THEN
+			Strings.FloatToStr(frames/5.0, 0, 2, 0, fpsstr);
+			Strings.Concat("FPS:", fpsstr, fpsstr);
+			Kernel.SetTimer(timer, 5000);
+			IF debug THEN
+				KernelLog.String(fpsstr); KernelLog.Ln; 
 			END;
+			frames := 0;
 		END;
-
 	END;
 END GLWindow;
+
+VAR
+	nofWindows : LONGINT;
 
 PROCEDURE Open*;
 VAR
@@ -375,10 +391,33 @@ BEGIN
 	NEW(window, 256, 256);
 END Open;
 
-BEGIN
+PROCEDURE IncCount;
+BEGIN {EXCLUSIVE}
+	INC(nofWindows)
+END IncCount;
 
+PROCEDURE DecCount;
+BEGIN {EXCLUSIVE}
+	DEC(nofWindows)
+END DecCount;
+
+PROCEDURE Cleanup;
+VAR die : KillerMsg;
+	 msg : WMMessages.Message;
+	 m : WM.WindowManager;
+BEGIN {EXCLUSIVE}
+	NEW(die);
+	msg.ext := die;
+	msg.msgType := WMMessages.MsgExt;
+	m := WM.GetDefaultManager();
+	m.Broadcast(msg);
+	AWAIT(nofWindows = 0)
+END Cleanup;
+
+BEGIN
+	Modules.InstallTermHandler(Cleanup)
 END WMGLDemo3.
 
-SystemTools.Free  WMGLDemo3  WMGLWindow GLU  ~
+SystemTools.Free  WMGLDemo3   ~
 
 WMGLDemo3.Open ~

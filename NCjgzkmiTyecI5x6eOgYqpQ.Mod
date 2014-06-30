@@ -7,7 +7,8 @@ TYPE
 VAR vox: TexVox.TexVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	NEW(vox,'granite.png');
+	NEW(vox,'die.1.png');
+	vox.tscale:=10000;
 	RETURN vox
 END thisvox;
 

@@ -1,6 +1,6 @@
 MODULE OpenGL; (** AUTHOR "fnecati"; PURPOSE "OpenGL binding for WinAos"; *)
 
-IMPORT SYSTEM, Kernel32, Modules,  Strings, GLC := OpenGLConst, KernelLog;
+IMPORT SYSTEM, Kernel32, Modules,  WinApi, Strings, GLC := OpenGLConst, KernelLog;
 
 (*
 	Compiler.Compile OpenGLConst.Mod Win32.OpenGL.Mod WinApi.Mod ~
@@ -28,47 +28,38 @@ TYPE
 
 	AnsiChar* = POINTER TO ARRAY OF CHAR;
  	PAnsiChar* = ADDRESS;
- 	THandle * = LONGINT;
+ 	THandle * = UNSIGNED32;
 
 
 
 	(* GL data types *)
-	Enum* = LONGINT;  	(* 4 bytes *)
-	Boolean* = LONGINT; 	(*  *)
-	Bitfield* = LONGINT; 	(* SET *)
-	Byte* = CHAR; 		(* 1 byte signed *)
+	Enum* = UNSIGNED32;  	(* 4 bytes *)
+	Boolean* = UNSIGNED8; 	(*  *)
+	Bitfield* = UNSIGNED32; 	(* SET *)
+	Byte* = SIGNED8; 		(* 1 byte signed *)
 	Short* = INTEGER;  	(* 2 bytes signed *)
 	Int* = LONGINT; 	(* 4 bytes signed *)
 	Sizei* = LONGINT;  	(* 4 bytes signed *)
-	Ubyte* = CHAR; 		(* 1 byte unsigned *)
-	Ushort* = INTEGER;	(* 2 bytes unsigned *)
-	Uint* = LONGINT;	(* 4 bytes unsigned *)
+	Ubyte* = UNSIGNED8; 		(* 1 byte unsigned *)
+	Ushort* = UNSIGNED16;	(* 2 bytes unsigned *)
+	Uint* = UNSIGNED32;	(* 4 bytes unsigned *)
 	Float* = REAL;		(* single precision real *)
 	Clampf* = REAL;		(* single precision real in [0,1] *)
 	Double* = LONGREAL;	(* double precision real *)
 	Clampd* = LONGREAL;	(* double precision real in [0,1] *)
 	Void* = LONGINT;
 	Int64* = HUGEINT;
-	Uint64* = HUGEINT;
+	Uint64* = UNSIGNED64;
 
-	Pointer* = ADDRESS;
-	PPointer* = ADDRESS;
-	PUint* = ADDRESS;
-	Integer* = LONGINT;
-   	PInteger* = ADDRESS; (* POINTER TO ARRAY OF  Int *)
-	Cardinal* = LONGINT;
-	PCardinal* = ADDRESS;
-	WORD* = INTEGER;
-	DWORD* = LONGINT;
 
 	PBoolean* = ADDRESS; 	(* POINTER TO ARRAY OF Boolean; *)
 	PByte* = ADDRESS; 	(* POINTER TO ARRAY OF Byte; *)
 	PShort* = ADDRESS; 	(* POINTER TO ARRAY OF Short; *)
-	Pint* =  ADDRESS; 	(* POINTER TO ARRAY OF Int; *)
+	PInt* =  ADDRESS; 	(* POINTER TO ARRAY OF Int; *)
 	PSizei* = ADDRESS; 	(* POINTER TO ARRAY OF Sizei; *)
 	PUbyte* = ADDRESS; 	(* POINTER TO ARRAY OF Ubyte; *)
 	PUshort* = ADDRESS; 	(* POINTER TO ARRAY OF Ushort; *)
-	PInt* = ADDRESS; 	(* POINTER TO ARRAY OF Uint; *)
+	PUint* = ADDRESS; 	(* POINTER TO ARRAY OF Uint; *)
 	PClampf* = ADDRESS; 	(* POINTER TO ARRAY OF Clampf; *)
 	PFloat* =  ADDRESS; 	(* POINTER TO ARRAY OF Float; *)
 	PDouble* = ADDRESS; 	(* POINTER TO ARRAY OF Double; *)
@@ -76,41 +67,50 @@ TYPE
 	PEnum* =  ADDRESS; 	(* POINTER TO ARRAY OF Enum *);
 	PVoid* = ADDRESS; 	(* Void *);
 	PPVoid* = ADDRESS; 	(* POINTER TO ARRAY OF PVoid; *)
-	Pint64* =  ADDRESS; 	(* POINTER TO ARRAY OF Int64; *)
-	PInt64* = ADDRESS; 	(* POINTER TO ARRAY OF Uint64; *)
-
+	PInt64* =  ADDRESS; 	(* POINTER TO ARRAY OF Int64; *)
+	PUint64* = ADDRESS; 	(* POINTER TO ARRAY OF Uint64; *)
 
 	(* GL_NV_half_float *)
-	HalfNV* = WORD;
-	PHalfNV* = ADDRESS; (*POINTER TO ARRAY OF HalfNV; *)
+	HalfNV* = Ushort;
+	PHalfNV* = ADDRESS; (* POINTER TO ARRAY OF HalfNV; *)
 
 	(* GL_ARB_shader_objects  *)
 	PHandleARB* = ADDRESS ;
 	HandleARB* = ADDRESS;
 	CharARB* = AnsiChar;
 	PCharARB* = PAnsiChar;
-	PPCharARB* =  ADDRESS; (* POINTER TO ARRAY OF PCharARB;  *)
+	PPCharARB* =  ADDRESS; (* POINTER TO ARRAY OF PCharARB; *)
 
-	(* GL_VERSION_1_5  *)
+	(* GL_VERSION_1_5 *)
 	Intptr* = Int;
 	Sizeiptr* = Sizei;
 
-	(* GL_ARB_vertex_buffer_object  *)
+	(* GL_ARB_vertex_buffer_object *)
 	IntptrARB* = Int;
 	SizeiptrARB* = Sizei;
 
-	(* GL_VERSION_2_0  *)
+	(* GL_VERSION_2_0 *)
 	Handle* = Uint;
 	PChar* = PAnsiChar;
-	PPChar* = ADDRESS; (* POINTER TO ARRAY OF PChar;  *)
+	PPChar* = ADDRESS; (* POINTER TO ARRAY OF PChar *)
 
 	(* GL_EXT_timer_query *)
 	Int64EXT* = Int64;
-	Pint64EXT* = ADDRESS; (*POINTER TO ARRAY OF Int64EXT; *)
+	PInt64EXT* = ADDRESS; (* POINTER TO ARRAY OF Int64EXT *)
 
 
 	Uint64EXT* = Uint64;
-	PInt64EXT* = ADDRESS; (*POINTER TO ARRAY OF Uint64EXT; *)
+	PUint64EXT* = ADDRESS; (* POINTER TO ARRAY OF Uint64EXT *)
+
+	(* ARB_sync *)
+	GLsync* = ADDRESS;
+
+	(* GL_ARB_cl_event  *)
+	(* These incomplete types let us declare types compatible with OpenCL's cl_context and cl_event *)
+	_cl_context = LONGINT;
+	_cl_event = LONGINT;
+	p_cl_context = ADDRESS; (* POINTER TO ARRAY OF _cl_context;  *)
+	p_cl_event = ADDRESS; (* POINTER TO ARRAY OF _cl_event;  *)
 
 	(*  WGL_ARB_pbuffer *)
 	HPBUFFERARB * = THandle;
@@ -136,16 +136,7 @@ TYPE
 	HVIDEOINPUTDEVICENV * = THandle;
 	PHVIDEOINPUTDEVICENV * = ADDRESS; (*POINTER TO ARRAY OF HVIDEOINPUTDEVICENV;*)
 
- 	(* ARB_sync *)
-	GLsync* = Pointer;
-
-	(* GL_ARB_cl_event  *)
-	(* These incomplete types let us declare types compatible with OpenCL's cl_context and cl_event *)
-	_cl_context = LONGINT;
-	_cl_event = LONGINT;
-	p_cl_context = ADDRESS; (* POINTER TO ARRAY OF _cl_context;  *)
-	p_cl_event = ADDRESS; (* POINTER TO ARRAY OF _cl_event;  *)
-
+ 
 	(* GL_ARB_debug_output  *)
 	TglDebugProcARB  = PROCEDURE{WINAPI}(source: Enum; xtype: Enum; id: Uint; severity: Enum; length: Sizei;  xmessage: PChar; userParam: PVoid);
 
@@ -166,10 +157,10 @@ TYPE
 
 	PGPU_DEVICE* = POINTER TO GPU_DEVICE;
 	GPU_DEVICE* = RECORD
-		cb*: DWORD;
+		cb*: Uint;
 		DeviceName*: ARRAY 32 OF CHAR;
 		DeviceString*: ARRAY 128 OF CHAR;
-		Flags*: DWORD;
+		Flags*: Uint;
 		rcVirtualScreen*: TRect;
 	END;
 
@@ -678,7 +669,7 @@ VAR
 
 
 TYPE
- 	(*! GL_VERSION_1_0  *)
+	(*! GL_VERSION_1_0  *)
 	TglCullFace* = PROCEDURE{WINAPI}(mode: Enum);
 	TglFrontFace* = PROCEDURE{WINAPI}(mode: Enum);
 	TglHint* = PROCEDURE{WINAPI}(target: Enum; mode: Enum);
@@ -689,7 +680,7 @@ TYPE
 	TglTexParameterf* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; param: Float);
 	TglTexParameterfv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: PFloat);
 	TglTexParameteri* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; param: Int);
-	TglTexParameteriv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint);
+	TglTexParameteriv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
 	TglTexImage1D* = PROCEDURE{WINAPI}(target: Enum; level: Int; internalformat: Int; width: Sizei; border: Int; format: Enum; xtype: Enum;  pixels: PVoid);
 	TglTexImage2D* = PROCEDURE{WINAPI}(target: Enum; level: Int; internalformat: Int; width: Sizei; height: Sizei; border: Int; format: Enum; xtype: Enum; pixels: PVoid);
 	TglDrawBuffer* = PROCEDURE{WINAPI}(mode: Enum);
@@ -717,17 +708,16 @@ TYPE
 	TglGetDoublev* = PROCEDURE{WINAPI}(pname: Enum; params: PDouble);
 	TglGetError* = PROCEDURE{WINAPI}(): Enum;
 	TglGetFloatv* = PROCEDURE{WINAPI}(pname: Enum; params: PFloat);
-	TglGetIntegerv* = PROCEDURE{WINAPI}(pname: Enum; params: Pint);
+	TglGetIntegerv* = PROCEDURE{WINAPI}(pname: Enum; params: PInt);
 	TglGetString* = PROCEDURE{WINAPI}(name: Enum): ADDRESS;
 	TglGetTexImage* = PROCEDURE{WINAPI}(target: Enum; level: Int; format: Enum; xtype: Enum; pixels: PVoid);
-	TglGetTexParameteriv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint);
+	TglGetTexParameteriv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
 	TglGetTexParameterfv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PFloat);
 	TglGetTexLevelParameterfv* = PROCEDURE{WINAPI}(target: Enum; level: Int; pname: Enum; params: PFloat);
-	TglGetTexLevelParameteriv* = PROCEDURE{WINAPI}(target: Enum; level: Int; pname: Enum; params: Pint);
+	TglGetTexLevelParameteriv* = PROCEDURE{WINAPI}(target: Enum; level: Int; pname: Enum; params: PInt);
 	TglIsEnabled* = PROCEDURE{WINAPI}(cap: Enum): Boolean;
 	TglDepthRange* = PROCEDURE{WINAPI}(zNear: Clampd; zFar: Clampd);
 	TglViewport* = PROCEDURE{WINAPI}(x: Int; y: Int; width: Sizei; height: Sizei);
-
 	(*! GL_VERSION_1_1  *)
 	TglDrawArrays* = PROCEDURE{WINAPI}(mode: Enum; first: Int; count: Sizei);
 	TglDrawElements* = PROCEDURE{WINAPI}(mode: Enum; count: Sizei; xtype: Enum;  indices: PVoid);
@@ -740,13 +730,13 @@ TYPE
 	TglTexSubImage1D* = PROCEDURE{WINAPI}(target: Enum; level: Int; xoffset: Int; width: Sizei; format: Enum; xtype: Enum;  pixels: PVoid);
 	TglTexSubImage2D* = PROCEDURE{WINAPI}(target: Enum; level: Int; xoffset: Int; yoffset: Int; width: Sizei; height: Sizei; format: Enum; xtype: Enum;  pixels: PVoid);
 	TglBindTexture* = PROCEDURE{WINAPI}(target: Enum; texture: Uint);
-	TglDeleteTextures* = PROCEDURE{WINAPI}(n: Sizei;  textures: PInt);
-	TglGenTextures* = PROCEDURE{WINAPI}(n: Sizei; textures: PInt);
+	TglDeleteTextures* = PROCEDURE{WINAPI}(n: Sizei;  textures: PUint);
+	TglGenTextures* = PROCEDURE{WINAPI}(n: Sizei; textures: PUint);
 
 	(*! ifdef DEPRECATED  *)
 	TglAccum* = PROCEDURE{WINAPI}(op: Enum; value: Float);
 	TglAlphaFunc* = PROCEDURE{WINAPI}(func: Enum; ref: Clampf);
-	TglAreTexturesResident* = PROCEDURE{WINAPI}(n: Sizei;  textures: PInt; residences: PBoolean): Boolean;
+	TglAreTexturesResident* = PROCEDURE{WINAPI}(n: Sizei;  textures: PUint; residences: PBoolean): Boolean;
 	TglArrayElement* = PROCEDURE{WINAPI}(i: Int);
 	TglBegin* = PROCEDURE{WINAPI}(mode: Enum);
 	TglBitmap* = PROCEDURE{WINAPI}(width: Sizei; height: Sizei; xorig: Float; yorig: Float; xmove: Float; ymove: Float;  bitmap: PUbyte);
@@ -762,13 +752,13 @@ TYPE
 	TglColor3f* = PROCEDURE{WINAPI}(red: Float; green: Float; blue: Float);
 	TglColor3fv* = PROCEDURE{WINAPI}( v: PFloat);
 	TglColor3i* = PROCEDURE{WINAPI}(red: Int; green: Int; blue: Int);
-	TglColor3iv* = PROCEDURE{WINAPI}( v: Pint);
+	TglColor3iv* = PROCEDURE{WINAPI}( v: PInt);
 	TglColor3s* = PROCEDURE{WINAPI}(red: Short; green: Short; blue: Short);
 	TglColor3sv* = PROCEDURE{WINAPI}( v: PShort);
 	TglColor3ub* = PROCEDURE{WINAPI}(red: Ubyte; green: Ubyte; blue: Ubyte);
 	TglColor3ubv* = PROCEDURE{WINAPI}( v: PUbyte);
 	TglColor3ui* = PROCEDURE{WINAPI}(red: Uint; green: Uint; blue: Uint);
-	TglColor3uiv* = PROCEDURE{WINAPI}( v: PInt);
+	TglColor3uiv* = PROCEDURE{WINAPI}( v: PUint);
 	TglColor3us* = PROCEDURE{WINAPI}(red: Ushort; green: Ushort; blue: Ushort);
 	TglColor3usv* = PROCEDURE{WINAPI}( v: PUshort);
 	TglColor4b* = PROCEDURE{WINAPI}(red: Byte; green: Byte; blue: Byte; alpha: Byte);
@@ -778,13 +768,13 @@ TYPE
 	TglColor4f* = PROCEDURE{WINAPI}(red: Float; green: Float; blue: Float; alpha: Float);
 	TglColor4fv* = PROCEDURE{WINAPI}( v: PFloat);
 	TglColor4i* = PROCEDURE{WINAPI}(red: Int; green: Int; blue: Int; alpha: Int);
-	TglColor4iv* = PROCEDURE{WINAPI}( v: Pint);
+	TglColor4iv* = PROCEDURE{WINAPI}( v: PInt);
 	TglColor4s* = PROCEDURE{WINAPI}(red: Short; green: Short; blue: Short; alpha: Short);
 	TglColor4sv* = PROCEDURE{WINAPI}( v: PShort);
 	TglColor4ub* = PROCEDURE{WINAPI}(red: Ubyte; green: Ubyte; blue: Ubyte; alpha: Ubyte);
 	TglColor4ubv* = PROCEDURE{WINAPI}( v: PUbyte);
 	TglColor4ui* = PROCEDURE{WINAPI}(red: Uint; green: Uint; blue: Uint; alpha: Uint);
-	TglColor4uiv* = PROCEDURE{WINAPI}( v: PInt);
+	TglColor4uiv* = PROCEDURE{WINAPI}( v: PUint);
 	TglColor4us* = PROCEDURE{WINAPI}(red: Ushort; green: Ushort; blue: Ushort; alpha: Ushort);
 	TglColor4usv* = PROCEDURE{WINAPI}( v: PUshort);
 	TglColorMaterial* = PROCEDURE{WINAPI}(face: Enum; mode: Enum);
@@ -815,26 +805,26 @@ TYPE
 	TglFogf* = PROCEDURE{WINAPI}(pname: Enum; param: Float);
 	TglFogfv* = PROCEDURE{WINAPI}(pname: Enum;  params: PFloat);
 	TglFogi* = PROCEDURE{WINAPI}(pname: Enum; param: Int);
-	TglFogiv* = PROCEDURE{WINAPI}(pname: Enum;  params: Pint);
+	TglFogiv* = PROCEDURE{WINAPI}(pname: Enum;  params: PInt);
 	TglFrustum* = PROCEDURE{WINAPI}(left, right, bottom, top, zNear, zFar: Double);
 	TglGenLists* = PROCEDURE{WINAPI}(range: Sizei): Uint;
 	TglGetClipPlane* = PROCEDURE{WINAPI}(plane: Enum; equation: PDouble);
 	TglGetLightfv* = PROCEDURE{WINAPI}(light: Enum; pname: Enum; params: PFloat);
-	TglGetLightiv* = PROCEDURE{WINAPI}(light: Enum; pname: Enum; params: Pint);
+	TglGetLightiv* = PROCEDURE{WINAPI}(light: Enum; pname: Enum; params: PInt);
 	TglGetMapdv* = PROCEDURE{WINAPI}(target: Enum; query: Enum; v: PDouble);
 	TglGetMapfv* = PROCEDURE{WINAPI}(target: Enum; query: Enum; v: PFloat);
-	TglGetMapiv* = PROCEDURE{WINAPI}(target: Enum; query: Enum; v: Pint);
+	TglGetMapiv* = PROCEDURE{WINAPI}(target: Enum; query: Enum; v: PInt);
 	TglGetMaterialfv* = PROCEDURE{WINAPI}(face: Enum; pname: Enum; params: PFloat);
-	TglGetMaterialiv* = PROCEDURE{WINAPI}(face: Enum; pname: Enum; params: Pint);
+	TglGetMaterialiv* = PROCEDURE{WINAPI}(face: Enum; pname: Enum; params: PInt);
 	TglGetPixelMapfv* = PROCEDURE{WINAPI}(map: Enum; values: PFloat);
-	TglGetPixelMapuiv* = PROCEDURE{WINAPI}(map: Enum; values: PInt);
+	TglGetPixelMapuiv* = PROCEDURE{WINAPI}(map: Enum; values: PUint);
 	TglGetPixelMapusv* = PROCEDURE{WINAPI}(map: Enum; values: PUshort);
 	TglGetPolygonStipple* = PROCEDURE{WINAPI}(mask: PUbyte);
 	TglGetTexEnvfv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PFloat);
-	TglGetTexEnviv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint);
+	TglGetTexEnviv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
 	TglGetTexGendv* = PROCEDURE{WINAPI}(coord: Enum; pname: Enum; params: PDouble);
 	TglGetTexGenfv* = PROCEDURE{WINAPI}(coord: Enum; pname: Enum; params: PFloat);
-	TglGetTexGeniv* = PROCEDURE{WINAPI}(coord: Enum; pname: Enum; params: Pint);
+	TglGetTexGeniv* = PROCEDURE{WINAPI}(coord: Enum; pname: Enum; params: PInt);
 	TglIndexMask* = PROCEDURE{WINAPI}(mask: Uint);
 	TglIndexPointer* = PROCEDURE{WINAPI}(xtype: Enum; stride: Sizei; xpointer: PVoid);
 	TglIndexd* = PROCEDURE{WINAPI}(c: Double);
@@ -842,7 +832,7 @@ TYPE
 	TglIndexf* = PROCEDURE{WINAPI}(c: Float);
 	TglIndexfv* = PROCEDURE{WINAPI}( c: PFloat);
 	TglIndexi* = PROCEDURE{WINAPI}(c: Int);
-	TglIndexiv* = PROCEDURE{WINAPI}( c: Pint);
+	TglIndexiv* = PROCEDURE{WINAPI}( c: PInt);
 	TglIndexs* = PROCEDURE{WINAPI}(c: Short);
 	TglIndexsv* = PROCEDURE{WINAPI}( c: PShort);
 	TglIndexub* = PROCEDURE{WINAPI}(c: Ubyte);
@@ -854,11 +844,11 @@ TYPE
 	TglLightModelf* = PROCEDURE{WINAPI}(pname: Enum; param: Float);
 	TglLightModelfv* = PROCEDURE{WINAPI}(pname: Enum;  params: PFloat);
 	TglLightModeli* = PROCEDURE{WINAPI}(pname: Enum; param: Int);
-	TglLightModeliv* = PROCEDURE{WINAPI}(pname: Enum;  params: Pint);
+	TglLightModeliv* = PROCEDURE{WINAPI}(pname: Enum;  params: PInt);
 	TglLightf* = PROCEDURE{WINAPI}(light: Enum; pname: Enum; param: Float);
 	TglLightfv* = PROCEDURE{WINAPI}(light: Enum; pname: Enum;   params: PFloat);
 	TglLighti* = PROCEDURE{WINAPI}(light: Enum; pname: Enum; param: Int);
-	TglLightiv* = PROCEDURE{WINAPI}(light: Enum; pname: Enum;  params: Pint);
+	TglLightiv* = PROCEDURE{WINAPI}(light: Enum; pname: Enum;  params: PInt);
 	TglLineStipple* = PROCEDURE{WINAPI}(factor: Int; pattern: Ushort);
 	TglListBase* = PROCEDURE{WINAPI}(base: Uint);
 	TglLoadIdentity* = PROCEDURE{WINAPI}();
@@ -876,7 +866,7 @@ TYPE
 	TglMaterialf* = PROCEDURE{WINAPI}(face: Enum; pname: Enum; param: Float);
 	TglMaterialfv* = PROCEDURE{WINAPI}(face: Enum; pname: Enum;  params: PFloat);
 	TglMateriali* = PROCEDURE{WINAPI}(face: Enum; pname: Enum; param: Int);
-	TglMaterialiv* = PROCEDURE{WINAPI}(face: Enum; pname: Enum;  params: Pint);
+	TglMaterialiv* = PROCEDURE{WINAPI}(face: Enum; pname: Enum;  params: PInt);
 	TglMatrixMode* = PROCEDURE{WINAPI}(mode: Enum);
 	TglMultMatrixd* = PROCEDURE{WINAPI}( m: PDouble);
 	TglMultMatrixf* = PROCEDURE{WINAPI}( m: PFloat);
@@ -888,14 +878,14 @@ TYPE
 	TglNormal3f* = PROCEDURE{WINAPI}(nx: Float; ny: Float; nz: Float);
 	TglNormal3fv* = PROCEDURE{WINAPI}( v: PFloat);
 	TglNormal3i* = PROCEDURE{WINAPI}(nx: Int; ny: Int; nz: Int);
-	TglNormal3iv* = PROCEDURE{WINAPI}( v: Pint);
+	TglNormal3iv* = PROCEDURE{WINAPI}( v: PInt);
 	TglNormal3s* = PROCEDURE{WINAPI}(nx: Short; ny: Short; nz: Short);
 	TglNormal3sv* = PROCEDURE{WINAPI}( v: PShort);
 	TglNormalPointer* = PROCEDURE{WINAPI}(xtype: Enum; stride: Sizei;  xpointer: PVoid);
 	TglOrtho* = PROCEDURE{WINAPI}(left: Double; right: Double; bottom: Double; top: Double; zNear: Double; zFar: Double);
 	TglPassThrough* = PROCEDURE{WINAPI}(token: Float);
 	TglPixelMapfv* = PROCEDURE{WINAPI}(map: Enum; mapsize: Sizei;  values: PFloat);
-	TglPixelMapuiv* = PROCEDURE{WINAPI}(map: Enum; mapsize: Sizei;  values: PInt);
+	TglPixelMapuiv* = PROCEDURE{WINAPI}(map: Enum; mapsize: Sizei;  values: PUint);
 	TglPixelMapusv* = PROCEDURE{WINAPI}(map: Enum; mapsize: Sizei;  values: PUshort);
 	TglPixelTransferf* = PROCEDURE{WINAPI}(pname: Enum; param: Float);
 	TglPixelTransferi* = PROCEDURE{WINAPI}(pname: Enum; param: Int);
@@ -905,7 +895,7 @@ TYPE
 	TglPopClientAttrib* = PROCEDURE{WINAPI}();
 	TglPopMatrix* = PROCEDURE{WINAPI}();
 	TglPopName* = PROCEDURE{WINAPI}();
-	TglPrioritizeTextures* = PROCEDURE{WINAPI}(n: Sizei;  textures: PInt;  priorities: PClampf);
+	TglPrioritizeTextures* = PROCEDURE{WINAPI}(n: Sizei;  textures: PUint;  priorities: PClampf);
 	TglPushAttrib* = PROCEDURE{WINAPI}(mask: Bitfield);
 	TglPushClientAttrib* = PROCEDURE{WINAPI}(mask: Bitfield);
 	TglPushMatrix* = PROCEDURE{WINAPI}();
@@ -915,7 +905,7 @@ TYPE
 	TglRasterPos2f* = PROCEDURE{WINAPI}(x: Float; y: Float);
 	TglRasterPos2fv* = PROCEDURE{WINAPI}( v: PFloat);
 	TglRasterPos2i* = PROCEDURE{WINAPI}(x: Int; y: Int);
-	TglRasterPos2iv* = PROCEDURE{WINAPI}( v: Pint);
+	TglRasterPos2iv* = PROCEDURE{WINAPI}( v: PInt);
 	TglRasterPos2s* = PROCEDURE{WINAPI}(x: Short; y: Short);
 	TglRasterPos2sv* = PROCEDURE{WINAPI}( v: PShort);
 	TglRasterPos3d* = PROCEDURE{WINAPI}(x: Double; y: Double; z: Double);
@@ -923,7 +913,7 @@ TYPE
 	TglRasterPos3f* = PROCEDURE{WINAPI}(x: Float; y: Float; z: Float);
 	TglRasterPos3fv* = PROCEDURE{WINAPI}( v: PFloat);
 	TglRasterPos3i* = PROCEDURE{WINAPI}(x: Int; y: Int; z: Int);
-	TglRasterPos3iv* = PROCEDURE{WINAPI}( v: Pint);
+	TglRasterPos3iv* = PROCEDURE{WINAPI}( v: PInt);
 	TglRasterPos3s* = PROCEDURE{WINAPI}(x: Short; y: Short; z: Short);
 	TglRasterPos3sv* = PROCEDURE{WINAPI}( v: PShort);
 	TglRasterPos4d* = PROCEDURE{WINAPI}(x: Double; y: Double; z: Double; w: Double);
@@ -931,7 +921,7 @@ TYPE
 	TglRasterPos4f* = PROCEDURE{WINAPI}(x: Float; y: Float; z: Float; w: Float);
 	TglRasterPos4fv* = PROCEDURE{WINAPI}( v: PFloat);
 	TglRasterPos4i* = PROCEDURE{WINAPI}(x: Int; y: Int; z: Int; w: Int);
-	TglRasterPos4iv* = PROCEDURE{WINAPI}( v: Pint);
+	TglRasterPos4iv* = PROCEDURE{WINAPI}( v: PInt);
 	TglRasterPos4s* = PROCEDURE{WINAPI}(x: Short; y: Short; z: Short; w: Short);
 	TglRasterPos4sv* = PROCEDURE{WINAPI}( v: PShort);
 	TglRectd* = PROCEDURE{WINAPI}(x1: Double; y1: Double; x2: Double; y2: Double);
@@ -939,7 +929,7 @@ TYPE
 	TglRectf* = PROCEDURE{WINAPI}(x1: Float; y1: Float; x2: Float; y2: Float);
 	TglRectfv* = PROCEDURE{WINAPI}( v1: PFloat;  v2: PFloat);
 	TglRecti* = PROCEDURE{WINAPI}(x1: Int; y1: Int; x2: Int; y2: Int);
-	TglRectiv* = PROCEDURE{WINAPI}( v1: Pint;  v2: Pint);
+	TglRectiv* = PROCEDURE{WINAPI}( v1: PInt;  v2: PInt);
 	TglRects* = PROCEDURE{WINAPI}(x1: Short; y1: Short; x2: Short; y2: Short);
 	TglRectsv* = PROCEDURE{WINAPI}( v1: PShort;  v2: PShort);
 	TglRenderMode* = PROCEDURE{WINAPI}(mode: Enum): Int;
@@ -947,14 +937,14 @@ TYPE
 	TglRotatef* = PROCEDURE{WINAPI}( angle, x, y, z: Float);
 	TglScaled* = PROCEDURE{WINAPI}(x, y, z: Double);
 	TglScalef* = PROCEDURE{WINAPI}(x, y, z: Float);
-	TglSelectBuffer* = PROCEDURE{WINAPI}(size: Sizei; buffer: PInt);
+	TglSelectBuffer* = PROCEDURE{WINAPI}(size: Sizei; buffer: PUint);
 	TglShadeModel* = PROCEDURE{WINAPI}(mode: Enum);
 	TglTexCoord1d* = PROCEDURE{WINAPI}(s: Double);
 	TglTexCoord1dv* = PROCEDURE{WINAPI}( v: PDouble);
 	TglTexCoord1f* = PROCEDURE{WINAPI}(s: Float);
 	TglTexCoord1fv* = PROCEDURE{WINAPI}( v: PFloat);
 	TglTexCoord1i* = PROCEDURE{WINAPI}(s: Int);
-	TglTexCoord1iv* = PROCEDURE{WINAPI}( v: Pint);
+	TglTexCoord1iv* = PROCEDURE{WINAPI}( v: PInt);
 	TglTexCoord1s* = PROCEDURE{WINAPI}(s: Short);
 	TglTexCoord1sv* = PROCEDURE{WINAPI}( v: PShort);
 	TglTexCoord2d* = PROCEDURE{WINAPI}(s: Double; t: Double);
@@ -962,7 +952,7 @@ TYPE
 	TglTexCoord2f* = PROCEDURE{WINAPI}(s: Float; t: Float);
 	TglTexCoord2fv* = PROCEDURE{WINAPI}( v: PFloat);
 	TglTexCoord2i* = PROCEDURE{WINAPI}(s: Int; t: Int);
-	TglTexCoord2iv* = PROCEDURE{WINAPI}( v: Pint);
+	TglTexCoord2iv* = PROCEDURE{WINAPI}( v: PInt);
 	TglTexCoord2s* = PROCEDURE{WINAPI}(s: Short; t: Short);
 	TglTexCoord2sv* = PROCEDURE{WINAPI}( v: PShort);
 	TglTexCoord3d* = PROCEDURE{WINAPI}(s: Double; t: Double; r: Double);
@@ -970,7 +960,7 @@ TYPE
 	TglTexCoord3f* = PROCEDURE{WINAPI}(s: Float; t: Float; r: Float);
 	TglTexCoord3fv* = PROCEDURE{WINAPI}( v: PFloat);
 	TglTexCoord3i* = PROCEDURE{WINAPI}(s: Int; t: Int; r: Int);
-	TglTexCoord3iv* = PROCEDURE{WINAPI}( v: Pint);
+	TglTexCoord3iv* = PROCEDURE{WINAPI}( v: PInt);
 	TglTexCoord3s* = PROCEDURE{WINAPI}(s: Short; t: Short; r: Short);
 	TglTexCoord3sv* = PROCEDURE{WINAPI}( v: PShort);
 	TglTexCoord4d* = PROCEDURE{WINAPI}(s: Double; t: Double; r: Double; q: Double);
@@ -978,20 +968,20 @@ TYPE
 	TglTexCoord4f* = PROCEDURE{WINAPI}(s: Float; t: Float; r: Float; q: Float);
 	TglTexCoord4fv* = PROCEDURE{WINAPI}( v: PFloat);
 	TglTexCoord4i* = PROCEDURE{WINAPI}(s: Int; t: Int; r: Int; q: Int);
-	TglTexCoord4iv* = PROCEDURE{WINAPI}( v: Pint);
+	TglTexCoord4iv* = PROCEDURE{WINAPI}( v: PInt);
 	TglTexCoord4s* = PROCEDURE{WINAPI}(s: Short; t: Short; r: Short; q: Short);
 	TglTexCoord4sv* = PROCEDURE{WINAPI}( v: PShort);
 	TglTexCoordPointer* = PROCEDURE{WINAPI}(size: Int; xtype: Enum; stride: Sizei; xpointer: PVoid);
 	TglTexEnvf* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; param: Float);
 	TglTexEnvfv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: PFloat);
 	TglTexEnvi* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; param: Int);
-	TglTexEnviv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: Pint);
+	TglTexEnviv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: PInt);
 	TglTexGend* = PROCEDURE{WINAPI}(coord: Enum; pname: Enum; param: Double);
 	TglTexGendv* = PROCEDURE{WINAPI}(coord: Enum; pname: Enum;  params: PDouble);
 	TglTexGenf* = PROCEDURE{WINAPI}(coord: Enum; pname: Enum; param: Float);
 	TglTexGenfv* = PROCEDURE{WINAPI}(coord: Enum; pname: Enum;  params: PFloat);
 	TglTexGeni* = PROCEDURE{WINAPI}(coord: Enum; pname: Enum; param: Int);
-	TglTexGeniv* = PROCEDURE{WINAPI}(coord: Enum; pname: Enum;  params: Pint);
+	TglTexGeniv* = PROCEDURE{WINAPI}(coord: Enum; pname: Enum;  params: PInt);
 	TglTranslated* = PROCEDURE{WINAPI}(x: Double; y: Double; z: Double);
 	TglTranslatef* = PROCEDURE{WINAPI}(x: Float; y: Float; z: Float);
 	TglVertex2d* = PROCEDURE{WINAPI}(x: Double; y: Double);
@@ -999,7 +989,7 @@ TYPE
 	TglVertex2f* = PROCEDURE{WINAPI}(x: Float; y: Float);
 	TglVertex2fv* = PROCEDURE{WINAPI}( v: PFloat);
 	TglVertex2i* = PROCEDURE{WINAPI}(x: Int; y: Int);
-	TglVertex2iv* = PROCEDURE{WINAPI}( v: Pint);
+	TglVertex2iv* = PROCEDURE{WINAPI}( v: PInt);
 	TglVertex2s* = PROCEDURE{WINAPI}(x: Short; y: Short);
 	TglVertex2sv* = PROCEDURE{WINAPI}( v: PShort);
 	TglVertex3d* = PROCEDURE{WINAPI}(x: Double; y: Double; z: Double);
@@ -1007,7 +997,7 @@ TYPE
 	TglVertex3f* = PROCEDURE{WINAPI}(x: Float; y: Float; z: Float);
 	TglVertex3fv* = PROCEDURE{WINAPI}( v: PFloat);
 	TglVertex3i* = PROCEDURE{WINAPI}(x: Int; y: Int; z: Int);
-	TglVertex3iv* = PROCEDURE{WINAPI}( v: Pint);
+	TglVertex3iv* = PROCEDURE{WINAPI}( v: PInt);
 	TglVertex3s* = PROCEDURE{WINAPI}(x: Short; y: Short; z: Short);
 	TglVertex3sv* = PROCEDURE{WINAPI}( v: PShort);
 	TglVertex4d* = PROCEDURE{WINAPI}(x: Double; y: Double; z: Double; w: Double);
@@ -1015,7 +1005,7 @@ TYPE
 	TglVertex4f* = PROCEDURE{WINAPI}(x: Float; y: Float; z: Float; w: Float);
 	TglVertex4fv* = PROCEDURE{WINAPI}( v: PFloat);
 	TglVertex4i* = PROCEDURE{WINAPI}(x: Int; y: Int; z: Int; w: Int);
-	TglVertex4iv* = PROCEDURE{WINAPI}( v: Pint);
+	TglVertex4iv* = PROCEDURE{WINAPI}( v: PInt);
 	TglVertex4s* = PROCEDURE{WINAPI}(x: Short; y: Short; z: Short; w: Short);
 	TglVertex4sv* = PROCEDURE{WINAPI}( v: PShort);
 	TglVertexPointer* = PROCEDURE{WINAPI}(size: Int; xtype: Enum; stride: Sizei;  xpointer: PVoid);
@@ -1032,11 +1022,11 @@ TYPE
 	(*! ifdef DEPRECATED 1.2  *)
 	TglColorTable* = PROCEDURE{WINAPI}(target: Enum; internalformat: Enum; width: Sizei; format: Enum; xtype: Enum;  table: PVoid);
 	TglColorTableParameterfv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: PFloat);
-	TglColorTableParameteriv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: Pint);
+	TglColorTableParameteriv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: PInt);
 	TglCopyColorTable* = PROCEDURE{WINAPI}(target: Enum; internalformat: Enum; x: Int; y: Int; width: Sizei);
 	TglGetColorTable* = PROCEDURE{WINAPI}(target: Enum; format: Enum; xtype: Enum; table: PVoid);
 	TglGetColorTableParameterfv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PFloat);
-	TglGetColorTableParameteriv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint);
+	TglGetColorTableParameteriv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
 	TglColorSubTable* = PROCEDURE{WINAPI}(target: Enum; start: Sizei; count: Sizei; format: Enum; xtype: Enum;  data: PVoid);
 	TglCopyColorSubTable* = PROCEDURE{WINAPI}(target: Enum; start: Sizei; x: Int; y: Int; width: Sizei);
 	TglConvolutionFilter1D* = PROCEDURE{WINAPI}(target: Enum; internalformat: Enum; width: Sizei; format: Enum; xtype: Enum;  image: PVoid);
@@ -1044,20 +1034,20 @@ TYPE
 	TglConvolutionParameterf* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Float);
 	TglConvolutionParameterfv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: PFloat);
 	TglConvolutionParameteri* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Int);
-	TglConvolutionParameteriv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: Pint);
+	TglConvolutionParameteriv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: PInt);
 	TglCopyConvolutionFilter1D* = PROCEDURE{WINAPI}(target: Enum; internalformat: Enum; x: Int; y: Int; width: Sizei);
 	TglCopyConvolutionFilter2D* = PROCEDURE{WINAPI}(target: Enum; internalformat: Enum; x: Int; y: Int; width: Sizei; height: Sizei);
 	TglGetConvolutionFilter* = PROCEDURE{WINAPI}(target: Enum; format: Enum; xtype: Enum; image: PVoid);
 	TglGetConvolutionParameterfv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PFloat);
-	TglGetConvolutionParameteriv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint);
+	TglGetConvolutionParameteriv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
 	TglGetSeparableFilter* = PROCEDURE{WINAPI}(target: Enum; format: Enum; xtype: Enum; row: PVoid; column: PVoid; span: PVoid);
 	TglSeparableFilter2D* = PROCEDURE{WINAPI}(target: Enum; internalformat: Enum; width: Sizei; height: Sizei; format: Enum; xtype: Enum;  row: PVoid;  column: PVoid);
 	TglGetHistogram* = PROCEDURE{WINAPI}(target: Enum; reset: Boolean; format: Enum; xtype: Enum; values: PVoid);
 	TglGetHistogramParameterfv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PFloat);
-	TglGetHistogramParameteriv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint);
+	TglGetHistogramParameteriv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
 	TglGetMinmax* = PROCEDURE{WINAPI}(target: Enum; reset: Boolean; format: Enum; xtype: Enum; values: PVoid);
 	TglGetMinmaxParameterfv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PFloat);
-	TglGetMinmaxParameteriv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint);
+	TglGetMinmaxParameteriv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
 	TglHistogram* = PROCEDURE{WINAPI}(target: Enum; width: Sizei; internalformat: Enum; sink: Boolean);
 	TglMinmax* = PROCEDURE{WINAPI}(target: Enum; internalformat: Enum; sink: Boolean);
 	TglResetHistogram* = PROCEDURE{WINAPI}(target: Enum);
@@ -1082,7 +1072,7 @@ TYPE
 	TglMultiTexCoord1f* = PROCEDURE{WINAPI}(target: Enum; s: Float);
 	TglMultiTexCoord1fv* = PROCEDURE{WINAPI}(target: Enum;  v: PFloat);
 	TglMultiTexCoord1i* = PROCEDURE{WINAPI}(target: Enum; s: Int);
-	TglMultiTexCoord1iv* = PROCEDURE{WINAPI}(target: Enum;  v: Pint);
+	TglMultiTexCoord1iv* = PROCEDURE{WINAPI}(target: Enum;  v: PInt);
 	TglMultiTexCoord1s* = PROCEDURE{WINAPI}(target: Enum; s: Short);
 	TglMultiTexCoord1sv* = PROCEDURE{WINAPI}(target: Enum;  v: PShort);
 	TglMultiTexCoord2d* = PROCEDURE{WINAPI}(target: Enum; s: Double; t: Double);
@@ -1090,7 +1080,7 @@ TYPE
 	TglMultiTexCoord2f* = PROCEDURE{WINAPI}(target: Enum; s: Float; t: Float);
 	TglMultiTexCoord2fv* = PROCEDURE{WINAPI}(target: Enum;  v: PFloat);
 	TglMultiTexCoord2i* = PROCEDURE{WINAPI}(target: Enum; s: Int; t: Int);
-	TglMultiTexCoord2iv* = PROCEDURE{WINAPI}(target: Enum;  v: Pint);
+	TglMultiTexCoord2iv* = PROCEDURE{WINAPI}(target: Enum;  v: PInt);
 	TglMultiTexCoord2s* = PROCEDURE{WINAPI}(target: Enum; s: Short; t: Short);
 	TglMultiTexCoord2sv* = PROCEDURE{WINAPI}(target: Enum;  v: PShort);
 	TglMultiTexCoord3d* = PROCEDURE{WINAPI}(target: Enum; s: Double; t: Double; r: Double);
@@ -1098,7 +1088,7 @@ TYPE
 	TglMultiTexCoord3f* = PROCEDURE{WINAPI}(target: Enum; s: Float; t: Float; r: Float);
 	TglMultiTexCoord3fv* = PROCEDURE{WINAPI}(target: Enum;  v: PFloat);
 	TglMultiTexCoord3i* = PROCEDURE{WINAPI}(target: Enum; s: Int; t: Int; r: Int);
-	TglMultiTexCoord3iv* = PROCEDURE{WINAPI}(target: Enum;  v: Pint);
+	TglMultiTexCoord3iv* = PROCEDURE{WINAPI}(target: Enum;  v: PInt);
 	TglMultiTexCoord3s* = PROCEDURE{WINAPI}(target: Enum; s: Short; t: Short; r: Short);
 	TglMultiTexCoord3sv* = PROCEDURE{WINAPI}(target: Enum;  v: PShort);
 	TglMultiTexCoord4d* = PROCEDURE{WINAPI}(target: Enum; s: Double; t: Double; r: Double; q: Double);
@@ -1106,7 +1096,7 @@ TYPE
 	TglMultiTexCoord4f* = PROCEDURE{WINAPI}(target: Enum; s: Float; t: Float; r: Float; q: Float);
 	TglMultiTexCoord4fv* = PROCEDURE{WINAPI}(target: Enum;  v: PFloat);
 	TglMultiTexCoord4i* = PROCEDURE{WINAPI}(target: Enum; s: Int; t: Int; r: Int; q: Int);
-	TglMultiTexCoord4iv* = PROCEDURE{WINAPI}(target: Enum;  v: Pint);
+	TglMultiTexCoord4iv* = PROCEDURE{WINAPI}(target: Enum;  v: PInt);
 	TglMultiTexCoord4s* = PROCEDURE{WINAPI}(target: Enum; s: Short; t: Short; r: Short; q: Short);
 	TglMultiTexCoord4sv* = PROCEDURE{WINAPI}(target: Enum;  v: PShort);
 	TglLoadTransposeMatrixf* = PROCEDURE{WINAPI}( m: PFloat);
@@ -1115,14 +1105,14 @@ TYPE
 	TglMultTransposeMatrixd* = PROCEDURE{WINAPI}( m: PDouble);
 	(*! endif  *)
 
-	(*! GL_VERSION_1_4  *)
+      (*! GL_VERSION_1_4  *)
 	TglBlendFuncSeparate* = PROCEDURE{WINAPI}(sfactorRGB: Enum; dfactorRGB: Enum; sfactorAlpha: Enum; dfactorAlpha: Enum);
-	TglMultiDrawArrays* = PROCEDURE{WINAPI}(mode: Enum; first: Pint; count: PSizei; primcount: Sizei);
+	TglMultiDrawArrays* = PROCEDURE{WINAPI}(mode: Enum; first: PInt; count: PSizei; primcount: Sizei);
 	TglMultiDrawElements* = PROCEDURE{WINAPI}(mode: Enum;  count: PSizei; xtype: Enum;  indices: PVoid; primcount: Sizei);
 	TglPointParameterf* = PROCEDURE{WINAPI}(pname: Enum; param: Float);
 	TglPointParameterfv* = PROCEDURE{WINAPI}(pname: Enum;  params: PFloat);
 	TglPointParameteri* = PROCEDURE{WINAPI}(pname: Enum; param: Int);
-	TglPointParameteriv* = PROCEDURE{WINAPI}(pname: Enum;  params: Pint);
+	TglPointParameteriv* = PROCEDURE{WINAPI}(pname: Enum;  params: PInt);
 
 	(*! ifdef DEPRECATED 1.4  *)
 	TglFogCoordf* = PROCEDURE{WINAPI}(coord: Float);
@@ -1137,13 +1127,13 @@ TYPE
 	TglSecondaryColor3f* = PROCEDURE{WINAPI}(red: Float; green: Float; blue: Float);
 	TglSecondaryColor3fv* = PROCEDURE{WINAPI}( v: PFloat);
 	TglSecondaryColor3i* = PROCEDURE{WINAPI}(red: Int; green: Int; blue: Int);
-	TglSecondaryColor3iv* = PROCEDURE{WINAPI}( v: Pint);
+	TglSecondaryColor3iv* = PROCEDURE{WINAPI}( v: PInt);
 	TglSecondaryColor3s* = PROCEDURE{WINAPI}(red: Short; green: Short; blue: Short);
 	TglSecondaryColor3sv* = PROCEDURE{WINAPI}( v: PShort);
 	TglSecondaryColor3ub* = PROCEDURE{WINAPI}(red: Ubyte; green: Ubyte; blue: Ubyte);
 	TglSecondaryColor3ubv* = PROCEDURE{WINAPI}( v: PUbyte);
 	TglSecondaryColor3ui* = PROCEDURE{WINAPI}(red: Uint; green: Uint; blue: Uint);
-	TglSecondaryColor3uiv* = PROCEDURE{WINAPI}( v: PInt);
+	TglSecondaryColor3uiv* = PROCEDURE{WINAPI}( v: PUint);
 	TglSecondaryColor3us* = PROCEDURE{WINAPI}(red: Ushort; green: Ushort; blue: Ushort);
 	TglSecondaryColor3usv* = PROCEDURE{WINAPI}( v: PUshort);
 	TglSecondaryColorPointer* = PROCEDURE{WINAPI}(size: Int; xtype: Enum; stride: Sizei; xpointer: PVoid);
@@ -1152,7 +1142,7 @@ TYPE
 	TglWindowPos2f* = PROCEDURE{WINAPI}(x: Float; y: Float);
 	TglWindowPos2fv* = PROCEDURE{WINAPI}( v: PFloat);
 	TglWindowPos2i* = PROCEDURE{WINAPI}(x: Int; y: Int);
-	TglWindowPos2iv* = PROCEDURE{WINAPI}( v: Pint);
+	TglWindowPos2iv* = PROCEDURE{WINAPI}( v: PInt);
 	TglWindowPos2s* = PROCEDURE{WINAPI}(x: Short; y: Short);
 	TglWindowPos2sv* = PROCEDURE{WINAPI}( v: PShort);
 	TglWindowPos3d* = PROCEDURE{WINAPI}(x: Double; y: Double; z: Double);
@@ -1160,30 +1150,30 @@ TYPE
 	TglWindowPos3f* = PROCEDURE{WINAPI}(x: Float; y: Float; z: Float);
 	TglWindowPos3fv* = PROCEDURE{WINAPI}( v: PFloat);
 	TglWindowPos3i* = PROCEDURE{WINAPI}(x: Int; y: Int; z: Int);
-	TglWindowPos3iv* = PROCEDURE{WINAPI}( v: Pint);
+	TglWindowPos3iv* = PROCEDURE{WINAPI}( v: PInt);
 	TglWindowPos3s* = PROCEDURE{WINAPI}(x: Short; y: Short; z: Short);
 	TglWindowPos3sv* = PROCEDURE{WINAPI}( v: PShort);
 	(*! endif  *)
 
 	(*! GL_VERSION_1_5  *)
-	TglGenQueries* = PROCEDURE{WINAPI}(n: Sizei; ids: PInt);
-	TglDeleteQueries* = PROCEDURE{WINAPI}(n: Sizei;  ids: PInt);
+	TglGenQueries* = PROCEDURE{WINAPI}(n: Sizei; ids: PUint);
+	TglDeleteQueries* = PROCEDURE{WINAPI}(n: Sizei;  ids: PUint);
 	TglIsQuery* = PROCEDURE{WINAPI}(id: Uint): BOOLEAN;
 	TglBeginQuery* = PROCEDURE{WINAPI}(target: Enum; id: Uint);
 	TglEndQuery* = PROCEDURE{WINAPI}(target: Enum);
-	TglGetQueryiv* = PROCEDURE{WINAPI}(target, pname: Enum; params: Pint);
-	TglGetQueryObjectiv* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: Pint);
-	TglGetQueryObjectuiv* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: PInt);
+	TglGetQueryiv* = PROCEDURE{WINAPI}(target, pname: Enum; params: PInt);
+	TglGetQueryObjectiv* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: PInt);
+	TglGetQueryObjectuiv* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: PUint);
 	TglBindBuffer* = PROCEDURE{WINAPI}(target: Enum; buffer: Uint);
-	TglDeleteBuffers* = PROCEDURE{WINAPI}(n: Sizei;  buffers: PInt );
-	TglGenBuffers* = PROCEDURE{WINAPI}(n: Sizei;  buffers: PInt);
+	TglDeleteBuffers* = PROCEDURE{WINAPI}(n: Sizei;  buffers: PUint );
+	TglGenBuffers* = PROCEDURE{WINAPI}(n: Sizei;  buffers: PUint);
 	TglIsBuffer* = PROCEDURE{WINAPI}(buffer: Uint): Boolean;
 	TglBufferData* = PROCEDURE{WINAPI}(target: Enum; size: Sizei;  data: ADDRESS; usage: Enum);
 	TglBufferSubData* = PROCEDURE{WINAPI}(target: Enum; offset: Sizei; size: Sizei;  data: PVoid);
 	TglGetBufferSubData* = PROCEDURE{WINAPI}(target: Enum; offset: Sizei; size: Sizei; data: PVoid);
 	TglMapBuffer* = PROCEDURE{WINAPI}(target: Enum; access: Enum): PVoid;
 	TglUnmapBuffer* = PROCEDURE{WINAPI}(target: Enum): Boolean;
-	TglGetBufferParameteriv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint);
+	TglGetBufferParameteriv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
 	TglGetBufferPointerv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PVoid);
 
 	(*! GL_VERSION_2_0  *)
@@ -1206,21 +1196,21 @@ TYPE
 	TglGetActiveUniform* = PROCEDURE{WINAPI}(programObj: Handle; index: Uint; maxLength: Sizei; VAR length: Sizei; VAR size: Int; VAR xtype: Enum; name: PChar);
 	TglGetAttachedShaders* = PROCEDURE{WINAPI}(programObj: Handle; MaxCount: Sizei; VAR Count: Int; shaders: PInt);
 	TglGetAttribLocation* = PROCEDURE{WINAPI}(programObj: Handle;  chars: ADDRESS): Int;
-	TglGetProgramiv* = PROCEDURE{WINAPI}(programObj: Handle; pname: Enum; params: Pint);
+	TglGetProgramiv* = PROCEDURE{WINAPI}(programObj: Handle; pname: Enum; params: PInt);
 	TglGetProgramInfoLog* = PROCEDURE{WINAPI}(programObj: Handle; maxLength: Sizei; VAR length: Int; infoLog: PChar);
-	TglGetShaderiv* = PROCEDURE{WINAPI}(shaderObj: Handle; pname: Enum; params: Pint);
+	TglGetShaderiv* = PROCEDURE{WINAPI}(shaderObj: Handle; pname: Enum; params: PInt);
 	TglGetShaderInfoLog* = PROCEDURE{WINAPI}(shaderObj: Handle; maxLength: Sizei; VAR length: Int; infoLog: PChar);
 	TglGetShaderSource* = PROCEDURE{WINAPI}(shaderObj: Handle; maxlength: Sizei; VAR length: Sizei; source: PChar);
 	TglGetUniformLocation* = PROCEDURE{WINAPI}(programObj: Handle;  chars: ADDRESS): Int;
 	TglGetUniformfv* = PROCEDURE{WINAPI}(programObj: Handle; location: Int; params: PFloat);
-	TglGetUniformiv* = PROCEDURE{WINAPI}(programObj: Handle; location: Int; params: Pint);
+	TglGetUniformiv* = PROCEDURE{WINAPI}(programObj: Handle; location: Int; params: PInt);
 	TglGetVertexAttribfv* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: PFloat);
-	TglGetVertexAttribiv* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: Pint);
+	TglGetVertexAttribiv* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: PInt);
 	TglGetVertexAttribPointerv* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; xpointer: PVoid);
 	TglIsProgram* = PROCEDURE{WINAPI}(programObj: Handle) : Boolean;
 	TglIsShader* = PROCEDURE{WINAPI}(shaderObj: Handle) : Boolean;
 	TglLinkProgram* = PROCEDURE{WINAPI}(programObj: Handle);
-	TglShaderSource* = PROCEDURE{WINAPI}(shaderObj: Handle; count: Sizei; xstring: PChar; lengths: Pint);
+	TglShaderSource* = PROCEDURE{WINAPI}(shaderObj: Handle; count: Sizei; xstring: PChar; lengths: PInt);
 	TglUseProgram* = PROCEDURE{WINAPI}(programObj: Handle);
 	TglUniform1f* = PROCEDURE{WINAPI}(location: Int; v0: Float);
 	TglUniform2f* = PROCEDURE{WINAPI}(location: Int; v0, v1: Float);
@@ -1234,10 +1224,10 @@ TYPE
 	TglUniform2fv* = PROCEDURE{WINAPI}(location: Int; count: Sizei; value: PFloat);
 	TglUniform3fv* = PROCEDURE{WINAPI}(location: Int; count: Sizei; value: PFloat);
 	TglUniform4fv* = PROCEDURE{WINAPI}(location: Int; count: Sizei; value: PFloat);
-	TglUniform1iv* = PROCEDURE{WINAPI}(location: Int; count: Sizei; value: Pint);
-	TglUniform2iv* = PROCEDURE{WINAPI}(location: Int; count: Sizei; value: Pint);
-	TglUniform3iv* = PROCEDURE{WINAPI}(location: Int; count: Sizei; value: Pint);
-	TglUniform4iv* = PROCEDURE{WINAPI}(location: Int; count: Sizei; value: Pint);
+	TglUniform1iv* = PROCEDURE{WINAPI}(location: Int; count: Sizei; value: PInt);
+	TglUniform2iv* = PROCEDURE{WINAPI}(location: Int; count: Sizei; value: PInt);
+	TglUniform3iv* = PROCEDURE{WINAPI}(location: Int; count: Sizei; value: PInt);
+	TglUniform4iv* = PROCEDURE{WINAPI}(location: Int; count: Sizei; value: PInt);
 	TglUniformMatrix2fv* = PROCEDURE{WINAPI}(location: Int; count: Sizei; transpose: Boolean; value: PFloat);
 	TglUniformMatrix3fv* = PROCEDURE{WINAPI}(location: Int; count: Sizei; transpose: Boolean; value: PFloat);
 	TglUniformMatrix4fv* = PROCEDURE{WINAPI}(location: Int; count: Sizei; transpose: Boolean; value: PFloat);
@@ -1261,22 +1251,22 @@ TYPE
 	TglVertexAttrib3s* = PROCEDURE{WINAPI}(index: Uint; x: Short; y: Short; z: Short);
 	TglVertexAttrib3sv* = PROCEDURE{WINAPI}(index: Uint;  v: PShort);
 	TglVertexAttrib4Nbv* = PROCEDURE{WINAPI}(index: Uint;  v: PByte);
-	TglVertexAttrib4Niv* = PROCEDURE{WINAPI}(index: Uint;  v: Pint);
+	TglVertexAttrib4Niv* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
 	TglVertexAttrib4Nsv* = PROCEDURE{WINAPI}(index: Uint;  v: PShort);
 	TglVertexAttrib4Nub* = PROCEDURE{WINAPI}(index: Uint; x: Ubyte; y: Ubyte; z: Ubyte; w: Ubyte);
 	TglVertexAttrib4Nubv* = PROCEDURE{WINAPI}(index: Uint;  v: PUbyte);
-	TglVertexAttrib4Nuiv* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
+	TglVertexAttrib4Nuiv* = PROCEDURE{WINAPI}(index: Uint;  v: PUint);
 	TglVertexAttrib4Nusv* = PROCEDURE{WINAPI}(index: Uint;  v: PUshort);
 	TglVertexAttrib4bv* = PROCEDURE{WINAPI}(index: Uint;  v: PByte);
 	TglVertexAttrib4d* = PROCEDURE{WINAPI}(index: Uint; x: Double; y: Double; z: Double; w: Double);
 	TglVertexAttrib4dv* = PROCEDURE{WINAPI}(index: Uint;  v: PDouble);
 	TglVertexAttrib4f* = PROCEDURE{WINAPI}(index: Uint; x: Float; y: Float; z: Float; w: Float);
 	TglVertexAttrib4fv* = PROCEDURE{WINAPI}(index: Uint;  v: PFloat);
-	TglVertexAttrib4iv* = PROCEDURE{WINAPI}(index: Uint;  v: Pint);
+	TglVertexAttrib4iv* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
 	TglVertexAttrib4s* = PROCEDURE{WINAPI}(index: Uint; x: Short; y: Short; z: Short; w: Short);
 	TglVertexAttrib4sv* = PROCEDURE{WINAPI}(index: Uint;  v: PShort);
 	TglVertexAttrib4ubv* = PROCEDURE{WINAPI}(index: Uint;  v: PUbyte);
-	TglVertexAttrib4uiv* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
+	TglVertexAttrib4uiv* = PROCEDURE{WINAPI}(index: Uint;  v: PUint);
 	TglVertexAttrib4usv* = PROCEDURE{WINAPI}(index: Uint;  v: PUshort);
 	TglVertexAttribPointer* = PROCEDURE{WINAPI}(index: Uint; size: Int; xtype: Enum; normalized: Boolean; stride: Sizei;  xpointer: PVoid);
 
@@ -1295,7 +1285,7 @@ TYPE
 	(* ARB_vertex_array_object *)
 	TglColorMaski* = PROCEDURE{WINAPI}(index: Uint; r: Boolean; g: Boolean; b: Boolean; a: Boolean);
 	TglGetBooleani_v* = PROCEDURE{WINAPI}(target: Enum; index: Uint; data: PBoolean);
-	TglGetIntegeri_v* = PROCEDURE{WINAPI}(target: Enum; index: Uint; data: Pint);
+	TglGetIntegeri_v* = PROCEDURE{WINAPI}(target: Enum; index: Uint; data: PInt);
 	TglEnablei* = PROCEDURE{WINAPI}(target: Enum; index: Uint);
 	TglDisablei* = PROCEDURE{WINAPI}(target: Enum; index: Uint);
 	TglIsEnabledi* = PROCEDURE{WINAPI}(target: Enum; index: Uint): Boolean;
@@ -1309,8 +1299,8 @@ TYPE
 	TglBeginConditionalRender* = PROCEDURE{WINAPI}(id: Uint; mode: Enum);
 	TglEndConditionalRender* = PROCEDURE{WINAPI}();
 	TglVertexAttribIPointer* = PROCEDURE{WINAPI}(index: Uint; size: Int; xtype: Enum; stride: Sizei;  pointer: PVoid);
-	TglGetVertexAttribIiv* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: Pint);
-	TglGetVertexAttribIuiv* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: PInt);
+	TglGetVertexAttribIiv* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: PInt);
+	TglGetVertexAttribIuiv* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: PUint);
 	TglVertexAttribI1i* = PROCEDURE{WINAPI}(index: Uint; x: Int);
 	TglVertexAttribI2i* = PROCEDURE{WINAPI}(index: Uint; x: Int; y: Int);
 	TglVertexAttribI3i* = PROCEDURE{WINAPI}(index: Uint; x: Int; y: Int; z: Int);
@@ -1319,35 +1309,35 @@ TYPE
 	TglVertexAttribI2ui* = PROCEDURE{WINAPI}(index: Uint; x: Uint; y: Uint);
 	TglVertexAttribI3ui* = PROCEDURE{WINAPI}(index: Uint; x: Uint; y: Uint; z: Uint);
 	TglVertexAttribI4ui* = PROCEDURE{WINAPI}(index: Uint; x: Uint; y: Uint; z: Uint; w: Uint);
-	TglVertexAttribI1iv* = PROCEDURE{WINAPI}(index: Uint;  v: Pint);
-	TglVertexAttribI2iv* = PROCEDURE{WINAPI}(index: Uint;  v: Pint);
-	TglVertexAttribI3iv* = PROCEDURE{WINAPI}(index: Uint;  v: Pint);
-	TglVertexAttribI4iv* = PROCEDURE{WINAPI}(index: Uint;  v: Pint);
-	TglVertexAttribI1uiv* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
-	TglVertexAttribI2uiv* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
-	TglVertexAttribI3uiv* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
-	TglVertexAttribI4uiv* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
+	TglVertexAttribI1iv* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
+	TglVertexAttribI2iv* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
+	TglVertexAttribI3iv* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
+	TglVertexAttribI4iv* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
+	TglVertexAttribI1uiv* = PROCEDURE{WINAPI}(index: Uint;  v: PUint);
+	TglVertexAttribI2uiv* = PROCEDURE{WINAPI}(index: Uint;  v: PUint);
+	TglVertexAttribI3uiv* = PROCEDURE{WINAPI}(index: Uint;  v: PUint);
+	TglVertexAttribI4uiv* = PROCEDURE{WINAPI}(index: Uint;  v: PUint);
 	TglVertexAttribI4bv* = PROCEDURE{WINAPI}(index: Uint;  v: PByte);
 	TglVertexAttribI4sv* = PROCEDURE{WINAPI}(index: Uint;  v: PShort);
 	TglVertexAttribI4ubv* = PROCEDURE{WINAPI}(index: Uint;  v: PUbyte);
 	TglVertexAttribI4usv* = PROCEDURE{WINAPI}(index: Uint;  v: PUshort);
-	TglGetUniformuiv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; params: PInt);
+	TglGetUniformuiv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; params: PUint);
 	TglBindFragDataLocation* = PROCEDURE{WINAPI}(xprogram: Uint; color: Uint;  name: ADDRESS);
 	TglGetFragDataLocation* = PROCEDURE{WINAPI}(xprogram: Uint;  name: ADDRESS): Int;
 	TglUniform1ui* = PROCEDURE{WINAPI}(location: Int; v0: Uint);
 	TglUniform2ui* = PROCEDURE{WINAPI}(location: Int; v0: Uint; v1: Uint);
 	TglUniform3ui* = PROCEDURE{WINAPI}(location: Int; v0: Uint; v1: Uint; v2: Uint);
 	TglUniform4ui* = PROCEDURE{WINAPI}(location: Int; v0: Uint; v1: Uint; v2: Uint; v3: Uint);
-	TglUniform1uiv* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PInt);
-	TglUniform2uiv* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PInt);
-	TglUniform3uiv* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PInt);
-	TglUniform4uiv* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PInt);
-	TglTexParameterIiv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: Pint);
-	TglTexParameterIuiv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: PInt);
-	TglGetTexParameterIiv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint);
-	TglGetTexParameterIuiv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
-	TglClearBufferiv* = PROCEDURE{WINAPI}(buffer: Enum; drawbuffer: Int;  value: Pint);
-	TglClearBufferuiv* = PROCEDURE{WINAPI}(buffer: Enum; drawbuffer: Int;  value: PInt);
+	TglUniform1uiv* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PUint);
+	TglUniform2uiv* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PUint);
+	TglUniform3uiv* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PUint);
+	TglUniform4uiv* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PUint);
+	TglTexParameterIiv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: PInt);
+	TglTexParameterIuiv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: PUint);
+	TglGetTexParameterIiv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
+	TglGetTexParameterIuiv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PUint);
+	TglClearBufferiv* = PROCEDURE{WINAPI}(buffer: Enum; drawbuffer: Int;  value: PInt);
+	TglClearBufferuiv* = PROCEDURE{WINAPI}(buffer: Enum; drawbuffer: Int;  value: PUint);
 	TglClearBufferfv* = PROCEDURE{WINAPI}(buffer: Enum; drawbuffer: Int;  value: PFloat);
 	TglClearBufferfi* = PROCEDURE{WINAPI}(buffer: Enum; drawbuffer: Int; depth: Float; stencil: Int);
 	TglGetStringi* = PROCEDURE{WINAPI}(name: Enum; index: Uint): PUbyte;
@@ -1367,8 +1357,8 @@ TYPE
 	(* ARB_provoking_vertex *)
 	(* ARB_sync *)
 	(* ARB_texture_multisample *)
-	TglGetInteger64i_v* = PROCEDURE{WINAPI}(target: Enum; index: Uint; data: Pint64);
-	TglGetBufferParameteri64v* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint64);
+	TglGetInteger64i_v* = PROCEDURE{WINAPI}(target: Enum; index: Uint; data: PInt64);
+	TglGetBufferParameteri64v* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt64);
 	TglFramebufferTexture* = PROCEDURE{WINAPI}(target: Enum; attachment: Enum; texture: Uint; level: Int);
 	(* TglFramebufferTextureFace  = PROCEDURE{WINAPI}(target: Enum; attachment: Enum; texture: Uint; level: Int; face: Enum);  *)
 
@@ -1384,6 +1374,7 @@ TYPE
 	(* ARB_timer_query  *)
 	(* ARB_vertex_type_2_10_10_10_rev  *)
 	TglVertexAttribDivisor* = PROCEDURE{WINAPI}(index: Uint; divisor: Uint);
+
 	(*! GL_VERSION_4_0  *)
 	(* OpenGL 4.0 also reuses entry points from these extensions:  *)
 	(* ARB_texture_query_lod (no entry points)  *)
@@ -1417,11 +1408,11 @@ TYPE
 	TglElementPointerAPPLE* = PROCEDURE{WINAPI}(xtype:  Enum; xpointer: PVoid);
 	TglDrawElementArrayAPPLE* = PROCEDURE{WINAPI}(mode: Enum; first: Int; count: Sizei);
 	TglDrawRangeElementArrayAPPLE* = PROCEDURE{WINAPI}(mode: Enum; start: Uint; xend: Uint; first: Int; count: Sizei);
-	TglMultiDrawElementArrayAPPLE* = PROCEDURE{WINAPI}(mode: Enum;  first: Pint;  count: PSizei; primcount: Sizei);
-	TglMultiDrawRangeElementArrayAPPLE* = PROCEDURE{WINAPI}(mode: Enum; start: Uint; xend: Uint;  first: Pint; count: PSizei; primcount: Sizei);
+	TglMultiDrawElementArrayAPPLE* = PROCEDURE{WINAPI}(mode: Enum;  first: PInt;  count: PSizei; primcount: Sizei);
+	TglMultiDrawRangeElementArrayAPPLE* = PROCEDURE{WINAPI}(mode: Enum; start: Uint; xend: Uint;  first: PInt; count: PSizei; primcount: Sizei);
 	(* GL_APPLE_fence  *)
-	TglGenFencesAPPLE* = PROCEDURE{WINAPI}(n: Sizei; fences: PInt);
-	TglDeleteFencesAPPLE* = PROCEDURE{WINAPI}(n: Sizei; fences: PInt);
+	TglGenFencesAPPLE* = PROCEDURE{WINAPI}(n: Sizei; fences: PUint);
+	TglDeleteFencesAPPLE* = PROCEDURE{WINAPI}(n: Sizei; fences: PUint);
 	TglSetFenceAPPLE* = PROCEDURE{WINAPI}(fence: Uint);
 	TglIsFenceAPPLE* = PROCEDURE{WINAPI}(fence: Uint): Boolean;
 	TglTestFenceAPPLE* = PROCEDURE{WINAPI}(fence: Uint): Boolean;
@@ -1430,8 +1421,8 @@ TYPE
 	TglFinishObjectAPPLE* = PROCEDURE{WINAPI}(xobject: Enum; name: Int);
 	(* GL_APPLE_vertex_array_object  *)
 	TglBindVertexArrayAPPLE* = PROCEDURE{WINAPI}(xarray: Uint);
-	TglDeleteVertexArraysAPPLE* = PROCEDURE{WINAPI}(n: Sizei; xarrays: PInt);
-	TglGenVertexArraysAPPLE* = PROCEDURE{WINAPI}(n: Sizei; xarrays: PInt);
+	TglDeleteVertexArraysAPPLE* = PROCEDURE{WINAPI}(n: Sizei; xarrays: PUint);
+	TglGenVertexArraysAPPLE* = PROCEDURE{WINAPI}(n: Sizei; xarrays: PUint);
 	TglIsVertexArrayAPPLE* = PROCEDURE{WINAPI}(narray: Uint): Boolean;
 	(*  GL_APPLE_vertex_array_range  *)
 	TglVertexArrayRangeAPPLE* = PROCEDURE{WINAPI}(length: Sizei; xpointer: PVoid);
@@ -1451,12 +1442,12 @@ TYPE
 	(*  GL_APPLE_object_purgeable  *)
 	TglObjectPurgeableAPPLE* = PROCEDURE{WINAPI}(objectType: Enum; name: Uint; option: Enum): Enum;
 	TglObjectUnpurgeableAPPLE* = PROCEDURE{WINAPI}(objectType: Enum; name: Uint; option: Enum): Enum;
-	TglGetObjectParameterivAPPLE* = PROCEDURE{WINAPI}(objectType: Enum; name: Uint; pname: Enum; params: Pint);
+	TglGetObjectParameterivAPPLE* = PROCEDURE{WINAPI}(objectType: Enum; name: Uint; pname: Enum; params: PInt);
 	(* GL_ARB_matrix_palette  *)
 	TglCurrentPaletteMatrixARB* = PROCEDURE{WINAPI}(index: Int);
 	TglMatrixIndexubvARB* = PROCEDURE{WINAPI}(size: Int;  indices: PUbyte);
 	TglMatrixIndexusvARB* = PROCEDURE{WINAPI}(size: Int;  indices: PUshort);
-	TglMatrixIndexuivARB* = PROCEDURE{WINAPI}(size: Int;  indices: PInt);
+	TglMatrixIndexuivARB* = PROCEDURE{WINAPI}(size: Int;  indices: PUint);
 	TglMatrixIndexPointerARB* = PROCEDURE{WINAPI}(size: Int; xtype: Enum; stride: Sizei;  xpointer: PVoid);
 	(* GL_ARB_multisample  *)
 	TglSampleCoverageARB* = PROCEDURE{WINAPI}(value: Clampf; invert: Boolean);
@@ -1468,7 +1459,7 @@ TYPE
 	TglMultiTexCoord1fARB* = PROCEDURE{WINAPI}(target: Enum; s: Float);
 	TglMultiTexCoord1fvARB* = PROCEDURE{WINAPI}(target: Enum;  v: PFloat);
 	TglMultiTexCoord1iARB* = PROCEDURE{WINAPI}(target: Enum; s: Int);
-	TglMultiTexCoord1ivARB* = PROCEDURE{WINAPI}(target: Enum;  v: Pint);
+	TglMultiTexCoord1ivARB* = PROCEDURE{WINAPI}(target: Enum;  v: PInt);
 	TglMultiTexCoord1sARB* = PROCEDURE{WINAPI}(target: Enum; s: Short);
 	TglMultiTexCoord1svARB* = PROCEDURE{WINAPI}(target: Enum;  v: PShort);
 	TglMultiTexCoord2dARB* = PROCEDURE{WINAPI}(target: Enum; s: Double; t: Double);
@@ -1476,7 +1467,7 @@ TYPE
 	TglMultiTexCoord2fARB* = PROCEDURE{WINAPI}(target: Enum; s: Float; t: Float);
 	TglMultiTexCoord2fvARB* = PROCEDURE{WINAPI}(target: Enum;  v: PFloat);
 	TglMultiTexCoord2iARB* = PROCEDURE{WINAPI}(target: Enum; s: Int; t: Int);
-	TglMultiTexCoord2ivARB* = PROCEDURE{WINAPI}(target: Enum;  v: Pint);
+	TglMultiTexCoord2ivARB* = PROCEDURE{WINAPI}(target: Enum;  v: PInt);
 	TglMultiTexCoord2sARB* = PROCEDURE{WINAPI}(target: Enum; s: Short; t: Short);
 	TglMultiTexCoord2svARB* = PROCEDURE{WINAPI}(target: Enum;  v: PShort);
 	TglMultiTexCoord3dARB* = PROCEDURE{WINAPI}(target: Enum; s: Double; t: Double; r: Double);
@@ -1484,7 +1475,7 @@ TYPE
 	TglMultiTexCoord3fARB* = PROCEDURE{WINAPI}(target: Enum; s: Float; t: Float; r: Float);
 	TglMultiTexCoord3fvARB* = PROCEDURE{WINAPI}(target: Enum;  v: PFloat);
 	TglMultiTexCoord3iARB* = PROCEDURE{WINAPI}(target: Enum; s: Int; t: Int; r: Int);
-	TglMultiTexCoord3ivARB* = PROCEDURE{WINAPI}(target: Enum;  v: Pint);
+	TglMultiTexCoord3ivARB* = PROCEDURE{WINAPI}(target: Enum;  v: PInt);
 	TglMultiTexCoord3sARB* = PROCEDURE{WINAPI}(target: Enum; s: Short; t: Short; r: Short);
 	TglMultiTexCoord3svARB* = PROCEDURE{WINAPI}(target: Enum;  v: PShort);
 	TglMultiTexCoord4dARB* = PROCEDURE{WINAPI}(target: Enum; s: Double; t: Double; r: Double; q: Double);
@@ -1492,7 +1483,7 @@ TYPE
 	TglMultiTexCoord4fARB* = PROCEDURE{WINAPI}(target: Enum; s: Float; t: Float; r: Float; q: Float);
 	TglMultiTexCoord4fvARB* = PROCEDURE{WINAPI}(target: Enum;  v: PFloat);
 	TglMultiTexCoord4iARB* = PROCEDURE{WINAPI}(target: Enum; s: Int; t: Int; r: Int; q: Int);
-	TglMultiTexCoord4ivARB* = PROCEDURE{WINAPI}(target: Enum;  v: Pint);
+	TglMultiTexCoord4ivARB* = PROCEDURE{WINAPI}(target: Enum;  v: PInt);
 	TglMultiTexCoord4sARB* = PROCEDURE{WINAPI}(target: Enum; s: Short; t: Short; r: Short; q: Short);
 	TglMultiTexCoord4svARB* = PROCEDURE{WINAPI}(target: Enum;  v: PShort);
 	(* GL_ARB_point_parameters  *)
@@ -1514,25 +1505,25 @@ TYPE
 	(* GL_ARB_vertex_blend  *)
 	TglWeightbvARB* = PROCEDURE{WINAPI}(size: Int;  weights: PByte);
 	TglWeightsvARB* = PROCEDURE{WINAPI}(size: Int;  weights: PShort);
-	TglWeightivARB* = PROCEDURE{WINAPI}(size: Int;  weights: Pint);
+	TglWeightivARB* = PROCEDURE{WINAPI}(size: Int;  weights: PInt);
 	TglWeightfvARB* = PROCEDURE{WINAPI}(size: Int;  weights: PFloat);
 	TglWeightdvARB* = PROCEDURE{WINAPI}(size: Int;  weights: PDouble);
 	TglWeightubvARB* = PROCEDURE{WINAPI}(size: Int;  weights: PUbyte);
 	TglWeightusvARB* = PROCEDURE{WINAPI}(size: Int;  weights: PUshort);
-	TglWeightuivARB* = PROCEDURE{WINAPI}(size: Int;  weights: PInt);
+	TglWeightuivARB* = PROCEDURE{WINAPI}(size: Int;  weights: PUint);
 	TglWeightPointerARB* = PROCEDURE{WINAPI}(size: Int; xtype: Enum; stride: Sizei; xpointer: PVoid);
 	TglVertexBlendARB* = PROCEDURE{WINAPI}(count: Int);
 	(* GL_ARB_vertex_buffer_object  *)
 	TglBindBufferARB* = PROCEDURE{WINAPI}(target: Enum; buffer: Uint);
-	TglDeleteBuffersARB* = PROCEDURE{WINAPI}(n: Sizei;  buffers: PInt);
-	TglGenBuffersARB* = PROCEDURE{WINAPI}(n: Sizei; buffers: PInt );
+	TglDeleteBuffersARB* = PROCEDURE{WINAPI}(n: Sizei;  buffers: PUint);
+	TglGenBuffersARB* = PROCEDURE{WINAPI}(n: Sizei; buffers: PUint );
 	TglIsBufferARB* = PROCEDURE{WINAPI}(buffer: Uint): Boolean;
 	TglBufferDataARB* = PROCEDURE{WINAPI}(target: Enum; size: Sizei;  data: PVoid; usage: Enum);
 	TglBufferSubDataARB* = PROCEDURE{WINAPI}(target: Enum; offset: Sizei; size: Sizei;  data: PVoid);
 	TglGetBufferSubDataARB* = PROCEDURE{WINAPI}(target: Enum; offset: Sizei; size: Sizei; data: PVoid);
 	TglMapBufferARB* = PROCEDURE{WINAPI}(target: Enum; access: Enum): PVoid;
 	TglUnmapBufferARB* = PROCEDURE{WINAPI}( target: Enum): Boolean;
-	TglGetBufferParameterivARB* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint);
+	TglGetBufferParameterivARB* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
 	TglGetBufferPointervARB* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PVoid);
 	(* GL_ARB_vertex_program  *)
 	TglVertexAttrib1dARB* = PROCEDURE{WINAPI}(index: Uint; x: Double);
@@ -1554,30 +1545,30 @@ TYPE
 	TglVertexAttrib3sARB* = PROCEDURE{WINAPI}(index: Uint; x: Short; y: Short; z: Short);
 	TglVertexAttrib3svARB* = PROCEDURE{WINAPI}(index: Uint;  v: PShort);
 	TglVertexAttrib4NbvARB* = PROCEDURE{WINAPI}(index: Uint;  v: PByte);
-	TglVertexAttrib4NivARB* = PROCEDURE{WINAPI}(index: Uint;  v: Pint);
+	TglVertexAttrib4NivARB* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
 	TglVertexAttrib4NsvARB* = PROCEDURE{WINAPI}(index: Uint;  v: PShort);
 	TglVertexAttrib4NubARB* = PROCEDURE{WINAPI}(index: Uint; x: Ubyte; y: Ubyte; z: Ubyte; w: Ubyte);
 	TglVertexAttrib4NubvARB* = PROCEDURE{WINAPI}(index: Uint;  v: PUbyte);
-	TglVertexAttrib4NuivARB* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
+	TglVertexAttrib4NuivARB* = PROCEDURE{WINAPI}(index: Uint;  v: PUint);
 	TglVertexAttrib4NusvARB* = PROCEDURE{WINAPI}(index: Uint;  v: PUshort);
 	TglVertexAttrib4bvARB* = PROCEDURE{WINAPI}(index: Uint;  v: PByte);
 	TglVertexAttrib4dARB* = PROCEDURE{WINAPI}(index: Uint; x: Double; y: Double; z: Double; w: Double);
 	TglVertexAttrib4dvARB* = PROCEDURE{WINAPI}(index: Uint;  v: PDouble);
 	TglVertexAttrib4fARB* = PROCEDURE{WINAPI}(index: Uint; x: Float; y: Float; z: Float; w: Float);
 	TglVertexAttrib4fvARB* = PROCEDURE{WINAPI}(index: Uint;  v: PFloat);
-	TglVertexAttrib4ivARB* = PROCEDURE{WINAPI}(index: Uint;  v: Pint);
+	TglVertexAttrib4ivARB* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
 	TglVertexAttrib4sARB* = PROCEDURE{WINAPI}(index: Uint; x: Short; y: Short; z: Short; w: Short);
 	TglVertexAttrib4svARB* = PROCEDURE{WINAPI}(index: Uint;  v: PShort);
 	TglVertexAttrib4ubvARB* = PROCEDURE{WINAPI}(index: Uint;  v: PUbyte);
-	TglVertexAttrib4uivARB* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
+	TglVertexAttrib4uivARB* = PROCEDURE{WINAPI}(index: Uint;  v: PUint);
 	TglVertexAttrib4usvARB* = PROCEDURE{WINAPI}(index: Uint;  v: PUshort);
 	TglVertexAttribPointerARB* = PROCEDURE{WINAPI}(index: Uint; size: Int; xtype: Enum; normalized: Boolean; stride: Sizei; xpointer: PVoid);
 	TglEnableVertexAttribArrayARB* = PROCEDURE{WINAPI}(index: Uint);
 	TglDisableVertexAttribArrayARB* = PROCEDURE{WINAPI}(index: Uint);
 	TglProgramStringARB* = PROCEDURE{WINAPI}(target: Enum; format: Enum; len: Sizei;  xstring: PVoid);
 	TglBindProgramARB* = PROCEDURE{WINAPI}(target: Enum; xprogram: Uint);
-	TglDeleteProgramsARB* = PROCEDURE{WINAPI}(n: Sizei;  programs: PInt);
-	TglGenProgramsARB* = PROCEDURE{WINAPI}(n: Sizei; programs: PInt);
+	TglDeleteProgramsARB* = PROCEDURE{WINAPI}(n: Sizei;  programs: PUint);
+	TglGenProgramsARB* = PROCEDURE{WINAPI}(n: Sizei; programs: PUint);
 	TglProgramEnvParameter4dARB* = PROCEDURE{WINAPI}(target: Enum; index: Uint; x: Double; y: Double; z: Double; w: Double);
 	TglProgramEnvParameter4dvARB* = PROCEDURE{WINAPI}(target: Enum; index: Uint;  params: PDouble);
 	TglProgramEnvParameter4fARB* = PROCEDURE{WINAPI}(target: Enum; index: Uint; x: Float; y: Float; z: Float; w: Float);
@@ -1590,11 +1581,11 @@ TYPE
 	TglGetProgramEnvParameterfvARB* = PROCEDURE{WINAPI}(target: Enum; index: Uint; params: PFloat);
 	TglGetProgramLocalParameterdvARB* = PROCEDURE{WINAPI}(target: Enum; index: Uint; params: PDouble);
 	TglGetProgramLocalParameterfvARB* = PROCEDURE{WINAPI}(target: Enum; index: Uint; params: PFloat);
-	TglGetProgramivARB* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint);
+	TglGetProgramivARB* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
 	TglGetProgramStringARB* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; xstring: PVoid);
 	TglGetVertexAttribdvARB* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: PDouble);
 	TglGetVertexAttribfvARB* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: PFloat);
-	TglGetVertexAttribivARB* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: Pint);
+	TglGetVertexAttribivARB* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: PInt);
 	TglGetVertexAttribPointervARB* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; xpointer: PVoid);
 	TglIsProgramARB* = PROCEDURE{WINAPI}(xprogram: Uint): Boolean;
 	(* GL_ARB_window_pos  *)
@@ -1603,7 +1594,7 @@ TYPE
 	TglWindowPos2fARB* = PROCEDURE{WINAPI}(x: Float; y: Float);
 	TglWindowPos2fvARB* = PROCEDURE{WINAPI}( v: PFloat);
 	TglWindowPos2iARB* = PROCEDURE{WINAPI}(x: Int; y: Int);
-	TglWindowPos2ivARB* = PROCEDURE{WINAPI}( v: Pint);
+	TglWindowPos2ivARB* = PROCEDURE{WINAPI}( v: PInt);
 	TglWindowPos2sARB* = PROCEDURE{WINAPI}(x: Short; y: Short);
 	TglWindowPos2svARB* = PROCEDURE{WINAPI}( v: PShort);
 	TglWindowPos3dARB* = PROCEDURE{WINAPI}(x: Double; y: Double; z: Double);
@@ -1611,7 +1602,7 @@ TYPE
 	TglWindowPos3fARB* = PROCEDURE{WINAPI}(x: Float; y: Float; z: Float);
 	TglWindowPos3fvARB* = PROCEDURE{WINAPI}( v: PFloat);
 	TglWindowPos3iARB* = PROCEDURE{WINAPI}(x: Int; y: Int; z: Int);
-	TglWindowPos3ivARB* = PROCEDURE{WINAPI}( v: Pint);
+	TglWindowPos3ivARB* = PROCEDURE{WINAPI}( v: PInt);
 	TglWindowPos3sARB* = PROCEDURE{WINAPI}(x: Short; y: Short; z: Short);
 	TglWindowPos3svARB* = PROCEDURE{WINAPI}( v: PShort);
 	(* GL_ARB_draw_buffers  *)
@@ -1627,7 +1618,7 @@ TYPE
 	TglGetHandleARB* = PROCEDURE{WINAPI}(pname: Enum): HandleARB;
 	TglDetachObjectARB* = PROCEDURE{WINAPI}(container, attached: HandleARB);
 	TglCreateShaderObjectARB* = PROCEDURE{WINAPI}(shaderType: Enum): HandleARB;
-	TglShaderSourceARB* = PROCEDURE{WINAPI}(shaderObj: HandleARB; count: Sizei; xstring: PPCharARB; lengths: Pint);
+	TglShaderSourceARB* = PROCEDURE{WINAPI}(shaderObj: HandleARB; count: Sizei; xstring: PPCharARB; lengths: PInt);
 	TglCompileShaderARB* = PROCEDURE{WINAPI}(shaderObj: HandleARB);
 	TglCreateProgramObjectARB* = PROCEDURE{WINAPI}(): HandleARB;
 	TglAttachObjectARB* = PROCEDURE{WINAPI}(programObj, shaderObj: HandleARB);
@@ -1646,51 +1637,51 @@ TYPE
 	TglUniform2fvARB* = PROCEDURE{WINAPI}(location: Int; count: Sizei; value: PFloat);
 	TglUniform3fvARB* = PROCEDURE{WINAPI}(location: Int; count: Sizei; value: PFloat);
 	TglUniform4fvARB* = PROCEDURE{WINAPI}(location: Int; count: Sizei; value: PFloat);
-	TglUniform1ivARB* = PROCEDURE{WINAPI}(location: Int; count: Sizei; value: Pint);
-	TglUniform2ivARB* = PROCEDURE{WINAPI}(location: Int; count: Sizei; value: Pint);
-	TglUniform3ivARB* = PROCEDURE{WINAPI}(location: Int; count: Sizei; value: Pint);
-	TglUniform4ivARB* = PROCEDURE{WINAPI}(location: Int; count: Sizei; value: Pint);
+	TglUniform1ivARB* = PROCEDURE{WINAPI}(location: Int; count: Sizei; value: PInt);
+	TglUniform2ivARB* = PROCEDURE{WINAPI}(location: Int; count: Sizei; value: PInt);
+	TglUniform3ivARB* = PROCEDURE{WINAPI}(location: Int; count: Sizei; value: PInt);
+	TglUniform4ivARB* = PROCEDURE{WINAPI}(location: Int; count: Sizei; value: PInt);
 	TglUniformMatrix2fvARB* = PROCEDURE{WINAPI}(location: Int; count: Sizei; transpose: Boolean; value: PFloat);
 	TglUniformMatrix3fvARB* = PROCEDURE{WINAPI}(location: Int; count: Sizei; transpose: Boolean; value: PFloat);
 	TglUniformMatrix4fvARB* = PROCEDURE{WINAPI}(location: Int; count: Sizei; transpose: Boolean; value: PFloat);
 	TglGetObjectParameterfvARB* = PROCEDURE{WINAPI}(Obj: HandleARB; pname: Enum; params: PFloat);
-	TglGetObjectParameterivARB* = PROCEDURE{WINAPI}(Obj: HandleARB; pname: Enum; params: Pint);
+	TglGetObjectParameterivARB* = PROCEDURE{WINAPI}(Obj: HandleARB; pname: Enum; params: PInt);
 	TglGetInfoLogARB* = PROCEDURE{WINAPI}(shaderObj: HandleARB; maxLength: Sizei; VAR length: Int; infoLog: PCharARB);
 	TglGetAttachedObjectsARB* = PROCEDURE{WINAPI}(programobj: HandleARB; maxCount: Sizei; VAR count: Sizei; objects: PHandleARB);
 	TglGetUniformLocationARB* = PROCEDURE{WINAPI}(programObj: HandleARB; chars: ADDRESS): Int;
 	TglGetActiveUniformARB* = PROCEDURE{WINAPI}(programobj: HandleARB; index: Uint; maxLength: Sizei; VAR length: Sizei; VAR size: Int; VAR xtype: Enum; name: PCharARB);
 	TglGetUniformfvARB* = PROCEDURE{WINAPI}(programObj: HandleARB; location: Int; params: PFloat);
-	TglGetUniformivARB* = PROCEDURE{WINAPI}(programObj: HandleARB; location: Int; params: Pint);
+	TglGetUniformivARB* = PROCEDURE{WINAPI}(programObj: HandleARB; location: Int; params: PInt);
 	TglGetShaderSourceARB* = PROCEDURE{WINAPI}(shader: HandleARB; maxLength: Sizei; VAR length: Sizei; source: PCharARB);
 	(* GL_ARB_Occlusion_Query  *)
-	TglGenQueriesARB* = PROCEDURE{WINAPI}(n: Sizei; ids: PInt);
-	TglDeleteQueriesARB* = PROCEDURE{WINAPI}(n: Sizei;  ids: PInt);
+	TglGenQueriesARB* = PROCEDURE{WINAPI}(n: Sizei; ids: PUint);
+	TglDeleteQueriesARB* = PROCEDURE{WINAPI}(n: Sizei;  ids: PUint);
 	TglIsQueryARB* = PROCEDURE{WINAPI}(id: Uint): BOOLEAN;
 	TglBeginQueryARB* = PROCEDURE{WINAPI}(target: Enum; id: Uint);
 	TglEndQueryARB* = PROCEDURE{WINAPI}(target: Enum);
-	TglGetQueryivARB* = PROCEDURE{WINAPI}(target, pname: Enum; params: Pint);
-	TglGetQueryObjectivARB* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: Pint);
-	TglGetQueryObjectuivARB* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: PInt);
+	TglGetQueryivARB* = PROCEDURE{WINAPI}(target, pname: Enum; params: PInt);
+	TglGetQueryObjectivARB* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: PInt);
+	TglGetQueryObjectuivARB* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: PUint);
 	(* GL_ARB_draw_instanced  *)
 	TglDrawArraysInstancedARB* = PROCEDURE{WINAPI}(mode: Enum; first: Int; count: Sizei; primcount: Sizei);
 	TglDrawElementsInstancedARB* = PROCEDURE{WINAPI}(mode: Enum; count: Sizei; xtype: Enum;  indices: PVoid; primcount: Sizei);
 	(* GL_ARB_framebuffer_object  *)
 	TglIsRenderbuffer* = PROCEDURE{WINAPI}(renderbuffer: Uint): Boolean;
 	TglBindRenderbuffer* = PROCEDURE{WINAPI}(target: Enum; renderbuffer: Uint);
-	TglDeleteRenderbuffers* = PROCEDURE{WINAPI}(n: Sizei;  renderbuffers: PInt);
-	TglGenRenderbuffers* = PROCEDURE{WINAPI}(n: Sizei; renderbuffers: PInt);
+	TglDeleteRenderbuffers* = PROCEDURE{WINAPI}(n: Sizei;  renderbuffers: PUint);
+	TglGenRenderbuffers* = PROCEDURE{WINAPI}(n: Sizei; renderbuffers: PUint);
 	TglRenderbufferStorage* = PROCEDURE{WINAPI}(target: Enum; internalformat: Enum; width: Sizei; height: Sizei);
-	TglGetRenderbufferParameteriv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint);
+	TglGetRenderbufferParameteriv* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
 	TglIsFramebuffer* = PROCEDURE{WINAPI}(framebuffer: Uint): Boolean;
 	TglBindFramebuffer* = PROCEDURE{WINAPI}(target: Enum; framebuffer: Uint);
-	TglDeleteFramebuffers* = PROCEDURE{WINAPI}(n: Sizei;  framebuffers: PInt);
-	TglGenFramebuffers* = PROCEDURE{WINAPI}(n: Sizei; framebuffers: PInt);
+	TglDeleteFramebuffers* = PROCEDURE{WINAPI}(n: Sizei;  framebuffers: PUint);
+	TglGenFramebuffers* = PROCEDURE{WINAPI}(n: Sizei; framebuffers: PUint);
 	TglCheckFramebufferStatus* = PROCEDURE{WINAPI}(target: Enum): Enum;
 	TglFramebufferTexture1D* = PROCEDURE{WINAPI}(target: Enum; attachment: Enum; textarget: Enum; texture: Uint; level: Int);
 	TglFramebufferTexture2D* = PROCEDURE{WINAPI}(target: Enum; attachment: Enum; textarget: Enum; texture: Uint; level: Int);
 	TglFramebufferTexture3D* = PROCEDURE{WINAPI}(target: Enum; attachment: Enum; textarget: Enum; texture: Uint; level: Int; zoffset: Int);
 	TglFramebufferRenderbuffer* = PROCEDURE{WINAPI}(target: Enum; attachment: Enum; renderbuffertarget: Enum; renderbuffer: Uint);
-	TglGetFramebufferAttachmentParameteriv* = PROCEDURE{WINAPI}(target: Enum; attachment: Enum; pname: Enum; params: Pint);
+	TglGetFramebufferAttachmentParameteriv* = PROCEDURE{WINAPI}(target: Enum; attachment: Enum; pname: Enum; params: PInt);
 	TglGenerateMipmap* = PROCEDURE{WINAPI}(target: Enum);
 	TglBlitFramebuffer* = PROCEDURE{WINAPI}(srcX0: Int; srcY0: Int; srcX1: Int; srcY1: Int; dstX0: Int; dstY0: Int; dstX1: Int; dstY1: Int; mask: Bitfield; filter: Enum);
 	TglRenderbufferStorageMultisample* = PROCEDURE{WINAPI}(target: Enum; samples: Sizei; internalformat: Enum; width: Sizei; height: Sizei);
@@ -1709,15 +1700,15 @@ TYPE
 	TglTexBufferARB* = PROCEDURE{WINAPI}(target: Enum; internalformat: Enum; buffer: Uint);
 	(* GL_ARB_vertex_array_object  *)
 	TglBindVertexArray* = PROCEDURE{WINAPI}(xarray: Uint);
-	TglDeleteVertexArrays* = PROCEDURE{WINAPI}(n: Sizei;  arrays: PInt);
-	TglGenVertexArrays* = PROCEDURE{WINAPI}(n: Sizei; arrays: PInt);
+	TglDeleteVertexArrays* = PROCEDURE{WINAPI}(n: Sizei;  arrays: PUint);
+	TglGenVertexArrays* = PROCEDURE{WINAPI}(n: Sizei; arrays: PUint);
 	TglIsVertexArray* = PROCEDURE{WINAPI}(xarray: Uint): Boolean;
 	(* GL_ARB_uniform_buffer_object  *)
-	TglGetUniformIndices* = PROCEDURE{WINAPI}(xprogram: Uint; uniformCount: Sizei;  uniformNames: PPChar; uniformIndices: PInt);
-	TglGetActiveUniformsiv* = PROCEDURE{WINAPI}(xprogram: Uint; uniformCount: Sizei;  uniformIndices: PInt; pname: Enum; params: Pint);
+	TglGetUniformIndices* = PROCEDURE{WINAPI}(xprogram: Uint; uniformCount: Sizei;  uniformNames: PPChar; uniformIndices: PUint);
+	TglGetActiveUniformsiv* = PROCEDURE{WINAPI}(xprogram: Uint; uniformCount: Sizei;  uniformIndices: PUint; pname: Enum; params: PInt);
 	TglGetActiveUniformName* = PROCEDURE{WINAPI}(xprogram: Uint; uniformIndex: Uint; bufSize: Sizei; length: PSizei; uniformName: PChar);
 	TglGetUniformBlockIndex* = PROCEDURE{WINAPI}(xprogram: Uint;  uniformBlockName: ADDRESS): Uint;
-	TglGetActiveUniformBlockiv* = PROCEDURE{WINAPI}(xprogram: Uint; uniformBlockIndex: Uint; pname: Enum; params: Pint);
+	TglGetActiveUniformBlockiv* = PROCEDURE{WINAPI}(xprogram: Uint; uniformBlockIndex: Uint; pname: Enum; params: PInt);
 	TglGetActiveUniformBlockName* = PROCEDURE{WINAPI}(xprogram: Uint; uniformBlockIndex: Uint; bufSize: Sizei; length: PSizei; uniformBlockName: PChar);
 	TglUniformBlockBinding* = PROCEDURE{WINAPI}(xprogram: Uint; uniformBlockIndex: Uint; uniformBlockBinding: Uint);
 	(* GL_ARB_copy_buffer  *)
@@ -1726,7 +1717,7 @@ TYPE
 	TglDrawElementsBaseVertex* = PROCEDURE{WINAPI}(mode: Enum; count: Sizei; xtype: Enum;  indices: PVoid; basevertex: Int);
 	TglDrawRangeElementsBaseVertex* = PROCEDURE{WINAPI}(mode: Enum; start: Uint; xend: Uint; count: Sizei; xtype: Enum;  indices: PVoid; basevertex: Int);
 	TglDrawElementsInstancedBaseVertex* = PROCEDURE{WINAPI}(mode: Enum; count: Sizei; xtype: Enum;  indices: PVoid; primcount: Sizei; basevertex: Int);
-	TglMultiDrawElementsBaseVertex* = PROCEDURE{WINAPI}(mode: Enum;  count: PSizei; xtype: Enum;  indices: PPVoid; primcount: Sizei;  basevertex: Pint);
+	TglMultiDrawElementsBaseVertex* = PROCEDURE{WINAPI}(mode: Enum;  count: PSizei; xtype: Enum;  indices: PPVoid; primcount: Sizei;  basevertex: PInt);
 	(* GL_ARB_provoking_vertex  *)
 	TglProvokingVertex* = PROCEDURE{WINAPI}(mode: Enum);
 	(* GL_ARB_sync  *)
@@ -1735,8 +1726,8 @@ TYPE
 	TglDeleteSync* = PROCEDURE{WINAPI}(sync: GLsync);
 	TglClientWaitSync* = PROCEDURE{WINAPI}(sync: GLsync; flags: Bitfield; timeout: Uint64): Enum;
 	TglWaitSync* = PROCEDURE{WINAPI}(sync: GLsync; flags: Bitfield; timeout: Uint64);
-	TglGetInteger64v* = PROCEDURE{WINAPI}(pname: Enum; params: Pint64);
-	TglGetSynciv* = PROCEDURE{WINAPI}(sync: GLsync; pname: Enum; butSize: Sizei; length: PSizei; values: Pint);
+	TglGetInteger64v* = PROCEDURE{WINAPI}(pname: Enum; params: PInt64);
+	TglGetSynciv* = PROCEDURE{WINAPI}(sync: GLsync; pname: Enum; butSize: Sizei; length: PSizei; values: PInt);
 	(* GL_ARB_texture_multisample  *)
 	TglTexImage2DMultisample* = PROCEDURE{WINAPI}(target: Enum; samples: Sizei; internalformat: Int; width: Sizei; height: Sizei; fixedsamplelocations: Boolean);
 	TglTexImage3DMultisample* = PROCEDURE{WINAPI}(target: Enum; samples: Sizei; internalformat: Int; width: Sizei; height: Sizei; depth: Sizei; fixedsamplelocations: Boolean);
@@ -1752,71 +1743,71 @@ TYPE
 	(*  GL_ARB_shading_language_include  *)
 	TglNamedStringARB* = PROCEDURE{WINAPI}(xtype: Enum; namelen: Int;  name: ADDRESS; stringlen: Int;  xstring: ADDRESS);
 	TglDeleteNamedStringARB* = PROCEDURE{WINAPI}(namelen: Int;  name: ADDRESS);
-	TglCompileShaderIncludeARB* = PROCEDURE{WINAPI}(shader: Uint; count: Sizei;  path: PPChar;  length: Pint);
+	TglCompileShaderIncludeARB* = PROCEDURE{WINAPI}(shader: Uint; count: Sizei;  path: PPChar;  length: PInt);
 	TglIsNamedStringARB* = PROCEDURE{WINAPI}(namelen: Int;  name: ADDRESS): Boolean;
 	TglGetNamedStringARB* = PROCEDURE{WINAPI}(namelen: Int;  name: ADDRESS; bufSize: Sizei; stringlen: Int; xstring: PChar);
-	TglGetNamedStringivARB* = PROCEDURE{WINAPI}(namelen: Int;  name: ADDRESS; pname: Enum; params: Pint);
+	TglGetNamedStringivARB* = PROCEDURE{WINAPI}(namelen: Int;  name: ADDRESS; pname: Enum; params: PInt);
 	(*  GL_ARB_blend_func_extended  *)
 	TglBindFragDataLocationIndexed* = PROCEDURE{WINAPI}(xprogram: Uint; colorNumber: Uint; index: Uint;  name: ADDRESS);
 	TglGetFragDataIndex* = PROCEDURE{WINAPI}(xprogram: Uint;  name: ADDRESS): Int;
 	(*  GL_ARB_sampler_objects  *)
-	TglGenSamplers* = PROCEDURE{WINAPI}(count: Sizei; samplers: PInt);
-	TglDeleteSamplers* = PROCEDURE{WINAPI}(count: Sizei;  samplers: PInt);
+	TglGenSamplers* = PROCEDURE{WINAPI}(count: Sizei; samplers: PUint);
+	TglDeleteSamplers* = PROCEDURE{WINAPI}(count: Sizei;  samplers: PUint);
 	TglIsSampler* = PROCEDURE{WINAPI}(sampler: Uint): Boolean;
 	TglBindSampler* = PROCEDURE{WINAPI}(unit: Uint; sampler: Uint);
 	TglSamplerParameteri* = PROCEDURE{WINAPI}(sampler: Uint; pname: Enum; param: Int);
-	TglSamplerParameteriv* = PROCEDURE{WINAPI}(sampler: Uint; pname: Enum;  param: Pint);
+	TglSamplerParameteriv* = PROCEDURE{WINAPI}(sampler: Uint; pname: Enum;  param: PInt);
 	TglSamplerParameterf* = PROCEDURE{WINAPI}(sampler: Uint; pname: Enum; param: Float);
 	TglSamplerParameterfv* = PROCEDURE{WINAPI}(sampler: Uint; pname: Enum;  param: PFloat);
-	TglSamplerParameterIiv* = PROCEDURE{WINAPI}(sampler: Uint; pname: Enum;  param: Pint);
-	TglSamplerParameterIuiv* = PROCEDURE{WINAPI}(sampler: Uint; pname: Enum;  param: PInt);
-	TglGetSamplerParameteriv* = PROCEDURE{WINAPI}(sampler: Uint; pname: Enum; params: Pint);
-	TglGetSamplerParameterIiv* = PROCEDURE{WINAPI}(sampler: Uint; pname: Enum; params: Pint);
+	TglSamplerParameterIiv* = PROCEDURE{WINAPI}(sampler: Uint; pname: Enum;  param: PInt);
+	TglSamplerParameterIuiv* = PROCEDURE{WINAPI}(sampler: Uint; pname: Enum;  param: PUint);
+	TglGetSamplerParameteriv* = PROCEDURE{WINAPI}(sampler: Uint; pname: Enum; params: PInt);
+	TglGetSamplerParameterIiv* = PROCEDURE{WINAPI}(sampler: Uint; pname: Enum; params: PInt);
 	TglGetSamplerParameterfv* = PROCEDURE{WINAPI}(sampler: Uint; pname: Enum; params: PFloat);
-	TglGetSamplerParameterIuiv* = PROCEDURE{WINAPI}(sampler: Uint; pname: Enum; params: PInt);
+	TglGetSamplerParameterIuiv* = PROCEDURE{WINAPI}(sampler: Uint; pname: Enum; params: PUint);
 	(*  GL_ARB_timer_query  *)
 	TglQueryCounter* = PROCEDURE{WINAPI}(id: Uint; target: Enum);
-	TglGetQueryObjecti64v* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: Pint64);
-	TglGetQueryObjectui64v* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: PInt64);
+	TglGetQueryObjecti64v* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: PInt64);
+	TglGetQueryObjectui64v* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: PUint64);
 	(*  GL_ARB_vertex_type_2_10_10_10_rev  *)
 	TglVertexP2ui* = PROCEDURE{WINAPI}(xtype: Enum; value: Uint);
-	TglVertexP2uiv* = PROCEDURE{WINAPI}(xtype: Enum;  value: PInt);
+	TglVertexP2uiv* = PROCEDURE{WINAPI}(xtype: Enum;  value: PUint);
 	TglVertexP3ui* = PROCEDURE{WINAPI}(xtype: Enum; value: Uint);
-	TglVertexP3uiv* = PROCEDURE{WINAPI}(xtype: Enum;  value: PInt);
+	TglVertexP3uiv* = PROCEDURE{WINAPI}(xtype: Enum;  value: PUint);
 	TglVertexP4ui* = PROCEDURE{WINAPI}(xtype: Enum; value: Uint);
-	TglVertexP4uiv* = PROCEDURE{WINAPI}(xtype: Enum;  value: PInt);
+	TglVertexP4uiv* = PROCEDURE{WINAPI}(xtype: Enum;  value: PUint);
 	TglTexCoordP1ui* = PROCEDURE{WINAPI}(xtype: Enum; coords: Uint);
-	TglTexCoordP1uiv* = PROCEDURE{WINAPI}(xtype: Enum;  coords: PInt);
+	TglTexCoordP1uiv* = PROCEDURE{WINAPI}(xtype: Enum;  coords: PUint);
 	TglTexCoordP2ui* = PROCEDURE{WINAPI}(xtype: Enum; coords: Uint);
-	TglTexCoordP2uiv* = PROCEDURE{WINAPI}(xtype: Enum;  coords: PInt);
+	TglTexCoordP2uiv* = PROCEDURE{WINAPI}(xtype: Enum;  coords: PUint);
 	TglTexCoordP3ui* = PROCEDURE{WINAPI}(xtype: Enum; coords: Uint);
-	TglTexCoordP3uiv* = PROCEDURE{WINAPI}(xtype: Enum;  coords: PInt);
+	TglTexCoordP3uiv* = PROCEDURE{WINAPI}(xtype: Enum;  coords: PUint);
 	TglTexCoordP4ui* = PROCEDURE{WINAPI}(xtype: Enum; coords: Uint);
-	TglTexCoordP4uiv* = PROCEDURE{WINAPI}(xtype: Enum;  coords: PInt);
+	TglTexCoordP4uiv* = PROCEDURE{WINAPI}(xtype: Enum;  coords: PUint);
 	TglMultiTexCoordP1ui* = PROCEDURE{WINAPI}(texture: Enum; xtype: Enum; coords: Uint);
-	TglMultiTexCoordP1uiv* = PROCEDURE{WINAPI}(texture: Enum; xtype: Enum;  coords: PInt);
+	TglMultiTexCoordP1uiv* = PROCEDURE{WINAPI}(texture: Enum; xtype: Enum;  coords: PUint);
 	TglMultiTexCoordP2ui* = PROCEDURE{WINAPI}(texture: Enum; xtype: Enum; coords: Uint);
-	TglMultiTexCoordP2uiv* = PROCEDURE{WINAPI}(texture: Enum; xtype: Enum; coords: PInt);
+	TglMultiTexCoordP2uiv* = PROCEDURE{WINAPI}(texture: Enum; xtype: Enum; coords: PUint);
 	TglMultiTexCoordP3ui* = PROCEDURE{WINAPI}(texture: Enum; xtype: Enum; coords: Uint);
-	TglMultiTexCoordP3uiv* = PROCEDURE{WINAPI}(texture: Enum; xtype: Enum; coords: PInt);
+	TglMultiTexCoordP3uiv* = PROCEDURE{WINAPI}(texture: Enum; xtype: Enum; coords: PUint);
 	TglMultiTexCoordP4ui* = PROCEDURE{WINAPI}(texture: Enum; xtype: Enum; coords: Uint);
-	TglMultiTexCoordP4uiv* = PROCEDURE{WINAPI}(texture: Enum; xtype: Enum; coords: PInt);
+	TglMultiTexCoordP4uiv* = PROCEDURE{WINAPI}(texture: Enum; xtype: Enum; coords: PUint);
 	TglNormalP3ui* = PROCEDURE{WINAPI}(xtype: Enum; coords: Uint);
-	TglNormalP3uiv* = PROCEDURE{WINAPI}(xtype: Enum;  coords: PInt);
+	TglNormalP3uiv* = PROCEDURE{WINAPI}(xtype: Enum;  coords: PUint);
 	TglColorP3ui* = PROCEDURE{WINAPI}(xtype: Enum; color: Uint);
-	TglColorP3uiv* = PROCEDURE{WINAPI}(xtype: Enum;  color: PInt);
+	TglColorP3uiv* = PROCEDURE{WINAPI}(xtype: Enum;  color: PUint);
 	TglColorP4ui* = PROCEDURE{WINAPI}(xtype: Enum; color: Uint);
 	TglColorP4uiv* = PROCEDURE{WINAPI}(xtype: Enum;  color: Uint);
 	TglSecondaryColorP3ui* = PROCEDURE{WINAPI}(xtype: Enum; color: Uint);
-	TglSecondaryColorP3uiv* = PROCEDURE{WINAPI}(xtype: Enum;  color: PInt);
+	TglSecondaryColorP3uiv* = PROCEDURE{WINAPI}(xtype: Enum;  color: PUint);
 	TglVertexAttribP1ui* = PROCEDURE{WINAPI}(index: Uint; xtype: Enum; normalized: Boolean; value: Uint);
-	TglVertexAttribP1uiv* = PROCEDURE{WINAPI}(index: Uint; xtype: Enum; normalized: Boolean;  value: PInt);
+	TglVertexAttribP1uiv* = PROCEDURE{WINAPI}(index: Uint; xtype: Enum; normalized: Boolean;  value: PUint);
 	TglVertexAttribP2ui* = PROCEDURE{WINAPI}(index: Uint; xtype: Enum; normalized: Boolean; value: Uint);
-	TglVertexAttribP2uiv* = PROCEDURE{WINAPI}(index: Uint; xtype: Enum; normalized: Boolean;  value: PInt);
+	TglVertexAttribP2uiv* = PROCEDURE{WINAPI}(index: Uint; xtype: Enum; normalized: Boolean;  value: PUint);
 	TglVertexAttribP3ui* = PROCEDURE{WINAPI}(index: Uint; xtype: Enum; normalized: Boolean; value: Uint);
-	TglVertexAttribP3uiv* = PROCEDURE{WINAPI}(index: Uint; xtype: Enum; normalized: Boolean;  value: PInt);
+	TglVertexAttribP3uiv* = PROCEDURE{WINAPI}(index: Uint; xtype: Enum; normalized: Boolean;  value: PUint);
 	TglVertexAttribP4ui* = PROCEDURE{WINAPI}(index: Uint; xtype: Enum; normalized: Boolean; value: Uint);
-	TglVertexAttribP4uiv* = PROCEDURE{WINAPI}(index: Uint; xtype: Enum; normalized: Boolean;  value: PInt);
+	TglVertexAttribP4uiv* = PROCEDURE{WINAPI}(index: Uint; xtype: Enum; normalized: Boolean;  value: PUint);
 	(*  GL_ARB_draw_indirect  *)
 	TglDrawArraysIndirect* = PROCEDURE{WINAPI}(mode: Enum;  indirect: PVoid);
 	TglDrawElementsIndirect* = PROCEDURE{WINAPI}(mode: Enum; xtype: Enum;  indirect: PVoid);
@@ -1842,19 +1833,19 @@ TYPE
 	(*  GL_ARB_shader_subroutine  *)
 	TglGetSubroutineUniformLocation* = PROCEDURE{WINAPI}(xprogram: Uint; shadertype: Enum;  name: ADDRESS): Int;
 	TglGetSubroutineIndex* = PROCEDURE{WINAPI}(xprogram: Uint; shadertype: Enum;  name: ADDRESS): Uint;
-	TglGetActiveSubroutineUniformiv* = PROCEDURE{WINAPI}(xprogram: Uint; shadertype: Enum; index: Uint; pname: Enum; values: Pint);
+	TglGetActiveSubroutineUniformiv* = PROCEDURE{WINAPI}(xprogram: Uint; shadertype: Enum; index: Uint; pname: Enum; values: PInt);
 	TglGetActiveSubroutineUniformName* = PROCEDURE{WINAPI}(xprogram: Uint; shadertype: Enum; index: Uint; bufsize: Sizei; length: PSizei; name: PChar);
 	TglGetActiveSubroutineName* = PROCEDURE{WINAPI}(xprogram: Uint; shadertype: Enum; index: Uint; bufsize: Sizei; length: PSizei; name: PChar);
-	TglUniformSubroutinesuiv* = PROCEDURE{WINAPI}(shadertype: Enum; count: Sizei;  indices: PInt);
-	TglGetUniformSubroutineuiv* = PROCEDURE{WINAPI}(shadertype: Enum; location: Int; params: PInt);
-	TglGetProgramStageiv* = PROCEDURE{WINAPI}(xprogram: Uint; shadertype: Enum; pname: Enum; values: Pint);
+	TglUniformSubroutinesuiv* = PROCEDURE{WINAPI}(shadertype: Enum; count: Sizei;  indices: PUint);
+	TglGetUniformSubroutineuiv* = PROCEDURE{WINAPI}(shadertype: Enum; location: Int; params: PUint);
+	TglGetProgramStageiv* = PROCEDURE{WINAPI}(xprogram: Uint; shadertype: Enum; pname: Enum; values: PInt);
 	(*  GL_ARB_tessellation_shader  *)
 	TglPatchParameteri* = PROCEDURE{WINAPI}(pname: Enum; value: Int);
 	TglPatchParameterfv* = PROCEDURE{WINAPI}(pname: Enum;  values: PFloat);
 	(*  GL_ARB_transform_feedback2  *)
 	TglBindTransformFeedback* = PROCEDURE{WINAPI}(target: Enum; id: Uint);
-	TglDeleteTransformFeedbacks* = PROCEDURE{WINAPI}(n: Sizei;  ids: PInt);
-	TglGenTransformFeedbacks* = PROCEDURE{WINAPI}(n: Sizei; ids: PInt);
+	TglDeleteTransformFeedbacks* = PROCEDURE{WINAPI}(n: Sizei;  ids: PUint);
+	TglGenTransformFeedbacks* = PROCEDURE{WINAPI}(n: Sizei; ids: PUint);
 	TglIsTransformFeedback* = PROCEDURE{WINAPI}(id: Uint): Boolean;
 	TglPauseTransformFeedback* = PROCEDURE{WINAPI}();
 	TglResumeTransformFeedback* = PROCEDURE{WINAPI}();
@@ -1863,11 +1854,11 @@ TYPE
 	TglDrawTransformFeedbackStream* = PROCEDURE{WINAPI}(mode: Enum; id: Uint; stream: Uint);
 	TglBeginQueryIndexed* = PROCEDURE{WINAPI}(target: Enum; index: Uint; id: Uint);
 	TglEndQueryIndexed* = PROCEDURE{WINAPI}(target: Enum; index: Uint);
-	TglGetQueryIndexediv* = PROCEDURE{WINAPI}(target: Enum; index: Uint; pname: Enum; params: Pint);
+	TglGetQueryIndexediv* = PROCEDURE{WINAPI}(target: Enum; index: Uint; pname: Enum; params: PInt);
 	(*  GL_ARB_ES2_compatibility  *)
 	TglReleaseShaderCompiler* = PROCEDURE{WINAPI}();
-	TglShaderBinary* = PROCEDURE{WINAPI}(count: Sizei;  shaders: PInt; binaryformat: Enum;  binary: PVoid; length: Sizei);
-	TglGetShaderPrecisionFormat* = PROCEDURE{WINAPI}(shadertype: Enum; precisiontype: Enum; range: Pint; precision: Pint);
+	TglShaderBinary* = PROCEDURE{WINAPI}(count: Sizei;  shaders: PUint; binaryformat: Enum;  binary: PVoid; length: Sizei);
+	TglGetShaderPrecisionFormat* = PROCEDURE{WINAPI}(shadertype: Enum; precisiontype: Enum; range: PInt; precision: PInt);
 	TglDepthRangef* = PROCEDURE{WINAPI}(n: Clampf; f: Clampf);
 	TglClearDepthf* = PROCEDURE{WINAPI}(d: Clampf);
 	(* GL_ARB_get_program_binary  *)
@@ -1879,42 +1870,42 @@ TYPE
 	TglActiveShaderProgram* = PROCEDURE{WINAPI}(pipeline: Uint; xprogram: Uint);
 	TglCreateShaderProgramv* = PROCEDURE{WINAPI}(xtype: Enum; count: Sizei;  strings: PPChar): Uint;
 	TglBindProgramPipeline* = PROCEDURE{WINAPI}(pipeline: Uint);
-	TglDeleteProgramPipelines* = PROCEDURE{WINAPI}(n: Sizei;  pipelines: PInt);
-	TglGenProgramPipelines* = PROCEDURE{WINAPI}(n: Sizei; pipelines: PInt);
+	TglDeleteProgramPipelines* = PROCEDURE{WINAPI}(n: Sizei;  pipelines: PUint);
+	TglGenProgramPipelines* = PROCEDURE{WINAPI}(n: Sizei; pipelines: PUint);
 	TglIsProgramPipeline* = PROCEDURE{WINAPI}(pipeline: Uint): Boolean;
-	TglGetProgramPipelineiv* = PROCEDURE{WINAPI}(pipeline: Uint; pname: Enum; params: Pint);
+	TglGetProgramPipelineiv* = PROCEDURE{WINAPI}(pipeline: Uint; pname: Enum; params: PInt);
 	TglProgramUniform1i* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; v0: Int);
-	TglProgramUniform1iv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: Pint);
+	TglProgramUniform1iv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
 	TglProgramUniform1f* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; v0: Float);
 	TglProgramUniform1fv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PFloat);
 	TglProgramUniform1d* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; v0: Double);
 	TglProgramUniform1dv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PDouble);
 	TglProgramUniform1ui* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; v0: Uint);
-	TglProgramUniform1uiv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
+	TglProgramUniform1uiv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PUint);
 	TglProgramUniform2i* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; v0: Int; v1: Int);
-	TglProgramUniform2iv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: Pint);
+	TglProgramUniform2iv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
 	TglProgramUniform2f* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; v0: Float; v1: Float);
 	TglProgramUniform2fv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PFloat);
 	TglProgramUniform2d* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; v0: Double; v1: Double);
 	TglProgramUniform2dv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PDouble);
 	TglProgramUniform2ui* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; v0: Uint; v1: Uint);
-	TglProgramUniform2uiv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
+	TglProgramUniform2uiv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PUint);
 	TglProgramUniform3i* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; v0: Int; v1: Int; v2: Int);
-	TglProgramUniform3iv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: Pint);
+	TglProgramUniform3iv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
 	TglProgramUniform3f* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; v0: Float; v1: Float; v2: Float);
 	TglProgramUniform3fv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PFloat);
 	TglProgramUniform3d* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; v0: Double; v1: Double; v2: Double);
 	TglProgramUniform3dv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PDouble);
 	TglProgramUniform3ui* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; v0: Uint; v1: Uint; v2: Uint);
-	TglProgramUniform3uiv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
+	TglProgramUniform3uiv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PUint);
 	TglProgramUniform4i* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; v0: Int; v1: Int; v2: Int; v3: Int);
-	TglProgramUniform4iv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: Pint);
+	TglProgramUniform4iv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
 	TglProgramUniform4f* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; v0: Float; v1: Float; v2: Float; v3: Float);
 	TglProgramUniform4fv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PFloat);
 	TglProgramUniform4d* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; v0: Double; v1: Double; v2: Double; v3: Double);
 	TglProgramUniform4dv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PDouble);
 	TglProgramUniform4ui* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; v0: Uint; v1: Uint; v2: Uint; v3: Uint);
-	TglProgramUniform4uiv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
+	TglProgramUniform4uiv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PUint);
 	TglProgramUniformMatrix2fv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei; transpose: Boolean;  value: PFloat);
 	TglProgramUniformMatrix3fv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei; transpose: Boolean;  value: PFloat);
 	TglProgramUniformMatrix4fv* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei; transpose: Boolean;  value: PFloat);
@@ -1950,9 +1941,9 @@ TYPE
 	TglViewportArrayv* = PROCEDURE{WINAPI}(first: Uint; count: Sizei;  v: PFloat);
 	TglViewportIndexedf* = PROCEDURE{WINAPI}(index: Uint; x: Float; y: Float; w: Float; h: Float);
 	TglViewportIndexedfv* = PROCEDURE{WINAPI}(index: Uint;  v: PFloat);
-	TglScissorArrayv* = PROCEDURE{WINAPI}(first: Uint; count: Sizei;  v: Pint);
+	TglScissorArrayv* = PROCEDURE{WINAPI}(first: Uint; count: Sizei;  v: PInt);
 	TglScissorIndexed* = PROCEDURE{WINAPI}(index: Uint; left: Int; bottom: Int; width: Sizei; height: Sizei);
-	TglScissorIndexedv* = PROCEDURE{WINAPI}(index: Uint;  v: Pint);
+	TglScissorIndexedv* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
 	TglDepthRangeArrayv* = PROCEDURE{WINAPI}(first: Uint; count: Sizei;  v: PClampd);
 	TglDepthRangeIndexed* = PROCEDURE{WINAPI}(index: Uint; n: Clampd; f: Clampd);
 	TglGetFloati_v* = PROCEDURE{WINAPI}(target: Enum; index: Uint; data: PFloat);
@@ -1967,9 +1958,9 @@ TYPE
 	TglDrawTransformFeedbackInstanced* = PROCEDURE{WINAPI}(mode : Enum; id : Uint; primcount : Sizei);
 	TglDrawTransformFeedbackStreamInstanced* = PROCEDURE{WINAPI}(mode : Enum; id : Uint; stream : Uint; primcount : Sizei);
 	(*  GL_ARB_internalformat_query  *)
-	TglGetInternalformativ* = PROCEDURE{WINAPI}(target : Enum; internalformat : Enum; pname : Enum; bufSize : Sizei; params : Pint);
+	TglGetInternalformativ* = PROCEDURE{WINAPI}(target : Enum; internalformat : Enum; pname : Enum; bufSize : Sizei; params : PInt);
 	(*  GL_ARB_shader_atomic_counters  *)
-	TglGetActiveAtomicCounterBufferiv* = PROCEDURE{WINAPI}(xprogram : Uint; bufferIndex : Uint; pname : Enum; params : Pint);
+	TglGetActiveAtomicCounterBufferiv* = PROCEDURE{WINAPI}(xprogram : Uint; bufferIndex : Uint; pname : Enum; params : PInt);
 	(*  GL_ARB_shader_image_load_store  *)
 	TglBindImageTexture* = PROCEDURE{WINAPI}(xunit : Uint; texture : Uint; level :Int; layered : Boolean; layer : Int; access : Enum; format : Enum);
 	TglMemoryBarrier* = PROCEDURE{WINAPI}(barriers : Bitfield);
@@ -1983,21 +1974,21 @@ TYPE
 
 	(*! GL 4.3  *)
 	(* GL_KHR_debug  *)
-	TglDebugMessageControl* = PROCEDURE{WINAPI}(source : Enum; xtype : Enum; severity : Enum; count : Sizei;  ids : PInt; enabled : Boolean);
+	TglDebugMessageControl* = PROCEDURE{WINAPI}(source : Enum; xtype : Enum; severity : Enum; count : Sizei;  ids : PUint; enabled : Boolean);
 	TglDebugMessageInsert* = PROCEDURE{WINAPI}(source : Enum;  xtype : Enum; id : Uint; sverity : Enum; length : Sizei;  buf : PChar);
-	TglDebugMessageCallback* = PROCEDURE{WINAPI}(callback : Pointer (*TGLDEBUGPROC *);  userParam : Pointer);
-	TglGetDebugMessageLog* = PROCEDURE{WINAPI}(count : Uint; bufsize : Sizei; sources : PEnum; types : PEnum; ids : PInt; sverities : PEnum; lengths : PSizei; messagelog : PChar) : Uint;
+	TglDebugMessageCallback* = PROCEDURE{WINAPI}(callback : ADDRESS (*TGLDEBUGPROC *);  userParam : ADDRESS);
+	TglGetDebugMessageLog* = PROCEDURE{WINAPI}(count : Uint; bufsize : Sizei; sources : PEnum; types : PEnum; ids : PUint; sverities : PEnum; lengths : PSizei; messagelog : PChar) : Uint;
 	TglPushDebugGroup* = PROCEDURE{WINAPI}(source : Enum; id : Uint; length : Sizei;  messagex : PChar);
 	TglPopDebugGroup* = PROCEDURE{WINAPI}();
 	TglObjectLabel* = PROCEDURE{WINAPI}(identifier : Enum; name : Uint; length : Sizei;  labelx : PChar);
 	TglGetObjectLabel* = PROCEDURE{WINAPI}(identifier : Enum; name : Uint; bufsize : Sizei; length : PSizei; label_ : PChar);
-	TglObjectPtrLabel* = PROCEDURE{WINAPI}( ptr : Pointer; length : Sizei;  labelx : PChar);
-	TglGetObjectPtrLabel* = PROCEDURE{WINAPI}( ptr : Pointer; bufSize : Sizei; length : PSizei; labelx : PChar);
+	TglObjectPtrLabel* = PROCEDURE{WINAPI}( ptr : ADDRESS; length : Sizei;  labelx : PChar);
+	TglGetObjectPtrLabel* = PROCEDURE{WINAPI}( ptr : ADDRESS; bufSize : Sizei; length : PSizei; labelx : PChar);
 	(* GL_ARB_clear_buffer_object  *)
-	TglClearBufferData* = PROCEDURE{WINAPI}(target : Enum; internalformat : Enum; format : Enum; xtype : Enum;  data : Pointer);
-	TglClearBufferSubData* = PROCEDURE{WINAPI}(target : Enum; internalformat : Enum; offset : Intptr; size : Sizeiptr; format : Enum; xtype : Enum;  data : Pointer);
-	TglClearNamedBufferDataEXT* = PROCEDURE{WINAPI}(buffer : Uint; internalformat : Enum; format : Enum; xtype : Enum;  data : Pointer);
-	TglClearNamedBufferSubDataEXT* = PROCEDURE{WINAPI}(buffer : Uint; internalformat : Enum; format : Enum; xtype : Enum; offset : Sizeiptr; size : Sizeiptr;  data : Pointer);
+	TglClearBufferData* = PROCEDURE{WINAPI}(target : Enum; internalformat : Enum; format : Enum; xtype : Enum;  data : ADDRESS);
+	TglClearBufferSubData* = PROCEDURE{WINAPI}(target : Enum; internalformat : Enum; offset : Intptr; size : Sizeiptr; format : Enum; xtype : Enum;  data : ADDRESS);
+	TglClearNamedBufferDataEXT* = PROCEDURE{WINAPI}(buffer : Uint; internalformat : Enum; format : Enum; xtype : Enum;  data : ADDRESS);
+	TglClearNamedBufferSubDataEXT* = PROCEDURE{WINAPI}(buffer : Uint; internalformat : Enum; format : Enum; xtype : Enum; offset : Sizeiptr; size : Sizeiptr;  data : ADDRESS);
 	(* GL_ARB_compute_shader 1  *)
 	TglDispatchCompute* = PROCEDURE{WINAPI}(num_groups_x : Uint; num_groups_y : Uint; num_groups_z : Uint);
 	TglDispatchComputeIndirect* = PROCEDURE{WINAPI}(indirect : Intptr);
@@ -2013,11 +2004,11 @@ TYPE
 	(* GL_ARB_fragment_layer_viewport  *)
 	(* GL_ARB_framebuffer_no_attachments  *)
 	TglFramebufferParameteri* = PROCEDURE{WINAPI}(target : Enum; pname : Enum; param : Int);
-	TglGetFramebufferParameteriv* = PROCEDURE{WINAPI}(target : Enum; pname : Enum; params : Pint);
+	TglGetFramebufferParameteriv* = PROCEDURE{WINAPI}(target : Enum; pname : Enum; params : PInt);
 	TglNamedFramebufferParameteriEXT* = PROCEDURE{WINAPI}(framebuffer : Uint; pname : Enum; param : Int);
 	TglGetNamedFramebufferParameterivEXT* = PROCEDURE{WINAPI}(framebuffer : Uint; pname : Enum; param : Int);
 	(* GL_ARB_internalformat_query2  *)
-	TglGetInternalformati64v* = PROCEDURE{WINAPI}(target : Enum; internalformat : Enum; pname : Enum; bufSize : Sizei; params : Pint64);
+	TglGetInternalformati64v* = PROCEDURE{WINAPI}(target : Enum; internalformat : Enum; pname : Enum; bufSize : Sizei; params : PInt64);
 	(* GL_ARB_invalidate_subdata  *)
 	TglInvalidateTexSubImage* = PROCEDURE{WINAPI}(texture : Uint; level : Int; xoffset : Int; yoffset : Int; zoffset : Int; width : Sizei; height : Sizei; depth : Sizei);
 	TglInvalidateTexImage* = PROCEDURE{WINAPI}(texture : Uint; level : Int);
@@ -2026,13 +2017,13 @@ TYPE
 	TglInvalidateFramebuffer* = PROCEDURE{WINAPI}(target : Enum; numAttachments : Sizei;  attachments : PEnum);
 	TglInvalidateSubFramebuffer* = PROCEDURE{WINAPI}(target : Enum; numAttachments : Sizei;  attachments : PEnum; x : Int; y : Int; width : Sizei; height : Sizei);
 	(* GL_ARB_multi_draw_indirect  *)
-	TglMultiDrawArraysIndirect* = PROCEDURE{WINAPI}(mode : Enum;  indirect : Pointer; drawcount : Sizei; stride : Sizei);
-	TglMultiDrawElementsIndirect* = PROCEDURE{WINAPI}(mode : Enum; xtype : Enum;  indirect : Pointer; drawcount : Sizei; stride : Sizei);
+	TglMultiDrawArraysIndirect* = PROCEDURE{WINAPI}(mode : Enum;  indirect : ADDRESS; drawcount : Sizei; stride : Sizei);
+	TglMultiDrawElementsIndirect* = PROCEDURE{WINAPI}(mode : Enum; xtype : Enum;  indirect : ADDRESS; drawcount : Sizei; stride : Sizei);
 	(* GL_ARB_program_interface_query  *)
-	TglGetProgramInterfaceiv* = PROCEDURE{WINAPI}(programx : Uint; programInterface : Enum; pname : Enum; params : Pint);
+	TglGetProgramInterfaceiv* = PROCEDURE{WINAPI}(programx : Uint; programInterface : Enum; pname : Enum; params : PInt);
 	TglGetProgramResourceIndex* = PROCEDURE{WINAPI}(programx : Uint; programInterface : Enum;  name : PChar) : Uint;
 	TglGetProgramResourceName* = PROCEDURE{WINAPI}(programx : Uint; programInterface : Enum; index : Uint; bufSize : Sizei; length : PSizei; name : PChar);
-	TglGetProgramResourceiv* = PROCEDURE{WINAPI}(programx : Uint; programInterface : Enum; index : Uint; propCount : Sizei;  props : PEnum; bufSize : Sizei; length : PSizei; params : Pint);
+	TglGetProgramResourceiv* = PROCEDURE{WINAPI}(programx : Uint; programInterface : Enum; index : Uint; propCount : Sizei;  props : PEnum; bufSize : Sizei; length : PSizei; params : PInt);
 	TglGetProgramResourceLocation* = PROCEDURE{WINAPI}(programx : Uint; programInterface : Enum;  name : PChar) : Int;
 	TglGetProgramResourceLocationIndex* = PROCEDURE{WINAPI}(programx : Uint; programInterface : Enum;  name : PChar) : Int;
 	(* GL_ARB_robust_buffer_access_behavior  *)
@@ -2068,17 +2059,17 @@ TYPE
 	(* GL_ARB_cl_event  *)
 	TglCreateSyncFromCLeventARB* = PROCEDURE{WINAPI}(context: p_cl_context; event: p_cl_event; flags: Bitfield): GLsync;
 	(* GL_ARB_debug_output *)
-	TglDebugMessageControlARB* = PROCEDURE{WINAPI}(source: Enum; xtype: Enum; severity: Enum; count: Sizei;  ids: PInt; enabled: Boolean);
+	TglDebugMessageControlARB* = PROCEDURE{WINAPI}(source: Enum; xtype: Enum; severity: Enum; count: Sizei;  ids: PUint; enabled: Boolean);
 	TglDebugMessageInsertARB* = PROCEDURE{WINAPI}(source: Enum; xtype: Enum; id: Uint; severity: Enum; length: Sizei;  buf: PChar);
 	(* TglDebugMessageCallbackARB  = PROCEDURE{WINAPI}(callback: TglDebugProcARB;  userParam: PVoid);  *)
-	TglGetDebugMessageLogARB* = PROCEDURE{WINAPI}(count: Uint; bufsize: Sizei; sources: PEnum; types: PEnum; ids: PInt; severities: PEnum; lengths: PSizei; messageLog: PChar): Uint;
+	TglGetDebugMessageLogARB* = PROCEDURE{WINAPI}(count: Uint; bufsize: Sizei; sources: PEnum; types: PEnum; ids: PUint; severities: PEnum; lengths: PSizei; messageLog: PChar): Uint;
 	(* GL_ARB_robustness *)
 	TglGetGraphicsResetStatusARB* = PROCEDURE{WINAPI}(): Enum;
 	TglGetnMapdvARB* = PROCEDURE{WINAPI}(target: Enum; query: Enum; bufSize: Sizei; v: PDouble);
 	TglGetnMapfvARB* = PROCEDURE{WINAPI}(target: Enum; query: Enum; bufSize: Sizei; v: PFloat);
-	TglGetnMapivARB* = PROCEDURE{WINAPI}(target: Enum; query: Enum; bufSize: Sizei; v: Pint);
+	TglGetnMapivARB* = PROCEDURE{WINAPI}(target: Enum; query: Enum; bufSize: Sizei; v: PInt);
 	TglGetnPixelMapfvARB* = PROCEDURE{WINAPI}(map: Enum; bufSize: Sizei; values: PFloat);
-	TglGetnPixelMapuivARB* = PROCEDURE{WINAPI}(map: Enum; bufSize: Sizei; values: PInt);
+	TglGetnPixelMapuivARB* = PROCEDURE{WINAPI}(map: Enum; bufSize: Sizei; values: PUint);
 	TglGetnPixelMapusvARB* = PROCEDURE{WINAPI}(map: Enum; bufSize: Sizei; values: PUshort);
 	TglGetnPolygonStippleARB* = PROCEDURE{WINAPI}(bufSize: Sizei; pattern: PUbyte);
 	TglGetnColorTableARB* = PROCEDURE{WINAPI}(target: Enum; format: Enum; xtype: Enum; bufSize: Sizei; table: PVoid);
@@ -2090,8 +2081,8 @@ TYPE
 	TglReadnPixelsARB* = PROCEDURE{WINAPI}(x: Int; y: Int; width: Sizei; height: Sizei; format: Enum; xtype: Enum; bufSize: Sizei; data: PVoid);
 	TglGetnCompressedTexImageARB* = PROCEDURE{WINAPI}(target: Enum; lod: Int; bufSize: Sizei; img: PVoid);
 	TglGetnUniformfvARB* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; bufSize: Sizei; params: PFloat);
-	TglGetnUniformivARB* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; bufSize: Sizei; params: Pint);
-	TglGetnUniformuivARB* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; bufSize: Sizei; params: PInt);
+	TglGetnUniformivARB* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; bufSize: Sizei; params: PInt);
+	TglGetnUniformuivARB* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; bufSize: Sizei; params: PUint);
 	TglGetnUniformdvARB* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; bufSize: Sizei; params: PDouble);
 	(* GL_ATI_draw_buffers  *)
 	TglDrawBuffersATI* = PROCEDURE{WINAPI}(n: Sizei;  bufs: PEnum);
@@ -2100,9 +2091,9 @@ TYPE
 	TglDrawElementArrayATI* = PROCEDURE{WINAPI}(mode: Enum; count: Sizei);
 	TglDrawRangeElementArrayATI* = PROCEDURE{WINAPI}(mode: Enum; start: Uint; xend: Uint; count: Sizei);
 	(* GL_ATI_envmap_bumpmap  *)
-	TglTexBumpParameterivATI* = PROCEDURE{WINAPI}(pname: Enum;  param: Pint);
+	TglTexBumpParameterivATI* = PROCEDURE{WINAPI}(pname: Enum;  param: PInt);
 	TglTexBumpParameterfvATI* = PROCEDURE{WINAPI}(pname: Enum;  param: PFloat);
-	TglGetTexBumpParameterivATI* = PROCEDURE{WINAPI}(pname: Enum; param: Pint);
+	TglGetTexBumpParameterivATI* = PROCEDURE{WINAPI}(pname: Enum; param: PInt);
 	TglGetTexBumpParameterfvATI* = PROCEDURE{WINAPI}(pname: Enum; param: PFloat);
 	(* GL_ATI_fragment_shader  *)
 	TglGenFragmentShadersATI* = PROCEDURE{WINAPI}(range: Uint): Uint;
@@ -2133,23 +2124,23 @@ TYPE
 	TglIsObjectBufferATI* = PROCEDURE{WINAPI}(buffer: Uint): Boolean;
 	TglUpdateObjectBufferATI* = PROCEDURE{WINAPI}(buffer: Uint; offset: Uint; size: Sizei;  xpointer: PVoid; preserve: Enum);
 	TglGetObjectBufferfvATI* = PROCEDURE{WINAPI}(buffer: Uint; pname: Enum; params: PFloat);
-	TglGetObjectBufferivATI* = PROCEDURE{WINAPI}(buffer: Uint; pname: Enum; params: Pint);
+	TglGetObjectBufferivATI* = PROCEDURE{WINAPI}(buffer: Uint; pname: Enum; params: PInt);
 	TglFreeObjectBufferATI* = PROCEDURE{WINAPI}(buffer: Uint);
 	TglArrayObjectATI* = PROCEDURE{WINAPI}(xarray: Enum; size: Int; xtype: Enum; stride: Sizei; buffer: Uint; offset: Uint);
 	TglGetArrayObjectfvATI* = PROCEDURE{WINAPI}(xarray: Enum; pname: Enum; params: PFloat);
-	TglGetArrayObjectivATI* = PROCEDURE{WINAPI}(xarray: Enum; pname: Enum; params: Pint);
+	TglGetArrayObjectivATI* = PROCEDURE{WINAPI}(xarray: Enum; pname: Enum; params: PInt);
 	TglVariantArrayObjectATI* = PROCEDURE{WINAPI}(id: Uint; xtype: Enum; stride: Sizei; buffer: Uint; offset: Uint);
 	TglGetVariantArrayObjectfvATI* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: PFloat);
-	TglGetVariantArrayObjectivATI* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: Pint);
+	TglGetVariantArrayObjectivATI* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: PInt);
 	(* GL_ATI_vertex_attrib_array_object  *)
 	TglVertexAttribArrayObjectATI* = PROCEDURE{WINAPI}(index: Uint; size: Int; xtype: Enum; normalized: Boolean; stride: Sizei; buffer: Uint; offset: Uint);
 	TglGetVertexAttribArrayObjectfvATI* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: PFloat);
-	TglGetVertexAttribArrayObjectivATI* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: Pint);
+	TglGetVertexAttribArrayObjectivATI* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: PInt);
 	(* GL_ATI_vertex_streams  *)
 	TglVertexStream1sATI* = PROCEDURE{WINAPI}(stream: Enum; x: Short);
 	TglVertexStream1svATI* = PROCEDURE{WINAPI}(stream: Enum;  coords: PShort);
 	TglVertexStream1iATI* = PROCEDURE{WINAPI}(stream: Enum; x: Int);
-	TglVertexStream1ivATI* = PROCEDURE{WINAPI}(stream: Enum;  coords: Pint);
+	TglVertexStream1ivATI* = PROCEDURE{WINAPI}(stream: Enum;  coords: PInt);
 	TglVertexStream1fATI* = PROCEDURE{WINAPI}(stream: Enum; x: Float);
 	TglVertexStream1fvATI* = PROCEDURE{WINAPI}(stream: Enum;  coords: PFloat);
 	TglVertexStream1dATI* = PROCEDURE{WINAPI}(stream: Enum; x: Double);
@@ -2157,7 +2148,7 @@ TYPE
 	TglVertexStream2sATI* = PROCEDURE{WINAPI}(stream: Enum; x: Short; y: Short);
 	TglVertexStream2svATI* = PROCEDURE{WINAPI}(stream: Enum;  coords: PShort);
 	TglVertexStream2iATI* = PROCEDURE{WINAPI}(stream: Enum; x: Int; y: Int);
-	TglVertexStream2ivATI* = PROCEDURE{WINAPI}(stream: Enum;  coords: Pint);
+	TglVertexStream2ivATI* = PROCEDURE{WINAPI}(stream: Enum;  coords: PInt);
 	TglVertexStream2fATI* = PROCEDURE{WINAPI}(stream: Enum; x: Float; y: Float);
 	TglVertexStream2fvATI* = PROCEDURE{WINAPI}(stream: Enum;  coords: PFloat);
 	TglVertexStream2dATI* = PROCEDURE{WINAPI}(stream: Enum; x: Double; y: Double);
@@ -2165,7 +2156,7 @@ TYPE
 	TglVertexStream3sATI* = PROCEDURE{WINAPI}(stream: Enum; x: Short; y: Short; z: Short);
 	TglVertexStream3svATI* = PROCEDURE{WINAPI}(stream: Enum;  coords: PShort);
 	TglVertexStream3iATI* = PROCEDURE{WINAPI}(stream: Enum; x: Int; y: Int; z: Int);
-	TglVertexStream3ivATI* = PROCEDURE{WINAPI}(stream: Enum;  coords: Pint);
+	TglVertexStream3ivATI* = PROCEDURE{WINAPI}(stream: Enum;  coords: PInt);
 	TglVertexStream3fATI* = PROCEDURE{WINAPI}(stream: Enum; x: Float; y: Float; z: Float);
 	TglVertexStream3fvATI* = PROCEDURE{WINAPI}(stream: Enum;  coords: PFloat);
 	TglVertexStream3dATI* = PROCEDURE{WINAPI}(stream: Enum; x: Double; y: Double; z: Double);
@@ -2173,7 +2164,7 @@ TYPE
 	TglVertexStream4sATI* = PROCEDURE{WINAPI}(stream: Enum; x: Short; y: Short; z: Short; w: Short);
 	TglVertexStream4svATI* = PROCEDURE{WINAPI}(stream: Enum;  coords: PShort);
 	TglVertexStream4iATI* = PROCEDURE{WINAPI}(stream: Enum; x: Int; y: Int; z: Int; w: Int);
-	TglVertexStream4ivATI* = PROCEDURE{WINAPI}(stream: Enum;  coords: Pint);
+	TglVertexStream4ivATI* = PROCEDURE{WINAPI}(stream: Enum;  coords: PInt);
 	TglVertexStream4fATI* = PROCEDURE{WINAPI}(stream: Enum; x: Float; y: Float; z: Float; w: Float);
 	TglVertexStream4fvATI* = PROCEDURE{WINAPI}(stream: Enum;  coords: PFloat);
 	TglVertexStream4dATI* = PROCEDURE{WINAPI}(stream: Enum; x: Double; y: Double; z: Double; w: Double);
@@ -2183,7 +2174,7 @@ TYPE
 	TglNormalStream3sATI* = PROCEDURE{WINAPI}(stream: Enum; nx: Short; ny: Short; nz: Short);
 	TglNormalStream3svATI* = PROCEDURE{WINAPI}(stream: Enum;  coords: PShort);
 	TglNormalStream3iATI* = PROCEDURE{WINAPI}(stream: Enum; nx: Int; ny: Int; nz: Int);
-	TglNormalStream3ivATI* = PROCEDURE{WINAPI}(stream: Enum;  coords: Pint);
+	TglNormalStream3ivATI* = PROCEDURE{WINAPI}(stream: Enum;  coords: PInt);
 	TglNormalStream3fATI* = PROCEDURE{WINAPI}(stream: Enum; nx: Float; ny: Float; nz: Float);
 	TglNormalStream3fvATI* = PROCEDURE{WINAPI}(stream: Enum;  coords: PFloat);
 	TglNormalStream3dATI* = PROCEDURE{WINAPI}(stream: Enum; nx: Double; ny: Double; nz: Double);
@@ -2192,17 +2183,17 @@ TYPE
 	TglVertexBlendEnviATI* = PROCEDURE{WINAPI}(pname: Enum; param: Int);
 	TglVertexBlendEnvfATI* = PROCEDURE{WINAPI}(pname: Enum; param: Float);
 	(* GL_AMD_performance_monitor  *)
-	TglGetPerfMonitorGroupsAMD* = PROCEDURE{WINAPI}(numGroups: Pint; groupsSize: Sizei; groups: PInt);
-	TglGetPerfMonitorCountersAMD* = PROCEDURE{WINAPI}(group: Uint; numCounters: Pint; maxActiveCouters: Pint; counterSize: Sizei; counters: PInt);
+	TglGetPerfMonitorGroupsAMD* = PROCEDURE{WINAPI}(numGroups: PInt; groupsSize: Sizei; groups: PUint);
+	TglGetPerfMonitorCountersAMD* = PROCEDURE{WINAPI}(group: Uint; numCounters: PInt; maxActiveCouters: PInt; counterSize: Sizei; counters: PUint);
 	TglGetPerfMonitorGroupStringAMD* = PROCEDURE{WINAPI}(group: Uint; bufSize: Sizei; length: PSizei; groupString: PChar);
 	TglGetPerfMonitorCounterStringAMD* = PROCEDURE{WINAPI}(group: Uint; counter: Uint; bufSize: Sizei; length: PSizei; counterString: PChar);
-	TglGetPerfMonitorCounterInfoAMD* = PROCEDURE{WINAPI}(group: Uint; counter: Uint; pname: Enum; data: Pointer);
-	TglGenPerfMonitorsAMD* = PROCEDURE{WINAPI}(n: Sizei; monitors: PInt);
-	TglDeletePerfMonitorsAMD* = PROCEDURE{WINAPI}(n: Sizei; monitors: PInt);
-	TglSelectPerfMonitorCountersAMD* = PROCEDURE{WINAPI}(monitor: Uint; enable: Boolean; group: Uint; numCounters: Int; counterList: PInt);
+	TglGetPerfMonitorCounterInfoAMD* = PROCEDURE{WINAPI}(group: Uint; counter: Uint; pname: Enum; data: ADDRESS);
+	TglGenPerfMonitorsAMD* = PROCEDURE{WINAPI}(n: Sizei; monitors: PUint);
+	TglDeletePerfMonitorsAMD* = PROCEDURE{WINAPI}(n: Sizei; monitors: PUint);
+	TglSelectPerfMonitorCountersAMD* = PROCEDURE{WINAPI}(monitor: Uint; enable: Boolean; group: Uint; numCounters: Int; counterList: PUint);
 	TglBeginPerfMonitorAMD* = PROCEDURE{WINAPI}(monitor: Uint);
 	TglEndPerfMonitorAMD* = PROCEDURE{WINAPI}(monitor: Uint);
-	TglGetPerfMonitorCounterDataAMD* = PROCEDURE{WINAPI}(monitor: Uint; pname: Enum; dataSize: Sizei; data: PInt; bytesWritten: Pint);
+	TglGetPerfMonitorCounterDataAMD* = PROCEDURE{WINAPI}(monitor: Uint; pname: Enum; dataSize: Sizei; data: PUint; bytesWritten: PInt);
 	(* GL_AMD_vertex_shader_tesselator  *)
 	TglTessellationFactorAMD* = PROCEDURE{WINAPI}(factor: Float);
 	TglTessellationModeAMD* = PROCEDURE{WINAPI}(mode: Enum);
@@ -2212,14 +2203,14 @@ TYPE
 	TglBlendEquationIndexedAMD* = PROCEDURE{WINAPI}(buf: Uint; mode: Enum);
 	TglBlendEquationSeparateIndexedAMD* = PROCEDURE{WINAPI}(buf: Uint; modeRGB: Enum; modeAlpha: Enum);
 	(* GL_AMD_name_gen_delete  *)
-	TglGenNamesAMD* = PROCEDURE{WINAPI}(identifier: Enum; num: Uint; names: PInt);
-	TglDeleteNamesAMD* = PROCEDURE{WINAPI}(identifier: Enum; num: Uint;  names: PInt);
+	TglGenNamesAMD* = PROCEDURE{WINAPI}(identifier: Enum; num: Uint; names: PUint);
+	TglDeleteNamesAMD* = PROCEDURE{WINAPI}(identifier: Enum; num: Uint;  names: PUint);
 	TglIsNameAMD* = PROCEDURE{WINAPI}(identifier: Enum; name: Uint): Boolean;
 	(* GL_AMD_debug_output  *)
-	TglDebugMessageEnableAMD* = PROCEDURE{WINAPI}(category: Enum; severity: Enum; count: Sizei;  ids: PInt; enabled: Boolean);
+	TglDebugMessageEnableAMD* = PROCEDURE{WINAPI}(category: Enum; severity: Enum; count: Sizei;  ids: PUint; enabled: Boolean);
 	TglDebugMessageInsertAMD* = PROCEDURE{WINAPI}(category: Enum; severity: Enum; id: Uint; length: Sizei;  buf: PChar);
 	(* TglDebugMessageCallbackAMD  = PROCEDURE{WINAPI}(callback: TGLDebugProcAMD; userParam: PVoid);   *)
-	TglGetDebugMessageLogAMD* = PROCEDURE{WINAPI}(count: Uint; bufsize: Sizei; categories: PEnum; severities: PInt; ids: PInt; lengths: PSizei; message: PChar): Uint;
+	TglGetDebugMessageLogAMD* = PROCEDURE{WINAPI}(count: Uint; bufsize: Sizei; categories: PEnum; severities: PUint; ids: PUint; lengths: PSizei; message: PChar): Uint;
 	(* GL_EXT_blend_color  *)
 	TglBlendColorEXT* = PROCEDURE{WINAPI}(red: Clampf; green: Clampf; blue: Clampf; alpha: Clampf);
 	(* GL_EXT_blend_func_separate  *)
@@ -2238,12 +2229,12 @@ TYPE
 	TglConvolutionParameterfEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Float);
 	TglConvolutionParameterfvEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: PFloat);
 	TglConvolutionParameteriEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Int);
-	TglConvolutionParameterivEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: Pint);
+	TglConvolutionParameterivEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: PInt);
 	TglCopyConvolutionFilter1DEXT* = PROCEDURE{WINAPI}(target: Enum; internalformat: Enum; x: Int; y: Int; width: Sizei);
 	TglCopyConvolutionFilter2DEXT* = PROCEDURE{WINAPI}(target: Enum; internalformat: Enum; x: Int; y: Int; width: Sizei; height: Sizei);
 	TglGetConvolutionFilterEXT* = PROCEDURE{WINAPI}(target: Enum; format: Enum; xtype: Enum; image: PVoid);
 	TglGetConvolutionParameterfvEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PFloat);
-	TglGetConvolutionParameterivEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint);
+	TglGetConvolutionParameterivEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
 	TglGetSeparableFilterEXT* = PROCEDURE{WINAPI}(target: Enum; format: Enum; xtype: Enum; row: PVoid; column: PVoid; span: PVoid);
 	TglSeparableFilter2DEXT* = PROCEDURE{WINAPI}(target: Enum; internalformat: Enum; width: Sizei; height: Sizei; format: Enum; xtype: Enum;  row: PVoid;  column: PVoid);
 	(* GL_EXT_coordinate_frame  *)
@@ -2254,7 +2245,7 @@ TYPE
 	TglTangent3fEXT* = PROCEDURE{WINAPI}(tx: Float; ty: Float; tz: Float);
 	TglTangent3fvEXT* = PROCEDURE{WINAPI}( v: PFloat);
 	TglTangent3iEXT* = PROCEDURE{WINAPI}(tx: Int; ty: Int; tz: Int);
-	TglTangent3ivEXT* = PROCEDURE{WINAPI}( v: Pint);
+	TglTangent3ivEXT* = PROCEDURE{WINAPI}( v: PInt);
 	TglTangent3sEXT* = PROCEDURE{WINAPI}(tx: Short; ty: Short; tz: Short);
 	TglTangent3svEXT* = PROCEDURE{WINAPI}( v: PShort);
 	TglBinormal3bEXT* = PROCEDURE{WINAPI}(bx: Byte; by: Byte; bz: Byte);
@@ -2264,7 +2255,7 @@ TYPE
 	TglBinormal3fEXT* = PROCEDURE{WINAPI}(bx: Float; by: Float; bz: Float);
 	TglBinormal3fvEXT* = PROCEDURE{WINAPI}( v: PFloat);
 	TglBinormal3iEXT* = PROCEDURE{WINAPI}(bx: Int; by: Int; bz: Int);
-	TglBinormal3ivEXT* = PROCEDURE{WINAPI}( v: Pint);
+	TglBinormal3ivEXT* = PROCEDURE{WINAPI}( v: PInt);
 	TglBinormal3sEXT* = PROCEDURE{WINAPI}(bx: Short; by: Short; bz: Short);
 	TglBinormal3svEXT* = PROCEDURE{WINAPI}( v: PShort);
 	TglTangentPointerEXT* = PROCEDURE{WINAPI}(xtype: Enum; stride: Sizei;  xpointer: PVoid);
@@ -2289,28 +2280,28 @@ TYPE
 	(* GL_EXT_framebuffer_object  *)
 	TglIsRenderbufferEXT* = PROCEDURE{WINAPI}(renderbuffer: Uint): BOOLEAN;
 	TglBindRenderbufferEXT* = PROCEDURE{WINAPI}(target: Enum; renderbuffer: Uint);
-	TglDeleteRenderbuffersEXT* = PROCEDURE{WINAPI}(n: Sizei;  renderbuffers: PInt);
-	TglGenRenderbuffersEXT* = PROCEDURE{WINAPI}(n: Sizei; renderbuffers: PInt);
+	TglDeleteRenderbuffersEXT* = PROCEDURE{WINAPI}(n: Sizei;  renderbuffers: PUint);
+	TglGenRenderbuffersEXT* = PROCEDURE{WINAPI}(n: Sizei; renderbuffers: PUint);
 	TglRenderbufferStorageEXT* = PROCEDURE{WINAPI}(target: Enum; internalformat: Enum; width: Sizei; height: Sizei);
-	TglGetRenderbufferParameterivEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint);
+	TglGetRenderbufferParameterivEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
 	TglIsFramebufferEXT* = PROCEDURE{WINAPI}(framebuffer: Uint): BOOLEAN;
 	TglBindFramebufferEXT* = PROCEDURE{WINAPI}(target: Enum; framebuffer: Uint);
-	TglDeleteFramebuffersEXT* = PROCEDURE{WINAPI}(n: Sizei;  framebuffers: PInt);
-	TglGenFramebuffersEXT* = PROCEDURE{WINAPI}(n: Sizei; framebuffers: PInt);
+	TglDeleteFramebuffersEXT* = PROCEDURE{WINAPI}(n: Sizei;  framebuffers: PUint);
+	TglGenFramebuffersEXT* = PROCEDURE{WINAPI}(n: Sizei; framebuffers: PUint);
 	TglCheckFramebufferStatusEXT* = PROCEDURE{WINAPI}(target: Enum): Enum;
 	TglFramebufferTexture1DEXT* = PROCEDURE{WINAPI}(target: Enum; attachment: Enum; textarget: Enum; texture: Uint; level: Int);
 	TglFramebufferTexture2DEXT* = PROCEDURE{WINAPI}(target: Enum; attachment: Enum; textarget: Enum; texture: Uint; level: Int);
 	TglFramebufferTexture3DEXT* = PROCEDURE{WINAPI}(target: Enum; attachment: Enum; textarget: Enum; texture: Uint; level: Int; zoffset: Int);
 	TglFramebufferRenderbufferEXT* = PROCEDURE{WINAPI}(target: Enum; attachment: Enum; renderbuffertarget: Enum; renderbuffer: Uint);
-	TglGetFramebufferAttachmentParameterivEXT* = PROCEDURE{WINAPI}(target: Enum; attachment: Enum; pname: Enum; params: Pint);
+	TglGetFramebufferAttachmentParameterivEXT* = PROCEDURE{WINAPI}(target: Enum; attachment: Enum; pname: Enum; params: PInt);
 	TglGenerateMipmapEXT* = PROCEDURE{WINAPI}(target: Enum);
 	(* GL_EXT_histogram  *)
 	TglGetHistogramEXT* = PROCEDURE{WINAPI}(target: Enum; reset: Boolean; format: Enum; xtype: Enum; values: PVoid);
 	TglGetHistogramParameterfvEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PFloat);
-	TglGetHistogramParameterivEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint);
+	TglGetHistogramParameterivEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
 	TglGetMinmaxEXT* = PROCEDURE{WINAPI}(target: Enum; reset: Boolean; format: Enum; xtype: Enum; values: PVoid);
 	TglGetMinmaxParameterfvEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PFloat);
-	TglGetMinmaxParameterivEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint);
+	TglGetMinmaxParameterivEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
 	TglHistogramEXT* = PROCEDURE{WINAPI}(target: Enum; width: Sizei; internalformat: Enum; sink: Boolean);
 	TglMinmaxEXT* = PROCEDURE{WINAPI}(target: Enum; internalformat: Enum; sink: Boolean);
 	TglResetHistogramEXT* = PROCEDURE{WINAPI}(target: Enum);
@@ -2324,7 +2315,7 @@ TYPE
 	TglTextureLightEXT* = PROCEDURE{WINAPI}(pname: Enum);
 	TglTextureMaterialEXT* = PROCEDURE{WINAPI}(face: Enum; mode: Enum);
 	(* GL_EXT_multi_draw_arrays  *)
-	TglMultiDrawArraysEXT* = PROCEDURE{WINAPI}(mode: Enum; first: Pint; count: PSizei; primcount: Sizei);
+	TglMultiDrawArraysEXT* = PROCEDURE{WINAPI}(mode: Enum; first: PInt; count: PSizei; primcount: Sizei);
 	TglMultiDrawElementsEXT* = PROCEDURE{WINAPI}(mode: Enum;  count: PSizei; xtype: Enum;  indices: PVoid; primcount: Sizei);
 	(* GL_EXT_multisample  *)
 	TglSampleMaskEXT* = PROCEDURE{WINAPI}(value: Clampf; invert: Boolean);
@@ -2332,12 +2323,12 @@ TYPE
 	(* GL_EXT_paletted_texture  *)
 	TglColorTableEXT* = PROCEDURE{WINAPI}(target: Enum; internalFormat: Enum; width: Sizei; format: Enum; xtype: Enum;  table: PVoid);
 	TglGetColorTableEXT* = PROCEDURE{WINAPI}(target: Enum; format: Enum; xtype: Enum; data: PVoid);
-	TglGetColorTableParameterivEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint);
+	TglGetColorTableParameterivEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
 	TglGetColorTableParameterfvEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PFloat);
 	(* GL_EXT_pixel_transform  *)
 	TglPixelTransformParameteriEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; param: Int);
 	TglPixelTransformParameterfEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; param: Float);
-	TglPixelTransformParameterivEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: Pint);
+	TglPixelTransformParameterivEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: PInt);
 	TglPixelTransformParameterfvEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: PFloat);
 	(* GL_EXT_point_parameters  *)
 	TglPointParameterfEXT* = PROCEDURE{WINAPI}(pname: Enum; param: Float);
@@ -2352,13 +2343,13 @@ TYPE
 	TglSecondaryColor3fEXT* = PROCEDURE{WINAPI}(red: Float; green: Float; blue: Float);
 	TglSecondaryColor3fvEXT* = PROCEDURE{WINAPI}( v: PFloat);
 	TglSecondaryColor3iEXT* = PROCEDURE{WINAPI}(red: Int; green: Int; blue: Int);
-	TglSecondaryColor3ivEXT* = PROCEDURE{WINAPI}( v: Pint);
+	TglSecondaryColor3ivEXT* = PROCEDURE{WINAPI}( v: PInt);
 	TglSecondaryColor3sEXT* = PROCEDURE{WINAPI}(red: Short; green: Short; blue: Short);
 	TglSecondaryColor3svEXT* = PROCEDURE{WINAPI}( v: PShort);
 	TglSecondaryColor3ubEXT* = PROCEDURE{WINAPI}(red: Ubyte; green: Ubyte; blue: Ubyte);
 	TglSecondaryColor3ubvEXT* = PROCEDURE{WINAPI}( v: PUbyte);
 	TglSecondaryColor3uiEXT* = PROCEDURE{WINAPI}(red: Uint; green: Uint; blue: Uint);
-	TglSecondaryColor3uivEXT* = PROCEDURE{WINAPI}( v: PInt);
+	TglSecondaryColor3uivEXT* = PROCEDURE{WINAPI}( v: PUint);
 	TglSecondaryColor3usEXT* = PROCEDURE{WINAPI}(red: Ushort; green: Ushort; blue: Ushort);
 	TglSecondaryColor3usvEXT* = PROCEDURE{WINAPI}( v: PUshort);
 	TglSecondaryColorPointerEXT* = PROCEDURE{WINAPI}(size: Int; xtype: Enum; stride: Sizei;  xpointer: PVoid);
@@ -2371,12 +2362,12 @@ TYPE
 	TglTexImage3DEXT* = PROCEDURE{WINAPI}(target: Enum; level: Int; internalformat: Enum; width: Sizei; height: Sizei; depth: Sizei; border: Int; format: Enum; xtype: Enum;  pixels: PVoid);
 	TglTexSubImage3DEXT* = PROCEDURE{WINAPI}(target: Enum; level: Int; xoffset: Int; yoffset: Int; zoffset: Int; width: Sizei; height: Sizei; depth: Sizei; format: Enum; xtype: Enum;  pixels: PVoid);
 	(* GL_EXT_texture_object  *)
-	TglAreTexturesResidentEXT* = PROCEDURE{WINAPI}(n: Sizei;  textures: PInt; residences: PBoolean): Boolean;
+	TglAreTexturesResidentEXT* = PROCEDURE{WINAPI}(n: Sizei;  textures: PUint; residences: PBoolean): Boolean;
 	TglBindTextureEXT* = PROCEDURE{WINAPI}(target: Enum; texture: Uint);
-	TglDeleteTexturesEXT* = PROCEDURE{WINAPI}(n: Sizei;  textures: PInt);
-	TglGenTexturesEXT* = PROCEDURE{WINAPI}(n: Sizei; textures: PInt);
+	TglDeleteTexturesEXT* = PROCEDURE{WINAPI}(n: Sizei;  textures: PUint);
+	TglGenTexturesEXT* = PROCEDURE{WINAPI}(n: Sizei; textures: PUint);
 	TglIsTextureEXT* = PROCEDURE{WINAPI}(texture: Uint): Boolean;
-	TglPrioritizeTexturesEXT* = PROCEDURE{WINAPI}(n: Sizei;  textures: PInt;  priorities: PClampf);
+	TglPrioritizeTexturesEXT* = PROCEDURE{WINAPI}(n: Sizei;  textures: PUint;  priorities: PClampf);
 	(* GL_EXT_texture_perturb_normal  *)
 	TglTextureNormalEXT* = PROCEDURE{WINAPI}(mode: Enum);
 	(* GL_EXT_vertex_array  *)
@@ -2407,12 +2398,12 @@ TYPE
 	TglSetLocalConstantEXT* = PROCEDURE{WINAPI}(id: Uint; xtype: Enum;  addr: PVoid);
 	TglVariantbvEXT* = PROCEDURE{WINAPI}(id: Uint;  addr: PByte);
 	TglVariantsvEXT* = PROCEDURE{WINAPI}(id: Uint;  addr: PShort);
-	TglVariantivEXT* = PROCEDURE{WINAPI}(id: Uint;  addr: Pint);
+	TglVariantivEXT* = PROCEDURE{WINAPI}(id: Uint;  addr: PInt);
 	TglVariantfvEXT* = PROCEDURE{WINAPI}(id: Uint;  addr: PFloat);
 	TglVariantdvEXT* = PROCEDURE{WINAPI}(id: Uint;  addr: PDouble);
 	TglVariantubvEXT* = PROCEDURE{WINAPI}(id: Uint;  addr: PUbyte);
 	TglVariantusvEXT* = PROCEDURE{WINAPI}(id: Uint;  addr: PUshort);
-	TglVariantuivEXT* = PROCEDURE{WINAPI}(id: Uint;  addr: PInt);
+	TglVariantuivEXT* = PROCEDURE{WINAPI}(id: Uint;  addr: PUint);
 	TglVariantPointerEXT* = PROCEDURE{WINAPI}(id: Uint; xtype: Enum; stride: Uint;  addr: PVoid);
 	TglEnableVariantClientStateEXT* = PROCEDURE{WINAPI}(id: Uint);
 	TglDisableVariantClientStateEXT* = PROCEDURE{WINAPI}(id: Uint);
@@ -2423,14 +2414,14 @@ TYPE
 	TglBindParameterEXT* = PROCEDURE{WINAPI}(value: Enum): Uint;
 	TglIsVariantEnabledEXT* = PROCEDURE{WINAPI}(id: Uint; cap: Enum): Boolean;
 	TglGetVariantBooleanvEXT* = PROCEDURE{WINAPI}(id: Uint; value: Enum; data: PBoolean);
-	TglGetVariantIntegervEXT* = PROCEDURE{WINAPI}(id: Uint; value: Enum; data: Pint);
+	TglGetVariantIntegervEXT* = PROCEDURE{WINAPI}(id: Uint; value: Enum; data: PInt);
 	TglGetVariantFloatvEXT* = PROCEDURE{WINAPI}(id: Uint; value: Enum; data: PFloat);
 	TglGetVariantPointervEXT* = PROCEDURE{WINAPI}(id: Uint; value: Enum; data: PVoid);
 	TglGetInvariantBooleanvEXT* = PROCEDURE{WINAPI}(id: Uint; value: Enum; data: PBoolean);
-	TglGetInvariantIntegervEXT* = PROCEDURE{WINAPI}(id: Uint; value: Enum; data: Pint);
+	TglGetInvariantIntegervEXT* = PROCEDURE{WINAPI}(id: Uint; value: Enum; data: PInt);
 	TglGetInvariantFloatvEXT* = PROCEDURE{WINAPI}(id: Uint; value: Enum; data: PFloat);
 	TglGetLocalConstantBooleanvEXT* = PROCEDURE{WINAPI}(id: Uint; value: Enum; data: PBoolean);
-	TglGetLocalConstantIntegervEXT* = PROCEDURE{WINAPI}(id: Uint; value: Enum; data: Pint);
+	TglGetLocalConstantIntegervEXT* = PROCEDURE{WINAPI}(id: Uint; value: Enum; data: PInt);
 	TglGetLocalConstantFloatvEXT* = PROCEDURE{WINAPI}(id: Uint; value: Enum; data: PFloat);
 	(* GL_EXT_vertex_weighting  *)
 	TglVertexWeightfEXT* = PROCEDURE{WINAPI}(weight: Float);
@@ -2443,25 +2434,25 @@ TYPE
 	(* GL_EXT_framebuffer_multisample  *)
 	TglRenderbufferStorageMultisampleEXT* = PROCEDURE{WINAPI}(target: Enum; samples: Sizei; internalformat: Enum; width: Sizei; height: Sizei);
 	(* GL_EXT_timer_query  *)
-	TglGetQueryObjecti64vEXT* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: Pint64EXT);
-	TglGetQueryObjectui64vEXT* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: PInt64EXT);
+	TglGetQueryObjecti64vEXT* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: PInt64EXT);
+	TglGetQueryObjectui64vEXT* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: PUint64EXT);
 	(* GL_EXT_gpu_program_parameters  *)
 	TglProgramEnvParameters4fvEXT* = PROCEDURE{WINAPI}(target: Enum; index: Uint; count: Sizei;  params: PFloat);
 	TglProgramLocalParameters4fvEXT* = PROCEDURE{WINAPI}(target: Enum; index: Uint; count: Sizei;  params: PFloat);
 	(* GL_EXT_bindable_uniform  *)
 	TglUniformBufferEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; buffer: Uint);
 	TglGetUniformBufferSizeEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int): Int;
-	TglGetUniformOffsetEXT* = PROCEDURE{WINAPI}( xprogram: Uint; location: Int): Pint;
+	TglGetUniformOffsetEXT* = PROCEDURE{WINAPI}( xprogram: Uint; location: Int): PInt;
 	(* GL_EXT_draw_buffers2  *)
 	TglColorMaskIndexedEXT* = PROCEDURE{WINAPI}(buf: Uint; r: Boolean; g: Boolean; b: Boolean; a: Boolean);
 	TglGetBooleanIndexedvEXT* = PROCEDURE{WINAPI}(value: Enum; index: Uint; data: PBoolean);
-	TglGetIntegerIndexedvEXT* = PROCEDURE{WINAPI}(value: Enum; index: Uint; data: Pint);
+	TglGetIntegerIndexedvEXT* = PROCEDURE{WINAPI}(value: Enum; index: Uint; data: PInt);
 	TglEnableIndexedEXT* = PROCEDURE{WINAPI}(target: Enum; index: Uint);
 	TglDisableIndexedEXT* = PROCEDURE{WINAPI}(target: Enum; index: Uint);
 	TglIsEnabledIndexedEXT* = PROCEDURE{WINAPI}(target: Enum; index: Uint): Boolean;
 	(* GL_EXT_draw_instanced  *)
 	TglDrawArraysInstancedEXT* = PROCEDURE{WINAPI}(mode: Enum; first: Int; count: Sizei; primcount: Sizei);
-	TglDrawElementsInstancedEXT* = PROCEDURE{WINAPI}(mode: Enum; count: Sizei; xtype: Enum;  indices: Pointer; primcount: Sizei);
+	TglDrawElementsInstancedEXT* = PROCEDURE{WINAPI}(mode: Enum; count: Sizei; xtype: Enum;  indices: ADDRESS; primcount: Sizei);
 	(* GL_EXT_geometry_shader4  *)
 	TglProgramParameteriEXT* = PROCEDURE{WINAPI}(xprogram: Uint; pname: Enum; value: Int);
 	TglFramebufferTextureEXT* = PROCEDURE{WINAPI}(target: Enum; attachment: Enum; texture: Uint; level: Int);
@@ -2476,30 +2467,30 @@ TYPE
 	TglVertexAttribI2uiEXT* = PROCEDURE{WINAPI}(index: Uint; x: Uint; y: Uint);
 	TglVertexAttribI3uiEXT* = PROCEDURE{WINAPI}(index: Uint; x: Uint; y: Uint; z: Uint);
 	TglVertexAttribI4uiEXT* = PROCEDURE{WINAPI}(index: Uint; x: Uint; y: Uint; z: Uint; w: Uint);
-	TglVertexAttribI1ivEXT* = PROCEDURE{WINAPI}(index: Uint;  v: Pint);
-	TglVertexAttribI2ivEXT* = PROCEDURE{WINAPI}(index: Uint;  v: Pint);
-	TglVertexAttribI3ivEXT* = PROCEDURE{WINAPI}(index: Uint;  v: Pint);
-	TglVertexAttribI4ivEXT* = PROCEDURE{WINAPI}(index: Uint;  v: Pint);
-	TglVertexAttribI1uivEXT* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
-	TglVertexAttribI2uivEXT* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
-	TglVertexAttribI3uivEXT* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
-	TglVertexAttribI4uivEXT* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
+	TglVertexAttribI1ivEXT* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
+	TglVertexAttribI2ivEXT* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
+	TglVertexAttribI3ivEXT* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
+	TglVertexAttribI4ivEXT* = PROCEDURE{WINAPI}(index: Uint;  v: PInt);
+	TglVertexAttribI1uivEXT* = PROCEDURE{WINAPI}(index: Uint;  v: PUint);
+	TglVertexAttribI2uivEXT* = PROCEDURE{WINAPI}(index: Uint;  v: PUint);
+	TglVertexAttribI3uivEXT* = PROCEDURE{WINAPI}(index: Uint;  v: PUint);
+	TglVertexAttribI4uivEXT* = PROCEDURE{WINAPI}(index: Uint;  v: PUint);
 	TglVertexAttribI4bvEXT* = PROCEDURE{WINAPI}(index: Uint;  v: PByte);
 	TglVertexAttribI4svEXT* = PROCEDURE{WINAPI}(index: Uint;  v: PShort);
 	TglVertexAttribI4ubvEXT* = PROCEDURE{WINAPI}(index: Uint;  v: PUbyte);
 	TglVertexAttribI4usvEXT* = PROCEDURE{WINAPI}(index: Uint;  v: PUshort);
-	TglVertexAttribIPointerEXT* = PROCEDURE{WINAPI}(index: Uint; size: Int; xtype: Enum; stride: Sizei;  xpointer: Pointer);
-	TglGetVertexAttribIivEXT* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: Pint);
-	TglGetVertexAttribIuivEXT* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: PInt);
+	TglVertexAttribIPointerEXT* = PROCEDURE{WINAPI}(index: Uint; size: Int; xtype: Enum; stride: Sizei;  xpointer: ADDRESS);
+	TglGetVertexAttribIivEXT* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: PInt);
+	TglGetVertexAttribIuivEXT* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: PUint);
 	TglUniform1uiEXT* = PROCEDURE{WINAPI}(location: Int; v0: Uint);
 	TglUniform2uiEXT* = PROCEDURE{WINAPI}(location: Int; v0: Uint; v1: Uint);
 	TglUniform3uiEXT* = PROCEDURE{WINAPI}(location: Int; v0: Uint; v1: Uint; v2: Uint);
 	TglUniform4uiEXT* = PROCEDURE{WINAPI}(location: Int; v0: Uint; v1: Uint; v2: Uint; v3: Uint);
-	TglUniform1uivEXT* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PInt);
-	TglUniform2uivEXT* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PInt);
-	TglUniform3uivEXT* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PInt);
-	TglUniform4uivEXT* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PInt);
-	TglGetUniformuivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; params: PInt);
+	TglUniform1uivEXT* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PUint);
+	TglUniform2uivEXT* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PUint);
+	TglUniform3uivEXT* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PUint);
+	TglUniform4uivEXT* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PUint);
+	TglGetUniformuivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; params: PUint);
 	TglBindFragDataLocationEXT* = PROCEDURE{WINAPI}(xprogram: Uint; colorNumber: Uint; name: ADDRESS);
 	TglGetFragDataLocationEXT* = PROCEDURE{WINAPI}(xprogram: Uint; name: ADDRESS): Int;
 	(* GL_EXT_texture_array  *)
@@ -2509,16 +2500,16 @@ TYPE
 	(* GL_EXT_texture_integer  *)
 	TglClearColorIiEXT* = PROCEDURE{WINAPI}(r: Int; g: Int; b: Int; a: Int);
 	TglClearColorIuiEXT* = PROCEDURE{WINAPI}(r: Uint; g: Uint; b: Uint; a: Uint);
-	TglTexParameterIivEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint);
-	TglTexParameterIuivEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
-	TglGetTexParameterIivEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint);
-	TglGetTexParameterIiuvEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
+	TglTexParameterIivEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
+	TglTexParameterIuivEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PUint);
+	TglGetTexParameterIivEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
+	TglGetTexParameterIiuvEXT* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PUint);
 	(* GL_HP_image_transform  *)
 	TglImageTransformParameteriHP* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; param: Int);
 	TglImageTransformParameterfHP* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; param: Float);
-	TglImageTransformParameterivHP* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: Pint);
+	TglImageTransformParameterivHP* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: PInt);
 	TglImageTransformParameterfvHP* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: PFloat);
-	TglGetImageTransformParameterivHP* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint);
+	TglGetImageTransformParameterivHP* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
 	TglGetImageTransformParameterfvHP* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PFloat);
 	(* GL_EXT_depth_bounds_test  *)
 	TglDepthBoundsEXT* = PROCEDURE{WINAPI}(zmin: Clampd; zmax: Clampd);
@@ -2530,8 +2521,8 @@ TYPE
 	TglBindBufferRangeEXT* = PROCEDURE{WINAPI}(target: Enum; index: Uint; buffer: Uint; offset: Sizei; size: Sizei);
 	TglBindBufferOffsetEXT* = PROCEDURE{WINAPI}(target: Enum; index: Uint; buffer: Uint; offset: Sizei);
 	TglBindBufferBaseEXT* = PROCEDURE{WINAPI}(target: Enum; index: Uint; buffer: Uint);
-	TglTransformFeedbackVaryingsEXT* = PROCEDURE{WINAPI}(xprogram: Uint; count: Sizei;  locations: Pint; bufferMode: Enum);
-	TglGetTransformFeedbackVaryingEXT* = PROCEDURE{WINAPI}(xprogram: Uint; index: Uint; location: Pint);
+	TglTransformFeedbackVaryingsEXT* = PROCEDURE{WINAPI}(xprogram: Uint; count: Sizei;  locations: PInt; bufferMode: Enum);
+	TglGetTransformFeedbackVaryingEXT* = PROCEDURE{WINAPI}(xprogram: Uint; index: Uint; location: PInt);
 	(* GL_EXT_direct_state_access  *)
 	TglClientAttribDefaultEXT* = PROCEDURE{WINAPI}(mask: Bitfield);
 	TglPushClientAttribDefaultEXT* = PROCEDURE{WINAPI}(mask: Bitfield);
@@ -2557,7 +2548,7 @@ TYPE
 	TglTextureParameterfEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum; param: Float);
 	TglTextureParameterfvEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum;  params: PFloat);
 	TglTextureParameteriEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum; param: Int);
-	TglTextureParameterivEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum;  params: Pint);
+	TglTextureParameterivEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum;  params: PInt);
 	TglTextureImage1DEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; level: Int; internalformat: Enum; width: Sizei; border: Int; format: Enum; xtype: Enum;  pixels: PVoid);
 	TglTextureImage2DEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; level: Int; internalformat: Enum; width: Sizei; height: Sizei; border: Int; format: Enum; xtype: Enum;  pixels: PVoid);
 	TglTextureSubImage1DEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; level: Int; xoffset: Int; width: Sizei; format: Enum; xtype: Enum;  pixels: PVoid);
@@ -2568,7 +2559,7 @@ TYPE
 	TglCopyTextureSubImage2DEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; level: Int; xoffset: Int; yoffset: Int; x: Int; y: Int; width: Sizei; height: Sizei);
 	TglGetTextureImageEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; level: Int; format: Enum; xtype: Enum; pixels: PVoid);
 	TglGetTextureParameterfvEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum; params: PFloat);
-	TglGetTextureParameterivEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum; params: Pint);
+	TglGetTextureParameterivEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum; params: PInt);
 	TglGetTextureLevelParameterfvEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; level: Int; pname: Enum; params: PFloat);
 	TglGetTextureLevelParameterivEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; level: Int; pname: Enum; params: Int);
 	TglTextureImage3DEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; level: Int; internalformat: Enum; width: Sizei; height: Sizei; depth: Sizei; border: Int; format: Enum; xtype: Enum;  pixels: PVoid);
@@ -2577,7 +2568,7 @@ TYPE
 	TglMultiTexParameterfEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; pname: Enum; param: Float);
 	TglMultiTexParameterfvEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; pname: Enum;  params: PFloat);
 	TglMultiTexParameteriEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; pname: Enum; param: Int);
-	TglMultiTexParameterivEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; pname: Enum;  params: Pint);
+	TglMultiTexParameterivEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; pname: Enum;  params: PInt);
 	TglMultiTexImage1DEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; level: Int; internalformat: Enum; width: Sizei; border: Int; format: Enum; xtype: Enum;  pixels: PVoid);
 	TglMultiTexImage2DEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; level: Int; internalformat: Enum; width: Sizei; height: Sizei; border: Int; format: Enum; xtype: Enum;  pixels: PVoid);
 	TglMultiTexSubImage1DEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; level: Int; xoffset: Int; width: Sizei; format: Enum; xtype: Enum;  pixels: PVoid);
@@ -2588,9 +2579,9 @@ TYPE
 	TglCopyMultiTexSubImage2DEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; level: Int; xoffset: Int; yoffset: Int; x: Int; y: Int; width: Sizei; height: Sizei);
 	TglGetMultiTexImageEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; level: Int; format: Enum; xtype: Enum; pixels: PVoid);
 	TglGetMultiTexParameterfvEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; pname: Enum; params: PFloat);
-	TglGetMultiTexParameterivEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; pname: Enum; params: Pint);
+	TglGetMultiTexParameterivEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; pname: Enum; params: PInt);
 	TglGetMultiTexLevelParameterfvEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; level: Int; pname: Enum; params: PFloat);
-	TglGetMultiTexLevelParameterivEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; level: Int; pname: Enum; params: Pint);
+	TglGetMultiTexLevelParameterivEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; level: Int; pname: Enum; params: PInt);
 	TglMultiTexImage3DEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; level: Int; internalformat: Enum; width: Sizei; height: Sizei; depth: Sizei; border: Int; format: Enum; xtype: Enum;  pixels: PVoid);
 	TglMultiTexSubImage3DEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; level: Int; xoffset: Int; yoffset: Int; zoffset: Int; width: Sizei; height: Sizei; depth: Sizei; format: Enum; xtype: Enum;  pixels:PVoid);
 	TglCopyMultiTexSubImage3DEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; level: Int; xoffset: Int; yoffset: Int; zoffset: Int; x: Int; y: Int; width: Sizei; height: Sizei);
@@ -2601,18 +2592,18 @@ TYPE
 	TglMultiTexEnvfEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; pname: Enum; param: Float);
 	TglMultiTexEnvfvEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; pname: Enum;  params: PFloat);
 	TglMultiTexEnviEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; pname: Enum; param: Int);
-	TglMultiTexEnvivEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; pname: Enum;  params: Pint);
+	TglMultiTexEnvivEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; pname: Enum;  params: PInt);
 	TglMultiTexGendEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; pname: Enum; param: Double);
 	TglMultiTexGendvEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; pname: Enum;  params: PDouble);
 	TglMultiTexGenfEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; pname: Enum; param: Float);
 	TglMultiTexGenfvEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; pname: Enum;  params: PFloat);
 	TglMultiTexGeniEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; pname: Enum; param: Int);
-	TglMultiTexGenivEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; pname: Enum;  params: Pint);
+	TglMultiTexGenivEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; pname: Enum;  params: PInt);
 	TglGetMultiTexEnvfvEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; pname: Enum; params: PFloat);
-	TglGetMultiTexEnvivEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; pname: Enum; params: Pint);
+	TglGetMultiTexEnvivEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; pname: Enum; params: PInt);
 	TglGetMultiTexGendvEXT* = PROCEDURE{WINAPI}(texunit: Enum; coord: Enum; pname: Enum; params: PDouble);
 	TglGetMultiTexGenfvEXT* = PROCEDURE{WINAPI}(texunit: Enum; coord: Enum; pname: Enum; params: PFloat);
-	TglGetMultiTexGenivEXT* = PROCEDURE{WINAPI}(texunit: Enum; coord: Enum; pname: Enum; params: Pint);
+	TglGetMultiTexGenivEXT* = PROCEDURE{WINAPI}(texunit: Enum; coord: Enum; pname: Enum; params: PInt);
 	TglGetFloatIndexedvEXT* = PROCEDURE{WINAPI}(target: Enum; index: Uint; data: PFloat);
 	TglGetDoubleIndexedvEXT* = PROCEDURE{WINAPI}(target: Enum; index: Uint; data: PDouble);
 	TglGetPointerIndexedvEXT* = PROCEDURE{WINAPI}(target: Enum; index: Uint; data: PPVoid);
@@ -2637,25 +2628,25 @@ TYPE
 	TglNamedProgramLocalParameter4fvEXT* = PROCEDURE{WINAPI}(xprogram: Uint; target: Enum; index: Uint;  params: PFloat);
 	TglGetNamedProgramLocalParameterdvEXT* = PROCEDURE{WINAPI}(xprogram: Uint; target: Enum; index: Uint; params: PDouble);
 	TglGetNamedProgramLocalParameterfvEXT* = PROCEDURE{WINAPI}(xprogram: Uint; target: Enum; index: Uint; params: PFloat);
-	TglGetNamedProgramivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; target: Enum; pname: Enum; params: Pint);
+	TglGetNamedProgramivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; target: Enum; pname: Enum; params: PInt);
 	TglGetNamedProgramStringEXT* = PROCEDURE{WINAPI}(xprogram: Uint; target: Enum; pname: Enum; xstring: PVoid);
 	TglNamedProgramLocalParameters4fvEXT* = PROCEDURE{WINAPI}(xprogram: Uint; target: Enum; index: Uint; count: Sizei;  params: PFloat);
 	TglNamedProgramLocalParameterI4iEXT* = PROCEDURE{WINAPI}(xprogram: Uint; target: Enum; index: Uint; x: Int; y: Int; z: Int; w: Int);
-	TglNamedProgramLocalParameterI4ivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; target: Enum; index: Uint;  params: Pint);
-	TglNamedProgramLocalParametersI4ivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; target: Enum; index: Uint; count: Sizei;  params: Pint);
+	TglNamedProgramLocalParameterI4ivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; target: Enum; index: Uint;  params: PInt);
+	TglNamedProgramLocalParametersI4ivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; target: Enum; index: Uint; count: Sizei;  params: PInt);
 	TglNamedProgramLocalParameterI4uiEXT* = PROCEDURE{WINAPI}(xprogram: Uint; target: Enum; index: Uint; x: Uint; y: Uint; z: Uint; w: Uint);
-	TglNamedProgramLocalParameterI4uivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; target: Enum; index: Uint;  params: PInt);
-	TglNamedProgramLocalParametersI4uivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; target: Enum; index: Uint; count: Sizei;  params: PInt);
-	TglGetNamedProgramLocalParameterIivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; target: Enum; index: Uint; params: Pint);
-	TglGetNamedProgramLocalParameterIuivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; target: Enum; index: Uint; params: PInt);
-	TglTextureParameterIivEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum;  params: Pint);
-	TglTextureParameterIuivEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum;  params: PInt);
-	TglGetTextureParameterIivEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum; params: Pint);
-	TglGetTextureParameterIuivEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum; params: PInt);
-	TglMultiTexParameterIivEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum;  params: Pint);
-	TglMultiTexParameterIuivEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum;  params: PInt);
-	TglGetMultiTexParameterIivEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum; params: Pint);
-	TglGetMultiTexParameterIuivEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum; params: PInt);
+	TglNamedProgramLocalParameterI4uivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; target: Enum; index: Uint;  params: PUint);
+	TglNamedProgramLocalParametersI4uivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; target: Enum; index: Uint; count: Sizei;  params: PUint);
+	TglGetNamedProgramLocalParameterIivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; target: Enum; index: Uint; params: PInt);
+	TglGetNamedProgramLocalParameterIuivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; target: Enum; index: Uint; params: PUint);
+	TglTextureParameterIivEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum;  params: PInt);
+	TglTextureParameterIuivEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum;  params: PUint);
+	TglGetTextureParameterIivEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum; params: PInt);
+	TglGetTextureParameterIuivEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum; params: PUint);
+	TglMultiTexParameterIivEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum;  params: PInt);
+	TglMultiTexParameterIuivEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum;  params: PUint);
+	TglGetMultiTexParameterIivEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum; params: PInt);
+	TglGetMultiTexParameterIuivEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; pname: Enum; params: PUint);
 	TglProgramUniform1fEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; v0: Float);
 	TglProgramUniform2fEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; v0: Float; v1: Float);
 	TglProgramUniform3fEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; v0: Float; v1: Float; v2: Float);
@@ -2668,10 +2659,10 @@ TYPE
 	TglProgramUniform2fvEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PFloat);
 	TglProgramUniform3fvEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PFloat);
 	TglProgramUniform4fvEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PFloat);
-	TglProgramUniform1ivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: Pint);
-	TglProgramUniform2ivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: Pint);
-	TglProgramUniform3ivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: Pint);
-	TglProgramUniform4ivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: Pint);
+	TglProgramUniform1ivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
+	TglProgramUniform2ivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
+	TglProgramUniform3ivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
+	TglProgramUniform4ivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
 	TglProgramUniformMatrix2fvEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei; transpose: Boolean;  value: PFloat);
 	TglProgramUniformMatrix3fvEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei; transpose: Boolean;  value: PFloat);
 	TglProgramUniformMatrix4fvEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei; transpose: Boolean;  value: PFloat);
@@ -2685,10 +2676,10 @@ TYPE
 	TglProgramUniform2uiEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; v0: Uint; v1: Uint);
 	TglProgramUniform3uiEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; v0: Uint; v1: Uint; v2: Uint);
 	TglProgramUniform4uiEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; v0: Uint; v1: Uint; v2: Uint; v3: Uint);
-	TglProgramUniform1uivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
-	TglProgramUniform2uivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
-	TglProgramUniform3uivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
-	TglProgramUniform4uivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt);
+	TglProgramUniform1uivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PUint);
+	TglProgramUniform2uivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PUint);
+	TglProgramUniform3uivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PUint);
+	TglProgramUniform4uivEXT* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PUint);
 	TglNamedBufferDataEXT* = PROCEDURE{WINAPI}(buffer: Uint; size: Sizei;  data: PVoid; usage: Enum);
 	TglNamedBufferSubDataEXT* = PROCEDURE{WINAPI}(buffer: Uint; offset: Intptr; size: Sizeiptr;  data: PVoid);
 	TglMapNamedBufferEXT* = PROCEDURE{WINAPI}(buffer: Uint; access: Enum): PVoid;
@@ -2696,25 +2687,25 @@ TYPE
 	TglMapNamedBufferRangeEXT* = PROCEDURE{WINAPI}(buffer: Uint; offset: Intptr; length: Sizeiptr; access: Bitfield): PVoid;
 	TglFlushMappedNamedBufferRangeEXT* = PROCEDURE{WINAPI}(buffer: Uint; offset: Intptr; length: Sizeiptr);
 	TglNamedCopyBufferSubDataEXT* = PROCEDURE{WINAPI}(readBuffer: Uint; writeBuffer: Uint; readOffset: Intptr; writeOffset: Intptr; size: Sizeiptr);
-	TglGetNamedBufferParameterivEXT* = PROCEDURE{WINAPI}(buffer: Uint; pname: Enum; params: Pint);
+	TglGetNamedBufferParameterivEXT* = PROCEDURE{WINAPI}(buffer: Uint; pname: Enum; params: PInt);
 	TglGetNamedBufferPointervEXT* = PROCEDURE{WINAPI}(buffer: Uint; pname: Enum; params: PPVoid);
 	TglGetNamedBufferSubDataEXT* = PROCEDURE{WINAPI}(buffer: Uint; offset: Intptr; size: Sizeiptr; data: PVoid);
 	TglTextureBufferEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum; internalformat: Enum; buffer: Uint);
 	TglMultiTexBufferEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum; interformat: Enum; buffer: Uint);
 	TglNamedRenderbufferStorageEXT* = PROCEDURE{WINAPI}(renderbuffer: Uint; interformat: Enum; width: Sizei; height: Sizei);
-	TglGetNamedRenderbufferParameterivEXT* = PROCEDURE{WINAPI}(renderbuffer: Uint; pname: Enum; params: Pint);
+	TglGetNamedRenderbufferParameterivEXT* = PROCEDURE{WINAPI}(renderbuffer: Uint; pname: Enum; params: PInt);
 	TglCheckNamedFramebufferStatusEXT* = PROCEDURE{WINAPI}(framebuffer: Uint; target: Enum): Enum;
 	TglNamedFramebufferTexture1DEXT* = PROCEDURE{WINAPI}(framebuffer: Uint; attachment: Enum; textarget: Enum; texture: Uint; level: Int);
 	TglNamedFramebufferTexture2DEXT* = PROCEDURE{WINAPI}(framebuffer: Uint; attachment: Enum; textarget: Enum; texture: Uint; level: Int);
 	TglNamedFramebufferTexture3DEXT* = PROCEDURE{WINAPI}(framebuffer: Uint; attachment: Enum; textarget: Enum; texture: Uint; level: Int; zoffset: Int);
 	TglNamedFramebufferRenderbufferEXT* = PROCEDURE{WINAPI}(framebuffer: Uint; attachment: Enum; renderbuffertarget: Enum; renderbuffer: Uint);
-	TglGetNamedFramebufferAttachmentParameterivEXT* = PROCEDURE{WINAPI}(framebuffer: Uint; attachment: Enum; pname: Enum; params: Pint);
+	TglGetNamedFramebufferAttachmentParameterivEXT* = PROCEDURE{WINAPI}(framebuffer: Uint; attachment: Enum; pname: Enum; params: PInt);
 	TglGenerateTextureMipmapEXT* = PROCEDURE{WINAPI}(texture: Uint; target: Enum);
 	TglGenerateMultiTexMipmapEXT* = PROCEDURE{WINAPI}(texunit: Enum; target: Enum);
 	TglFramebufferDrawBufferEXT* = PROCEDURE{WINAPI}(framebuffer: Uint; mode: Enum);
 	TglFramebufferDrawBuffersEXT* = PROCEDURE{WINAPI}(framebuffer: Uint; n: Sizei;  bufs: PEnum);
 	TglFramebufferReadBufferEXT* = PROCEDURE{WINAPI}(framebuffer: Uint; mode: Enum);
-	TglGetFramebufferParameterivEXT* = PROCEDURE{WINAPI}(framebuffer: Uint; pname: Enum; params: Pint);
+	TglGetFramebufferParameterivEXT* = PROCEDURE{WINAPI}(framebuffer: Uint; pname: Enum; params: PInt);
 	TglNamedRenderbufferStorageMultisampleEXT* = PROCEDURE{WINAPI}(renderbuffer: Uint; samples: Sizei; internalformat: Enum; width: Sizei; height: Sizei);
 	TglNamedRenderbufferStorageMultisampleCoverageEXT* = PROCEDURE{WINAPI}(renderbuffer: Uint; coverageSamples: Sizei; colorSamples: Sizei; internalformat: Enum; width: Sizei; height: Sizei);
 	TglNamedFramebufferTextureEXT* = PROCEDURE{WINAPI}(framebuffer: Uint; attachment: Enum; texture: Uint; level: Int);
@@ -2759,7 +2750,7 @@ TYPE
 	TglGetVertexAttribLdvEXT* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: PDouble);
 	TglVertexArrayVertexAttribLOffsetEXT* = PROCEDURE{WINAPI}(vaobj: Uint; buffer: Uint; index: Uint; size: Int; xtype: Enum; stride: Sizei; offset: Intptr);
 	(*  GL_IBM_multimode_draw_arrays  *)
-	TglMultiModeDrawArraysIBM* = PROCEDURE{WINAPI}(mode: Enum; first: Pint; count: PSizei; primcount: Sizei; modestride: Int);
+	TglMultiModeDrawArraysIBM* = PROCEDURE{WINAPI}(mode: Enum; first: PInt; count: PSizei; primcount: Sizei; modestride: Int);
 	TglMultiModeDrawElementsIBM* = PROCEDURE{WINAPI}(mode: PEnum; count: PSizei; xtype:  Enum; indices: PVoid; primcount: Sizei; modestride: Int);
 	(*  GL_IBM_vertex_array_lists  *)
 	TglColorPointerListIBM* = PROCEDURE{WINAPI}(size: Int; xtype:  Enum; stride: Int; xpointer: PVoid; ptrstride: Int);
@@ -2785,7 +2776,7 @@ TYPE
 	TglWindowPos2fMESA* = PROCEDURE{WINAPI}(x: Float; y: Float);
 	TglWindowPos2fvMESA* = PROCEDURE{WINAPI}( v: PFloat);
 	TglWindowPos2iMESA* = PROCEDURE{WINAPI}(x: Int; y: Int);
-	TglWindowPos2ivMESA* = PROCEDURE{WINAPI}( v: Pint);
+	TglWindowPos2ivMESA* = PROCEDURE{WINAPI}( v: PInt);
 	TglWindowPos2sMESA* = PROCEDURE{WINAPI}(x: Short; y: Short);
 	TglWindowPos2svMESA* = PROCEDURE{WINAPI}( v: PShort);
 	TglWindowPos3dMESA* = PROCEDURE{WINAPI}(x: Double; y: Double; z: Double);
@@ -2793,7 +2784,7 @@ TYPE
 	TglWindowPos3fMESA* = PROCEDURE{WINAPI}(x: Float; y: Float; z: Float);
 	TglWindowPos3fvMESA* = PROCEDURE{WINAPI}( v: PFloat);
 	TglWindowPos3iMESA* = PROCEDURE{WINAPI}(x: Int; y: Int; z: Int);
-	TglWindowPos3ivMESA* = PROCEDURE{WINAPI}( v: Pint);
+	TglWindowPos3ivMESA* = PROCEDURE{WINAPI}( v: PInt);
 	TglWindowPos3sMESA* = PROCEDURE{WINAPI}(x: Short; y: Short; z: Short);
 	TglWindowPos3svMESA* = PROCEDURE{WINAPI}( v: PShort);
 	TglWindowPos4dMESA* = PROCEDURE{WINAPI}(x: Double; y: Double; z: Double; w: Double);
@@ -2801,25 +2792,25 @@ TYPE
 	TglWindowPos4fMESA* = PROCEDURE{WINAPI}(x: Float; y: Float; z: Float; w: Float);
 	TglWindowPos4fvMESA* = PROCEDURE{WINAPI}( v: PFloat);
 	TglWindowPos4iMESA* = PROCEDURE{WINAPI}(x: Int; y: Int; z: Int; w: Int);
-	TglWindowPos4ivMESA* = PROCEDURE{WINAPI}( v: Pint);
+	TglWindowPos4ivMESA* = PROCEDURE{WINAPI}( v: PInt);
 	TglWindowPos4sMESA* = PROCEDURE{WINAPI}(x: Short; y: Short; z: Short; w: Short);
 	TglWindowPos4svMESA* = PROCEDURE{WINAPI}( v: PShort);
 	(* GL_NV_evaluators  *)
 	TglMapControlPointsNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; xtype: Enum; ustride: Sizei; vstride: Sizei; uorder: Int; vorder: Int; packed: Boolean;  points: PVoid);
-	TglMapParameterivNV* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: Pint);
+	TglMapParameterivNV* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: PInt);
 	TglMapParameterfvNV* = PROCEDURE{WINAPI}(target: Enum; pname: Enum;  params: PFloat);
 	TglGetMapControlPointsNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; xtype: Enum; ustride: Sizei; vstride: Sizei; packed: Boolean; points: PVoid);
-	TglGetMapParameterivNV* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint);
+	TglGetMapParameterivNV* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
 	TglGetMapParameterfvNV* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PFloat);
-	TglGetMapAttribParameterivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; pname: Enum; params: Pint);
+	TglGetMapAttribParameterivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; pname: Enum; params: PInt);
 	TglGetMapAttribParameterfvNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; pname: Enum; params: PFloat);
 	TglEvalMapsNV* = PROCEDURE{WINAPI}(target: Enum; mode: Enum);
 	(* GL_NV_fence  *)
-	TglDeleteFencesNV* = PROCEDURE{WINAPI}(n: Sizei;  fences: PInt);
-	TglGenFencesNV* = PROCEDURE{WINAPI}(n: Sizei; fences: PInt);
+	TglDeleteFencesNV* = PROCEDURE{WINAPI}(n: Sizei;  fences: PUint);
+	TglGenFencesNV* = PROCEDURE{WINAPI}(n: Sizei; fences: PUint);
 	TglIsFenceNV* = PROCEDURE{WINAPI}(fence: Uint): Boolean;
 	TglTestFenceNV* = PROCEDURE{WINAPI}(fence: Uint): Boolean;
-	TglGetFenceivNV* = PROCEDURE{WINAPI}(fence: Uint; pname: Enum; params: Pint);
+	TglGetFenceivNV* = PROCEDURE{WINAPI}(fence: Uint; pname: Enum; params: PInt);
 	TglFinishFenceNV* = PROCEDURE{WINAPI}(fence: Uint);
 	TglSetFenceNV* = PROCEDURE{WINAPI}(fence: Uint; condition: Enum);
 	(* GL_NV_fragment_program  *)
@@ -2877,36 +2868,36 @@ TYPE
 	TglVertexAttribs3hvNV* = PROCEDURE{WINAPI}(index: Uint; n: Sizei;  v: PHalfNV);
 	TglVertexAttribs4hvNV* = PROCEDURE{WINAPI}(index: Uint; n: Sizei;  v: PHalfNV);
 	(* GL_NV_occlusion_query  *)
-	TglGenOcclusionQueriesNV* = PROCEDURE{WINAPI}(n: Sizei; ids: PInt);
-	TglDeleteOcclusionQueriesNV* = PROCEDURE{WINAPI}(n: Sizei;  ids: PInt);
+	TglGenOcclusionQueriesNV* = PROCEDURE{WINAPI}(n: Sizei; ids: PUint);
+	TglDeleteOcclusionQueriesNV* = PROCEDURE{WINAPI}(n: Sizei;  ids: PUint);
 	TglIsOcclusionQueryNV* = PROCEDURE{WINAPI}(id: Uint): Boolean;
 	TglBeginOcclusionQueryNV* = PROCEDURE{WINAPI}(id: Uint);
 	TglEndOcclusionQueryNV* = PROCEDURE{WINAPI}();
-	TglGetOcclusionQueryivNV* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: Pint);
-	TglGetOcclusionQueryuivNV* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: PInt);
+	TglGetOcclusionQueryivNV* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: PInt);
+	TglGetOcclusionQueryuivNV* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: PUint);
 	(* GL_NV_pixel_data_range  *)
 	TglPixelDataRangeNV* = PROCEDURE{WINAPI}(target: Enum; length: Sizei; xpointer: PVoid);
 	TglFlushPixelDataRangeNV* = PROCEDURE{WINAPI}(target: Enum);
 	(* GL_NV_point_sprite  *)
 	TglPointParameteriNV* = PROCEDURE{WINAPI}(pname: Enum; param: Int);
-	TglPointParameterivNV* = PROCEDURE{WINAPI}(pname: Enum;  params: Pint);
+	TglPointParameterivNV* = PROCEDURE{WINAPI}(pname: Enum;  params: PInt);
 	(* GL_NV_primitive_restart  *)
 	TglPrimitiveRestartNV* = PROCEDURE{WINAPI}();
 	TglPrimitiveRestartIndexNV* = PROCEDURE{WINAPI}(index: Uint);
 	(* GL_NV_register_combiners  *)
 	TglCombinerParameterfvNV* = PROCEDURE{WINAPI}(pname: Enum;  params: PFloat);
 	TglCombinerParameterfNV* = PROCEDURE{WINAPI}(pname: Enum; param: Float);
-	TglCombinerParameterivNV* = PROCEDURE{WINAPI}(pname: Enum;  params: Pint);
+	TglCombinerParameterivNV* = PROCEDURE{WINAPI}(pname: Enum;  params: PInt);
 	TglCombinerParameteriNV* = PROCEDURE{WINAPI}(pname: Enum; param: Int);
 	TglCombinerInputNV* = PROCEDURE{WINAPI}(stage: Enum; portion: Enum; variable: Enum; input: Enum; mapping: Enum; componentUsage: Enum);
 	TglCombinerOutputNV* = PROCEDURE{WINAPI}(stage: Enum; portion: Enum; abOutput: Enum; cdOutput: Enum; sumOutput: Enum; scale: Enum; bias: Enum; abDotProduct: Boolean; cdDotProduct: Boolean; muxSum: Boolean);
 	TglFinalCombinerInputNV* = PROCEDURE{WINAPI}(variable: Enum; input: Enum; mapping: Enum; componentUsage: Enum);
 	TglGetCombinerInputParameterfvNV* = PROCEDURE{WINAPI}(stage: Enum; portion: Enum; variable: Enum; pname: Enum; params: PFloat);
-	TglGetCombinerInputParameterivNV* = PROCEDURE{WINAPI}(stage: Enum; portion: Enum; variable: Enum; pname: Enum; params: Pint);
+	TglGetCombinerInputParameterivNV* = PROCEDURE{WINAPI}(stage: Enum; portion: Enum; variable: Enum; pname: Enum; params: PInt);
 	TglGetCombinerOutputParameterfvNV* = PROCEDURE{WINAPI}(stage: Enum; portion: Enum; pname: Enum; params: PFloat);
-	TglGetCombinerOutputParameterivNV* = PROCEDURE{WINAPI}(stage: Enum; portion: Enum; pname: Enum; params: Pint);
+	TglGetCombinerOutputParameterivNV* = PROCEDURE{WINAPI}(stage: Enum; portion: Enum; pname: Enum; params: PInt);
 	TglGetFinalCombinerInputParameterfvNV* = PROCEDURE{WINAPI}(variable: Enum; pname: Enum; params: PFloat);
-	TglGetFinalCombinerInputParameterivNV* = PROCEDURE{WINAPI}(variable: Enum; pname: Enum; params: Pint);
+	TglGetFinalCombinerInputParameterivNV* = PROCEDURE{WINAPI}(variable: Enum; pname: Enum; params: PInt);
 	(* GL_NV_register_combiners2 *)
 	TglCombinerStageParameterfvNV* = PROCEDURE{WINAPI}(stage: Enum; pname: Enum;  params: PFloat);
 	TglGetCombinerStageParameterfvNV* = PROCEDURE{WINAPI}(stage: Enum; pname: Enum; params: PFloat);
@@ -2914,19 +2905,19 @@ TYPE
 	TglFlushVertexArrayRangeNV* = PROCEDURE{WINAPI}();
 	TglVertexArrayRangeNV* = PROCEDURE{WINAPI}(length: Sizei;  xpointer: PVoid);
 	(* GL_NV_vertex_program  *)
-	TglAreProgramsResidentNV* = PROCEDURE{WINAPI}(n: Sizei;  programs: PInt; residences: PBoolean): Boolean;
+	TglAreProgramsResidentNV* = PROCEDURE{WINAPI}(n: Sizei;  programs: PUint; residences: PBoolean): Boolean;
 	TglBindProgramNV* = PROCEDURE{WINAPI}(target: Enum; id: Uint);
-	TglDeleteProgramsNV* = PROCEDURE{WINAPI}(n: Sizei;  programs: PInt);
+	TglDeleteProgramsNV* = PROCEDURE{WINAPI}(n: Sizei;  programs: PUint);
 	TglExecuteProgramNV* = PROCEDURE{WINAPI}(target: Enum; id: Uint;  params: PFloat);
-	TglGenProgramsNV* = PROCEDURE{WINAPI}(n: Sizei; programs: PInt);
+	TglGenProgramsNV* = PROCEDURE{WINAPI}(n: Sizei; programs: PUint);
 	TglGetProgramParameterdvNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; pname: Enum; params: PDouble);
 	TglGetProgramParameterfvNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; pname: Enum; params: PFloat);
-	TglGetProgramivNV* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: Pint);
+	TglGetProgramivNV* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; params: PInt);
 	TglGetProgramStringNV* = PROCEDURE{WINAPI}(id: Uint; pname: Enum; xprogram: PUbyte);
-	TglGetTrackMatrixivNV* = PROCEDURE{WINAPI}(target: Enum; address: Uint; pname: Enum; params: Pint);
+	TglGetTrackMatrixivNV* = PROCEDURE{WINAPI}(target: Enum; address: Uint; pname: Enum; params: PInt);
 	TglGetVertexAttribdvNV* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: PDouble);
 	TglGetVertexAttribfvNV* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: PFloat);
-	TglGetVertexAttribivNV* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: Pint);
+	TglGetVertexAttribivNV* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: PInt);
 	TglGetVertexAttribPointervNV* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; xpointer: PVoid);
 	TglIsProgramNV* = PROCEDURE{WINAPI}(id: Uint): Boolean;
 	TglLoadProgramNV* = PROCEDURE{WINAPI}(target: Enum; id: Uint; len: Sizei;  xprogram: PUbyte);
@@ -2936,7 +2927,7 @@ TYPE
 	TglProgramParameter4fvNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint;  v: PFloat);
 	TglProgramParameters4dvNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; count: Uint;  v: PDouble);
 	TglProgramParameters4fvNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; count: Uint;  v: PFloat);
-	TglRequestResidentProgramsNV* = PROCEDURE{WINAPI}(n: Sizei;  programs: PInt);
+	TglRequestResidentProgramsNV* = PROCEDURE{WINAPI}(n: Sizei;  programs: PUint);
 	TglTrackMatrixNV* = PROCEDURE{WINAPI}(target: Enum; address: Uint; matrix: Enum; transform: Enum);
 	TglVertexAttribPointerNV* = PROCEDURE{WINAPI}(index: Uint; fsize: Int; xtype: Enum; stride: Sizei;  xpointer: PVoid);
 	TglVertexAttrib1dNV* = PROCEDURE{WINAPI}(index: Uint; x: Double);
@@ -2988,25 +2979,25 @@ TYPE
 	TglProgramVertexLimitNV* = PROCEDURE{WINAPI}(target: Enum; limit: Int);
 	(* GL_NV_gpu_program4  *)
 	TglProgramLocalParameterI4iNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; x: Int; y: Int; z: Int; w: Int);
-	TglProgramLocalParameterI4ivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint;  params: Pint);
-	TglProgramLocalParametersI4ivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; count: Sizei;  params: Pint);
+	TglProgramLocalParameterI4ivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint;  params: PInt);
+	TglProgramLocalParametersI4ivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; count: Sizei;  params: PInt);
 	TglProgramLocalParameterI4uiNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; x: Uint; y: Uint; z: Uint; w: Uint);
-	TglProgramLocalParameterI4uivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint;  params: PInt);
-	TglProgramLocalParametersI4uivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; count: Sizei;  params: PInt);
+	TglProgramLocalParameterI4uivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint;  params: PUint);
+	TglProgramLocalParametersI4uivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; count: Sizei;  params: PUint);
 	TglProgramEnvParameterI4iNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; x: Int; y: Int; z: Int; w: Int);
-	TglProgramEnvParameterI4ivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint;  params: Pint);
-	TglProgramEnvParametersI4ivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; count: Sizei;  params: Pint);
+	TglProgramEnvParameterI4ivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint;  params: PInt);
+	TglProgramEnvParametersI4ivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; count: Sizei;  params: PInt);
 	TglProgramEnvParameterI4uiNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; x: Uint; y: Uint; z: Uint; w: Uint);
-	TglProgramEnvParameterI4uivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint;  params: PInt);
-	TglProgramEnvParametersI4uivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; count: Sizei;  params: PInt);
-	TglGetProgramLocalParameterIivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; params: Pint);
-	TglGetProgramLocalParameterIuivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; params: PInt);
-	TglGetProgramEnvParameterIivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; params: Pint);
-	TglGetProgramEnvParameterIuivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; params: PInt);
+	TglProgramEnvParameterI4uivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint;  params: PUint);
+	TglProgramEnvParametersI4uivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; count: Sizei;  params: PUint);
+	TglGetProgramLocalParameterIivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; params: PInt);
+	TglGetProgramLocalParameterIuivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; params: PUint);
+	TglGetProgramEnvParameterIivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; params: PInt);
+	TglGetProgramEnvParameterIuivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; params: PUint);
 	(* GL_NV_parameter_buffer_object  *)
 	TglProgramBufferParametersfvNV* = PROCEDURE{WINAPI}(target: Enum; buffer: Uint; index: Uint; count: Sizei;  params: PFloat);
 	TglProgramBufferParametersIivNV* = PROCEDURE{WINAPI}(target: Enum; buffer: Uint; index: Uint; count: Sizei;  params: Int);
-	TglProgramBufferParametersIuivNV* = PROCEDURE{WINAPI}(target: Enum; buffer: Uint; index: Uint; count: Uint;  params: PInt);
+	TglProgramBufferParametersIuivNV* = PROCEDURE{WINAPI}(target: Enum; buffer: Uint; index: Uint; count: Uint;  params: PUint);
 	(* GL_NV_transform_feedback  *)
 	TglBeginTransformFeedbackNV* = PROCEDURE{WINAPI}(primitiveMode: Enum);
 	TglEndTransformFeedbackNV* = PROCEDURE{WINAPI}();
@@ -3018,27 +3009,27 @@ TYPE
 	TglActiveVaryingNV* = PROCEDURE{WINAPI}(xprogram: Uint;  name: ADDRESS);
 	TglGetVaryingLocationNV* = PROCEDURE{WINAPI}(xprogram: Uint;  name: ADDRESS): Int;
 	TglGetActiveVaryingNV* = PROCEDURE{WINAPI}(xprogram: Uint; index: Uint; bufSize: Sizei; length: PSizei; size: PSizei; xtype: PEnum; name: PChar);
-	TglGetTransformFeedbackVaryingNV* = PROCEDURE{WINAPI}(xprogram: Uint; index: Uint; location: Pint);
-	TglTransformFeedbackStreamAttribsNV* = PROCEDURE{WINAPI}(count: Sizei;  attribs: Pint; nbuffers: Sizei;  bufstreams: Pint; bufferMode: Enum);
+	TglGetTransformFeedbackVaryingNV* = PROCEDURE{WINAPI}(xprogram: Uint; index: Uint; location: PInt);
+	TglTransformFeedbackStreamAttribsNV* = PROCEDURE{WINAPI}(count: Sizei;  attribs: PInt; nbuffers: Sizei;  bufstreams: PInt; bufferMode: Enum);
 	(* GL_NV_conditional_render  *)
 	TglBeginConditionalRenderNV* = PROCEDURE{WINAPI}(id: Uint; mode: Enum);
 	TglEndConditionalRenderNV* = PROCEDURE{WINAPI}();
 	(* GL_NV_present_video  *)
 	TglPresentFrameKeyedNV* = PROCEDURE{WINAPI}(video_slot: Uint; minPresentTime: Uint64EXT; BeginPresentTimeId: Uint; presentDuratioId: Uint; xtype: Enum; target0: Enum; fill0: Uint; key0: Uint; target1: Enum; fill1: Uint; key1: Uint);
 	TglPresentFrameDualFillNV* = PROCEDURE{WINAPI}(video_slot: Uint; minPresentTime: Uint64EXT; BeginPresentTimeId: Uint; presentDurationId: Uint; xtype: Enum; target0: Enum; fill0: Uint; target1: Enum; fill1: Uint; target2: Enum; fill2: Uint; target3: Enum; fill3: Uint);
-	TglGetVideoivNV* = PROCEDURE{WINAPI}(video_slot: Uint; pname: Enum; params: Pint);
-	TglGetVideouivNV* = PROCEDURE{WINAPI}(video_slot: Uint; pname: Enum; params: PInt);
-	TglGetVideoi64vNV* = PROCEDURE{WINAPI}(video_slot: Uint; pname: Enum; params: Pint64EXT);
-	TglGetVideoui64vNV* = PROCEDURE{WINAPI}(video_slot: Uint; pname: Enum; params: PInt64EXT);
-	(*  TglVideoParameterivNV  = PROCEDURE{WINAPI}(video_slot: Uint; pname: Enum;  params: Pint);   *)
+	TglGetVideoivNV* = PROCEDURE{WINAPI}(video_slot: Uint; pname: Enum; params: PInt);
+	TglGetVideouivNV* = PROCEDURE{WINAPI}(video_slot: Uint; pname: Enum; params: PUint);
+	TglGetVideoi64vNV* = PROCEDURE{WINAPI}(video_slot: Uint; pname: Enum; params: PInt64EXT);
+	TglGetVideoui64vNV* = PROCEDURE{WINAPI}(video_slot: Uint; pname: Enum; params: PUint64EXT);
+	(*  TglVideoParameterivNV  = PROCEDURE{WINAPI}(video_slot: Uint; pname: Enum;  params: PInt);   *)
 	(* GL_NV_explicit_multisample  *)
 	TglGetMultisamplefvNV* = PROCEDURE{WINAPI}(pname: Enum; index: Uint; val: PFloat);
 	TglSampleMaskIndexedNV* = PROCEDURE{WINAPI}(index: Uint; mask: Bitfield);
 	TglTexRenderbufferNV* = PROCEDURE{WINAPI}(target: Enum; renderbuffer: Uint);
 	(* GL_NV_transform_feedback2  *)
 	TglBindTransformFeedbackNV* = PROCEDURE{WINAPI}(target: Enum; id: Uint);
-	TglDeleteTransformFeedbacksNV* = PROCEDURE{WINAPI}(n: Sizei; ids: PInt);
-	TglGenTransformFeedbacksNV* = PROCEDURE{WINAPI}(n: Sizei; ids: PInt);
+	TglDeleteTransformFeedbacksNV* = PROCEDURE{WINAPI}(n: Sizei; ids: PUint);
+	TglGenTransformFeedbacksNV* = PROCEDURE{WINAPI}(n: Sizei; ids: PUint);
 	TglIsTransformFeedbackNV* = PROCEDURE{WINAPI}(id: Uint): Boolean;
 	TglPauseTransformFeedbackNV* = PROCEDURE{WINAPI}();
 	TglResumeTransformFeedbackNV* = PROCEDURE{WINAPI}();
@@ -3048,12 +3039,12 @@ TYPE
 	TglBindVideoCaptureStreamBufferNV* = PROCEDURE{WINAPI}(video_capture_slot: Uint; stream: Uint; frame_region: Enum; offset: Sizei);
 	TglBindVideoCaptureStreamTextureNV* = PROCEDURE{WINAPI}(video_capture_slot: Uint; stream: Uint; frame_region: Enum; target: Enum; texture: Uint);
 	TglEndVideoCaptureNV* = PROCEDURE{WINAPI}(video_capture_slot: Uint);
-	TglGetVideoCaptureivNV* = PROCEDURE{WINAPI}(video_capture_slot: Uint; pname: Enum; params: Pint);
-	TglGetVideoCaptureStreamivNV* = PROCEDURE{WINAPI}(video_capture_slot: Uint; stream: Uint; pname: Enum; params: Pint);
+	TglGetVideoCaptureivNV* = PROCEDURE{WINAPI}(video_capture_slot: Uint; pname: Enum; params: PInt);
+	TglGetVideoCaptureStreamivNV* = PROCEDURE{WINAPI}(video_capture_slot: Uint; stream: Uint; pname: Enum; params: PInt);
 	TglGetVideoCaptureStreamfvNV* = PROCEDURE{WINAPI}(video_capture_slot: Uint; stream: Uint; pname: Enum; params: PFloat);
 	TglGetVideoCaptureStreamdvNV* = PROCEDURE{WINAPI}(video_capture_slot: Uint; stream: Uint; pname: Enum; params: PDouble);
-	TglVideoCaptureNV* = PROCEDURE{WINAPI}(video_capture_slot: Uint; sequence_num: PInt; capture_time: PInt64EXT): Enum;
-	TglVideoCaptureStreamParameterivNV* = PROCEDURE{WINAPI}(video_capture_slot: Uint; stream: Uint; pname: Enum;  params: Pint);
+	TglVideoCaptureNV* = PROCEDURE{WINAPI}(video_capture_slot: Uint; sequence_num: PUint; capture_time: PUint64EXT): Enum;
+	TglVideoCaptureStreamParameterivNV* = PROCEDURE{WINAPI}(video_capture_slot: Uint; stream: Uint; pname: Enum;  params: PInt);
 	TglVideoCaptureStreamParameterfvNV* = PROCEDURE{WINAPI}(video_capture_slot: Uint; stream: Uint; pname: Enum;  params: PFloat);
 	TglVideoCaptureStreamParameterdvNV* = PROCEDURE{WINAPI}(video_capture_slot: Uint; stream: Uint; pname: Enum;  params: PDouble);
 	(* GL_NV_copy_image  *)
@@ -3065,14 +3056,14 @@ TYPE
 	TglMakeNamedBufferResidentNV* = PROCEDURE{WINAPI}(buffer: Uint; access: Enum);
 	TglMakeNamedBufferNonResidentNV* = PROCEDURE{WINAPI}(buffer: Uint);
 	TglIsNamedBufferResidentNV* = PROCEDURE{WINAPI}(buffer: Uint): Boolean;
-	TglGetBufferParameterui64vNV* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt64EXT);
-	TglGetNamedBufferParameterui64vNV* = PROCEDURE{WINAPI}(buffer: Uint; pname: Enum; params: PInt64EXT);
-	TglGetIntegerui64vNV* = PROCEDURE{WINAPI}(value: Enum; result: PInt64EXT);
+	TglGetBufferParameterui64vNV* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PUint64EXT);
+	TglGetNamedBufferParameterui64vNV* = PROCEDURE{WINAPI}(buffer: Uint; pname: Enum; params: PUint64EXT);
+	TglGetIntegerui64vNV* = PROCEDURE{WINAPI}(value: Enum; result: PUint64EXT);
 	TglUniformui64NV* = PROCEDURE{WINAPI}(location: Int; value: Uint64EXT);
-	TglUniformui64vNV* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PInt64EXT);
-	TglGetUniformui64vNV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; params: PInt64EXT);
+	TglUniformui64vNV* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PUint64EXT);
+	TglGetUniformui64vNV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; params: PUint64EXT);
 	TglProgramUniformui64NV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; value: Uint64EXT);
-	TglProgramUniformui64vNV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt64EXT);
+	TglProgramUniformui64vNV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PUint64EXT);
 	(* GL_NV_vertex_buffer_unified_memory  *)
 	TglBufferAddressRangeNV* = PROCEDURE{WINAPI}(pname: Enum; index: Uint; adress: Uint64EXT; length: Sizei);
 	TglVertexFormatNV* = PROCEDURE{WINAPI}(size: Int; xtype: Enum; stride: Sizei);
@@ -3085,72 +3076,72 @@ TYPE
 	TglFogCoordFormatNV* = PROCEDURE{WINAPI}(xtype: Enum; stride: Sizei);
 	TglVertexAttribFormatNV* = PROCEDURE{WINAPI}(index: Uint; size: Int; xtype: Enum; normalized: Boolean; stride: Sizei);
 	TglVertexAttribIFormatNV* = PROCEDURE{WINAPI}(index: Uint; size: Int; xtype: Enum; stride: Sizei);
-	TglGetIntegerui64i_vNV* = PROCEDURE{WINAPI}(value: Enum; index: Uint; Result: PInt64EXT);
+	TglGetIntegerui64i_vNV* = PROCEDURE{WINAPI}(value: Enum; index: Uint; Result: PUint64EXT);
 	(* GL_NV_gpu_program5  *)
-	TglProgramSubroutineParametersuivNV* = PROCEDURE{WINAPI}(target: Enum; count: Sizei;  params: PInt);
-	TglGetProgramSubroutineParameteruivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; param: PInt);
+	TglProgramSubroutineParametersuivNV* = PROCEDURE{WINAPI}(target: Enum; count: Sizei;  params: PUint);
+	TglGetProgramSubroutineParameteruivNV* = PROCEDURE{WINAPI}(target: Enum; index: Uint; param: PUint);
 	(*  GL_NV_gpu_shader5  *)
 	TglUniform1i64NV* = PROCEDURE{WINAPI}(location: Int; x: Int64EXT);
 	TglUniform2i64NV* = PROCEDURE{WINAPI}(location: Int; x: Int64EXT; y: Int64EXT);
 	TglUniform3i64NV* = PROCEDURE{WINAPI}(location: Int; x: Int64EXT; y: Int64EXT; z: Int64EXT);
 	TglUniform4i64NV* = PROCEDURE{WINAPI}(location: Int; x: Int64EXT; y: Int64EXT; z: Int64EXT; w: Int64EXT);
-	TglUniform1i64vNV* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: Pint64EXT);
-	TglUniform2i64vNV* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: Pint64EXT);
-	TglUniform3i64vNV* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: Pint64EXT);
-	TglUniform4i64vNV* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: Pint64EXT);
+	TglUniform1i64vNV* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PInt64EXT);
+	TglUniform2i64vNV* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PInt64EXT);
+	TglUniform3i64vNV* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PInt64EXT);
+	TglUniform4i64vNV* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PInt64EXT);
 	TglUniform1ui64NV* = PROCEDURE{WINAPI}(location: Int; x: Uint64EXT);
 	TglUniform2ui64NV* = PROCEDURE{WINAPI}(location: Int; x: Uint64EXT; y: Uint64EXT);
 	TglUniform3ui64NV* = PROCEDURE{WINAPI}(location: Int; x: Uint64EXT; y: Uint64EXT; z: Uint64EXT);
 	TglUniform4ui64NV* = PROCEDURE{WINAPI}(location: Int; x: Uint64EXT; y: Uint64EXT; z: Uint64EXT; w: Uint64EXT);
-	TglUniform1ui64vNV* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PInt64EXT);
-	TglUniform2ui64vNV* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PInt64EXT);
-	TglUniform3ui64vNV* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PInt64EXT);
-	TglUniform4ui64vNV* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PInt64EXT);
-	TglGetUniformi64vNV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; params: Pint64EXT);
+	TglUniform1ui64vNV* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PUint64EXT);
+	TglUniform2ui64vNV* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PUint64EXT);
+	TglUniform3ui64vNV* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PUint64EXT);
+	TglUniform4ui64vNV* = PROCEDURE{WINAPI}(location: Int; count: Sizei;  value: PUint64EXT);
+	TglGetUniformi64vNV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; params: PInt64EXT);
 	TglProgramUniform1i64NV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; x: Int64EXT);
 	TglProgramUniform2i64NV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; x: Int64EXT; y: Int64EXT);
 	TglProgramUniform3i64NV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; x: Int64EXT; y: Int64EXT; z: Int64EXT);
 	TglProgramUniform4i64NV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; x: Int64EXT; y: Int64EXT; z: Int64EXT; w: Int64EXT);
-	TglProgramUniform1i64vNV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: Pint64EXT);
-	TglProgramUniform2i64vNV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: Pint64EXT);
-	TglProgramUniform3i64vNV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: Pint64EXT);
-	TglProgramUniform4i64vNV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: Pint64EXT);
+	TglProgramUniform1i64vNV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt64EXT);
+	TglProgramUniform2i64vNV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt64EXT);
+	TglProgramUniform3i64vNV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt64EXT);
+	TglProgramUniform4i64vNV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt64EXT);
 	TglProgramUniform1ui64NV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; x: Uint64EXT);
 	TglProgramUniform2ui64NV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; x: Uint64EXT; y: Uint64EXT);
 	TglProgramUniform3ui64NV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; x: Uint64EXT; y: Uint64EXT; z: Uint64EXT);
 	TglProgramUniform4ui64NV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; x: Uint64EXT; y: Uint64EXT; z: Uint64EXT; w: Uint64EXT);
-	TglProgramUniform1ui64vNV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt64EXT);
-	TglProgramUniform2ui64vNV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt64EXT);
-	TglProgramUniform3ui64vNV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt64EXT);
-	TglProgramUniform4ui64vNV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PInt64EXT);
+	TglProgramUniform1ui64vNV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PUint64EXT);
+	TglProgramUniform2ui64vNV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PUint64EXT);
+	TglProgramUniform3ui64vNV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PUint64EXT);
+	TglProgramUniform4ui64vNV* = PROCEDURE{WINAPI}(xprogram: Uint; location: Int; count: Sizei;  value: PUint64EXT);
 	(* GL_NV_vertex_attrib_integer_64bit  *)
 	TglVertexAttribL1i64NV* = PROCEDURE{WINAPI}(index: Uint; x: Int64EXT);
 	TglVertexAttribL2i64NV* = PROCEDURE{WINAPI}(index: Uint; x: Int64EXT; y: Int64EXT);
 	TglVertexAttribL3i64NV* = PROCEDURE{WINAPI}(index: Uint; x: Int64EXT; y: Int64EXT; z: Int64EXT);
 	TglVertexAttribL4i64NV* = PROCEDURE{WINAPI}(index: Uint; x: Int64EXT; y: Int64EXT; z: Int64EXT; w: Int64EXT);
-	TglVertexAttribL1i64vNV* = PROCEDURE{WINAPI}(index: Uint;  v: Pint64EXT);
-	TglVertexAttribL2i64vNV* = PROCEDURE{WINAPI}(index: Uint;  v: Pint64EXT);
-	TglVertexAttribL3i64vNV* = PROCEDURE{WINAPI}(index: Uint;  v: Pint64EXT);
-	TglVertexAttribL4i64vNV* = PROCEDURE{WINAPI}(index: Uint;  v: Pint64EXT);
+	TglVertexAttribL1i64vNV* = PROCEDURE{WINAPI}(index: Uint;  v: PInt64EXT);
+	TglVertexAttribL2i64vNV* = PROCEDURE{WINAPI}(index: Uint;  v: PInt64EXT);
+	TglVertexAttribL3i64vNV* = PROCEDURE{WINAPI}(index: Uint;  v: PInt64EXT);
+	TglVertexAttribL4i64vNV* = PROCEDURE{WINAPI}(index: Uint;  v: PInt64EXT);
 	TglVertexAttribL1ui64NV* = PROCEDURE{WINAPI}(index: Uint; x: Uint64EXT);
 	TglVertexAttribL2ui64NV* = PROCEDURE{WINAPI}(index: Uint; x: Uint64EXT; y: Uint64EXT);
 	TglVertexAttribL3ui64NV* = PROCEDURE{WINAPI}(index: Uint; x: Uint64EXT; y: Uint64EXT; z: Uint64EXT);
 	TglVertexAttribL4ui64NV* = PROCEDURE{WINAPI}(index: Uint; x: Uint64EXT; y: Uint64EXT; z: Uint64EXT; w: Uint64EXT);
-	TglVertexAttribL1ui64vNV* = PROCEDURE{WINAPI}(index: Uint;  v: PInt64EXT);
-	TglVertexAttribL2ui64vNV* = PROCEDURE{WINAPI}(index: Uint;  v: PInt64EXT);
-	TglVertexAttribL3ui64vNV* = PROCEDURE{WINAPI}(index: Uint;  v: PInt64EXT);
-	TglVertexAttribL4ui64vNV* = PROCEDURE{WINAPI}(index: Uint;  v: PInt64EXT);
-	TglGetVertexAttribLi64vNV* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: Pint64EXT);
-	TglGetVertexAttribLui64vNV* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: PInt64EXT);
+	TglVertexAttribL1ui64vNV* = PROCEDURE{WINAPI}(index: Uint;  v: PUint64EXT);
+	TglVertexAttribL2ui64vNV* = PROCEDURE{WINAPI}(index: Uint;  v: PUint64EXT);
+	TglVertexAttribL3ui64vNV* = PROCEDURE{WINAPI}(index: Uint;  v: PUint64EXT);
+	TglVertexAttribL4ui64vNV* = PROCEDURE{WINAPI}(index: Uint;  v: PUint64EXT);
+	TglGetVertexAttribLi64vNV* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: PInt64EXT);
+	TglGetVertexAttribLui64vNV* = PROCEDURE{WINAPI}(index: Uint; pname: Enum; params: PUint64EXT);
 	TglVertexAttribLFormatNV* = PROCEDURE{WINAPI}(index: Uint; size: Int; xtype: Enum; stride: Sizei);
 	(* GL_NV_vdpau_interop  *)
 	TglVDPAUInitNV* = PROCEDURE{WINAPI}( vdpDevice: PVoid;  getProcAddress: PVoid);
 	TglVDPAUFiniNV* = PROCEDURE{WINAPI};
-	TglVDPAURegisterVideoSurfaceNV* = PROCEDURE{WINAPI}(vdpSurface: PVoid; target: Enum; numTextureNames: Sizei;  textureNames: PInt): GLvdpauSurfaceNV;
-	TglVDPAURegisterOutputSurfaceNV* = PROCEDURE{WINAPI}(vdpSurface: PVoid; target: Enum; numTextureNames: Sizei;  textureNames: PInt): GLvdpauSurfaceNV;
+	TglVDPAURegisterVideoSurfaceNV* = PROCEDURE{WINAPI}(vdpSurface: PVoid; target: Enum; numTextureNames: Sizei;  textureNames: PUint): GLvdpauSurfaceNV;
+	TglVDPAURegisterOutputSurfaceNV* = PROCEDURE{WINAPI}(vdpSurface: PVoid; target: Enum; numTextureNames: Sizei;  textureNames: PUint): GLvdpauSurfaceNV;
 	TglVDPAUIsSurfaceNV* = PROCEDURE{WINAPI}(surface: GLvdpauSurfaceNV);
 	TglVDPAUUnregisterSurfaceNV* = PROCEDURE{WINAPI}(surface: GLvdpauSurfaceNV);
-	TglVDPAUGetSurfaceivNV* = PROCEDURE{WINAPI}(surface: GLvdpauSurfaceNV; pname: Enum; bufSize: Sizei; length: PSizei; values: Pint);
+	TglVDPAUGetSurfaceivNV* = PROCEDURE{WINAPI}(surface: GLvdpauSurfaceNV; pname: Enum; bufSize: Sizei; length: PSizei; values: PInt);
 	TglVDPAUSurfaceAccessNV* = PROCEDURE{WINAPI}(surface: GLvdpauSurfaceNV; access: Enum);
 	TglVDPAUMapSurfacesNV* = PROCEDURE{WINAPI}(numSurfaces: Sizei;  surfaces: PGLvdpauSurfaceNV);
 	TglVDPAUUnmapSurfacesNV* = PROCEDURE{WINAPI}(numSurface: Sizei;  surfaces: PGLvdpauSurfaceNV);
@@ -3168,11 +3159,11 @@ TYPE
 	TglPathStringNV* = PROCEDURE{WINAPI}(path : Uint; format : Enum; length : Sizei;  pathString : PVoid);
 	TglPathGlyphsNV* = PROCEDURE{WINAPI}(firstPathName : Uint; fontTarget : Enum;  fontName : PVoid; fontStyle : Bitfield; numGlyphs : Sizei; type_ : Enum;  charcodes : PVoid; handleMissingGlyphs : Enum; pathParameterTemplate : Uint; emScale : Float);
 	TglPathGlyphRangeNV* = PROCEDURE{WINAPI}(firstPathName : Uint; fontTarget : Enum;  fontName : PVoid; fontStyle : Bitfield; firstGlyph : Uint; numGlyphs : Sizei; handleMissingGlyphs : Enum; pathParameterTemplate : Uint; emScale : Float);
-	TglWeightPathsNV* = PROCEDURE{WINAPI}(resultPath : Uint; numPaths : Sizei;  paths : PInt;  weights : PFloat);
+	TglWeightPathsNV* = PROCEDURE{WINAPI}(resultPath : Uint; numPaths : Sizei;  paths : PUint;  weights : PFloat);
 	TglCopyPathNV* = PROCEDURE{WINAPI}(resultPath : Uint; srcPath : Uint);
 	TglInterpolatePathsNV* = PROCEDURE{WINAPI}(resultPath : Uint; pathA : Uint; pathB : Uint; weight : Float);
 	TglTransformPathNV* = PROCEDURE{WINAPI}(resultPath : Uint; srcPath : Uint; transformType : Enum;  transformValues : PFloat);
-	TglPathParameterivNV* = PROCEDURE{WINAPI}(path : Uint; pname : Enum;  value : Pint);
+	TglPathParameterivNV* = PROCEDURE{WINAPI}(path : Uint; pname : Enum;  value : PInt);
 	TglPathParameteriNV* = PROCEDURE{WINAPI}(path : Uint; pname : Enum; value : Int);
 	TglPathParameterfvNV* = PROCEDURE{WINAPI}(path : Uint; pname : Enum;  value : PFloat);
 	TglPathParameterfNV* = PROCEDURE{WINAPI}(path : Uint; pname : Enum; value : Float);
@@ -3191,7 +3182,7 @@ TYPE
 	TglCoverStrokePathNV* = PROCEDURE{WINAPI}(path : Uint; coverMode : Enum);
 	TglCoverFillPathInstancedNV* = PROCEDURE{WINAPI}(numPaths : Sizei; pathNameType : Enum;  paths : PVoid; pathBase : Uint; coverMode : Enum; transformType : Enum;  transformValues : PFloat);
 	TglCoverStrokePathInstancedNV* = PROCEDURE{WINAPI}(numPaths : Sizei; pathNameType : Enum;  paths : PVoid; pathBase : Uint; coverMode : Enum; transformType : Enum;  transformValues : PFloat);
-	TglGetPathParameterivNV* = PROCEDURE{WINAPI}(path : Uint; pname : Enum; value : Pint);
+	TglGetPathParameterivNV* = PROCEDURE{WINAPI}(path : Uint; pname : Enum; value : PInt);
 	TglGetPathParameterfvNV* = PROCEDURE{WINAPI}(path : Uint; pname : Enum; value : PFloat);
 	TglGetPathCommandsNV* = PROCEDURE{WINAPI}(path : Uint; commands : PUbyte);
 	TglGetPathCoordsNV* = PROCEDURE{WINAPI}(path : Uint; coords : PFloat);
@@ -3199,9 +3190,9 @@ TYPE
 	TglGetPathMetricsNV* = PROCEDURE{WINAPI}(metricQueryMask : Bitfield; numPaths : Sizei; pathNameType : Enum;  paths : PVoid; pathBase : Uint; stride : Sizei; metrics : PFloat);
 	TglGetPathMetricRangeNV* = PROCEDURE{WINAPI}(metricQueryMask : Bitfield; firstPathName : Uint; numPaths : Sizei; stride : Sizei; metrics : PFloat);
 	TglGetPathSpacingNV* = PROCEDURE{WINAPI}(pathListMode : Enum; numPaths : Sizei; pathNameType : Enum;  paths : PVoid; pathBase : Uint; advanceScale : Float; kerningScale : Float; transformType : Enum; returnedSpacing : PFloat);
-	TglGetPathColorGenivNV* = PROCEDURE{WINAPI}(color : Enum; pname : Enum; value : Pint);
+	TglGetPathColorGenivNV* = PROCEDURE{WINAPI}(color : Enum; pname : Enum; value : PInt);
 	TglGetPathColorGenfvNV* = PROCEDURE{WINAPI}(color : Enum; pname : Enum; value : PFloat);
-	TglGetPathTexGenivNV* = PROCEDURE{WINAPI}(texCoordSet : Enum; pname : Enum; value : Pint);
+	TglGetPathTexGenivNV* = PROCEDURE{WINAPI}(texCoordSet : Enum; pname : Enum; value : PInt);
 	TglGetPathTexGenfvNV* = PROCEDURE{WINAPI}(texCoordSet : Enum; pname : Enum; value : PFloat);
 	TglIsPointInFillPathNV* = PROCEDURE{WINAPI}(path : Uint; mask : Uint; x : Float; y : Float) : Boolean;
 	TglIsPointInStrokePathNV* = PROCEDURE  {WINAPI}(path : Uint; x : Float; y : Float) : Boolean;
@@ -3221,9 +3212,9 @@ TYPE
 	TglMakeImageHandleResidentNV* = PROCEDURE{WINAPI}(handle : Uint64; access : Enum);
 	TglMakeImageHandleNonResidentNV* = PROCEDURE{WINAPI}(handle : Uint64);
 	TglUniformHandleui64NV* = PROCEDURE{WINAPI}(location : Int; value : Uint64);
-	TglUniformHandleui64vNV* = PROCEDURE{WINAPI}(location : Int; cowunt : Sizei;  value : PInt64);
+	TglUniformHandleui64vNV* = PROCEDURE{WINAPI}(location : Int; cowunt : Sizei;  value : PUint64);
 	TglProgramUniformHandleui64NV* = PROCEDURE{WINAPI}(program_ : Uint; location : Int; value : Uint64);
-	TglProgramUniformHandleui64vNV* = PROCEDURE{WINAPI}(program_ : Uint; location : Int; count : Sizei;  values : PInt64);
+	TglProgramUniformHandleui64vNV* = PROCEDURE{WINAPI}(program_ : Uint; location : Int; count : Sizei;  values : PUint64);
 	TglIsTextureHandleResidentNV* = PROCEDURE{WINAPI}(handle : Uint64) : Boolean;
 	TglIsImageHandleResidentNV* = PROCEDURE{WINAPI}(handle : Uint64) : Boolean;
 	(* GL_NV_shader_atomic_float  *)
@@ -3242,10 +3233,10 @@ TYPE
 	TglSamplePatternSGIS* = PROCEDURE{WINAPI}(pattern: Enum);
 	(*  GL_SGIS_pixel_texture  *)
 	TglPixelTexGenParameteriSGIS* = PROCEDURE{WINAPI}(pname: Enum; param: Int);
-	TglPixelTexGenParameterivSGIS* = PROCEDURE{WINAPI}(pname: Enum; params: Pint);
+	TglPixelTexGenParameterivSGIS* = PROCEDURE{WINAPI}(pname: Enum; params: PInt);
 	TglPixelTexGenParameterfSGIS* = PROCEDURE{WINAPI}(pname: Enum; param: Float);
 	TglPixelTexGenParameterfvSGIS* = PROCEDURE{WINAPI}(pname: Enum; params: PFloat);
-	TglGetPixelTexGenParameterivSGIS* = PROCEDURE{WINAPI}(pname: Enum; params: Pint);
+	TglGetPixelTexGenParameterivSGIS* = PROCEDURE{WINAPI}(pname: Enum; params: PInt);
 	TglGetPixelTexGenParameterfvSGIS* = PROCEDURE{WINAPI}(pname: Enum; params: PFloat);
 	(*  GL_SGIS_point_parameters  *)
 	TglPointParameterfSGIS* = PROCEDURE{WINAPI}(pname: Enum; param: Float);
@@ -3263,8 +3254,8 @@ TYPE
 	TglTexFilterFuncSGIS* = PROCEDURE{WINAPI}(target: Enum; filter: Enum; n: Sizei; weights: PFloat);
 	(*  GL_SGIX_async  *)
 	TglAsyncMarkerSGIX* = PROCEDURE{WINAPI}(marker: Uint);
-	TglFinishAsyncSGIX* = PROCEDURE{WINAPI}(markerp: PInt): Int;
-	TglPollAsyncSGIX* = PROCEDURE{WINAPI}(markerp: PInt): Int;
+	TglFinishAsyncSGIX* = PROCEDURE{WINAPI}(markerp: PUint): Int;
+	TglPollAsyncSGIX* = PROCEDURE{WINAPI}(markerp: PUint): Int;
 	TglGenAsyncMarkersSGIX* = PROCEDURE{WINAPI}(range: Sizei): Uint;
 	TglDeleteAsyncMarkersSGIX* = PROCEDURE{WINAPI}(marker: Uint; range: Sizei);
 	TglIsAsyncMarkerSGIX* = PROCEDURE{WINAPI}(marker: Uint): Boolean;
@@ -3275,19 +3266,19 @@ TYPE
 	TglFragmentLightfSGIX* = PROCEDURE{WINAPI}(light: Enum; pname: Enum; param: Float);
 	TglFragmentLightfvSGIX* = PROCEDURE{WINAPI}(light: Enum; pname: Enum; params: PFloat);
 	TglFragmentLightiSGIX* = PROCEDURE{WINAPI}(light: Enum; pname: Enum; param: Int);
-	TglFragmentLightivSGIX* = PROCEDURE{WINAPI}(light: Enum; pname: Enum; params: Pint);
+	TglFragmentLightivSGIX* = PROCEDURE{WINAPI}(light: Enum; pname: Enum; params: PInt);
 	TglFragmentLightModelfSGIX* = PROCEDURE{WINAPI}(pname: Enum; param: Float);
 	TglFragmentLightModelfvSGIX* = PROCEDURE{WINAPI}(pname: Enum; params: PFloat);
 	TglFragmentLightModeliSGIX* = PROCEDURE{WINAPI}(pname: Enum; param: Int);
-	TglFragmentLightModelivSGIX* = PROCEDURE{WINAPI}(pname: Enum; params: Pint);
+	TglFragmentLightModelivSGIX* = PROCEDURE{WINAPI}(pname: Enum; params: PInt);
 	TglFragmentMaterialfSGIX* = PROCEDURE{WINAPI}(face: Enum; pname: Enum; param: Float);
 	TglFragmentMaterialfvSGIX* = PROCEDURE{WINAPI}(face: Enum; pname: Enum; params: PFloat);
 	TglFragmentMaterialiSGIX* = PROCEDURE{WINAPI}(face: Enum; pname: Enum; param: Int);
-	TglFragmentMaterialivSGIX* = PROCEDURE{WINAPI}(face: Enum; pname: Enum; params: Pint);
+	TglFragmentMaterialivSGIX* = PROCEDURE{WINAPI}(face: Enum; pname: Enum; params: PInt);
 	TglGetFragmentLightfvSGIX* = PROCEDURE{WINAPI}(light: Enum; pname: Enum; params: PFloat);
-	TglGetFragmentLightivSGIX* = PROCEDURE{WINAPI}(light: Enum; pname: Enum; params: Pint);
+	TglGetFragmentLightivSGIX* = PROCEDURE{WINAPI}(light: Enum; pname: Enum; params: PInt);
 	TglGetFragmentMaterialfvSGIX* = PROCEDURE{WINAPI}(face: Enum; pname: Enum; params: PFloat);
-	TglGetFragmentMaterialivSGIX* = PROCEDURE{WINAPI}(face: Enum; pname: Enum; params: Pint);
+	TglGetFragmentMaterialivSGIX* = PROCEDURE{WINAPI}(face: Enum; pname: Enum; params: PInt);
 	TglLightEnviSGIX* = PROCEDURE{WINAPI}(pname: Enum; param: Int);
 	(*  GL_SGIX_framezoom  *)
 	TglFrameZoomSGIX* = PROCEDURE{WINAPI}(factor: Int);
@@ -3295,18 +3286,18 @@ TYPE
 	TglIglooInterfaceSGIX* = PROCEDURE{WINAPI}(pname: Enum; params: PVoid);
 	(*  GL_SGIX_instruments  *)
 	TglGetInstrumentsSGIX* = PROCEDURE{WINAPI}(): Int;
-	TglInstrumentsBufferSGIX* = PROCEDURE{WINAPI}(size: Sizei; buffer: Pint);
-	TglPollInstrumentsSGIX* = PROCEDURE{WINAPI}(marker_p: Pint): Int;
+	TglInstrumentsBufferSGIX* = PROCEDURE{WINAPI}(size: Sizei; buffer: PInt);
+	TglPollInstrumentsSGIX* = PROCEDURE{WINAPI}(marker_p: PInt): Int;
 	TglReadInstrumentsSGIX* = PROCEDURE{WINAPI}(marker: Int);
 	TglStartInstrumentsSGIX* = PROCEDURE{WINAPI}();
 	TglStopInstrumentsSGIX* = PROCEDURE{WINAPI}(marker: Int);
 	(*  GL_SGIX_list_priority  *)
 	TglGetListParameterfvSGIX* = PROCEDURE{WINAPI}(list: Uint; pname: Enum; params: PFloat);
-	TglGetListParameterivSGIX* = PROCEDURE{WINAPI}(list: Uint; pname: Enum; params: Pint);
+	TglGetListParameterivSGIX* = PROCEDURE{WINAPI}(list: Uint; pname: Enum; params: PInt);
 	TglListParameterfSGIX* = PROCEDURE{WINAPI}(list: Uint; pname: Enum; param: Float);
 	TglListParameterfvSGIX* = PROCEDURE{WINAPI}(list: Uint; pname: Enum; params: PFloat);
 	TglListParameteriSGIX* = PROCEDURE{WINAPI}(list: Uint; pname: Enum; param: Int);
-	TglListParameterivSGIX* = PROCEDURE{WINAPI}(list: Uint; pname: Enum; params: Pint);
+	TglListParameterivSGIX* = PROCEDURE{WINAPI}(list: Uint; pname: Enum; params: PInt);
 	(*  GL_SGIX_pixel_texture  *)
 	TglPixelTexGenSGIX* = PROCEDURE{WINAPI}(mode: Enum);
 	(*  GL_SGIX_polynomial_ffd  *)
@@ -3320,17 +3311,17 @@ TYPE
 	TglSpriteParameterfSGIX* = PROCEDURE{WINAPI}(pname: Enum; param: Float);
 	TglSpriteParameterfvSGIX* = PROCEDURE{WINAPI}(pname: Enum; params: PFloat);
 	TglSpriteParameteriSGIX* = PROCEDURE{WINAPI}(pname: Enum; param: Int);
-	TglSpriteParameterivSGIX* = PROCEDURE{WINAPI}(pname: Enum; params: Pint);
+	TglSpriteParameterivSGIX* = PROCEDURE{WINAPI}(pname: Enum; params: PInt);
 	(*  GL_SGIX_tag_sample_buffer  *)
 	TglTagSampleBufferSGIX* = PROCEDURE{WINAPI}();
 	(*  GL_SGI_color_table  *)
 	TglColorTableSGI* = PROCEDURE{WINAPI}(target: Enum; internalformat: Enum; width: Sizei; format: Enum; xtype:  Enum; table: PVoid);
 	TglColorTableParameterfvSGI* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PFloat);
-	TglColorTableParameterivSGI* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint);
+	TglColorTableParameterivSGI* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
 	TglCopyColorTableSGI* = PROCEDURE{WINAPI}(target: Enum; internalformat: Enum; x: Int; y: Int; width: Sizei);
 	TglGetColorTableSGI* = PROCEDURE{WINAPI}(target: Enum; format: Enum; xtype:  Enum; table: PVoid);
 	TglGetColorTableParameterfvSGI* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PFloat);
-	TglGetColorTableParameterivSGI* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: Pint);
+	TglGetColorTableParameterivSGI* = PROCEDURE{WINAPI}(target: Enum; pname: Enum; params: PInt);
 	(*  GL_SUNX_constant_data  *)
 	TglFinishTextureSUNX* = PROCEDURE{WINAPI}();
 	(*  GL_SUN_global_alpha  *)
@@ -3348,7 +3339,7 @@ TYPE
 	TglReplacementCodeuiSUN* = PROCEDURE{WINAPI}(code: Uint);
 	TglReplacementCodeusSUN* = PROCEDURE{WINAPI}(code: Ushort);
 	TglReplacementCodeubSUN* = PROCEDURE{WINAPI}(code: Ubyte);
-	TglReplacementCodeuivSUN* = PROCEDURE{WINAPI}( code: PInt);
+	TglReplacementCodeuivSUN* = PROCEDURE{WINAPI}( code: PUint);
 	TglReplacementCodeusvSUN* = PROCEDURE{WINAPI}( code: PUshort);
 	TglReplacementCodeubvSUN* = PROCEDURE{WINAPI}( code: PUbyte);
 	TglReplacementCodePointerSUN* = PROCEDURE{WINAPI}(xtype:  Enum; stride: Sizei; xpointer: PVoid);
@@ -3378,50 +3369,56 @@ TYPE
 	TglTexCoord4fColor4fNormal3fVertex4fSUN* = PROCEDURE{WINAPI}(s: Float; t: Float; p: Float; q: Float; r: Float; g: Float; b: Float; a: Float; nx: Float; ny: Float; nz: Float; x: Float; y: Float; z: Float; w: Float);
 	TglTexCoord4fColor4fNormal3fVertex4fvSUN* = PROCEDURE{WINAPI}( tc: PFloat;  c: PFloat;  n: PFloat;  v: PFloat);
 	TglReplacementCodeuiVertex3fSUN* = PROCEDURE{WINAPI}(rc: Uint; x: Float; y: Float; z: Float);
-	TglReplacementCodeuiVertex3fvSUN* = PROCEDURE{WINAPI}( rc: PInt;  v: PFloat);
+	TglReplacementCodeuiVertex3fvSUN* = PROCEDURE{WINAPI}( rc: PUint;  v: PFloat);
 	TglReplacementCodeuiColor4ubVertex3fSUN* = PROCEDURE{WINAPI}(rc: Uint; r: Ubyte; g: Ubyte; b: Ubyte; a: Ubyte; x: Float; y: Float; z: Float);
-	TglReplacementCodeuiColor4ubVertex3fvSUN* = PROCEDURE{WINAPI}( rc: PInt;  c: PUbyte;  v: PFloat);
+	TglReplacementCodeuiColor4ubVertex3fvSUN* = PROCEDURE{WINAPI}( rc: PUint;  c: PUbyte;  v: PFloat);
 	TglReplacementCodeuiColor3fVertex3fSUN* = PROCEDURE{WINAPI}(rc: Uint; r: Float; g: Float; b: Float; x: Float; y: Float; z: Float);
-	TglReplacementCodeuiColor3fVertex3fvSUN* = PROCEDURE{WINAPI}( rc: PInt;  c: PFloat;  v: PFloat);
+	TglReplacementCodeuiColor3fVertex3fvSUN* = PROCEDURE{WINAPI}( rc: PUint;  c: PFloat;  v: PFloat);
 	TglReplacementCodeuiNormal3fVertex3fSUN* = PROCEDURE{WINAPI}(rc: Uint; nx: Float; ny: Float; nz: Float; x: Float; y: Float; z: Float);
-	TglReplacementCodeuiNormal3fVertex3fvSUN* = PROCEDURE{WINAPI}( rc: PInt;  n: PFloat;  v: PFloat);
+	TglReplacementCodeuiNormal3fVertex3fvSUN* = PROCEDURE{WINAPI}( rc: PUint;  n: PFloat;  v: PFloat);
 	TglReplacementCodeuiColor4fNormal3fVertex3fSUN* = PROCEDURE{WINAPI}(rc: Uint; r: Float; g: Float; b: Float; a: Float; nx: Float; ny: Float; nz: Float; x: Float; y: Float; z: Float);
-	TglReplacementCodeuiColor4fNormal3fVertex3fvSUN* = PROCEDURE{WINAPI}( rc: PInt;  c: PFloat;  n: PFloat;  v: PFloat);
+	TglReplacementCodeuiColor4fNormal3fVertex3fvSUN* = PROCEDURE{WINAPI}( rc: PUint;  c: PFloat;  n: PFloat;  v: PFloat);
 	TglReplacementCodeuiTexCoord2fVertex3fSUN* = PROCEDURE{WINAPI}(rc: Uint; s: Float; t: Float; x: Float; y: Float; z: Float);
-	TglReplacementCodeuiTexCoord2fVertex3fvSUN* = PROCEDURE{WINAPI}( rc: PInt;  tc: PFloat;  v: PFloat);
+	TglReplacementCodeuiTexCoord2fVertex3fvSUN* = PROCEDURE{WINAPI}( rc: PUint;  tc: PFloat;  v: PFloat);
 	TglReplacementCodeuiTexCoord2fNormal3fVertex3fSUN* = PROCEDURE{WINAPI}(rc: Uint; s: Float; t: Float; nx: Float; ny: Float; nz: Float; x: Float; y: Float; z: Float);
-	TglReplacementCodeuiTexCoord2fNormal3fVertex3fvSUN* = PROCEDURE{WINAPI}( rc: PInt;  tc: PFloat;  n: PFloat;  v: PFloat);
+	TglReplacementCodeuiTexCoord2fNormal3fVertex3fvSUN* = PROCEDURE{WINAPI}( rc: PUint;  tc: PFloat;  n: PFloat;  v: PFloat);
 	TglReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fSUN* = PROCEDURE{WINAPI}(rc: Uint; s: Float; t: Float; r: Float; g: Float; b: Float; a: Float; nx: Float; ny: Float; nz: Float; x: Float; y: Float; z: Float);
-	TglReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fvSUN* = PROCEDURE{WINAPI}( rc: PInt;  tc: PFloat;  c: PFloat;  n: PFloat;  v: PFloat);
-
+	TglReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fvSUN* = PROCEDURE{WINAPI}( rc: PUint;  tc: PFloat;  c: PFloat;  n: PFloat;  v: PFloat);
 
 	(* -------------------------------------------------  *)
 	(*! window support functions for WINDOWS - WGL        *)
 	(* -------------------------------------------------  *)
 
-	TwglGetProcAddress* = PROCEDURE {WINAPI} (  CONST ProcName: ARRAY OF CHAR): Pointer;
-	TwglCopyContext* = PROCEDURE {WINAPI} (p1: HGLRC; p2: HGLRC; p3: Cardinal): BOOLEAN;
+	TwglGetProcAddress* = PROCEDURE {WINAPI} (  CONST ProcName: ARRAY OF CHAR): ADDRESS;
+	TwglCopyContext* = PROCEDURE {WINAPI} (p1: HGLRC; p2: HGLRC; p3: Uint): BOOLEAN;
 	TwglCreateContext* = PROCEDURE {WINAPI} (DC: HDC): HGLRC;
-	TwglCreateLayerContext* = PROCEDURE {WINAPI} (p1: HDC; p2: Integer): HGLRC;
+	TwglCreateLayerContext* = PROCEDURE {WINAPI} (p1: HDC; p2: Int): HGLRC;
 	TwglDeleteContext = PROCEDURE {WINAPI} (p1: HGLRC): BOOLEAN;
-	(*TwglDescribeLayerPlane*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3: LONGINT; p4: LONGINT; p5: PLayerPlaneDescriptor): BOOLEAN; *)
+	TwglDescribeLayerPlane*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3: LONGINT; p4: LONGINT; p5: WinApi.LayerPlaneDescriptor): BOOLEAN;
 	TwglGetCurrentContext* = PROCEDURE {WINAPI}(): HGLRC;
 	TwglGetCurrentDC* = PROCEDURE {WINAPI}(): HDC;
-	TwglGetLayerPaletteEntries* = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: Integer; varpcr: ADDRESS): Integer;
+	TwglGetLayerPaletteEntries* = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: Int; varpcr: ADDRESS): Int;
 	TwglMakeCurrent* = PROCEDURE {WINAPI} (DC: HDC; p2: HGLRC): BOOLEAN;
-	TwglRealizeLayerPalette*  = PROCEDURE {WINAPI} (p1: HDC; p2: Integer; p3: BOOLEAN): BOOLEAN;
-	TwglSetLayerPaletteEntries*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: Integer;  varpcr: ADDRESS): Integer;
+	TwglRealizeLayerPalette*  = PROCEDURE {WINAPI} (p1: HDC; p2: Int; p3: BOOLEAN): BOOLEAN;
+	TwglSetLayerPaletteEntries*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: Int;  varpcr: ADDRESS): Int;
 	TwglShareLists* = PROCEDURE {WINAPI} (p1, p2: HGLRC): BOOLEAN;
-	TwglSwapLayerBuffers*  = PROCEDURE {WINAPI} (p1: HDC; p2: Cardinal): BOOLEAN;
-	(*  TwglSwapMultipleBuffers*  = PROCEDURE {WINAPI} (p1: UINT; CONST p2: PWGLSWAP): DWORD; *)
-	TwglUseFontBitmapsA*  = PROCEDURE {WINAPI} (DC: HDC; p2, p3, p4: DWORD): BOOLEAN;
-	TwglUseFontBitmapsW*  = PROCEDURE {WINAPI} (DC: HDC; p2, p3, p4: DWORD): BOOLEAN;
-	TwglUseFontBitmaps*  = PROCEDURE {WINAPI} (DC: HDC; p2, p3, p4: DWORD): BOOLEAN;
+	TwglSwapLayerBuffers*  = PROCEDURE {WINAPI} (p1: HDC; p2: Uint): BOOLEAN;
 
-	(* TwglUseFontOutlinesA*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: DWORD; p5, p6: Single; p7: Integer; p8: PGlyphMetricsFloat): BOOLEAN;
-	TwglUseFontOutlinesW*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: DWORD; p5, p6: Single; p7: Integer; p8: PGlyphMetricsFloat): BOOLEAN;
-	TwglUseFontOutlines*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: DWORD; p5, p6: Single; p7: Integer; p8: PGlyphMetricsFloat): BOOLEAN;
-	*)
+	WGLSWAP* = RECORD
+		hdc*: HDC;
+	    	uiFlags: Uint;
+	END;
+	PWGLSWAP* = POINTER TO ARRAY 16 OF WGLSWAP; (* WGL_SWAPMULTIPLE_MAX = 16 *)
+	
+	TwglSwapMultipleBuffers*  = PROCEDURE {WINAPI} (p1: Uint; p2: ADDRESS (* PWGLSWAP *)): Uint; (* undocumented!, IF WINVER >= 0x0500 *)
+	TwglUseFontBitmapsA*  = PROCEDURE {WINAPI} (DC: HDC; p2, p3, p4: Uint): BOOLEAN;
+	TwglUseFontBitmapsW*  = PROCEDURE {WINAPI} (DC: HDC; p2, p3, p4: Uint): BOOLEAN;
+	TwglUseFontBitmaps*  = PROCEDURE {WINAPI} (DC: HDC; p2, p3, p4: Uint): BOOLEAN;
+
+	TwglUseFontOutlinesA*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: Uint; p5, p6: Float; p7: LONGINT; p8: ADDRESS (*GlyphMetricsFloat*) ): BOOLEAN;
+	TwglUseFontOutlinesW*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: Uint; p5, p6: Float; p7: LONGINT; p8: ADDRESS (*GlyphMetricsFloat*)): BOOLEAN;
+	TwglUseFontOutlines*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: Uint; p5, p6: Float; p7: LONGINT; p8: ADDRESS (*GlyphMetricsFloat*)): BOOLEAN;
+	
 
 	(* WGL_ARB_buffer_region *)
 	TwglCreateBufferRegionARB*  = PROCEDURE {WINAPI} (hDC: HDC; iLayerPlane: Int; uType: Uint): THandle;
@@ -3461,11 +3458,11 @@ TYPE
 	TwglCreateContextAttribsARB*  = PROCEDURE {WINAPI} (hDC: HDC; hShareContext: HGLRC;  attribList: ADDRESS (*PInt*)): HGLRC;
 
 	(* WGL_AMD_gpu_association *)
-	TwglGetGPUIDsAMD*  = PROCEDURE {WINAPI} (maxCount: Cardinal; ids: PCardinal): Cardinal;
-	TwglGetGPUInfoAMD*  = PROCEDURE {WINAPI} (id: Cardinal; property_: Integer; dataType: Enum; size: Cardinal; data: Pointer): Integer;
-	TwglGetContextGPUIDAMD*  = PROCEDURE {WINAPI} (hglrc: HGLRC): Cardinal;
-	TwglCreateAssociatedContextAMD*  = PROCEDURE {WINAPI} (id: Cardinal): HGLRC;
-	TwglCreateAssociatedContextAttribsAMD*  = PROCEDURE {WINAPI} (id: Cardinal; hShareContext: HGLRC; CONST attribList: PInteger): HGLRC;
+	TwglGetGPUIDsAMD*  = PROCEDURE {WINAPI} (maxCount: Uint; ids: PUint): Uint;
+	TwglGetGPUInfoAMD*  = PROCEDURE {WINAPI} (id: Uint; property: Int; dataType: Enum; size: Uint; data: ADDRESS): Int;
+	TwglGetContextGPUIDAMD*  = PROCEDURE {WINAPI} (hglrc: HGLRC): Uint;
+	TwglCreateAssociatedContextAMD*  = PROCEDURE {WINAPI} (id: Uint): HGLRC;
+	TwglCreateAssociatedContextAttribsAMD*  = PROCEDURE {WINAPI} (id: Uint; hShareContext: HGLRC; CONST attribList: PInt): HGLRC;
 	TwglDeleteAssociatedContextAMD*  = PROCEDURE {WINAPI} (hglrc: HGLRC): BOOLEAN;
 	TwglMakeAssociatedContextCurrentAMD*  = PROCEDURE {WINAPI} (hglrc: HGLRC): BOOLEAN;
 	TwglGetCurrentAssociatedContextAMD*  = PROCEDURE {WINAPI} (): HGLRC;
@@ -3544,20 +3541,20 @@ TYPE
 
 	(* WGL_NV_vertex_array_range *)
 	TwglAllocateMemoryNV*  = PROCEDURE {WINAPI}(size: Sizei; readfreq: Float; writefreq: Float; priority: Float);
-	TwglFreeMemoryNV*  = PROCEDURE {WINAPI}(_pointer: Pointer);
+	TwglFreeMemoryNV*  = PROCEDURE {WINAPI}(pointer: ADDRESS);
 
 	(* WGL_NV_present_video  *)
-	TwglEnumerateVideoDevicesNV*  = PROCEDURE {WINAPI} (hdc: HDC; phDeviceList: PHVIDEOOUTPUTDEVICENV): Integer;
-	TwglBindVideoDeviceNV*  = PROCEDURE {WINAPI} (hd: HDC; uVideoSlot: Cardinal; hVideoDevice: HVIDEOOUTPUTDEVICENV; piAttribList: PInteger): BOOLEAN;
-	TwglQueryCurrentContextNV*  = PROCEDURE {WINAPI} (iAttribute: Integer; piValue: PInteger): BOOLEAN;
+	TwglEnumerateVideoDevicesNV*  = PROCEDURE {WINAPI} (hdc: HDC; phDeviceList: PHVIDEOOUTPUTDEVICENV): Int;
+	TwglBindVideoDeviceNV*  = PROCEDURE {WINAPI} (hd: HDC; uVideoSlot: Uint; hVideoDevice: HVIDEOOUTPUTDEVICENV; piAttribList: PInt): BOOLEAN;
+	TwglQueryCurrentContextNV*  = PROCEDURE {WINAPI} (iAttribute: Int; piValue: PInt): BOOLEAN;
 
 	(* WGL_NV_video_output *)
-	TwglGetVideoDeviceNV*  = PROCEDURE {WINAPI} (hDC: HDC; numDevices: Integer; hVideoDevice: PHPVIDEODEV): BOOLEAN;
+	TwglGetVideoDeviceNV*  = PROCEDURE {WINAPI} (hDC: HDC; numDevices: Int; hVideoDevice: PHPVIDEODEV): BOOLEAN;
 	TwglReleaseVideoDeviceNV*  = PROCEDURE {WINAPI} (hVideoDevice: HPVIDEODEV): BOOLEAN;
-	TwglBindVideoImageNV*  = PROCEDURE {WINAPI} (hVideoDevice: HPVIDEODEV; hPbuffer: HPBUFFERARB; iVideoBuffer: Integer): BOOLEAN;
-	TwglReleaseVideoImageNV*  = PROCEDURE {WINAPI} (hPbuffer: HPBUFFERARB; iVideoBuffer: Integer): BOOLEAN;
-	TwglSendPbufferToVideoNV*  = PROCEDURE {WINAPI} (hPbuffer: HPBUFFERARB; iBufferType: Integer; pulCounterPbuffer: PCardinal; bBlock: BOOLEAN): BOOLEAN;
-	TwglGetVideoInfoNV*  = PROCEDURE {WINAPI} (hpVideoDevice: HPVIDEODEV; pulCounterOutputPbuffer: PCardinal; pulCounterOutputVideo: PCardinal): BOOLEAN;
+	TwglBindVideoImageNV*  = PROCEDURE {WINAPI} (hVideoDevice: HPVIDEODEV; hPbuffer: HPBUFFERARB; iVideoBuffer: Int): BOOLEAN;
+	TwglReleaseVideoImageNV*  = PROCEDURE {WINAPI} (hPbuffer: HPBUFFERARB; iVideoBuffer: Int): BOOLEAN;
+	TwglSendPbufferToVideoNV*  = PROCEDURE {WINAPI} (hPbuffer: HPBUFFERARB; iBufferType: Int; pulCounterPbuffer: PUint; bBlock: BOOLEAN): BOOLEAN;
+	TwglGetVideoInfoNV*  = PROCEDURE {WINAPI} (hpVideoDevice: HPVIDEODEV; pulCounterOutputPbuffer: PUint; pulCounterOutputVideo: PUint): BOOLEAN;
 
 	(* WGL_NV_swap_group *)
 	TwglJoinSwapGroupNV*  = PROCEDURE {WINAPI} (hDC: HDC; group: Uint): BOOLEAN;
@@ -3568,31 +3565,31 @@ TYPE
 	TwglResetFrameCountNV*  = PROCEDURE {WINAPI} (hDC: HDC): BOOLEAN;
 
 	(* WGL_NV_gpu_affinity *)
-	TwglEnumGpusNV*  = PROCEDURE {WINAPI} (iGpuIndex: Cardinal; phGpu: PHGPUNV): BOOLEAN;
-	TwglEnumGpuDevicesNV*  = PROCEDURE {WINAPI} (hGpu: HGPUNV; iDeviceIndex: Cardinal; lpGpuDevice: PGPU_DEVICE): BOOLEAN;
+	TwglEnumGpusNV*  = PROCEDURE {WINAPI} (iGpuIndex: Uint; phGpu: PHGPUNV): BOOLEAN;
+	TwglEnumGpuDevicesNV*  = PROCEDURE {WINAPI} (hGpu: HGPUNV; iDeviceIndex: Uint; lpGpuDevice: PGPU_DEVICE): BOOLEAN;
 	TwglCreateAffinityDCNV*  = PROCEDURE {WINAPI} ( CONST phGpuList: PHGPUNV): HDC;
-	TwglEnumGpusFromAffinityDCNV*  = PROCEDURE {WINAPI} (hAffinityDC: HDC; iGpuIndex: Cardinal; hGpu: PHGPUNV): BOOLEAN;
+	TwglEnumGpusFromAffinityDCNV*  = PROCEDURE {WINAPI} (hAffinityDC: HDC; iGpuIndex: Uint; hGpu: PHGPUNV): BOOLEAN;
 	TwglDeleteDCNV*  = PROCEDURE {WINAPI} (hDC: HDC): BOOLEAN;
 
 	(* WGL_NV_video_capture *)
-	TwglBindVideoCaptureDeviceNV*  = PROCEDURE {WINAPI} (uVideoSlot: Cardinal; hDevice: HVIDEOINPUTDEVICENV): BOOLEAN;
-	TwglEnumerateVideoCaptureDevicesNV*  = PROCEDURE {WINAPI} (hDc: HDC; phDeviceList: PHVIDEOINPUTDEVICENV): Cardinal;
+	TwglBindVideoCaptureDeviceNV*  = PROCEDURE {WINAPI} (uVideoSlot: Uint; hDevice: HVIDEOINPUTDEVICENV): BOOLEAN;
+	TwglEnumerateVideoCaptureDevicesNV*  = PROCEDURE {WINAPI} (hDc: HDC; phDeviceList: PHVIDEOINPUTDEVICENV): Uint;
 	TwglLockVideoCaptureDeviceNV*  = PROCEDURE {WINAPI} (hDc: HDC; hDevice: HVIDEOINPUTDEVICENV): BOOLEAN;
-	TwglQueryVideoCaptureDeviceNV*  = PROCEDURE {WINAPI} (hDc: HDC; hDevice: HVIDEOINPUTDEVICENV; iAttribute: Integer; piValue: PInteger): BOOLEAN;
+	TwglQueryVideoCaptureDeviceNV*  = PROCEDURE {WINAPI} (hDc: HDC; hDevice: HVIDEOINPUTDEVICENV; iAttribute: Int; piValue: PInt): BOOLEAN;
 	TwglReleaseVideoCaptureDeviceNV*  = PROCEDURE {WINAPI} (hDc: HDC; hDevice: HVIDEOINPUTDEVICENV): BOOLEAN;
 
 	(* WGL_NV_copy_image *)
 	TwglCopyImageSubDataNV*  = PROCEDURE {WINAPI} (hSrcRc: HGLRC; srcName: Uint; srcTarget: Enum; srcLevel: Int; srcX: Int; srcY: Int; srcZ: Int; hDstRC: HGLRC; dstName: Uint; dstTarget: Enum; dstLevel: Int; dstX: Int; dstY: Int; dstZ: Int; width: Sizei; height: Sizei; depth: Sizei): BOOLEAN;
 
 	(* WGL_NV_DX_interop *)
-	TwglDXSetResourceShareHandleNV* = PROCEDURE {WINAPI} (dxObject : PVoid; hareHandle : Cardinal) : BOOLEAN;
-	TwglDXOpenDeviceNV* = PROCEDURE {WINAPI} (dxDevice : PVoid) : Cardinal;
-	TwglDXCloseDeviceNV* = PROCEDURE {WINAPI} (hDevice : Cardinal) : BOOLEAN;
-	TwglDXRegisterObjectNV* = PROCEDURE {WINAPI} (hDevice : Cardinal; dxObject : PVoid; name : Uint; _type : Enum; access : Enum) : Cardinal;
-	TwglDXUnregisterObjectNV* = PROCEDURE {WINAPI} (hDevice : Cardinal; hObject : Cardinal) : BOOLEAN;
-	TwglDXObjectAccessNV* = PROCEDURE {WINAPI} (hObject : Cardinal; access : Enum) :BOOLEAN;
-	TwglDXLockObjectsNV* = PROCEDURE {WINAPI} (hDevice : Cardinal; count : Int; hObjects : PCardinal) : BOOLEAN;
-	TwglDXUnlockObjectsNV* = PROCEDURE {WINAPI} (hDevice : Cardinal; count : Int; hObjects : PCardinal) : BOOLEAN;
+	TwglDXSetResourceShareHandleNV* = PROCEDURE {WINAPI} (dxObject : PVoid; hareHandle : Uint) : BOOLEAN;
+	TwglDXOpenDeviceNV* = PROCEDURE {WINAPI} (dxDevice : PVoid) : Uint;
+	TwglDXCloseDeviceNV* = PROCEDURE {WINAPI} (hDevice : Uint) : BOOLEAN;
+	TwglDXRegisterObjectNV* = PROCEDURE {WINAPI} (hDevice : Uint; dxObject : PVoid; name : Uint; _type : Enum; access : Enum) : Uint;
+	TwglDXUnregisterObjectNV* = PROCEDURE {WINAPI} (hDevice : Uint; hObject : Uint) : BOOLEAN;
+	TwglDXObjectAccessNV* = PROCEDURE {WINAPI} (hObject : Uint; access : Enum) :BOOLEAN;
+	TwglDXLockObjectsNV* = PROCEDURE {WINAPI} (hDevice : Uint; count : Int; hObjects : PUint) : BOOLEAN;
+	TwglDXUnlockObjectsNV* = PROCEDURE {WINAPI} (hDevice : Uint; count : Int; hObjects : PUint) : BOOLEAN;
 
 	(* WGL_OML_sync_control *)
 	TwglGetSyncValuesOML*  = PROCEDURE {WINAPI} (hdc: HDC; ust: PInt64; msc: PInt64; sbc: PInt64): BOOLEAN;
@@ -6294,7 +6291,7 @@ TYPE
 	wglCreateContext- : TwglCreateContext;
 	wglCreateLayerContext- : TwglCreateLayerContext;
 	wglDeleteContext- : TwglDeleteContext;
-	(* wglDescribeLayerPlane- : TwglDescribeLayerPlane;*)
+	wglDescribeLayerPlane- : TwglDescribeLayerPlane;
 	wglGetCurrentContext- : TwglGetCurrentContext;
 	wglGetCurrentDC- : TwglGetCurrentDC;
 	wglGetLayerPaletteEntries- : TwglGetLayerPaletteEntries;
@@ -6303,14 +6300,14 @@ TYPE
 	wglSetLayerPaletteEntries- : TwglSetLayerPaletteEntries;
 	wglShareLists- : TwglShareLists;
 	wglSwapLayerBuffers- : TwglSwapLayerBuffers;
-	(*  wglSwapMultipleBuffers- : TwglSwapMultipleBuffers;*)
+	wglSwapMultipleBuffers- : TwglSwapMultipleBuffers;
 	wglUseFontBitmapsA- : TwglUseFontBitmapsA;
-	(*  wglUseFontOutlinesA- : TwglUseFontOutlinesA;
+	wglUseFontOutlinesA- : TwglUseFontOutlinesA;
 	wglUseFontBitmapsW- : TwglUseFontBitmapsW;
 	wglUseFontOutlinesW- : TwglUseFontOutlinesW;
 	wglUseFontBitmaps- : TwglUseFontBitmaps;
 	wglUseFontOutlines- : TwglUseFontOutlines;
-	*)
+	
 	  (* WGL_ARB_buffer_region *)
 	wglCreateBufferRegionARB- : TwglCreateBufferRegionARB;
 	wglDeleteBufferRegionARB- : TwglDeleteBufferRegionARB;
@@ -6525,7 +6522,7 @@ BEGIN
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglCreateLayerContext', SYSTEM.VAL(ADDRESS, wglCreateLayerContext ));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglCreateContext', SYSTEM.VAL(ADDRESS, wglCreateContext));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglDeleteContext', SYSTEM.VAL(ADDRESS, wglDeleteContext ));
-	    (*  Kernel32.GetProcAddress(GL_LibHandle,'wglDescribeLayerPlane', SYSTEM.VAL(ADDRESS, wglDescribeLayerPlane ));*)
+	    Kernel32.GetProcAddress(GL_LibHandle,'wglDescribeLayerPlane', SYSTEM.VAL(ADDRESS, wglDescribeLayerPlane ));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglGetCurrentContext', SYSTEM.VAL(ADDRESS, wglGetCurrentContext));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglGetCurrentDC', SYSTEM.VAL(ADDRESS, wglGetCurrentDC));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglGetLayerPaletteEntries', SYSTEM.VAL(ADDRESS, wglGetLayerPaletteEntries));
@@ -6536,14 +6533,14 @@ BEGIN
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglShareLists', SYSTEM.VAL(ADDRESS, wglShareLists));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglSwapLayerBuffers', SYSTEM.VAL(ADDRESS, wglSwapLayerBuffers));
 
-	    (*     Kernel32.GetProcAddress(GL_LibHandle,'wglSwapMultipleBuffers', SYSTEM.VAL(ADDRESS, wglSwapMultipleBuffers));
+	    Kernel32.GetProcAddress(GL_LibHandle,'wglSwapMultipleBuffers', SYSTEM.VAL(ADDRESS, wglSwapMultipleBuffers));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglUseFontBitmapsA', SYSTEM.VAL(ADDRESS, wglUseFontBitmapsA));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglUseFontOutlinesA', SYSTEM.VAL(ADDRESS, wglUseFontOutlinesA));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglUseFontBitmapsW', SYSTEM.VAL(ADDRESS, wglUseFontBitmapsW));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglUseFontOutlinesW', SYSTEM.VAL(ADDRESS, wglUseFontOutlinesW));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglUseFontBitmapsA', SYSTEM.VAL(ADDRESS, wglUseFontBitmaps));
 	    Kernel32.GetProcAddress(GL_LibHandle,'wglUseFontOutlinesA', SYSTEM.VAL(ADDRESS, wglUseFontOutlines));
-	    *)
+	    
 	(*! GL_VERSION_1_0 *)
 	CullFace := SYSTEM.VAL(TglCullFace, GetProcAddress('glCullFace'));
 	FrontFace := SYSTEM.VAL(TglFrontFace, GetProcAddress('glFrontFace'));
@@ -10289,8 +10286,8 @@ END ReadExtensions;
 
 (* utilities *)
 (* Get string from address *)
-PROCEDURE GetStringFromAddr*(adr: LONGINT): Strings.String;
-VAR  sadr, sadr1: LONGINT;
+PROCEDURE GetStringFromAddr*(adr: ADDRESS): Strings.String;
+VAR  sadr, sadr1: ADDRESS;
 		i, cnt: LONGINT;
 		ch: CHAR;
 		s: Strings.String;
@@ -10322,21 +10319,21 @@ BEGIN
 END GetStringFromAddr;
 
 PROCEDURE GetString*(name: Enum): Strings.String;
-VAR  sadr: LONGINT;
+VAR  sadr: ADDRESS;
 BEGIN {EXCLUSIVE}
 	sadr := XglGetString(name);
 	RETURN GetStringFromAddr(sadr);
 END GetString;
 
 PROCEDURE wglEXTStrings*(): Strings.String;
-VAR  sadr: LONGINT;
+VAR  sadr: ADDRESS;
 BEGIN {EXCLUSIVE}
 	sadr := wglGetExtensionsStringEXT();
 	RETURN GetStringFromAddr(sadr);
 END wglEXTStrings;
 
 PROCEDURE wglARBStrings*(): Strings.String;
-VAR  sadr: LONGINT;
+VAR  sadr: ADDRESS;
 BEGIN {EXCLUSIVE}
 	sadr := wglGetExtensionsStringARB(wglGetCurrentDC());
 	RETURN GetStringFromAddr(sadr);
@@ -11073,7 +11070,7 @@ BEGIN
 	XglGetNamedStringARB(namelen, ADDRESSOF(name[0]), bufSize, stringlen, xstring);
 END GetNamedStringARB;
 
-PROCEDURE GetNamedStringivARB*(namelen: Int; CONST name: ARRAY OF CHAR; pname: Enum; params: Pint);
+PROCEDURE GetNamedStringivARB*(namelen: Int; CONST name: ARRAY OF CHAR; pname: Enum; params: PInt);
 BEGIN
 	XglGetNamedStringivARB(namelen, ADDRESSOF(name[0]), pname, params);
 END GetNamedStringivARB;
@@ -11212,9 +11209,9 @@ BEGIN
 	END;
 END OnClose;
 
-BEGIN
-	Modules.InstallTermHandler(OnClose);
+BEGIN	
 	InitOpenGL;
+	Modules.InstallTermHandler(OnClose);
 	(*  ReadOpenGLCore(); *)
 END OpenGL.
 

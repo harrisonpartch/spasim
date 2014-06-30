@@ -4,7 +4,7 @@ MODULE NnKyXYNiHwdxuM6wHrbxwuQ;
 VAR vox: TexVox.TexVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	IF vox=NIL THEN NEW(vox,'die.0.png')  END;
+	IF vox=NIL THEN NEW(vox,'tigerlily.png')  END;
 	RETURN vox
 END thisvox;
 

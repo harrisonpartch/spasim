@@ -19,8 +19,8 @@ TYPE
 		source2Pos := [ 0.0, 0.0, -4.0];
 		transdz := -6.6;
 		SetTitle("OGLDemo1");
-		(* SetIdleTime(60);
-		SetGameMode(TRUE); *)
+		SetIdleTime(60);
+		SetGameMode(TRUE);
 		(* cmdlinerun := TRUE;*)
 	END New;
 
@@ -73,13 +73,13 @@ TYPE
 		ELSE
 		END;
 			CASE keysym OF
-				Inputs.KsLeft: listenerPos[0] := listenerPos[0]- 0.1; 
+				Inputs.KsLeft: listenerPos[0] := listenerPos[0]- 0.1;
 				| Inputs.KsRight: listenerPos[0] := listenerPos[0]+ 0.1;
 				| Inputs.KsUp: 	listenerPos[2] := listenerPos[2]- 0.1;
 				| Inputs.KsDown: listenerPos[2] := listenerPos[2]+ 0.1;
 		ELSE
 		END;
-		ReDisplay;
+
 	END KeyEvent ;
 
 	PROCEDURE ChangePosititon*;
@@ -127,10 +127,10 @@ TYPE
 			GL.PopMatrix() ;
 			SwapBuffers();
 
-	(*		(* update poisition for next display *)
+			(* update poisition for next display *)
 			x := listenerPos[0] + 0.1;
 			IF x > 4.0 THEN x := -4.0; END;
-			listenerPos[0] :=x;*)
+			listenerPos[0] :=x;
 
 		END Display;
 

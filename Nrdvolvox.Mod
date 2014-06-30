@@ -1,6 +1,6 @@
 MODULE Nrdvolvox;
 
-IMPORT Base, XNXLE, XNXLFRep;
+IMPORT Base, XNXLE, FRep,Objects;
 
 CONST	
 	M=20;
@@ -34,7 +34,6 @@ BEGIN
 	IF YELLOW=NIL THEN NEW(YELLOW) END;
 	clere;
 	seed;
-	register; 
 	tock := 1;
 END init;
 			
@@ -277,13 +276,18 @@ BEGIN
 			ray.scale := ray.scale/M;
 END Shade;
 
+BEGIN{ACTIVE, PRIORITY(Objects.Low)}
+	REPEAT
+		tick;
+		Objects.Sleep(40)
+	UNTIL FALSE
 END RDVolVox;
 
 VAR
 	vox: RDVolVox; 
 	r,b,y: Base.Voxel;
 	center: Base.PT;
-	ball: XNXLFRep.sphere;
+	ball: FRep.sphere;
 	
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN	
@@ -291,9 +295,9 @@ BEGIN
 END thisvox;
 
 BEGIN
-	r:=Base.VoxelFromName("NFLOOP"); 	
+	r:=Base.VoxelFromName("N5a2g4M6HYjPJxYSNQvYyvw"); 	
 	b:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODh");
-	y:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");
-	NEW(vox,r,NIL,b);
+	y:=Base.VoxelFromName("NUeconrGpx7plz7ym76ibLw");
+	NEW(vox,b,NIL,NIL);
 	vox.passable:=TRUE
 END Nrdvolvox. 

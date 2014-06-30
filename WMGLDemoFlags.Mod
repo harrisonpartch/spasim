@@ -1,7 +1,7 @@
 MODULE WMGLDemoFlags; (** AUTHOR "fnecati"; PURPOSE "Flags simulation demo"; *)
 (*  translation from HeNe lesson11a: *)
 IMPORT
-	WMRectangles, WMGraphics, Strings, Kernel, Raster, Math,
+	WMRectangles, WMGraphics, Strings, Kernel, Raster, Math, Modules,
 	WM := WMWindowManager,  WMMessages, WMDialogs,
 	GL := OpenGL, GLC := OpenGLConst, GLU, WMGL:=WMGLWindow;
 
@@ -41,18 +41,19 @@ TYPE
 		initGL;
 		Reshape(w, h);
 		UpdateImage;
+		IncCount
 	  END New;
 
 	PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
 	BEGIN
 		IF ucs = ORD("s") THEN SaveImage;
 		ELSIF  ucs = ORD("q") THEN Close;
-		ELSIF  ucs = ORD("a") THEN animated := ~ animated;
+		ELSIF  ucs = ORD("a") THEN BEGIN {EXCLUSIVE} animated := ~ animated; END;
 		ELSE
 		END;
 	END KeyEvent;
 
-	PROCEDURE WheelMove*(dz : LONGINT);
+	PROCEDURE WheelMove(dz : LONGINT);
 	BEGIN
 		Reshape(GetWidth(), GetHeight());
 		UpdateImage;
@@ -66,10 +67,11 @@ TYPE
 		END
 	END Handle;
 
-	PROCEDURE Close*;
-	BEGIN  (* {EXCLUSIVE}*)
-		alive := FALSE;
+	PROCEDURE Close;
+	BEGIN
+		BEGIN {EXCLUSIVE} alive := FALSE; animated := FALSE END;
 		Close^;
+		DecCount
 	END Close;
 
 	PROCEDURE UpdateImage;
@@ -111,9 +113,9 @@ TYPE
 	BEGIN
 		MakeCurrent();
 
-		texture := LoadTexture("europe.png");
+		texture := LoadTexture("opengloberon/europe.png");
 
-		texture2 := LoadTexture("turkiye.png");
+		texture2 := LoadTexture("opengloberon/turkiye.png");
 
 
 		GL.Enable(GLC.GL_TEXTURE_2D);                          (* Zapne mapov textur*)
@@ -267,16 +269,17 @@ TYPE
 BEGIN  { ACTIVE }
 	Kernel.SetTimer(timer, waittime);
 	WHILE alive DO
-		IF animated THEN
-			 IF Kernel.Expired(timer) THEN
-			 	 UpdateImage();
-				Kernel.SetTimer(timer, waittime);
-			END;
+		BEGIN {EXCLUSIVE} AWAIT(animated) END;
+		 IF Kernel.Expired(timer) THEN
+		 	 UpdateImage();
+			Kernel.SetTimer(timer, waittime);
 		END;
 	END;
-
 END GLWindow;
 
+VAR
+	nofWindows : LONGINT;
+	
 PROCEDURE Open*;
 VAR
 	window: GLWindow;
@@ -284,9 +287,33 @@ BEGIN
 	NEW(window, 256, 256) ;
 END Open;
 
+PROCEDURE IncCount;
+BEGIN {EXCLUSIVE}
+	INC(nofWindows)
+END IncCount;
+
+PROCEDURE DecCount;
+BEGIN {EXCLUSIVE}
+	DEC(nofWindows)
+END DecCount;
+
+PROCEDURE Cleanup;
+VAR die : KillerMsg;
+	 msg : WMMessages.Message;
+	 m : WM.WindowManager;
+BEGIN {EXCLUSIVE}
+	NEW(die);
+	msg.ext := die;
+	msg.msgType := WMMessages.MsgExt;
+	m := WM.GetDefaultManager();
+	m.Broadcast(msg);
+	AWAIT(nofWindows = 0)
+END Cleanup;
+
 BEGIN
+	Modules.InstallTermHandler(Cleanup)
 END WMGLDemoFlags.
 
-SystemTools.Free  WMGLDemoFlags  WMGLWindow ~  OpenGL OpenGLConst ~
+SystemTools.Free  WMGLDemoFlags  ~
 
 WMGLDemoFlags.Open  ~

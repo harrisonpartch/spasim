@@ -13,14 +13,14 @@ BEGIN
 	context.MakeCurrent;
 
 	(* GLX server and client info *)
-	s := GL.GLXQueryServerString(context.glWin.display, 0, GLC.GLX_VENDOR); KernelLog.String("Server GLX_VENDOR: "); KernelLog.String(s^); KernelLog.Ln;
-	s := GL.GLXQueryServerString(context.glWin.display, 0, GLC.GLX_VERSION); KernelLog.String("Server GLX_VERSION: "); KernelLog.String(s^); KernelLog.Ln;
-	s := GL.GLXQueryServerString(context.glWin.display, 0, GLC.GLX_EXTENSIONS); KernelLog.String("Server GLX_EXTENSIONS: "); KernelLog.String(s^); KernelLog.Ln;
+	s := GL.GLXQueryServerString(context.GetDisplay(), 0, GLC.GLX_VENDOR); KernelLog.String("Server GLX_VENDOR: "); KernelLog.String(s^); KernelLog.Ln;
+	s := GL.GLXQueryServerString(context.GetDisplay(), 0, GLC.GLX_VERSION); KernelLog.String("Server GLX_VERSION: "); KernelLog.String(s^); KernelLog.Ln;
+	s := GL.GLXQueryServerString(context.GetDisplay(), 0, GLC.GLX_EXTENSIONS); KernelLog.String("Server GLX_EXTENSIONS: "); KernelLog.String(s^); KernelLog.Ln;
 	KernelLog.Ln;
 
-	s := GL.GLXGetClientString(context.glWin.display, GLC.GLX_VENDOR); KernelLog.String("Client GLX_VENDOR: "); KernelLog.String(s^); KernelLog.Ln;
-	s := GL.GLXGetClientString(context.glWin.display, GLC.GLX_VERSION); KernelLog.String("Client GLX_VERSION: "); KernelLog.String(s^); KernelLog.Ln;
-	s := GL.GLXGetClientString(context.glWin.display, GLC.GLX_EXTENSIONS); KernelLog.String("Client GLX_EXTENSIONS: "); KernelLog.String(s^); KernelLog.Ln;
+	s := GL.GLXGetClientString(context.GetDisplay(), GLC.GLX_VENDOR); KernelLog.String("Client GLX_VENDOR: "); KernelLog.String(s^); KernelLog.Ln;
+	s := GL.GLXGetClientString(context.GetDisplay(), GLC.GLX_VERSION); KernelLog.String("Client GLX_VERSION: "); KernelLog.String(s^); KernelLog.Ln;
+	s := GL.GLXGetClientString(context.GetDisplay(), GLC.GLX_EXTENSIONS); KernelLog.String("Client GLX_EXTENSIONS: "); KernelLog.String(s^); KernelLog.Ln;
 	KernelLog.Ln;
 
 	(* OpenGL info *)

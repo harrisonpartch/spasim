@@ -1,96 +1,92 @@
 MODULE NXWCxXWLIcD2LegvoGXXBiQ;
 
-IMPORT Base;
+IMPORT Base, NM3;
 TYPE PT = Base.PT;
 	Ray = Base.Ray;
 	Voxel = Base.Voxel;  
 	
-TYPE AlphaVox* = OBJECT(Voxel);
+TYPE TransparaVox*=OBJECT(Base.Voxel);
 VAR
-	r, g, b : REAL;
-PROCEDURE setcolor* (red, green, blue, black,alpha : REAL);
+	r, g, b, black: REAL;	
+PROCEDURE setcolor* (red, green, blue,bl , a : REAL); 
 BEGIN
-	r := red * alpha;
-	g := green * alpha;
-	b := blue * alpha;
+	r := red;
+	g := green;
+	b := blue;
+	black:=bl;
+	passable := TRUE;
 END setcolor;
-PROCEDURE Shade(VAR ray: Ray);
+
+PROCEDURE Shade (VAR ray: Ray);
 VAR 
-	dr, dg, db: REAL;
+	depth: REAL;
+	exit:PT;
+	dr,dg,db,dbl: REAL;
 BEGIN
-	dr :=  r*ray.ra;
-	dg :=  g*ray.ga;
-	db :=  b*ray.ba;
+	exit:=Base.Exit(ray);
+	depth:=Base.dist(ray.lxyz,exit);
+	dr := r*depth;
+	dg := g*depth;
+	db := b*depth;
+	dbl:=black*depth;
 	ray.r := ray.r + dr;
 	ray.g := ray.g + dg;
-	ray.b := ray.b + db;
-	ray.ra := ray.ra - (dg+db)/2;
-	ray.ga := ray.ga - (dr+db)/2;
-	ray.ba := ray.ba - (dr+dg)/2;
-	ray.bla := ray.bla -(dr+dg+db)/3;
-	IF (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1) THEN ray.terminate:=TRUE END;
+	ray.b := ray.b + db; 
+	ray.ra := (ray.ra - dr);
+	ray.ga := (ray.ga - dg);
+	ray.ba := (ray.ba - db); 
+	ray.bla:=ray.bla-dbl;
+	IF (ray.bla<0.1) THEN ray.terminate:=TRUE END;
 END Shade;
 
-PROCEDURE deepcopy*():Voxel;
-VAR	v:AlphaVox;
-BEGIN
-	NEW(v);
-	v.setcolor(r,g,b,0,1);
-	RETURN(v)
-END deepcopy;
-END AlphaVox; 
+END TransparaVox;  
 
 VAR 
-	serp, subserp, beatrix,lobster,sparx: Voxel;
+	subserp, beatrix,lobster, tree: Voxel;
 	greenball: Voxel;
 	v: Voxel;
-blue: Voxel;
+	blue,red,reddot: Voxel;
+	alphablue: TransparaVox;
+	s0,s1,s2,s3,s4: NM3.cell;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	beatrix:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw"); 
-	lobster:=Base.VoxelFromName("NznGx2ySiHIGrO5t9Pzcw5Q"); 
+	lobster:=Base.VoxelFromName("N5a2g4M6HYjPJxYSNQvYyv7"); 
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	blue:=Base.VoxelFromName("Ndiffuseblue"); 
+	red:=Base.VoxelFromName("Ndiffusered"); 	
+	reddot:=Base.VoxelFromName("Ndiffusereddot"); 
+	blue.passable:=FALSE;
 	subserp:=Base.VoxelFromName("NM3"); 	
-	serp:=Base.VoxelFromName("NM3"); 	
+	tree:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX666"); 	
+	NEW(s0);
+	NEW(s1);
+	NEW(s2);
+	NEW(s3);
+	NEW(s4);	
+	NEW(alphablue);
+	alphablue.setcolor(0,0,0,1/4,1/4);
+
+	tree.imposter:=blue;
+	s0.fillsierp(s1,tree);	
+	s0.imposter:=blue;
+	s0.copyonstroke:=TRUE;
+	s0.DTL:=120;
+	
+	s1.fillsierp(s2,alphablue);	
+	s1.imposter:=blue;
+	s1.copyonstroke:=TRUE;
+	s1.DTL:=120;
+
+	s2.fillsierp(s2,reddot);	
+	s2.imposter:=blue;
+	s2.DTL:=120;
+	s2.lockTF:=TRUE;
 
 
-	subserp.DTL:=300;
-	subserp.imposter:=greenball;		
 
-	serp.DTL:=300;	
-
-(*	subserp.fill(subserp);*)
-
-	subserp.stroke(Base.mkPT(1/2,1/2,1/4),1,subserp,v);
-	subserp.stroke(Base.mkPT(1/2,1/2,3/4),1,subserp,v);
-	subserp.stroke(Base.mkPT(1/4,1/2,1/2),1,subserp,v);
-	subserp.stroke(Base.mkPT(3/4,1/2,1/2),1,subserp,v);
-	subserp.stroke(Base.mkPT(1/2,1/4,1/2),1,subserp,v);
-	subserp.stroke(Base.mkPT(1/2,3/4,1/2),1,subserp,v);
-	subserp.stroke(Base.mkPT(1/2,1/2,1/2),1,beatrix,v);		
-	subserp.stroke(Base.mkPT(0,0,0),1,beatrix,v);		
-	subserp.stroke(Base.mkPT(1,0,0),1,greenball,v);		
-	subserp.stroke(Base.mkPT(0,0,1),1,beatrix,v);		
-	subserp.stroke(Base.mkPT(0,1,1),1,greenball,v);	
-	subserp.stroke(Base.mkPT(1,1,0),1,beatrix,v);		
-	subserp.stroke(Base.mkPT(0,1,0),1,greenball,v);		
-	subserp.stroke(Base.mkPT(1,0,1),1,beatrix,v);		
-	subserp.stroke(Base.mkPT(1,1,1),1,greenball,v);	
-	serp.fill(serp);	
-	serp.imposter:=blue;
-	serp.stroke(Base.mkPT(1/2,1/2,1/2),1,greenball,v);
-	serp.stroke(Base.mkPT(1/2,0,1),1,greenball,v);
-	serp.stroke(Base.mkPT(1/2,1,0),1,greenball,v);
-	serp.stroke(Base.mkPT(0,0,1/2),1,greenball,v);	
-	serp.stroke(Base.mkPT(0,1,1/2),1,greenball,v);
-	serp.stroke(Base.mkPT(1,0,1/2),1,greenball,v);	
-	serp.stroke(Base.mkPT(1,1,1/2),1,greenball,v);
-	subserp.copyonstroke:=TRUE;	
-	serp.copyonstroke:=TRUE;	
-	beatrix.copyonstroke:=TRUE;
-	RETURN serp
+	RETURN s0
 END thisvox;
  END NXWCxXWLIcD2LegvoGXXBiQ. 
  

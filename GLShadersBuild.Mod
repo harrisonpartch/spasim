@@ -502,7 +502,7 @@ BEGIN
 	context.Init(100,100);
 END GLShadersBuild.
 
-GLShadersBuild.Open MyDemos/mycd4.vert MyDemos/mycd4.frag ~
+GLShadersBuild.Open passthroughVS.glsl  toonShadingFS.glsl ~ 
 
 GLShadersBuild.Open ~
 

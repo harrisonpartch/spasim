@@ -7,27 +7,28 @@ TYPE Ray = Base.Ray;
 	PT =Base.PT;
 VAR 
 	ball: FRep.sphere;
-	reddot,v: Voxel;
+	dot,v: Voxel;
 	center:  PT;
 	i:LONGINT;
 	
-PROCEDURE draw(VAR reddott: Voxel);
+PROCEDURE draw;
 BEGIN
-	reddott:=Base.VoxelFromName("NM3"); 	
-	reddott.copyonstroke:=TRUE;
+	dot:=Base.VoxelFromName("NM3"); 	
+	dot.copyonstroke:=TRUE;
 	Base.setPT(center,1/2,1/2,1/2);
 	NEW(ball,center,1/2);	
 	ball.setcolor(0,1,0);		
-	reddott.FRaster(ball,9);
+	dot.FRaster(ball,9);
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	draw(reddot);
-	RETURN reddot
+	RETURN dot
 END thisvox;
 
- END N2qeD84Fv78X2XEj8PtUZO9. 
+BEGIN
+	draw
+END N2qeD84Fv78X2XEj8PtUZO9. 
  
 XNXLMarsh.Rez N2qeD84Fv78X2XEj8PtUZOQ ~
  

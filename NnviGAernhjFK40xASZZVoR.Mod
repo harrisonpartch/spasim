@@ -1,13 +1,13 @@
 MODULE NnviGAernhjFK40xASZZVoR;(*anonymous module created by saboteur*)
   
-IMPORT Base,  XNXLFRep;
+IMPORT Base,  FRep;
 
 TYPE Ray = Base.Ray;
 	Voxel = Base.Voxel;  
 	PT =Base.PT;
 	
 VAR 
-	ball: XNXLFRep.sphere;
+	ball: FRep.sphere;
 	n3ball, v:Voxel;
 	center:  PT;
 PROCEDURE thisvox*():Base.Voxel;

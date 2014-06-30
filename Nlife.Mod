@@ -1,6 +1,6 @@
 MODULE Nlife;
 
-IMPORT Base, XNXLE, XNXLFRep,Raster;
+IMPORT Base, XNXLE, FRep,Raster;
 
 CONST
 	N = 500;
@@ -25,7 +25,7 @@ VAR
 PROCEDURE &init;
 BEGIN
 	seed;
-	register;
+	 register; 
 END init;
 			
 PROCEDURE seed;
@@ -150,7 +150,7 @@ VAR
 	vox: LifeVox; 
 	r,b,y: Base.Voxel;
 	center: Base.PT;
-	ball: XNXLFRep.sphere;
+	ball: FRep.sphere;
 	
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN	

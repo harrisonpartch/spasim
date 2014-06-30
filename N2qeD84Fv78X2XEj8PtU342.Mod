@@ -1,6 +1,6 @@
 MODULE N2qeD84Fv78X2XEj8PtU342;(*anonymous module created by saboteur*)
   
-IMPORT Objects, Base,  XNXLFRep, Out:=KernelLog, Random;
+IMPORT Objects, Base,  FRep, Out:=KernelLog, Random;
 
 TYPE Ray = Base.Ray;
 	Voxel = Base.Voxel;  
@@ -34,9 +34,9 @@ VAR
 	ecount:INTEGER;
 BEGIN
 	dot := ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
-	IF (ray.lxyz.x< 0.1) OR (ray.lxyz.x > 0.9) THEN INC(ecount) END;
-	IF (ray.lxyz.y <0.1) OR (ray.lxyz.y > 0.9) THEN INC(ecount) END;
-	IF (ray.lxyz.z < 0.1) OR (ray.lxyz.z > 0.9) THEN INC(ecount) END;
+	IF (ray.lxyz.x< 0.01) OR (ray.lxyz.x > 0.99) THEN INC(ecount) END;
+	IF (ray.lxyz.y <0.01) OR (ray.lxyz.y > 0.99) THEN INC(ecount) END;
+	IF (ray.lxyz.z < 0.01) OR (ray.lxyz.z > 0.99) THEN INC(ecount) END;
 	IF (ecount > 1) THEN
 		ray.r := ray.r + or * ray.ra*dot;
 		ray.g := ray.g + og * ray.ga*dot;

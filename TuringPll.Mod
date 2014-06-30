@@ -1,11 +1,11 @@
 MODULE TuringPll;
-IMPORT Raster, Random, Objects, WMRectangles, WMGraphics, Modules, Strings,
+IMPORT Base,Raster, Random, Objects, WMRectangles, WMGraphics, Modules, Strings,
 	WM := WMWindowManager, Math;
 
 CONST
-	M =500; 
+	M =300; 
 	M2 = (M DIV 2);
-	MSIZE =2
+	MSIZE =1
 
 TYPE Twindow* =  OBJECT(WM.BufferWindow)
 VAR
@@ -68,11 +68,9 @@ BEGIN
 	END;
 	FOR i := 0 TO M - 1 DO
 		FOR j := 0 TO M - 1 DO
-			(*  HERE ARE THE DIFFERENCE RULES! *)
-			
-			mesh1[i, j] := mesh1[i, j] + n1[i, j]/400- mesh2[i, j];
-			mesh2[i, j] := mesh2[i, j] +  mesh1[i, j]/20 - 0.02;
-(*			mesh2[i, j] := ABS(mesh2[i, j] +  mesh1[i, j] / 10 - (Math.sqrt((M2-i)*(M2-i)+(M2-j)*(M2-j))/333 + 0.001)); *)
+			(*  HERE ARE THE DIFFERENCE RULES! *)	
+			mesh1[i, j] := mesh1[i, j] + n1[i, j]/73 - mesh2[i, j];
+			mesh2[i, j] := ABS(mesh2[i, j] +  mesh1[i, j]/100 - 0.0081);   
 			IF mesh1[i, j] < 0 THEN mesh1[i, j] := 0 END;
 			IF mesh2[i, j] < 0 THEN mesh2[i, j] := 0 END;
 			IF mesh1[i, j] > 1 THEN mesh1[i, j] := 1 END;
@@ -107,8 +105,9 @@ BEGIN {ACTIVE}
 	Objects.SetPriority(Objects.Low);
 	WHILE alive DO
 		FOR i := 0 TO 0 DO Generation END;
-			DrawIt;
-		END;
+		DrawIt;
+	(*	Objects.Sleep(10) *)
+	END;
 	BEGIN {EXCLUSIVE} dead := TRUE; END;
 END Twindow;
 

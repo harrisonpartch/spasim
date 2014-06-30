@@ -5,7 +5,8 @@ IMPORT Base, TexVox;
 VAR vox: TexVox.TexVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	IF vox=NIL THEN NEW(vox,"Sky.png"); vox.lock()  END;
+	IF vox=NIL THEN NEW(vox,"alice.png"); vox.lock()  END;
+	vox.tscale:=100;
 	RETURN vox
 END thisvox;
 

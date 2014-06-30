@@ -1,5 +1,5 @@
 MODULE XNXLVoxel;
-IMPORT Base, Random, Math, XNXLMath, XNXLE, XNXLHex, Noise:=XNXLNoise, Streams;
+IMPORT Base, Random, Math, XNXLMath, XNXLE, XNXLHex, Noise, Streams;
 
 CONST 	
 		NL=Base.NL;
@@ -196,6 +196,7 @@ BEGIN
 	w.RawReal(b);	
 	w.RawReal(black);	
 END engrain;
+
 PROCEDURE sprout(rdr: Streams.Reader);
 BEGIN
 	rdr.RawReal(r);

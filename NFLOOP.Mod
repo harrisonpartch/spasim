@@ -5,8 +5,11 @@ VAR vox: TexVox.FloopVox;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	NEW(vox,"pdome.mpg");
-	vox.copyonstroke:=TRUE;
 	RETURN vox
 END thisvox;
+
+BEGIN
+	NEW(vox,"ket.mpg");
+	vox.tscale:=50;
+	vox.copyonstroke:=FALSE
 END NFLOOP. 

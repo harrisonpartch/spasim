@@ -1,7 +1,7 @@
 MODULE Base;
 
-IMPORT  Math:=Math, Random, Kernel, Out:=KernelLog (*DebugLog*), Objects,  
-Strings, Streams, WMFontManager, Raster, Graphics := WMGraphics, Commands(*, XNXLAudio*);
+IMPORT  Math:=Math, Random, Kernel, Out:=KernelLog (*DebugLog*), Objects, (* AL:=OpenAL, ALUT := OpenALUtil,  *)
+Strings, Streams, WMFontManager, Raster, WMRasterScale, WMRectangles, Graphics := WMGraphics, Commands(*, XNXLAudio*);
 
 CONST
 	BPS*=3; 
@@ -70,9 +70,7 @@ END V;
 
 TYPE Texture*=OBJECT(V)
 VAR
-	img*: Raster.Image;
-	imp*:ARRAY 10,10 OF Color;
-	fmt: Raster.Format;
+	img,mip0,mip1: Raster.Image;
 	W*,H*, bpr,adr: LONGINT;
 	transparent*: BOOLEAN;
 
@@ -82,21 +80,23 @@ VAR
 BEGIN
 	Raster.InitMode(copy,Raster.srcCopy);
 	img :=Graphics.LoadImage(n, TRUE); (* img format is BGRA8888 *)
-	IF img#NIL THEN 
-		W:=img.width-1; H:=img.height-1;
-		ix:=W DIV 10;
-		jy:=H DIV 10;
-		FOR i:=0 TO 9 DO
-			FOR j:=0 TO 9 DO
-				imp[i,j]:=pixel(rand.Dice(W),rand.Dice(H))
-			END
-		END
-	ELSE
+	IF img=NIL THEN 
+		Out.String(n);
+		Out.String(" not found: loading grain.png instead");
+		Out.Ln;
 		img := Graphics.LoadImage("grain.png", TRUE); 
-		IF img=NIL THEN Out.String("NIL TEXTURE  FAULT") END;
 		ASSERT(img#NIL);
-		W:=img.width-1; H:=img.height-1;
 	END;
+	NEW(mip0);
+	NEW(mip1);	
+	Raster.Create(mip0,8,8,Raster.BGRA8888);
+	Raster.Create(mip1,64,64,Raster.BGRA8888);		
+	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height),mip0,
+		WMRectangles.MakeRect(0,0, mip0.width, mip0.height),WMRectangles.MakeRect(0,0,mip0.width, mip0.height),
+			WMRasterScale.ModeCopy, WMRasterScale.ScaleBilinear);
+	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height),mip1,
+		WMRectangles.MakeRect(0,0, mip1.width, mip1.height),
+			WMRectangles.MakeRect(0,0, mip1.width, mip1.height),WMRasterScale.ModeSrcOverDst, WMRasterScale.ScaleBilinear);	
 END init;
 
 PROCEDURE pixel*(x,y:REAL):Color;
@@ -105,15 +105,35 @@ VAR
 	p: Raster.Pixel;
 	c: Color;
 BEGIN
-	IF img#NIL THEN
-		i:=ENTIER(x*W) MOD W; j:=ENTIER(y*H) MOD H;	
-		Raster.Get(img,i,j,p,copy);
-		c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
-	ELSE
-		c.red:=1; c.blue:=1;
-	END;
+	i:=ENTIER(x*img.width) MOD img.width; j:=ENTIER(y*img.height) MOD img.height;	
+	Raster.Get(img,i,j,p,copy);
+	c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
 	RETURN c
 END pixel;
+
+PROCEDURE pixelmip0*(x,y:REAL):Color;
+VAR
+	i,j: LONGINT;
+	p: Raster.Pixel;
+	c: Color;
+BEGIN
+	i:=ENTIER(x*mip0.width) MOD mip0.width; j:=ENTIER(y*mip0.height) MOD mip0.height;	
+	Raster.Get(mip0,i,j,p,copy);
+	c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
+	RETURN c
+END pixelmip0;
+
+PROCEDURE pixelmip1*(x,y:REAL):Color;
+VAR
+	i,j: LONGINT;
+	p: Raster.Pixel;
+	c: Color;
+BEGIN
+	i:=ENTIER(x*mip1.width) MOD mip1.width; j:=ENTIER(y*mip1.height) MOD mip1.height;	
+	Raster.Get(mip1,i,j,p,copy);
+	c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
+	RETURN c
+END pixelmip1;
 
 PROCEDURE pixelT*(x,y:REAL; T: LONGINT):Color;
 VAR
@@ -132,7 +152,6 @@ BEGIN
 	END;
 	RETURN c
 END pixelT;
-
 
 END Texture;
 
@@ -158,11 +177,12 @@ BEGIN
 		NEW(side[5],nstring^);	
 	ELSE
 		NEW(side[0],name);
-		NEW(side[1],name);	
-		NEW(side[2],name);		
-		NEW(side[3],name);
-		NEW(side[4],name);	
-		NEW(side[5],name);			
+		side[1]:=side[0];		
+		side[2]:=side[0];		
+		side[3]:=side[0];		
+		side[4]:=side[0];		
+		side[5]:=side[0];
+		
 	END
 END init;	
 END TexCube;
@@ -176,12 +196,12 @@ TYPE BPATCH*=ARRAY BPS,BPS OF BPE;
 TYPE Ray* = RECORD
 	xyz*, dxyz*, ddxyz*, lxyz*, txyz*, origin*, oxyz*, popdelta*, hitxyz*, hitdxyz*: PT;	
 	theta*,phi*, dtheta*,dphi*: REAL;
-	cellred*,cellgreen*,cellblue*,cellblack*: REAL;
+(*	cellred*,cellgreen*,cellblue*,cellblack*: REAL; *)
 	texcube*:TexCube;
 	texcubeTF*:BOOLEAN;
 	ncube*: NCube;
 	ncubeTF*: BOOLEAN;
-	r*, g*, b*, ra*, ga*, ba*, bla*,ulfire*: REAL; (* ulfire is an invisible color *)
+	r*, g*, b*, ra*, ga*, ba*, bla*,alpha*: REAL; 
 	rgb*: ARRAY 3,3 OF BPE;
 	terminate*: BOOLEAN;
 	scale*,tscale*: REAL;
@@ -192,6 +212,7 @@ TYPE Ray* = RECORD
 	changed*: BOOLEAN; 
 	face*: INTEGER;
 	mirrortf*:BOOLEAN;	
+	inside*: BOOLEAN;
 	normal*,fnormal*: PT;  
 	normalTF*: BOOLEAN;
 	corner*:PT;
@@ -210,11 +231,11 @@ VAR
 	lockTF*,copymarker*,emptysplit*: BOOLEAN;
 	DTL*: REAL;
 	code*,ncode*:Name;  
-	tscale*: PT;
+	tscale*: LONGINT;
 	red*,green*,blue*,black*,alpha*: REAL;
 	colored*,frozen*,probelock*,copyonstroke*,copyonstrokerecursion*:BOOLEAN;
 	offset*:PT;
-	lightcube*:LightCube;
+
 PROCEDURE Shade*(VAR ray: Ray);
 END Shade;
 PROCEDURE proberay*(VAR ray: Ray):Voxel;
@@ -227,14 +248,24 @@ PROCEDURE probe*(p:PT; resolution: LONGINT):Voxel;
 BEGIN
 	RETURN(SELF);
 END probe;
+PROCEDURE touchcache*;
+END touchcache;
 PROCEDURE passprobe*(p:PT):BOOLEAN;
 BEGIN
 	RETURN(passable);
 END passprobe;
+PROCEDURE chat*(in: CHAR):Strings.String;
+VAR
+	out: Strings.String;
+BEGIN
+	out:=Strings.NewString("generic voxel chat response");
+	IF in='h' THEN 
+		out:=Strings.NewString("i have nothing to say")
+	END;
+	RETURN out
+ END chat;
 PROCEDURE setcolor* (r,g,b,bl,a: REAL); 
 END setcolor;
-PROCEDURE setcolorrec*(r,g,b,bl,a: REAL); 
-END setcolorrec;
 PROCEDURE erase*(p:PT; resolution:LONGINT);
 END erase;
 PROCEDURE deepcopy*():Voxel;
@@ -262,6 +293,10 @@ PROCEDURE stroke*(p:PT; resolution: LONGINT; voxel,voxundo:Voxel);
 END stroke;
 PROCEDURE strokerec*(p:PT; resolution,scale: LONGINT; voxel,voxundo:Voxel);
 END strokerec;
+PROCEDURE strokephemeral*(p:PT; resolution: LONGINT; voxel,voxundo:Voxel);
+END strokephemeral;
+PROCEDURE strokephemeralrec*(p:PT; resolution,scale: LONGINT; voxel,voxundo:Voxel);
+END strokephemeralrec;
 PROCEDURE nstroke*(p:PT; resolution: LONGINT; normal: PT; color: Color);
 END nstroke;
 PROCEDURE nstrokerec*(p:PT; resolution,scale: LONGINT; normal: PT; color: Color);
@@ -307,11 +342,21 @@ END showcode;
 PROCEDURE play*();
 BEGIN
 (*	XNXLAudio.LoadWav("grain.wav");
-	XNXLAudio.Play *)
+	XNXLAudio.Play 
+
+	ALUT.Play(basesource);	*)
 END play;
 
 PROCEDURE touch*;
 END touch; 
+
+PROCEDURE free*;
+END free; 
+
+PROCEDURE freerec*;
+END freerec; 
+
+
 
 END Voxel; 
 
@@ -489,11 +534,16 @@ VAR
 	skydistance*:REAL;
 	rnf*:REAL; (*random number for frame*);
 	sniperay*:Ray;
+	blackspeed*:REAL;
 
+(*	basesource*, texsound*, grainsound*: AL.ALuint;
+	listenerPos*: ARRAY [3] OF AL.ALfloat; (* global position *)
+	sourcePos: ARRAY 3 OF AL.ALfloat;
+	buffer1*, buffer2*, buffer3* : AL.ALuint;	
+*)	
 PROCEDURE VoxelFromName*(modname: Name): Voxel;
 	VAR voxel: Voxel;  fackery: VoxelFackery;
 	BEGIN
-		Out.String(".... ");	 
 		IF modname[0]='N' THEN
 			GETPROCEDURE(modname, "thisvox", fackery );
 			IF (fackery # NIL) THEN  
@@ -628,6 +678,14 @@ BEGIN
 	c.red:=r; c.green:=g; c.blue:=b;
 	RETURN(c);
 END mkcolor;
+
+PROCEDURE avgcolor*(a,b: Color): Color;
+VAR
+	c:Color;
+BEGIN
+	c.red:=(a.red+b.red)/2; c.green:=(a.green+b.green)/2; c.blue:=(a.blue+b.blue)/2;
+	RETURN(c);
+END avgcolor;
 
 PROCEDURE mkPT*(x,y,z: REAL): PT;
 VAR
@@ -975,31 +1033,147 @@ BEGIN
 		IF (drx < drz ) THEN
 			IF ray.dxyz.x>0 THEN
 				exit.x:=1; exit.y:=ray.lxyz.y+drx*ray.dxyz.y; exit.z:=ray.lxyz.z+ drx*ray.dxyz.z;
+				ray.face := 0; ray.fnormal:= Face[0] 
 			ELSE
 				exit.x:=0; exit.y:=ray.lxyz.y+drx*ray.dxyz.y; exit.z:=ray.lxyz.z+ drx*ray.dxyz.z;
+				ray.face := 0; ray.fnormal:= Face[0] 
 			END;	
 		ELSE
 			IF ray.dxyz.z>0 THEN
 				exit.x:=ray.lxyz.x+drz*ray.dxyz.x; exit.y:=ray.lxyz.y+drz*ray.dxyz.y; exit.z:=1;
+				ray.face := 2; ray.fnormal:= Face[2] 
 			ELSE
 				exit.x:=ray.lxyz.x+drz*ray.dxyz.x; exit.y:=ray.lxyz.y+drz*ray.dxyz.y; exit.z:=0;
+				ray.face := 5; ray.fnormal:= Face[5]
 			END;		
 		END;
 	ELSIF (dry < drz) THEN
 		IF ray.dxyz.y>0 THEN
 			exit.x:=ray.lxyz.x+dry*ray.dxyz.x; exit.y:=1; exit.z:=ray.lxyz.z+dry*ray.dxyz.z;
+			ray.face := 1; ray.fnormal:= Face[1] 
 		ELSE
 			exit.x:=ray.lxyz.x+dry*ray.dxyz.x; exit.y:=0; exit.z:=ray.lxyz.z+dry*ray.dxyz.z;
+			ray.face := 4; ray.fnormal:= Face[4] 
 		END;
 	ELSE
 		IF ray.dxyz.z>0 THEN
 			exit.x:=ray.lxyz.x+drz*ray.dxyz.x; exit.y:=ray.lxyz.y+drz*ray.dxyz.y; exit.z:=1;
+			ray.face := 2; ray.fnormal:= Face[2] 
 		ELSE
 			exit.x:=ray.lxyz.x+drz*ray.dxyz.x; exit.y:=ray.lxyz.y+drz*ray.dxyz.y; exit.z:=0;
+			ray.face := 5; ray.fnormal:= Face[5]
 		END;		
 	END;
 	RETURN(exit);
 END Exit;
+
+PROCEDURE ExitF*(ray: Ray; VAR exit: PT; VAR face: INTEGER);
+VAR
+	drx, dry, drz: REAL;
+BEGIN
+	clamPT(ray.lxyz);
+	IF ray.dxyz.x>0 THEN
+		drx:= (1-ray.lxyz.x)/ ray.dxyz.x
+	ELSE
+		drx :=  (-ray.lxyz.x) / ray.dxyz.x
+	END;
+	IF ray.dxyz.y > 0 THEN
+		dry := (1 - ray.lxyz.y) / ray.dxyz.y
+	ELSE
+		dry :=  (-ray.lxyz.y) / ray.dxyz.y
+	END;
+	IF ray.dxyz.z > 0 THEN
+		drz := (1-ray.lxyz.z) / ray.dxyz.z
+	ELSE
+		drz :=  (-ray.lxyz.z) / ray.dxyz.z
+	END;
+	IF (drx < dry) THEN
+		IF (drx < drz ) THEN
+			IF ray.dxyz.x>0 THEN
+				exit.x:=1; exit.y:=ray.lxyz.y+drx*ray.dxyz.y; exit.z:=ray.lxyz.z+ drx*ray.dxyz.z;
+				face := 0
+			ELSE
+				exit.x:=0; exit.y:=ray.lxyz.y+drx*ray.dxyz.y; exit.z:=ray.lxyz.z+ drx*ray.dxyz.z;
+				face := 3
+			END;	
+		ELSE
+			IF ray.dxyz.z>0 THEN
+				exit.x:=ray.lxyz.x+drz*ray.dxyz.x; exit.y:=ray.lxyz.y+drz*ray.dxyz.y; exit.z:=1;
+				face := 2
+			ELSE
+				exit.x:=ray.lxyz.x+drz*ray.dxyz.x; exit.y:=ray.lxyz.y+drz*ray.dxyz.y; exit.z:=0;
+				face := 5
+			END;		
+		END;
+	ELSIF (dry < drz) THEN
+		IF ray.dxyz.y>0 THEN
+			exit.x:=ray.lxyz.x+dry*ray.dxyz.x; exit.y:=1; exit.z:=ray.lxyz.z+dry*ray.dxyz.z;
+			face := 1
+		ELSE
+			exit.x:=ray.lxyz.x+dry*ray.dxyz.x; exit.y:=0; exit.z:=ray.lxyz.z+dry*ray.dxyz.z;
+			face := 4
+		END;
+	ELSE
+		IF ray.dxyz.z>0 THEN
+			exit.x:=ray.lxyz.x+drz*ray.dxyz.x; exit.y:=ray.lxyz.y+drz*ray.dxyz.y; exit.z:=1;
+			face := 2
+		ELSE
+			exit.x:=ray.lxyz.x+drz*ray.dxyz.x; exit.y:=ray.lxyz.y+drz*ray.dxyz.y; exit.z:=0;
+			face := 5
+		END;		
+	END
+END ExitF;
+
+PROCEDURE InitSounds;
+
+(*BEGIN
+*(	ALUT.OpenPlayDevice();
+	buffer1 := ALUT.LoadWavFileToBuffer("grain.wav");
+	
+	 AL.alGenSources(1, ADDRESSOF(basesource));
+	 AL.alSourcef(basesource, AL.AL_PITCH, 1.0);
+	AL.alSourcef(basesource, AL.AL_GAIN, 1.0); 
+	sourcePos := [0.0, 0.0, 0.0];
+	AL.alSourcefv(basesource, AL.AL_POSITION, ADDRESSOF(sourcePos[0]));
+	AL.alSourcei(basesource, AL.AL_LOOPING, AL.AL_FALSE); 
+	 AL.alSourcei(basesource, AL.AL_BUFFER, buffer1);
+	 
+	 (* the same sound, wav *)
+	buffer2 := buffer1;
+	grainsound := basesource;
+	
+	(* sound for TexVox *)
+	buffer3 := ALUT.LoadWavFileToBuffer("test.wav");		
+	 AL.alGenSources(1, ADDRESSOF(texsound));
+	 	
+	 AL.alSourcef(texsound, AL.AL_PITCH, 1.0);
+	AL.alSourcef(texsound, AL.AL_GAIN, 1.0); 
+	sourcePos := [0.0, 0.0, 0.0];
+	AL.alSourcefv(texsound, AL.AL_POSITION, ADDRESSOF(sourcePos[0]));
+	AL.alSourcei(texsound, AL.AL_LOOPING, AL.AL_FALSE); 
+	AL.alSourcei(texsound, AL.AL_BUFFER, buffer3);
+ 
+ 	
+ 	(* finally create one listener *)
+	listenerPos := [0.0, 0.0, 0.0];
+	AL.alListenerfv(AL.AL_POSITION, ADDRESSOF(listenerPos[0]));
+	ALUT.ALWriteError("2-loadwav: ");	
+*)
+END InitSounds;
+
+PROCEDURE engrain*(w: Streams.Writer); 
+BEGIN
+	w.RawReal(cameraPT.x);
+	w.RawReal(cameraPT.y);
+	w.RawReal(cameraPT.z);
+END engrain;
+
+PROCEDURE sprout*(r: Streams.Reader);
+BEGIN
+	r.RawReal(cameraPT.x);
+	r.RawReal(cameraPT.y);
+	r.RawReal(cameraPT.z);
+END sprout;
 
 BEGIN
 	Out.String("Base loading...");
@@ -1020,26 +1194,27 @@ BEGIN
 	rlimit := 4;
 	iterlimit := 500;
 	DTL:=25;	
-	STOP:=TRUE;
 	Origin:=mkPT(0,0,0);   (* unneeded initialization *)
 	blankray.bla := 1;
 	blankray.ra := 1;
 	blankray.ga := 1;
 	blankray.ba := 1;
+	blankray.alpha:=1;
 	blankray.scale := 1; 
 	blankray.length := 0;
 	blankray.tscale:=1;
-	blankray.dtl:=30000;	
-	Face[0].x := 1; Face[0].y := 0; Face[0].z := 0; 
-	Face[3].x := -1; Face[3].y := 0; Face[3].z := 0; 
+	blankray.dtl:=10;	
+	Face[0].x := -1; Face[0].y := 0; Face[0].z := 0; 
+	Face[3].x := 1; Face[3].y := 0; Face[3].z := 0; 
 	Face[1].x := 0; Face[1].y := 1; Face[1].z := 0; 
-	Face[4].x := 0; Face[4].y := -1; Face[4].z := 0; 
-	Face[2].x := 0; Face[2].y := 0; Face[2].z := 1; 
-	Face[5].x := 0; Face[5].y := 0; Face[5].z := -1; 	
+	Face[2].x := 0; Face[4].y := -1; Face[4].z := 0; 
+	Face[5].x := 0; Face[2].y := 0; Face[2].z := 1; 
+	Face[4].x := 0; Face[5].y := 0; Face[5].z := -1; 	
 	m2sdelta:=25;
 	m3sdelta:=25;
 	speed:=0.00051;
 	skydistance:=1.0;
 	Out.String("loaded.");
 	Out.Ln;
+	InitSounds();	
 END Base.

@@ -1,6 +1,6 @@
 MODULE XNXLFRep;
 
-IMPORT Math, XNXLMath, Base, XNXLVoxel, Raster, Graphics:=WMGraphics, Noise:=XNXLNoise;
+IMPORT Math, XNXLMath, Base, XNXLVoxel, Raster, Graphics:=WMGraphics, Noise;
 	
 CONST
 	twopi = 2*Math.pi;
@@ -34,14 +34,10 @@ END in;
 END rprism;
 
 TYPE sphere*= OBJECT(FR)
-CONST
-	N=30;
-	NMO=N-1
 VAR 
 	radius*, rsquared*: REAL;
 	center*:PT;
 	cxf*:BOOLEAN;
-	NC: ARRAY N,N OF NCube;
 
 PROCEDURE &init*(c:PT; r: REAL);
 VAR
@@ -60,16 +56,7 @@ BEGIN
 	bbc2.y:=c.y+r;
 	bbc2.z:=c.z+r;	
 	center:=c;	
-	mir:=0.8;
-	FOR i:=0 TO NMO DO 
-		theta := twopi*i/N;
-		FOR j:=0 TO NMO DO
-			phi := twopi*j/N;
-			normal.x := Math.cos(theta)*Math.sin(phi);
-			normal.y := Math.sin(theta)*Math.sin(phi);
-			normal.z := Math.cos(theta);
-		END
-	END				
+	mir:=0.8;	
 END init;
 
 PROCEDURE color*(p:PT):Color;
@@ -173,6 +160,11 @@ BEGIN
 		RETURN(Noise.noise3dperlin(a*p.x,b*p.y,c*p.z, seed,octaves,persistence)/1000 - 1/2000)	
 	END
 END d2s;
+
+PROCEDURE noise*(p:PT):REAL; 
+BEGIN
+	RETURN(Noise.noise3dperlin(a*p.x,b*p.y,c*p.z, seed,octaves,persistence));
+END noise;
 
 END noise;
 

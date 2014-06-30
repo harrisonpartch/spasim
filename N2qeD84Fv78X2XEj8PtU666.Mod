@@ -8,29 +8,30 @@ TYPE Ray = Base.Ray;
 VAR 
 	ball: FRep.sphere;
 	cyl: FRep.hexgrid;
-	reddot,bludot,sand,v: Voxel;
+	dot,bludot,sand,v: Voxel;
 	center, p1, p2,n:  PT;
 	i:LONGINT;
 	rand: Random.Generator;
 	vu: Voxel;
 	
-PROCEDURE draw(VAR reddott: Voxel);
+PROCEDURE draw;
 BEGIN
-	reddott:=Base.VoxelFromName("NM3");
+	dot:=Base.VoxelFromName("NM3");
 	Base.setPT(center,1/2,1/2,1/2);
 	sand:=Base.VoxelFromName("NFLOOP");  
 	NEW(ball,center,8/12);	
 	ball.setvoxel(sand);		
-	reddott.FRaster(ball,27);
-	reddott.copyonstroke:=TRUE;	
+	dot.FRaster(ball,27);
+	dot.copyonstroke:=TRUE;	
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN	
-	draw(reddot);
-	RETURN reddot
+	RETURN dot
 END thisvox;
 
+BEGIN 
+	draw
 END N2qeD84Fv78X2XEj8PtU666. 
  
 XNXLMarsh.Rez N2qeD84Fv78X2XEj8PtUZOQ ~

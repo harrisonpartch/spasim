@@ -1,11 +1,14 @@
 MODULE NBsHFiBKkSckXBAd46Zbsss;
  
-IMPORT Base, XNXLVoxel4;
+IMPORT Base, XNXLVoxel, Voxel4;
 
-VAR vox: XNXLVoxel4.MirrorSphereInVox;
+VAR 
+	vox: Voxel4.MirrorSphereInVox;
+	
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN; 
-	 NEW(vox);
+	NEW(vox);
 	RETURN vox
 END thisvox;
+
  END NBsHFiBKkSckXBAd46Zbsss. 

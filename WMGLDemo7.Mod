@@ -1,7 +1,7 @@
 MODULE WMGLDemo7;  (** AUTHOR "fnecati"; PURPOSE "opengl mirroring effect "; *)
 
 IMPORT
-	WMRectangles, WMGraphics, Strings, Kernel,
+	WMRectangles, WMGraphics, Strings, Kernel, Modules,
 	WM := WMWindowManager,  WMMessages, WMDialogs,
 	gl := OpenGL, glc := OpenGLConst, GLU, WMGL := WMGLWindow;
 
@@ -27,7 +27,7 @@ TYPE
 		WM.DefaultAddWindow(SELF);
 
 		SetTitle(Strings.NewString("WMGLDemo7- Mirroring"));
-
+		IncCount;
 		canvas.SetColor(WMGraphics.Green);
 		font := canvas.GetFont();
 		fpsstr := "FPS: ";
@@ -40,12 +40,13 @@ TYPE
 		UpdateImage;
 		animated := FALSE;
 		alive := TRUE;
+		
 	END New;
 
 	PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
 	BEGIN
 		CASE CHR(ucs) OF
-			"a", "A": animated := ~ animated;
+			"a", "A": BEGIN {EXCLUSIVE} animated := ~ animated; END;
 
 			| "d": drawMode := (drawMode+1) MOD 3; DrawMode(drawMode);   UpdateImage;
 
@@ -53,7 +54,7 @@ TYPE
 			| "+" : xrot := xrot + 1.0;  UpdateImage;
 
 			| "s": SaveImage;
-			| "q" : Close; RETURN;
+			| "q" : BEGIN {EXCLUSIVE} animated := FALSE; alive := FALSE; END; Close;
 		ELSE
 
 		END;
@@ -67,10 +68,12 @@ TYPE
 		END
 	END Handle;
 
-	PROCEDURE Close*;
-	BEGIN {EXCLUSIVE}
-		alive := FALSE;
+	PROCEDURE Close;
+	BEGIN 
+		BEGIN {EXCLUSIVE}  animated := FALSE; alive := FALSE; END; 
+		
 		Close^;
+		DecCount
 	END Close;
 
 	PROCEDURE UpdateImage;
@@ -228,7 +231,7 @@ TYPE
 
 		(* draw mirror *)
 		gl.Clear (glc.GL_DEPTH_BUFFER_BIT);
-		gl.PushAttrib (SHORT(0FFFFFFFFH));
+		gl.PushAttrib (LONGINT(0FFFFFFFFH));
 		gl.Disable (glc.GL_LIGHTING);
 		(* Create imperfect reflector effect by blending a black
 		   mirror over the reflected scene with alpha of 0.05 *)
@@ -271,23 +274,47 @@ BEGIN  {ACTIVE}
 				Kernel.SetTimer(timer, 5000);
 				frames := 0;
 			END;
-
-(*		END; *)
 	END;
 END GLWindow;
 
-PROCEDURE Open*;
 VAR
+	nofWindows : LONGINT;
+	
+PROCEDURE Open*;
+VAR 
 	window: GLWindow;
 BEGIN
 	NEW(window, 256, 256);
 END Open;
 
-BEGIN
+PROCEDURE IncCount;
+BEGIN {EXCLUSIVE}
+	INC(nofWindows)
+END IncCount;
 
+PROCEDURE DecCount;
+BEGIN {EXCLUSIVE}
+	DEC(nofWindows)
+END DecCount;
+
+PROCEDURE Cleanup;
+VAR die : KillerMsg;
+	 msg : WMMessages.Message;
+	 m : WM.WindowManager;
+BEGIN 
+	NEW(die);
+	msg.ext := die;
+	msg.msgType := WMMessages.MsgExt;
+	m := WM.GetDefaultManager();
+	m.Broadcast(msg);
+	BEGIN {EXCLUSIVE}	AWAIT(nofWindows = 0); END;
+END Cleanup;
+
+BEGIN
+	Modules.InstallTermHandler(Cleanup)
 END WMGLDemo7.
 
-SystemTools.Free  WMGLDemo7 WMGLWindow ~  OpenGL OpenGLConst ~
+SystemTools.Free  WMGLDemo7 ~
 
 WMGLDemo7.Open ~
 

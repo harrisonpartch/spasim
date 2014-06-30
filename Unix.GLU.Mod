@@ -16,8 +16,8 @@ TYPE
   Int = GL.Int;
   Float = GL.Float;
   Double = GL.Double;
-  Pointer = GL.Pointer;
-  PPointer = GL.PPointer;
+  Pointer = ADDRESS;
+  PPointer = ADDRESS;
 
   PFloat = ADDRESS; (*POINTER TO ARRAY OF Float; *)
   PDouble = ADDRESS; (* POINTER TO ARRAY OF Double;*)
@@ -318,63 +318,69 @@ BEGIN
 	END;
 END ReadVersion;
 
+(** Wrapper for Unix.Dlsym *)
+PROCEDURE GetProcAddress*( lib: LONGINT;  CONST procName: ARRAY OF CHAR;  adr: ADDRESS );
+BEGIN
+	Unix.Dlsym(lib, procName, adr);
+END GetProcAddress;
+
 PROCEDURE InitGLU();
 BEGIN
 	lib := Unix.Dlopen(libname, 2);
 	ASSERT(lib # 0,102);
 
 	(* load GLU functions *)
-     Unix.Dlsym(lib,  'gluBeginCurve', ADDRESSOF( BeginCurve ));
-     Unix.Dlsym(lib,  'gluBeginPolygon', ADDRESSOF( BeginPolygon ));
-     Unix.Dlsym(lib,  'gluBeginSurface', ADDRESSOF( BeginSurface ));
-     Unix.Dlsym(lib,  'gluBeginTrim', ADDRESSOF(  BeginTrim));
-     Unix.Dlsym(lib,  'gluBuild1DMipmaps', ADDRESSOF( Build1DMipmaps ));
-     Unix.Dlsym(lib,  'gluBuild2DMipmaps', ADDRESSOF( Build2DMipmaps ));
-     Unix.Dlsym(lib,  'gluCylinder', ADDRESSOF( Cylinder ));
-     Unix.Dlsym(lib,  'gluDeleteNurbsRenderer', ADDRESSOF( DeleteNurbsRenderer ));
-     Unix.Dlsym(lib,  'gluDeleteQuadric', ADDRESSOF( DeleteQuadric ));
-     Unix.Dlsym(lib,  'gluDeleteTess', ADDRESSOF( DeleteTess ));
-     Unix.Dlsym(lib,  'gluDisk', ADDRESSOF( Disk ));
-     Unix.Dlsym(lib,  'gluEndCurve', ADDRESSOF( EndCurve ));
-     Unix.Dlsym(lib,  'gluEndPolygon', ADDRESSOF( EndPolygon ));
-     Unix.Dlsym(lib,  'gluEndSurface', ADDRESSOF( EndSurface ));
-     Unix.Dlsym(lib,  'gluEndTrim', ADDRESSOF( EndTrim ));
-     Unix.Dlsym(lib,  'gluErrorString', ADDRESSOF( XgluErrorString ));
-     Unix.Dlsym(lib,  'gluGetNurbsProperty', ADDRESSOF( GetNurbsProperty ));
-     Unix.Dlsym(lib,  'gluGetString', ADDRESSOF( XgluGetString ));
-     Unix.Dlsym(lib,  'gluGetTessProperty', ADDRESSOF( GetTessProperty ));
-     Unix.Dlsym(lib,  'gluLoadSamplingMatrices', ADDRESSOF( LoadSamplingMatrices ));
-     Unix.Dlsym(lib,  'gluLookAt', ADDRESSOF( LookAt ));
-     Unix.Dlsym(lib,  'gluNewNurbsRenderer', ADDRESSOF( NewNurbsRenderer ));
-     Unix.Dlsym(lib,  'gluNewQuadric', ADDRESSOF( NewQuadric ));
-     Unix.Dlsym(lib,  'gluNewTess', ADDRESSOF( NewTess ));
-     Unix.Dlsym(lib,  'gluNextContour', ADDRESSOF( NextContour ));
-     Unix.Dlsym(lib,  'gluNurbsCallback', ADDRESSOF( NurbsCallback ));
-     Unix.Dlsym(lib,  'gluNurbsCurve', ADDRESSOF( NurbsCurve ));
-     Unix.Dlsym(lib,  'gluNurbsProperty', ADDRESSOF( NurbsProperty ));
-     Unix.Dlsym(lib,  'gluNurbsSurface', ADDRESSOF( NurbsSurface ));
-     Unix.Dlsym(lib,  'gluOrtho2D', ADDRESSOF( Ortho2D ));
-     Unix.Dlsym(lib,  'gluPartialDisk', ADDRESSOF( PartialDisk ));
-     Unix.Dlsym(lib,  'gluPerspective', ADDRESSOF( Perspective ));
-     Unix.Dlsym(lib,  'gluPickMatrix', ADDRESSOF( PickMatrix ));
-     Unix.Dlsym(lib,  'gluProject', ADDRESSOF( Project ));
-     Unix.Dlsym(lib,  'gluPwlCurve', ADDRESSOF( PwlCurve ));
-     Unix.Dlsym(lib,  'gluQuadricCallback', ADDRESSOF( QuadricCallback ));
-     Unix.Dlsym(lib,  'gluQuadricDrawStyle', ADDRESSOF( QuadricDrawStyle ));
-     Unix.Dlsym(lib,  'gluQuadricNormals', ADDRESSOF( QuadricNormals ));
-     Unix.Dlsym(lib,  'gluQuadricOrientation', ADDRESSOF( QuadricOrientation ));
-     Unix.Dlsym(lib,  'gluQuadricTexture', ADDRESSOF( QuadricTexture ));
-     Unix.Dlsym(lib,  'gluScaleImage', ADDRESSOF( ScaleImage ));
-     Unix.Dlsym(lib,  'gluSphere', ADDRESSOF( Sphere ));
-     Unix.Dlsym(lib,  'gluTessBeginContour', ADDRESSOF( TessBeginContour ));
-     Unix.Dlsym(lib,  'gluTessBeginPolygon', ADDRESSOF( TessBeginPolygon ));
-     Unix.Dlsym(lib,  'gluTessCallback', ADDRESSOF( TessCallback ));
-     Unix.Dlsym(lib,  'gluTessEndContour', ADDRESSOF( TessEndContour ));
-     Unix.Dlsym(lib,  'gluTessEndPolygon', ADDRESSOF( TessEndPolygon ));
-     Unix.Dlsym(lib,  'gluTessNormal', ADDRESSOF( TessNormal ));
-     Unix.Dlsym(lib,  'gluTessProperty', ADDRESSOF( TessProperty ));
-     Unix.Dlsym(lib,  'gluTessVertex', ADDRESSOF( TessVertex ));
-     Unix.Dlsym(lib,  'gluUnProject', ADDRESSOF( UnProject ));
+     GetProcAddress(lib, 'gluBeginCurve', ADDRESSOF( BeginCurve ));
+     GetProcAddress(lib, 'gluBeginPolygon', ADDRESSOF( BeginPolygon ));
+     GetProcAddress(lib, 'gluBeginSurface', ADDRESSOF( BeginSurface ));
+     GetProcAddress(lib, 'gluBeginTrim', ADDRESSOF(  BeginTrim));
+     GetProcAddress(lib, 'gluBuild1DMipmaps', ADDRESSOF( Build1DMipmaps ));
+     GetProcAddress(lib, 'gluBuild2DMipmaps', ADDRESSOF( Build2DMipmaps ));
+     GetProcAddress(lib, 'gluCylinder', ADDRESSOF( Cylinder ));
+     GetProcAddress(lib, 'gluDeleteNurbsRenderer', ADDRESSOF( DeleteNurbsRenderer ));
+     GetProcAddress(lib, 'gluDeleteQuadric', ADDRESSOF( DeleteQuadric ));
+     GetProcAddress(lib, 'gluDeleteTess', ADDRESSOF( DeleteTess ));
+     GetProcAddress(lib, 'gluDisk', ADDRESSOF( Disk ));
+     GetProcAddress(lib, 'gluEndCurve', ADDRESSOF( EndCurve ));
+     GetProcAddress(lib, 'gluEndPolygon', ADDRESSOF( EndPolygon ));
+     GetProcAddress(lib, 'gluEndSurface', ADDRESSOF( EndSurface ));
+     GetProcAddress(lib, 'gluEndTrim', ADDRESSOF( EndTrim ));
+     GetProcAddress(lib, 'gluErrorString', ADDRESSOF( XgluErrorString ));
+     GetProcAddress(lib, 'gluGetNurbsProperty', ADDRESSOF( GetNurbsProperty ));
+     GetProcAddress(lib, 'gluGetString', ADDRESSOF( XgluGetString ));
+     GetProcAddress(lib, 'gluGetTessProperty', ADDRESSOF( GetTessProperty ));
+     GetProcAddress(lib, 'gluLoadSamplingMatrices', ADDRESSOF( LoadSamplingMatrices ));
+     GetProcAddress(lib, 'gluLookAt', ADDRESSOF( LookAt ));
+     GetProcAddress(lib, 'gluNewNurbsRenderer', ADDRESSOF( NewNurbsRenderer ));
+     GetProcAddress(lib, 'gluNewQuadric', ADDRESSOF( NewQuadric ));
+     GetProcAddress(lib, 'gluNewTess', ADDRESSOF( NewTess ));
+     GetProcAddress(lib, 'gluNextContour', ADDRESSOF( NextContour ));
+     GetProcAddress(lib, 'gluNurbsCallback', ADDRESSOF( NurbsCallback ));
+     GetProcAddress(lib, 'gluNurbsCurve', ADDRESSOF( NurbsCurve ));
+     GetProcAddress(lib, 'gluNurbsProperty', ADDRESSOF( NurbsProperty ));
+     GetProcAddress(lib, 'gluNurbsSurface', ADDRESSOF( NurbsSurface ));
+     GetProcAddress(lib, 'gluOrtho2D', ADDRESSOF( Ortho2D ));
+     GetProcAddress(lib, 'gluPartialDisk', ADDRESSOF( PartialDisk ));
+     GetProcAddress(lib, 'gluPerspective', ADDRESSOF( Perspective ));
+     GetProcAddress(lib, 'gluPickMatrix', ADDRESSOF( PickMatrix ));
+     GetProcAddress(lib, 'gluProject', ADDRESSOF( Project ));
+     GetProcAddress(lib, 'gluPwlCurve', ADDRESSOF( PwlCurve ));
+     GetProcAddress(lib, 'gluQuadricCallback', ADDRESSOF( QuadricCallback ));
+     GetProcAddress(lib, 'gluQuadricDrawStyle', ADDRESSOF( QuadricDrawStyle ));
+     GetProcAddress(lib, 'gluQuadricNormals', ADDRESSOF( QuadricNormals ));
+     GetProcAddress(lib, 'gluQuadricOrientation', ADDRESSOF( QuadricOrientation ));
+     GetProcAddress(lib, 'gluQuadricTexture', ADDRESSOF( QuadricTexture ));
+     GetProcAddress(lib, 'gluScaleImage', ADDRESSOF( ScaleImage ));
+     GetProcAddress(lib, 'gluSphere', ADDRESSOF( Sphere ));
+     GetProcAddress(lib, 'gluTessBeginContour', ADDRESSOF( TessBeginContour ));
+     GetProcAddress(lib, 'gluTessBeginPolygon', ADDRESSOF( TessBeginPolygon ));
+     GetProcAddress(lib, 'gluTessCallback', ADDRESSOF( TessCallback ));
+     GetProcAddress(lib, 'gluTessEndContour', ADDRESSOF( TessEndContour ));
+     GetProcAddress(lib, 'gluTessEndPolygon', ADDRESSOF( TessEndPolygon ));
+     GetProcAddress(lib, 'gluTessNormal', ADDRESSOF( TessNormal ));
+     GetProcAddress(lib, 'gluTessProperty', ADDRESSOF( TessProperty ));
+     GetProcAddress(lib, 'gluTessVertex', ADDRESSOF( TessVertex ));
+     GetProcAddress(lib, 'gluUnProject', ADDRESSOF( UnProject ));
 
       KernelLog.String(libname); KernelLog.String(" loaded."); KernelLog.Ln;
 END InitGLU;

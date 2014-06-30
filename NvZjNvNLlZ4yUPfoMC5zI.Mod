@@ -1,12 +1,12 @@
 MODULE NvZjNvNLlZ4yUPfoMC5zI;(*anonymous module created by saboteur*)
   
-IMPORT Base,  XNXLFRep;
+IMPORT Base,  FRep;
 
 TYPE Ray = Base.Ray;
 	Voxel = Base.Voxel;  
 	PT =Base.PT;
 VAR 
-	ball: XNXLFRep.sphere;
+	ball: FRep.sphere;
 	conglomerate:Voxel;
 	center:  PT;
 	i:INTEGER;
