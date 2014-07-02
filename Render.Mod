@@ -386,9 +386,9 @@ BEGIN
 			| "m": leftsticky:=leftsticky/1.3; upsticky:=upsticky/1.3;
 			| "o": GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_NEAREST)
 			| "t": GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR)
-(*			| "v":Marsh.engrain
+			| "v":Marsh.engrain
 			| "c": Marsh.sprout 
-*)			| "x": Marsh.incVN
+			| "x": Marsh.incVN
 			| "z": Marsh.decVN		
 			| "p":  camera.stop	
 			| "1": Marsh.lighten		
@@ -408,11 +408,9 @@ BEGIN
 			| "7": Base.cursordist:=Base.cursordist*1.3
 			| "8": Base.cursordist:=Base.cursordist/1.3
 			| "l": Marsh.lines:=~Marsh.lines
-			| "b": Marsh.showcode;
-			
+			| "b": Marsh.showcode;		
 			| "f": curprogram := (curprogram +1 ) MOD 13; 
-					Out.String("curprogram="); Out.Int(curprogram,0); Out.Ln;
-					
+					Out.String("curprogram="); Out.Int(curprogram,0); Out.Ln;			
 		ELSE (* use keysm *)
 			Out.String("ucs: "); Out.Hex(ucs,4); Out.String("keysym: "); Out.Hex(keysym,4); Out.Ln;
 			CASE keysym OF

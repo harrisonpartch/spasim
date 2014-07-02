@@ -963,7 +963,6 @@ BEGIN
 	w.RawReal(green);
 	w.RawReal(blue);
 	w.RawReal(black);	
-	copyclear;
 	IF (code=NCODE)  &(~copymarker) THEN	
 		copymarker:=TRUE;
 		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO

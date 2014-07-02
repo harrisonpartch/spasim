@@ -254,13 +254,7 @@ PROCEDURE sprout*;
 VAR v:Voxel;
 BEGIN
 	Out.String("sprouting...");
-	v:=Engrainer.sprout(); 
-	IF v=NIL THEN 
-		Out.String("nilsprout");
-		NEW(Base.world) 
-	ELSE
-		Base.world:=v;
-	END
+	push(Engrainer.sprout()); 
 END sprout;
 
 PROCEDURE randPT*():PT;

@@ -17,7 +17,7 @@ VAR
 PROCEDURE draw;
 BEGIN
 	w3:=Base.VoxelFromName("NM3");	 
-	z3:=Base.VoxelFromName("NM3");	
+	z3:=Base.VoxelFromName("NM2");	
 	z2:=Base.VoxelFromName("NM3");
 	z3.setcolor(0,0,0,1/2,1);
 	z2.setcolor(10,10,0,0,10);	
