@@ -21,7 +21,7 @@ BEGIN
 	z2:=Base.VoxelFromName("NM3");
 	z3.setcolor(0,0,0,1/2,1);
 	z2.setcolor(10,10,0,0,10);	
-	sky:=Base.VoxelFromName("Ndiffusered"); 
+	sky:=Base.VoxelFromName("Ndiffusereddot"); 
 	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXXBiQ"); 	
 	Base.setPT(center,1/2,1/2,1/2);
 	NEW(ball,center,0.5);

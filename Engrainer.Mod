@@ -19,13 +19,13 @@ BEGIN
 		voxel.engrain(w);
 		IF (w.res = Streams.Ok) THEN
 			w.Update;
-			GZip.Deflate(f,fgz,GZip.BestSpeed,GZip.DefaultStrategy,GZip.NoFlush);
-			Files.Register(f);
-			Files.Register(fgz);
-			Out.String("sprout saved");
-			Out.Ln
+			GZip.Deflate(f,fgz,GZip.BestSpeed,GZip.DefaultStrategy,GZip.FullFlush)		
 		END
 	END;
+	Files.Register(f);
+	Files.Register(fgz);
+	Out.String("sprout saved");
+	Out.Ln
 END engrain;
 
 PROCEDURE sprout*():Voxel;
