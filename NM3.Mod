@@ -462,7 +462,8 @@ VAR
 BEGIN
 	copymarker:=FALSE;
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
-		IF (blox[i,j,k]#NIL)&blox[i,j,k].copymarker THEN
+		IF (blox[i,j,k]#NIL) & blox[i,j,k].copymarker THEN
+			blox[i,j,k].copymarker:=FALSE;
 			blox[i,j,k].copyclear
 		END
 	END END END;		
@@ -612,6 +613,7 @@ VAR
 	code: Base.Name;
 BEGIN
 	IF ~lockTF THEN
+		code:=NCODE; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 		nextscale:=scale*M;
 		p.x:=p.x*M;
 		p.y:=p.y*M;
@@ -774,6 +776,7 @@ VAR
 	v: Voxel;
 	newcell: cell; 
 BEGIN
+	code:=NCODE; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 	MS:=M*scale;
 	TWOMS:=2*MS;
 	nextscale:=scale*M;
@@ -964,7 +967,7 @@ BEGIN
 	w.RawReal(green);
 	w.RawReal(blue);
 	w.RawReal(black);	
-	IF ~copymarker THEN	
+	IF (code=NCODE) & (~copymarker) THEN	
 		copymarker:=TRUE;
 		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 				IF (blox[i,j,k]#NIL)  THEN
@@ -985,7 +988,6 @@ VAR
 	anothercell: cell;
 	len: LONGINT;
 BEGIN
-	IF code=NCODE THEN
 		r.RawReal(red);
 		r.RawReal(green);		
 		r.RawReal(blue);		
@@ -997,8 +999,7 @@ BEGIN
 				blox[i,j,k]:=Base.VoxelFromName(name);
 				IF blox[i,j,k]#NIL THEN blox[i,j,k].sprout(r) END		
 			END;	
-		END END END	
-	END					
+		END END END					
 END sprout;
 
 END cell;

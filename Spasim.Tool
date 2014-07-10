@@ -68,7 +68,7 @@ ncompile compiles the "anonymous" modules]]></Span><Span style="Normal"><![CDATA
 **********************************************************************************************************
 
 
-SystemTools.FreeDownTo	Base ]]></Span><Span style="Normal"><![CDATA[~
+SystemTools.FreeDownTo     Base ]]></Span><Span style="Normal"><![CDATA[~
 ]]></Span><Span style="AdHoc Oberon 10 0 0 F00BFFF 0000000"><![CDATA[
 Modules must be freed to force their reloading after being changed and recompiled, or to return them to their original state. ]]></Span><Span style="Normal"><![CDATA[
 

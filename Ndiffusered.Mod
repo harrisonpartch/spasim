@@ -1,14 +1,15 @@
 MODULE Ndiffusered;
-IMPORT Base, TexVox,  XNXLHalfSpace;
+IMPORT Base, TexVox;
 
-VAR vox: XNXLHalfSpace.halfvox; v: TexVox.TexVox;
+VAR  v: TexVox.TexVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	 NEW(v, 'reddot.png'); 
-	 v.tscale:=0;
-	 NEW(vox,v,Base.randPT(),Base.randPT());
 	RETURN v
 END thisvox;
+
+BEGIN
+	NEW(v, 'reddot.png'); 
+		v.tscale:=0;
 END Ndiffusered. 
 
 reddot.png

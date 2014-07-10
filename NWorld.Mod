@@ -17,11 +17,11 @@ VAR
 PROCEDURE draw;
 BEGIN
 	w3:=Base.VoxelFromName("NM3");	 
-	z3:=Base.VoxelFromName("NM2");	
+	z3:=Base.VoxelFromName("NM3");	
 	z2:=Base.VoxelFromName("NM3");
 	z3.setcolor(0,0,0,1/2,1);
 	z2.setcolor(10,10,0,0,10);	
-	sky:=Base.VoxelFromName("Ndiffusereddot"); 
+	sky:=Base.VoxelFromName("Ndiffusered"); 
 	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXXBiQ"); 	
 	Base.setPT(center,1/2,1/2,1/2);
 	NEW(ball,center,0.5);
@@ -42,7 +42,8 @@ END draw;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	RETURN z3
+	RETURN z3;
+	NEW(z3);
 END thisvox;
 
 BEGIN

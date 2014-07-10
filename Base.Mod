@@ -81,11 +81,7 @@ BEGIN
 	Raster.InitMode(copy,Raster.srcCopy);
 	img :=Graphics.LoadImage(n, TRUE); (* img format is BGRA8888 *)
 	IF img=NIL THEN 
-		Out.String(n);
-		Out.String(" not found: loading grain.png instead");
-		Out.Ln;
-		img := Graphics.LoadImage("grain.png", TRUE); 
-		ASSERT(img#NIL);
+		img := defaultimg;
 	END;
 	NEW(mip0);
 	NEW(mip1);	
@@ -535,6 +531,7 @@ VAR
 	rnf*:REAL; (*random number for frame*);
 	sniperay*:Ray;
 	blackspeed*:REAL;
+	defaultimg: Raster.Image;
 
 (*	basesource*, texsound*, grainsound*: AL.ALuint;
 	listenerPos*: ARRAY [3] OF AL.ALfloat; (* global position *)
@@ -1217,4 +1214,6 @@ BEGIN
 	Out.String("loaded.");
 	Out.Ln;
 	InitSounds();	
+	defaultimg := Graphics.LoadImage("grain.png", TRUE); 
+	ASSERT(defaultimg#NIL);
 END Base.

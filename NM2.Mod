@@ -36,7 +36,7 @@ BEGIN
 	old := pool;
 	NEW(pool, LEN(pool)*2);
 	FOR i := 0 TO count-1 DO pool[i] := old[i] END;
-	Out.String("NM2 pool growing to ");
+	Out.String("NM3 pool growing to ");
 	Out.Int(count*2,10);
 END grow;
 
@@ -101,7 +101,7 @@ BEGIN
 	old := wipe;
 	NEW(wipe, count*2);
 	FOR i := 0 TO LEN(old)-1 DO wipe[i] := old[i] END;
-	Out.String("NM2 wipe growing to ");
+	Out.String("NM3 wipe growing to ");
 	Out.Int(count*2,10);
 END grow;
 
@@ -147,14 +147,15 @@ VAR
 	v: Voxel;
 	vdepth, blainv: REAL;
 	last:BOOLEAN;
-	dtl: REAL;
+	dtl,rdtl: REAL;
 BEGIN
 	ray.scale := ray.scale*M;
 	scaleInv := 1/ray.scale;
 	xyz.x := ABS(ray.lxyz.x-offset.x) * M;  
 	xyz.y := ABS(ray.lxyz.y-offset.y) * M;		
 	xyz.z := ABS(ray.lxyz.z-offset.z)* M;	
-	pushxyz:=xyz;	
+	pushxyz:=xyz;
+	rdtl:=ray.dtl;
 	IF DTL>0 THEN ray.dtl:=DTL END; 
 	IF (ray.length*ray.scale>ray.dtl) THEN
 		IF imposter#NIL THEN
@@ -246,15 +247,12 @@ BEGIN
 			IF ~out THEN
 				v := blox[ijk.i,ijk.j,ijk.k];  (*moved up here for cache latency --stupid idea*)
 			END;
-			vdepth:=Base.distance(newxyz,xyz);
-			IF vdepth>1 THEN vdepth:=1 END;
-			vdepth:=vdepth*scaleInv; 
+			vdepth:=Base.distance(newxyz,xyz)*scaleInv;
 			ray.xyz.x:=ray.xyz.x +((newxyz.x-xyz.x)+ray.ddxyz.x)*scaleInv;
 			ray.xyz.y:=ray.xyz.y +((newxyz.y-xyz.y)+ray.ddxyz.y)*scaleInv;			
 			ray.xyz.z:=ray.xyz.z +((newxyz.z-xyz.z)+ray.ddxyz.z)*scaleInv;			
 			xyz:=newxyz;
 			ray.length:=ray.length+vdepth;
-	(*		IF ray.length>0.1 THEN ray.terminate:=TRUE END; *)
 			blr:=black*vdepth;
 			ray.bla := ray.bla-blr; 
 			blainv:=1-ray.bla;
@@ -295,6 +293,7 @@ BEGIN
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
 	ray.popdelta.y := (xyz.y-pushxyz.y)/M;
 	ray.popdelta.z := (xyz.z-pushxyz.z)/M; 
+	ray.dtl:=rdtl;
 	ray.scale := ray.scale/M;
 END Shade;
 
@@ -482,24 +481,26 @@ VAR
 	v: Voxel;
 	i,j,k: INTEGER;
 BEGIN
-	copymarker:=TRUE;
-	red:= r;
-	green := g;
-	blue := b;
-	black:= bl;
-	alpha:=a;
-	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
-		v:=blox[i,j,k];
-		IF v#NIL THEN
-			IF v IS cell THEN
-				IF (~v.copymarker) & (v.code=code) THEN
-					WITH v: cell DO
-						v.setcolorrec(r,g,b,bl,a);
+	IF ~copymarker THEN
+		copymarker:=TRUE;
+		red:= r;
+		green := g;
+		blue := b;
+		black:= bl;
+		alpha:=a;
+		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
+			v:=blox[i,j,k];
+			IF v#NIL THEN
+				IF v IS cell THEN
+					IF v.code=code THEN
+						WITH v: cell DO
+							v.setcolorrec(r,g,b,bl,a);
+						END
 					END
 				END
 			END
-		END
-	END END END	
+		END END END
+	END	
 END setcolorrec;
 
 PROCEDURE bounds*(i, j, k: LONGINT; VAR out: BOOLEAN);
@@ -611,6 +612,7 @@ VAR
 	code: Base.Name;
 BEGIN
 	IF ~lockTF THEN
+		code:=NCODE; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 		nextscale:=scale*M;
 		p.x:=p.x*M;
 		p.y:=p.y*M;
@@ -773,6 +775,7 @@ VAR
 	v: Voxel;
 	newcell: cell; 
 BEGIN
+	code:=NCODE; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 	MS:=M*scale;
 	TWOMS:=2*MS;
 	nextscale:=scale*M;
@@ -963,7 +966,7 @@ BEGIN
 	w.RawReal(green);
 	w.RawReal(blue);
 	w.RawReal(black);	
-	IF (code=NCODE)  &(~copymarker) THEN	
+	IF (code=NCODE) & (~copymarker) THEN	
 		copymarker:=TRUE;
 		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 				IF (blox[i,j,k]#NIL)  THEN
@@ -984,8 +987,7 @@ VAR
 	anothercell: cell;
 	len: LONGINT;
 BEGIN
-	IF code=NCODE THEN
-		r.RawReal(red);
+	r.RawReal(red);
 		r.RawReal(green);		
 		r.RawReal(blue);		
 		r.RawReal(black);	
@@ -996,8 +998,7 @@ BEGIN
 				blox[i,j,k]:=Base.VoxelFromName(name);
 				IF blox[i,j,k]#NIL THEN blox[i,j,k].sprout(r) END		
 			END;	
-		END END END	
-	END					
+		END END END					
 END sprout;
 
 END cell;

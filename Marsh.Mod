@@ -253,8 +253,9 @@ END engrain;
 PROCEDURE sprout*;
 VAR v:Voxel;
 BEGIN
+	Base.world.free;
 	Out.String("sprouting...");
-	push(Engrainer.sprout()); 
+	Base.world:= Engrainer.sprout();
 END sprout;
 
 PROCEDURE randPT*():PT;
@@ -274,8 +275,9 @@ VAR
 	undo,rd, rdpseudosolid, blu, die,gren,granite,sand,whiteblock,lazy,pdestroyer,axolotl,xen,sky1,sky2,tigerlily,cloud: Voxel;
 	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison,fuse:Voxel;
 	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,
-	cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp: Voxel;
-	 
+	w3,z3,z2,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp: Voxel;
+	ball: FRep.sphere;
+	noise: FRep.noise;	 
 BEGIN
 	NEW(ms);
 	NEW(EMPTY);
@@ -445,10 +447,32 @@ BEGIN
 	Base.setPT(up,0,0,1);
 	NEW(plane,center,up);
 	plane.vox:=sky;	
-	Base.world:=Base.VoxelFromName("NWorld"); 
-(*	engrain;
-	sprout;
-*)	Base.avatar:=harrison;
+	w3:=Base.VoxelFromName("NM3");	 
+	z3:=Base.VoxelFromName("NM3");	
+	z2:=Base.VoxelFromName("NM2");
+	z3.setcolor(0,0,0,1/2,1);
+	z2.setcolor(1,1,0,1,1);	
+	sky:=Base.VoxelFromName("Ndiffusered"); 
+	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXXBiQ"); 	
+	Base.setPT(center,1/2,1/2,1/2);
+	NEW(ball,center,0.5);
+	ball.setcolor(0.9, 0.7,0.7);
+	ball.setvoxel(sky); 
+	z2.FRaster(ball,16);
+	NEW(noise);		
+	noise.seed:=123666;		
+	noise.a:=1;
+	noise.b:=1;
+	noise.c:=1;		
+	noise.persistence:=3.1;
+	noise.octaves:=4;	
+	noise.setvoxel(Base.VoxelFromName("NXWCxXWLIcD2LegvoGXXBiQ"));
+(*	z3.FRaster(noise,27); *)
+	sky.lockTF:=TRUE;		
+	
+	Base.world:=z2; 
+
+	Base.avatar:=harrison;
 	Base.avatarsize:=1000;
 END dawn;
 
