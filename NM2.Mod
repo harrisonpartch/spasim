@@ -1,7 +1,12 @@
 MODULE NM2; (*! This module may be either imported or used anonymously *)
 IMPORT Base, XNXLE, Noise, Math, Out := KernelLog, Debugging, Streams,Strings;
 
-CONST M=2;
+(*
+Special voxel containing 8 children arranged in a 2x2x2 grid.
+Trees constructed by such voxels mean one can achieve infinitely small details in the world.
+*)
+
+CONST M=2; (* defines grid size *)
 	MMO=M-1;
 	CUBERADIUS=0.8;   (*change to sqrt(3)/2 ???*)
 	NCODE="NM2";
@@ -957,6 +962,17 @@ BEGIN
 	END;	
 END deepcopy;
 
+(* 
+Engrains this voxel and it's children recursively in the following format:
+"NM2"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
+<----- Voxel data -----><------                     children data                     ------>
+Children data contains 8 boolean-child pairs, each boolean being TRUE if a child is contained in that position.
+In case of FALSE the length of child data is 0 for that child (i.e. no data is being written except for the FALSE).
+Child data is engrained by the child itself.
+
+Note that children can be special Voxels containing children like NM2 allowing an infinitely large tree where the
+deeper a voxel is the smaller it is compared to the world voxel.
+*)
 PROCEDURE engrain(w: Streams.Writer); 
 VAR
 	i,j,k: INTEGER;
@@ -979,6 +995,9 @@ BEGIN
 	END
 END engrain;
 
+(*
+Sprouts the voxel and it's children recursively using the inverse of the engrain procedure.
+*)
 PROCEDURE sprout(r: Streams.Reader);
 VAR
 	i,j,k: INTEGER;

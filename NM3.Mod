@@ -1,7 +1,12 @@
 MODULE NM3; (*! This module may be either imported or used anonymously *)
 IMPORT Base, XNXLE, Noise, Math, Out := KernelLog, Debugging, Streams,Strings;
 
-CONST M=3;
+(*
+Special voxel containing 27 children arranged in a 3x3x3 grid.
+Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
+*)
+
+CONST M=3; (* defines grid size *)
 	MMO=M-1;
 	CUBERADIUS=0.8;   (*change to sqrt(3)/2 ???*)
 	NCODE="NM3";
@@ -958,6 +963,17 @@ BEGIN
 	END;	
 END deepcopy;
 
+(* 
+Engrains this voxel and it's children recursively in the following format:
+"NM3"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
+<----- Voxel data -----><------                     children data                     ------>
+Children data contains 27 boolean-child pairs, each boolean being TRUE if a child is contained in that position.
+In case of FALSE the length of child data is 0 for that child (i.e. no data is being written except for the FALSE).
+Child data is engrained by the child itself.
+
+Note that children can be special Voxels containing children like NM3 allowing an infinitely large tree where the
+deeper a voxel is the smaller it is compared to the world voxel.
+*)
 PROCEDURE engrain(w: Streams.Writer); 
 VAR
 	i,j,k: INTEGER;
@@ -980,6 +996,9 @@ BEGIN
 	END
 END engrain;
 
+(*
+Sprouts the voxel and it's children recursively using the inverse of the engrain procedure.
+*)
 PROCEDURE sprout(r: Streams.Reader);
 VAR
 	i,j,k: INTEGER;
