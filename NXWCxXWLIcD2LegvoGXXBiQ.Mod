@@ -47,7 +47,7 @@ VAR
 	v: Voxel;
 	blue,red,reddot: Voxel;
 	alphablue: TransparaVox;
-	s0,s1,s2,s3,s4: NM3.cell;
+	s0,s1,s2,s3,s4: Voxel;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
@@ -83,9 +83,7 @@ BEGIN
 	s2.imposter:=blue;
 	s2.DTL:=120;
 	s2.lockTF:=TRUE;
-
-
-
+	
 	RETURN s0
 END thisvox;
  END NXWCxXWLIcD2LegvoGXXBiQ. 

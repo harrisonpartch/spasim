@@ -53,7 +53,8 @@ BEGIN
 		FOR j:=0 TO MMO DO
 			FOR k:=0 TO MMO DO
 				c.blox[i,j,k]:=NIL;
-				c.nbloxTF[i,j,k]:=FALSE  
+				c.nbloxTF[i,j,k]:=FALSE;	
+				c.nposterTF:=FALSE
 			END
 		END
 	END;	
@@ -139,7 +140,6 @@ VAR
 	blox*: ARRAY M,M,M OF Voxel;
 	nbloxTF*: ARRAY M,M,M OF BOOLEAN;
 	nblox*: ARRAY M,M,M OF NCube; 
-	lblox*: ARRAY M,M,M OF LCube;
 	nposterTF*:BOOLEAN;
 	nposter*: NCube;
 PROCEDURE Shade (VAR ray: Ray);
@@ -971,7 +971,7 @@ Children data contains 27 boolean-child pairs, each boolean being TRUE if a chil
 In case of FALSE the length of child data is 0 for that child (i.e. no data is being written except for the FALSE).
 Child data is engrained by the child itself.
 
-Note that children can be special Voxels containing children like NM3 allowing an infinitely large tree where the
+Note that children can be composite voxels containing children allowing an infinitely large tree where the
 deeper a voxel is the smaller it is compared to the world voxel.
 *)
 PROCEDURE engrain(w: Streams.Writer); 
@@ -982,17 +982,21 @@ BEGIN
 	w.RawReal(red);
 	w.RawReal(green);
 	w.RawReal(blue);
-	w.RawReal(black);	
-	IF (code=NCODE) & (~copymarker) THEN	
-		copymarker:=TRUE;
-		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
-				IF (blox[i,j,k]#NIL)  THEN
-					w.RawBool(TRUE);
-					blox[i,j,k].engrain(w) 				
-				ELSE
-					w.RawBool(FALSE);
-				END;			
-		END END END; 
+	w.RawReal(black);
+	IF ~copymarker THEN	
+		IF code=NCODE THEN
+			copymarker:=TRUE;
+			FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
+					IF (blox[i,j,k]#NIL)  THEN
+						w.RawBool(TRUE);
+						blox[i,j,k].engrain(w) 				
+					ELSE
+						w.RawBool(FALSE);
+					END;			
+			END END END; 
+		ELSE
+			w.Bytes(code,0,NL);	 
+		END
 	END
 END engrain;
 
@@ -1031,7 +1035,8 @@ PROCEDURE thisvox*():Voxel;
 VAR
 	v: cell;  
 BEGIN
-	pool.new(v);
+(*	pool.new(v); *)
+	NEW(v);
 	RETURN v
 END thisvox;
 

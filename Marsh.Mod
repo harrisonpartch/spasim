@@ -247,6 +247,7 @@ END showcode;
 PROCEDURE engrain*;
 BEGIN
 	Out.String("engraining...");
+	Base.world.copyclear;
 	Engrainer.engrain(Base.world); 
 END engrain;
 
@@ -458,7 +459,7 @@ BEGIN
 	NEW(ball,center,0.5);
 	ball.setcolor(0.9, 0.7,0.7);
 	ball.setvoxel(sky); 
-	z2.FRaster(ball,16);
+	z3.FRaster(ball,27);
 	NEW(noise);		
 	noise.seed:=123666;		
 	noise.a:=1;
@@ -470,7 +471,7 @@ BEGIN
 (*	z3.FRaster(noise,27); *)
 	sky.lockTF:=TRUE;		
 	
-	Base.world:=z2; 
+	Base.world:=z3; 
 
 	Base.avatar:=harrison;
 	Base.avatarsize:=1000;

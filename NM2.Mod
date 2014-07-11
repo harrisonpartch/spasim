@@ -1006,7 +1006,7 @@ VAR
 	anothercell: cell;
 	len: LONGINT;
 BEGIN
-	r.RawReal(red);
+		r.RawReal(red);
 		r.RawReal(green);		
 		r.RawReal(blue);		
 		r.RawReal(black);	

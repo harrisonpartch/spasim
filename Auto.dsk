@@ -1,8 +1,20 @@
 <Desktop>
 	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="33" t="197" r="374" b="624" flags="{0..2}"/>
-	<Window name="PET" loader="PET.Restore" l="95" t="87" r="917" b="812" flags="{0..2}">
+	<Window name="PET" loader="PET.Restore" l="42" t="140" r="842" b="740" flags="{0..2}">
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>
+			<Tab file="NXWCxXWLIcD2LegvoGXXBiQ.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="0"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="10"/>
+			</Tab>
+		</PETData>
+	</Window>
+	<Window name="PET" loader="PET.Restore" l="313" t="121" r="1135" b="846" flags="{0..2}">
+		<PETData>
+			<General SelectedPageNr="5" ProjectTextFile=""/>
 			<Tab file="Spasim.Tool" codecFormat="BBT" compilerOptions="\check" showLabels="false" wordWrap="false">
 				<Editor firstLine="33" cursorPos="853"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
@@ -18,7 +30,7 @@
 				<SidePanel visible="true" width="225" scratchHeight="10"/>
 			</Tab>
 			<Tab file="NM2.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="383" cursorPos="9339"/>
+				<Editor firstLine="377" cursorPos="9339"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
@@ -39,14 +51,14 @@
 				<SidePanel visible="true" width="188" scratchHeight="10"/>
 			</Tab>
 			<Tab file="Marsh.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="249" cursorPos="4417"/>
+				<Editor firstLine="292" cursorPos="5671"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="162" scratchHeight="10"/>
 			</Tab>
 			<Tab file="NM3.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="1005" cursorPos="23798"/>
+				<Editor firstLine="983" cursorPos="23798"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
