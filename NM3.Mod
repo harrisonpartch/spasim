@@ -1035,8 +1035,7 @@ PROCEDURE thisvox*():Voxel;
 VAR
 	v: cell;  
 BEGIN
-(*	pool.new(v); *)
-	NEW(v);
+	pool.new(v); 
 	RETURN v
 END thisvox;
 

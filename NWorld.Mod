@@ -29,7 +29,7 @@ BEGIN
 	ball.setvoxel(sky); 
 	z3.FRaster(ball,81);
 	NEW(noise);		
-	noise.seed:=123666;		
+	noise.seed:=76453;		
 	noise.a:=1;
 	noise.b:=1;
 	noise.c:=1;		

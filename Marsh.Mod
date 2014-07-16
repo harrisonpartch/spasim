@@ -254,7 +254,7 @@ END engrain;
 PROCEDURE sprout*;
 VAR v:Voxel;
 BEGIN
-	Base.world.free;
+	Base.world.free; 
 	Out.String("sprouting...");
 	Base.world:= Engrainer.sprout();
 END sprout;
@@ -453,25 +453,26 @@ BEGIN
 	z2:=Base.VoxelFromName("NM2");
 	z3.setcolor(0,0,0,1/2,1);
 	z2.setcolor(1,1,0,1,1);	
-	sky:=Base.VoxelFromName("Ndiffusered"); 
-	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXXBiQ"); 	
-	Base.setPT(center,1/2,1/2,1/2);
-	NEW(ball,center,0.5);
-	ball.setcolor(0.9, 0.7,0.7);
-	ball.setvoxel(sky); 
-	z3.FRaster(ball,27);
 	NEW(noise);		
 	noise.seed:=123666;		
 	noise.a:=1;
 	noise.b:=1;
 	noise.c:=1;		
-	noise.persistence:=3.1;
+	noise.persistence:=3.31;
 	noise.octaves:=4;	
-	noise.setvoxel(Base.VoxelFromName("NXWCxXWLIcD2LegvoGXXBiQ"));
-(*	z3.FRaster(noise,27); *)
-	sky.lockTF:=TRUE;		
+	noise.setvoxel(lobster);
+(*	z2.FRaster(noise,32); 	*)
 	
-	Base.world:=z3; 
+	sky:=Base.VoxelFromName("NGNYAfkxmEzxe6ZESmcMJtw"); 
+	serp:=Base.VoxelFromName("Ndiffusered"); 	
+	Base.setPT(center,1/2,1/2,1/2);
+	NEW(ball,center,0.5);
+	ball.setcolor(0.9, 0.7,0.7);
+	ball.setvoxel(gxy); 
+	z2.FRaster(ball,64);
+     push(z2);
+	
+	Base.world:=z2; 
 
 	Base.avatar:=harrison;
 	Base.avatarsize:=1000;

@@ -41,7 +41,7 @@ BEGIN
 	old := pool;
 	NEW(pool, LEN(pool)*2);
 	FOR i := 0 TO count-1 DO pool[i] := old[i] END;
-	Out.String("NM3 pool growing to ");
+	Out.String("NM2 pool growing to ");
 	Out.Int(count*2,10);
 END grow;
 

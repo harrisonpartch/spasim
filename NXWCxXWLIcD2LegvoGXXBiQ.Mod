@@ -47,7 +47,7 @@ VAR
 	v: Voxel;
 	blue,red,reddot: Voxel;
 	alphablue: TransparaVox;
-	s0,s1,s2,s3,s4: Voxel;
+	s0,s1,s2,s3,s4: NM3.cell;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
