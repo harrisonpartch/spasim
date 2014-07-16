@@ -106,7 +106,7 @@ BEGIN
 	old := wipe;
 	NEW(wipe, count*2);
 	FOR i := 0 TO LEN(old)-1 DO wipe[i] := old[i] END;
-	Out.String("NM3 wipe growing to ");
+	Out.String("NM2 wipe growing to ");
 	Out.Int(count*2,10);
 END grow;
 
