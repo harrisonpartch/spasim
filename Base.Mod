@@ -551,7 +551,7 @@ PROCEDURE VoxelFromName*(modname: Name): Voxel;
 			Out.String(modname); 
 			Out.String(".Mod");
 			Out.Ln;  
-			(* voxel:=EMPTY *)
+			voxel:=EMPTY
 		ELSE
 			voxel.code:=modname;
 		 END;
