@@ -1,5 +1,5 @@
 MODULE Voxel4;
-IMPORT Random, Base, XNXLVoxel,  XNXLMath, Math, Raster;
+IMPORT Random, Base,  SPSMMath, Math, Raster;
 
 VAR
 	rand: Random.Generator;
@@ -105,15 +105,15 @@ END in;
 PROCEDURE ctop(p:PT; VAR th,ph,d: REAL);
 BEGIN
 (*	d := MathL.sqrt(dee2(p));
-	th := 6.28*XNXLMath.sin((x-cx)/d);
-	ph :=  6.28*XNXLMath.cos((y-cy)/d); *)
+	th := 6.28*SPSMMath.sin((x-cx)/d);
+	ph :=  6.28*SPSMMath.cos((y-cy)/d); *)
 END ctop;
 
 PROCEDURE ctop1(p:PT; VAR th,ph,d: REAL);
 BEGIN
 	d := Math.sqrt(dee2(p));
-(*	th := (1+XNXLMath.sin((x-cx)/d))/2;
-	ph := (1+XNXLMath.cos((y-cy)/d))/2; *)
+(*	th := (1+SPSMMath.sin((x-cx)/d))/2;
+	ph := (1+SPSMMath.cos((y-cy)/d))/2; *)
 END ctop1;
 
 PROCEDURE setCenter*(x,y,z: REAL);
@@ -129,8 +129,8 @@ PROCEDURE ctop(x,y,z: REAL; VAR th,ph: REAL);
 BEGIN
 	x := x - 1/2; y := y-1/2; z := z-1/2;
 	Base.normalize(x,y,z);
-(*	th := 6.28*XNXLMath.sin(x);
-	ph :=  6.28*XNXLMath.cos(y); *)  (*XNXLeal=longreal breaks this for some reason *)
+(*	th := 6.28*SPSMMath.sin(x);
+	ph :=  6.28*SPSMMath.cos(y); *)  (*SPSMeal=longreal breaks this for some reason *)
 END ctop;
 
 PROCEDURE Shade*(VAR ray: Ray);
@@ -496,7 +496,7 @@ BEGIN
 			x := (ax+bx)/2; y := (ay+by)/2; z := (az + bz)/2
 		END;
 (*		ctop(x,y,z,lat,long,d);
-		r := ABS(XNXLMath.sin(lat)); g := ABS(XNXLMath.sin(long));
+		r := ABS(SPSMMath.sin(lat)); g := ABS(SPSMMath.sin(long));
 		ray.r := ray.r + r*ray.bla;
 		ray.g := ray.g + g*ray.bla;
 		ray.b := ray.b + b*ray.bla;

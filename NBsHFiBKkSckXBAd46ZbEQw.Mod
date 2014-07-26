@@ -1,8 +1,8 @@
 MODULE NBsHFiBKkSckXBAd46ZbEQw;
  
-IMPORT Base, TexVox,  XNXLHalfSpace;
+IMPORT Base, TexVox,  HalfSpace;
 
-VAR vox: XNXLHalfSpace.halfvox; v: TexVox.TexVox;
+VAR vox: HalfSpace.halfvox; v: TexVox.TexVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	 NEW(v, "mandel.png"); 

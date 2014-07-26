@@ -1,6 +1,6 @@
 MODULE N2qeD84Fv78X2XEj8PtUZOQ;(*anonymous module created by saboteur*)
   
-IMPORT Base,  XNXLVoxel, FRep;
+IMPORT Base,  FRep;
 
 TYPE Ray = Base.Ray;
 	Voxel = Base.Voxel;  
@@ -10,7 +10,7 @@ VAR
 	cyl: FRep.cyl;
 	v: Voxel;
 	conglomerate,sc,star,vundo: Voxel;
-	red,blue: XNXLVoxel.DiffuseVox;
+	red,blue: Voxel;
 	center,q,qq:  PT;
 	p:ARRAY 7 OF PT;
 	i,j,k:INTEGER;

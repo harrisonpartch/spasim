@@ -1,7 +1,7 @@
 MODULE TestOpenALWav3; (** AUTHOR "fnecati"; PURPOSE "test WAV file playing using OpenALUtil"; *)
 (* uses stripped version of WAVcodec *)
 
-IMPORT  AL:=OpenAL, ALU := OpenALUtil,  KernelLog, Kernel, Commands,XNXLAudio;
+IMPORT  AL:=OpenAL, ALU := OpenALUtil,  KernelLog, Kernel, Commands;
 
 
 VAR

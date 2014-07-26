@@ -1,5 +1,5 @@
 MODULE NM3; (*! This module may be either imported or used anonymously *)
-IMPORT Base, XNXLE, Noise, Math, Out := KernelLog, Debugging, Streams,Strings;
+IMPORT Base, SPSME, Noise, Math, Out := KernelLog, Debugging, Streams,Strings;
 
 (*
 Special voxel containing 27 children arranged in a 3x3x3 grid.
@@ -21,64 +21,6 @@ TYPE PT = Base.PT;
  	NCube=Base.NCube;
  	LCube=Base.LightCube;
 
-TYPE cellarray=POINTER TO ARRAY OF cell;
-
-TYPE Pool = OBJECT
-VAR
-	pool: cellarray;
-	count: LONGINT;
-	
-PROCEDURE &New;
-BEGIN
-	NEW(pool,8);
-	count:=0;
-END New;
-
-PROCEDURE grow;
-VAR old: cellarray;
-	i : LONGINT;
-BEGIN
-	old := pool;
-	NEW(pool, LEN(pool)*2);
-	FOR i := 0 TO count-1 DO pool[i] := old[i] END;
-	Out.String("NM3 pool growing to ");
-	Out.Int(count*2,10);
-END grow;
-
-PROCEDURE add(c : cell);
-VAR
-	i,j,k: INTEGER;
-BEGIN 
-	FOR i:=0 TO MMO DO
-		FOR j:=0 TO MMO DO
-			FOR k:=0 TO MMO DO
-				c.blox[i,j,k]:=NIL;
-				c.nbloxTF[i,j,k]:=FALSE;	
-				c.nposterTF:=FALSE
-			END
-		END
-	END;	
-	IF count < LEN(pool) THEN 
-		pool[0]:= c;
-		INC(count)	
-	ELSE	
-		grow;
-		add(c) 
-	END;
-END add;
-
-PROCEDURE new(VAR c: cell);
-BEGIN
-	IF count>0 THEN 
-		c:=pool[count];
-		DEC(count);
-	ELSE
-		NEW(c);
-	END;
-END new;
-
-END Pool;
-	
 TYPE WipeRecord=RECORD
 	c: cell;
 	restore: Voxel;
@@ -171,7 +113,7 @@ BEGIN
 			nshade(nposter,ray);
 		END	
 	ELSE	
-	XNXLE.E(xyz,ijk);
+	SPSME.E(xyz,ijk);
 	bounds(ijk.i,ijk.j,ijk.k,out);
 	IF ~out THEN
 		v:= blox[ijk.i,ijk.j,ijk.k];
@@ -403,7 +345,7 @@ VAR
 	c: cell;
 BEGIN
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
-		pool.new(c);
+		NEW(c);
 		c.fillchequer(v,w);
 		blox[i,j,k]:=c;
 	END END END
@@ -428,38 +370,6 @@ BEGIN
 	ncode:=NCODE
 END init;
 
-PROCEDURE free*;
-VAR
-	i,j,k: INTEGER;
-BEGIN
-	FOR i:=0 TO MMO DO
-		FOR j:=0 TO MMO DO
-			FOR k:=0 TO MMO DO
-				IF blox[i,j,k]#NIL THEN
-					blox[i,j,k].freerec();
-					blox[i,j,k]:=NIL;
-				END;
-			END
-		END
-	END;
-END free; 
-
-PROCEDURE freerec*;
-VAR
-	i,j,k: INTEGER;
-BEGIN
-	FOR i:=0 TO MMO DO
-		FOR j:=0 TO MMO DO
-			FOR k:=0 TO MMO DO
-				IF blox[i,j,k]#NIL THEN
-					blox[i,j,k].free();
-					blox[i,j,k]:=NIL;
-				END;
-			END
-		END
-	END;
-END freerec; 
-
 PROCEDURE copyclear*;
 VAR
 	child:Voxel;
@@ -468,7 +378,6 @@ BEGIN
 	copymarker:=FALSE;
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 		IF (blox[i,j,k]#NIL) & blox[i,j,k].copymarker THEN
-			blox[i,j,k].copymarker:=FALSE;
 			blox[i,j,k].copyclear
 		END
 	END END END;		
@@ -638,7 +547,7 @@ BEGIN
 				ELSIF blox[i,j,k].complex THEN
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel,vu)
 				ELSE
-					pool.new(c);
+					NEW(c);
 					c.setcolor(red,green,blue,black,alpha);
 					c.fill(blox[i,j,k]);
 					c.passable:=blox[i,j,k].passable;
@@ -647,7 +556,7 @@ BEGIN
 					c.strokerec(p, resolution,nextscale,voxel,vu);
 				END	
 			ELSE
-				pool.new(c);
+				NEW(c);
 				c.setcolor(red,green,blue,black,alpha);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
@@ -679,7 +588,7 @@ BEGIN
 					blox[i,j,k].strokephemeralrec(p, resolution,nextscale,voxel,vu)
 				ELSE
 					wiper.add(SELF,i,j,k,blox[i,j,k]);
-					pool.new(c);
+					NEW(c);
 					c.setcolor(red,green,blue,black,alpha);
 					c.fill(blox[i,j,k]);
 					c.passable:=blox[i,j,k].passable;
@@ -689,7 +598,7 @@ BEGIN
 				END	
 			ELSE
 				wiper.add(SELF,i,j,k,NIL);
-				pool.new(c);
+				NEW(c);
 				c.setcolor(red,green,blue,black,alpha);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
@@ -725,12 +634,12 @@ BEGIN
 				ELSIF (blox[i,j,k] IS Voxel) THEN
 					blox[i,j,k].nstroke(p, resolution DIV nextscale,normal,color)
 				ELSE
-					pool.new(c);
+					NEW(c);
 					c.setcolor(red,green,blue,black,alpha);
 					c.imposter:=blox[i,j,k];	
 					IF blox[i,j,k].emptysplit THEN 
 						FOR ii := 0 TO MMO DO FOR jj := 0 TO MMO DO FOR kk:= 0 TO MMO DO
-							pool.new(c2);
+							NEW(c2);
 							blox[i,j,k]:=c2
 						END END END;
 					ELSE
@@ -741,7 +650,7 @@ BEGIN
 					c.nstrokerec(p, resolution,nextscale,normal,color);
 				END	
 			ELSE
-				pool.new(c);
+				NEW(c);
 				c.setcolor(red,green,blue,black,alpha);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
@@ -794,7 +703,7 @@ BEGIN
 			IF ABS(d2s) < CRDNS THEN				
 				o.x:=p.x-1/TWOMS; o.y:=p.y-1/TWOMS; o.z:=p.z-1/TWOMS; (* p is center, o is corner *)
 				IF blox[i,j,k]=NIL THEN 
-					pool.new(newcell);
+					NEW(newcell);
 					newcell.setcolor(red,green,blue,black,alpha);
 					blox[i,j,k]:=newcell;
 					IF f.normaltf(p) THEN
@@ -855,7 +764,7 @@ BEGIN
 			IF ABS(d2s)<CRDS THEN  (* at surface *)				
 				o.x:=p.x-1/TWOMS; o.y:=p.y-1/TWOMS; o.z:=p.z-1/TWOMS; (* p is center, o is corner *)
 				IF blox[i,j,k]=NIL THEN
-					pool.new(newcell);
+					NEW(newcell);
 					newcell.setcolor(red,green,blue,black,alpha);
 					newcell.imposter:=f.voxel(p);
 					newcell.nposterTF:=TRUE;
@@ -916,7 +825,7 @@ PROCEDURE copy():Voxel;
 VAR c: cell;
 	i,j,k: INTEGER;
 BEGIN
-	pool.new(c);
+	NEW(c);
 	c.setcolor(red,green,blue,black,alpha);
 	c.nbloxTF:=nbloxTF;
 	c.nblox:=nblox;
@@ -941,7 +850,7 @@ VAR
 BEGIN
 	IF code=NCODE THEN
 		copymarker:=TRUE;
-		pool.new(c);
+		NEW(c);
 		c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; c.alpha:=alpha;
 		c.nbloxTF:=nbloxTF;
 		c.nblox:=nblox;
@@ -978,26 +887,24 @@ PROCEDURE engrain(w: Streams.Writer);
 VAR
 	i,j,k: INTEGER;
 BEGIN
-	w.Bytes(code,0,NL);	
-	w.RawReal(red);
-	w.RawReal(green);
-	w.RawReal(blue);
-	w.RawReal(black);
-	IF ~copymarker THEN	
-		IF code=NCODE THEN
-			copymarker:=TRUE;
+(* copymarker code removed: this will not terminate [ie it WILL trap] if the cell is recursive *)
+	IF code=NCODE THEN	
+		IF TRUE THEN
+			w.Bytes(code,0,NL);	
+			w.RawReal(red);
+			w.RawReal(green);
+			w.RawReal(blue);
+			w.RawReal(black);	
 			FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
-					IF (blox[i,j,k]#NIL)  THEN
+					IF (blox[i,j,k]#NIL) THEN
 						w.RawBool(TRUE);
 						blox[i,j,k].engrain(w) 				
 					ELSE
 						w.RawBool(FALSE);
-					END;			
-			END END END; 
-		ELSE
-			w.Bytes(code,0,NL);	 
+					END			
+			END END END
 		END
-	END
+	END;
 END engrain;
 
 (*
@@ -1028,19 +935,17 @@ END sprout;
 END cell;
 
 VAR
-	pool:Pool;
 	wiper: Wiper;
 	
 PROCEDURE thisvox*():Voxel;
 VAR
 	v: cell;  
 BEGIN
-	pool.new(v); 
+	NEW(v);
 	RETURN v
 END thisvox;
 
 BEGIN
-	NEW(pool);
 	NEW(wiper)
 END NM3.
 

@@ -1,6 +1,6 @@
 MODULE NBsHFiBKkSckXBAd46Zbsss;
  
-IMPORT Base, XNXLVoxel, Voxel4;
+IMPORT Base, Voxel4;
 
 VAR 
 	vox: Voxel4.MirrorSphereInVox;

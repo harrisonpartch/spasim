@@ -1,6 +1,6 @@
 MODULE Render;
-IMPORT Kernel, Objects, Random, Marsh,(* ALUT := OpenALUtil, XNXLAudio,*)
- Out := KernelLog, Math,XNXLMath, Base,  Retina, GLW := OGLWindow, 
+IMPORT Kernel, Objects, Random, Marsh,(* ALUT := OpenALUtil, SPSMAudio,*)
+ Out := KernelLog, Math,SPSMMath, Base,  Retina, GLW := OGLWindow, 
 	 GL:=OpenGL, GLC := OpenGLConst,  GLSL:= GLShaderUtils,
 	 Inputs,  Raster, Strings, Streams, Debugging;
 
@@ -110,8 +110,8 @@ BEGIN
 	pass := Base.world.passprobe(p);
 
 	IF ~pass THEN
-	(*	XNXLAudio.LoadWav("grain.wav");
-		XNXLAudio.Play ;	
+	(*	SPSMAudio.LoadWav("grain.wav");
+		SPSMAudio.Play ;	
 		ALUT.Play(Base.grainsound);
 		
 		Out.String("grain!");*)
@@ -175,9 +175,9 @@ BEGIN
 (*	fward:=Base.mkPT(1,0,0);
 	dward:=Base.mkPT(0,0,1);
 	rward:=Base.mkPT(0,1,0);	
-	XNXLMath.orrot(fward, dward,cameraphi);   
-	XNXLMath.orrot(rward, dward,cameraphi);   		
-	XNXLMath.orrot(fward, rward,cameratheta);  	*)
+	SPSMMath.orrot(fward, dward,cameraphi);   
+	SPSMMath.orrot(rward, dward,cameraphi);   		
+	SPSMMath.orrot(fward, rward,cameratheta);  	*)
 	fward:=Retina.fward;
 	cvx :=cvx+(x*fward.x); 
 	cvy :=cvy+(x*fward.y); 	
@@ -191,7 +191,7 @@ VAR
 BEGIN
 	rward:=Retina.fward;
 	dward:=Base.mkPT(0,1,0);
-	XNXLMath.orrot(rward, dward,3.14159/2);   		
+	SPSMMath.orrot(rward, dward,3.14159/2);   		
 	cvx :=cvx+(x*rward.x); 
 	cvy :=cvy+(x*rward.y); 	
 	cvz :=cvz+(x*rward.z); 	
@@ -204,8 +204,8 @@ VAR
 BEGIN
 	dward:=Base.mkPT(0,0,1);
 	rward:=Base.mkPT(0,1,0);	
-	XNXLMath.orrot(rward, dward,cameratheta);   		
-	XNXLMath.orrot(dward, rward,cameraphi);  		
+	SPSMMath.orrot(rward, dward,cameratheta);   		
+	SPSMMath.orrot(dward, rward,cameraphi);  		
 	cvx :=cvx+(x*dward.x); 
 	cvy :=cvy+(x*dward.y); 	
 	cvz :=cvz+(x*dward.z); 	
@@ -328,7 +328,7 @@ BEGIN
 	leftsticky:=10.0;
 	upsticky:=10.0;	
 	Out.String('*line 1217!*');
-	msd:=45;
+	msd:=75;
 END OnLoad;
 
 PROCEDURE Reshape(w, h: LONGINT);
@@ -683,8 +683,8 @@ VAR
 BEGIN
 	x := p.x; y := p.y; z := 0;
 	Base.normalize(x,y,z);
-	theta := XNXLMath.arccos(x);	
-	phi := XNXLMath.arccos(1-p.z);
+	theta := SPSMMath.arccos(x);	
+	phi := SPSMMath.arccos(1-p.z);
 END sphtocart;
 
 PROCEDURE ddray(VAR ray: Base.Ray); 

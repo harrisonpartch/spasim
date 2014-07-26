@@ -1,5 +1,5 @@
 MODULE Nharrisonavatar;
-IMPORT Base, TexVox, XNXLRotaVox;
+IMPORT Base, TexVox, RotaVox;
   
 VAR 
 	cv: TexVox.TexVox;

@@ -18,7 +18,7 @@ OpenALinfo.Mod
 OpenALUtil.Mod
 TestOpenAL0.Mod
 TestOpenALWav.Mod 
-XNXLAudio.Mod
+SPSMAudio.Mod
 TestOpenALWav3.Mod
 
 ~
@@ -26,11 +26,10 @@ TestOpenALWav3.Mod
 #Linux or Windows:
 Compiler.Compile
 Base.Mod
-XNXLE.Mod 
-XNXLMath.Mod
-XNXLHex.Mod
+SPSME.Mod 
+SPSMMath.Mod
+SPSMHex.Mod
 Noise.Mod
-XNXLVoxel.Mod
 FRep.Mod
 Retina.Mod
 MPEG.Mod
@@ -38,8 +37,8 @@ FilmLoop.Mod
 TexVox.Mod
 CellAuto.Mod
 Voxel4.Mod
-XNXLHalfSpace.Mod
-XNXLRotaVox.Mod
+HalfSpace.Mod
+RotaVox.Mod
 Engrainer.Mod
 Saboteur.Mod
 FRep.Mod
@@ -56,7 +55,7 @@ NCompiler.ncompile
 
 Render.Open
 
-SystemTools.FreeDownTo   Base ~
+SystemTools.FreeDownTo  Base ~
 
 ~
 

@@ -1,6 +1,6 @@
 MODULE FRep;
 
-IMPORT Math, XNXLMath, Base, XNXLVoxel, Raster, Graphics:=WMGraphics, Noise;
+IMPORT Math, SPSMMath, Base, Raster, Graphics:=WMGraphics, Noise;
 	
 CONST
 	twopi = 2*Math.pi;
@@ -469,23 +469,6 @@ END voxel;
 		
 END landscape;
 
-TYPE cube*= OBJECT(FR)
-VAR
-	white:XNXLVoxel.DiffuseVox;
-
-PROCEDURE getcolor*(p:PT):Color;
-VAR
-	c:Color;
-BEGIN
-	c.red:=p.x; c.blue:=p.y; c.red:=p.z;
-	RETURN c
-END getcolor;
-
-BEGIN
-	NEW(white);
-	white.setcolor(1,1,1,0,0);
-	vox:=white;
-END cube;
 
 TYPE hexgrid*= OBJECT(FR)  (*accidentally created from cyl *)
 VAR 

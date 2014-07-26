@@ -1,9 +1,9 @@
 MODULE Ndogepearl;
-IMPORT Base, TexVox, XNXLRotaVox;
+IMPORT Base, TexVox, RotaVox;
   
 VAR 
 	cv: TexVox.AvaVox;
-	rv: XNXLRotaVox.RVox;
+	rv: RotaVox.RVox;
 	up,right: Base.PT;
 	sabot, vox,v,sphere: Base.Voxel;
 	center: Base.PT;

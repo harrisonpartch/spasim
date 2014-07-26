@@ -1,6 +1,6 @@
 MODULE Nrdpseudosolid;
 
-IMPORT Base, XNXLE, FRep;
+IMPORT Base, FRep;
 
 CONST	
 	M=200;

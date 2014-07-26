@@ -543,19 +543,18 @@ PROCEDURE VoxelFromName*(modname: Name): Voxel;
 			GETPROCEDURE(modname, "thisvox", fackery );
 			IF (fackery # NIL) THEN  
 				voxel := fackery();		 
-			END		 
-		END;
-		IF voxel=NIL THEN 
-			Out.String("failed");
-			Out.String("rezzing ");
-			Out.String(modname); 
-			Out.String(".Mod");
-			Out.Ln;  
-			voxel:=EMPTY
+			END;
+			IF voxel=NIL THEN 
+				Out.String("failed voxelfromname 1");
+				voxel:=EMPTY
+			ELSE
+				voxel.code:=modname;
+			END;
 		ELSE
-			voxel.code:=modname;
-		 END;
-		RETURN voxel; (* this may return EMPTY which is what we want *)
+			Out.String("failed voxelfromname 2");
+			voxel:=EMPTY
+		END;
+		RETURN voxel
 END VoxelFromName;
 
 PROCEDURE radiositize*(l:LightCube; p:PT; face:INTEGER);

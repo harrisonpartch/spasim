@@ -1,5 +1,5 @@
 MODULE TexVox;
-IMPORT Base, (* ALUT := OpenALUtil, *)  XNXLMath, Noise, FilmLoop, Raster, Graphics := WMGraphics, Random, Math,Out := KernelLog; 
+IMPORT Base, (* ALUT := OpenALUtil, *)  SPSMMath, Noise, FilmLoop, Raster, Graphics := WMGraphics, Random, Math,Out := KernelLog; 
 
 TYPE PT = Base.PT;
 	Color = Base.Color;
@@ -309,8 +309,8 @@ END mirror;
 
 PROCEDURE play*();
 BEGIN
-(*	XNXLAudio.LoadWav("test.wav");
-	XNXLAudio.Play 
+(*	SPSMAudio.LoadWav("test.wav");
+	SPSMAudio.Play 
 
 	ALUT.Play(Base.texsound);	*)
 END play;

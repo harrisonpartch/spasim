@@ -1,6 +1,6 @@
 MODULE Nrdvolvox;
 
-IMPORT Base, XNXLE, FRep,Objects;
+IMPORT Base, SPSME, FRep,Objects;
 
 CONST	
 	M=20;
@@ -138,7 +138,7 @@ BEGIN
 			imposter.Shade(ray)
 		END	
 	ELSE	
-	XNXLE.E(xyz,ijk);
+	SPSME.E(xyz,ijk);
 	bounds(ijk.i,ijk.j,ijk.k,out);
 	IF ~out THEN
 		ray.lxyz.x := ABS(xyz.x - ijk.i);

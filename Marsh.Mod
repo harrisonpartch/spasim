@@ -254,7 +254,7 @@ END engrain;
 PROCEDURE sprout*;
 VAR v:Voxel;
 BEGIN
-	Base.world.free; 
+	Base.world.free();
 	Out.String("sprouting...");
 	Base.world:= Engrainer.sprout();
 END sprout;
@@ -468,8 +468,8 @@ BEGIN
 	Base.setPT(center,1/2,1/2,1/2);
 	NEW(ball,center,0.5);
 	ball.setcolor(0.9, 0.7,0.7);
-	ball.setvoxel(gxy); 
-	z2.FRaster(ball,64);
+	ball.setvoxel(gxy);
+	z2.FRaster(ball,81);  
      push(z2);
 	
 	Base.world:=z2; 

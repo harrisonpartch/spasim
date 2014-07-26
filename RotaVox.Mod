@@ -1,6 +1,6 @@
 MODULE RotaVox;
 
-IMPORT Base, XNXLMath, Math;
+IMPORT Base, SPSMMath, Math;
 
 TYPE Voxel=Base.Voxel;
 TYPE PT=Base.PT;
@@ -83,11 +83,11 @@ BEGIN
 	IF (ABS(d-1/4) < 0.001) THEN 
 		a.x := x; a.y := y; a.z := z;
 		a.x:=(x-1/2)*2; a.y:=(y-1/2)*2; a.z:=(z-1/2)*2;      (* we know that the vector from (1/2,1/2,1/2) to (x,y,z) has length 1/2 so this translates and normalizes it *)
-		XNXLMath.orrot(a,X,xphi);	
-		XNXLMath.orrot(a,Z,zphi);	
+		SPSMMath.orrot(a,X,xphi);	
+		SPSMMath.orrot(a,Z,zphi);	
 		a.x:=a.x/2+1/2; a.y:=a.y/2+1/2; a.z:=a.z/2+1/2; 	(* denormalize and translate back*)
-		XNXLMath.orrot(ray.dxyz,X,xphi); 
-		XNXLMath.orrot(ray.dxyz,Z,zphi); 
+		SPSMMath.orrot(ray.dxyz,X,xphi); 
+		SPSMMath.orrot(ray.dxyz,Z,zphi); 
 		IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
 		IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 		IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;		

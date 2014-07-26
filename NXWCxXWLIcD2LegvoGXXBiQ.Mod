@@ -66,22 +66,22 @@ BEGIN
 	NEW(s3);
 	NEW(s4);	
 	NEW(alphablue);
-	alphablue.setcolor(0,0,0,1/4,1/4);
+	alphablue.setcolor(0,0,1,1,1);
 
-	tree.imposter:=blue;
-	s0.fillsierp(s1,tree);	
-	s0.imposter:=blue;
+	tree.imposter:=alphablue;
+	s0.fillsierp(s1,blue);	
+	s0.imposter:=lobster;
 	s0.copyonstroke:=TRUE;
-	s0.DTL:=120;
+	s0.DTL:=60;
 	
-	s1.fillsierp(s2,alphablue);	
+	s1.fillsierp(s2,blue);	
 	s1.imposter:=blue;
 	s1.copyonstroke:=TRUE;
-	s1.DTL:=120;
+	s1.DTL:=60;
 
 	s2.fillsierp(s2,reddot);	
 	s2.imposter:=blue;
-	s2.DTL:=120;
+	s2.DTL:=60;
 	s2.lockTF:=TRUE;
 	
 	RETURN s0

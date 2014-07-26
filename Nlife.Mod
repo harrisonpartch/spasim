@@ -1,6 +1,6 @@
 MODULE Nlife;
 
-IMPORT Base, XNXLE, FRep,Raster;
+IMPORT Base, FRep, Raster;
 
 CONST
 	N = 500;

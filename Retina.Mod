@@ -1,6 +1,6 @@
 MODULE Retina;
 IMPORT  Base, Objects, Kernel, Out:=KernelLog, Noise,
-Math, XNXLMath, Raster, Graphics:=WMGraphics;
+Math, SPSMMath, Raster, Graphics:=WMGraphics;
 
 TYPE
 	Ray=Base.Ray;
@@ -8,8 +8,8 @@ TYPE
 CONST
 	T=5;        
 	TS=2*32;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=6;
-	TH=4;
+	TW=8;
+	TH=5;
 	W*=TS*TW;
 	H*=TS*TH;
 
@@ -269,8 +269,8 @@ BEGIN
 	ray.dxyz.x := ray.dxyz.x/d;
 	ray.dxyz.y := ray.dxyz.y/d;
 	ray.dxyz.z := ray.dxyz.z/d;	
-	XNXLMath.orrot(ray.dxyz, Base.dward, rtheta);  
-	XNXLMath.orrot(ray.dxyz, rward, rphi);  
+	SPSMMath.orrot(ray.dxyz, Base.dward, rtheta);  
+	SPSMMath.orrot(ray.dxyz, rward, rphi);  
 	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
@@ -391,10 +391,10 @@ BEGIN
 	rward:=Base.rward;
 	rtheta:=phi;
 	rphi:=theta;	
-	XNXLMath.orrot(fward, Base.dward,rtheta);   
-	XNXLMath.orrot(rward, Base.dward,rtheta);   		
-	XNXLMath.orrot(fward, Base.rward,rphi);  	
-	XNXLMath.orrot(dward, Base.rward,rphi);  
+	SPSMMath.orrot(fward, Base.dward,rtheta);   
+	SPSMMath.orrot(rward, Base.dward,rtheta);   		
+	SPSMMath.orrot(fward, Base.rward,rphi);  	
+	SPSMMath.orrot(dward, Base.rward,rphi);  
 	angletoray(Base.sniperay,0,0);	
 	BEGIN{EXCLUSIVE}
 		gotiles;

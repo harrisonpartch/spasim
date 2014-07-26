@@ -1,8 +1,8 @@
 MODULE NMjMiBiHzuhtrETMbA4X0MQ;(*anonymous module created by saboteur*)
  
-IMPORT Base, TexVox, XNXLHalfSpace ;
+IMPORT Base, TexVox, HalfSpace ;
 VAR 
-	vox: XNXLHalfSpace.halfvox; 
+	vox: HalfSpace.halfvox; 
 	v: TexVox.TexVox
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
