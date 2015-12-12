@@ -5,6 +5,7 @@ IMPORT Objects, Base,  FRep, RotaVox, Out:=KernelLog, Random;
 TYPE Ray = Base.Ray;
 	Voxel = Base.Voxel;  
 	PT =Base.PT;
+	Path=Base.Path;
 	
 TYPE anim=OBJECT(Base.V)
 VAR
@@ -35,11 +36,12 @@ VAR
 	i:LONGINT;
 	rand: Random.Generator;
 	shell: RotaVox.RVox;
-	an: anim
+	an: anim;
+	path: Path;
 PROCEDURE draw;
 BEGIN	 
 	bluedot:=Base.VoxelFromName("NM2");
-	reddot:=Base.VoxelFromName("NM2");
+	reddot:=Base.VoxelFromName("NM4");
 	greendot:=Base.VoxelFromName("NM3");
 	Base.setPT(center,1/2,1/2,1/2);
 	rdot:=Base.VoxelFromName("Nreddot");  
@@ -61,9 +63,9 @@ BEGIN
 	NEW(shell,reddot,Base.mkPT(0,1,0),Base.mkPT(0,0,1),0.03,0.01);
 	FOR i:=0 TO 1 DO
 		Base.randsphPT(p,n,center,0.45);
-		reddot.stroke(p,16,greendot,v);
+		reddot.stroke(p,16,path,greendot,v);
 		Base.randsphPT(p,n,center,0.45);
-		reddot.stroke(p,16,shell,v);
+		reddot.stroke(p,16,path,shell,v);
 	END;	
 	reddot.copyonstroke:=TRUE;
 	greendot.lockTF:=TRUE;

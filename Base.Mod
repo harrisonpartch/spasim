@@ -1,7 +1,7 @@
 MODULE Base;
 
 IMPORT  Math:=Math, Random, Kernel, Out:=KernelLog (*DebugLog*), Objects, (* AL:=OpenAL, ALUT := OpenALUtil,  *)
-Strings, Streams, WMFontManager, Raster, WMRasterScale, WMRectangles, Graphics := WMGraphics, Commands(*, XNXLAudio*);
+Strings, Streams, CryptoMD5, WMFontManager, Raster, WMRasterScale, WMRectangles, Graphics := WMGraphics, Commands(*, XNXLAudio*);
 
 CONST
 	BPS*=3; 
@@ -220,6 +220,8 @@ TYPE Ray* = RECORD
 	texdtl*:REAL;
 END;
 
+TYPE Path*=ARRAY 20 OF ARRAY 3 OF INTEGER;
+
 TYPE Voxel*=OBJECT(V)
 VAR
 	complex*, passable*: BOOLEAN;
@@ -285,9 +287,9 @@ END FRasterSolid;
 PROCEDURE FRasterrecSolid*(f: FR; resolution: LONGINT; origin: PT; scale: LONGINT); 
 END FRasterrecSolid;
 
-PROCEDURE stroke*(p:PT; resolution: LONGINT; voxel,voxundo:Voxel);
+PROCEDURE stroke*(p:PT; resolution: LONGINT; VAR path: Path; voxel,voxundo:Voxel);
 END stroke;
-PROCEDURE strokerec*(p:PT; resolution,scale: LONGINT; voxel,voxundo:Voxel);
+PROCEDURE strokerec*(p:PT; resolution,scale: LONGINT;  VAR path: Path; voxel,voxundo:Voxel);
 END strokerec;
 PROCEDURE strokephemeral*(p:PT; resolution: LONGINT; voxel,voxundo:Voxel);
 END strokephemeral;
@@ -346,11 +348,10 @@ END play;
 PROCEDURE touch*;
 END touch; 
 
-PROCEDURE free*;
-END free; 
-
-PROCEDURE freerec*;
-END freerec; 
+PROCEDURE hash():Name;
+BEGIN
+	RETURN ncode	
+END hash;
 
 END Voxel; 
 
@@ -530,7 +531,7 @@ VAR
 	sniperay*:Ray;
 	blackspeed*:REAL;
 	defaultimg: Raster.Image;
-
+	hasher*:CryptoMD5.Hash;
 (*	basesource*, texsound*, grainsound*: AL.ALuint;
 	listenerPos*: ARRAY [3] OF AL.ALfloat; (* global position *)
 	sourcePos: ARRAY 3 OF AL.ALfloat;
@@ -1170,7 +1171,7 @@ BEGIN
 	NEW(world);
 	worldalive := TRUE;
 	frame:=0;
-	fog := 1/10;
+	fog := 0.02;
 	rlimit := 4;
 	iterlimit := 500;
 	DTL:=25;	

@@ -15,6 +15,7 @@ CONST M=3; (* defines grid size *)
 TYPE PT = Base.PT;
 	Color = Base.Color;
 	Ray = Base.Ray;
+	Path = Base.Path;
 	Voxel = Base.Voxel;
 	FR = Base.FR;
 	Name = Base.Name;
@@ -489,13 +490,13 @@ BEGIN
 	END 
 END passprobe;
 
-PROCEDURE stroke(p:PT; resolution:LONGINT; voxel,voxundo:Voxel);
+PROCEDURE stroke*(p:PT; resolution: LONGINT; VAR path: Path; voxel,voxundo:Voxel);
 VAR
 	i,j,k: LONGINT;
 BEGIN
 	Base.clamPT(p);
 	IF voxel#NIL THEN
-		strokerec(p,resolution,1,voxel,voxundo);
+		strokerec(p,resolution,1, path, voxel,voxundo);
 	END
 END stroke;
 
@@ -518,7 +519,7 @@ BEGIN
 	nstrokerec(p,resolution,1,normal,color);
 END nstroke;
 
-PROCEDURE strokerec(p:PT; resolution,scale:LONGINT; voxel,voxundo:Voxel);
+PROCEDURE strokerec*(p:PT; resolution,scale: LONGINT;  VAR path: Path; voxel,voxundo:Voxel);
 VAR
 	i,j,k,ii,jj,kk,nextscale: LONGINT;
 	v,vv:Voxel;
@@ -542,10 +543,10 @@ BEGIN
 					copy:=Base.VoxelFromName(blox[i,j,k].code);
 					copy.code:="";
 					copy.copyonstroke:=FALSE; 
-					copy.strokerec(p, resolution,nextscale,voxel,vu);					
+					copy.strokerec(p, resolution,nextscale, path, voxel,vu);					
 					blox[i,j,k]:=copy;
 				ELSIF blox[i,j,k].complex THEN
-					blox[i,j,k].strokerec(p, resolution,nextscale,voxel,vu)
+					blox[i,j,k].strokerec(p, resolution,nextscale, path, voxel,vu)
 				ELSE
 					NEW(c);
 					c.setcolor(red,green,blue,black,alpha);
@@ -553,14 +554,14 @@ BEGIN
 					c.passable:=blox[i,j,k].passable;
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-					c.strokerec(p, resolution,nextscale,voxel,vu);
+					c.strokerec(p, resolution,nextscale, path, voxel,vu);
 				END	
 			ELSE
 				NEW(c);
 				c.setcolor(red,green,blue,black,alpha);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-				c.strokerec(p, resolution,nextscale,voxel,vu);
+				c.strokerec(p, resolution,nextscale, path, voxel,vu);
 			END
 		END
 	END
@@ -573,6 +574,7 @@ VAR
 	c,c2: cell;	
 	copy,vu: Voxel;
 	code: Base.Name;
+	path: Path;
 BEGIN
 	IF ~lockTF THEN
 		nextscale:=scale*M;
@@ -594,7 +596,7 @@ BEGIN
 					c.passable:=blox[i,j,k].passable;
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-					c.strokerec(p, resolution,nextscale,voxel,vu);
+					c.strokerec(p, resolution,nextscale, path, voxel,vu);
 				END	
 			ELSE
 				wiper.add(SELF,i,j,k,NIL);
@@ -602,7 +604,7 @@ BEGIN
 				c.setcolor(red,green,blue,black,alpha);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-				c.strokerec(p, resolution,nextscale,voxel,vu);
+				c.strokerec(p, resolution,nextscale, path, voxel,vu);
 			END
 		END
 	END
@@ -667,6 +669,7 @@ VAR
 	delta: REAL;
 	n: LONGINT;
 	p: PT;
+	path: Path;
 	vu: Voxel
 BEGIN
 	n := ENTIER(Base.distance(a,b)*resolution*M);
@@ -675,7 +678,7 @@ BEGIN
 		dxdt := (a.x-b.x)/n; dydt := (a.y-b.y)/n; dzdt := (a.z-b.z)/n; 
 		FOR t := 0 TO n DO
 			Base.setPT(p,tx, ty, tz);
-			stroke(p, resolution,v,vu);
+			stroke(p, resolution, path, v,vu);
 			tx := tx + dxdt; ty := ty + dydt; tz := tz+dzdt;
 		END
 	END		
@@ -931,6 +934,14 @@ BEGIN
 			END;	
 		END END END					
 END sprout;
+
+PROCEDURE hash():Name;
+VAR
+	i,j,k: INTEGER;
+	hashtext: Strings.String;
+BEGIN
+	Base.hasher.Initialize;
+END hash;
 
 END cell;
 

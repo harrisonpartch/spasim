@@ -6,6 +6,7 @@ CONST sfile="marshstrokes.text"
 TYPE Voxel=Base.Voxel;
 	PT=Base.PT;
 	Color=Base.Color;  
+	Path=Base.Path;
 	VA=ARRAY 5 OF Voxel;
 
 TYPE vloop=OBJECT
@@ -115,7 +116,7 @@ VAR
 	A,B: PT;
 	SNIPE*,SNIPEINTO*:BOOLEAN;
 	atmdark: REAL;
-
+	pth: Path; 
 PROCEDURE draw*;
 BEGIN
 	stroke(Base.cursorPT,cursorsize,marshv.vox,voxundo)
@@ -140,7 +141,7 @@ PROCEDURE stroke(p:PT; resolution:LONGINT; voxel,vundo:Voxel);
 BEGIN
 	A:=B;
 	B:=p;
-	Base.world.stroke(p,resolution,voxel,vundo);
+	Base.world.stroke(p,resolution, pth, voxel,vundo);
 	IF lines THEN line END
 END stroke;
 
@@ -200,7 +201,7 @@ VAR
 	v: Voxel;
 	d:REAL;
 BEGIN
-	Base.world.stroke(Base.cameraPT,729,cursormark,voxundo); 	
+	Base.world.stroke(Base.cameraPT,729, pth, cursormark,voxundo); 	
 END drawHUD;
 
 PROCEDURE push*(v: Voxel);
@@ -254,7 +255,6 @@ END engrain;
 PROCEDURE sprout*;
 VAR v:Voxel;
 BEGIN
-	Base.world.free();
 	Out.String("sprouting...");
 	Base.world:= Engrainer.sprout();
 END sprout;
@@ -276,7 +276,7 @@ VAR
 	undo,rd, rdpseudosolid, blu, die,gren,granite,sand,whiteblock,lazy,pdestroyer,axolotl,xen,sky1,sky2,tigerlily,cloud: Voxel;
 	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison,fuse:Voxel;
 	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,
-	w3,z3,z2,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp: Voxel;
+	w3,z3,z3a,z2,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp: Voxel;
 	ball: FRep.sphere;
 	noise: FRep.noise;	 
 BEGIN
@@ -373,7 +373,7 @@ BEGIN
 	push(granite);
 	sand:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw"); 		
 	push(sand);
-	blacksun:=Base.VoxelFromName("NGNYAfkxmEzxe6ZESmcMJtw"); 	
+	blacksun:=Base.VoxelFromName("Nblacksun"); 	
 	push(blacksun);
 	
 	lazy:=Base.VoxelFromName("NwPicBWw4NfcserX4ELxxx"); 	
@@ -436,9 +436,9 @@ BEGIN
 	noise.a:=1;
 	noise.b:=1;
 	noise.c:=1;		
-	noise.octaves:=4;
+	noise.octaves:=3;
 	noise.setvoxel(tigerlily);
-	noise.persistence:=3.2;
+	noise.persistence:=3.6;
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,1/2);
@@ -450,30 +450,39 @@ BEGIN
 	plane.vox:=sky;	
 	w3:=Base.VoxelFromName("NM3");	 
 	z3:=Base.VoxelFromName("NM3");	
+	z3a:=Base.VoxelFromName("NM3");	
 	z2:=Base.VoxelFromName("NM2");
-	z3.setcolor(0,0,0,1/2,1);
-	z2.setcolor(1,1,0,1,1);	
+	z3.setcolor(1000,0,0,1/2,1000);
+	z2.setcolor(10,0,0,1,1);	
 	NEW(noise);		
-	noise.seed:=123666;		
-	noise.a:=1;
-	noise.b:=1;
-	noise.c:=1;		
+	noise.seed:=12345666;		
+	noise.a:=3;
+	noise.b:=3;
+	noise.c:=3;		
 	noise.persistence:=3.31;
 	noise.octaves:=4;	
-	noise.setvoxel(lobster);
-(*	z2.FRaster(noise,32); 	*)
+	noise.setvoxel(conglomerate);
 	
+	noise.seed:=166;		
+	noise.a:=3;
+	noise.b:=3;
+	noise.c:=3;		
+	noise.persistence:=4.01;
+	noise.octaves:=4;	
+	noise.setvoxel(treeserp);
+	 z3.FRaster(noise,16);	
+		
 	sky:=Base.VoxelFromName("NGNYAfkxmEzxe6ZESmcMJtw"); 
-	serp:=Base.VoxelFromName("Ndiffusered"); 	
 	Base.setPT(center,1/2,1/2,1/2);
 	NEW(ball,center,0.5);
-	ball.setcolor(0.9, 0.7,0.7);
-	ball.setvoxel(gxy);
-	z2.FRaster(ball,81);  
-     push(z2);
-	
-	Base.world:=z2; 
+	ball.setcolor(0.9, 0.2,0.7);
+	ball.setvoxel(blacksun);
+	z3a.FRaster(ball,64);  
+	push(z3a);
+	z3a.setcolor(1,1,1,1,1);
 
+ 
+ 	Base.world:=z3a; 	
 	Base.avatar:=harrison;
 	Base.avatarsize:=1000;
 END dawn;

@@ -328,7 +328,7 @@ BEGIN
 	leftsticky:=10.0;
 	upsticky:=10.0;	
 	Out.String('*line 1217!*');
-	msd:=75;
+	msd:=30;
 END OnLoad;
 
 PROCEDURE Reshape(w, h: LONGINT);
@@ -425,7 +425,7 @@ BEGIN
 							(* Out.String("KsEscape.."); Out.Ln;*)
 			|	Inputs.KsF1:
 					Out.String("F1- Close"); Out.Ln;
-					Marsh.engrain; 
+					(* Marsh.engrain; *)
 					Close();	
 					
 					
@@ -465,8 +465,8 @@ END KeyEvent;
 	VAR
 		up,left: REAL;
 		xr,yr: LONGINT;
-		temporaljust: REAL;
-	BEGIN
+		temporaljust: REAL; 
+		BEGIN
 			MB := keys;
 			temporaljust := msd/GetCurrentFrameMs();
 			
@@ -476,8 +476,8 @@ END KeyEvent;
 			IF CAPTUREMOUSE & (ABS(xr)+ABS(yr)>5) THEN
 				left:=ABS(xr)*xr;
 				up:=-ABS(yr)*yr; 
-				camera.up(-up/(60000*leftsticky)); 
-				camera.left(left/(30000*leftsticky));
+				camera.up(-up/(15000*leftsticky)); 
+				camera.left(left/(6000*leftsticky));
 				
 				WarpPointer(1000,1000, centerx,centery);
 			END
@@ -610,9 +610,9 @@ END KeyEvent;
 	(* change detail according to frame speed, called in GLWindow.MainLoop *)
 	PROCEDURE GameLogic();
 	BEGIN
-		IF GetCurrentFrameMs() <msd THEN 
+		IF GetCurrentFrameMs() <50 THEN 
 			Retina.moredetail;
-		ELSIF GetCurrentFrameMs() >(msd+10) THEN 
+		ELSIF GetCurrentFrameMs() >60THEN 
 			Retina.lessdetail;
 		END; 
 	END GameLogic;

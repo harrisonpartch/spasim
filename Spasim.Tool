@@ -29,6 +29,7 @@ Base.Mod
 SPSME.Mod 
 SPSMMath.Mod
 SPSMHex.Mod
+SPSMHash.Mod
 Noise.Mod
 FRep.Mod
 Retina.Mod

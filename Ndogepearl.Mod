@@ -2,7 +2,7 @@ MODULE Ndogepearl;
 IMPORT Base, TexVox, RotaVox;
   
 VAR 
-	cv: TexVox.AvaVox;
+	cv: TexVox.TexVox;
 	rv: RotaVox.RVox;
 	up,right: Base.PT;
 	sabot, vox,v,sphere: Base.Voxel;
@@ -10,9 +10,9 @@ VAR
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	IF vox=NIL THEN
-		NEW(cv,"dogepearl.png");
+		NEW(cv,"swastika2.jpg");
 		vox:=cv;
-		vox.passable:=TRUE
+		vox.passable:=FALSE
 	END;
 	RETURN vox
 END thisvox;

@@ -5,6 +5,7 @@ IMPORT Base,  FRep;
 TYPE Ray = Base.Ray;
 	Voxel = Base.Voxel;  
 	PT =Base.PT;
+	Path= Base.Path;
 VAR 
 	ball: FRep.sphere;
 	cyl: FRep.cyl;
@@ -13,6 +14,7 @@ VAR
 	center,q,qq:  PT;
 	p:ARRAY 7 OF PT;
 	i,j,k:INTEGER;
+	path: Path;
 	
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
@@ -38,9 +40,9 @@ BEGIN
 	star.imposter:=conglomerate;
 	FOR i := 0  TO 10 DO
 		q:=Base.randPT();
-		star.stroke(q,3,conglomerate,vr);
+		star.stroke(q,3,path,conglomerate,vr);
 		q:=Base.randPT();
-		star.stroke(q,3,sc,vr);	
+		star.stroke(q,3,path,sc,vr);	
 	END;
 	star.setcolor(0,0,0,10,0);
 	star.copyonstroke:=TRUE;

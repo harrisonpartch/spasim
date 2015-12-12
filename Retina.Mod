@@ -8,8 +8,8 @@ TYPE
 CONST
 	T=5;        
 	TS=2*32;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=8;
-	TH=5;
+	TW=5;
+	TH=4;
 	W*=TS*TW;
 	H*=TS*TH;
 
@@ -183,12 +183,33 @@ BEGIN
 	END;
 END ztrace;
 
+PROCEDURE ztraced(cam: Camera; level: INTEGER);
+VAR
+	a,b,c,d: Camera;
+	l: INTEGER;
+	x,y: REAL;
+BEGIN
+	splitcam(cam,a,b,c,d);
+	IF level<2 THEN
+			tessad(a); 
+			tessad(b); 
+			tessad(c); 
+			tessad(d); 
+	ELSE
+		l:=level-1;
+		ztraced(a,l);
+		ztraced(b,l);
+		ztraced(c,l);
+		ztraced(d,l) 	
+	END;
+END ztraced;
+
 BEGIN{ACTIVE, PRIORITY(Objects.Normal)
 	 }REPEAT
 		BEGIN{EXCLUSIVE}
 			AWAIT(GO);
 		END;
-		ztrace(cam,T);	
+		ztraced(cam,T);	
 		BEGIN{EXCLUSIVE}
 			GO:=FALSE;
 			incTD;
@@ -196,7 +217,7 @@ BEGIN{ACTIVE, PRIORITY(Objects.Normal)
 		UNTIL ~Base.worldalive;
 END Tile;
 
-TYPE antimalice=OBJECT
+(*TYPE antimalice=OBJECT
 VAR
 	timer: Kernel.Timer;
 PROCEDURE frameguaard;
@@ -221,7 +242,7 @@ BEGIN{ACTIVE, PRIORITY(Objects.High)}
 		END;
 	UNTIL ~Base.worldalive;
 END antimalice;
-
+*)
 VAR
 	tile: ARRAY TW,TH OF Tile;
 	a,b: LONGINT;
@@ -326,14 +347,16 @@ END splitcam;
 
 PROCEDURE lessdetail*;
 BEGIN
-	IF foveaparameter<50 THEN foveaparameter:=foveaparameter+3  END;
-	FV:=W*W/foveaparameter
+	IF foveaparameter<50 THEN foveaparameter:=foveaparameter+5  END;
+	FV:=W*W/foveaparameter;
+	Base.fog:=Base.fog*13/12;
 END lessdetail;
 
 PROCEDURE moredetail*;
 BEGIN
-	foveaparameter:=ABS(foveaparameter-1);
-	FV:=W*W/foveaparameter	 
+	foveaparameter:=ABS(foveaparameter-5);
+	FV:=W*W/foveaparameter	;
+	Base.fog:=Base.fog*12/13;
 END moredetail;
 
 PROCEDURE incTD;

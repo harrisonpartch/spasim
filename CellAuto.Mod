@@ -3,6 +3,7 @@ IMPORT Base, Objects,Out:=KernelLog;
 
 TYPE 	PT=Base.PT;
 		Ray = Base.Ray;
+		Path=Base.Path;
 		Voxel = Base.Voxel;
 		Name = Base.Name;
 		
@@ -58,7 +59,7 @@ BEGIN
 	RETURN(FALSE);
 END passprobe;
 
-PROCEDURE stroke*(p:PT; resolution: LONGINT; voxel,voxundo:Voxel);
+PROCEDURE stroke*(p:PT; resolution: LONGINT; VAR path: Path; voxel,voxundo:Voxel);
 BEGIN
 	fire
 END stroke;
@@ -110,6 +111,7 @@ PROCEDURE anonyhook;
 VAR
 	v: Voxel;
 	g:GroVox;
+	path: Path;
 BEGIN
 	v:=Base.world.probe(Base.mkPT(center.x,center.y,center.z-delta),1000);
 	IF (v=NIL) OR v.passable THEN
@@ -117,7 +119,7 @@ BEGIN
 		center.z:=center.z-delta;
 		g.set(center,Base.avatarsize);
 		g.burning2:=TRUE;
-		Base.world.stroke(center,Base.avatarsize, g,v);
+		Base.world.stroke(center,Base.avatarsize, path, g,v);
 	END
 END anonyhook;
 END GroVox;

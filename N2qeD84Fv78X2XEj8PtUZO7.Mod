@@ -5,12 +5,13 @@ IMPORT Objects, Base,  FRep, Out:=KernelLog;
 TYPE Ray = Base.Ray;
 	Voxel = Base.Voxel;  
 	PT =Base.PT;
+	Path= Base.Path;
 VAR 
 	ball: FRep.sphere;
 	dot,v,lobster: Voxel;
 	center,p,n:  PT;
 	i:LONGINT;
-	
+	path: Path;
 PROCEDURE draw;
 VAR
 	fractaldot, greendot,reddot: Voxel;
@@ -32,11 +33,11 @@ BEGIN
 	greendot.FRaster(ball,32);
 	FOR i:=0 TO 300 DO
 		Base.randsphPT(p,n,center,7/12);
-		fractaldot.stroke(p,32,greendot,v)
+		fractaldot.stroke(p,32,path,greendot,v)
 	END;
 	FOR i:=0 TO 200 DO
 		Base.randsphPT(p,n,center,7/12);
-		fractaldot.stroke(p,32,reddot,v);
+		fractaldot.stroke(p,32,path,reddot,v);
 	END;
 	dot:=fractaldot;
 END draw;
