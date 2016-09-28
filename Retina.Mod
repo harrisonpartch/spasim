@@ -99,7 +99,7 @@ BEGIN
 	Base.world.Shade(ray);
 	IF ~ray.terminate THEN
 			ray.b:= ray.b + ray.ba;
-			ray.r:= ray.r + ray.ra/2;
+			ray.r:= ray.r + ray.ra;
 			ray.g:= ray.g + ray.ga/2;	
 	END;
 	Base.clamp3(ray.r,ray.g,ray.b);
@@ -146,7 +146,11 @@ VAR
 BEGIN
 	splitcam(cam,a,b,c,d);
 	IF level<2 THEN
-			x:=a.imx - W/2;
+			tessa(a); 
+			tessa(b); 
+			tessa(c); 
+			tessa(d); 
+(*			x:=a.imx - W/2;
 			y:=a.imy-H/2;		
 			IF (x*x+y*y)<FV THEN	
 				tessad(a); 
@@ -160,8 +164,8 @@ BEGIN
 			ELSE
 				tessa(b); 			
 			END;			
-			x:=b.imx - W/2;
-			y:=b.imy-H/2;		
+			x:=c.imx - W/2;
+			y:=c.imy-H/2;		
 			IF (x*x+y*y)<FV THEN	
 				tessad(c); 
 			ELSE
@@ -173,7 +177,7 @@ BEGIN
 				tessad(d); 
 			ELSE
 				tessa(d); 
-			END;
+			END; *)
 	ELSE
 		l:=level-1;
 		ztrace(a,l);

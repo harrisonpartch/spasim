@@ -462,7 +462,6 @@ BEGIN
 	noise.persistence:=3.31;
 	noise.octaves:=4;	
 	noise.setvoxel(conglomerate);
-	
 	noise.seed:=166;		
 	noise.a:=3;
 	noise.b:=3;
@@ -471,17 +470,14 @@ BEGIN
 	noise.octaves:=4;	
 	noise.setvoxel(treeserp);
 	 z3.FRaster(noise,16);	
-		
 	sky:=Base.VoxelFromName("NGNYAfkxmEzxe6ZESmcMJtw"); 
 	Base.setPT(center,1/2,1/2,1/2);
 	NEW(ball,center,0.5);
 	ball.setcolor(0.9, 0.2,0.7);
-	ball.setvoxel(blacksun);
-	z3a.FRaster(ball,64);  
+	ball.setvoxel(axolotl);
+	z3a.FRaster(ball,16);  
 	push(z3a);
-	z3a.setcolor(1,1,1,1,1);
-
- 
+	z3a.setcolor(1,1,1,1,1); 
  	Base.world:=z3a; 	
 	Base.avatar:=harrison;
 	Base.avatarsize:=1000;

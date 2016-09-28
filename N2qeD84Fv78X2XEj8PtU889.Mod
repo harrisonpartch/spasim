@@ -12,7 +12,6 @@ PROCEDURE tick*;
 VAR 
 	i: LONGINT;
 BEGIN
-	free;
 	FOR i:=0 TO 100 DO
 		p1:=Base.randPT();
 		strokephemeral(p1,9,bludot,v);
