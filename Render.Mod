@@ -1,5 +1,5 @@
 MODULE Render;
-IMPORT Kernel, Objects, Random, Marsh, Rectangles := WMRectangles, WM := WMWindowManager, Messages := WMMessages,
+IMPORT Kernel, Objects, Random, Marsh, Rectangles := WMRectangles, WM := WMWindowManager, WMMessages,
  Out := KernelLog, Math,SPSMMath, Base,  Retina,
 	 Inputs,  Raster, Strings, Streams, Debugging;
 
@@ -8,8 +8,6 @@ TYPE
 	Ray = Base.Ray;
 	Voxel = Base.Voxel;
 	PT = Base.PT;
-	Message = Messages.Message;
-	
 	
 TYPE SNAP = RECORD
 	lookphi, looktheta : REAL;
@@ -17,6 +15,7 @@ TYPE SNAP = RECORD
 	x,y,z,cdroll: REAL;
 	lookdxyz:PT;
 END;
+
 TYPE Camera = OBJECT
 VAR
 	random: Random.Generator;
@@ -52,7 +51,7 @@ BEGIN
 	Base.setPT(yaxis,0,1,0);
 	Base.setPT(zaxis,0,0,-1);
 	Base.setPT(worldcenter,1/2,1/2,1/2);
-	cx:=1/2; cy:=1/2; cz:=1/2;
+	cx:=1/3; cy:=1/2; cz:=1/2;
 	fisheye:=1;
 	GLIDE:=0.98;
 	hop;
@@ -254,10 +253,17 @@ END tick;
   
 END Camera;
 
+PROCEDURE P(VAR message:WMMessages.Message; VAR discard: BOOLEAN);
+BEGIN
+	IF CAPTURE THEN 
+		IF message.msgSubType = WMMessages.MsgSubPointerMove THEN
+				mousedx:=message.dx; mousedy:=message.dy;
+				message.x:=RWcenterx; message.y:=RWcentery;
+		END
+	END
+END P;
 
 (*! ************* XLTL AMALGAMATION FOLLOWS *)
-
-
 
 TYPE RayWindow=OBJECT(WM.DoubleBufferWindow)
 VAR
@@ -265,8 +271,7 @@ VAR
 	i: LONGINT;
 	pointerlastx, pointerlasty: LONGINT;
 	pi: WM.PointerInfo;
-     wmanager: WM.WindowManager;
-      
+  
 PROCEDURE &openwincam(W,H: INTEGER);
 BEGIN
 	Init(W, H, TRUE);
@@ -274,7 +279,9 @@ BEGIN
 	camera.aperjust(W,H);
 	manager := WM.GetDefaultManager();
 	manager.Add(100,100, SELF, { WM.FlagFrame, WM.FlagClose, WM.FlagStayOnTop});
-    WM.LoadCursor("recticle.png", 3,3, pi);
+	RWcenterx:=100+(W DIV 2);
+	RWcentery:=100+(H DIV 2);
+     WM.LoadCursor("recticle.png", 3,3, pi);
 	SetPointerInfo(pi);
 END openwincam;
 
@@ -319,49 +326,49 @@ BEGIN
 		END
 END KeyEvent;
 
-	PROCEDURE PointerDown(x, y: LONGINT; keys: SET);
-	BEGIN
+PROCEDURE PointerDown(x, y: LONGINT; keys: SET);
+VAR 
+	wmanager: WM.WindowManager;
+BEGIN
+	IF ~CAPTURE THEN
+		CAPTURE:= TRUE;
 		wmanager:=WM.GetDefaultManager();
-		
-	END PointerDown;
+		wmanager.InstallMessagePreview(P);
+	END
+END PointerDown;
 
-	PROCEDURE PointerUp(x, y: LONGINT; keys: SET);
+PROCEDURE uncapture;
+VAR 
+	wmanager: WM.WindowManager;
+BEGIN
+	CAPTURE:= FALSE;
+	wmanager:=WM.GetDefaultManager();
+	wmanager.RemoveMessagePreview(P);
+END uncapture;
+
+PROCEDURE PointerUp(x, y: LONGINT; keys: SET);
 	BEGIN
 		MOUSEDOWN:=FALSE
 	END PointerUp;
+	
+PROCEDURE MouseMove (x, y : LONGINT);
+VAR
+	sx,sy: REAL;
+BEGIN
+	Out.Int(x,5);
+	Out.Ln;
+	camera.up(x*ABS(x)/(1500*leftsticky));
+	camera.left(y*ABS(y)/(600*leftsticky));
+END MouseMove;
 
-	PROCEDURE PointerMove (x, y : LONGINT; keys : SET);
-	VAR
-		up,left: REAL;
-		xr,yr: LONGINT;
-		temporaljust: REAL;
-		BEGIN
-			MB := keys;
-(*			temporaljust := msd/GetCurrentFrameMs();
-
-			xr := ENTIER((x-centerx)*temporaljust); yr :=ENTIER((y-centery)*temporaljust);
-
-
-			IF CAPTUREMOUSE & (ABS(xr)+ABS(yr)>5) THEN
-				left:=ABS(xr)*xr;
-				up:=-ABS(yr)*yr;
-				camera.up(-up/(15000*leftsticky));
-				camera.left(left/(6000*leftsticky));
-
-				WarpPointer(1000,1000, centerx,centery);
-			END
-*)	END PointerMove;
-
-(*	PROCEDURE InstallMessagePreview*(x : WM.MessagePreviewProc); *)
-
-	PROCEDURE WheelMove(dz: LONGINT);
-	BEGIN
+PROCEDURE WheelMove(dz: LONGINT);
+BEGIN
 	IF TRUE  THEN
 		IF dz > 0 THEN slowdown; Out.String("slowdown dz="); Out.Int(dz, 0); Out.Ln;
 		ELSE speedup; Out.String("speedup dz="); Out.Int(dz, 0); Out.Ln;
 		END;
 	END;
-	END WheelMove;
+END WheelMove;
 
 (*	PROCEDURE GameLogic();
 	BEGIN
@@ -392,13 +399,13 @@ END KeyEvent;
 		Out.String('*line 1217!*');
 		msd:=30;
 		REPEAT
+			MouseMove(mousedx,mousedy);
 			Retina.image := backImg;
 			camera.tick;
 			Swap;
 			Invalidate(Rectangles.MakeRect(0, 0, GetWidth(), GetHeight()))
 		UNTIL FALSE
 	END RayWindow;
-
 
 VAR
 	FRAMERATE: REAL;
@@ -423,7 +430,7 @@ VAR
 	chatvoxel: Voxel;
 	warpedthemouse: BOOLEAN;
 	MB : SET;	(* 0, 1, 2 *)
-	MOUSEDOWN, CAPTUREMOUSE, GO,TRAIL,AVATAR,SCULL,METASLASH: BOOLEAN;
+	MOUSEDOWN, CAPTURE, GO,TRAIL,AVATAR,SCULL,METASLASH: BOOLEAN;
 	camera:Camera;
 	fogdensity:REAL;
 	leftsticky,upsticky: REAL;
@@ -431,6 +438,7 @@ VAR
 	GLIDE:REAL;
 	msd: REAL;
 	RW:  RayWindow;
+	mousedx, mousedy, RWcenterx, RWcentery: LONGINT;
 
 PROCEDURE speedup;
 BEGIN
@@ -480,7 +488,7 @@ END Open;
 
 PROCEDURE Close*;
 BEGIN
-	 IF RW# NIL THEN RW.Close; RW := NIL END;
+	 IF RW# NIL THEN RW.uncapture; RW.Close; RW := NIL END;
 END Close;
 
 BEGIN

@@ -43,7 +43,7 @@ BEGIN
 			phi:=cam.phi+dphi*j;
 			ray:=Base.blankray;
 			angletoray(ray,theta,phi);
-			Base.world.Shade(ray);
+			Base.world.Shade(ray); 
 			IF ~ray.terminate THEN
 				ray.b:= ray.b + ray.ba;
 				ray.r:= ray.r + ray.ra/2;

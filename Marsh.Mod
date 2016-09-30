@@ -478,7 +478,7 @@ BEGIN
 	z3a.FRaster(ball,16);  
 	push(z3a);
 	z3a.setcolor(1,1,1,1,1); 
- 	Base.world:=z3a; 	
+ 	Base.world:=z3; 	
 	Base.avatar:=harrison;
 	Base.avatarsize:=1000;
 END dawn;
