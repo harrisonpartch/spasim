@@ -255,11 +255,9 @@ END Camera;
 
 PROCEDURE P(VAR message:WMMessages.Message; VAR discard: BOOLEAN);
 BEGIN
-	IF CAPTURE THEN 
-		IF message.msgSubType = WMMessages.MsgSubPointerMove THEN
-				mousedx:=message.dx; mousedy:=message.dy;
-				message.x:=RWcenterx; message.y:=RWcentery;
-		END
+	IF message.msgType=WMMessages.MsgPointer THEN
+		message.x:=RWcenterx; message.y:=RWcentery;
+		mousedx:=message.dx; mousedy:=message.dy;
 	END
 END P;
 
@@ -268,7 +266,7 @@ END P;
 TYPE RayWindow=OBJECT(WM.DoubleBufferWindow)
 VAR
 	alive: BOOLEAN;
-	i: LONGINT;
+	i, t1: LONGINT;
 	pointerlastx, pointerlasty: LONGINT;
 	pi: WM.PointerInfo;
   
@@ -285,12 +283,29 @@ BEGIN
 	SetPointerInfo(pi);
 END openwincam;
 
+PROCEDURE uncapture;
+VAR 
+	wmanager: WM.WindowManager;
+BEGIN
+	CAPTURE:= FALSE;
+	wmanager:=WM.GetDefaultManager();
+	wmanager.RemoveMessagePreview(P);
+END uncapture;
+
 PROCEDURE KeyEvent (ucs : LONGINT; flags : SET; keysym : LONGINT);
 VAR
 	v: Voxel;
 	s: Strings.String;
 	c: CHAR;
 BEGIN
+	CASE ucs OF
+		   27: uncapture;
+		| 164: uncapture; Close
+		| 193: camera.up(0.03)
+		| 194: camera.up(-0.03)
+		| 195: camera.left(0.03)
+		| 196: camera.left(-0.03)
+	ELSE
 		CASE CHR(ucs) OF
 			   "s" : camera.forward(-0.51*Base.speed)
 			| "w" :camera.forward(0.51*Base.speed)
@@ -322,8 +337,13 @@ BEGIN
 			| "8": Base.cursordist:=Base.cursordist/1.3
 			| "l": Marsh.lines:=~Marsh.lines
 			| "b": Marsh.showcode;
+			| "=": uncapture;
+			| "+": uncapture; Close;	
 		ELSE
+			Out.Int(ucs,5);
+			Out.Ln;
 		END
+	END
 END KeyEvent;
 
 PROCEDURE PointerDown(x, y: LONGINT; keys: SET);
@@ -334,32 +354,19 @@ BEGIN
 		CAPTURE:= TRUE;
 		wmanager:=WM.GetDefaultManager();
 		wmanager.InstallMessagePreview(P);
-	END
+	END;
 END PointerDown;
-
-PROCEDURE uncapture;
-VAR 
-	wmanager: WM.WindowManager;
-BEGIN
-	CAPTURE:= FALSE;
-	wmanager:=WM.GetDefaultManager();
-	wmanager.RemoveMessagePreview(P);
-END uncapture;
 
 PROCEDURE PointerUp(x, y: LONGINT; keys: SET);
 	BEGIN
 		MOUSEDOWN:=FALSE
 	END PointerUp;
 	
-PROCEDURE MouseMove (x, y : LONGINT);
-VAR
-	sx,sy: REAL;
+PROCEDURE PointerMove (x, y : LONGINT; keys : SET);
 BEGIN
-	Out.Int(x,5);
-	Out.Ln;
-	camera.up(x*ABS(x)/(1500*leftsticky));
-	camera.left(y*ABS(y)/(600*leftsticky));
-END MouseMove;
+	camera.up(-ABS(mousedy)*mousedy/(45000));
+	camera.left(ABS(mousedx)*mousedx/(20000));
+END PointerMove;
 
 PROCEDURE WheelMove(dz: LONGINT);
 BEGIN
@@ -370,15 +377,15 @@ BEGIN
 	END;
 END WheelMove;
 
-(*	PROCEDURE GameLogic();
+PROCEDURE detail();
 	BEGIN
-		IF GetCurrentFrameMs() <50 THEN
+		IF framedt <50 THEN
 			Retina.moredetail;
-		ELSIF GetCurrentFrameMs() >60THEN
+		ELSIF framedt >60 THEN
 			Retina.lessdetail;
 		END;
-	END GameLogic;
-*)
+END detail;
+
 	BEGIN {ACTIVE}
 		NEW(rand);
 		foveasize := 100;
@@ -399,11 +406,13 @@ END WheelMove;
 		Out.String('*line 1217!*');
 		msd:=30;
 		REPEAT
-			MouseMove(mousedx,mousedy);
 			Retina.image := backImg;
-			camera.tick;
+			t1:=Kernel.GetTicks();
+			camera.tick; 
+			framedt:=Kernel.GetTicks()-t1;	
+			detail;
 			Swap;
-			Invalidate(Rectangles.MakeRect(0, 0, GetWidth(), GetHeight()))
+			Invalidate(Rectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 		UNTIL FALSE
 	END RayWindow;
 
@@ -438,7 +447,7 @@ VAR
 	GLIDE:REAL;
 	msd: REAL;
 	RW:  RayWindow;
-	mousedx, mousedy, RWcenterx, RWcentery: LONGINT;
+	RWcenterx, RWcentery,mousedx,mousedy: LONGINT;
 
 PROCEDURE speedup;
 BEGIN

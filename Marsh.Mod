@@ -449,10 +449,9 @@ BEGIN
 	NEW(plane,center,up);
 	plane.vox:=sky;	
 	w3:=Base.VoxelFromName("NM3");	 
-	z3:=Base.VoxelFromName("NM3");	
-	z3a:=Base.VoxelFromName("NM3");	
+	z3:=Base.VoxelFromName("NM2");	
+	z3a:=Base.VoxelFromName("NM2");	
 	z2:=Base.VoxelFromName("NM2");
-	z3.setcolor(1000,0,0,1/2,1000);
 	z2.setcolor(10,0,0,1,1);	
 	NEW(noise);		
 	noise.seed:=12345666;		
@@ -468,8 +467,8 @@ BEGIN
 	noise.c:=3;		
 	noise.persistence:=4.01;
 	noise.octaves:=4;	
-	noise.setvoxel(treeserp);
-	 z3.FRaster(noise,16);	
+	noise.setvoxel(axolotl);
+	 z3.FRaster(noise,128);	
 	sky:=Base.VoxelFromName("NGNYAfkxmEzxe6ZESmcMJtw"); 
 	Base.setPT(center,1/2,1/2,1/2);
 	NEW(ball,center,0.5);

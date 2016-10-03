@@ -7,9 +7,9 @@ TYPE
 	PT=Base.PT;
 CONST
 	T=5;        
-	TS=2*32;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=5;
-	TH=4;
+	TS=3*32;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
+	TW=6;
+	TH=6;
 	W*=TS*TW;
 	H*=TS*TH;
 
@@ -56,7 +56,7 @@ BEGIN
 	END;
 END tessa4;
 
-PROCEDURE tessad4(cam: Camera);
+PROCEDURE tessad3(cam: Camera);
 VAR
 	i,j: LONGINT;
 	theta,phi,dtheta,dphi: REAL;
@@ -64,11 +64,11 @@ VAR
 	pixel: Raster.Pixel;
 BEGIN
 	theta:=cam.theta;
-	dtheta:=cam.dtheta/4;
-	dphi:=cam.dphi/4;
-	FOR i:= 0 TO 3 DO
+	dtheta:=cam.dtheta/3;
+	dphi:=cam.dphi/3;
+	FOR i:= 0 TO 2 DO
 		phi:=cam.phi;
-		FOR j :=  0 TO 3 DO 
+		FOR j :=  0 TO 2 DO 
 			ray:=Base.blankray;
 			angletoray(ray,theta,phi);
 			Base.world.Shade(ray);
@@ -84,7 +84,7 @@ BEGIN
 		END;
 		theta:=theta+dtheta;
 	END;
-END tessad4;
+END tessad3;
 
 PROCEDURE tessa(cam: Camera);
 VAR
@@ -104,7 +104,7 @@ BEGIN
 	END;
 	Base.clamp3(ray.r,ray.g,ray.b);
 	Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255)); 
-	Raster.Fill(image,cam.imx,cam.imy,cam.imx+2,cam.imy+2,pixel,copy);
+	Raster.Fill(image,cam.imx,cam.imy,cam.imx+3,cam.imy+3,pixel,copy);
 END tessa;
 
 PROCEDURE tessad(cam: Camera);
@@ -146,38 +146,34 @@ VAR
 BEGIN
 	splitcam(cam,a,b,c,d);
 	IF level<2 THEN
-			tessa(a); 
-			tessa(b); 
-			tessa(c); 
-			tessa(d); 
-(*			x:=a.imx - W/2;
+			x:=a.imx - W/2;
 			y:=a.imy-H/2;		
 			IF (x*x+y*y)<FV THEN	
-				tessad(a); 
+				tessad3(a); 
 			ELSE
 				tessa(a); 
 			END;
 			x:=b.imx - W/2;
 			y:=b.imy-H/2;		
 			IF (x*x+y*y)<FV THEN	
-				tessad(b); 
+				tessad3(b); 
 			ELSE
 				tessa(b); 			
 			END;			
 			x:=c.imx - W/2;
 			y:=c.imy-H/2;		
 			IF (x*x+y*y)<FV THEN	
-				tessad(c); 
+				tessad3(c); 
 			ELSE
 				tessa(c); 
 			END;
 			x:=d.imx - W/2;
 			y:=d.imy-H/2;		
 			IF (x*x+y*y)<FV THEN	
-				tessad(d); 
+				tessad3(d); 
 			ELSE
 				tessa(d); 
-			END; *)
+			END; 
 	ELSE
 		l:=level-1;
 		ztrace(a,l);
@@ -195,10 +191,10 @@ VAR
 BEGIN
 	splitcam(cam,a,b,c,d);
 	IF level<2 THEN
-			tessad(a); 
-			tessad(b); 
-			tessad(c); 
-			tessad(d); 
+			tessad3(a); 
+			tessad3(b); 
+			tessad3(c); 
+			tessad3(d); 
 	ELSE
 		l:=level-1;
 		ztraced(a,l);
@@ -213,7 +209,7 @@ BEGIN{ACTIVE, PRIORITY(Objects.Normal)
 		BEGIN{EXCLUSIVE}
 			AWAIT(GO);
 		END;
-		ztraced(cam,T);	
+		ztrace(cam,T);	
 		BEGIN{EXCLUSIVE}
 			GO:=FALSE;
 			incTD;
