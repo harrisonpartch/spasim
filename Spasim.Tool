@@ -1,5 +1,5 @@
-#Linux or Windows:
-Compiler.Compile
+#Linux or Windows or Darwin:
+Compiler.Compile <== Middle mouse click on this
 Base.Mod
 SPSME.Mod 
 SPSMMath.Mod
@@ -23,24 +23,16 @@ NanonyPET.Mod
 Marsh.Mod
 Render.Mod ~
 
-NCompiler.ncompile
+NCompiler.ncompile  <== Middle mouse click on this
 
 **********************************************************************************************************
 
-Render.Open
+Render.Open    <== Middle mouse click on this
 
-SystemTools.FreeDownTo  Base ~
+SystemTools.FreeDownTo  Base ~   <== Don't worry about this
 
 ~
 
-NM3.Mod
-
-
-OpenAL.Tool
-OpenGL.Tool
-
-OpenALinfo.Do 
-======
 
 
 
