@@ -1,6 +1,6 @@
 MODULE Render;
 IMPORT Kernel, Objects, Random, Marsh, Rectangles := WMRectangles, WM := WMWindowManager, WMMessages,
- Out := KernelLog, Math,SPSMMath, Base,  Retina,
+ Out := KernelLog, Math,SPSMMath, Base, Retina, WarpMouse, 
 	 Inputs,  Raster, Strings, Streams, Debugging;
 
 TYPE
@@ -240,7 +240,7 @@ BEGIN
 	GLIDE:=0.99;
 	cvz := cvz*GLIDE+gravityvector.z;
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y;
-	cvl :=cvl*0.0; cvu := cvu*0.0;
+	cvl :=cvl*0.5; cvu := cvu*0.5; 
 	IF MOUSEDOWN THEN
 		IF 0 IN MB THEN Marsh.draw;
 		ELSIF  1 IN MB THEN Marsh.snipeinto;
@@ -255,10 +255,12 @@ END Camera;
 
 PROCEDURE P(VAR message:WMMessages.Message; VAR discard: BOOLEAN);
 BEGIN
-	IF message.msgType=WMMessages.MsgPointer THEN
-		message.x:=RWcenterx; message.y:=RWcentery;
-		mousedx:=message.dx; mousedy:=message.dy;
-	END
+	IF  CAPTURE THEN
+		IF (message.msgType=WMMessages.MsgPointer) & (message.msgSubType=WMMessages.MsgSubPointerMove) THEN
+			IF message.x#500 THEN mousedx:=mousedx+message.dx END;	
+			IF message.y#500 THEN mousedy:=mousedy+message.dy END;
+		END;
+	END;
 END P;
 
 (*! ************* XLTL AMALGAMATION FOLLOWS *)
@@ -269,7 +271,7 @@ VAR
 	i, t1: LONGINT;
 	pointerlastx, pointerlasty: LONGINT;
 	pi: WM.PointerInfo;
-  
+
 PROCEDURE &openwincam(W,H: INTEGER);
 BEGIN
 	Init(W, H, TRUE);
@@ -279,7 +281,7 @@ BEGIN
 	manager.Add(100,100, SELF, { WM.FlagFrame, WM.FlagClose, WM.FlagStayOnTop});
 	RWcenterx:=100+(W DIV 2);
 	RWcentery:=100+(H DIV 2);
-     WM.LoadCursor("recticle.png", 3,3, pi);
+     WM.LoadCursor("blankrecticle.png", 3,3, pi);
 	SetPointerInfo(pi);
 END openwincam;
 
@@ -353,8 +355,8 @@ BEGIN
 	IF ~CAPTURE THEN
 		CAPTURE:= TRUE;
 		wmanager:=WM.GetDefaultManager();
-		wmanager.InstallMessagePreview(P);
-	END;
+		wmanager.InstallMessagePreview(P); 
+	END; 
 END PointerDown;
 
 PROCEDURE PointerUp(x, y: LONGINT; keys: SET);
@@ -362,11 +364,14 @@ PROCEDURE PointerUp(x, y: LONGINT; keys: SET);
 		MOUSEDOWN:=FALSE
 	END PointerUp;
 	
-PROCEDURE PointerMove (x, y : LONGINT; keys : SET);
+PROCEDURE mouse;
 BEGIN
-	camera.up(-ABS(mousedy)*mousedy/(45000));
-	camera.left(ABS(mousedx)*mousedx/(20000));
-END PointerMove;
+	camera.up(-mousedy*ABS(mousedy)/(100000)); 
+	camera.left(mousedx*ABS(mousedx)/(100000));	
+	mousedx:=0;
+	mousedy:=0;
+	IF CAPTURE THEN WarpMouse.warp END; 
+END mouse;
 
 PROCEDURE WheelMove(dz: LONGINT);
 BEGIN
@@ -381,7 +386,7 @@ PROCEDURE detail();
 	BEGIN
 		IF framedt <50 THEN
 			Retina.moredetail;
-		ELSIF framedt >60 THEN
+		ELSIF framedt >70 THEN
 			Retina.lessdetail;
 		END;
 END detail;
@@ -413,6 +418,7 @@ END detail;
 			detail;
 			Swap;
 			Invalidate(Rectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
+			mouse;
 		UNTIL FALSE
 	END RayWindow;
 
@@ -491,7 +497,7 @@ END cursorsizeminus;
 
 PROCEDURE Open* ;
 BEGIN
-	NEW(RW, Retina.W,Retina.H);
+	NEW(RW, Retina.W*2,Retina.H*2);
 	Base.STOPGO
 END Open;
 

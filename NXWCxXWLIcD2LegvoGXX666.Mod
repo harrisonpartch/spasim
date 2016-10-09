@@ -58,7 +58,7 @@ BEGIN
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	red:=Base.VoxelFromName("Ndiffusered"); 
 	reddot:=Base.VoxelFromName("Ndiffusereddot"); 
-	gmdot:=Base.VoxelFromName("Ngreenmirrordot"); 	
+	gmdot:=Base.VoxelFromName("Nr3kPtbyEYLFK3AN2UUVrqg"); 	
 	NEW(s0);
 	NEW(s1);
 	NEW(s2);

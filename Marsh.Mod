@@ -287,20 +287,22 @@ BEGIN
 
   	w10:=Base.VoxelFromName("NM3");	
  	z10:=Base.VoxelFromName("NM2");	
-
+	w3:=Base.VoxelFromName("NM3");	 
+	z3:=Base.VoxelFromName("NM3");	
+	z3a:=Base.VoxelFromName("NM3");	
+	z2:=Base.VoxelFromName("NM2");
 	harrison:=Base.VoxelFromName("Nharrisonavatar"); 
 	push(harrison);
 	doge:=Base.VoxelFromName("Ndogepearl"); 
 	push(doge);		
 	xot:=Base.VoxelFromName("N5a2g4M6HYjPJxYSNQvYyv7"); 
 	push(xot);
-     floop:=Base.VoxelFromName("NFLOOP");  
+(*     floop:=Base.VoxelFromName("NFLOOP");  
      push(floop);
- 	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXXBiQ"); 	
-	push(serp);
-	treeserp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX666"); 	
+*) 
+	treeserp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXXBiQ"); 	
 	push(treeserp);	
-	gorge:=Base.VoxelFromName("NxxxGAernhjFK40xASZZVoQ"); 
+ 	gorge:=Base.VoxelFromName("NxxxGAernhjFK40xASZZVoQ"); 
 	push(gorge);
 	xot2:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 	
 	push(xot2);
@@ -308,8 +310,8 @@ BEGIN
 	push(reddot);
 	msphere:=Base.VoxelFromName("NBsHFiBKkSckXBAd46Zbsss"); 	
 	 push(msphere);	
- (*	volvox:=Base.VoxelFromName("Nrdvolvox");  	
-       push(volvox);*)
+ 	volvox:=Base.VoxelFromName("Nrdvolvox");  	
+      push(volvox);
        rdpseudosolid:=Base.VoxelFromName("Nrdpseudosolid"); 
        push(rdpseudosolid);
 	beatrix:=Base.VoxelFromName("NwPicBWw4NfcserX4ELaQ3b"); 
@@ -412,27 +414,9 @@ BEGIN
 	sky2:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXXBiQ"); 	
 	push(sky2);
 	tigerlily:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  				
-	push(tigerlily);
-	
-	Base.setPT(up,0,0,1);
-	Base.setPT(center,1/2,1/2,1/12);
-	NEW(tnoise);
-	tnoise.seed:=123666;	
-	tnoise.a:=1;
-	tnoise.b:=1;
-	tnoise.c:=1;		
-	tnoise.octaves:=4;
-	tnoise.persistence:=3;
-	tnoise.setvoxel(dotz);
-	tnoise.va[0]:=cthulhu;
-	tnoise.va[1]:=sparx;
-	tnoise.va[2]:=lobster;
-	tnoise.va[3]:=xot;
-	tnoise.va[4]:=xot2;
-	tnoise.va[5]:=sky;	
-
+	push(tigerlily);	
 	NEW(noise);		
-	noise.seed:=123666;		
+	noise.seed:=123789;		
 	noise.a:=1;
 	noise.b:=1;
 	noise.c:=1;		
@@ -448,38 +432,20 @@ BEGIN
 	Base.setPT(up,0,0,1);
 	NEW(plane,center,up);
 	plane.vox:=sky;	
-	w3:=Base.VoxelFromName("NM3");	 
-	z3:=Base.VoxelFromName("NM2");	
-	z3a:=Base.VoxelFromName("NM2");	
-	z2:=Base.VoxelFromName("NM2");
-	z2.setcolor(10,0,0,1,1);	
-	NEW(noise);		
-	noise.seed:=12345666;		
-	noise.a:=3;
-	noise.b:=3;
-	noise.c:=3;		
-	noise.persistence:=3.31;
-	noise.octaves:=4;	
-	noise.setvoxel(conglomerate);
-	noise.seed:=166;		
-	noise.a:=3;
-	noise.b:=3;
-	noise.c:=3;		
-	noise.persistence:=4.01;
-	noise.octaves:=4;	
-	noise.setvoxel(axolotl);
-	 z3.FRaster(noise,128);	
-	sky:=Base.VoxelFromName("NGNYAfkxmEzxe6ZESmcMJtw"); 
+
+
+	noise.setvoxel(gxy);
 	Base.setPT(center,1/2,1/2,1/2);
 	NEW(ball,center,0.5);
 	ball.setcolor(0.9, 0.2,0.7);
-	ball.setvoxel(axolotl);
-	z3a.FRaster(ball,16);  
-	push(z3a);
-	z3a.setcolor(1,1,1,1,1); 
- 	Base.world:=z3; 	
+	ball.setvoxel(treeserp);
+	z2.FRaster(ball,16); 
+	z2.FRaster(noise,64); 
+	push(z2);
+	z2.setcolor(3,1,1,3,1); 
+  	Base.world:=z2; 	
 	Base.avatar:=harrison;
-	Base.avatarsize:=1000;
+	Base.avatarsize:=1000; 
 END dawn;
 
 PROCEDURE darken*;
