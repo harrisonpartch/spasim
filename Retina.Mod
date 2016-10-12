@@ -8,8 +8,8 @@ TYPE
 CONST
 	T=5;        
 	TS=3*32;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=5;
-	TH=5;
+	TW=4;
+	TH=4;
 	W*=TS*TW;
 	H*=TS*TH;
 

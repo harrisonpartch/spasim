@@ -1,6 +1,6 @@
 MODULE Render;
 IMPORT Kernel, Objects, Random, Marsh, Rectangles := WMRectangles, WM := WMWindowManager, WMMessages,
- Out := KernelLog, Math,SPSMMath, Base, Retina, WarpMouse, 
+ Out := KernelLog, Math,SPSMMath, Base, Retina,  
 	 Inputs,  Raster, Strings, Streams, Debugging;
 
 TYPE
@@ -65,9 +65,9 @@ END aperjust;
 PROCEDURE hop;
 BEGIN
 	stop;
-	cx :=cx+Base.rand.Uniform()/500-1/1000;
-	cy :=cy+Base.rand.Uniform()/500-1/1000;
-	cz :=cz+Base.rand.Uniform()/500-1/1000;
+	cx :=cx+Base.rand.Uniform()/50-1/100;
+	cy :=cy+Base.rand.Uniform()/50-1/100;
+	cz :=cz+Base.rand.Uniform()/50-1/100;
 END hop;
 
 PROCEDURE move;
@@ -217,8 +217,8 @@ PROCEDURE up (ph: REAL);
 BEGIN
 	cvu:=cvu+ph;
 	cameraphi := cameraphi + cvu;
-	IF cameraphi > 1.6 THEN cameraphi := 1.6 END;
-	IF cameraphi < -1.6 THEN cameraphi := -1.6 END
+	IF cameraphi > 1.3 THEN cameraphi := 1.3 END;
+	IF cameraphi < -1.3 THEN cameraphi := -1.3 END
 END up;
 
 PROCEDURE tick;
@@ -255,12 +255,10 @@ END Camera;
 
 PROCEDURE P(VAR message:WMMessages.Message; VAR discard: BOOLEAN);
 BEGIN
-	IF  CAPTURE THEN
-		IF (message.msgType=WMMessages.MsgPointer) & (message.msgSubType=WMMessages.MsgSubPointerMove) THEN
-			IF message.x#500 THEN mousedx:=mousedx+message.dx END;	
-			IF message.y#500 THEN mousedy:=mousedy+message.dy END;
-		END;
-	END;
+	IF CAPTURE THEN 
+		RW.Handle(message);
+		discard:=TRUE
+	END
 END P;
 
 (*! ************* XLTL AMALGAMATION FOLLOWS *)
@@ -269,8 +267,9 @@ TYPE RayWindow=OBJECT(WM.DoubleBufferWindow)
 VAR
 	alive: BOOLEAN;
 	i, t1: LONGINT;
-	pointerlastx, pointerlasty: LONGINT;
+	mousepreviousx, mousepreviousy: LONGINT;
 	pi: WM.PointerInfo;
+	warpvent: BOOLEAN;
 
 PROCEDURE &openwincam(W,H: INTEGER);
 BEGIN
@@ -364,14 +363,18 @@ PROCEDURE PointerUp(x, y: LONGINT; keys: SET);
 		MOUSEDOWN:=FALSE
 	END PointerUp;
 	
-PROCEDURE mouse;
+PROCEDURE PointerMove(x,y: LONGINT; keys: SET);
 BEGIN
-	camera.up(-mousedy*ABS(mousedy)/(100000)); 
-	camera.left(mousedx*ABS(mousedx)/(100000));	
-	mousedx:=0;
-	mousedy:=0;
-	IF CAPTURE THEN WarpMouse.warp END; 
-END mouse;
+		IF (2 IN keys) THEN
+			mousedx:=x-mousepreviousx;
+			mousedy:=y-mousepreviousy;
+			camera.up(-mousedy/30000); 
+			camera.left(mousedx/30000);	
+		ELSE
+			mousepreviousx:=x;
+			mousepreviousy:=y;		
+	END
+END PointerMove;
 
 PROCEDURE WheelMove(dz: LONGINT);
 BEGIN
@@ -409,7 +412,7 @@ END detail;
 		leftsticky:=10.0;
 		upsticky:=10.0;
 		Out.String('*line 1217!*');
-		msd:=30;
+		msd:=30;		
 		REPEAT
 			Retina.image := backImg;
 			t1:=Kernel.GetTicks();
@@ -418,7 +421,6 @@ END detail;
 			detail;
 			Swap;
 			Invalidate(Rectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
-			mouse;
 		UNTIL FALSE
 	END RayWindow;
 

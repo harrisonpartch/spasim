@@ -1,6 +1,4 @@
-#Linux or Windows or Darwin:
-Compiler.Compile <== Middle mouse click on this
-Base.Mod
+Compiler.Compile Base.Mod
 SPSME.Mod 
 SPSMMath.Mod
 SPSMHex.Mod

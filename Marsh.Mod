@@ -276,7 +276,7 @@ VAR
 	undo,rd, rdpseudosolid, blu, die,gren,granite,sand,whiteblock,lazy,pdestroyer,axolotl,xen,sky1,sky2,tigerlily,cloud: Voxel;
 	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison,fuse:Voxel;
 	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,
-	w3,z3,z3a,z2,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp: Voxel;
+	w3,z3,z3a,z2,z2a,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp,acidcats: Voxel;
 	ball: FRep.sphere;
 	noise: FRep.noise;	 
 BEGIN
@@ -291,6 +291,7 @@ BEGIN
 	z3:=Base.VoxelFromName("NM3");	
 	z3a:=Base.VoxelFromName("NM3");	
 	z2:=Base.VoxelFromName("NM2");
+	z2a:=Base.VoxelFromName("NM2");	
 	harrison:=Base.VoxelFromName("Nharrisonavatar"); 
 	push(harrison);
 	doge:=Base.VoxelFromName("Ndogepearl"); 
@@ -315,6 +316,7 @@ BEGIN
        rdpseudosolid:=Base.VoxelFromName("Nrdpseudosolid"); 
        push(rdpseudosolid);
 	beatrix:=Base.VoxelFromName("NwPicBWw4NfcserX4ELaQ3b"); 
+	acidcats:=Base.VoxelFromName("Nacidcats"); 
        speckle:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7"); 
        push(speckle);
        
@@ -416,34 +418,28 @@ BEGIN
 	tigerlily:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  				
 	push(tigerlily);	
 	NEW(noise);		
-	noise.seed:=123789;		
+	noise.seed:=33666;		
 	noise.a:=1;
 	noise.b:=1;
 	noise.c:=1;		
-	noise.octaves:=3;
-	noise.setvoxel(tigerlily);
-	noise.persistence:=3.6;
+	noise.octaves:=4;
+
+	noise.persistence:=3.5;
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
-	Base.setPT(center,1/2,1/2,1/2);
-	NEW(sphere,center,5/9);
-	sphere.vox:=lobster;
-	NEW(bifr,sphere,noise);
+	Base.setPT(center,1/2,1/2,9/10);
 	Base.setPT(up,0,0,1);
 	NEW(plane,center,up);
-	plane.vox:=sky;	
-
-
-	noise.setvoxel(gxy);
+	plane.vox:=acidcats;	
+	z2a.FRaster(plane,16); 
 	Base.setPT(center,1/2,1/2,1/2);
-	NEW(ball,center,0.5);
-	ball.setcolor(0.9, 0.2,0.7);
-	ball.setvoxel(treeserp);
-	z2.FRaster(ball,16); 
-	z2.FRaster(noise,64); 
-	push(z2);
-	z2.setcolor(3,1,1,3,1); 
-  	Base.world:=z2; 	
+	NEW(ball,center,0.5);     
+	noise.setvoxel(acidcats);	
+	z2a.FRaster(noise,32); 
+	
+
+	z2a.setcolor(0,1.5,0,0,0); 
+  	Base.world:=z2a; 	
 	Base.avatar:=harrison;
 	Base.avatarsize:=1000; 
 END dawn;
