@@ -49,6 +49,7 @@ BEGIN
 				ray.r:= ray.r + ray.ra/2;
 				ray.g:= ray.g + ray.ga/2;	
 			END;	
+			Base.clamp3(ray.r,ray.g,ray.b);
 			Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255)); 
 (*			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy); *)
 			Raster.Fill(image,cam.imx*2+i*2,cam.imy*2+j*2,cam.imx*2+i*2+2,cam.imy*2+j*2+2,pixel,copy);

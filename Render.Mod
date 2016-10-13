@@ -1,6 +1,6 @@
 MODULE Render;
 IMPORT Kernel, Objects, Random, Marsh, Rectangles := WMRectangles, WM := WMWindowManager, WMMessages,
- Out := KernelLog, Math,SPSMMath, Base, Retina,  
+ Out := KernelLog, Math,SPSMMath, Base, Retina,  WarpMouse,
 	 Inputs,  Raster, Strings, Streams, Debugging;
 
 TYPE
@@ -355,6 +355,8 @@ BEGIN
 		CAPTURE:= TRUE;
 		wmanager:=WM.GetDefaultManager();
 		wmanager.InstallMessagePreview(P); 
+	ELSE
+		MB:=keys;
 	END; 
 END PointerDown;
 
@@ -365,14 +367,13 @@ PROCEDURE PointerUp(x, y: LONGINT; keys: SET);
 	
 PROCEDURE PointerMove(x,y: LONGINT; keys: SET);
 BEGIN
-		IF (2 IN keys) THEN
+	IF CAPTURE THEN
 			mousedx:=x-mousepreviousx;
 			mousedy:=y-mousepreviousy;
-			camera.up(-mousedy/30000); 
-			camera.left(mousedx/30000);	
-		ELSE
+			camera.up(-mousedy*ABS(mousedy)/100000); 
+			camera.left(mousedx*ABS(mousedx)/100000);	
 			mousepreviousx:=x;
-			mousepreviousy:=y;		
+			mousepreviousy:=y;
 	END
 END PointerMove;
 
@@ -421,6 +422,11 @@ END detail;
 			detail;
 			Swap;
 			Invalidate(Rectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
+			IF CAPTURE THEN 
+				WarpMouse.warp(500,500);
+				mousepreviousx:=500; 
+				mousepreviousy:=500;
+			END
 		UNTIL FALSE
 	END RayWindow;
 

@@ -438,7 +438,7 @@ BEGIN
 	z2a.FRaster(noise,32); 
 	
 
-	z2a.setcolor(0,1.5,0,0,0); 
+	z2a.setcolor(1,12.5,1,1,1); 
   	Base.world:=z2a; 	
 	Base.avatar:=harrison;
 	Base.avatarsize:=1000; 

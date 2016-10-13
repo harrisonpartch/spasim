@@ -1,19 +1,5 @@
 <Desktop>
-	<Window name="FileManager" loader="WMFileManager.Restore" l="91" t="181" r="591" b="581" flags="{0..2,13}"/>
-	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="1136" t="44" r="1776" b="432" flags="{0..2,13}"/>
-	<Window name="PET" loader="PET.Restore" l="183" t="185" r="983" b="785" flags="{0..2,13}">
-		<PETData>
-			<General SelectedPageNr="0" ProjectTextFile=""/>
-			<Tab file="Nacidcats.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="16"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="10"/>
-			</Tab>
-		</PETData>
-	</Window>
-	<Window name="PET" loader="PET.Restore" l="1012" t="682" r="2099" b="1512" flags="{0..2,13}">
+	<Window name="PET" loader="PET.Restore" l="1293" t="95" r="2380" b="925" flags="{0..2,13}">
 		<PETData>
 			<General SelectedPageNr="1" ProjectTextFile=""/>
 			<Tab file="Spasim.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
@@ -28,7 +14,7 @@
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="10"/>
+				<SidePanel visible="true" width="75" scratchHeight="10"/>
 			</Tab>
 			<Tab file="Render.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
 				<Editor firstLine="251" cursorPos="6040"/>
