@@ -276,7 +276,7 @@ VAR
 	undo,rd, rdpseudosolid, blu, die,gren,granite,sand,whiteblock,lazy,pdestroyer,axolotl,xen,sky1,sky2,tigerlily,cloud: Voxel;
 	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison,fuse:Voxel;
 	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,
-	w3,z3,z3a,z2,z2a,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp,acidcats: Voxel;
+	w3,z3,z3a,z2,z2a,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp,acidcats, badopossum, raccoon: Voxel;
 	ball: FRep.sphere;
 	noise: FRep.noise;	 
 BEGIN
@@ -289,7 +289,7 @@ BEGIN
  	z10:=Base.VoxelFromName("NM2");	
 	w3:=Base.VoxelFromName("NM3");	 
 	z3:=Base.VoxelFromName("NM3");	
-	z3a:=Base.VoxelFromName("NM3");	
+	z3a:=Base.VoxelFromName("NM4");	
 	z2:=Base.VoxelFromName("NM2");
 	z2a:=Base.VoxelFromName("NM2");	
 	harrison:=Base.VoxelFromName("Nharrisonavatar"); 
@@ -301,7 +301,9 @@ BEGIN
 (*     floop:=Base.VoxelFromName("NFLOOP");  
      push(floop);
 *) 
-	treeserp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXXBiQ"); 	
+	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX666"); 	
+	badopossum:=Base.VoxelFromName("Nbadopossum"); 	
+	raccoon:=Base.VoxelFromName("Nraccoon"); 	
 	push(treeserp);	
  	gorge:=Base.VoxelFromName("NxxxGAernhjFK40xASZZVoQ"); 
 	push(gorge);
@@ -422,24 +424,26 @@ BEGIN
 	noise.a:=1;
 	noise.b:=1;
 	noise.c:=1;		
-	noise.octaves:=4;
+	noise.octaves:=5;
 
-	noise.persistence:=3.5;
+	noise.persistence:=4.1;
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,9/10);
 	Base.setPT(up,0,0,1);
 	NEW(plane,center,up);
-	plane.vox:=acidcats;	
-	z2a.FRaster(plane,16); 
+	plane.vox:=badopossum;	
+	z3a.FRaster(plane,16); 
 	Base.setPT(center,1/2,1/2,1/2);
-	NEW(ball,center,0.5);     
-	noise.setvoxel(acidcats);	
-	z2a.FRaster(noise,32); 
-	
-
-	z2a.setcolor(1,12.5,1,1,1); 
-  	Base.world:=z2a; 	
+	NEW(ball,center,0.5);  
+	serp.passable:=FALSE;   
+	conglomerate.copyonstroke:=TRUE;
+	noise.setvoxel(conglomerate);	
+(*	z2a.FRaster(noise,32); 
+	z2a.setcolor(13,1,1,1,1); 
+*)	z3a.FRaster(noise,64); 
+	z3a.setcolor(8,1,1,1,1);
+  	Base.world:=z3a; 	
 	Base.avatar:=harrison;
 	Base.avatarsize:=1000; 
 END dawn;

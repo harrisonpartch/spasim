@@ -1,4 +1,4 @@
-MODULE NM2; (*! This module may be either imported or used anonymously *)
+MODULE NM4; (*! This module may be either imported or used anonymously *)
 IMPORT Base, SPSME, Noise, Math, Out := KernelLog, Debugging, Streams,Strings;
 
 (*
@@ -6,7 +6,7 @@ Special voxel containing 27 children arranged in a 3x3x3 grid.
 Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
 *)
 
-CONST M=2; (* defines grid size *)
+CONST M=4; (* defines grid size *)
 	MMO=M-1;
 	CUBERADIUS=0.8;   (*change to sqrt(3)/2 ???*)
 	NCODE="NM2";
@@ -854,7 +854,7 @@ VAR
 	cv,child:Voxel;
 	i,j,k: INTEGER;
 BEGIN
-	IF code=NCODE THEN
+	IF TRUE OR (code=NCODE) THEN
 		copymarker:=TRUE;
 		NEW(c);
 		c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; c.alpha:=alpha;
@@ -953,7 +953,7 @@ END thisvox;
 
 BEGIN
 	NEW(wiper)
-END NM2.
+END NM4.
 
 
 

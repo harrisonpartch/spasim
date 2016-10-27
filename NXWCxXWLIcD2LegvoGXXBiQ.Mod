@@ -42,7 +42,7 @@ END Shade;
 END TransparaVox;  
 
 VAR 
-	subserp, beatrix,lobster, tree: Voxel;
+	subserp, badopossum, tree: Voxel;
 	greenball: Voxel;
 	v: Voxel;
 	blue,red,reddot: Voxel;
@@ -51,8 +51,7 @@ VAR
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	beatrix:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw"); 
-	lobster:=Base.VoxelFromName("N5a2g4M6HYjPJxYSNQvYyv7"); 
+	badopossum:=Base.VoxelFromName("Nbadopossum"); 
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	blue:=Base.VoxelFromName("Ndiffuseblue"); 
 	red:=Base.VoxelFromName("Ndiffusered"); 	
@@ -68,11 +67,10 @@ BEGIN
 	NEW(alphablue);
 	alphablue.setcolor(0,0,1,1,1);
 
-	tree.imposter:=alphablue;
-	s0.fillsierp(s1,blue);	
-	s0.imposter:=lobster;
+	s0.fillsierp(alphablue,s0);	
+	s0.imposter:=badopossum;
 	s0.copyonstroke:=TRUE;
-	s0.DTL:=60;
+	s0.DTL:=10;
 	
 	s1.fillsierp(s2,blue);	
 	s1.imposter:=blue;

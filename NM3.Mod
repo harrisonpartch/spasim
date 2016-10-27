@@ -9,7 +9,7 @@ Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
 CONST M=3; (* defines grid size *)
 	MMO=M-1;
 	CUBERADIUS=0.8;   (*change to sqrt(3)/2 ???*)
-	NCODE="NM3";
+	NCODE="NM2";
 	NL=Base.NL;
 
 TYPE PT = Base.PT;
@@ -50,7 +50,7 @@ BEGIN
 	old := wipe;
 	NEW(wipe, count*2);
 	FOR i := 0 TO LEN(old)-1 DO wipe[i] := old[i] END;
-	Out.String("NM3 wipe growing to ");
+	Out.String("NM2 wipe growing to ");
 	Out.Int(count*2,10);
 END grow;
 
@@ -85,6 +85,8 @@ VAR
 	nblox*: ARRAY M,M,M OF NCube; 
 	nposterTF*:BOOLEAN;
 	nposter*: NCube;
+	light: Base.Light;
+
 PROCEDURE Shade (VAR ray: Ray);
 VAR
 	pushxyz, newxyz, xyz: Base.PT;
@@ -129,6 +131,8 @@ BEGIN
 			xyz.y := xyz.y + ray.popdelta.y;
 			xyz.z := xyz.z + ray.popdelta.z;
 			ray.inside:=FALSE
+		ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
+			nshade(nblox[ijk.i,ijk.j,ijk.k],ray);	
 		END
 	END;	 
 	IF (ray.alpha<0.1) OR ( (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1))THEN ray.terminate:=TRUE END;	
@@ -213,7 +217,7 @@ BEGIN
 			ray.ra := (ray.ra-rr)-blr;
 			ray.ga := (ray.ga-gr)-blr;
 			ray.ba := (ray.ba-br)-blr; 
-			ray.alpha:=ray.alpha-alpha*vdepth;		
+			ray.alpha:=ray.alpha-black*vdepth;		
 			IF ~out THEN
 				IF (v#NIL) THEN
 					ray.lxyz.x := ABS(xyz.x - ijk.i);  
@@ -224,8 +228,8 @@ BEGIN
 						ray.normalTF:=TRUE;
 						ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal
 					ELSE
-					ray.normalTF:=FALSE;
-					ray.normal:=ray.fnormal;						
+						ray.normalTF:=FALSE;
+						ray.normal:=ray.fnormal;						
 					END;
 					v.Shade(ray);	
 					xyz.x := xyz.x + ray.popdelta.x;    
@@ -252,7 +256,7 @@ VAR
 BEGIN
 	dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z); 
 	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-	mix:=ray.length*ray.scale/100;
+	mix:=ray.length*ray.scale/10;
 	IF mix>1 THEN mix:=1 END;
 	dot:=mix*dot1+(1-mix)*dot2;
 	dr:=nc.color.red*dot*ray.ra;
@@ -332,11 +336,11 @@ VAR
 BEGIN
 	fill(v);
 	blox[1,1,0]:=w;
-	blox[1,1,2]:=w;	
+
 	blox[0,1,1]:=w;	
-	blox[2,1,1]:=w;
+
 	blox[1,0,1]:=w;	
-	blox[1,2,1]:=w;		
+
 	blox[1,1,1]:=w;	
 END fillsierp;
 
@@ -524,7 +528,7 @@ VAR
 	i,j,k,ii,jj,kk,nextscale: LONGINT;
 	v,vv:Voxel;
 	c,c2: cell;	
-	copy,vu: Voxel;
+	copyv,vu: Voxel;
 	code: Base.Name;
 BEGIN
 	IF ~lockTF THEN
@@ -540,11 +544,10 @@ BEGIN
 			IF blox[i,j,k]#NIL THEN 
 				IF voxundo= NIL THEN voxundo:=blox[i,j,k] END;  
 				IF  blox[i,j,k].copyonstroke THEN
-					copy:=Base.VoxelFromName(blox[i,j,k].code);
-					copy.code:="";
-					copy.copyonstroke:=FALSE; 
-					copy.strokerec(p, resolution,nextscale, path, voxel,vu);					
-					blox[i,j,k]:=copy;
+					copyv:=blox[i,j,k].deepcopy();
+					copyv.copyonstroke:=FALSE; 
+					copyv.strokerec(p, resolution,nextscale, path, voxel,vu);					
+					blox[i,j,k]:=copyv;
 				ELSIF blox[i,j,k].complex THEN
 					blox[i,j,k].strokerec(p, resolution,nextscale, path, voxel,vu)
 				ELSE
@@ -861,7 +864,7 @@ BEGIN
 			child:=blox[i,j,k]; 
 			IF (child#NIL) THEN
 				IF ~child.copymarker THEN 
-					 c.blox[i,j,k]:=child.copy();
+					 c.blox[i,j,k]:=child.deepcopy();
 				ELSE
 					c.blox[i,j,k]:=child
 				END
@@ -877,7 +880,7 @@ END deepcopy;
 
 (* 
 Engrains this voxel and it's children recursively in the following format:
-"NM3"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
+"NM2"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
 <----- Voxel data -----><------                     children data                     ------>
 Children data contains 27 boolean-child pairs, each boolean being TRUE if a child is contained in that position.
 In case of FALSE the length of child data is 0 for that child (i.e. no data is being written except for the FALSE).
@@ -934,14 +937,6 @@ BEGIN
 			END;	
 		END END END					
 END sprout;
-
-PROCEDURE hash():Name;
-VAR
-	i,j,k: INTEGER;
-	hashtext: Strings.String;
-BEGIN
-	Base.hasher.Initialize;
-END hash;
 
 END cell;
 

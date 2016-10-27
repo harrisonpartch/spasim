@@ -150,6 +150,7 @@ VAR
 	dtl: LONGINT;
 	mip,mipverse,gray,grayinv: REAL;
 BEGIN
+IF ray.length>0.0000001 THEN
 	IF tscale>0 THEN
 		xx:=ray.xyz.x;
 		yy:=ray.xyz.y;
@@ -226,7 +227,7 @@ BEGIN
 			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 		END
 	END;
-	mip:=ray.length*ray.scale/10;
+	mip:=ray.length*ray.scale/100;
 	IF mip>1 THEN 
 		mip:=mip/10;
 		IF mip>1 THEN mip:=1 END;
@@ -238,16 +239,8 @@ BEGIN
 		color.blue:=(color1.blue*mipverse+mip*color.blue);	
 		color.alpha:=(color1.alpha*mipverse+mip*color.alpha);		
 	ELSE
-		color:=texcube.side[ray.face].pixel(lx,ly);
-(*		CASE ray.face OF
-			 0: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
-			|1: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
-			|2: lx := ray.lxyz.x; ly := ray.lxyz.y;
-			|3: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
-			|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
-			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
-		END;		
-*)		color1:=texcube.side[ray.face].pixel(lx,ly);	
+		color:=texcube.side[ray.face].pixel(lx,ly);	
+		color1:=texcube.side[ray.face].pixel(lx,ly);	
 		mipverse:=1-mip;			
 		color.red:=(color1.red*mipverse+mip*color.red);
 		color.green:=(color1.green*mipverse+mip*color.green);
@@ -278,6 +271,7 @@ BEGIN
 		ray.b := ray.b + db;	
 		ray.terminate:=TRUE
 	END
+END
 END Shade;
 
 PROCEDURE reflect(VAR p: PT; n: PT);

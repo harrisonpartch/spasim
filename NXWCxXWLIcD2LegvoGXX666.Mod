@@ -44,7 +44,7 @@ END Shade;
 END TransparaVox;  
 
 VAR 
-	subserp, beatrix,lobster,sparx: Voxel;
+	subserp, raccoon,bpossum,sparx: Voxel;
 	greenball: Voxel;
 	v: Voxel;
 	red,reddot,gmdot: Voxel;
@@ -53,8 +53,8 @@ VAR
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	beatrix:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw"); 
-	lobster:=Base.VoxelFromName("N5a2g4M6HYjPJxYSNQvYyv7"); 
+	raccoon:=Base.VoxelFromName("Nraccoon"); 
+	bpossum:=Base.VoxelFromName("Nbadopossum"); 
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	red:=Base.VoxelFromName("Ndiffusered"); 
 	reddot:=Base.VoxelFromName("Ndiffusereddot"); 
@@ -64,17 +64,18 @@ BEGIN
 	NEW(s2);
 	s2.setcolor(0,0,0,1/3,1/3);
 	NEW(alphablue);
-	alphablue.setcolor(0,0,0,1/50,1/50);
+	alphablue.setcolor(0,0,1/5,1/12,1/15);
 
-	s0.fillsierp(s1,alphablue);	
-	s0.blox[1,1,1]:=red;
-	s0.imposter:=red;
+	s0.fillsierp(s0,s1);	
+	s0.imposter:=raccoon;
 	s0.copyonstroke:=TRUE;
-	s0.DTL:=100;
+	s0.DTL:=5;
 	
-	s1.fillsierp(red,s2);	
+	s1.fillsierp(s1,alphablue);	
 	s1.imposter:=red;
 	s1.copyonstroke:=TRUE;
+	s1.DTL:=5;
+	s1.passable:=FALSE;
 
 	s2.fillsierp(alphablue,s2);	
 	s2.blox[1,1,1]:=gmdot;

@@ -8,7 +8,7 @@ TYPE
 CONST
 	T=5;        
 	TS=3*32;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=4;
+	TW=6;
 	TH=4;
 	W*=TS*TW;
 	H*=TS*TH;
@@ -42,6 +42,7 @@ BEGIN
 		phi:=cam.phi;
 		FOR j :=  0 TO 2 DO 
 			ray:=Base.blankray;
+			ray.dtl:=100;
 			angletoray(ray,theta,phi);
 			Base.world.Shade(ray);
 			IF ~ray.terminate THEN
@@ -72,7 +73,7 @@ BEGIN
 	Base.world.Shade(ray);
 	IF ~ray.terminate THEN
 			ray.b:= ray.b + ray.ba;
-			ray.r:= ray.r + ray.ra;
+			ray.r:= ray.r + ray.ra/2;
 			ray.g:= ray.g + ray.ga/2;	
 	END;
 	Base.clamp3(ray.r,ray.g,ray.b);
@@ -90,28 +91,28 @@ BEGIN
 	IF level<2 THEN
 			x:=a.imx - W/2;
 			y:=a.imy-H/2;		
-			IF (x*x+y*y)<FV THEN	
+			IF (~saccade)&((x*x+y*y)<FV) THEN	
 				tessad3(a); 
 			ELSE
 				tessa(a); 
 			END;
 			x:=b.imx - W/2;
 			y:=b.imy-H/2;		
-			IF (x*x+y*y)<FV THEN	
+			IF (~saccade)&((x*x+y*y)<FV) THEN	
 				tessad3(b); 
 			ELSE
 				tessa(b); 			
 			END;			
 			x:=c.imx - W/2;
 			y:=c.imy-H/2;		
-			IF (x*x+y*y)<FV THEN	
+			IF (~saccade)&((x*x+y*y)<FV) THEN		
 				tessad3(c); 
 			ELSE
 				tessa(c); 
 			END;
 			x:=d.imx - W/2;
 			y:=d.imy-H/2;		
-			IF (x*x+y*y)<FV THEN	
+			IF (~saccade)&((x*x+y*y)<FV) THEN	
 				tessad3(d); 
 			ELSE
 				tessa(d); 
@@ -194,7 +195,7 @@ VAR
 	FAST*:INTEGER;
 	lsense,ls2:REAL;
 	FGUAARD,FRAMEBOORT:BOOLEAN;
-	SACCADE*,SACCADE1*,DTLRAYS*:BOOLEAN;
+	saccade*,SACCADE1*,DTLRAYS*:BOOLEAN;
 	cameratheta*,cameraphi*:REAL;
 	aperture*: Base.Aperture;
 	image*: Raster.Image;
@@ -291,14 +292,12 @@ PROCEDURE lessdetail*;
 BEGIN
 	IF foveaparameter<50 THEN foveaparameter:=foveaparameter+1  END;
 	FV:=W*W/foveaparameter;
-	Base.fog:=Base.fog*13/12;
 END lessdetail;
 
 PROCEDURE moredetail*;
 BEGIN
 	foveaparameter:=ABS(foveaparameter-1);
 	FV:=W*W/foveaparameter	;
-	Base.fog:=Base.fog*12/13;
 END moredetail;
 
 PROCEDURE incTD;
