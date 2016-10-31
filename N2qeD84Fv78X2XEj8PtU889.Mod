@@ -39,7 +39,7 @@ BEGIN
 	Base.setPT(center,1/2,1/2,1/2);
 	tigerlily:=Base.VoxelFromName("NwPicBWw4NfcserX4ELaQ3b");  
 	NEW(ball,center,5/12);	
-	ball.setcolor(0.01,0.66,0.0);		
+	ball.setcolor(0.01,0.66,0.0,1);		
 	ball.setvoxel(tigerlily);	
 	dot.FRasterSolid(ball,64);
 	dot.copyonstroke:=TRUE;

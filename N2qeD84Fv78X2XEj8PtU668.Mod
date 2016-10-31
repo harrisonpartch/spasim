@@ -22,7 +22,7 @@ BEGIN
 	Base.setPT(center,1/2,1/2,1/2);
 	tigerlily:=Base.VoxelFromName("NUzl1lqmBmaKyswkc70kO1w");  
 	NEW(ball,center,8/12);	
-	ball.setcolor(0.9,0.9,1);			
+	ball.setcolor(0.9,0.9,1,1);			
 	ball.setvoxel(tigerlily);
 	dot.FRaster(ball,32);
 	dot.DTL:=1000;

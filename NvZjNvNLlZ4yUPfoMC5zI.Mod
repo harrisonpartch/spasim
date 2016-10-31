@@ -21,7 +21,7 @@ BEGIN
 	FOR i :=0 TO 100 DO
 		Base.setPT(center,Base.rand.Uniform(),Base.rand.Uniform(),Base.rand.Uniform());
 		NEW(ball,center,Base.rand.Uniform()/10);
-		ball.setcolor(Base.rand.Uniform(),Base.rand.Uniform(),Base.rand.Uniform());		
+		ball.setcolor(Base.rand.Uniform(),Base.rand.Uniform(),Base.rand.Uniform(),1);		
 		Base.setPT(center,1/2,1/2,1/2);
 		conglomerate.FRaster(ball,81)
 	END;

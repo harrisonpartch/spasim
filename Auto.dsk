@@ -1,35 +1,22 @@
 <Desktop>
-	<Window name="FileManager" loader="WMFileManager.Restore" l="1354" t="150" r="1995" b="546" flags="{0..2,13}"/>
 	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="1166" t="51" r="1806" b="439" flags="{0..2,13}"/>
-	<Window name="PET" loader="PET.Restore" l="1343" t="392" r="2126" b="1375" flags="{0..2,13}">
+	<Window name="PET" loader="PET.Restore" l="743" t="70" r="1526" b="1053" flags="{0..2,13}">
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>
 			<Tab file="NM4.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="522" cursorPos="12241"/>
-				<SplitEditor visible="true" firstLine="853" cursorPos="21205" height="400"/>
+				<Editor firstLine="264" cursorPos="7227"/>
+				<SplitEditor visible="true" firstLine="855" cursorPos="21246" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="163" scratchHeight="10"/>
 			</Tab>
 		</PETData>
 	</Window>
-	<Window name="PET" loader="PET.Restore" l="899" t="385" r="1699" b="985" flags="{0..2,13}">
-		<PETData>
-			<General SelectedPageNr="0" ProjectTextFile=""/>
-			<Tab file="Nharrisonavatar.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="0"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="10"/>
-			</Tab>
-		</PETData>
-	</Window>
-	<Window name="PET" loader="PET.Restore" l="1231" t="65" r="2031" b="665" flags="{0..2,13}">
+	<Window name="PET" loader="PET.Restore" l="226" t="252" r="1026" b="852" flags="{0..2,13}">
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>
 			<Tab file="N2qeD84Fv78X2XEj8PtUZO7.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="14" cursorPos="360"/>
+				<Editor firstLine="0" cursorPos="755"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
@@ -37,11 +24,11 @@
 			</Tab>
 		</PETData>
 	</Window>
-	<Window name="PET" loader="PET.Restore" l="618" t="35" r="1412" b="1015" flags="{0..2,13}">
+	<Window name="PET" loader="PET.Restore" l="1089" t="137" r="1883" b="1117" flags="{0..2,13}">
 		<PETData>
-			<General SelectedPageNr="2" ProjectTextFile=""/>
+			<General SelectedPageNr="0" ProjectTextFile=""/>
 			<Tab file="Spasim.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="6" cursorPos="494"/>
+				<Editor firstLine="0" cursorPos="21"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
@@ -74,6 +61,13 @@
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="130" scratchHeight="10"/>
+			</Tab>
+			<Tab file="Base.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="0"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="10"/>
 			</Tab>
 		</PETData>
 	</Window>

@@ -145,12 +145,13 @@ VAR
 	txcube: TexCube;
 	rlf: REAL;
 	rlm: BOOLEAN;
-	lxyz: Base.PT;
+	lxyz,exit: Base.PT;
 	lsp: Base.SPT;
+	faace:INTEGER;
 	dtl: LONGINT;
 	mip,mipverse,gray,grayinv: REAL;
 BEGIN
-IF ray.length>0.0000001 THEN
+IF ray.length>0.00000001 THEN
 	IF tscale>0 THEN
 		xx:=ray.xyz.x;
 		yy:=ray.xyz.y;
@@ -227,45 +228,69 @@ IF ray.length>0.0000001 THEN
 			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 		END
 	END;
-	mip:=ray.length*ray.scale/100;
-	IF mip>1 THEN 
-		mip:=mip/10;
-		IF mip>1 THEN mip:=1 END;
-		mipverse:=1-mip;		
-		color:=texcube.side[ray.face].pixelmip0(lx,ly);
-		color1:=texcube.side[ray.face].pixelmip1(lx,ly);
-		color.red:=(color1.red*mipverse+mip*color.red);
-		color.green:=(color1.green*mipverse+mip*color.green);
-		color.blue:=(color1.blue*mipverse+mip*color.blue);	
-		color.alpha:=(color1.alpha*mipverse+mip*color.alpha);		
-	ELSE
-		color:=texcube.side[ray.face].pixel(lx,ly);	
-		color1:=texcube.side[ray.face].pixel(lx,ly);	
-		mipverse:=1-mip;			
-		color.red:=(color1.red*mipverse+mip*color.red);
-		color.green:=(color1.green*mipverse+mip*color.green);
-		color.blue:=(color1.blue*mipverse+mip*color.blue);	
-		color.alpha:=(color1.alpha*mipverse+mip*color.alpha);	
-	END; 	
-	dot1:= ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z); 
-	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-	mix:= (ray.length*ray.scale)/10;
-	IF mix>1 THEN mix:=1 END;
-	dot:=(dot2*mix+dot1*(1-mix));
-	dr:=color.red*dot*color.alpha;
-	dg:=color.green*dot*color.alpha;
-	db:=color.blue*dot*color.alpha;	
+	color:=texcube.side[ray.face].pixel(lx,ly);	
 	IF color.alpha<0.99 THEN
-			IF color.alpha>0.75 THEN 
+			IF color.alpha>0.97 THEN 
 				ray.alpha:=ray.alpha-0.2;
 				mirror(ray,mix)
-			ELSE
-				mix:=1;
-				ray.r := ray.r + dr*mix;
-				ray.g := ray.g + dg*mix;
-				ray.b := ray.b + db*mix;
+			ELSE		
+				dr:=color.red*color.alpha;
+				dg:=color.green*color.alpha;
+				db:=color.blue*color.alpha;	
+				ray.r := ray.r + dr;
+				ray.g := ray.g + dg;
+				ray.b := ray.b + db;
+				ray.ra:=ray.ra -dr;
+				ray.ga:=ray.ga -dg;
+				ray.ba:=ray.ba -db;
+				ray.alpha:= ray.alpha-(dr+dg+db)/3;
+				Base.ExitF(ray,exit,faace);
+				CASE faace OF
+					 0: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
+					|1: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
+					|2: lx := ray.lxyz.x; ly := ray.lxyz.y;
+					|3: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
+					|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
+					|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
+				END;
+				color:=texcube.side[faace].pixel(lx,ly);			
+				ray.r := ray.r + dr;
+				ray.g := ray.g + dg;
+				ray.b := ray.b + db;
+				ray.ra:=ray.ra -dr;
+				ray.ga:=ray.ga -dg;
+				ray.ba:=ray.ba -db;
+				ray.alpha:= ray.alpha-((dr+dg+db)/3+0.1);										
 			END			
 	ELSE
+		mip:=ray.length*ray.scale/10;
+		IF mip>1 THEN 
+			mip:=mip/10;
+			IF mip>1 THEN mip:=1 END;
+			mipverse:=1-mip;		
+			color:=texcube.side[ray.face].pixelmip0(lx,ly);
+			color1:=texcube.side[ray.face].pixelmip1(lx,ly);
+			color.red:=(color1.red*mipverse+mip*color.red);
+			color.green:=(color1.green*mipverse+mip*color.green);
+			color.blue:=(color1.blue*mipverse+mip*color.blue);	
+			color.alpha:=(color1.alpha*mipverse+mip*color.alpha);		
+		ELSE
+			color:=texcube.side[ray.face].pixel(lx,ly);	
+			color1:=texcube.side[ray.face].pixel(lx,ly);	
+			mipverse:=1-mip;			
+			color.red:=(color1.red*mipverse+mip*color.red);
+			color.green:=(color1.green*mipverse+mip*color.green);
+			color.blue:=(color1.blue*mipverse+mip*color.blue);	
+			color.alpha:=(color1.alpha*mipverse+mip*color.alpha);	
+		END; 	
+		dot1:= ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z); 
+		dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
+		mix:= (ray.length*ray.scale)/10;
+		IF mix>1 THEN mix:=1 END;
+		dot:=(dot2*mix+dot1*(1-mix));
+		dr:=color.red*dot*color.alpha;
+		dg:=color.green*dot*color.alpha;
+		db:=color.blue*dot*color.alpha;	
 		ray.r := ray.r + dr;
 		ray.g := ray.g + dg;
 		ray.b := ray.b + db;	

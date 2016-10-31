@@ -42,7 +42,7 @@ BEGIN
 		phi:=cam.phi;
 		FOR j :=  0 TO 2 DO 
 			ray:=Base.blankray;
-			ray.dtl:=100;
+			ray.dtl:=10;
 			angletoray(ray,theta,phi);
 			Base.world.Shade(ray);
 			IF ~ray.terminate THEN
@@ -68,7 +68,7 @@ VAR
 	pixel: Raster.Pixel;
 BEGIN
 	ray:=Base.blankray;
-	ray.dtl:=10;
+	ray.dtl:=3;
 	angletoray(ray,cam.theta+cam.dtheta/2,cam.phi+cam.dphi/2);
 	Base.world.Shade(ray);
 	IF ~ray.terminate THEN

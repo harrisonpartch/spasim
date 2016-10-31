@@ -55,10 +55,10 @@ BEGIN
 	ball.setvoxel(bdot);	
 	bluedot.FRaster(ball,16);
 	ball.setvoxel(NIL);	
-	ball.setcolor(1,1,1);
+	ball.setcolor(1,1,1,1);
 	reddot.FRaster(ball,64);	
 	ball.setvoxel(NIL);	
-	ball.setcolor(1,1,1/2);	
+	ball.setcolor(1,1,1/2,1);	
 	greendot.FRaster(ball,64);	
 	NEW(shell,reddot,Base.mkPT(0,1,0),Base.mkPT(0,0,1),0.03,0.01);
 	FOR i:=0 TO 1 DO

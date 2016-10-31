@@ -11,21 +11,25 @@ VAR
 	ball: FRep.sphere;
 	plane: FRep.plane;
 	center,p,n:  PT;
+	radius:REAL;
 	i:LONGINT;
 	path: Path;
 PROCEDURE draw;
 BEGIN
-	conglo:=Base.VoxelFromName("NM4"); 	
+	conglo:=Base.VoxelFromName("NM4"); 
+	conglo.setcolor(10,100,10,100,1);	
 	conglo.copyonstroke:=TRUE;
 	NEW(ball,center,6/12);	
-	FOR i:=0 TO 100 DO
-		ball.reset(Base.randPT(), Base.rand.Uniform()/18);
-		ball.setcolor(Base.rand.Uniform(),Base.rand.Uniform(),Base.rand.Uniform());	
-		conglo.FRaster(ball,16);
-		NEW(plane,Base.randPT(), Base.randPT());
-		plane.setcolor(Base.rand.Uniform(),Base.rand.Uniform(),Base.rand.Uniform());
+	FOR i:=0 TO 200 DO
+		center:=Base.randPT();
+		radius:=Base.rand.Uniform()/28;
+		ball.reset(center, radius);
+		ball.setcolor(Base.rand.Uniform(),Base.rand.Uniform(),Base.rand.Uniform(),1/2);	
+		conglo.FRaster(ball,16);	
+(*		NEW(plane,Base.randPT(), Base.randPT());
+		plane.setcolor(Base.rand.Uniform(),Base.rand.Uniform(),Base.rand.Uniform(),1);
 		conglo.FRaster(plane,16);
-	END
+*)	END
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;

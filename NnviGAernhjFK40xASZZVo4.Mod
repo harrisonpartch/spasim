@@ -19,7 +19,7 @@ BEGIN
 	n3ball:=Base.VoxelFromName("NM3"); 	
 	Base.setPT(center,1/2,1/2,1/2);
 	NEW(ball,center,6.5/12);
-	ball.setcolor(0.91,0.6,0.2);
+	ball.setcolor(0.91,0.6,0.2,1);
 	n3ball.FRaster(ball,9);
 	n3ball.DTL:=10000;
 END NnviGAernhjFK40xASZZVo4. 

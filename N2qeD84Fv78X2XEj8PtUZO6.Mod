@@ -18,7 +18,7 @@ BEGIN
 	dot.copyonstroke:=TRUE;
 	Base.setPT(center,1/2,1/2,1/2);
 	NEW(ball,center,1/2);	
-	ball.setcolor(1,0,0);		
+	ball.setcolor(1,0,0,1);		
 (*		ball.setvoxel(v); *)
 	dot.FRaster(ball,9);
 END draw;

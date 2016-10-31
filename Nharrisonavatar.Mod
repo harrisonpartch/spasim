@@ -14,7 +14,7 @@ END thisvox;
 BEGIN
 	NEW(cv,"hexglass.png");
 	cv.passable:=TRUE;
-	cv.tscale:=64;	
+	cv.tscale:=0;	
 END Nharrisonavatar. 
  
  XNXLMarsh.Rez Nharrisonavtar ~

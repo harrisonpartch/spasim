@@ -30,11 +30,11 @@ BEGIN
 	Base.setPT(q,1/2,1/2,0);
 	Base.setPT(qq,1/2,1/2,1);
 	NEW(ball,center,2/3);
-	ball.setcolor(1,1,1);
+	ball.setcolor(1,1,1,1);
 	conglomerate.FRaster(ball,9);
 	NEW(star);
 	star.setcolor(0,0,0,100,0);
-	ball.setcolor(1,0,1);
+	ball.setcolor(1,0,1,1);
 	star.FRaster(ball,9);	
 	NEW(ball,center,1/2);	
 	ball.setvoxel(conglomerate);

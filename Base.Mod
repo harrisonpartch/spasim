@@ -45,7 +45,6 @@ TYPE NCube*=RECORD
 	TF*:BOOLEAN;
 	normal*: PT; 
 	color*: Color;
-	lightcube*:LightCube;
 	mirrorTF*: BOOLEAN;
 END;
 
@@ -444,9 +443,9 @@ BEGIN
 	imposter:=v
 END setvoxel;
 
-PROCEDURE setcolor*(r,g,b: REAL);  
+PROCEDURE setcolor*(r,g,b,a: REAL);  
 BEGIN
-	cxolor.red:=r; cxolor.green:=g; cxolor.blue:=b; 
+	cxolor.red:=r; cxolor.green:=g; cxolor.blue:=b; cxolor.alpha:=a;
 END setcolor;
 
 PROCEDURE getcolor*(p:PT):Color;

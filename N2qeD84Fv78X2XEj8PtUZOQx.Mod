@@ -29,13 +29,13 @@ BEGIN
 	Base.setPT(q,1/2,1/2,0);
 	Base.setPT(qq,1/2,1/2,1);
 	NEW(ball,center,2/3);
-	ball.setcolor(1,1,0);
+	ball.setcolor(1,1,0,1);
 (*	ball.cxf:=TRUE; *)
 	NEW(cyl,q,qq,1/6);
 	conglomerate.FRaster(ball,32);
 	sc.FRaster(cyl,9);	
 	star.setcolor(0,0,0,100,0);
-	ball.setcolor(1,0,1);
+	ball.setcolor(1,0,1,1);
 	star.FRaster(ball,32);	
 	NEW(ball,center,1/2);	
 	ball.setvoxel(conglomerate);

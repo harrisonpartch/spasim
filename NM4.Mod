@@ -239,7 +239,7 @@ BEGIN
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);	
 				END;
 			END;
-			IF (ray.alpha<0.1) (* OR ( (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1)) *)THEN ray.terminate:=TRUE END;
+			IF (ray.alpha<0.1)  OR ( (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1)) THEN ray.terminate:=TRUE END;
 		UNTIL out OR ray.terminate;
 	END 		END;
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
@@ -251,27 +251,22 @@ END Shade;
 
 PROCEDURE nshade*(CONST nc: NCube; VAR ray: Ray);
 VAR
-	dr,dg,db,mix,dot,dot1,dot2: REAL;
+	dr,dg,db,mix,dot,dot1,dot2,depth,dblack: REAL;
 	light: Base.Light;	
+	exit: PT;
 BEGIN
 	dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z); 
 	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-	mix:=ray.length*ray.scale/10;
+	mix:=ray.length*ray.scale/40;
 	IF mix>1 THEN mix:=1 END;
 	dot:=mix*dot1+(1-mix)*dot2;
-	dr:=nc.color.red*dot*ray.ra;
-	dg:=nc.color.green*dot*ray.ga;
-	db:=nc.color.blue*dot*ray.ba;	
+	dr := nc.color.red*dot;
+	dg := nc.color.green*dot;
+	db := nc.color.blue*dot;
 	ray.r := ray.r + dr;
 	ray.g := ray.g + dg;
-	ray.b := ray.b + db;	
-	ray.ra:=ray.ra-dr;
-	ray.ga:=ray.ga-dg;
-	ray.ba:=ray.ba-db;
-	ray.r := ray.r + nc.color.red * ray.ra*dot;
-	ray.g := ray.g + nc.color.green * ray.ga*dot;
-	ray.b := ray.b + nc.color.blue * ray.ba*dot; 	
-	ray.terminate:=TRUE
+	ray.b := ray.b + db;
+	ray.terminate:=TRUE;
 END nshade;
 
 PROCEDURE reflect(VAR p: PT; n: PT);
