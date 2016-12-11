@@ -429,7 +429,7 @@ END detail;
 			Swap; 
 			Invalidate(Rectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 			IF CAPTURE THEN 
-				WarpMouse.warp(500,500);
+				WarpMouse.warp(500+bounds.l,500+bounds.t);
 				mousepreviousx:=500; 
 				mousepreviousy:=500;
 			END

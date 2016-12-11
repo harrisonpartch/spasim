@@ -1,4 +1,6 @@
 Compiler.Compile 
+XDisplay.Mod
+WarpMouse.Mod
 Base.Mod
 SPSME.Mod 
 SPSMMath.Mod
