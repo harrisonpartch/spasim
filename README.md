@@ -8,7 +8,6 @@ as root:
 
 clone this repository
 
-
 cd spasim
 
 aos
