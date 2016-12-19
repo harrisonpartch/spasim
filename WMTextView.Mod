@@ -33,7 +33,7 @@ CONST
 	MaxCommandLength = 256; (* without parameters *)
 
 	(* If TRUE, a mouse right click will open a pie menu *)
-	UsePieMenu = FALSE;
+	UsePieMenu = TRUE;
 
 	InterclickNone = 0;
 	Interclick01 = 1;	(* mouse button 0 & 1 *)
@@ -672,6 +672,9 @@ TYPE
 		highlighter : SyntaxHighlighter.Highlighter;
 		state : SyntaxHighlighter.State;
 		fontCache : FontCache;
+		
+		(** vertical centering -- momentarily only working for a single line *)
+		textAlignV-: WMProperties.Int32Property;
 
 		showLineNumbers- : WMProperties.BooleanProperty;
 		showLineNumbersI : BOOLEAN;
@@ -777,6 +780,7 @@ TYPE
 			lineNumberFont := NIL; lineNumberFont10 := NIL;
 			NEW(indicateTabs, PTVIndicateTabs, NIL, NIL); properties.Add(indicateTabs);
 			NEW(clBgCurrentLine, PTVclBgCurrentLine, NIL, NIL); properties.Add(clBgCurrentLine);
+			NEW(textAlignV, PVTtextAlignV, NIL, NIL); properties.Add(textAlignV);
 
 			(* events *)
 			NEW(onLinkClicked, SELF, PTVonLinkClick, PTVonLinkClickInfo, SELF.StringToCompCommand); events.Add(onLinkClicked);
@@ -832,10 +836,11 @@ TYPE
 			Initialize^;
 			RecacheProperties;
 			cursor.SetVisible(FALSE);
-			Resized;
+			IF text#NIL THEN	Resized 	END;
 
 			(* from now on, bidi-formatting can be done *)
 			layout.initialized := TRUE;
+			(*Initialize^;*)
 		END Initialize;
 
 		PROCEDURE Finalize;
@@ -914,15 +919,18 @@ TYPE
 			indicateTabsI := indicateTabs.Get();
 			clBgCurrentLineI := clBgCurrentLine.Get();
 			string := highlighting.Get();
+			
 			IF (string # NIL) THEN
 				highlighter := SyntaxHighlighter.GetHighlighter(string^);
 			ELSE
 				highlighter := NIL;
 			END;
-			SetSyntaxHighlighter(highlighter);
-			UpdateScrollbars;
-			IF ~WMRectangles.IsEqual(oldBorders, bordersI) THEN BordersChanged END;
-			Invalidate;
+			IF text#NIL THEN 
+				SetSyntaxHighlighter(highlighter);
+				UpdateScrollbars;
+				IF ~WMRectangles.IsEqual(oldBorders, bordersI) THEN BordersChanged END;
+			END;
+			(*Invalidate;*)
 		END RecacheProperties;
 
 		PROCEDURE SetScrollbars*(hScrollbar, vScrollbar : WMStandardComponents.Scrollbar);
@@ -987,7 +995,7 @@ TYPE
 			Resized;
 			optimize := FALSE;
 			UpdateScrollbars;
-			Invalidate;
+			(*Invalidate;*)
 		END WrapModeChanged;
 
 		PROCEDURE PropertyChanged*(sender, property : ANY);
@@ -1038,6 +1046,8 @@ TYPE
 				indicateTabsI := indicateTabs.Get(); Invalidate;
 			ELSIF (property = clBgCurrentLine) THEN
 				clBgCurrentLineI := clBgCurrentLine.Get(); Invalidate;
+			ELSIF (property = textAlignV) THEN
+				Invalidate;
 			ELSIF (property = lineNumberColor) OR (property = lineNumberBgColor) THEN
 				lineNumberColorI := lineNumberColor.Get();
 				lineNumberBgColorI := lineNumberBgColor.Get();
@@ -1087,8 +1097,8 @@ TYPE
 			CheckNumberOfLines;
 			ASSERT(((highlighter = NIL) & (state = NIL)) OR ((highlighter # NIL) & (state # NIL)));
 			text.ReleaseRead;
-			Invalidate;
-			Release
+			Invalidate;(*! Redundant ?*)
+			Release;
 		END SetText;
 
 		PROCEDURE SetSyntaxHighlighter*(highlighter : SyntaxHighlighter.Highlighter);
@@ -1117,11 +1127,13 @@ TYPE
 		END SetSyntaxHighlighter;
 
 		PROCEDURE ShowLineNumbers(enabled : BOOLEAN);
+		VAR font : WMGraphics.Font;
 		BEGIN
+			font := GetFont( );
 			IF enabled THEN
-				x0 := 35;
-				lineNumberFont := WMGraphics.GetFont("Oberon", 8, {});
-				lineNumberFont10 := WMGraphics.GetFont("Oberon", 8, {WMGraphics.FontBold});
+				x0 := 55;
+				lineNumberFont := WMGraphics.GetFont(font.name, font.size, {});
+				lineNumberFont10 := WMGraphics.GetFont(font.name, font.size, {WMGraphics.FontBold});
 			ELSE
 				x0 := 0;
 				lineNumberFont := NIL;
@@ -1830,14 +1842,22 @@ TYPE
 				IF i > 0 THEN
 					y := (ty + layout.lines[i - 1].ascent)
 				ELSE
-					y := (ty + 10)
+					f := GetFont();
+					y := (ty + f.GetAscent());
 				END;
 				x := bordersI.l + x0 - leftShiftI;
 				text.ReleaseRead;
 				RETURN TRUE
 			ELSIF (pos = 0) & (firstLineI = 0) THEN
-				x := bordersI.l + x0 - leftShiftI; f := GetFont();  y := f.GetAscent();
-				CheckParagraphBegin(i, y);
+				ty := bordersI.t;
+				IF layout.GetNofLines() > 0 THEN
+					y := (ty + layout.lines[0].ascent);
+				ELSE
+					f := GetFont();
+					y := ty+f.GetAscent();
+				END;
+				CheckParagraphBegin(0, y);
+				x := bordersI.l + x0 - leftShiftI;
 				text.ReleaseRead;
 				RETURN TRUE
 			ELSE
@@ -2020,9 +2040,10 @@ TYPE
 						ascent := vc.bounds.GetHeight() - style.voff;
 						descent := style.voff;
 						(* Add a Sequencer to the object if none exists *)
+			
 						IF (vc.sequencer = NIL) OR (vc.sequencer # sequencer) THEN
 							vc.SetSequencer(sequencer);
-							vc.Reset(NIL, NIL);
+							IF sequencer#NIL THEN vc.Reset(NIL, NIL); END; 
 						END;
 					END
 				ELSIF ch = Texts.TabChar THEN
@@ -2058,7 +2079,7 @@ TYPE
 			cf := GetFont();
 			style.font := cf;
 
-			x := 0; l.pos := pos; l.height := style.font.GetHeight(); eol := FALSE;
+			x := 0; l.pos := pos; l.height := style.font.GetHeight();
 
 			(* For layouting a reordered line, the reordered text is needed, to correctly measure
 				the extends of each character. *)
@@ -2099,7 +2120,7 @@ TYPE
 				END;
 			END;
 
-			i := 0;  ascent := style.font.GetAscent(); descent := style.font.GetDescent();
+			i := 0;  leading := 0; ascent := style.font.GetAscent(); descent := style.font.GetDescent();
 			align := AlignLeft; l.tabStops := NIL; COPY("", tabstring);
 			firstIndent := 0; leftIndent := 0; rightIndent := 0; spaceBefore := 0; spaceAfter := 0;
 
@@ -2107,8 +2128,8 @@ TYPE
 			highlighterStyle := NIL; lastHighlighterStyle := NIL;
 			currentStyle := NIL; lastStyle := NIL;
 
+			eol := FALSE;
 			REPEAT
-
 				readerPosition := localTextReader.GetPosition();
 				localTextReader.ReadCh(ch);
 
@@ -2228,8 +2249,8 @@ TYPE
 				lastHighlighterStyle := highlighterStyle;
 
 				IF first THEN
-					IF ch = Texts.NewLineChar THEN
-						ascent := style.font.GetAscent(); descent := 0;
+					IF (ch = Texts.NewLineChar) OR (ch = 0) THEN
+						ascent := style.font.GetAscent(); descent := style.font.GetDescent();
 					ELSE
 						descent := 0; ascent := 0;
 					END;
@@ -2240,7 +2261,7 @@ TYPE
 				END;
 				INC(pos);
 				IF (stopPos < 0) OR (pos <= stopPos) THEN
-					IF ch # Texts.NewLineChar THEN
+					IF (ch # Texts.NewLineChar) & (ch # 0) THEN
 						GetExtents(ch, dx, a, d); ascent := Strings.Max(ascent, a); descent := Strings.Max(descent, d);
 						IF ld = 0 THEN ld := ascent + descent; ELSE ld := Strings.Max(ld, ascent + descent); END; leading := Strings.Max(leading, ld);
 						IF isMultiLineI & (wrapModeI # NoWrap) & (i > 0) & (x0 + x + dx > wrapwidth) THEN
@@ -2276,7 +2297,7 @@ TYPE
 				ELSE
 					eol := TRUE
 				END;
-				INC(i)
+				INC(i);
 			UNTIL eol OR localTextReader.eot;
 
 			l.width := x;
@@ -2617,26 +2638,38 @@ TYPE
 			text.ReleaseRead;
 		END RenderAboveTextMarkers;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas);
-		VAR la, lb, i, top, t : LONGINT; cliprect : WMRectangles.Rectangle; cstate : WMGraphics.CanvasState;
+		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
+		VAR la, lb, i, top, t, b : LONGINT; rect, clip : WMRectangles.Rectangle; cstate : WMGraphics.CanvasState;
 		BEGIN
 			ASSERT(layout # NIL);
-			canvas.SaveState(cstate);
-			canvas.GetClipRect(cliprect);
-			IF WMRectangles.RectEmpty(cliprect) THEN RETURN END;
 
-			IF showBorderI THEN
-				WMGraphicUtilities.DrawBevel(canvas, GetClientRect(),
-					1, TRUE, LONGINT(0808080FFH), WMGraphics.ModeCopy)
+			canvas.GetClipRect(clip);
+			IF WMRectangles.RectEmpty(clip) THEN RETURN END;
+			rect := GetClientRect();
+			canvas.SaveState(cstate);
+
+			IF WMRectangles.Intersect(rect, clip) THEN
+				DrawBackground^(canvas);
+				IF showBorderI THEN
+					WMGraphicUtilities.DrawBevel(canvas, rect,
+						1, TRUE, LONGINT(0808080FFH), WMGraphics.ModeCopy)
+				END;
+			END;
+
+			(* allow clean clipping in at inner border *)
+			WMRectangles.ClipRect(rect, borderClip);
+			WMRectangles.ClipRect(clip, borderClip);
+			canvas.SetClipRect(clip);
+
+			(* draw gutter *)
+			rect.r := x0 - 1;
+			IF showLineNumbersI & (lineNumberBgColorI # 0) & WMRectangles.Intersect(rect, clip) THEN
+				canvas.Fill(rect, lineNumberBgColorI, WMGraphics.ModeSrcOverDst);
 			END;
 
 			text.AcquireRead;
-			la := FindLineByY(firstLineI, Strings.Max(cliprect.t, bordersI.t));
-			lb := FindLineByY(firstLineI, Strings.Min(cliprect.b, bounds.GetHeight() - bordersI.b));
-
-			(* allow clean clipping in at inner border *)
-			WMRectangles.ClipRect(cliprect, borderClip);
-			canvas.SetClipRect(cliprect);
+			la := FindLineByY(firstLineI, clip.t);
+			lb := FindLineByY(firstLineI, clip.b);
 
 			(* prepare selections *)
 			FOR i := 0 TO nofHighlights - 1 DO
@@ -2645,12 +2678,18 @@ TYPE
 				IF highlights[i].a > highlights[i].b THEN t := highlights[i].a; highlights[i].a := highlights[i].b; highlights[i].b := t END
 			END;
 
-			top := bordersI.t;
+			top := borderClip.t;
+			IF (la = lb) & (textAlignV.Get() = WMGraphics.AlignCenter) THEN 
+				top := (borderClip.t+borderClip.b-layout.lines[la].height) DIV 2;
+				(* something is wrong with ascent and height here, does not comply with the notions in fonts *)
+			END;
+
 			FOR i := firstLineI TO la - 1 DO
 				top := top + (layout.lines[i].height);
 				CheckParagraphBegin(i, top);
 				CheckParagraphEnd(i, top);
 			END;
+
 			IF la >= 0 THEN
 				(* draw the lines that intersect the clipping rectangle *)
 				FOR i := la TO lb DO
@@ -2660,11 +2699,11 @@ TYPE
 					CheckParagraphEnd(i, top);
 				END
 			END;
+
 			RenderAboveTextMarkers(canvas);
 			text.ReleaseRead;
 			canvas.RestoreState(cstate);
-			Draw^(canvas);
-		END Draw;
+		END DrawBackground;
 
 		PROCEDURE StoreLineEnter;
 		VAR pos, cl : LONGINT;
@@ -2800,13 +2839,20 @@ TYPE
 			END;
 			IF canStart & (2 IN keys) THEN openFile := TRUE; SetInterclick(InterclickCancelled); END;
 			IF keys * {0, 1, 2} = {0, 1, 2} THEN AbortStart END;
+
 			IF allowPiemenu.Get() & (keys * {0, 1, 2} = {2}) THEN
 				text.AcquireRead;
 				ViewToTextPos(x, y, pos);
 				cursor.SetPosition(pos);
 				text.ReleaseRead;
-				ShowContextMenu(x, y) END;
-			IF allowTextSelection.Get() & (keys * {0, 1, 2} = {0}) THEN
+				ShowContextMenu(x, y)
+			END;
+
+			IF allowTextSelection.Get() &
+			( (keys * {0, 1, 2} = {0})  (* left mouse for select *)
+			   OR (keys * {0, 1, 2} = {1}) & doubleclickedWord  (* remove selection when double clicking *)
+			   OR (keys * {0,1,2} = {2}) & (~allowPiemenu.Get())) (* right mouse for selection if pie menu is not enabled *)
+			THEN
 				AbortStart;
 				text.AcquireRead;
 				ViewToTextPos(x, y, pos);
@@ -3577,6 +3623,35 @@ TYPE
 
 		PROCEDURE FindCommandRange*(pos: LONGINT; VAR start, end, nofLastSelections : LONGINT);
 		VAR ch : LONGINT; string : ARRAY 23 OF CHAR; i : LONGINT; sDoCommands, lastWasTilde : BOOLEAN;
+			escapeString: ARRAY 32 OF LONGINT; escapePos: LONGINT; escape: BOOLEAN;
+
+			(* note: this simple algorithm can be emplyed if  the substring to be implicitly searched for does not contain its first character *)
+			PROCEDURE String(escape: BOOLEAN; CONST escapeString: ARRAY OF LONGINT);
+			VAR done: BOOLEAN; escapePos: LONGINT;
+			BEGIN
+				done := FALSE; escapePos := -1;
+				REPEAT
+					utilreader.ReadCh(ch);
+					IF ch = ORD('"') THEN
+						IF escape THEN
+							escapePos := 0;
+						ELSE
+							 done := TRUE
+						END;
+					ELSIF escapePos >= 0 THEN
+						IF escapeString[escapePos] = 0 THEN
+							IF ch =ORD("\") THEN done := TRUE
+							ELSE escapePos := -1
+							END;
+						ELSIF escapeString[escapePos] # ch THEN
+							escapePos := -1;
+						ELSE
+							INC(escapePos);
+						END;
+					END;
+				UNTIL done OR utilreader.eot;
+			END String;
+
 		BEGIN
 			nofLastSelections := 0;
 			text.AcquireRead;
@@ -3589,6 +3664,18 @@ TYPE
 			utilreader.SetDirection(1); utilreader.SetPosition(start);
 			REPEAT
 				utilreader.ReadCh(ch);
+
+				IF ch = ORD('"') THEN
+					escapeString[escapePos] := 0;
+					String(escape, escapeString);
+				ELSIF ch =ORD("\") THEN
+					escape := TRUE;
+					escapePos := 0;
+				ELSIF escape THEN
+					IF TextUtilities.IsWhiteSpace(ch,text.isUTF) THEN escape := FALSE
+					ELSE escapeString[escapePos] := ch; INC(escapePos);
+					END;
+				END;
 
 				(* check whether the command is SystemTools.DoCommands *)
 				IF (i < 22) THEN
@@ -3860,8 +3947,8 @@ TYPE
 				(* TODO: Can't set  := NIL, since its used by the button handlers *)
 			ELSE
 				NEW(popup);
-				str := "Copy "; Strings.Append(str, command^); popup.AddParButton(str, Copy, clickInfo);
-				str := "Paste "; Strings.Append(str, command^); popup.AddParButton(str, Paste, clickInfo);
+				str := "Start "; Strings.Append(str, command^); popup.AddParButton(str, Start, clickInfo);
+				str := "Open "; Strings.Append(str, command^); popup.AddParButton(str, Open, clickInfo);
 				Acquire; ToWMCoordinates(x, y, x, y); Release;
 				popup.Popup(x, y);
 			END
@@ -4051,7 +4138,7 @@ VAR
 
 	PTVIsMultiLine, PTVIsPassword, PTVShowBorder, PTValwaysShowCursor, PTVShowLabels : WMProperties.BooleanProperty;
 	PTVAllowCommandExecution, PTVAllowTextSelection, PTVAllowPiemenu : WMProperties.BooleanProperty;
-	PTVWrapMode, PTVMouseWheelScrollSpeed : WMProperties.Int32Property;
+	PTVWrapMode, PTVMouseWheelScrollSpeed, PVTtextAlignV : WMProperties.Int32Property;
 	PTVfirstLine, PTVleftShift, PTVPasswordChar : WMProperties.Int32Property;
 	PTVdefaultTextColor, PTVdefaultTextBgColor : WMProperties.ColorProperty;
 	PTVborders : WMProperties.RectangleProperty;
@@ -4151,10 +4238,10 @@ BEGIN
 	 PTVleftShift.Set(0);
 	NEW(PTVdefaultTextColor, NIL, Strings.NewString("defaultTextColor"),
 		Strings.NewString("the color of a text that does not explicitly specify a color"));
-	PTVdefaultTextColor.Set(0FFH);
+	PTVdefaultTextColor.Set(93A1A1FFH);
 	NEW(PTVdefaultTextBgColor, NIL, Strings.NewString("defaultTextBgColor"),
 		Strings.NewString("The color of a text background if not specified otherwise in the text"));
-	PTVdefaultTextBgColor.Set(0);
+	PTVdefaultTextBgColor.Set(586E75FFH);
 	NEW(PTVborders, NIL, Strings.NewString("borders"),
 		Strings.NewString("spaces from bounds of the component to the text"));
 	PTVborders.Set(WMRectangles.MakeRect(5, 5, 5, 5));
@@ -4170,7 +4257,23 @@ BEGIN
 	PTVHighlighting.Set(NIL);
 	NEW(PTVclBgCurrentLine, NIL, Strings.NewString("ClBgCurrentLine"), Strings.NewString("Background color of currently edited line"));
 	PTVclBgCurrentLine.Set(0);
+	NEW(PVTtextAlignV, NIL, Strings.NewString("TextAlignV"), Strings.NewString("vertical Text Alignment"));
+	PVTtextAlignV.Set(WMGraphics.AlignTop);
 END InitPrototypes;
+
+
+PROCEDURE EnablePiemenu*;
+BEGIN
+	PTVAllowPiemenu.Set( TRUE );
+	KernelLog.String( "Piemenu enabled" );  KernelLog.Ln
+END EnablePiemenu;
+
+PROCEDURE DisablePiemenu*;
+BEGIN
+	PTVAllowPiemenu.Set( FALSE );
+	KernelLog.String( "Piemenu disabled" );  KernelLog.Ln
+END DisablePiemenu;
+
 
 PROCEDURE TextViewFactory*() : XML.Element;
 VAR e : TextView;
