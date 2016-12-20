@@ -1,9 +1,9 @@
 <Desktop>
-	<Window name="PET" loader="PET.Restore" l="930" t="71" r="1724" b="1051" flags="{0..2,13}">
+	<Window name="PET" loader="PET.Restore" l="815" t="52" r="1608" b="1032" flags="{0..2,13}">
 		<PETData>
-			<General SelectedPageNr="0" ProjectTextFile=""/>
+			<General SelectedPageNr="6" ProjectTextFile=""/>
 			<Tab file="Spasim.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="9"/>
+				<Editor firstLine="0" cursorPos="471"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
@@ -31,7 +31,7 @@
 				<SidePanel visible="true" width="250" scratchHeight="10"/>
 			</Tab>
 			<Tab file="Retina.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="275"/>
+				<Editor firstLine="349" cursorPos="7906"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
@@ -41,6 +41,13 @@
 				<Editor firstLine="0" cursorPos="0"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="10"/>
+			</Tab>
+			<Tab file="Scratch.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="0"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="true" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="H" replaceString="h"/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="10"/>
 			</Tab>
