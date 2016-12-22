@@ -1,5 +1,4 @@
 
-
 realtime voxel raytracer
 
 download a) the appropriate tgz file and b) the file "install.UnixAos" from http://www.informatik.uni-bremen.de/~fld/UnixAos/rev.5500/ 
