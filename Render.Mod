@@ -285,7 +285,7 @@ BEGIN
 	RWcentery:=100+(H DIV 2);
      WM.LoadCursor("blankrecticle.png", 3,3, pi);
 	SetPointerInfo(pi);
-	mstarget:=30;
+	mstarget:=50;
 END openwincam;
 
 PROCEDURE uncapture;

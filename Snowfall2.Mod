@@ -5,7 +5,7 @@ IMPORT
 	WM := WMWindowManager, WMMessages, Out:=DebugLog;
 
 CONST
-	m = 300;
+	m = 100;
 	size = 3;
 
 
@@ -50,7 +50,7 @@ TYPE TCW* =  OBJECT(WM.BufferWindow)
 			manager := WM.GetDefaultManager();
 			manager.Add(100, 100, SELF, {WM.FlagFrame, WM.FlagClose, WM.FlagNoResizing});
 
-			SetTitle(Strings.NewString("Turing"));
+			SetTitle(Strings.NewString("Snowfall"));
 			SetIcon(WMGraphics.LoadImage("WMIcons.tar://Snowfall.png", TRUE));
 
 			NEW(random);

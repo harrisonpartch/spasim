@@ -322,7 +322,7 @@ BEGIN
        speckle:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7"); 
        push(speckle);
        
-       lobster:=Base.VoxelFromName("Ndiffuseblue"); 
+       lobster:=Base.VoxelFromName("Ndiffusered"); 
 	push(lobster);
 	tigerlily:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  
        push(tigerlily);
@@ -438,7 +438,7 @@ BEGIN
 	NEW(ball,center,0.5);  
 	serp.passable:=FALSE;   
 	conglomerate.copyonstroke:=TRUE;
-	noise.setvoxel(conglomerate);	
+	noise.setvoxel(lobster);	
 (*	z2a.FRaster(noise,32); 
 	z2a.setcolor(13,1,1,1,1); 
 *)	z3a.FRaster(noise,64); 

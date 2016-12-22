@@ -294,10 +294,16 @@ BEGIN
 	RETURN vox
 END thisvox;
 
+PROCEDURE P*;
+END P;
+
 BEGIN
-	r:=Base.VoxelFromName("N5a2g4M6HYjPJxYSNQvYyvw"); 	
+	r:=Base.VoxelFromName("Ndiffusered"); 	
 	b:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODh");
 	y:=Base.VoxelFromName("NUeconrGpx7plz7ym76ibLw");
 	NEW(vox,b,NIL,NIL);
 	vox.passable:=TRUE
-END Nrdvolvox. 
+END Nrdvolvox.
+
+
+ Nrdvolvox.P
