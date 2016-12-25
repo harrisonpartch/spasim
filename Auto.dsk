@@ -190,20 +190,6 @@
 			</Standard:Button>
 		</Standard:Panel>
 	</Window>
-	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="184" t="582" r="824" b="1002" flags="{0..2,13}"/>
-	<Window name="FileManager" loader="WMFileManager.Restore" l="354" t="796" r="854" b="1196" flags="{0..2,13}"/>
-	<Window name="PET" loader="PET.Restore" l="1016" t="119" r="1816" b="719" flags="{0..2,13}">
-		<PETData>
-			<General SelectedPageNr="0" ProjectTextFile=""/>
-			<Tab file="Nrdvolvox.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="290" cursorPos="7394"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="182" scratchHeight="10"/>
-			</Tab>
-		</PETData>
-	</Window>
 	<Window name="PET" loader="PET.Restore" l="921" t="227" r="1714" b="1207" flags="{0..2,13}">
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>

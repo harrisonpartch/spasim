@@ -285,7 +285,7 @@ BEGIN
 	RWcentery:=100+(H DIV 2);
      WM.LoadCursor("blankrecticle.png", 3,3, pi);
 	SetPointerInfo(pi);
-	mstarget:=50;
+	mstarget:=100;
 END openwincam;
 
 PROCEDURE uncapture;
@@ -437,7 +437,7 @@ END detail;
 	END RayWindow;
 
 VAR
-	rand: Random.Generator;
+rand: Random.Generator;
 	wcount: INTEGER;
 	frame, tickframe: LONGINT;
 	movierecording, movieplaying: BOOLEAN;
@@ -511,7 +511,7 @@ END cursorsizeminus;
 
 PROCEDURE Open* ;
 BEGIN
-	NEW(RW, Retina.W*4,Retina.H*4);
+	NEW(RW, Retina.W*2, Retina.H*2);
 	Base.STOPGO
 END Open;
 

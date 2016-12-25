@@ -8,12 +8,10 @@ TYPE
 CONST
 	T=5;        
 	TS=3*32;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=3;
-	TH=2;
+	TW=6;
+	TH=5;
 	W*=TS*TW;
 	H*=TS*TH;
-	w=2*W;
-	h=2*H;
 
 TYPE Camera= RECORD			(* solid angle *)
 	dtheta, dphi, theta, phi,rphi:REAL;
@@ -54,8 +52,8 @@ BEGIN
 			END;	
 			Base.clamp3(ray.r,ray.g,ray.b);
 			Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255)); 
-(*			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy); *)
-			Raster.Fill(image,cam.imx*4+i*4,cam.imy*4+j*4,cam.imx*4+i*4+4,cam.imy*4+j*4+4,pixel,copy);
+(*			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);*)
+			Raster.Fill(image,cam.imx*2+i*2,cam.imy*2+j*2,cam.imx*2+i*2+2,cam.imy*2+j*2+2,pixel,copy); 
 			phi:=phi+dphi;
 		END;
 		theta:=theta+dtheta;
@@ -80,7 +78,7 @@ BEGIN
 	END;
 	Base.clamp3(ray.r,ray.g,ray.b);
 	Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255)); 
-	Raster.Fill(image,cam.imx*4,cam.imy*4,cam.imx*4+12,cam.imy*4+12,pixel,copy);
+	Raster.Fill(image,cam.imx*2,cam.imy*2,cam.imx*2+6,cam.imy*2+6,pixel,copy);
 END tessa;
 
 PROCEDURE ztrace(cam: Camera; level: INTEGER);
@@ -367,15 +365,15 @@ BEGIN
 		AWAIT((tilesdone=TW*TH) OR FRAMEBOORT)
 	END;
 	Raster.SetRGB(pixel,255,255,255);
-	Raster.Put(image,w+2,h+2,pixel,copy);	
-	Raster.Put(image,w-2,h+2,pixel,copy);	
-	Raster.Put(image,w-2,h-2,pixel,copy);	
-	Raster.Put(image,w+2,h-2,pixel,copy);
+	Raster.Put(image,W+2,H+2,pixel,copy);	
+	Raster.Put(image,W-2,H+2,pixel,copy);	
+	Raster.Put(image,W-2,H-2,pixel,copy);	
+	Raster.Put(image,W+2,H-2,pixel,copy);
 	Raster.SetRGB(pixel,0,0,0);
-	Raster.Put(image,w+1,h+1,pixel,copy);	
-	Raster.Put(image,w-1,h+1,pixel,copy);	
-	Raster.Put(image,w-1,h-1,pixel,copy);	
-	Raster.Put(image,w+1,h-1,pixel,copy);			
+	Raster.Put(image,W+1,H+1,pixel,copy);	
+	Raster.Put(image,W-1,H+1,pixel,copy);	
+	Raster.Put(image,W-1,H-1,pixel,copy);	
+	Raster.Put(image,W+1,H-1,pixel,copy);			
 	Base.tick
 END go;
 
