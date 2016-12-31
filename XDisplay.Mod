@@ -31,6 +31,8 @@ TYPE
 				r, g, b: INTEGER
 			END;
 
+
+
 	Clip* = OBJECT
 		VAR
 			d: Display;  lx, ly, lw, lh: LONGINT;
@@ -670,7 +672,7 @@ VAR
 	END getDisplayName;
 
 	PROCEDURE OpenX11Display( ): X11.DisplayPtr;
-	VAR xdisp: X11.DisplayPtr;  screen, depth,i: LONGINT;
+	VAR xdisp: X11.DisplayPtr;  screen, depth: LONGINT;
 	BEGIN
 		getDisplayName;
 		xdisp := Api.OpenDisplay( dispname );
@@ -685,7 +687,8 @@ VAR
 		Trace.String( "X11 Display depth = " ); Trace.Int( depth, 1 ); Trace.Ln;
 		RETURN xdisp
 	END OpenX11Display;
-	
+
+
 	PROCEDURE CreateColors( d: Display );
 	VAR col: INTEGER;
 		visualInfo: X11.VisualInfo;  
@@ -854,7 +857,7 @@ VAR
 		disp.SetName( "XDisplay" );
 		disp.desc := "X11 display driver";
 		Displays.registry.Add( disp, res );
-		DISP:=disp;
+		DISP:=disp;		
 	END Install;
 
 BEGIN
