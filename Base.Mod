@@ -232,6 +232,9 @@ VAR
 	red*,green*,blue*,black*,alpha*: REAL;
 	colored*,frozen*,probelock*,copyonstroke*,copyonstrokerecursion*:BOOLEAN;
 	offset*:PT;
+	
+PROCEDURE r90z*;
+END r90z;
 
 PROCEDURE Shade*(VAR ray: Ray);
 END Shade;

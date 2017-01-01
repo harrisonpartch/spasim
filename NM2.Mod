@@ -22,61 +22,50 @@ TYPE PT = Base.PT;
  	NCube=Base.NCube;
  	LCube=Base.LightCube;
 
-TYPE WipeRecord=RECORD
-	c: cell;
-	restore: Voxel;
-	i,j,k: LONGINT
-END;
-
-TYPE WipeArray=POINTER TO ARRAY OF WipeRecord;
-
-TYPE Wiper=OBJECT(Base.V)
+PROCEDURE rot90z(VAR blx: ARRAY 2,2,2 OF Voxel);
 VAR
-	wipe: WipeArray;
-	i, count: LONGINT;
-	TIC:BOOLEAN;
-	tx: INTEGER;
-	
-PROCEDURE &New;
+	b: ARRAY 2,2,2 OF Voxel;
 BEGIN
-	NEW(wipe,8);
-	register
-END New;
+	b[1,0,0]:= blx[0,0,0];
+	b[1,1,0]:= blx[1,0,0];
+	b[0,1,0]:= blx[1,1,0];
+	b[0,0,0]:= blx[0,1,0];
+	b[1,0,1]:= blx[0,0,1];
+	b[1,1,1]:= blx[1,0,1];
+	b[0,1,1]:= blx[1,1,1];
+	b[0,0,1]:= blx[0,1,1];
+	blx:=b;
+END rot90z;
 
-PROCEDURE grow;
-VAR old: WipeArray;
-	i : LONGINT;
-BEGIN
-	old := wipe;
-	NEW(wipe, count*2);
-	FOR i := 0 TO LEN(old)-1 DO wipe[i] := old[i] END;
-	Out.String("NM2 wipe growing to ");
-	Out.Int(count*2,10);
-END grow;
-
-PROCEDURE add(c : cell; i,j,k: LONGINT; v: Voxel);
-BEGIN 
-	IF count >= LEN(wipe)-1 THEN grow END;
-	wipe[count].c := c;
-	wipe[count].restore := v;
-	wipe[count].i:= i;
-	wipe[count].j := j;
-	wipe[count].k:= k;		
-	INC(count)
-END add;
-
-PROCEDURE tick;
+PROCEDURE rot90zB(VAR blx: ARRAY 2,2,2 OF BOOLEAN);
 VAR
-	i: LONGINT;	
+	b: ARRAY 2,2,2 OF BOOLEAN;
 BEGIN
-	FOR i:=0 TO count-1 DO
-		IF  wipe[i].c#NIL THEN
-			wipe[i].c.blox[wipe[i].i,wipe[i].j,wipe[i].k]:=wipe[i].restore
-		END
-	END;
-END tick;
+	b[1,0,0]:= blx[0,0,0];
+	b[1,1,0]:= blx[1,0,0];
+	b[0,1,0]:= blx[1,1,0];
+	b[0,0,0]:= blx[0,1,0];
+	b[1,0,1]:= blx[0,0,1];
+	b[1,1,1]:= blx[1,0,1];
+	b[0,1,1]:= blx[1,1,1];
+	b[0,0,1]:= blx[0,1,1];
+	blx:=b;
+END rot90zB;
 
-END Wiper;
+PROCEDURE rot90zNC(VAR blx: ARRAY 2,2,2 OF NCube);
+VAR
+	b: ARRAY 2,2,2 OF NCube;
+BEGIN
+	b[1,0,0]:= blx[0,0,0];
+	b[1,1,0]:= blx[1,0,0];
+	b[0,1,0]:= blx[1,1,0];
+	b[0,0,0]:= blx[0,1,0];
+	b[1,0,1]:= blx[0,0,1];
+	b[1,1,1]:= blx[1,0,1];
+	b[0,1,1]:= blx[1,1,1];
+	b[0,0,1]:= blx[0,1,1];
+	blx:=b;
+END rot90zNC;
 
 TYPE cell* = OBJECT(Voxel);   
 VAR
@@ -86,6 +75,22 @@ VAR
 	nposterTF*:BOOLEAN;
 	nposter*: NCube;
 	light: Base.Light;
+	
+PROCEDURE r90z;
+VAR i,j,k: INTEGER;
+BEGIN
+	rot90z(blox);
+	rot90zB(nbloxTF);
+	rot90zNC(nblox);
+FOR i:=0 TO 1 DO
+	FOR j:=0 TO 1 DO
+		FOR k:=0 TO 1 DO	
+			IF blox[i,j,k]#NIL THEN blox[i,j,k].r90z END
+		END
+	END
+END
+	
+END r90z;
 
 PROCEDURE Shade (VAR ray: Ray);
 VAR
@@ -135,7 +140,7 @@ BEGIN
 			nshade(nblox[ijk.i,ijk.j,ijk.k],ray);	
 		END
 	END;	 
-	IF (ray.alpha<0.1) OR ( (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1))THEN ray.terminate:=TRUE END;	
+(*	IF (ray.alpha<0.1) OR ( (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1))THEN ray.terminate:=TRUE END;*)	
 	IF ~ray.terminate THEN
 		REPEAT
 			IF ray.di  THEN
@@ -592,7 +597,6 @@ BEGIN
 				IF blox[i,j,k].complex THEN
 					blox[i,j,k].strokephemeralrec(p, resolution,nextscale,voxel,vu)
 				ELSE
-					wiper.add(SELF,i,j,k,blox[i,j,k]);
 					NEW(c);
 					c.setcolor(red,green,blue,black,alpha);
 					c.fill(blox[i,j,k]);
@@ -602,7 +606,6 @@ BEGIN
 					c.strokerec(p, resolution,nextscale, path, voxel,vu);
 				END	
 			ELSE
-				wiper.add(SELF,i,j,k,NIL);
 				NEW(c);
 				c.setcolor(red,green,blue,black,alpha);
 				blox[i,j,k]:=c;
@@ -940,9 +943,6 @@ END sprout;
 
 END cell;
 
-VAR
-	wiper: Wiper;
-	
 PROCEDURE thisvox*():Voxel;
 VAR
 	v: cell;  
@@ -952,7 +952,7 @@ BEGIN
 END thisvox;
 
 BEGIN
-	NEW(wiper)
+
 END NM2.
 
 

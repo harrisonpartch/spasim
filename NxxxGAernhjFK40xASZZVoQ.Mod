@@ -11,6 +11,7 @@ VAR
 	gorge: Voxel;
 	v:Voxel;
 	up, center:  PT;
+	
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	RETURN gorge
@@ -22,7 +23,7 @@ BEGIN
 	Base.setPT(up,0,0,1);		
 	NEW(gorgeplane,center,up,"XNXL.gorge.png","XNXL.gorge.png");
 	gorgeplane.vox:= v;
-	gorge:=Base.VoxelFromName("NM2");
+	gorge:=Base.VoxelFromName("NRotatingM2");
 	gorge.FRaster(gorgeplane,64);
-	
+
 END NxxxGAernhjFK40xASZZVoQ. mv 

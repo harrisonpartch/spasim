@@ -25,7 +25,7 @@ BEGIN
 	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXXBiQ"); 	
 	Base.setPT(center,1/2,1/2,1/2);
 	NEW(ball,center,0.5);
-	ball.setcolor(0.9, 0.7,0.7);
+	ball.setcolor(0.9, 0.7,0.7,0.0);
 	ball.setvoxel(sky); 
 	z3.FRaster(ball,81);
 	NEW(noise);		

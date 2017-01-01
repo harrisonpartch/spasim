@@ -304,8 +304,8 @@ VAR
 	c: CHAR;
 BEGIN
 	CASE ucs OF
-		   27: uncapture;
-		| 164: uncapture; Close
+		   27: uncapture
+		| 164: uncapture; Close; Base.worldalive:=FALSE
 		| 193: INC(mstarget);  INC(mstarget);  INC(mstarget);  INC(mstarget); 
 		| 194: DEC(mstarget); DEC(mstarget); DEC(mstarget); DEC(mstarget); 
 		| 195: camera.left(0.03)

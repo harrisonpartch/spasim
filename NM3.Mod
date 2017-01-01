@@ -22,62 +22,6 @@ TYPE PT = Base.PT;
  	NCube=Base.NCube;
  	LCube=Base.LightCube;
 
-TYPE WipeRecord=RECORD
-	c: cell;
-	restore: Voxel;
-	i,j,k: LONGINT
-END;
-
-TYPE WipeArray=POINTER TO ARRAY OF WipeRecord;
-
-TYPE Wiper=OBJECT(Base.V)
-VAR
-	wipe: WipeArray;
-	i, count: LONGINT;
-	TIC:BOOLEAN;
-	tx: INTEGER;
-	
-PROCEDURE &New;
-BEGIN
-	NEW(wipe,8);
-	register
-END New;
-
-PROCEDURE grow;
-VAR old: WipeArray;
-	i : LONGINT;
-BEGIN
-	old := wipe;
-	NEW(wipe, count*2);
-	FOR i := 0 TO LEN(old)-1 DO wipe[i] := old[i] END;
-	Out.String("NM2 wipe growing to ");
-	Out.Int(count*2,10);
-END grow;
-
-PROCEDURE add(c : cell; i,j,k: LONGINT; v: Voxel);
-BEGIN 
-	IF count >= LEN(wipe)-1 THEN grow END;
-	wipe[count].c := c;
-	wipe[count].restore := v;
-	wipe[count].i:= i;
-	wipe[count].j := j;
-	wipe[count].k:= k;		
-	INC(count)
-END add;
-
-PROCEDURE tick;
-VAR
-	i: LONGINT;	
-BEGIN
-	FOR i:=0 TO count-1 DO
-		IF  wipe[i].c#NIL THEN
-			wipe[i].c.blox[wipe[i].i,wipe[i].j,wipe[i].k]:=wipe[i].restore
-		END
-	END;
-END tick;
-
-END Wiper;
-
 TYPE cell* = OBJECT(Voxel);   
 VAR
 	blox*: ARRAY M,M,M OF Voxel;
@@ -592,7 +536,6 @@ BEGIN
 				IF blox[i,j,k].complex THEN
 					blox[i,j,k].strokephemeralrec(p, resolution,nextscale,voxel,vu)
 				ELSE
-					wiper.add(SELF,i,j,k,blox[i,j,k]);
 					NEW(c);
 					c.setcolor(red,green,blue,black,alpha);
 					c.fill(blox[i,j,k]);
@@ -602,7 +545,6 @@ BEGIN
 					c.strokerec(p, resolution,nextscale, path, voxel,vu);
 				END	
 			ELSE
-				wiper.add(SELF,i,j,k,NIL);
 				NEW(c);
 				c.setcolor(red,green,blue,black,alpha);
 				blox[i,j,k]:=c;
@@ -940,8 +882,6 @@ END sprout;
 
 END cell;
 
-VAR
-	wiper: Wiper;
 	
 PROCEDURE thisvox*():Voxel;
 VAR
@@ -952,7 +892,6 @@ BEGIN
 END thisvox;
 
 BEGIN
-	NEW(wiper)
 END NM3.
 
 

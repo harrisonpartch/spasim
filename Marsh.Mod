@@ -439,11 +439,11 @@ BEGIN
 	serp.passable:=FALSE;   
 	conglomerate.copyonstroke:=TRUE;
 	noise.setvoxel(lobster);	
-(*	z2a.FRaster(noise,32); 
+	z2a.FRaster(noise,32); 
 	z2a.setcolor(13,1,1,1,1); 
-*)	z3a.FRaster(noise,64); 
+(*	z3a.FRaster(noise,64); 
 	z3a.setcolor(0,0,6,6,6);
-  	Base.world:=z3a; 	
+*)  	Base.world:=z2a; 	
 	Base.avatar:=harrison;
 	Base.avatarsize:=1000; 
 END dawn;
