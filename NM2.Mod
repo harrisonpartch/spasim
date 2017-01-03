@@ -96,21 +96,16 @@ VAR
 	pushxyz, newxyz, xyz: Base.PT;
 	ijk: Base.IPT;
 	drx, dry, drz, dr,rr,gr,br,blr,bla: REAL;
-	scaleInv:REAL; 
 	out,shadenil,A,B,C: BOOLEAN;
 	v: Voxel;
 	vdepth, blainv: REAL;
 	last:BOOLEAN;
-	dtl,rdtl: REAL;
 BEGIN
 	ray.scale := ray.scale*M;
-	scaleInv := 1/ray.scale;
 	xyz.x := ABS(ray.lxyz.x-offset.x) * M;  
 	xyz.y := ABS(ray.lxyz.y-offset.y) * M;		
 	xyz.z := ABS(ray.lxyz.z-offset.z)* M;	
 	pushxyz:=xyz;
-	rdtl:=ray.dtl;
-	IF DTL>0 THEN ray.dtl:=DTL END; 
 	IF (ray.length*ray.scale>ray.dtl) THEN
 		IF imposter#NIL THEN
 			imposter.Shade(ray)
@@ -125,7 +120,6 @@ BEGIN
 	IF ~out THEN
 		v:= blox[ijk.i,ijk.j,ijk.k];
 		IF (v#NIL) THEN
-			ray.inside:=TRUE;
 			ray.lxyz.x := ABS(xyz.x - ijk.i);  
 			ray.lxyz.y := ABS(xyz.y - ijk.j);
 			ray.lxyz.z := ABS(xyz.z - ijk.k);
@@ -134,12 +128,10 @@ BEGIN
 			xyz.x := xyz.x + ray.popdelta.x;    
 			xyz.y := xyz.y + ray.popdelta.y;
 			xyz.z := xyz.z + ray.popdelta.z;
-			ray.inside:=FALSE
 		ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 			nshade(nblox[ijk.i,ijk.j,ijk.k],ray);	
 		END
 	END;	 
-(*	IF (ray.alpha<0.1) OR ( (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1))THEN ray.terminate:=TRUE END;*)	
 	IF ~ray.terminate THEN
 		REPEAT
 			IF ray.di  THEN
@@ -198,31 +190,16 @@ BEGIN
 					ray.face := 5; ray.fnormal:= Base.Face[5]
 				END;
 				newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
-			END;
-			bounds(ijk.i,ijk.j,ijk.k, out);	
-			IF ~out THEN
-				v := blox[ijk.i,ijk.j,ijk.k];  (*moved up here for cache latency --stupid idea*)
-			END;
-			vdepth:=Base.distance(newxyz,xyz)*scaleInv;
-			ray.xyz.x:=ray.xyz.x +((newxyz.x-xyz.x)+ray.ddxyz.x)*scaleInv;
-			ray.xyz.y:=ray.xyz.y +((newxyz.y-xyz.y)+ray.ddxyz.y)*scaleInv;			
-			ray.xyz.z:=ray.xyz.z +((newxyz.z-xyz.z)+ray.ddxyz.z)*scaleInv;			
+			END;	
+			vdepth:=Base.distance(newxyz,xyz)/ray.scale; 
+			ray.xyz.x:=ray.xyz.x +((newxyz.x-xyz.x)+ray.ddxyz.x)/ray.scale;
+			ray.xyz.y:=ray.xyz.y +((newxyz.y-xyz.y)+ray.ddxyz.y)/ray.scale;			
+			ray.xyz.z:=ray.xyz.z +((newxyz.z-xyz.z)+ray.ddxyz.z)/ray.scale;			
 			xyz:=newxyz;
 			ray.length:=ray.length+vdepth;
-			blr:=black*vdepth;
-			ray.bla := ray.bla-blr; 
-			blainv:=1-ray.bla;
-(*			rr := red*vdepth*ray.ra*blainv; 
-			gr := green*vdepth*ray.ga*blainv; 
-			br := blue*vdepth*ray.ba*blainv; 	 	
-			ray.r := ray.r+rr;
-			ray.g:= ray.g+gr;
-			ray.b := ray.b+br; 
-			ray.ra := (ray.ra-rr)-blr;
-			ray.ga := (ray.ga-gr)-blr;
-			ray.ba := (ray.ba-br)-blr; 
-			ray.alpha:=ray.alpha-black*vdepth;		
-*)			IF ~out THEN
+			bounds(ijk.i,ijk.j,ijk.k, out);
+			IF ~out THEN
+				v := blox[ijk.i,ijk.j,ijk.k]; 
 				IF (v#NIL) THEN
 					ray.lxyz.x := ABS(xyz.x - ijk.i);  
 					ray.lxyz.y := ABS(xyz.y - ijk.j);
@@ -249,7 +226,6 @@ BEGIN
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
 	ray.popdelta.y := (xyz.y-pushxyz.y)/M;
 	ray.popdelta.z := (xyz.z-pushxyz.z)/M; 
-	ray.dtl:=rdtl;
 	ray.scale := ray.scale/M;
 END Shade;
 

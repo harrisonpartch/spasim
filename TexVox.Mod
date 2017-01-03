@@ -263,7 +263,7 @@ IF ray.length>0.00000001 THEN
 				ray.alpha:= ray.alpha-((dr+dg+db)/3+0.1);										
 			END			
 	ELSE
-		mip:=ray.length*ray.scale/10;
+		mip:=ray.length*ray.scale/12;
 		IF mip>3 THEN 	
 			color:=texcube.side[ray.face].pixelmip0(lx,ly);
 		ELSIF mip>1 THEN
@@ -271,14 +271,10 @@ IF ray.length>0.00000001 THEN
 		ELSE
 			color:=texcube.side[ray.face].pixel(lx,ly);		
 		END; 	
-		dot1:= ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z); 
-		dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-		mix:= (ray.length*ray.scale)/10;
-		IF mix>1 THEN mix:=1 END;
-		dot:=(dot2*mix+dot1*(1-mix));
-		dr:=color.red*dot*color.alpha;
-		dg:=color.green*dot*color.alpha;
-		db:=color.blue*dot*color.alpha;	
+		dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
+		dr:=color.red*dot;
+		dg:=color.green*dot;
+		db:=color.blue*dot;	
 		ray.r := ray.r + dr;
 		ray.g := ray.g + dg;
 		ray.b := ray.b + db;	
