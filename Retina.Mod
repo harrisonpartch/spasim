@@ -6,10 +6,10 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=5;        
-	TS=3*32;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=5;
-	TH=4;
+	T=6;        
+	TS=2*64;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
+	TW=6;
+	TH=5;
 	W*=TS*TW;
 	H*=TS*TH;
 
@@ -28,7 +28,7 @@ BEGIN{EXCLUSIVE}
      GO:=TRUE
 END go;
 
-PROCEDURE tessad3(cam: Camera);
+PROCEDURE tessad2(cam: Camera);
 VAR
 	i,j: LONGINT;
 	theta,phi,dtheta,dphi: REAL;
@@ -36,31 +36,28 @@ VAR
 	pixel: Raster.Pixel;
 BEGIN
 	theta:=cam.theta;
-	dtheta:=cam.dtheta/3;
-	dphi:=cam.dphi/3;
-	FOR i:= 0 TO 2 DO
+	dtheta:=cam.dtheta/2;
+	dphi:=cam.dphi/2;
+	FOR i:= 0 TO 1 DO
 		phi:=cam.phi;
-		FOR j :=  0 TO 2 DO 
+		FOR j :=  0 TO 1 DO 
 			ray:=Base.blankray;
 			ray.dtl:=10;
 			angletoray(ray,theta,phi);
 			Base.world.Shade(ray);
-			frameasteps:=frameasteps+ray.asteps;
-			framebsteps:=framebsteps+ray.bsteps;
 			IF ~ray.terminate THEN
 				ray.b:= ray.b + ray.ba;
 				ray.r:= ray.r + ray.ra/2;
 				ray.g:= ray.g + ray.ga/2;	
 			END;	
-			Base.clamp3(ray.r,ray.g,ray.b);
+(*			Base.clamp3(ray.r,ray.g,ray.b); *)
 			Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255)); 
-(*			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);*)
-			Raster.Fill(image,cam.imx*2+i*2,cam.imy*2+j*2,cam.imx*2+i*2+2,cam.imy*2+j*2+2,pixel,copy); 
+			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
 			phi:=phi+dphi;
 		END;
 		theta:=theta+dtheta;
 	END;
-END tessad3;
+END tessad2;
 
 PROCEDURE tessa(cam: Camera);
 VAR
@@ -73,16 +70,14 @@ BEGIN
 	ray.dtl:=3;
 	angletoray(ray,cam.theta+cam.dtheta/2,cam.phi+cam.dphi/2);
 	Base.world.Shade(ray);
-	frameasteps:=frameasteps+ray.asteps;
-	framebsteps:=framebsteps+ray.bsteps;
 	IF ~ray.terminate THEN
 			ray.b:= ray.b + ray.ba;
 			ray.r:= ray.r + ray.ra/2;
 			ray.g:= ray.g + ray.ga/2;	
 	END;
-	Base.clamp3(ray.r,ray.g,ray.b);
+(*	Base.clamp3(ray.r,ray.g,ray.b); *)
 	Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255)); 
-	Raster.Fill(image,cam.imx*2,cam.imy*2,cam.imx*2+6,cam.imy*2+6,pixel,copy);
+	Raster.Fill(image,cam.imx,cam.imy,cam.imx+2,cam.imy+2,pixel,copy);	
 END tessa;
 
 PROCEDURE ztrace(cam: Camera; level: INTEGER);
@@ -96,28 +91,28 @@ BEGIN
 			x:=a.imx - W/2;
 			y:=a.imy-H/2;		
 			IF (~saccade)&((x*x+y*y)<FV) THEN	
-				tessad3(a); 
+				tessad2(a); 
 			ELSE
 				tessa(a); 
 			END;
 			x:=b.imx - W/2;
 			y:=b.imy-H/2;		
 			IF (~saccade)&((x*x+y*y)<FV) THEN	
-				tessad3(b); 
+				tessad2(b); 
 			ELSE
 				tessa(b); 			
 			END;			
 			x:=c.imx - W/2;
 			y:=c.imy-H/2;		
 			IF (~saccade)&((x*x+y*y)<FV) THEN		
-				tessad3(c); 
+				tessad2(c); 
 			ELSE
 				tessa(c); 
 			END;
 			x:=d.imx - W/2;
 			y:=d.imy-H/2;		
 			IF (~saccade)&((x*x+y*y)<FV) THEN	
-				tessad3(d); 
+				tessad2(d); 
 			ELSE
 				tessa(d); 
 			END; 
@@ -138,10 +133,10 @@ VAR
 BEGIN
 	splitcam(cam,a,b,c,d);
 	IF level<2 THEN
-			tessad3(a); 
-			tessad3(b); 
-			tessad3(c); 
-			tessad3(d); 
+			tessad2(a); 
+			tessad2(b); 
+			tessad2(c); 
+			tessad2(d); 
 	ELSE
 		l:=level-1;
 		ztraced(a,l);
@@ -295,7 +290,7 @@ END splitcam;
 
 PROCEDURE lessdetail*;
 BEGIN
-	IF foveaparameter<50 THEN foveaparameter:=foveaparameter+1  END;
+	IF foveaparameter<100 THEN foveaparameter:=foveaparameter+1  END;
 	FV:=W*W/foveaparameter;
 END lessdetail;
 

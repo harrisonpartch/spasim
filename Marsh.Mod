@@ -313,9 +313,9 @@ BEGIN
 	push(reddot);
 	msphere:=Base.VoxelFromName("NBsHFiBKkSckXBAd46Zbsss"); 	
 	 push(msphere);	
- 	volvox:=Base.VoxelFromName("Nrdvolvox");  	
+(* 	volvox:=Base.VoxelFromName("Nrdvolvox");  	
       push(volvox);
-       rdpseudosolid:=Base.VoxelFromName("Nrdpseudosolid"); 
+*)       rdpseudosolid:=Base.VoxelFromName("Nrdpseudosolid"); 
        push(rdpseudosolid);
 	beatrix:=Base.VoxelFromName("NwPicBWw4NfcserX4ELaQ3b"); 
 	acidcats:=Base.VoxelFromName("Nacidcats"); 

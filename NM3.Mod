@@ -103,7 +103,6 @@ VAR
 	last:BOOLEAN;
 	dtl,rdtl: REAL;
 BEGIN
-	INC(ray.bsteps);
 	ray.scale := ray.scale*M;
 	scaleInv := 1/ray.scale;
 	xyz.x := ABS(ray.lxyz.x-offset.x) * M;  
@@ -143,7 +142,6 @@ BEGIN
 (*	IF (ray.alpha<0.1) OR ( (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1))THEN ray.terminate:=TRUE END;*)	
 	IF ~ray.terminate THEN
 		REPEAT
-			INC(ray.asteps);
 			IF ray.di  THEN
 				drx := ( (ijk.i + 1) - xyz.x) / ray.dxyz.x
 			ELSE
@@ -214,7 +212,7 @@ BEGIN
 			blr:=black*vdepth;
 			ray.bla := ray.bla-blr; 
 			blainv:=1-ray.bla;
-			rr := red*vdepth*ray.ra*blainv; 
+(*			rr := red*vdepth*ray.ra*blainv; 
 			gr := green*vdepth*ray.ga*blainv; 
 			br := blue*vdepth*ray.ba*blainv; 	 	
 			ray.r := ray.r+rr;
@@ -224,7 +222,7 @@ BEGIN
 			ray.ga := (ray.ga-gr)-blr;
 			ray.ba := (ray.ba-br)-blr; 
 			ray.alpha:=ray.alpha-black*vdepth;		
-			IF ~out THEN
+*)			IF ~out THEN
 				IF (v#NIL) THEN
 					ray.lxyz.x := ABS(xyz.x - ijk.i);  
 					ray.lxyz.y := ABS(xyz.y - ijk.j);

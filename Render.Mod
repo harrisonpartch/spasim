@@ -285,7 +285,7 @@ BEGIN
 	RWcentery:=100+(H DIV 2);
      WM.LoadCursor("blankrecticle.png", 3,3, pi);
 	SetPointerInfo(pi);
-	mstarget:=50;
+	mstarget:=60;
 END openwincam;
 
 PROCEDURE uncapture;
@@ -393,7 +393,7 @@ PROCEDURE detail();
 		ELSE	
 			Retina.saccade:=FALSE;
 			IF framedt < mstarget THEN
-				timer.Sleep(mstarget-framedt); 
+				timer.Sleep(mstarget-framedt - 10); 
 				Retina.moredetail;
 			ELSIF framedt > (mstarget+10) THEN
 				Retina.lessdetail;
@@ -512,7 +512,7 @@ END cursorsizeminus;
 
 PROCEDURE Open* ;
 BEGIN
-	NEW(RW, Retina.W*2, Retina.H*2);
+	NEW(RW, Retina.W, Retina.H);
 	Base.STOPGO
 END Open;
 
