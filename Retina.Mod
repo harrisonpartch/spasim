@@ -50,6 +50,7 @@ BEGIN
 				ray.clr.r:= ray.clr.r + ray.clr.ra/2;
 				ray.clr.g:= ray.clr.g + ray.clr.ga/2;	
 			END;	
+
 			Raster.SetRGB(pixel,ENTIER(ray.clr.r*255),ENTIER(ray.clr.g*255),ENTIER(ray.clr.b*255)); 
 			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
 			phi:=phi+dphi;

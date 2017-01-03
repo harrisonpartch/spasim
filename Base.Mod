@@ -6,6 +6,9 @@ Strings, Streams, CryptoMD5, WMFontManager, Raster, WMRasterScale, WMRectangles,
 CONST
 	patchsize*=2; 
 	NL*=24;
+	MIP0=8;
+	MIP1=64;
+	MIP2=256;
 
 TYPE Name*=ARRAY NL OF CHAR;
 
@@ -73,7 +76,7 @@ END V;
 
 TYPE Texture*=OBJECT(V)
 VAR
-	img,mip0,mip1: Raster.Image;
+	img,mip0,mip1,mip2: Raster.Image;
 	W*,H*, bpr,adr: LONGINT;
 	transparent*: BOOLEAN;
 
@@ -88,27 +91,20 @@ BEGIN
 	END;
 	NEW(mip0);
 	NEW(mip1);	
-	Raster.Create(mip0,8,8,Raster.BGRA8888);
-	Raster.Create(mip1,64,64,Raster.BGRA8888);		
+	NEW(mip2);
+	Raster.Create(mip0,MIP0,MIP0,Raster.BGRA8888);
+	Raster.Create(mip1,MIP1,MIP1,Raster.BGRA8888);		
+	Raster.Create(mip2,MIP2,MIP2,Raster.BGRA8888);		
 	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height),mip0,
 		WMRectangles.MakeRect(0,0, mip0.width, mip0.height),WMRectangles.MakeRect(0,0,mip0.width, mip0.height),
 			WMRasterScale.ModeCopy, WMRasterScale.ScaleBilinear);
 	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height),mip1,
 		WMRectangles.MakeRect(0,0, mip1.width, mip1.height),
 			WMRectangles.MakeRect(0,0, mip1.width, mip1.height),WMRasterScale.ModeSrcOverDst, WMRasterScale.ScaleBilinear);	
+	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height),mip2,
+		WMRectangles.MakeRect(0,0, mip2.width, mip2.height),
+			WMRectangles.MakeRect(0,0, mip2.width, mip2.height),WMRasterScale.ModeSrcOverDst, WMRasterScale.ScaleBilinear);	
 END init;
-
-PROCEDURE pixel*(x,y:REAL):Color;
-VAR
-	i,j: LONGINT;
-	p: Raster.Pixel;
-	c: Color;
-BEGIN
-	i:=ENTIER(x*img.width) MOD img.width; j:=ENTIER(y*img.height) MOD img.height;	
-	Raster.Get(img,i,j,p,copy);
-	c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
-	RETURN c
-END pixel;
 
 PROCEDURE pixelmip0*(x,y:REAL):Color;
 VAR
@@ -116,10 +112,12 @@ VAR
 	p: Raster.Pixel;
 	c: Color;
 BEGIN
-	i:=ENTIER(x*mip0.width) MOD mip0.width; j:=ENTIER(y*mip0.height) MOD mip0.height;	
+(*	i:= ENTIER(x*Mip0);
+	j:=ENTIER(y*Mip0);
+	i:=i MOD Mip0; j:=j MOD Mip0;	
 	Raster.Get(mip0,i,j,p,copy);
 	c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
-	RETURN c
+*)	RETURN c
 END pixelmip0;
 
 PROCEDURE pixelmip1*(x,y:REAL):Color;
@@ -128,11 +126,26 @@ VAR
 	p: Raster.Pixel;
 	c: Color;
 BEGIN
-	i:=ENTIER(x*mip1.width) MOD mip1.width; j:=ENTIER(y*mip1.height) MOD mip1.height;	
+	i:= ENTIER(x*MIP1);
+	j:=ENTIER(y*MIP1);
+	i:=i MOD MIP1; j:=j MOD MIP1;	
 	Raster.Get(mip1,i,j,p,copy);
 	c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
 	RETURN c
 END pixelmip1;
+
+PROCEDURE pixelmip2*(x,y:REAL):Color;
+VAR
+	i,j: LONGINT;
+	p: Raster.Pixel;
+	c: Color;
+BEGIN
+(*	i:= ENTIER(x*MIP2) MOD MIP2;
+	j:=ENTIER(y*MIP2) MOD MIP2;
+	Raster.Get(mip2,i,j,p,copy); 
+	c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
+*)	RETURN c
+END pixelmip2;
 
 PROCEDURE pixelT*(x,y:REAL; T: LONGINT):Color;
 VAR
@@ -190,8 +203,7 @@ TYPE Ray* = RECORD
 	theta*,phi*, dtheta*,dphi*: REAL;
 (*	r*, g*, b*, ra*, ga*, ba*, bla*,alpha*: REAL; *)
 	clr*: ray_color;
-	patchTF*: BOOLEAN;
-	patch*: ARRAY patchsize, patchsize OF ray_color; (* a: 1x1 b: 2x2 etc *)
+	mirrors*: INTEGER;
 	texcube*:TexCube;
 	texcubeTF*:BOOLEAN;
 	ncube*: NCube;
@@ -218,11 +230,12 @@ TYPE Ray* = RECORD
 END;
 
 TYPE pRay2*=RECORD(Ray)
-	patch*: ARRAY 2,2 OF Colr; (* alpha not needed *)
+	patch*: ARRAY 2,2 OF ray_color; (* alpha not needed *)
 END;
 
 TYPE pRay3*=RECORD(Ray)
-	patch*: ARRAY 3,3 OF Colr; (* alpha not needed *)
+	patchTF*: BOOLEAN;
+	patch*: ARRAY 3,3 OF ray_color; (* alpha not needed *)
 END;
 
 TYPE Path*=ARRAY 20 OF ARRAY 3 OF INTEGER;
@@ -520,6 +533,7 @@ VAR
 	fuzzon*, STOP*: BOOLEAN;
 	singleray*: Ray;	(* for when a single ray is most convenient *)
 	blankray*: Ray;
+	blankpray3*: pRay3;
 	Face*: ARRAY 6 OF PT;
 	EMPTY*,OPAQUE*: Voxel;
 	deathflag*:BOOLEAN;
@@ -1195,6 +1209,12 @@ BEGIN
 	blankray.scale := 1; 
 	blankray.tscale:=1;
 	blankray.dtl:=10;	
+	blankpray3.clr.ra := 1;
+	blankpray3.clr.ga := 1;
+	blankpray3.clr.ba := 1;
+	blankpray3.scale := 1; 
+	blankpray3.tscale:=1;
+	blankpray3.dtl:=1;
 	Face[0].x := -1; Face[0].y := 0; Face[0].z := 0; 
 	Face[3].x := 1; Face[3].y := 0; Face[3].z := 0; 
 	Face[1].x := 0; Face[1].y := 1; Face[1].z := 0; 
