@@ -141,7 +141,7 @@ PROCEDURE stroke(p:PT; resolution:LONGINT; voxel,vundo:Voxel);
 BEGIN
 	A:=B;
 	B:=p;
-	Base.world.stroke(p,resolution, pth, voxel,vundo);
+	Base.world.stroke(p,resolution, voxel);
 	IF lines THEN line END
 END stroke;
 
@@ -201,7 +201,7 @@ VAR
 	v: Voxel;
 	d:REAL;
 BEGIN
-	Base.world.stroke(Base.cameraPT,729, pth, cursormark,voxundo); 	
+	Base.world.stroke(Base.cameraPT,729, cursormark); 	
 END drawHUD;
 
 PROCEDURE push*(v: Voxel);
@@ -435,12 +435,15 @@ BEGIN
 	plane.vox:=badopossum;	
 	z3a.FRaster(plane,16); 
 	Base.setPT(center,1/2,1/2,1/2);
-	NEW(ball,center,0.5);  
+	NEW(ball,center,0.6);  
 	serp.passable:=FALSE;   
 	conglomerate.copyonstroke:=TRUE;
 	noise.setvoxel(lobster);	
+	ball.setvoxel(sfish);
+
+	z2a.FRaster(ball,32); 	
 	z2a.FRaster(noise,32); 
-	z2a.setcolor(13,1,1,1,1); 
+	z2a.setcolor(2,2,2,2,2); 
 (*	z3a.FRaster(noise,64); 
 	z3a.setcolor(0,0,6,6,6);
 *)  	Base.world:=z2a; 	

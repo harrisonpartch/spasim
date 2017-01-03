@@ -285,7 +285,7 @@ BEGIN
 	RWcentery:=100+(H DIV 2);
      WM.LoadCursor("blankrecticle.png", 3,3, pi);
 	SetPointerInfo(pi);
-	mstarget:=100;
+	mstarget:=50;
 END openwincam;
 
 PROCEDURE uncapture;
@@ -331,6 +331,7 @@ BEGIN
 			| "4" : Base.gravity:= 1.5*Base.gravity
 			| "5" : Base.STOPGO
 			| "6" : avaTF:=~avaTF
+			| "?" : Out.Int(Base.world.count(7),4); Out.Ln
 			| "h" : camera.hop
 			| "]": camera.aperture.width := camera.aperture.width * 101/99; camera.aperture.height := camera.aperture.height *101/99;
 				(*    Out.String("] pressed"); Out.Ln; *)
@@ -392,7 +393,7 @@ PROCEDURE detail();
 		ELSE	
 			Retina.saccade:=FALSE;
 			IF framedt < mstarget THEN
-				(* timer.Sleep(mstarget-framedt); *)
+				timer.Sleep(mstarget-framedt); 
 				Retina.moredetail;
 			ELSIF framedt > (mstarget+10) THEN
 				Retina.lessdetail;

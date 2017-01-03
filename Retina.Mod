@@ -8,8 +8,8 @@ TYPE
 CONST
 	T=5;        
 	TS=3*32;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=4;
-	TH=3;
+	TW=5;
+	TH=4;
 	W*=TS*TW;
 	H*=TS*TH;
 
@@ -45,6 +45,8 @@ BEGIN
 			ray.dtl:=10;
 			angletoray(ray,theta,phi);
 			Base.world.Shade(ray);
+			frameasteps:=frameasteps+ray.asteps;
+			framebsteps:=framebsteps+ray.bsteps;
 			IF ~ray.terminate THEN
 				ray.b:= ray.b + ray.ba;
 				ray.r:= ray.r + ray.ra/2;
@@ -71,6 +73,8 @@ BEGIN
 	ray.dtl:=3;
 	angletoray(ray,cam.theta+cam.dtheta/2,cam.phi+cam.dphi/2);
 	Base.world.Shade(ray);
+	frameasteps:=frameasteps+ray.asteps;
+	framebsteps:=framebsteps+ray.bsteps;
 	IF ~ray.terminate THEN
 			ray.b:= ray.b + ray.ba;
 			ray.r:= ray.r + ray.ra/2;
@@ -188,6 +192,7 @@ END antimalice;
 *)
 VAR
 	tile: ARRAY TW,TH OF Tile;
+	frameasteps*,framebsteps*:LONGINT;
 	a,b: LONGINT;
 	tilesdone:INTEGER;
 	EDGE*: REAL;
@@ -333,6 +338,8 @@ VAR
 	pixel: Raster.Pixel;
 BEGIN
 	zeroTD;
+	frameasteps:=0;
+	framebsteps:=0;
 	dtheta:=apw/TW;
 	dphi:=aph/TH;
 	ctheta:=-apw/2;	
@@ -374,7 +381,12 @@ BEGIN
 	Raster.Put(image,W-1,H+1,pixel,copy);	
 	Raster.Put(image,W-1,H-1,pixel,copy);	
 	Raster.Put(image,W+1,H-1,pixel,copy);			
-	Base.tick
+	Base.tick;
+(*	Out.Int(frameasteps,7);
+	Out.String(" <-a b-> ");
+	Out.Int(framebsteps,7);	
+	Out.Ln;
+*)	
 END go;
 
 PROCEDURE lsu*;

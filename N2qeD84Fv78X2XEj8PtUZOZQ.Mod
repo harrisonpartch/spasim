@@ -43,9 +43,9 @@ BEGIN
 	star.imposter:=conglomerate;
 	FOR i := 0  TO 10 DO
 		q:=Base.randPT();
-		star.stroke(q,3,conglomerate,vundo);
+		star.stroke(q,3,conglomerate);
 		q:=Base.randPT();
-		star.stroke(q,3,sc,vundo);	
+		star.stroke(q,3,sc);	
 	END;
 	star.setcolor(0,0,0,10,0);
 	star.copyonstroke:=TRUE;

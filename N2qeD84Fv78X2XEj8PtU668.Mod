@@ -28,7 +28,7 @@ BEGIN
 	dot.DTL:=1000;
 	FOR i:=0 TO 1000 DO
 		p1:=Base.randPT();
-		dot.stroke(p1,32,bludot,v);
+		dot.stroke(p1,32,bludot);
 	END;
 	dot.copyonstroke:=TRUE;	
 END draw;

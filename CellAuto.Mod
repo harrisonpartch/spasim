@@ -59,7 +59,7 @@ BEGIN
 	RETURN(FALSE);
 END passprobe;
 
-PROCEDURE stroke*(p:PT; resolution: LONGINT; VAR path: Path; voxel,voxundo:Voxel);
+PROCEDURE stroke*(p:PT; resolution: LONGINT; voxel:Voxel);
 BEGIN
 	fire
 END stroke;
@@ -119,11 +119,10 @@ BEGIN
 		center.z:=center.z-delta;
 		g.set(center,Base.avatarsize);
 		g.burning2:=TRUE;
-		Base.world.stroke(center,Base.avatarsize, path, g,v);
+		Base.world.stroke(center,Base.avatarsize, g);
 	END
 END anonyhook;
 END GroVox;
-
 
 TYPE GateFuseVox*=OBJECT(FuseVox)
 PROCEDURE step;	

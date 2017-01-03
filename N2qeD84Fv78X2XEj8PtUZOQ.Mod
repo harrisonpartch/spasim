@@ -40,9 +40,9 @@ BEGIN
 	star.imposter:=conglomerate;
 	FOR i := 0  TO 10 DO
 		q:=Base.randPT();
-		star.stroke(q,3,path,conglomerate,vr);
+		star.stroke(q,3,conglomerate);
 		q:=Base.randPT();
-		star.stroke(q,3,path,sc,vr);	
+		star.stroke(q,3,sc);	
 	END;
 	star.setcolor(0,0,0,10,0);
 	star.copyonstroke:=TRUE;
@@ -53,7 +53,7 @@ BEGIN
 	FOR i := 0  TO 100 DO
 		Base.setPT(center,Base.rand.Uniform(),Base.rand.Uniform(),Base.rand.Uniform());
 		NEW(ball,center,1/25);	
-		ball.setcolor(Base.rand.Uniform(),Base.rand.Uniform(),Base.rand.Uniform());		
+		ball.setcolor(Base.rand.Uniform(),Base.rand.Uniform(),Base.rand.Uniform(),1/2);		
 		star.FRaster(ball,128);			
 	END;
 

@@ -9,7 +9,7 @@ Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
 CONST M=4; (* defines grid size *)
 	MMO=M-1;
 	CUBERADIUS=0.8;   (*change to sqrt(3)/2 ???*)
-	NCODE="NM2";
+	NCODE="NM4";
 	NL=Base.NL;
 
 TYPE PT = Base.PT;
@@ -22,61 +22,50 @@ TYPE PT = Base.PT;
  	NCube=Base.NCube;
  	LCube=Base.LightCube;
 
-TYPE WipeRecord=RECORD
-	c: cell;
-	restore: Voxel;
-	i,j,k: LONGINT
-END;
-
-TYPE WipeArray=POINTER TO ARRAY OF WipeRecord;
-
-TYPE Wiper=OBJECT(Base.V)
+PROCEDURE rot90z(VAR blx: ARRAY 4,4,4 OF Voxel);
 VAR
-	wipe: WipeArray;
-	i, count: LONGINT;
-	TIC:BOOLEAN;
-	tx: INTEGER;
-	
-PROCEDURE &New;
+	b: ARRAY 4,4,4 OF Voxel;
 BEGIN
-	NEW(wipe,8);
-	register
-END New;
+	b[1,0,0]:= blx[0,0,0];
+	b[1,1,0]:= blx[1,0,0];
+	b[0,1,0]:= blx[1,1,0];
+	b[0,0,0]:= blx[0,1,0];
+	b[1,0,1]:= blx[0,0,1];
+	b[1,1,1]:= blx[1,0,1];
+	b[0,1,1]:= blx[1,1,1];
+	b[0,0,1]:= blx[0,1,1];
+	blx:=b;
+END rot90z;
 
-PROCEDURE grow;
-VAR old: WipeArray;
-	i : LONGINT;
-BEGIN
-	old := wipe;
-	NEW(wipe, count*2);
-	FOR i := 0 TO LEN(old)-1 DO wipe[i] := old[i] END;
-	Out.String("NM2 wipe growing to ");
-	Out.Int(count*2,10);
-END grow;
-
-PROCEDURE add(c : cell; i,j,k: LONGINT; v: Voxel);
-BEGIN 
-	IF count >= LEN(wipe)-1 THEN grow END;
-	wipe[count].c := c;
-	wipe[count].restore := v;
-	wipe[count].i:= i;
-	wipe[count].j := j;
-	wipe[count].k:= k;		
-	INC(count)
-END add;
-
-PROCEDURE tick;
+PROCEDURE rot90zB(VAR blx: ARRAY 4,4,4 OF BOOLEAN);
 VAR
-	i: LONGINT;	
+	b: ARRAY 4,4,4 OF BOOLEAN;
 BEGIN
-	FOR i:=0 TO count-1 DO
-		IF  wipe[i].c#NIL THEN
-			wipe[i].c.blox[wipe[i].i,wipe[i].j,wipe[i].k]:=wipe[i].restore
-		END
-	END;
-END tick;
+	b[1,0,0]:= blx[0,0,0];
+	b[1,1,0]:= blx[1,0,0];
+	b[0,1,0]:= blx[1,1,0];
+	b[0,0,0]:= blx[0,1,0];
+	b[1,0,1]:= blx[0,0,1];
+	b[1,1,1]:= blx[1,0,1];
+	b[0,1,1]:= blx[1,1,1];
+	b[0,0,1]:= blx[0,1,1];
+	blx:=b;
+END rot90zB;
 
-END Wiper;
+PROCEDURE rot90zNC(VAR blx: ARRAY 4,4,4 OF NCube);
+VAR
+	b: ARRAY 4,4,4 OF NCube;
+BEGIN
+	b[1,0,0]:= blx[0,0,0];
+	b[1,1,0]:= blx[1,0,0];
+	b[0,1,0]:= blx[1,1,0];
+	b[0,0,0]:= blx[0,1,0];
+	b[1,0,1]:= blx[0,0,1];
+	b[1,1,1]:= blx[1,0,1];
+	b[0,1,1]:= blx[1,1,1];
+	b[0,0,1]:= blx[0,1,1];
+	blx:=b;
+END rot90zNC;
 
 TYPE cell* = OBJECT(Voxel);   
 VAR
@@ -86,6 +75,21 @@ VAR
 	nposterTF*:BOOLEAN;
 	nposter*: NCube;
 	light: Base.Light;
+	
+PROCEDURE r90z;
+VAR i,j,k: INTEGER;
+BEGIN
+	rot90z(blox);
+	rot90zB(nbloxTF);
+	rot90zNC(nblox);
+	FOR i:=0 TO 1 DO
+		FOR j:=0 TO 1 DO
+			FOR k:=0 TO 1 DO	
+				IF blox[i,j,k]#NIL THEN blox[i,j,k].r90z END
+			END
+		END
+	END
+END r90z;
 
 PROCEDURE Shade (VAR ray: Ray);
 VAR
@@ -99,6 +103,7 @@ VAR
 	last:BOOLEAN;
 	dtl,rdtl: REAL;
 BEGIN
+	INC(ray.bsteps);
 	ray.scale := ray.scale*M;
 	scaleInv := 1/ray.scale;
 	xyz.x := ABS(ray.lxyz.x-offset.x) * M;  
@@ -135,9 +140,10 @@ BEGIN
 			nshade(nblox[ijk.i,ijk.j,ijk.k],ray);	
 		END
 	END;	 
-	IF (ray.alpha<0.1) OR ( (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1))THEN ray.terminate:=TRUE END;	
+(*	IF (ray.alpha<0.1) OR ( (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1))THEN ray.terminate:=TRUE END;*)	
 	IF ~ray.terminate THEN
 		REPEAT
+			INC(ray.asteps);
 			IF ray.di  THEN
 				drx := ( (ijk.i + 1) - xyz.x) / ray.dxyz.x
 			ELSE
@@ -239,7 +245,7 @@ BEGIN
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);	
 				END;
 			END;
-			IF (ray.alpha<0.1)  OR ( (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1)) THEN ray.terminate:=TRUE END;
+			IF (ray.alpha<0.1) (* OR ( (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1)) *)THEN ray.terminate:=TRUE END;
 		UNTIL out OR ray.terminate;
 	END 		END;
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
@@ -251,22 +257,27 @@ END Shade;
 
 PROCEDURE nshade*(CONST nc: NCube; VAR ray: Ray);
 VAR
-	dr,dg,db,mix,dot,dot1,dot2,depth,dblack: REAL;
+	dr,dg,db,mix,dot,dot1,dot2: REAL;
 	light: Base.Light;	
-	exit: PT;
 BEGIN
 	dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z); 
 	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-	mix:=ray.length*ray.scale/40;
+	mix:=ray.length*ray.scale/10;
 	IF mix>1 THEN mix:=1 END;
 	dot:=mix*dot1+(1-mix)*dot2;
-	dr := nc.color.red*dot;
-	dg := nc.color.green*dot;
-	db := nc.color.blue*dot;
+	dr:=nc.color.red*dot*ray.ra;
+	dg:=nc.color.green*dot*ray.ga;
+	db:=nc.color.blue*dot*ray.ba;	
 	ray.r := ray.r + dr;
 	ray.g := ray.g + dg;
-	ray.b := ray.b + db;
-	ray.terminate:=TRUE;
+	ray.b := ray.b + db;	
+	ray.ra:=ray.ra-dr;
+	ray.ga:=ray.ga-dg;
+	ray.ba:=ray.ba-db;
+	ray.r := ray.r + nc.color.red * ray.ra*dot;
+	ray.g := ray.g + nc.color.green * ray.ga*dot;
+	ray.b := ray.b + nc.color.blue * ray.ba*dot; 	
+	ray.terminate:=TRUE
 END nshade;
 
 PROCEDURE reflect(VAR p: PT; n: PT);
@@ -414,7 +425,8 @@ BEGIN
 					END
 				END
 			END
-		END END END
+		END END END;
+		copymarker:=FALSE
 	END	
 END setcolorrec;
 
@@ -489,13 +501,13 @@ BEGIN
 	END 
 END passprobe;
 
-PROCEDURE stroke*(p:PT; resolution: LONGINT; VAR path: Path; voxel,voxundo:Voxel);
+PROCEDURE stroke*(p:PT; resolution: LONGINT; voxel :Voxel);
 VAR
 	i,j,k: LONGINT;
 BEGIN
 	Base.clamPT(p);
 	IF voxel#NIL THEN
-		strokerec(p,resolution,1, path, voxel,voxundo);
+		strokerec(p,resolution,1, voxel);
 	END
 END stroke;
 
@@ -518,7 +530,7 @@ BEGIN
 	nstrokerec(p,resolution,1,normal,color);
 END nstroke;
 
-PROCEDURE strokerec*(p:PT; resolution,scale: LONGINT;  VAR path: Path; voxel,voxundo:Voxel);
+PROCEDURE strokerec*(p:PT; resolution,scale: LONGINT; voxel :Voxel);
 VAR
 	i,j,k,ii,jj,kk,nextscale: LONGINT;
 	v,vv:Voxel;
@@ -537,14 +549,13 @@ BEGIN
 			blox[i,j,k]:=voxel
 		ELSE
 			IF blox[i,j,k]#NIL THEN 
-				IF voxundo= NIL THEN voxundo:=blox[i,j,k] END;  
 				IF  blox[i,j,k].copyonstroke THEN
 					copyv:=blox[i,j,k].deepcopy();
 					copyv.copyonstroke:=FALSE; 
-					copyv.strokerec(p, resolution,nextscale, path, voxel,vu);					
+					copyv.strokerec(p, resolution,nextscale, voxel);					
 					blox[i,j,k]:=copyv;
 				ELSIF blox[i,j,k].complex THEN
-					blox[i,j,k].strokerec(p, resolution,nextscale, path, voxel,vu)
+					blox[i,j,k].strokerec(p, resolution,nextscale,  voxel)
 				ELSE
 					NEW(c);
 					c.setcolor(red,green,blue,black,alpha);
@@ -552,14 +563,14 @@ BEGIN
 					c.passable:=blox[i,j,k].passable;
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-					c.strokerec(p, resolution,nextscale, path, voxel,vu);
+					c.strokerec(p, resolution,nextscale, voxel);
 				END	
 			ELSE
 				NEW(c);
 				c.setcolor(red,green,blue,black,alpha);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-				c.strokerec(p, resolution,nextscale, path, voxel,vu);
+				c.strokerec(p, resolution,nextscale, voxel);
 			END
 		END
 	END
@@ -587,22 +598,20 @@ BEGIN
 				IF blox[i,j,k].complex THEN
 					blox[i,j,k].strokephemeralrec(p, resolution,nextscale,voxel,vu)
 				ELSE
-					wiper.add(SELF,i,j,k,blox[i,j,k]);
 					NEW(c);
 					c.setcolor(red,green,blue,black,alpha);
 					c.fill(blox[i,j,k]);
 					c.passable:=blox[i,j,k].passable;
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-					c.strokerec(p, resolution,nextscale, path, voxel,vu);
+					c.strokerec(p, resolution,nextscale, voxel);
 				END	
 			ELSE
-				wiper.add(SELF,i,j,k,NIL);
 				NEW(c);
 				c.setcolor(red,green,blue,black,alpha);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-				c.strokerec(p, resolution,nextscale, path, voxel,vu);
+				c.strokerec(p, resolution,nextscale, voxel);
 			END
 		END
 	END
@@ -676,7 +685,7 @@ BEGIN
 		dxdt := (a.x-b.x)/n; dydt := (a.y-b.y)/n; dzdt := (a.z-b.z)/n; 
 		FOR t := 0 TO n DO
 			Base.setPT(p,tx, ty, tz);
-			stroke(p, resolution, path, v,vu);
+			stroke(p, resolution, v);
 			tx := tx + dxdt; ty := ty + dydt; tz := tz+dzdt;
 		END
 	END		
@@ -722,7 +731,7 @@ BEGIN
 							v.nposterTF:=TRUE;
 							v.nposter.normal:=f.normal(p);
 							v.nposter.color:=f.color(p);
-							v.FRasterrecSolid(f,resolution,o,nextscale)
+							v.FRasterrec(f,resolution,o,nextscale)
 				 		END
 				 	END
 				 END
@@ -849,7 +858,7 @@ VAR
 	cv,child:Voxel;
 	i,j,k: INTEGER;
 BEGIN
-	IF TRUE OR (code=NCODE) THEN
+	IF code=NCODE THEN
 		copymarker:=TRUE;
 		NEW(c);
 		c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; c.alpha:=alpha;
@@ -873,9 +882,28 @@ BEGIN
 	END;	
 END deepcopy;
 
+PROCEDURE count*(level: INTEGER):LONGINT;
+VAR
+	c: LONGINT;
+	i,j,k:INTEGER;
+BEGIN
+	c:=1;
+	IF level>1 THEN
+		FOR i:=0 TO MMO DO
+			FOR j:=0 TO MMO DO
+				FOR k:=0 TO MMO DO	
+					IF (blox[i,j,k]#NIL) THEN c:=c+blox[i,j,k].count(level-1) 
+					END
+				END
+			END
+		END
+	END;
+RETURN c
+END count;
+
 (* 
 Engrains this voxel and it's children recursively in the following format:
-"NM2"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
+"NM4"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
 <----- Voxel data -----><------                     children data                     ------>
 Children data contains 27 boolean-child pairs, each boolean being TRUE if a child is contained in that position.
 In case of FALSE the length of child data is 0 for that child (i.e. no data is being written except for the FALSE).
@@ -935,9 +963,6 @@ END sprout;
 
 END cell;
 
-VAR
-	wiper: Wiper;
-	
 PROCEDURE thisvox*():Voxel;
 VAR
 	v: cell;  
@@ -947,7 +972,7 @@ BEGIN
 END thisvox;
 
 BEGIN
-	NEW(wiper)
+
 END NM4.
 
 

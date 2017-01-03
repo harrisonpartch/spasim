@@ -110,9 +110,9 @@ BEGIN
 	END;	
 END Shade;
 
-PROCEDURE strokerec*(p:PT; resolution,scale: LONGINT; voxel,vu:Voxel);
+PROCEDURE strokerec*(p:PT; resolution,scale: LONGINT; voxel:Voxel);
 BEGIN
-	innard.strokerec(p,resolution,scale,voxel,vu);
+	innard.strokerec(p,resolution,scale,voxel);
 END strokerec;
 	
 END OutlineVox;

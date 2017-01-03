@@ -44,11 +44,7 @@ BEGIN
 	s1.FRasterSolid(ball,28);
 	s1.copyonstroke:=TRUE;
 
-	FOR i := 0  TO 1000 DO
-		q:=Base.randPT();
-		sc.stroke(q,9,s1,vu);
-	END;
-	
+
 	sc.lockTF:=TRUE;	
 	
 	sc.copyonstroke:=TRUE;

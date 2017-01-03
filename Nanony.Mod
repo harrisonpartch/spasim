@@ -46,14 +46,14 @@ BEGIN
 	Base.setPT(q,1/2,1/2,0);
 	Base.setPT(qq,1/2,1/2,1);
 	NEW(ball,center,6/12);
-	ball.setcolor(1,1,0);
+	ball.setcolor(1,1,0,1/2);
 	ball.setvoxel(v); 
 	starr.FRaster(ball,27);	
 	FOR i:= 0 TO 1000 DO
-		starr.stroke(Base.randPT(),27,reddot,vox);
-		starr.stroke(Base.randPT(),27,bludot,vox);			
-		starr.stroke(Base.randPT(),27,yellodot,vox);			
-		starr.stroke(Base.randPT(),27,greendot,vox);
+		starr.stroke(Base.randPT(),27,reddot);
+		starr.stroke(Base.randPT(),27,bludot);			
+		starr.stroke(Base.randPT(),27,yellodot);			
+		starr.stroke(Base.randPT(),27,greendot);
 	END;
 END drawstar;
 

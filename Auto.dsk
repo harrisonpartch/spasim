@@ -1,10 +1,29 @@
 <Desktop>
-	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="811" t="91" r="1451" b="479" flags="{0..2,13}"/>
-	<Window name="FileManager" loader="WMFileManager.Restore" l="453" t="606" r="1094" b="1002" flags="{0..2,13}"/>
-	<Window name="PET" loader="PET.Restore" l="1077" t="69" r="1877" b="669" flags="{0..2,13}">
+	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="1036" t="62" r="1676" b="450" flags="{0..2,13}"/>
+	<Window name="FileManager" loader="WMFileManager.Restore" l="484" t="542" r="1125" b="938" flags="{0..2,13}"/>
+	<Window name="PET" loader="PET.Restore" l="1168" t="375" r="1968" b="975" flags="{0..2,13}">
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>
-			<Tab file="Spasim.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
+			<Tab file="N2qeD84Fv78X2XEj8PtU667.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="60" cursorPos="1603"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="10"/>
+			</Tab>
+		</PETData>
+	</Window>
+	<Window name="PET" loader="PET.Restore" l="925" t="782" r="2089" b="1675" flags="{0..2,13}">
+		<PETData>
+			<General SelectedPageNr="0" ProjectTextFile=""/>
+			<Tab file="NM3.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="780" cursorPos="18191"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="true" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="imposter" replaceString="NM3"/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="128" scratchHeight="10"/>
+			</Tab>
+			<Tab file="NM2.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
 				<Editor firstLine="0" cursorPos="0"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
@@ -13,13 +32,27 @@
 			</Tab>
 		</PETData>
 	</Window>
-	<Window name="PET" loader="PET.Restore" l="1042" t="120" r="1842" b="720" flags="{0..2,13}">
+	<Window name="PET" loader="PET.Restore" l="866" t="68" r="1666" b="668" flags="{0..2,13}">
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>
-			<Tab file="NM2.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="0"/>
+			<Tab file="Spasim.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
+				<Editor firstLine="9" cursorPos="467"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="10"/>
+			</Tab>
+			<Tab file="Render.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="328" cursorPos="7603"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="10"/>
+			</Tab>
+			<Tab file="Marsh.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="301" cursorPos="6134"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="true" wrap="true" casesensitive="true" backwards="false" highlight="false" searchString="push" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="10"/>
 			</Tab>

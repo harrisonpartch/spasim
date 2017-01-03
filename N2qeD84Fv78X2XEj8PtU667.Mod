@@ -41,7 +41,7 @@ VAR
 PROCEDURE draw;
 BEGIN	 
 	bluedot:=Base.VoxelFromName("NM2");
-	reddot:=Base.VoxelFromName("NM4");
+	reddot:=Base.VoxelFromName("NM2");
 	greendot:=Base.VoxelFromName("NM3");
 	Base.setPT(center,1/2,1/2,1/2);
 	rdot:=Base.VoxelFromName("Nreddot");  
@@ -50,8 +50,7 @@ BEGIN
 	tblue:=Base.VoxelFromName("Ntblue");	
 	NEW(ball,center,0.45);	
 	ball.setvoxel(tblue);	
-(*	reddot.FRaster(ball,16);	*)
-	NEW(ball,center,0.33);
+	NEW(ball,center,0.57);
 	ball.setvoxel(bdot);	
 	bluedot.FRaster(ball,16);
 	ball.setvoxel(NIL);	
@@ -59,22 +58,21 @@ BEGIN
 	reddot.FRaster(ball,64);	
 	ball.setvoxel(NIL);	
 	ball.setcolor(1,1,1/2,1);	
-	greendot.FRaster(ball,64);	
+	greendot.FRaster(ball,81);	
 	NEW(shell,reddot,Base.mkPT(0,1,0),Base.mkPT(0,0,1),0.03,0.01);
-	FOR i:=0 TO 1 DO
+	FOR i:=0 TO 100 DO
 		Base.randsphPT(p,n,center,0.45);
-		reddot.stroke(p,16,path,greendot,v);
+		reddot.stroke(p,16, bluedot);
 		Base.randsphPT(p,n,center,0.45);
-		reddot.stroke(p,16,path,shell,v);
+		reddot.stroke(p,16,bdot);
 	END;	
-	reddot.copyonstroke:=TRUE;
-	greendot.lockTF:=TRUE;
-	greendot.DTL:=1000;
+	greendot.copyonstroke:=TRUE;
+	greendot.DTL:=200;
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	RETURN greendot
+	RETURN reddot
 END thisvox;
 
 BEGIN

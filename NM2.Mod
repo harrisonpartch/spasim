@@ -8,7 +8,7 @@ Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
 
 CONST M=2; (* defines grid size *)
 	MMO=M-1;
-	CUBERADIUS=0.8;   (*change to sqrt(3)/2 ???*)
+	CUBERADIUS=0.9;   (*change to sqrt(3)/2 ???*)
 	NCODE="NM2";
 	NL=Base.NL;
 
@@ -82,14 +82,13 @@ BEGIN
 	rot90z(blox);
 	rot90zB(nbloxTF);
 	rot90zNC(nblox);
-FOR i:=0 TO 1 DO
-	FOR j:=0 TO 1 DO
-		FOR k:=0 TO 1 DO	
-			IF blox[i,j,k]#NIL THEN blox[i,j,k].r90z END
+	FOR i:=0 TO 1 DO
+		FOR j:=0 TO 1 DO
+			FOR k:=0 TO 1 DO	
+				IF blox[i,j,k]#NIL THEN blox[i,j,k].r90z END
+			END
 		END
 	END
-END
-	
 END r90z;
 
 PROCEDURE Shade (VAR ray: Ray);
@@ -104,6 +103,7 @@ VAR
 	last:BOOLEAN;
 	dtl,rdtl: REAL;
 BEGIN
+	INC(ray.bsteps);
 	ray.scale := ray.scale*M;
 	scaleInv := 1/ray.scale;
 	xyz.x := ABS(ray.lxyz.x-offset.x) * M;  
@@ -143,6 +143,7 @@ BEGIN
 (*	IF (ray.alpha<0.1) OR ( (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1))THEN ray.terminate:=TRUE END;*)	
 	IF ~ray.terminate THEN
 		REPEAT
+			INC(ray.asteps);
 			IF ray.di  THEN
 				drx := ( (ijk.i + 1) - xyz.x) / ray.dxyz.x
 			ELSE
@@ -424,7 +425,8 @@ BEGIN
 					END
 				END
 			END
-		END END END
+		END END END;
+		copymarker:=FALSE
 	END	
 END setcolorrec;
 
@@ -499,13 +501,13 @@ BEGIN
 	END 
 END passprobe;
 
-PROCEDURE stroke*(p:PT; resolution: LONGINT; VAR path: Path; voxel,voxundo:Voxel);
+PROCEDURE stroke*(p:PT; resolution: LONGINT; voxel :Voxel);
 VAR
 	i,j,k: LONGINT;
 BEGIN
 	Base.clamPT(p);
 	IF voxel#NIL THEN
-		strokerec(p,resolution,1, path, voxel,voxundo);
+		strokerec(p,resolution,1, voxel);
 	END
 END stroke;
 
@@ -528,7 +530,7 @@ BEGIN
 	nstrokerec(p,resolution,1,normal,color);
 END nstroke;
 
-PROCEDURE strokerec*(p:PT; resolution,scale: LONGINT;  VAR path: Path; voxel,voxundo:Voxel);
+PROCEDURE strokerec*(p:PT; resolution,scale: LONGINT; voxel :Voxel);
 VAR
 	i,j,k,ii,jj,kk,nextscale: LONGINT;
 	v,vv:Voxel;
@@ -547,14 +549,13 @@ BEGIN
 			blox[i,j,k]:=voxel
 		ELSE
 			IF blox[i,j,k]#NIL THEN 
-				IF voxundo= NIL THEN voxundo:=blox[i,j,k] END;  
 				IF  blox[i,j,k].copyonstroke THEN
 					copyv:=blox[i,j,k].deepcopy();
 					copyv.copyonstroke:=FALSE; 
-					copyv.strokerec(p, resolution,nextscale, path, voxel,vu);					
+					copyv.strokerec(p, resolution,nextscale, voxel);					
 					blox[i,j,k]:=copyv;
 				ELSIF blox[i,j,k].complex THEN
-					blox[i,j,k].strokerec(p, resolution,nextscale, path, voxel,vu)
+					blox[i,j,k].strokerec(p, resolution,nextscale,  voxel)
 				ELSE
 					NEW(c);
 					c.setcolor(red,green,blue,black,alpha);
@@ -562,14 +563,14 @@ BEGIN
 					c.passable:=blox[i,j,k].passable;
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-					c.strokerec(p, resolution,nextscale, path, voxel,vu);
+					c.strokerec(p, resolution,nextscale, voxel);
 				END	
 			ELSE
 				NEW(c);
 				c.setcolor(red,green,blue,black,alpha);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-				c.strokerec(p, resolution,nextscale, path, voxel,vu);
+				c.strokerec(p, resolution,nextscale, voxel);
 			END
 		END
 	END
@@ -603,14 +604,14 @@ BEGIN
 					c.passable:=blox[i,j,k].passable;
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-					c.strokerec(p, resolution,nextscale, path, voxel,vu);
+					c.strokerec(p, resolution,nextscale, voxel);
 				END	
 			ELSE
 				NEW(c);
 				c.setcolor(red,green,blue,black,alpha);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-				c.strokerec(p, resolution,nextscale, path, voxel,vu);
+				c.strokerec(p, resolution,nextscale, voxel);
 			END
 		END
 	END
@@ -684,7 +685,7 @@ BEGIN
 		dxdt := (a.x-b.x)/n; dydt := (a.y-b.y)/n; dzdt := (a.z-b.z)/n; 
 		FOR t := 0 TO n DO
 			Base.setPT(p,tx, ty, tz);
-			stroke(p, resolution, path, v,vu);
+			stroke(p, resolution, v);
 			tx := tx + dxdt; ty := ty + dydt; tz := tz+dzdt;
 		END
 	END		
@@ -730,7 +731,7 @@ BEGIN
 							v.nposterTF:=TRUE;
 							v.nposter.normal:=f.normal(p);
 							v.nposter.color:=f.color(p);
-							v.FRasterrecSolid(f,resolution,o,nextscale)
+							v.FRasterrec(f,resolution,o,nextscale)
 				 		END
 				 	END
 				 END
@@ -880,6 +881,25 @@ BEGIN
 		RETURN cv
 	END;	
 END deepcopy;
+
+PROCEDURE count*(level: INTEGER):LONGINT;
+VAR
+	c: LONGINT;
+	i,j,k:INTEGER;
+BEGIN
+	c:=1;
+	IF level>1 THEN
+		FOR i:=0 TO MMO DO
+			FOR j:=0 TO MMO DO
+				FOR k:=0 TO MMO DO	
+					IF (blox[i,j,k]#NIL) THEN c:=c+blox[i,j,k].count(level-1) 
+					END
+				END
+			END
+		END
+	END;
+RETURN c
+END count;
 
 (* 
 Engrains this voxel and it's children recursively in the following format:

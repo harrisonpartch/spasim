@@ -191,6 +191,7 @@ TYPE BPATCH*=ARRAY BPS,BPS OF BPE;
 TYPE Ray* = RECORD
 	xyz*, dxyz*, ddxyz*, lxyz*, txyz*, origin*, oxyz*, popdelta*, hitxyz*, hitdxyz*: PT;	
 	theta*,phi*, dtheta*,dphi*: REAL;
+	asteps*, bsteps*: INTEGER;
 (*	cellred*,cellgreen*,cellblue*,cellblack*: REAL; *)
 	texcube*:TexCube;
 	texcubeTF*:BOOLEAN;
@@ -235,6 +236,11 @@ VAR
 	
 PROCEDURE r90z*;
 END r90z;
+
+PROCEDURE count*(level: INTEGER):LONGINT;
+BEGIN
+	RETURN 1;
+END count;
 
 PROCEDURE Shade*(VAR ray: Ray);
 END Shade;
@@ -289,9 +295,9 @@ END FRasterSolid;
 PROCEDURE FRasterrecSolid*(f: FR; resolution: LONGINT; origin: PT; scale: LONGINT); 
 END FRasterrecSolid;
 
-PROCEDURE stroke*(p:PT; resolution: LONGINT; VAR path: Path; voxel,voxundo:Voxel);
+PROCEDURE stroke*(p:PT; resolution: LONGINT; voxel:Voxel);
 END stroke;
-PROCEDURE strokerec*(p:PT; resolution,scale: LONGINT;  VAR path: Path; voxel,voxundo:Voxel);
+PROCEDURE strokerec*(p:PT; resolution,scale: LONGINT;  voxel: Voxel);
 END strokerec;
 PROCEDURE strokephemeral*(p:PT; resolution: LONGINT; voxel,voxundo:Voxel);
 END strokephemeral;
