@@ -431,22 +431,19 @@ BEGIN
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,9/10);
 	Base.setPT(up,0,0,1);
-	NEW(plane,center,up);
-	plane.vox:=badopossum;	
-	z3a.FRaster(plane,16); 
+
 	Base.setPT(center,1/2,1/2,1/2);
 	NEW(ball,center,0.6);  
 	serp.passable:=FALSE;   
 	conglomerate.copyonstroke:=TRUE;
 	noise.setvoxel(lobster);	
 	ball.setvoxel(sfish);
-
+	NEW(plane,center,up);
+	plane.vox:=badopossum;	
+(*	z2a.FRaster(plane,32);  *)
 	z2a.FRaster(ball,32); 	
-	z2a.FRaster(noise,32); 
-	z2a.setcolor(2,2,2,2,2); 
-(*	z3a.FRaster(noise,64); 
-	z3a.setcolor(0,0,6,6,6);
-*)  	Base.world:=z2a; 	
+	z2a.FRaster(noise,32);
+ 	Base.world:=z2a; 	
 	Base.avatar:=harrison;
 	Base.avatarsize:=1000; 
 END dawn;

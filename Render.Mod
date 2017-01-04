@@ -306,8 +306,8 @@ BEGIN
 	CASE ucs OF
 		   27: uncapture
 		| 164: uncapture; Close; Base.worldalive:=FALSE
-		| 193: INC(mstarget);  INC(mstarget);  INC(mstarget);  INC(mstarget); 
-		| 194: DEC(mstarget); DEC(mstarget); DEC(mstarget); DEC(mstarget); 
+		| 193: INC(mstarget);  INC(mstarget);  INC(mstarget);  INC(mstarget); Out.Int(mstarget,4); Out.Ln
+		| 194: DEC(mstarget); DEC(mstarget); DEC(mstarget); DEC(mstarget); Out.Int(mstarget,4); Out.Ln
 		| 195: camera.left(0.03)
 		| 196: camera.left(-0.03)
 	ELSE
@@ -393,7 +393,7 @@ PROCEDURE detail();
 		ELSE	
 			Retina.saccade:=FALSE;
 			IF framedt < mstarget THEN
-				timer.Sleep(mstarget-framedt - 10); 
+				 timer.Sleep(mstarget-framedt - 10); 
 				Retina.moredetail;
 			ELSIF framedt > (mstarget+10) THEN
 				Retina.lessdetail;

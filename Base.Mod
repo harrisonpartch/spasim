@@ -4,7 +4,7 @@ IMPORT  Math:=Math, Random, Kernel, Out:=KernelLog (*DebugLog*), Objects, (* AL:
 Strings, Streams, CryptoMD5, WMFontManager, Raster, WMRasterScale, WMRectangles, Graphics := WMGraphics, Commands(*, XNXLAudio*);
 
 CONST
-	BPS*=3; 
+	patchsize*=2; 
 	NL*=24;
 
 TYPE Name*=ARRAY NL OF CHAR;
@@ -35,6 +35,10 @@ END;
 
 TYPE Color*=RECORD
 	red*,green*,blue*,alpha*: REAL
+END;
+
+TYPE ray_color*=RECORD
+	r*,g*,b*,ra*,ga*,ba*: REAL
 END;
 
 TYPE Colr*=RECORD
@@ -184,12 +188,13 @@ END TexCube;
 TYPE Ray* = RECORD
 	xyz*, dxyz*, ddxyz*, lxyz*, txyz*, origin*, oxyz*, popdelta*, hitxyz*, hitdxyz*: PT;	
 	theta*,phi*, dtheta*,dphi*: REAL;
-	patch*: CHAR; (* a: 1x1 b: 2x2 etc *)
+	r*, g*, b*, ra*, ga*, ba*, bla*,alpha*: REAL; 
+	patchTF*: BOOLEAN;
+	patch*: ARRAY patchsize, patchsize OF ray_color; (* a: 1x1 b: 2x2 etc *)
 	texcube*:TexCube;
 	texcubeTF*:BOOLEAN;
 	ncube*: NCube;
 	ncubeTF*: BOOLEAN;
-	r*, g*, b*, ra*, ga*, ba*, bla*,alpha*: REAL; 
 	terminate*: BOOLEAN;
 	scale*,tscale*: REAL;
 	length*: REAL; 

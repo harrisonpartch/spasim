@@ -264,7 +264,7 @@ IF ray.length>0.00000001 THEN
 			END			
 	ELSE
 		mip:=ray.length*ray.scale/12;
-		IF mip>3 THEN 	
+		IF mip>2 THEN 	
 			color:=texcube.side[ray.face].pixelmip0(lx,ly);
 		ELSIF mip>1 THEN
 			color:=texcube.side[ray.face].pixelmip1(lx,ly);
@@ -275,10 +275,22 @@ IF ray.length>0.00000001 THEN
 		dr:=color.red*dot;
 		dg:=color.green*dot;
 		db:=color.blue*dot;	
+		IF ray.patchTF THEN
+			ray.justhitTF:=TRUE;
+			FOR i := 0 TO Base.patchsize-1 DO
+				FOR j:= 0 TO Base.patchsize-1 DO
+					ray.patch[i,j].r:= ray.r;   (*patch is of ray_color -- ray should use that too *)
+					ray.patch[i,j].g:= ray.g;  
+					ray.patch[i,j].b:= ray.b;
+					ray.patch[i,j].ra:= ray.ra;	
+					ray.patch[i,j].ga:= ray.ga;
+					ray.patch[i,j].ba:= ray.ba;
+				END
+			END
+		END;
 		ray.r := ray.r + dr;
 		ray.g := ray.g + dg;
 		ray.b := ray.b + db;	
-(*		ray.justhitTF:=TRUE;*)
 		ray.terminate:=TRUE
 	END
 END

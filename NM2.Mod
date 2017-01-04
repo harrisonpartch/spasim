@@ -192,9 +192,9 @@ BEGIN
 				newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
 			END;	
 			vdepth:=Base.distance(newxyz,xyz)/ray.scale; 
-			ray.xyz.x:=ray.xyz.x +((newxyz.x-xyz.x)+ray.ddxyz.x)/ray.scale;
-			ray.xyz.y:=ray.xyz.y +((newxyz.y-xyz.y)+ray.ddxyz.y)/ray.scale;			
-			ray.xyz.z:=ray.xyz.z +((newxyz.z-xyz.z)+ray.ddxyz.z)/ray.scale;			
+			ray.xyz.x:=ray.xyz.x +(newxyz.x-xyz.x)/ray.scale;
+			ray.xyz.y:=ray.xyz.y +(newxyz.y-xyz.y)/ray.scale;			
+			ray.xyz.z:=ray.xyz.z +(newxyz.z-xyz.z)/ray.scale;			
 			xyz:=newxyz;
 			ray.length:=ray.length+vdepth;
 			bounds(ijk.i,ijk.j,ijk.k, out);
