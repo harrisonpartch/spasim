@@ -1,4 +1,4 @@
-MODULE NM3; (*! This module may be either imported or used anonymously *)
+MODULE NM4; (*! This module may be either imported or used anonymously *)
 IMPORT Base, SPSME, Noise, Math, Out := KernelLog, Debugging, Streams,Strings;
 
 (*
@@ -6,10 +6,10 @@ Special voxel containing 27 children arranged in a 3x3x3 grid.
 Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
 *)
 
-CONST M=3; (* defines grid size *)
+CONST M=4; (* defines grid size *)
 	MMO=M-1;
 	CUBERADIUS=0.9;   (*change to sqrt(3)/2 ???*)
-	NCODE="NM3";
+	NCODE="NM4";
 	NL=Base.NL;
 
 TYPE PT = Base.PT;
@@ -22,9 +22,9 @@ TYPE PT = Base.PT;
  	NCube=Base.NCube;
  	LCube=Base.LightCube;
 
-PROCEDURE rot90z(VAR blx: ARRAY 3,3,3 OF Voxel);
+PROCEDURE rot90z(VAR blx: ARRAY 4,4,4 OF Voxel);
 VAR
-	b: ARRAY 3,3,3 OF Voxel;
+	b: ARRAY 4,4,4 OF Voxel;
 BEGIN
 	b[1,0,0]:= blx[0,0,0];
 	b[1,1,0]:= blx[1,0,0];
@@ -37,9 +37,9 @@ BEGIN
 	blx:=b;
 END rot90z;
 
-PROCEDURE rot90zB(VAR blx: ARRAY 3,3,3 OF BOOLEAN);
+PROCEDURE rot90zB(VAR blx: ARRAY 4,4,4 OF BOOLEAN);
 VAR
-	b: ARRAY 3,3,3 OF BOOLEAN;
+	b: ARRAY 4,4,4 OF BOOLEAN;
 BEGIN
 	b[1,0,0]:= blx[0,0,0];
 	b[1,1,0]:= blx[1,0,0];
@@ -52,9 +52,9 @@ BEGIN
 	blx:=b;
 END rot90zB;
 
-PROCEDURE rot90zNC(VAR blx: ARRAY 3,3,3 OF NCube);
+PROCEDURE rot90zNC(VAR blx: ARRAY 4,4,4 OF NCube);
 VAR
-	b: ARRAY 3,3,3 OF NCube;
+	b: ARRAY 4,4,4 OF NCube;
 BEGIN
 	b[1,0,0]:= blx[0,0,0];
 	b[1,1,0]:= blx[1,0,0];
@@ -192,9 +192,9 @@ BEGIN
 				newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
 			END;	
 			vdepth:=Base.distance(newxyz,xyz)/ray.scale; 
-			ray.xyz.x:=ray.xyz.x +((newxyz.x-xyz.x)+ray.ddxyz.x)/ray.scale;
-			ray.xyz.y:=ray.xyz.y +((newxyz.y-xyz.y)+ray.ddxyz.y)/ray.scale;			
-			ray.xyz.z:=ray.xyz.z +((newxyz.z-xyz.z)+ray.ddxyz.z)/ray.scale;			
+			ray.xyz.x:=ray.xyz.x +(newxyz.x-xyz.x)/ray.scale;
+			ray.xyz.y:=ray.xyz.y +(newxyz.y-xyz.y)/ray.scale;			
+			ray.xyz.z:=ray.xyz.z +(newxyz.z-xyz.z)/ray.scale;			
 			xyz:=newxyz;
 			ray.length:=ray.length+vdepth;
 			bounds(ijk.i,ijk.j,ijk.k, out);
@@ -220,7 +220,6 @@ BEGIN
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);	
 				END;
 			END;
-			IF ray.alpha<0.1 THEN ray.terminate:=TRUE END;
 		UNTIL out OR ray.terminate;
 	END 		END;
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
@@ -239,18 +238,18 @@ BEGIN
 	mix:=ray.length*ray.scale/10;
 	IF mix>1 THEN mix:=1 END;
 	dot:=mix*dot1+(1-mix)*dot2;
-	dr:=nc.color.red*dot*ray.ra;
-	dg:=nc.color.green*dot*ray.ga;
-	db:=nc.color.blue*dot*ray.ba;	
-	ray.r := ray.r + dr;
-	ray.g := ray.g + dg;
-	ray.b := ray.b + db;	
-	ray.ra:=ray.ra-dr;
-	ray.ga:=ray.ga-dg;
-	ray.ba:=ray.ba-db;
-	ray.r := ray.r + nc.color.red * ray.ra*dot;
-	ray.g := ray.g + nc.color.green * ray.ga*dot;
-	ray.b := ray.b + nc.color.blue * ray.ba*dot; 	
+	dr:=nc.color.red*dot*ray.clr.ra;
+	dg:=nc.color.green*dot*ray.clr.ga;
+	db:=nc.color.blue*dot*ray.clr.ba;	
+	ray.clr.r := ray.clr.r + dr;
+	ray.clr.g := ray.clr.g + dg;
+	ray.clr.b := ray.clr.b + db;	
+	ray.clr.ra:=ray.clr.ra-dr;
+	ray.clr.ga:=ray.clr.ga-dg;
+	ray.clr.ba:=ray.clr.ba-db;
+	ray.clr.r := ray.clr.r + nc.color.red * ray.clr.ra*dot;
+	ray.clr.g := ray.clr.g + nc.color.green * ray.clr.ga*dot;
+	ray.clr.b := ray.clr.b + nc.color.blue * ray.clr.ba*dot; 	
 	ray.terminate:=TRUE
 END nshade;
 
@@ -877,7 +876,7 @@ END count;
 
 (* 
 Engrains this voxel and it's children recursively in the following format:
-"NM3"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
+"NM4"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
 <----- Voxel data -----><------                     children data                     ------>
 Children data contains 27 boolean-child pairs, each boolean being TRUE if a child is contained in that position.
 In case of FALSE the length of child data is 0 for that child (i.e. no data is being written except for the FALSE).
@@ -947,7 +946,7 @@ END thisvox;
 
 BEGIN
 
-END NM3.
+END NM4.
 
 
 

@@ -141,10 +141,10 @@ BEGIN
 	r := (ENTIER(theta*17) MOD 5)/4;
 	g := (ENTIER(theta*11) MOD 3)/2;
 	b := (ENTIER(phi*17) MOD 5)/4;
-	ray.r := ray.r + ray.bla*r;
-	ray.g := ray.g + ray.bla*g;
-	ray.b := ray.b + ray.bla*b;
-	ray.bla := 0;
+	ray.clr.r := ray.clr.r + ray.clr.alpha*r;
+	ray.clr.g := ray.clr.g + ray.clr.alpha*g;
+	ray.clr.b := ray.clr.b + ray.clr.alpha*b;
+	ray.clr.alpha := 0;
 END Shade;
 END Stripey;
 
@@ -259,8 +259,8 @@ BEGIN
 		IF V # NIL THEN 
 			V.Shade(ray) 
 		ELSE
-(*			volshader.Shade(x,y,z,r,g,blue,ray.bla);
-			ray.r:=r*dott; ray.g:=g*dott; ray.b:=blue*dott; ray.bla:=0; *)
+(*			volshader.Shade(x,y,z,r,g,blue,ray.clr.alpha);
+			ray.clr.r:=r*dott; ray.clr.g:=g*dott; ray.clr.b:=blue*dott; ray.clr.alpha:=0; *)
 		END
 	ELSE		
 		b:= Base.Exit(ray);
@@ -297,8 +297,8 @@ BEGIN
 		IF V # NIL THEN 
 			V.Shade(ray) 
 		ELSE
-	(*		volshader.Shade(x,y,z,r,g,blue,ray.bla);
-			ray.r:=r*dott; ray.g:=g*dott; ray.b:=blue*dott; ray.bla:=0; *)
+	(*		volshader.Shade(x,y,z,r,g,blue,ray.clr.alpha);
+			ray.clr.r:=r*dott; ray.clr.g:=g*dott; ray.clr.b:=blue*dott; ray.clr.alpha:=0; *)
 		END
 	END
 END Shade;
@@ -446,10 +446,10 @@ BEGIN
 		reflect(ray.dxyz.x,ray.dxyz.y,ray.dxyz.z, n.x,n.y,n.z);
 		ray.lxyz.x :=  x; ray.lxyz.y :=  y; ray.xyz.z := z; 
 		ray.changed := TRUE;
-		ray.ra := ray.ra - 0.1;
-		ray.ga := ray.ga - 0.1;
-		ray.ba := ray.ba - 0.1;
-		ray.bla := ray.bla - 0.1;
+		ray.clr.ra := ray.clr.ra - 0.1;
+		ray.clr.ga := ray.clr.ga - 0.1;
+		ray.clr.ba := ray.clr.ba - 0.1;
+		ray.clr.alpha := ray.clr.alpha - 0.1;
 	END;
 	IF ray.changed & (enclosingvoxel#NIL) THEN
 		ray.changed:=FALSE;
@@ -497,16 +497,16 @@ BEGIN
 		END;
 (*		ctop(x,y,z,lat,long,d);
 		r := ABS(SPSMMath.sin(lat)); g := ABS(SPSMMath.sin(long));
-		ray.r := ray.r + r*ray.bla;
-		ray.g := ray.g + g*ray.bla;
-		ray.b := ray.b + b*ray.bla;
-	    ray.bla :=0; *)
+		ray.clr.r := ray.clr.r + r*ray.clr.alpha;
+		ray.clr.g := ray.clr.g + g*ray.clr.alpha;
+		ray.clr.b := ray.clr.b + b*ray.clr.alpha;
+	    ray.clr.alpha :=0; *)
 	    nx := cx-x; ny := cy - y; nz := 0;
 	    normalize(nx,ny,nz);
 		reflect(ray.dxyz.x,ray.dxyz.y,ray.dxyz.z, nx,ny,nz);
 		ray.xyz.x := ray.xyz.x + x; ray.xyz.y := ray.xyz.y  + y; ray.xyz.z := ray.xyz.z + z; 
 		ray.changed := TRUE;
-		ray.bla := ray.bla - 1/5;
+		ray.clr.alpha := ray.clr.alpha - 1/5;
 	 END;
 END Shade;
 
@@ -564,12 +564,12 @@ BEGIN
 		bounds(i, j, k, out);
 		IF ~out THEN
 			c := ar[i, j, k];
-			ray.r := ray.r + c.r;
-			ray.g := ray.g + c.g;
-			ray.b := ray.b + c.b;
-			ray.bla := ray.bla - c.a;
+			ray.clr.r := ray.clr.r + c.r;
+			ray.clr.g := ray.clr.g + c.g;
+			ray.clr.b := ray.clr.b + c.b;
+			ray.clr.alpha := ray.clr.alpha - c.a;
 		END;
-	UNTIL  (ray.bla < 0.1) OR out;
+	UNTIL  (ray.clr.alpha < 0.1) OR out;
 END Shade;
 
 END ArVox;

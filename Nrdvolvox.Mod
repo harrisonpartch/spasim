@@ -164,7 +164,7 @@ BEGIN
 		xyz.y := xyz.y + ray.popdelta.y;
 		xyz.z := xyz.z + ray.popdelta.z;
 	END;	 
-	IF (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1) THEN ray.terminate:=TRUE END;	
+	IF (ray.clr.ra<0.1)&(ray.clr.ga<0.1)&(ray.clr.ba<0.1) THEN ray.terminate:=TRUE END;	
 	IF ~ray.terminate THEN
 		REPEAT
 			IF ray.di  THEN
@@ -233,14 +233,14 @@ BEGIN
 			ray.xyz.z:=ray.xyz.z +((newxyz.z-xyz.z)+ray.ddxyz.z)*scaleInv;			
 			xyz:=newxyz;
 			ray.length:=ray.length+vdepth;
-			rr := red*vdepth*ray.ra; gr := green*vdepth*ray.ga; br := blue*vdepth*ray.ba; blr:=black*vdepth; bla:=alpha*vdepth;
-			ray.r := ray.r+rr;
-			ray.g:= ray.g+gr;
-			ray.b := ray.b+br; 
-			ray.ra := (ray.ra-rr)-blr;
-			ray.ga := (ray.ga-gr)-blr;
-			ray.ba := (ray.ba-br)-blr; 	
-			ray.bla := ray.bla-bla; 		
+			rr := red*vdepth*ray.clr.ra; gr := green*vdepth*ray.clr.ga; br := blue*vdepth*ray.clr.ba; blr:=black*vdepth; bla:=alpha*vdepth;
+			ray.clr.r := ray.clr.r+rr;
+			ray.clr.g:= ray.clr.g+gr;
+			ray.clr.b := ray.clr.b+br; 
+			ray.clr.ra := (ray.clr.ra-rr)-blr;
+			ray.clr.ga := (ray.clr.ga-gr)-blr;
+			ray.clr.ba := (ray.clr.ba-br)-blr; 	
+	
 			bounds(ijk.i,ijk.j,ijk.k, out);
 			IF ~out THEN
 				ray.lxyz.x := ABS(xyz.x - ijk.i);
@@ -266,7 +266,7 @@ BEGIN
 				xyz.y := xyz.y + ray.popdelta.y;
 				xyz.z := xyz.z + ray.popdelta.z;
 			END;		
-		IF (ray.bla<0.1)OR((ray.ra<0.01)OR(ray.ga<0.01)OR(ray.ba<0.01))THEN ray.terminate:=TRUE END;
+		IF (ray.clr.ra<0.01)OR(ray.clr.ga<0.01)OR(ray.clr.ba<0.01) THEN ray.terminate:=TRUE END;
 		UNTIL  out OR ray.terminate;
 	END 	
 	END;

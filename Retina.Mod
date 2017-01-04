@@ -46,11 +46,11 @@ BEGIN
 			angletoray(ray,theta,phi);
 			Base.world.Shade(ray);
 			IF ~ray.terminate THEN
-				ray.b:= ray.b + ray.ba;
-				ray.r:= ray.r + ray.ra/2;
-				ray.g:= ray.g + ray.ga/2;	
+				ray.clr.b:= ray.clr.b + ray.clr.ba;
+				ray.clr.r:= ray.clr.r + ray.clr.ra/2;
+				ray.clr.g:= ray.clr.g + ray.clr.ga/2;	
 			END;	
-			Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255)); 
+			Raster.SetRGB(pixel,ENTIER(ray.clr.r*255),ENTIER(ray.clr.g*255),ENTIER(ray.clr.b*255)); 
 			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
 			phi:=phi+dphi;
 		END;
@@ -72,11 +72,11 @@ BEGIN
 	angletoray(ray,cam.theta+cam.dtheta/3, cam.phi+cam.dphi/3);	
 	Base.world.Shade(ray);
 	IF ~ray.terminate THEN
-			ray.b:= ray.b + ray.ba;
-			ray.r:= ray.r + ray.ra/2;
-			ray.g:= ray.g + ray.ga/2;	
+			ray.clr.b:= ray.clr.b + ray.clr.ba;
+			ray.clr.r:= ray.clr.r + ray.clr.ra/2;
+			ray.clr.g:= ray.clr.g + ray.clr.ga/2;	
 	END;
-	Raster.SetRGB(pixel,ENTIER(ray.r*255),ENTIER(ray.g*255),ENTIER(ray.b*255)); 
+	Raster.SetRGB(pixel,ENTIER(ray.clr.r*255),ENTIER(ray.clr.g*255),ENTIER(ray.clr.b*255)); 
 	Raster.Fill(image,cam.imx,cam.imy,cam.imx+2,cam.imy+2,pixel,copy);	
 END tessa;
 

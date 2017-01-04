@@ -291,7 +291,7 @@ BEGIN
 	z3:=Base.VoxelFromName("NM3");	
 	z3a:=Base.VoxelFromName("NM4");	
 	z2:=Base.VoxelFromName("NM2");
-	z2a:=Base.VoxelFromName("NM2");	
+	z2a:=Base.VoxelFromName("NM3");	
 	harrison:=Base.VoxelFromName("Nharrisonavatar"); 
 	push(harrison);
 	doge:=Base.VoxelFromName("Ndogepearl"); 

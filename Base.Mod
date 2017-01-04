@@ -38,7 +38,7 @@ TYPE Color*=RECORD
 END;
 
 TYPE ray_color*=RECORD
-	r*,g*,b*,ra*,ga*,ba*: REAL
+	r*,g*,b*,ra*,ga*,ba*,alpha*: REAL
 END;
 
 TYPE Colr*=RECORD
@@ -188,7 +188,8 @@ END TexCube;
 TYPE Ray* = RECORD
 	xyz*, dxyz*, ddxyz*, lxyz*, txyz*, origin*, oxyz*, popdelta*, hitxyz*, hitdxyz*: PT;	
 	theta*,phi*, dtheta*,dphi*: REAL;
-	r*, g*, b*, ra*, ga*, ba*, bla*,alpha*: REAL; 
+(*	r*, g*, b*, ra*, ga*, ba*, bla*,alpha*: REAL; *)
+	clr*: ray_color;
 	patchTF*: BOOLEAN;
 	patch*: ARRAY patchsize, patchsize OF ray_color; (* a: 1x1 b: 2x2 etc *)
 	texcube*:TexCube;
@@ -584,9 +585,9 @@ BEGIN
 		ray.dxyz:=randnormPT();
 		IF dot(ray.xyz,Face[face])>1 THEN	
 			world.Shade(ray);
-			l.light[face].red:=l.light[face].red+ray.r/11;
-			l.light[face].green:=l.light[face].green+ray.g/11;
-			l.light[face].blue:=l.light[face].blue+ray.b/11
+			l.light[face].red:=l.light[face].red+ray.clr.r/11;
+			l.light[face].green:=l.light[face].green+ray.clr.g/11;
+			l.light[face].blue:=l.light[face].blue+ray.clr.b/11
 		END
 	END;
 	l.light[face].red:=rand.Uniform();
@@ -1188,13 +1189,10 @@ BEGIN
 	iterlimit := 500;
 	DTL:=25;	
 	Origin:=mkPT(0,0,0);   (* unneeded initialization *)
-	blankray.bla := 1;
-	blankray.ra := 1;
-	blankray.ga := 1;
-	blankray.ba := 1;
-	blankray.alpha:=1;
+	blankray.clr.ra := 1;
+	blankray.clr.ga := 1;
+	blankray.clr.ba := 1;
 	blankray.scale := 1; 
-	blankray.length := 0;
 	blankray.tscale:=1;
 	blankray.dtl:=10;	
 	Face[0].x := -1; Face[0].y := 0; Face[0].z := 0; 

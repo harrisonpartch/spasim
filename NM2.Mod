@@ -220,7 +220,6 @@ BEGIN
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);	
 				END;
 			END;
-			IF ray.alpha<0.1 THEN ray.terminate:=TRUE END;
 		UNTIL out OR ray.terminate;
 	END 		END;
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
@@ -239,18 +238,18 @@ BEGIN
 	mix:=ray.length*ray.scale/10;
 	IF mix>1 THEN mix:=1 END;
 	dot:=mix*dot1+(1-mix)*dot2;
-	dr:=nc.color.red*dot*ray.ra;
-	dg:=nc.color.green*dot*ray.ga;
-	db:=nc.color.blue*dot*ray.ba;	
-	ray.r := ray.r + dr;
-	ray.g := ray.g + dg;
-	ray.b := ray.b + db;	
-	ray.ra:=ray.ra-dr;
-	ray.ga:=ray.ga-dg;
-	ray.ba:=ray.ba-db;
-	ray.r := ray.r + nc.color.red * ray.ra*dot;
-	ray.g := ray.g + nc.color.green * ray.ga*dot;
-	ray.b := ray.b + nc.color.blue * ray.ba*dot; 	
+	dr:=nc.color.red*dot*ray.clr.ra;
+	dg:=nc.color.green*dot*ray.clr.ga;
+	db:=nc.color.blue*dot*ray.clr.ba;	
+	ray.clr.r := ray.clr.r + dr;
+	ray.clr.g := ray.clr.g + dg;
+	ray.clr.b := ray.clr.b + db;	
+	ray.clr.ra:=ray.clr.ra-dr;
+	ray.clr.ga:=ray.clr.ga-dg;
+	ray.clr.ba:=ray.clr.ba-db;
+	ray.clr.r := ray.clr.r + nc.color.red * ray.clr.ra*dot;
+	ray.clr.g := ray.clr.g + nc.color.green * ray.clr.ga*dot;
+	ray.clr.b := ray.clr.b + nc.color.blue * ray.clr.ba*dot; 	
 	ray.terminate:=TRUE
 END nshade;
 

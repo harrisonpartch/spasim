@@ -94,12 +94,12 @@ BEGIN
 		ray.lxyz:=a; 
 		child.Shade(ray); 
 	END;
-	oray.r:=ray.r;
-	oray.g:=ray.g;
-	oray.b:=ray.b;
-	oray.ra:=ray.ra;
-	oray.ga:=ray.ga;
-	oray.ba:=ray.ba;
+	oray.clr.r:=ray.clr.r;
+	oray.clr.g:=ray.clr.g;
+	oray.clr.b:=ray.clr.b;
+	oray.clr.ra:=ray.clr.ra;
+	oray.clr.ga:=ray.clr.ga;
+	oray.clr.ba:=ray.clr.ba;
 	oray.terminate:=ray.terminate; 
 END Shade;
 
