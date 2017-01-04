@@ -278,10 +278,20 @@ IF ray.length>0.00000001 THEN
 		ray.r := ray.r + dr;
 		ray.g := ray.g + dg;
 		ray.b := ray.b + db;	
+(*		ray.justhitTF:=TRUE;*)
 		ray.terminate:=TRUE
 	END
 END
 END Shade;
+
+(*
+texture patch rays: diverge by dtheta, dphi: so distance between them at the hit is approximately
+sin(dtheta)*ray.length -- screw it. this should be handled in the mspace shader!
+X X X
+X x X
+X X X 
+
+*)
 
 PROCEDURE reflect(VAR p: PT; n: PT);
 VAR 

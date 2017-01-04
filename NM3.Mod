@@ -204,7 +204,7 @@ BEGIN
 					ray.lxyz.x := ABS(xyz.x - ijk.i);  
 					ray.lxyz.y := ABS(xyz.y - ijk.j);
 					ray.lxyz.z := ABS(xyz.z - ijk.k);
-					ray.popdelta := Base.Origin; (* because many shaders don't set it *)
+					ray.popdelta := Base.Origin; (* because many shaders don't set it *) 
 					IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 						ray.normalTF:=TRUE;
 						ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal
@@ -220,7 +220,7 @@ BEGIN
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);	
 				END;
 			END;
-			IF (ray.alpha<0.1) (* OR ( (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1)) *)THEN ray.terminate:=TRUE END;
+			IF ray.alpha<0.1 THEN ray.terminate:=TRUE END;
 		UNTIL out OR ray.terminate;
 	END 		END;
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;

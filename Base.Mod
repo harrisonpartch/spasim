@@ -176,29 +176,20 @@ BEGIN
 		side[2]:=side[0];		
 		side[3]:=side[0];		
 		side[4]:=side[0];		
-		side[5]:=side[0];
-		
+		side[5]:=side[0];		
 	END
 END init;	
 END TexCube;
 
-TYPE BPE*=RECORD
-	red*,green*,blue*: REAL
-END;
-
-TYPE BPATCH*=ARRAY BPS,BPS OF BPE;
-
 TYPE Ray* = RECORD
 	xyz*, dxyz*, ddxyz*, lxyz*, txyz*, origin*, oxyz*, popdelta*, hitxyz*, hitdxyz*: PT;	
 	theta*,phi*, dtheta*,dphi*: REAL;
-	asteps*, bsteps*: INTEGER;
-(*	cellred*,cellgreen*,cellblue*,cellblack*: REAL; *)
+	patch*: CHAR; (* a: 1x1 b: 2x2 etc *)
 	texcube*:TexCube;
 	texcubeTF*:BOOLEAN;
 	ncube*: NCube;
 	ncubeTF*: BOOLEAN;
 	r*, g*, b*, ra*, ga*, ba*, bla*,alpha*: REAL; 
-	rgb*: ARRAY 3,3 OF BPE;
 	terminate*: BOOLEAN;
 	scale*,tscale*: REAL;
 	length*: REAL; 
@@ -218,6 +209,14 @@ TYPE Ray* = RECORD
 	justhitTF*:BOOLEAN;
 	diositizeTF*:BOOLEAN;
 	texdtl*:REAL;
+END;
+
+TYPE pRay2*=RECORD(Ray)
+	patch*: ARRAY 2,2 OF Colr; (* alpha not needed *)
+END;
+
+TYPE pRay3*=RECORD(Ray)
+	patch*: ARRAY 3,3 OF Colr; (* alpha not needed *)
 END;
 
 TYPE Path*=ARRAY 20 OF ARRAY 3 OF INTEGER;
