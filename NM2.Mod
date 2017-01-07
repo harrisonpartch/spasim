@@ -269,7 +269,8 @@ BEGIN
 	ray.hitdxyz:=ray.dxyz;
 	ray.changed := TRUE;
 	ray.mirrortf:=TRUE;	
-	reflect(ray.dxyz, ray.normal);	
+	INC(ray.mirrors);
+	IF ray.mirrors<4 THEN reflect(ray.dxyz, ray.normal) END;
 	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
@@ -531,16 +532,13 @@ BEGIN
 					blox[i,j,k].strokerec(p, resolution,nextscale,  voxel)
 				ELSE
 					NEW(c);
-					c.setcolor(red,green,blue,black,alpha);
 					c.fill(blox[i,j,k]);
-					c.passable:=blox[i,j,k].passable;
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
 					c.strokerec(p, resolution,nextscale, voxel);
 				END	
 			ELSE
 				NEW(c);
-				c.setcolor(red,green,blue,black,alpha);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
 				c.strokerec(p, resolution,nextscale, voxel);
@@ -572,7 +570,6 @@ BEGIN
 					blox[i,j,k].strokephemeralrec(p, resolution,nextscale,voxel,vu)
 				ELSE
 					NEW(c);
-					c.setcolor(red,green,blue,black,alpha);
 					c.fill(blox[i,j,k]);
 					c.passable:=blox[i,j,k].passable;
 					blox[i,j,k]:=c;
@@ -581,7 +578,6 @@ BEGIN
 				END	
 			ELSE
 				NEW(c);
-				c.setcolor(red,green,blue,black,alpha);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
 				c.strokerec(p, resolution,nextscale, voxel);

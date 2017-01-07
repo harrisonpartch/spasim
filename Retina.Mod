@@ -7,9 +7,9 @@ TYPE
 	PT=Base.PT;
 CONST
 	T=6;        
-	TS=2*64;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=6;
-	TH=5;
+	TS=3*64;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
+	TW=4;
+	TH=4;
 	W*=TS*TW;
 	H*=TS*TH;
 
@@ -28,7 +28,7 @@ BEGIN{EXCLUSIVE}
      GO:=TRUE
 END go;
 
-PROCEDURE tessad2(cam: Camera);
+PROCEDURE tessad3(cam: Camera);
 VAR
 	i,j: LONGINT;
 	theta,phi,dtheta,dphi: REAL;
@@ -36,13 +36,12 @@ VAR
 	pixel: Raster.Pixel;
 BEGIN
 	theta:=cam.theta;
-	dtheta:=cam.dtheta/2;
-	dphi:=cam.dphi/2;
-	FOR i:= 0 TO 1 DO
+	dtheta:=cam.dtheta/3;
+	dphi:=cam.dphi/3;
+	FOR i:= 0 TO 2 DO
 		phi:=cam.phi;
-		FOR j :=  0 TO 1 DO 
+		FOR j :=  0 TO 2 DO 
 			ray:=Base.blankray;
-			ray.dtl:=10;
 			angletoray(ray,theta,phi);
 			Base.world.Shade(ray);
 			IF ~ray.terminate THEN
@@ -57,28 +56,34 @@ BEGIN
 		END;
 		theta:=theta+dtheta;
 	END;
-END tessad2;
+END tessad3;
 
 PROCEDURE tessa(cam: Camera);
 VAR
 	i,j: LONGINT;
 	theta,phi,dtheta,dphi: REAL;
-	ray: Base.Ray;
+	pray: Base.pRay3;
 	pixel: Raster.Pixel;
 BEGIN
-	ray:=Base.blankray;
-(*	ray.dtheta:=cam.dtheta;
-	ray.dphi:=cam.dphi; *)
-	ray.dtl:=10;
-	angletoray(ray,cam.theta+cam.dtheta/3, cam.phi+cam.dphi/3);	
-	Base.world.Shade(ray);
-	IF ~ray.terminate THEN
-			ray.clr.b:= ray.clr.b + ray.clr.ba;
-			ray.clr.r:= ray.clr.r + ray.clr.ra/2;
-			ray.clr.g:= ray.clr.g + ray.clr.ga/2;	
+	pray:=Base.blankpray3;
+	angletoray(pray,cam.theta+cam.dtheta/3, cam.phi+cam.dphi/3);	
+	Base.world.Shade(pray);
+	IF ~pray.terminate THEN
+			pray.clr.b:= pray.clr.b + pray.clr.ba;
+			pray.clr.r:= pray.clr.r + pray.clr.ra/2;
+			pray.clr.g:= pray.clr.g + pray.clr.ga/2;	
 	END;
-	Raster.SetRGB(pixel,ENTIER(ray.clr.r*255),ENTIER(ray.clr.g*255),ENTIER(ray.clr.b*255)); 
-	Raster.Fill(image,cam.imx,cam.imy,cam.imx+2,cam.imy+2,pixel,copy);	
+	IF pray.patchTF THEN
+		FOR i:= 0 TO 2 DO
+			FOR j :=  0 TO 2 DO 
+				Raster.SetRGB(pixel,ENTIER(pray.patch[i,j].r*255),ENTIER(pray.patch[i,j].g*255),ENTIER(pray.patch[i,j].b*255)); 
+				Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy)
+			END
+		END
+	ELSE
+		Raster.SetRGB(pixel,ENTIER(pray.clr.r*255),ENTIER(pray.clr.g*255),ENTIER(pray.clr.b*255)); 
+		Raster.Fill(image,cam.imx,cam.imy,cam.imx+3,cam.imy+3,pixel,copy);	
+	END
 END tessa;
 
 PROCEDURE ztrace(cam: Camera; level: INTEGER);
@@ -92,28 +97,28 @@ BEGIN
 			x:=a.imx - W/2;
 			y:=a.imy-H/2;		
 			IF (~saccade)&((x*x+y*y)<FV) THEN	
-				tessad2(a); 
+				tessad3(a); 
 			ELSE
 				tessa(a); 
 			END;
 			x:=b.imx - W/2;
 			y:=b.imy-H/2;		
 			IF (~saccade)&((x*x+y*y)<FV) THEN	
-				tessad2(b); 
+				tessad3(b); 
 			ELSE
 				tessa(b); 			
 			END;			
 			x:=c.imx - W/2;
 			y:=c.imy-H/2;		
 			IF (~saccade)&((x*x+y*y)<FV) THEN		
-				tessad2(c); 
+				tessad3(c); 
 			ELSE
 				tessa(c); 
 			END;
 			x:=d.imx - W/2;
 			y:=d.imy-H/2;		
 			IF (~saccade)&((x*x+y*y)<FV) THEN	
-				tessad2(d); 
+				tessad3(d); 
 			ELSE
 				tessa(d); 
 			END; 
@@ -134,10 +139,10 @@ VAR
 BEGIN
 	splitcam(cam,a,b,c,d);
 	IF level<2 THEN
-			tessad2(a); 
-			tessad2(b); 
-			tessad2(c); 
-			tessad2(d); 
+			tessad3(a); 
+			tessad3(b); 
+			tessad3(c); 
+			tessad3(d); 
 	ELSE
 		l:=level-1;
 		ztraced(a,l);
@@ -242,7 +247,7 @@ BEGIN
 	ray.lxyz:=Base.cameraPT;
 	ray.xyz:=Base.cameraPT;
 	ray.oxyz:=Base.cameraPT;
-	ray.dtl:=Base.DTL;
+	ray.dtl:=Base.DTL*ray.dtl;
 	ray.texdtl:=1;	
 END angletoray;
 
@@ -378,11 +383,6 @@ BEGIN
 	Raster.Put(image,W-1,H-1,pixel,copy);	
 	Raster.Put(image,W+1,H-1,pixel,copy);			
 	Base.tick;
-(*	Out.Int(frameasteps,7);
-	Out.String(" <-a b-> ");
-	Out.Int(framebsteps,7);	
-	Out.Ln;
-*)	
 END go;
 
 PROCEDURE lsu*;
@@ -411,6 +411,6 @@ BEGIN
  	lsense:=0.2;
  	aperture.width:=1;
  	aperture.height:=1;
- 	foveaparameter:=23;
+ 	foveaparameter:=50;
  	Out.String("loaded...");
 END Retina.

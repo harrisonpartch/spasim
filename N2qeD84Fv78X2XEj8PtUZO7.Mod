@@ -16,7 +16,7 @@ VAR
 	path: Path;
 PROCEDURE draw;
 BEGIN
-	conglo:=Base.VoxelFromName("NM4"); 
+	conglo:=Base.VoxelFromName("NM3"); 
 	conglo.setcolor(10,100,10,100,1);	
 	conglo.copyonstroke:=TRUE;
 	NEW(ball,center,6/12);	
@@ -25,7 +25,7 @@ BEGIN
 		radius:=Base.rand.Uniform()/28;
 		ball.reset(center, radius);
 		ball.setcolor(Base.rand.Uniform(),Base.rand.Uniform(),Base.rand.Uniform(),1/2);	
-		conglo.FRaster(ball,16);	
+		conglo.FRaster(ball,27);	
 (*		NEW(plane,Base.randPT(), Base.randPT());
 		plane.setcolor(Base.rand.Uniform(),Base.rand.Uniform(),Base.rand.Uniform(),1);
 		conglo.FRaster(plane,16);

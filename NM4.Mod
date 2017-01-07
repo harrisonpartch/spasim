@@ -8,7 +8,7 @@ Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
 
 CONST M=4; (* defines grid size *)
 	MMO=M-1;
-	CUBERADIUS=0.8;   (*change to sqrt(3)/2 ???*)
+	CUBERADIUS=0.9;   (*change to sqrt(3)/2 ???*)
 	NCODE="NM4";
 	NL=Base.NL;
 
@@ -96,22 +96,16 @@ VAR
 	pushxyz, newxyz, xyz: Base.PT;
 	ijk: Base.IPT;
 	drx, dry, drz, dr,rr,gr,br,blr,bla: REAL;
-	scaleInv:REAL; 
 	out,shadenil,A,B,C: BOOLEAN;
 	v: Voxel;
 	vdepth, blainv: REAL;
 	last:BOOLEAN;
-	dtl,rdtl: REAL;
 BEGIN
-	INC(ray.bsteps);
 	ray.scale := ray.scale*M;
-	scaleInv := 1/ray.scale;
 	xyz.x := ABS(ray.lxyz.x-offset.x) * M;  
 	xyz.y := ABS(ray.lxyz.y-offset.y) * M;		
 	xyz.z := ABS(ray.lxyz.z-offset.z)* M;	
 	pushxyz:=xyz;
-	rdtl:=ray.dtl;
-	IF DTL>0 THEN ray.dtl:=DTL END; 
 	IF (ray.length*ray.scale>ray.dtl) THEN
 		IF imposter#NIL THEN
 			imposter.Shade(ray)
@@ -126,7 +120,6 @@ BEGIN
 	IF ~out THEN
 		v:= blox[ijk.i,ijk.j,ijk.k];
 		IF (v#NIL) THEN
-			ray.inside:=TRUE;
 			ray.lxyz.x := ABS(xyz.x - ijk.i);  
 			ray.lxyz.y := ABS(xyz.y - ijk.j);
 			ray.lxyz.z := ABS(xyz.z - ijk.k);
@@ -135,15 +128,12 @@ BEGIN
 			xyz.x := xyz.x + ray.popdelta.x;    
 			xyz.y := xyz.y + ray.popdelta.y;
 			xyz.z := xyz.z + ray.popdelta.z;
-			ray.inside:=FALSE
 		ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 			nshade(nblox[ijk.i,ijk.j,ijk.k],ray);	
 		END
 	END;	 
-(*	IF (ray.alpha<0.1) OR ( (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1))THEN ray.terminate:=TRUE END;*)	
 	IF ~ray.terminate THEN
 		REPEAT
-			INC(ray.asteps);
 			IF ray.di  THEN
 				drx := ( (ijk.i + 1) - xyz.x) / ray.dxyz.x
 			ELSE
@@ -200,36 +190,21 @@ BEGIN
 					ray.face := 5; ray.fnormal:= Base.Face[5]
 				END;
 				newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
-			END;
-			bounds(ijk.i,ijk.j,ijk.k, out);	
-			IF ~out THEN
-				v := blox[ijk.i,ijk.j,ijk.k];  (*moved up here for cache latency --stupid idea*)
-			END;
-			vdepth:=Base.distance(newxyz,xyz)*scaleInv;
-			ray.xyz.x:=ray.xyz.x +((newxyz.x-xyz.x)+ray.ddxyz.x)*scaleInv;
-			ray.xyz.y:=ray.xyz.y +((newxyz.y-xyz.y)+ray.ddxyz.y)*scaleInv;			
-			ray.xyz.z:=ray.xyz.z +((newxyz.z-xyz.z)+ray.ddxyz.z)*scaleInv;			
+			END;	
+			vdepth:=Base.distance(newxyz,xyz)/ray.scale; 
+			ray.xyz.x:=ray.xyz.x +(newxyz.x-xyz.x)/ray.scale;
+			ray.xyz.y:=ray.xyz.y +(newxyz.y-xyz.y)/ray.scale;			
+			ray.xyz.z:=ray.xyz.z +(newxyz.z-xyz.z)/ray.scale;			
 			xyz:=newxyz;
 			ray.length:=ray.length+vdepth;
-			blr:=black*vdepth;
-			ray.bla := ray.bla-blr; 
-			blainv:=1-ray.bla;
-			rr := red*vdepth*ray.ra*blainv; 
-			gr := green*vdepth*ray.ga*blainv; 
-			br := blue*vdepth*ray.ba*blainv; 	 	
-			ray.r := ray.r+rr;
-			ray.g:= ray.g+gr;
-			ray.b := ray.b+br; 
-			ray.ra := (ray.ra-rr)-blr;
-			ray.ga := (ray.ga-gr)-blr;
-			ray.ba := (ray.ba-br)-blr; 
-			ray.alpha:=ray.alpha-black*vdepth;		
+			bounds(ijk.i,ijk.j,ijk.k, out);
 			IF ~out THEN
+				v := blox[ijk.i,ijk.j,ijk.k]; 
 				IF (v#NIL) THEN
 					ray.lxyz.x := ABS(xyz.x - ijk.i);  
 					ray.lxyz.y := ABS(xyz.y - ijk.j);
 					ray.lxyz.z := ABS(xyz.z - ijk.k);
-					ray.popdelta := Base.Origin; (* because many shaders don't set it *)
+					ray.popdelta := Base.Origin; (* because many shaders don't set it *) 
 					IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 						ray.normalTF:=TRUE;
 						ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal
@@ -245,13 +220,11 @@ BEGIN
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);	
 				END;
 			END;
-			IF (ray.alpha<0.1) (* OR ( (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1)) *)THEN ray.terminate:=TRUE END;
 		UNTIL out OR ray.terminate;
 	END 		END;
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
 	ray.popdelta.y := (xyz.y-pushxyz.y)/M;
 	ray.popdelta.z := (xyz.z-pushxyz.z)/M; 
-	ray.dtl:=rdtl;
 	ray.scale := ray.scale/M;
 END Shade;
 
@@ -265,18 +238,18 @@ BEGIN
 	mix:=ray.length*ray.scale/10;
 	IF mix>1 THEN mix:=1 END;
 	dot:=mix*dot1+(1-mix)*dot2;
-	dr:=nc.color.red*dot*ray.ra;
-	dg:=nc.color.green*dot*ray.ga;
-	db:=nc.color.blue*dot*ray.ba;	
-	ray.r := ray.r + dr;
-	ray.g := ray.g + dg;
-	ray.b := ray.b + db;	
-	ray.ra:=ray.ra-dr;
-	ray.ga:=ray.ga-dg;
-	ray.ba:=ray.ba-db;
-	ray.r := ray.r + nc.color.red * ray.ra*dot;
-	ray.g := ray.g + nc.color.green * ray.ga*dot;
-	ray.b := ray.b + nc.color.blue * ray.ba*dot; 	
+	dr:=nc.color.red*dot*ray.clr.ra;
+	dg:=nc.color.green*dot*ray.clr.ga;
+	db:=nc.color.blue*dot*ray.clr.ba;	
+	ray.clr.r := ray.clr.r + dr;
+	ray.clr.g := ray.clr.g + dg;
+	ray.clr.b := ray.clr.b + db;	
+	ray.clr.ra:=ray.clr.ra-dr;
+	ray.clr.ga:=ray.clr.ga-dg;
+	ray.clr.ba:=ray.clr.ba-db;
+	ray.clr.r := ray.clr.r + nc.color.red * ray.clr.ra*dot;
+	ray.clr.g := ray.clr.g + nc.color.green * ray.clr.ga*dot;
+	ray.clr.b := ray.clr.b + nc.color.blue * ray.clr.ba*dot; 	
 	ray.terminate:=TRUE
 END nshade;
 
@@ -296,7 +269,8 @@ BEGIN
 	ray.hitdxyz:=ray.dxyz;
 	ray.changed := TRUE;
 	ray.mirrortf:=TRUE;	
-	reflect(ray.dxyz, ray.normal);	
+	INC(ray.mirrors);
+	IF ray.mirrors<4 THEN reflect(ray.dxyz, ray.normal) END;
 	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
@@ -558,16 +532,13 @@ BEGIN
 					blox[i,j,k].strokerec(p, resolution,nextscale,  voxel)
 				ELSE
 					NEW(c);
-					c.setcolor(red,green,blue,black,alpha);
 					c.fill(blox[i,j,k]);
-					c.passable:=blox[i,j,k].passable;
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
 					c.strokerec(p, resolution,nextscale, voxel);
 				END	
 			ELSE
 				NEW(c);
-				c.setcolor(red,green,blue,black,alpha);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
 				c.strokerec(p, resolution,nextscale, voxel);
@@ -599,7 +570,6 @@ BEGIN
 					blox[i,j,k].strokephemeralrec(p, resolution,nextscale,voxel,vu)
 				ELSE
 					NEW(c);
-					c.setcolor(red,green,blue,black,alpha);
 					c.fill(blox[i,j,k]);
 					c.passable:=blox[i,j,k].passable;
 					blox[i,j,k]:=c;
@@ -608,7 +578,6 @@ BEGIN
 				END	
 			ELSE
 				NEW(c);
-				c.setcolor(red,green,blue,black,alpha);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
 				c.strokerec(p, resolution,nextscale, voxel);

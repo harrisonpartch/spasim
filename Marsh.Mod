@@ -119,7 +119,7 @@ VAR
 	pth: Path; 
 PROCEDURE draw*;
 BEGIN
-	stroke(Base.cursorPT,cursorsize,marshv.vox,voxundo)
+	stroke(Base.cursorPT,cursorsize,marshv.vox)
 END draw;
 
 PROCEDURE key*(CONST c:CHAR);
@@ -129,7 +129,7 @@ END key;
 
 PROCEDURE clear*;
 BEGIN
-	stroke(Base.cursorPT,cursorsize,EMPTY,voxundo)
+	stroke(Base.cursorPT,cursorsize,EMPTY)
 END clear;
 
 PROCEDURE line*;
@@ -137,7 +137,7 @@ BEGIN
 	Base.world.line(A,B,cursorsize,marshv.vox);	
 END line;
 
-PROCEDURE stroke(p:PT; resolution:LONGINT; voxel,vundo:Voxel);
+PROCEDURE stroke(p:PT; resolution:LONGINT; voxel:Voxel);
 BEGIN
 	A:=B;
 	B:=p;
@@ -163,7 +163,7 @@ BEGIN
 	p.y:=p.y+dp.y/1000000;
 	p.z:=p.z+dp.z/1000000;
 	Base.cursorPT:=p; 	
-	stroke(Base.cursorPT,cursorsize,marshv.vox,voxundo)
+	stroke(Base.cursorPT,cursorsize,marshv.vox)
 END snipeinto;
 
 PROCEDURE snipeonto*;
@@ -184,7 +184,7 @@ BEGIN
 	p.y:=p.y-dp.y/1000000;
 	p.z:=p.z-dp.z/1000000;
 	Base.cursorPT:=p; 	
-	stroke(Base.cursorPT,cursorsize,marshv.vox,voxundo)
+	stroke(Base.cursorPT,cursorsize,marshv.vox)
 END snipeonto;
 
 PROCEDURE sniprobe*():Voxel;
@@ -424,9 +424,9 @@ BEGIN
 	noise.a:=1;
 	noise.b:=1;
 	noise.c:=1;		
-	noise.octaves:=5;
+	noise.octaves:=4;
 
-	noise.persistence:=4.1;
+	noise.persistence:=3.1;
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,9/10);
@@ -436,13 +436,16 @@ BEGIN
 	NEW(ball,center,0.6);  
 	serp.passable:=FALSE;   
 	conglomerate.copyonstroke:=TRUE;
-	noise.setvoxel(lobster);	
-	ball.setvoxel(sfish);
+	noise.setvoxel(reddot);	
+	reddot.tscale:=128;
+	ball.setvoxel(axolotl);
+	Base.setPT(center,1/2,1/2,9/12);
 	NEW(plane,center,up);
-	plane.vox:=badopossum;	
-(*	z2a.FRaster(plane,32);  *)
+	plane.vox:=rat;	
+	rat.tscale:=16;
+	z2a.FRaster(plane,64);  
 	z2a.FRaster(ball,32); 	
-	z2a.FRaster(noise,32);
+	z2a.FRaster(noise,64);
  	Base.world:=z2a; 	
 	Base.avatar:=harrison;
 	Base.avatarsize:=1000; 

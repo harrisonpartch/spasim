@@ -1,4 +1,4 @@
-MODULE NM4; (*! This module may be either imported or used anonymously *)
+MODULE NM3; (*! This module may be either imported or used anonymously *)
 IMPORT Base, SPSME, Noise, Math, Out := KernelLog, Debugging, Streams,Strings;
 
 (*
@@ -6,10 +6,10 @@ Special voxel containing 27 children arranged in a 3x3x3 grid.
 Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
 *)
 
-CONST M=4; (* defines grid size *)
+CONST M=3; (* defines grid size *)
 	MMO=M-1;
 	CUBERADIUS=0.9;   (*change to sqrt(3)/2 ???*)
-	NCODE="NM4";
+	NCODE="NM3";
 	NL=Base.NL;
 
 TYPE PT = Base.PT;
@@ -22,9 +22,9 @@ TYPE PT = Base.PT;
  	NCube=Base.NCube;
  	LCube=Base.LightCube;
 
-PROCEDURE rot90z(VAR blx: ARRAY 4,4,4 OF Voxel);
+PROCEDURE rot90z(VAR blx: ARRAY 3,3,3 OF Voxel);
 VAR
-	b: ARRAY 4,4,4 OF Voxel;
+	b: ARRAY 3,3,3 OF Voxel;
 BEGIN
 	b[1,0,0]:= blx[0,0,0];
 	b[1,1,0]:= blx[1,0,0];
@@ -37,9 +37,9 @@ BEGIN
 	blx:=b;
 END rot90z;
 
-PROCEDURE rot90zB(VAR blx: ARRAY 4,4,4 OF BOOLEAN);
+PROCEDURE rot90zB(VAR blx: ARRAY 3,3,3 OF BOOLEAN);
 VAR
-	b: ARRAY 4,4,4 OF BOOLEAN;
+	b: ARRAY 3,3,3 OF BOOLEAN;
 BEGIN
 	b[1,0,0]:= blx[0,0,0];
 	b[1,1,0]:= blx[1,0,0];
@@ -52,9 +52,9 @@ BEGIN
 	blx:=b;
 END rot90zB;
 
-PROCEDURE rot90zNC(VAR blx: ARRAY 4,4,4 OF NCube);
+PROCEDURE rot90zNC(VAR blx: ARRAY 3,3,3 OF NCube);
 VAR
-	b: ARRAY 4,4,4 OF NCube;
+	b: ARRAY 3,3,3 OF NCube;
 BEGIN
 	b[1,0,0]:= blx[0,0,0];
 	b[1,1,0]:= blx[1,0,0];
@@ -269,7 +269,8 @@ BEGIN
 	ray.hitdxyz:=ray.dxyz;
 	ray.changed := TRUE;
 	ray.mirrortf:=TRUE;	
-	reflect(ray.dxyz, ray.normal);	
+	INC(ray.mirrors);
+	IF ray.mirrors<4 THEN reflect(ray.dxyz, ray.normal) END;
 	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
@@ -531,16 +532,13 @@ BEGIN
 					blox[i,j,k].strokerec(p, resolution,nextscale,  voxel)
 				ELSE
 					NEW(c);
-					c.setcolor(red,green,blue,black,alpha);
 					c.fill(blox[i,j,k]);
-					c.passable:=blox[i,j,k].passable;
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
 					c.strokerec(p, resolution,nextscale, voxel);
 				END	
 			ELSE
 				NEW(c);
-				c.setcolor(red,green,blue,black,alpha);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
 				c.strokerec(p, resolution,nextscale, voxel);
@@ -572,7 +570,6 @@ BEGIN
 					blox[i,j,k].strokephemeralrec(p, resolution,nextscale,voxel,vu)
 				ELSE
 					NEW(c);
-					c.setcolor(red,green,blue,black,alpha);
 					c.fill(blox[i,j,k]);
 					c.passable:=blox[i,j,k].passable;
 					blox[i,j,k]:=c;
@@ -581,7 +578,6 @@ BEGIN
 				END	
 			ELSE
 				NEW(c);
-				c.setcolor(red,green,blue,black,alpha);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
 				c.strokerec(p, resolution,nextscale, voxel);
@@ -876,7 +872,7 @@ END count;
 
 (* 
 Engrains this voxel and it's children recursively in the following format:
-"NM4"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
+"NM3"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
 <----- Voxel data -----><------                     children data                     ------>
 Children data contains 27 boolean-child pairs, each boolean being TRUE if a child is contained in that position.
 In case of FALSE the length of child data is 0 for that child (i.e. no data is being written except for the FALSE).
@@ -946,7 +942,7 @@ END thisvox;
 
 BEGIN
 
-END NM4.
+END NM3.
 
 
 

@@ -26,8 +26,8 @@ VAR
 BEGIN
 	exit:=Base.Exit(ray);
 	depth:=Base.dist(ray.lxyz,exit);
-	dr := r*depth*ray.bla;
-	dg := g*depth*ray.bla;
+	dr := r*depth*ray.clr.ra;
+	dg := g*depth*ray.clr.ga;
 	db := b*depth*ray.bla;
 	dbl:=black*depth;
 	ray.r := ray.r + dr;

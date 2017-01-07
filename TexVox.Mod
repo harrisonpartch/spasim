@@ -52,7 +52,7 @@ BEGIN
 			|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
 			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 		END;	
-		color:=texcube.side[ray.face].pixelmip2(1-lx,1-ly);
+		color:=texcube.side[ray.face].pixelmip_one(1-lx,1-ly);
 		dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
 		dr:=color.red*dot;
 		dg:=color.green*dot;
@@ -228,7 +228,7 @@ IF ray.length>0.00000001 THEN
 			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 		END
 	END;
-	color:=texcube.side[ray.face].pixelmip2(lx,ly);	
+	color:=texcube.side[ray.face].pixelmip_one(lx,ly);	
 	IF color.alpha<0.99 THEN
 			IF color.alpha>0.97 THEN 
 				mirror(ray,mix)
@@ -251,7 +251,7 @@ IF ray.length>0.00000001 THEN
 					|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
 					|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 				END;
-				color:=texcube.side[faace].pixelmip2(lx,ly);			
+				color:=texcube.side[faace].pixelmip_one(lx,ly);			
 				dr:=color.red*color.alpha;
 				dg:=color.green*color.alpha;
 				db:=color.blue*color.alpha;	
@@ -264,34 +264,38 @@ IF ray.length>0.00000001 THEN
 			END			
 	ELSE
 		mip:=ray.length*ray.scale/12;
-		IF mip>2 THEN 	
-			mip:=ray.length*ray.scale/10
-		END;
-		IF mip>3 THEN 	
+		IF mip>4 THEN 	
 			color:=texcube.side[ray.face].pixelmip0(lx,ly);
 		ELSIF mip>1 THEN
-			color:=texcube.side[ray.face].pixelmip1(lx,ly);
+			color:=texcube.side[ray.face].pixelmip_one(lx,ly);
 		ELSE
-			color:=texcube.side[ray.face].pixelmip2(lx,ly);		
+			color:=texcube.side[ray.face].pixelmip_one(lx,ly);		
 		END; 	
 		dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
 		dr:=color.red*dot;
 		dg:=color.green*dot;
 		db:=color.blue*dot;	
-		IF ray IS Base.pRay3 THEN
-			WITH ray: Base.pRay3 DO
-				ray.patchTF:=TRUE;
-				FOR i := -1 TO 1 DO
-					FOR j:= -1 TO 1 DO
-						ray.patch[i,j]:= ray.clr
-					END
-				END
-			END
-		END;
 		ray.clr.r := ray.clr.r + dr*ray.clr.ra;
 		ray.clr.g := ray.clr.g + dg*ray.clr.ga;
 		ray.clr.b := ray.clr.b + db*ray.clr.ba;	
-		ray.terminate:=TRUE
+		IF ray IS Base.pRay3 THEN 
+			WITH ray: Base.pRay3 DO
+				ray.patchTF:=TRUE;	
+				FOR i := -1 TO 1 DO
+					FOR j:= -1 TO 1 DO
+					(*	IF mip>4 THEN 	
+							color:=texcube.side[ray.face].pixelmip0(lx+i,ly+j);
+						ELSIF mip>1 THEN
+							color:=texcube.side[ray.face].pixelmip_one(lx+i,ly-i);
+						ELSE
+							color:=texcube.side[ray.face].pixelmip2(lx+i,ly+j);		
+						END; 	*)					
+						ray.patch[i,j]:= ray.clr;   
+					END
+				END
+			END 
+		END;
+		ray.terminate:=TRUE	
 	END
 END
 END Shade;
@@ -323,6 +327,8 @@ BEGIN
 	ray.hitdxyz:=ray.dxyz;
 	ray.changed := TRUE;
 	ray.mirrortf:=TRUE;	
+	INC(ray.mirrors);
+	IF ray.mirrors<4 THEN reflect(ray.dxyz, ray.normal)	END;
 	n.x:=(ray.normal.x*mix+ray.fnormal.x*(1-mix));
 	n.y:=(ray.normal.y*mix+ray.fnormal.y*(1-mix));	
 	n.z:=(ray.normal.z*mix+ray.fnormal.z*(1-mix));	

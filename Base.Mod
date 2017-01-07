@@ -76,7 +76,7 @@ END V;
 
 TYPE Texture*=OBJECT(V)
 VAR
-	img,mip0,mip1,mip2: Raster.Image;
+	img,mip0,mip_one,mip2: Raster.Image;
 	W*,H*, bpr,adr: LONGINT;
 	transparent*: BOOLEAN;
 
@@ -90,17 +90,17 @@ BEGIN
 		img := defaultimg;
 	END;
 	NEW(mip0);
-	NEW(mip1);	
+	NEW(mip_one);	
 	NEW(mip2);
 	Raster.Create(mip0,MIP0,MIP0,Raster.BGRA8888);
-	Raster.Create(mip1,MIP1,MIP1,Raster.BGRA8888);		
+	Raster.Create(mip_one,MIP1,MIP1,Raster.BGRA8888);		
 	Raster.Create(mip2,MIP2,MIP2,Raster.BGRA8888);		
 	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height),mip0,
 		WMRectangles.MakeRect(0,0, mip0.width, mip0.height),WMRectangles.MakeRect(0,0,mip0.width, mip0.height),
 			WMRasterScale.ModeCopy, WMRasterScale.ScaleBilinear);
-	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height),mip1,
-		WMRectangles.MakeRect(0,0, mip1.width, mip1.height),
-			WMRectangles.MakeRect(0,0, mip1.width, mip1.height),WMRasterScale.ModeSrcOverDst, WMRasterScale.ScaleBilinear);	
+	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height),mip_one,
+		WMRectangles.MakeRect(0,0, mip_one.width, mip_one.height),
+			WMRectangles.MakeRect(0,0, mip_one.width, mip_one.height),WMRasterScale.ModeSrcOverDst, WMRasterScale.ScaleBilinear);	
 	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height),mip2,
 		WMRectangles.MakeRect(0,0, mip2.width, mip2.height),
 			WMRectangles.MakeRect(0,0, mip2.width, mip2.height),WMRasterScale.ModeSrcOverDst, WMRasterScale.ScaleBilinear);	
@@ -120,19 +120,20 @@ BEGIN
 *)	RETURN c
 END pixelmip0;
 
-PROCEDURE pixelmip1*(x,y:REAL):Color;
+PROCEDURE pixelmip_one*(x,y:REAL):Color;
 VAR
 	i,j: LONGINT;
 	p: Raster.Pixel;
 	c: Color;
 BEGIN
+	ASSERT(mip_one#NIL);
 	i:= ENTIER(x*MIP1);
 	j:=ENTIER(y*MIP1);
 	i:=i MOD MIP1; j:=j MOD MIP1;	
-	Raster.Get(mip1,i,j,p,copy);
+	Raster.Get(mip_one,0,0,p,copy);
 	c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
 	RETURN c
-END pixelmip1;
+END pixelmip_one;
 
 PROCEDURE pixelmip2*(x,y:REAL):Color;
 VAR

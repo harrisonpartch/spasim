@@ -241,9 +241,9 @@ BEGIN
 	cvz := cvz*GLIDE+gravityvector.z;
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y;
 	cvl :=cvl*0.5; cvu := cvu*0.5; 
-	IF 0 IN MB THEN Marsh.draw; Out.Char("*");
+	IF (0 IN MB) OR (key='K') THEN Marsh.snipeonto;
 	ELSIF  1 IN MB THEN Marsh.snipeinto;
-	ELSIF  2 IN MB THEN Marsh.snipeonto;
+	ELSIF  2 IN MB THEN Marsh.draw; 
 	END;
 	trace;
 	Base.tick
@@ -270,7 +270,7 @@ VAR
 	i, t1: LONGINT;
 	mousepreviousx, mousepreviousy: LONGINT;
 	pi: WM.PointerInfo;
-	warpvent: BOOLEAN;
+	warpvent,rlock: BOOLEAN;
 	saccade: BOOLEAN;
 	mstarget: INTEGER;
 
@@ -303,13 +303,16 @@ VAR
 	s: Strings.String;
 	c: CHAR;
 BEGIN
+	key:=CHR(ucs);
 	CASE ucs OF
 		   27: uncapture
 		| 164: uncapture; Close; Base.worldalive:=FALSE
-		| 193: INC(mstarget);  INC(mstarget);  INC(mstarget);  INC(mstarget); Out.Int(mstarget,4); Out.Ln
-		| 194: DEC(mstarget); DEC(mstarget); DEC(mstarget); DEC(mstarget); Out.Int(mstarget,4); Out.Ln
-		| 195: camera.left(0.03)
+		| 193: INC(mstarget);  INC(mstarget);  INC(mstarget);  INC(mstarget); Out.Int(framedt,4); Out.Ln
+		| 194: DEC(mstarget); DEC(mstarget); DEC(mstarget); DEC(mstarget); Out.Int(framedt,4); Out.Ln
+(*		| 195: camera.left(0.03)
 		| 196: camera.left(-0.03)
+*)		| 195: Base.DTL:= Base.DTL*2/3;
+		| 196: Base.DTL:= Base.DTL*3/2;
 	ELSE
 		CASE CHR(ucs) OF
 			   "s" : camera.forward(-0.51*Base.speed)
@@ -345,6 +348,9 @@ BEGIN
 			| "b": Marsh.showcode;
 			| "=": uncapture;
 			| "+": uncapture; Close;	
+			| " ": rlock:= ~rlock
+			| "-": Out.Int(framedt,4); Out.Ln
+
 		ELSE
 			Out.Int(ucs,5);
 			Out.Ln;
@@ -370,8 +376,10 @@ BEGIN
 			mousedx:=x-mousepreviousx;
 			mousedy:=y-mousepreviousy;
 			IF (mousedx+mousedy)>50 THEN saccade:=TRUE ELSE saccade:=FALSE END;
-			camera.up(-mousedy*ABS(mousedy)/(10000*upsticky)); 
-			camera.left(mousedx*ABS(mousedx)/(10000*leftsticky));	
+			IF ~rlock THEN
+				camera.up(-mousedy*ABS(mousedy)/(10000*upsticky)); 
+				camera.left(mousedx*ABS(mousedx)/(10000*leftsticky))
+			END;
 			mousepreviousx:=x;
 			mousepreviousy:=y;
 	END
@@ -394,9 +402,9 @@ PROCEDURE detail();
 			Retina.saccade:=FALSE;
 			IF framedt < mstarget THEN
 				 timer.Sleep(mstarget-framedt - 10); 
-				Retina.moredetail;
+				Retina.moredetail; 
 			ELSIF framedt > (mstarget+10) THEN
-				Retina.lessdetail;
+				Retina.lessdetail; 
 			END
  END 
 END detail;
@@ -406,7 +414,7 @@ END detail;
 		foveasize := 100;
 		multicore:=TRUE;
 		camrotinertia:=100;
-		Base.DTL:=25000;
+		Base.DTL:=2500;
 		Base.DTL2:=2500;
 		Base.gravity:=0.000001;
 		Base.speed:=0.001;
@@ -469,6 +477,7 @@ rand: Random.Generator;
 	RW:  RayWindow;
 	RWcenterx, RWcentery,mousedx,mousedy: LONGINT;
 	timer: Kernel.Timer;
+	key: CHAR;
 
 PROCEDURE speedup;
 BEGIN
