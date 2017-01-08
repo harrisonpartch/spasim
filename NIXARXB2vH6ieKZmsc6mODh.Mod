@@ -29,13 +29,13 @@ BEGIN
 	dg := g*depth;
 	db := b*depth;
 	dbl:=black*depth;
-	ray.r := ray.r + dr;
-	ray.g := ray.g + dg;
-	ray.b := ray.b + db; 
-	ray.ra := (ray.ra - dr)-dbl;
-	ray.ga := (ray.ga - dg)-dbl;
-	ray.ba := (ray.ba - db)-dbl; 
-	IF (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1) THEN ray.terminate:=TRUE END;
+	ray.clr.r := ray.clr.r + dr;
+	ray.clr.g := ray.clr.g + dg;
+	ray.clr.b := ray.clr.b + db; 
+	ray.clr.ra := (ray.clr.ra - dr)-dbl;
+	ray.clr.ga := (ray.clr.ga - dg)-dbl;
+	ray.clr.ba := (ray.clr.ba - db)-dbl; 
+	IF (ray.clr.ra<0.1)&(ray.clr.ga<0.1)&(ray.clr.ba<0.1) THEN ray.terminate:=TRUE END;
 END Shade;
 
 END TransparaVox;  
@@ -48,5 +48,5 @@ END thisvox;
 
 BEGIN
 NEW(vox); 
-vox.setcolor(200,200,200,0,200);
+vox.setcolor(1,1/5,1/5,0,0);
 END NIXARXB2vH6ieKZmsc6mODh. 

@@ -130,7 +130,7 @@ BEGIN
 	i:= ENTIER(x*MIP1);
 	j:=ENTIER(y*MIP1);
 	i:=i MOD MIP1; j:=j MOD MIP1;	
-	Raster.Get(mip_one,0,0,p,copy);
+	Raster.Get(mip_one,0,0,p,copy); 
 	c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
 	RETURN c
 END pixelmip_one;

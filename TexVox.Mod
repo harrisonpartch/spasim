@@ -52,7 +52,7 @@ BEGIN
 			|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
 			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 		END;	
-		color:=texcube.side[ray.face].pixelmip_one(1-lx,1-ly);
+		color:=texcube.side[ray.face].pixelmip_one(lx,ly);
 		dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
 		dr:=color.red*dot;
 		dg:=color.green*dot;
