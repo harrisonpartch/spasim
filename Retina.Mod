@@ -24,6 +24,20 @@ TYPE Tile=OBJECT
 VAR
 	GO: BOOLEAN;
 	cam: Camera;
+	blankray, blankpray: Base.Ray;
+
+PROCEDURE & init;
+BEGIN
+	blankray.clr.ra := 1;
+	blankray.clr.ga := 1;
+	blankray.clr.ba := 1;
+	blankray.scale := 1; 
+	blankray.tscale:=1;
+	blankray.dtl:=3;	
+	blankpray:=blankray;
+	blankpray.dtl:=1.5;
+	blankpray.ispatchTF:=TRUE;
+END init;
 
 PROCEDURE go;
 BEGIN{EXCLUSIVE}
@@ -43,7 +57,7 @@ BEGIN
 	FOR i:= 0 TO 2 DO
 		phi:=cam.phi;
 		FOR j :=  0 TO 2 DO 
-			ray:=Base.blankray;
+			ray:=blankray;
 			ray.dtl:=Base.DTL;
 			angletoray(ray,theta,phi);
 			Base.world.Shade(ray);
@@ -67,8 +81,9 @@ VAR
 	ray: Base.Ray;
 	pixel: Raster.Pixel;
 BEGIN
-	ray:=Base.blankpray;
-	ray.isPatchTF:=TRUE;
+	ray:=blankray;
+	ray.patchTF:=TRUE;
+	ASSERT(ray.patchTF);		
 	ray.dtl:=Base.DTL;
 	angletoray(ray,cam.theta+cam.dtheta/3, cam.phi+cam.dphi/3);	
 	Base.world.Shade(ray);
@@ -162,7 +177,7 @@ BEGIN{ACTIVE, PRIORITY(Objects.Normal)
 		BEGIN{EXCLUSIVE}
 			AWAIT(GO);
 		END;
-		ztrace(cam,T);	
+		ztraced(cam,T);	
 		BEGIN{EXCLUSIVE}
 			GO:=FALSE;
 			incTD;
@@ -237,7 +252,6 @@ END mirror;
 PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
 VAR d: REAL;
 BEGIN
-	ray:=Base.blankray;
 	ray.dxyz.x:= Math.cos(theta) * Math.cos(phi);
 	ray.dxyz.y:= Math.sin(theta) * Math.cos(phi);
 	ray.dxyz.z := Math.sin(phi);

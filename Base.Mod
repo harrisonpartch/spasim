@@ -229,8 +229,7 @@ TYPE Ray* = RECORD
 	corner*:PT;
 	dtl*: REAL;	
 	dtlTF*:BOOLEAN;
-	isPatchTF*: BOOLEAN;
-	patchTF*: BOOLEAN;
+	ispatchTF*,patchTF*: BOOLEAN;
 	patch*: ARRAY 3,3 OF ray_color; (* alpha not needed *)
 	hitmirrorTF*:BOOLEAN;
 	justhitTF*:BOOLEAN;
@@ -532,7 +531,6 @@ VAR
 	gravity*:REAL;
 	fuzzon*, STOP*: BOOLEAN;
 	singleray*: Ray;	(* for when a single ray is most convenient *)
-	blankray*,blankpray*: Ray;
 	Face*: ARRAY 6 OF PT;
 	EMPTY*,OPAQUE*: Voxel;
 	deathflag*:BOOLEAN;
@@ -583,30 +581,6 @@ PROCEDURE VoxelFromName*(modname: Name): Voxel;
 		END;
 		RETURN voxel
 END VoxelFromName;
-
-PROCEDURE radiositize*(l:LightCube; p:PT; face:INTEGER);
-VAR
-	i: INTEGER;
-	ray: Ray;
-BEGIN
-	l.light[face].red:=0;
-	l.light[face].green:=0;
-	l.light[face].blue:=0;
-	FOR i:=0 TO 10 DO
-		ray:=blankray;
-		ray.xyz:=p;
-		ray.dxyz:=randnormPT();
-		IF dot(ray.xyz,Face[face])>1 THEN	
-			world.Shade(ray);
-			l.light[face].red:=l.light[face].red+ray.clr.r/11;
-			l.light[face].green:=l.light[face].green+ray.clr.g/11;
-			l.light[face].blue:=l.light[face].blue+ray.clr.b/11
-		END
-	END;
-	l.light[face].red:=rand.Uniform();
-	l.light[face].green:=rand.Uniform();
-	l.light[face].blue:=rand.Uniform();	
-END radiositize;
 
 PROCEDURE updatecamera*(x,y,z,a,b,c,d,e,f:  REAL);
 BEGIN
@@ -1202,15 +1176,6 @@ BEGIN
 	iterlimit := 500;
 	DTL:=3;	
 	Origin:=mkPT(0,0,0);   (* unneeded initialization *)
-	blankray.clr.ra := 1;
-	blankray.clr.ga := 1;
-	blankray.clr.ba := 1;
-	blankray.scale := 1; 
-	blankray.tscale:=1;
-	blankray.dtl:=3;	
-	blankpray:=blankray;
-	blankpray.dtl:=1;
-	blankpray.isPatchTF:=TRUE;
 	Face[0].x := -1; Face[0].y := 0; Face[0].z := 0; 
 	Face[3].x := 1; Face[3].y := 0; Face[3].z := 0; 
 	Face[1].x := 0; Face[1].y := 1; Face[1].z := 0; 
