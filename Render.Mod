@@ -332,7 +332,7 @@ BEGIN
 			| "2" : Marsh.darken
 			| "3" : Base.gravity:= Base.gravity/1.5
 			| "4" : Base.gravity:= 1.5*Base.gravity
-			| "5" : Base.STOPGO
+			| "5" : Base.STOPGO; Retina.PATCH:= ~Retina.PATCH;
 			| "6" : avaTF:=~avaTF
 			| "?" : Out.Int(Base.world.count(7),4); Out.Ln
 			| "h" : camera.hop

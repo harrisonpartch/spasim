@@ -229,75 +229,80 @@ IF ray.length>0.00000001 THEN
 		END
 	END;
 	color:=texcube.side[ray.face].pixelmip_one(lx,ly);	
+	dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
 	IF color.alpha<0.99 THEN
-			IF color.alpha>0.97 THEN 
-				mirror(ray,mix)
-			ELSE		
-				dr:=color.red*color.alpha;
-				dg:=color.green*color.alpha;
-				db:=color.blue*color.alpha;	
-				ray.clr.r := ray.clr.r + dr*ray.clr.ra;
-				ray.clr.g := ray.clr.g + dg*ray.clr.ga;
-				ray.clr.b := ray.clr.b + db*ray.clr.ba;
-				ray.clr.ra:=ray.clr.ra -dr;
-				ray.clr.ga:=ray.clr.ga -dg;
-				ray.clr.ba:=ray.clr.ba -db;
-				Base.ExitF(ray,exit,faace);
-				CASE faace OF
-					 0: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
-					|1: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
-					|2: lx := ray.lxyz.x; ly := ray.lxyz.y;
-					|3: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
-					|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
-					|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
-				END;
-				color:=texcube.side[faace].pixelmip_one(lx,ly);			
-				dr:=color.red*color.alpha;
-				dg:=color.green*color.alpha;
-				db:=color.blue*color.alpha;	
-				ray.clr.r := ray.clr.r + dr*ray.clr.ra;
-				ray.clr.g := ray.clr.g + dg*ray.clr.ga;
-				ray.clr.b := ray.clr.b + db*ray.clr.ba;
-				ray.clr.ra:=ray.clr.ra -dr;
-				ray.clr.ga:=ray.clr.ga -dg;
-				ray.clr.ba:=ray.clr.ba -db;								
-			END			
-	ELSE
+		IF color.alpha>0.97 THEN 
+			mirror(ray,mix)
+		ELSE		
+			dr:=color.red*color.alpha;
+			dg:=color.green*color.alpha;
+			db:=color.blue*color.alpha;	
+			ray.clr.r := ray.clr.r + dr*ray.clr.ra;
+			ray.clr.g := ray.clr.g + dg*ray.clr.ga;
+			ray.clr.b := ray.clr.b + db*ray.clr.ba;
+			ray.clr.ra:=ray.clr.ra -dr;
+			ray.clr.ga:=ray.clr.ga -dg;
+			ray.clr.ba:=ray.clr.ba -db;
+			Base.ExitF(ray,exit,faace);
+			CASE faace OF
+				 0: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
+				|1: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
+				|2: lx := ray.lxyz.x; ly := ray.lxyz.y;
+				|3: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
+				|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
+				|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
+			END;
+			color:=texcube.side[faace].pixelmip_one(lx,ly);			
+			dr:=color.red*color.alpha;
+			dg:=color.green*color.alpha;
+			db:=color.blue*color.alpha;	
+			ray.clr.r := ray.clr.r + dr*ray.clr.ra;
+			ray.clr.g := ray.clr.g + dg*ray.clr.ga;
+			ray.clr.b := ray.clr.b + db*ray.clr.ba;
+			ray.clr.ra:=ray.clr.ra -dr;
+			ray.clr.ga:=ray.clr.ga -dg;
+			ray.clr.ba:=ray.clr.ba -db;								
+		END;					
+	ELSIF ~ray.isPatchTF THEN
 		mip:=ray.length*ray.scale/12;
 		IF mip>4 THEN 	
-			color:=texcube.side[ray.face].pixelmip0(lx,ly);
+			color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
 		ELSIF mip>1 THEN
 			color:=texcube.side[ray.face].pixelmip_one(lx,ly);
 		ELSE
-			color:=texcube.side[ray.face].pixelmip_one(lx,ly);		
+			color:=texcube.side[ray.face].pixelmip_two(lx,ly);		
 		END; 	
-		dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
 		dr:=color.red*dot;
 		dg:=color.green*dot;
 		db:=color.blue*dot;	
 		ray.clr.r := ray.clr.r + dr*ray.clr.ra;
 		ray.clr.g := ray.clr.g + dg*ray.clr.ga;
 		ray.clr.b := ray.clr.b + db*ray.clr.ba;	
-		IF ray IS Base.pRay3 THEN 
-			WITH ray: Base.pRay3 DO
-				ray.patchTF:=TRUE;	
-				FOR i := -1 TO 1 DO
-					FOR j:= -1 TO 1 DO
-					(*	IF mip>4 THEN 	
-							color:=texcube.side[ray.face].pixelmip0(lx+i,ly+j);
-						ELSIF mip>1 THEN
-							color:=texcube.side[ray.face].pixelmip_one(lx+i,ly-i);
-						ELSE
-							color:=texcube.side[ray.face].pixelmip2(lx+i,ly+j);		
-						END; 	*)					
-						ray.patch[i,j]:= ray.clr;   
-					END
-				END
-			END 
-		END;
-		ray.terminate:=TRUE	
+		ray.terminate:=TRUE		
+	ELSE
+		ray.patchTF:=TRUE;
+		dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
+		FOR i := -1 TO 1 DO
+			FOR j:= -1 TO 1 DO
+				IF mip>4 THEN 	
+					color:=texcube.side[ray.face].pixelmip_zero(lx+i,ly+j);
+				ELSIF mip>1 THEN
+					color:=texcube.side[ray.face].pixelmip_one(lx+i,ly-i);
+				ELSE
+					color:=texcube.side[ray.face].pixelmip_two(lx+i,ly+j);		
+				END; 
+				dr:=color.red*dot;
+				dg:=color.green*dot;
+				db:=color.blue*dot;	
+				ray.patch[i,j].r := ray.clr.r + dr*ray.clr.ra;
+				ray.patch[i,j].g := ray.clr.g + dg*ray.clr.ga;
+				ray.patch[i,j].b := ray.clr.b + db*ray.clr.ba;			
+				ray.terminate:=TRUE									
+			END
+		END	
 	END
-END
+END 
+
 END Shade;
 
 (*
@@ -452,7 +457,7 @@ BEGIN
 			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 		END
 	END;
-	color:=texcube.side[ray.face].pixelmip2(lx,ly);	
+	color:=texcube.side[ray.face].pixelmip_two(lx,ly);	
 	dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
 	dr:=color.red*dot*ray.clr.ra;
 	dg:=color.green*dot*ray.clr.ra;
@@ -476,7 +481,7 @@ BEGIN
 					|4: lx := lxyz.x; ly := 1-lxyz.z; 
 					|5: lx := lxyz.x; ly := lxyz.y;  
 				END;
-				color:=texcube.side[ray.face].pixelmip2(lx,ly);	
+				color:=texcube.side[ray.face].pixelmip_two(lx,ly);	
 				dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
 				dr:=color.red*dot*ray.clr.ra;
 				dg:=color.green*dot*ray.clr.ra;

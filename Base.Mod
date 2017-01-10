@@ -76,11 +76,12 @@ END V;
 
 TYPE Texture*=OBJECT(V)
 VAR
-	img,mip0,mip_one,mip2: Raster.Image;
+	img,mip_zero,mip_one,mip_two: Raster.Image;
 	W*,H*, bpr,adr: LONGINT;
 	transparent*: BOOLEAN;
+	copy: Raster.Mode;
 
-PROCEDURE & init*(n: ARRAY OF CHAR);
+PROCEDURE & init(n: ARRAY OF CHAR);
 VAR
 	i,j,ix,jy: LONGINT;
 BEGIN
@@ -89,36 +90,42 @@ BEGIN
 	IF img=NIL THEN 
 		img := defaultimg;
 	END;
-	NEW(mip0);
+	NEW(mip_zero);
 	NEW(mip_one);	
-	NEW(mip2);
-	Raster.Create(mip0,MIP0,MIP0,Raster.BGRA8888);
-	Raster.Create(mip_one,MIP1,MIP1,Raster.BGRA8888);		
-	Raster.Create(mip2,MIP2,MIP2,Raster.BGRA8888);		
-	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height),mip0,
-		WMRectangles.MakeRect(0,0, mip0.width, mip0.height),WMRectangles.MakeRect(0,0,mip0.width, mip0.height),
-			WMRasterScale.ModeCopy, WMRasterScale.ScaleBilinear);
-	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height),mip_one,
-		WMRectangles.MakeRect(0,0, mip_one.width, mip_one.height),
-			WMRectangles.MakeRect(0,0, mip_one.width, mip_one.height),WMRasterScale.ModeSrcOverDst, WMRasterScale.ScaleBilinear);	
-	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height),mip2,
-		WMRectangles.MakeRect(0,0, mip2.width, mip2.height),
-			WMRectangles.MakeRect(0,0, mip2.width, mip2.height),WMRasterScale.ModeSrcOverDst, WMRasterScale.ScaleBilinear);	
+	NEW(mip_two);
+	Raster.Create(mip_zero,8,8,Raster.BGRA8888);
+	Raster.Create(mip_one,64,64,Raster.BGRA8888);		
+	Raster.Create(mip_two,MIP2,MIP2,Raster.BGRA8888);		
+	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height), mip_zero,
+			WMRectangles.MakeRect(0,0, mip_zero.width, mip_zero.height),
+				WMRectangles.MakeRect(0,0,mip_zero.width, mip_zero.height),
+					WMRasterScale.ModeCopy,
+						WMRasterScale.ScaleBilinear);
+	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height), mip_one,
+			WMRectangles.MakeRect(0,0, mip_one.width, mip_one.height), 
+				WMRectangles.MakeRect(0,0, mip_one.width, mip_one.height),
+					WMRasterScale.ModeSrcOverDst,
+						WMRasterScale.ScaleBilinear);	
+	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height), mip_two,
+				WMRectangles.MakeRect(0,0, mip_two.width, mip_two.height),
+					WMRectangles.MakeRect(0,0, mip_two.width, mip_two.height),
+						WMRasterScale.ModeSrcOverDst,
+							WMRasterScale.ScaleBilinear);	
 END init;
 
-PROCEDURE pixelmip0*(x,y:REAL):Color;
+PROCEDURE pixelmip_zero*(x,y:REAL):Color;
 VAR
 	i,j: LONGINT;
 	p: Raster.Pixel;
 	c: Color;
 BEGIN
-(*	i:= ENTIER(x*Mip0);
-	j:=ENTIER(y*Mip0);
-	i:=i MOD Mip0; j:=j MOD Mip0;	
-	Raster.Get(mip0,i,j,p,copy);
+	i:= ENTIER(x*MIP0);
+	j:=ENTIER(y*MIP0);
+	i:=i MOD MIP0; j:=j MOD MIP0;	
+	Raster.Get(mip_zero,i,j,p,copy);
 	c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
-*)	RETURN c
-END pixelmip0;
+	RETURN c
+END pixelmip_zero;
 
 PROCEDURE pixelmip_one*(x,y:REAL):Color;
 VAR
@@ -126,27 +133,25 @@ VAR
 	p: Raster.Pixel;
 	c: Color;
 BEGIN
-	ASSERT(mip_one#NIL);
-	i:= ENTIER(x*MIP1);
-	j:=ENTIER(y*MIP1);
-	i:=i MOD MIP1; j:=j MOD MIP1;	
-	Raster.Get(mip_one,0,0,p,copy); 
+	i:= ENTIER(x*mip_one.width)MOD mip_one.width;
+	j:=ENTIER(y*mip_one.height)MOD mip_one.height;
+	Raster.Get(mip_one,i,j,p,copy); 
 	c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
 	RETURN c
 END pixelmip_one;
 
-PROCEDURE pixelmip2*(x,y:REAL):Color;
+PROCEDURE pixelmip_two*(x,y:REAL):Color;
 VAR
 	i,j: LONGINT;
 	p: Raster.Pixel;
 	c: Color;
 BEGIN
-(*	i:= ENTIER(x*MIP2) MOD MIP2;
+	i:= ENTIER(x*MIP2) MOD MIP2;
 	j:=ENTIER(y*MIP2) MOD MIP2;
-	Raster.Get(mip2,i,j,p,copy); 
+	Raster.Get(mip_two,i,j,p,copy); 
 	c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
-*)	RETURN c
-END pixelmip2;
+	RETURN c
+END pixelmip_two;
 
 PROCEDURE pixelT*(x,y:REAL; T: LONGINT):Color;
 VAR
@@ -224,19 +229,13 @@ TYPE Ray* = RECORD
 	corner*:PT;
 	dtl*: REAL;	
 	dtlTF*:BOOLEAN;
+	isPatchTF*: BOOLEAN;
+	patchTF*: BOOLEAN;
+	patch*: ARRAY 3,3 OF ray_color; (* alpha not needed *)
 	hitmirrorTF*:BOOLEAN;
 	justhitTF*:BOOLEAN;
 	diositizeTF*:BOOLEAN;
 	texdtl*:REAL;
-END;
-
-TYPE pRay2*=RECORD(Ray)
-	patch*: ARRAY 2,2 OF ray_color; (* alpha not needed *)
-END;
-
-TYPE pRay3*=RECORD(Ray)
-	patchTF*: BOOLEAN;
-	patch*: ARRAY 3,3 OF ray_color; (* alpha not needed *)
 END;
 
 TYPE Path*=ARRAY 20 OF ARRAY 3 OF INTEGER;
@@ -533,8 +532,7 @@ VAR
 	gravity*:REAL;
 	fuzzon*, STOP*: BOOLEAN;
 	singleray*: Ray;	(* for when a single ray is most convenient *)
-	blankray*: Ray;
-	blankpray3*: pRay3;
+	blankray*,blankpray*: Ray;
 	Face*: ARRAY 6 OF PT;
 	EMPTY*,OPAQUE*: Voxel;
 	deathflag*:BOOLEAN;
@@ -1202,20 +1200,17 @@ BEGIN
 	fog := 0.02;
 	rlimit := 4;
 	iterlimit := 500;
-	DTL:=25;	
+	DTL:=3;	
 	Origin:=mkPT(0,0,0);   (* unneeded initialization *)
 	blankray.clr.ra := 1;
 	blankray.clr.ga := 1;
 	blankray.clr.ba := 1;
 	blankray.scale := 1; 
 	blankray.tscale:=1;
-	blankray.dtl:=10;	
-	blankpray3.clr.ra := 1;
-	blankpray3.clr.ga := 1;
-	blankpray3.clr.ba := 1;
-	blankpray3.scale := 1; 
-	blankpray3.tscale:=1;
-	blankpray3.dtl:=1;
+	blankray.dtl:=3;	
+	blankpray:=blankray;
+	blankpray.dtl:=1;
+	blankpray.isPatchTF:=TRUE;
 	Face[0].x := -1; Face[0].y := 0; Face[0].z := 0; 
 	Face[3].x := 1; Face[3].y := 0; Face[3].z := 0; 
 	Face[1].x := 0; Face[1].y := 1; Face[1].z := 0; 

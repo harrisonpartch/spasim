@@ -1,6 +1,18 @@
 <Desktop>
+	<Window name="FileManager" loader="WMFileManager.Restore" l="1053" t="392" r="1694" b="788" flags="{0..2,13}"/>
 	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="1073" t="76" r="1713" b="464" flags="{0..2,13}"/>
-	<Window name="FileManager" loader="WMFileManager.Restore" l="1274" t="585" r="1915" b="981" flags="{0..2,13}"/>
+	<Window name="PET" loader="PET.Restore" l="970" t="111" r="1905" b="711" flags="{0..2,13}">
+		<PETData>
+			<General SelectedPageNr="0" ProjectTextFile=""/>
+			<Tab file=".aoshome/source/I386.Raster.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="3002" cursorPos="87590"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="10"/>
+			</Tab>
+		</PETData>
+	</Window>
 	<Window name="PET" loader="PET.Restore" l="1430" t="291" r="2230" b="891" flags="{0..2,13}">
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>
@@ -13,11 +25,11 @@
 			</Tab>
 		</PETData>
 	</Window>
-	<Window name="PET" loader="PET.Restore" l="378" t="35" r="1525" b="1004" flags="{0..2,13}">
+	<Window name="PET" loader="PET.Restore" l="570" t="153" r="1717" b="1122" flags="{0..2,13}">
 		<PETData>
 			<General SelectedPageNr="3" ProjectTextFile=""/>
 			<Tab file="Spasim.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="145"/>
+				<Editor firstLine="3" cursorPos="471"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
@@ -38,7 +50,7 @@
 				<SidePanel visible="true" width="250" scratchHeight="10"/>
 			</Tab>
 			<Tab file="Base.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="73" cursorPos="1291"/>
+				<Editor firstLine="108" cursorPos="3347"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="true" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="blankray" replaceString="blankpray3"/>
 				<LogPanel height="130"/>

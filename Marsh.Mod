@@ -436,7 +436,7 @@ BEGIN
 	NEW(ball,center,0.6);  
 	serp.passable:=FALSE;   
 	conglomerate.copyonstroke:=TRUE;
-	noise.setvoxel(reddot);	
+	noise.setvoxel(conglomerate);	
 	reddot.tscale:=128;
 	ball.setvoxel(axolotl);
 	Base.setPT(center,1/2,1/2,9/12);
@@ -445,7 +445,7 @@ BEGIN
 	rat.tscale:=16;
 	z2a.FRaster(plane,64);  
 	z2a.FRaster(ball,32); 	
-	z2a.FRaster(noise,64);
+	z2a.FRaster(noise,32);
  	Base.world:=z2a; 	
 	Base.avatar:=harrison;
 	Base.avatarsize:=1000; 

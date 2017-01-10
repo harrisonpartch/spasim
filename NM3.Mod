@@ -350,7 +350,6 @@ BEGIN
 	passable:=TRUE;
 	complex:=TRUE;
 	imposter:=Base.EMPTY;
-	DTL:=0;
 	code:=NCODE; 
 	ncode:=NCODE
 END init;

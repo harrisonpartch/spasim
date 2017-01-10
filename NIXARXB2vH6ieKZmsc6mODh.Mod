@@ -24,10 +24,10 @@ VAR
 	dr,dg,db,dbl: REAL;
 BEGIN
 	exit:=Base.Exit(ray);
-	depth:=Base.dist(ray.lxyz,exit)/ray.scale;
-	dr := r*depth;
-	dg := g*depth;
-	db := b*depth;
+	depth:=Base.dist(ray.lxyz,exit);
+	dr := r*depth*ray.clr.ra;
+	dg := g*depth*ray.clr.ga;
+	db := b*depth*ray.clr.ba;
 	dbl:=black*depth;
 	ray.clr.r := ray.clr.r + dr;
 	ray.clr.g := ray.clr.g + dg;
@@ -35,7 +35,7 @@ BEGIN
 	ray.clr.ra := (ray.clr.ra - dr)-dbl;
 	ray.clr.ga := (ray.clr.ga - dg)-dbl;
 	ray.clr.ba := (ray.clr.ba - db)-dbl; 
-	IF (ray.clr.ra<0.1)&(ray.clr.ga<0.1)&(ray.clr.ba<0.1) THEN ray.terminate:=TRUE END;
+	IF (ray.clr.ra<0.1) OR (ray.clr.ga<0.1) OR(ray.clr.ba<0.1) THEN ray.terminate:=TRUE END;
 END Shade;
 
 END TransparaVox;  
@@ -48,5 +48,5 @@ END thisvox;
 
 BEGIN
 NEW(vox); 
-vox.setcolor(1,1/5,1/5,0,0);
+vox.setcolor(0, 1/23, 1/20, 1/27 ,1 /23);
 END NIXARXB2vH6ieKZmsc6mODh. 

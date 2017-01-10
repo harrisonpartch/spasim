@@ -6,12 +6,14 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=6;        
-	TS=3*64;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=4;
-	TH=4;
+	T=5;        
+	TS=3*32;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
+	TW=6;
+	TH=6;
 	W*=TS*TW;
 	H*=TS*TH;
+	CX=W DIV 2;
+	CY=W DIV 2;
 
 TYPE Camera= RECORD			(* solid angle *)
 	dtheta, dphi, theta, phi,rphi:REAL;
@@ -42,6 +44,7 @@ BEGIN
 		phi:=cam.phi;
 		FOR j :=  0 TO 2 DO 
 			ray:=Base.blankray;
+			ray.dtl:=Base.DTL;
 			angletoray(ray,theta,phi);
 			Base.world.Shade(ray);
 			IF ~ray.terminate THEN
@@ -49,7 +52,6 @@ BEGIN
 				ray.clr.r:= ray.clr.r + ray.clr.ra/2;
 				ray.clr.g:= ray.clr.g + ray.clr.ga/2;	
 			END;	
-
 			Raster.SetRGB(pixel,ENTIER(ray.clr.r*255),ENTIER(ray.clr.g*255),ENTIER(ray.clr.b*255)); 
 			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
 			phi:=phi+dphi;
@@ -62,28 +64,31 @@ PROCEDURE tessa(cam: Camera);
 VAR
 	i,j: LONGINT;
 	theta,phi,dtheta,dphi: REAL;
-	pray: Base.pRay3;
+	ray: Base.Ray;
 	pixel: Raster.Pixel;
 BEGIN
-	pray:=Base.blankpray3;
-	angletoray(pray,cam.theta+cam.dtheta/3, cam.phi+cam.dphi/3);	
-	Base.world.Shade(pray);
-	IF ~pray.terminate THEN
-			pray.clr.b:= pray.clr.b + pray.clr.ba;
-			pray.clr.r:= pray.clr.r + pray.clr.ra/2;
-			pray.clr.g:= pray.clr.g + pray.clr.ga/2;	
-	END;
-	IF pray.patchTF THEN
-		FOR i:= 0 TO 2 DO
-			FOR j :=  0 TO 2 DO 
-				Raster.SetRGB(pixel,ENTIER(pray.patch[i,j].r*255),ENTIER(pray.patch[i,j].g*255),ENTIER(pray.patch[i,j].b*255)); 
-				Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy)
+	ray:=Base.blankpray;
+	ray.isPatchTF:=TRUE;
+	ray.dtl:=Base.DTL;
+	angletoray(ray,cam.theta+cam.dtheta/3, cam.phi+cam.dphi/3);	
+	Base.world.Shade(ray);
+	IF ray.terminate THEN
+		IF PATCH & ray.patchTF THEN
+			FOR i:= 0 TO 2 DO
+				FOR j :=  0 TO 2 DO 
+					Raster.SetRGB(pixel,ENTIER(ray.patch[i,j].r*255),ENTIER(ray.patch[i,j].g*255),ENTIER(ray.patch[i,j].b*255)); 
+					Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy)
+				END
 			END
+		ELSE
+			Raster.SetRGB(pixel,ENTIER(ray.clr.r*155),ENTIER(ray.clr.g*155),ENTIER(ray.clr.b*155)); 
+			Raster.Fill(image,cam.imx,cam.imy,cam.imx+3,cam.imy+3,pixel,copy)
 		END
-	ELSE
-		Raster.SetRGB(pixel,ENTIER(pray.clr.r*255),ENTIER(pray.clr.g*255),ENTIER(pray.clr.b*255)); 
-		Raster.Fill(image,cam.imx,cam.imy,cam.imx+3,cam.imy+3,pixel,copy);	
-	END
+	ELSE 
+			ray.clr.b:= ray.clr.b + ray.clr.ba;
+			ray.clr.r:= ray.clr.r + ray.clr.ra/2;
+			ray.clr.g:= ray.clr.g + ray.clr.ga/2;	
+	END		
 END tessa;
 
 PROCEDURE ztrace(cam: Camera; level: INTEGER);
@@ -210,6 +215,7 @@ VAR
 	foveaparameter:INTEGER;
 	FV: REAL;
 	copy: Raster.Mode;
+	PATCH*:BOOLEAN;
 
 PROCEDURE reflect(VAR p: PT; n: PT);
 VAR 
@@ -296,7 +302,7 @@ END splitcam;
 
 PROCEDURE lessdetail*;
 BEGIN
-	IF foveaparameter<100 THEN foveaparameter:=foveaparameter+1  END;
+	IF foveaparameter<100 THEN foveaparameter:=foveaparameter+1 END;
 	FV:=W*W/foveaparameter;
 END lessdetail;
 
@@ -373,15 +379,15 @@ BEGIN
 		AWAIT((tilesdone=TW*TH) OR FRAMEBOORT)
 	END;
 	Raster.SetRGB(pixel,255,255,255);
-	Raster.Put(image,W+2,H+2,pixel,copy);	
-	Raster.Put(image,W-2,H+2,pixel,copy);	
-	Raster.Put(image,W-2,H-2,pixel,copy);	
-	Raster.Put(image,W+2,H-2,pixel,copy);
+	Raster.Put(image,CX+2,CY+2,pixel,copy);	
+	Raster.Put(image,CX-2,CY+2,pixel,copy);	
+	Raster.Put(image,CX-2,CY-2,pixel,copy);	
+	Raster.Put(image,CX+2,CY-2,pixel,copy);
 	Raster.SetRGB(pixel,0,0,0);
-	Raster.Put(image,W+1,H+1,pixel,copy);	
-	Raster.Put(image,W-1,H+1,pixel,copy);	
-	Raster.Put(image,W-1,H-1,pixel,copy);	
-	Raster.Put(image,W+1,H-1,pixel,copy);			
+	Raster.Put(image,CX+1,CY+1,pixel,copy);	
+	Raster.Put(image,CX-1,CY+1,pixel,copy);	
+	Raster.Put(image,CX-1,CY-1,pixel,copy);	
+	Raster.Put(image,CX+1,CY-1,pixel,copy);			
 	Base.tick;
 END go;
 
@@ -397,8 +403,7 @@ END lsd;
 
 BEGIN
 	Out.String("Retina loading...");
-	Raster.InitMode(copy,Raster.srcCopy);
-	
+	Raster.InitMode(copy,Raster.srcCopy);	
 	image := Graphics.LoadImage("granite.jpg", FALSE);
 	FOR a:= 0 TO TW-1  DO
 		FOR b:= 0 TO TH-1 DO
