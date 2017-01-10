@@ -1,18 +1,6 @@
 <Desktop>
-	<Window name="FileManager" loader="WMFileManager.Restore" l="1053" t="392" r="1694" b="788" flags="{0..2,13}"/>
 	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="1073" t="76" r="1713" b="464" flags="{0..2,13}"/>
-	<Window name="PET" loader="PET.Restore" l="970" t="111" r="1905" b="711" flags="{0..2,13}">
-		<PETData>
-			<General SelectedPageNr="0" ProjectTextFile=""/>
-			<Tab file=".aoshome/source/I386.Raster.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="3002" cursorPos="87590"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="10"/>
-			</Tab>
-		</PETData>
-	</Window>
+	<Window name="FileManager" loader="WMFileManager.Restore" l="1053" t="392" r="1694" b="788" flags="{0..2,13}"/>
 	<Window name="PET" loader="PET.Restore" l="1430" t="291" r="2230" b="891" flags="{0..2,13}">
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>

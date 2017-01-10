@@ -33,7 +33,7 @@ BEGIN
 	blankray.clr.ba := 1;
 	blankray.scale := 1; 
 	blankray.tscale:=1;
-	blankray.dtl:=3;	
+	blankray.dtl:=1;	
 	blankpray:=blankray;
 	blankpray.dtl:=1.5;
 	blankpray.ispatchTF:=TRUE;
@@ -58,16 +58,16 @@ BEGIN
 		phi:=cam.phi;
 		FOR j :=  0 TO 2 DO 
 			ray:=blankray;
-			ray.dtl:=Base.DTL;
 			angletoray(ray,theta,phi);
 			Base.world.Shade(ray);
-			IF ~ray.terminate THEN
+			IF ray.terminate THEN
+				Raster.SetRGB(pixel,ENTIER(ray.clr.r*255),ENTIER(ray.clr.g*255),ENTIER(ray.clr.b*255)); 
+				Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
+			ELSE
 				ray.clr.b:= ray.clr.b + ray.clr.ba;
 				ray.clr.r:= ray.clr.r + ray.clr.ra/2;
 				ray.clr.g:= ray.clr.g + ray.clr.ga/2;	
 			END;	
-			Raster.SetRGB(pixel,ENTIER(ray.clr.r*255),ENTIER(ray.clr.g*255),ENTIER(ray.clr.b*255)); 
-			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
 			phi:=phi+dphi;
 		END;
 		theta:=theta+dtheta;
@@ -81,14 +81,11 @@ VAR
 	ray: Base.Ray;
 	pixel: Raster.Pixel;
 BEGIN
-	ray:=blankray;
-	ray.patchTF:=TRUE;
-	ASSERT(ray.patchTF);		
-	ray.dtl:=Base.DTL;
+	ray:=blankpray;
 	angletoray(ray,cam.theta+cam.dtheta/3, cam.phi+cam.dphi/3);	
 	Base.world.Shade(ray);
 	IF ray.terminate THEN
-		IF PATCH & ray.patchTF THEN
+		IF  PATCH & ray.patchTF THEN
 			FOR i:= 0 TO 2 DO
 				FOR j :=  0 TO 2 DO 
 					Raster.SetRGB(pixel,ENTIER(ray.patch[i,j].r*255),ENTIER(ray.patch[i,j].g*255),ENTIER(ray.patch[i,j].b*255)); 
@@ -96,13 +93,13 @@ BEGIN
 				END
 			END
 		ELSE
-			Raster.SetRGB(pixel,ENTIER(ray.clr.r*155),ENTIER(ray.clr.g*155),ENTIER(ray.clr.b*155)); 
+			Raster.SetRGB(pixel,ENTIER(ray.clr.r*200),ENTIER(ray.clr.g*200),ENTIER(ray.clr.b*200)); 
 			Raster.Fill(image,cam.imx,cam.imy,cam.imx+3,cam.imy+3,pixel,copy)
 		END
 	ELSE 
 			ray.clr.b:= ray.clr.b + ray.clr.ba;
-			ray.clr.r:= ray.clr.r + ray.clr.ra/2;
-			ray.clr.g:= ray.clr.g + ray.clr.ga/2;	
+			ray.clr.r:= ray.clr.r + ray.clr.ra/4;
+			ray.clr.g:= ray.clr.g + ray.clr.ga/4;	
 	END		
 END tessa;
 
@@ -177,7 +174,7 @@ BEGIN{ACTIVE, PRIORITY(Objects.Normal)
 		BEGIN{EXCLUSIVE}
 			AWAIT(GO);
 		END;
-		ztraced(cam,T);	
+		ztrace(cam,T);	
 		BEGIN{EXCLUSIVE}
 			GO:=FALSE;
 			incTD;

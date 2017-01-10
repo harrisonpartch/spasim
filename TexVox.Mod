@@ -263,7 +263,7 @@ IF ray.length>0.00000001 THEN
 			ray.clr.ga:=ray.clr.ga -dg;
 			ray.clr.ba:=ray.clr.ba -db;								
 		END;					
-	ELSIF ~ray.patchTF THEN
+	ELSIF ~ray.ispatchTF THEN
 		mip:=ray.length*ray.scale/12;
 		IF mip>4 THEN 	
 			color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
@@ -276,13 +276,12 @@ IF ray.length>0.00000001 THEN
 		dg:=color.green*dot;
 		db:=color.blue*dot;	
 		ray.clr.r := ray.clr.r + dr*ray.clr.ra;
-		ray.clr.g := ray.clr.g + ray.clr.ga;
+		ray.clr.g := ray.clr.g + dg*ray.clr.ga;
 		ray.clr.b := ray.clr.b + db*ray.clr.ba;	
 		ray.terminate:=TRUE		
 	ELSE
 		ray.patchTF:=TRUE;
 		ray.clr.r := ray.clr.r +ray.clr.ra;	
-		dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
 		FOR i := -1 TO 1 DO
 			FOR j:= -1 TO 1 DO
 				IF mip>4 THEN 	
@@ -295,9 +294,9 @@ IF ray.length>0.00000001 THEN
 				dr:=color.red*dot;
 				dg:=color.green*dot;
 				db:=color.blue*dot;	
-				ray.patch[i,j].r := ray.clr.r + dr*ray.clr.ra;
-				ray.patch[i,j].g := ray.clr.g + dg*ray.clr.ga;
-				ray.patch[i,j].b := ray.clr.b + db*ray.clr.ba;			
+				ray.patch[i+1,j+1].r := ray.clr.r + dr*ray.clr.ra;
+				ray.patch[i+1,j+1].g := ray.clr.g + dg*ray.clr.ga;
+				ray.patch[i+1,j+1].b := ray.clr.b + db*ray.clr.ba;			
 				ray.terminate:=TRUE									
 			END
 		END	
