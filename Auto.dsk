@@ -1,6 +1,6 @@
 <Desktop>
-	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="1073" t="76" r="1713" b="464" flags="{0..2,13}"/>
-	<Window name="FileManager" loader="WMFileManager.Restore" l="1053" t="392" r="1694" b="788" flags="{0..2,13}"/>
+	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="1523" t="59" r="2163" b="447" flags="{0..2,13}"/>
+	<Window name="FileManager" loader="WMFileManager.Restore" l="1518" t="825" r="2159" b="1221" flags="{0..2,13}"/>
 	<Window name="PET" loader="PET.Restore" l="1430" t="291" r="2230" b="891" flags="{0..2,13}">
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>
@@ -13,11 +13,23 @@
 			</Tab>
 		</PETData>
 	</Window>
-	<Window name="PET" loader="PET.Restore" l="570" t="153" r="1717" b="1122" flags="{0..2,13}">
+	<Window name="PET" loader="PET.Restore" l="42" t="110" r="842" b="710" flags="{0..2,13}">
 		<PETData>
-			<General SelectedPageNr="3" ProjectTextFile=""/>
+			<General SelectedPageNr="0" ProjectTextFile=""/>
+			<Tab file="NM3.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="0"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="10"/>
+			</Tab>
+		</PETData>
+	</Window>
+	<Window name="PET" loader="PET.Restore" l="139" t="403" r="1286" b="1372" flags="{0..2,13}">
+		<PETData>
+			<General SelectedPageNr="0" ProjectTextFile=""/>
 			<Tab file="Spasim.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="3" cursorPos="471"/>
+				<Editor firstLine="3" cursorPos="469"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>

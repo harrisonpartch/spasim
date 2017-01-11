@@ -117,6 +117,7 @@ VAR
 	SNIPE*,SNIPEINTO*:BOOLEAN;
 	atmdark: REAL;
 	pth: Path; 
+
 PROCEDURE draw*;
 BEGIN
 	stroke(Base.cursorPT,cursorsize,marshv.vox)
@@ -154,35 +155,31 @@ VAR
 BEGIN
 	ray:=Base.sniperay;
 	Base.world.Shade(ray);
-	IF ray.hitmirrorTF THEN 
-		p:=ray.hitxyz; dp:=ray.hitdxyz
-	ELSE
-		p:= ray.xyz; dp:=ray.dxyz
-	END;
-	p.x:=p.x+dp.x/1000000;
-	p.y:=p.y+dp.y/1000000;
-	p.z:=p.z+dp.z/1000000;
+	Out.Int(ENTIER(ray.clr.r*255),4);
+	Out.Int(ENTIER(ray.clr.g*255),4);
+	Out.Int(ENTIER(ray.clr.b*255),4);	
+	Out.Ln;
+	p:=ray.hitxyz;
+	p.x:=p.x+ray.dxyz.x/1000000;
+	p.y:=p.y+ray.dxyz.y/1000000;
+	p.z:=p.z+ray.dxyz.z/1000000;
 	Base.cursorPT:=p; 	
-	stroke(Base.cursorPT,cursorsize,marshv.vox)
+	stroke(p,cursorsize,marshv.vox)
 END snipeinto;
 
 PROCEDURE snipeonto*;
 VAR
-	p,dp:PT;
+	p:PT;
 	ray:Base.Ray;
 	v: Voxel;
 	d:REAL;
 BEGIN
 	ray:=Base.sniperay;
 	Base.world.Shade(ray);
-	IF ray.hitmirrorTF THEN 
-		p:=ray.hitxyz; dp:=ray.hitdxyz
-	ELSE
-		p:= ray.xyz; dp:=ray.dxyz
-	END;
-	p.x:=p.x-dp.x/1000000;
-	p.y:=p.y-dp.y/1000000;
-	p.z:=p.z-dp.z/1000000;
+	p:=ray.hitxyz;
+	p.x:=p.x-ray.dxyz.x/1000000;
+	p.y:=p.y-ray.dxyz.y/1000000;
+	p.z:=p.z-ray.dxyz.z/1000000;
 	Base.cursorPT:=p; 	
 	stroke(Base.cursorPT,cursorsize,marshv.vox)
 END snipeonto;
@@ -379,7 +376,7 @@ BEGIN
 	push(granite);
 	sand:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw"); 		
 	push(sand);
-	blacksun:=Base.VoxelFromName("Nblacksun"); 	
+	blacksun:=Base.VoxelFromName("Nbluedot"); 	
 	push(blacksun);
 	
 	lazy:=Base.VoxelFromName("NwPicBWw4NfcserX4ELxxx"); 	
@@ -436,7 +433,7 @@ BEGIN
 	NEW(ball,center,0.6);  
 	serp.passable:=FALSE;   
 	conglomerate.copyonstroke:=TRUE;
-	noise.setvoxel(conglomerate);	
+	noise.setvoxel(blacksun);	
 	reddot.tscale:=128;
 	ball.setvoxel(axolotl);
 	Base.setPT(center,1/2,1/2,9/12);
@@ -465,8 +462,9 @@ END lighten
 
 BEGIN
 	NEW(marshv);
+	push(Base.EMPTY);
 	dawn;
-	cursorsize:=512;
+	cursorsize:=81;
 	cursorTF:=TRUE;
 	atmdark:=1.2;
 	SNIPEINTO:=TRUE;

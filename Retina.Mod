@@ -33,9 +33,9 @@ BEGIN
 	blankray.clr.ba := 1;
 	blankray.scale := 1; 
 	blankray.tscale:=1;
-	blankray.dtl:=1;	
+	blankray.dtl:=10;	
 	blankpray:=blankray;
-	blankpray.dtl:=1.5;
+	blankpray.dtl:=5;
 	blankpray.ispatchTF:=TRUE;
 END init;
 
@@ -354,6 +354,7 @@ VAR
 	i,j: INTEGER;
 	ctheta,cphi,dtheta,dphi: REAL;
 	pixel: Raster.Pixel;
+	sr: Ray;
 BEGIN
 	zeroTD;
 	frameasteps:=0;
@@ -384,7 +385,14 @@ BEGIN
 	SPSMMath.orrot(rward, Base.dward,rtheta);   		
 	SPSMMath.orrot(fward, Base.rward,rphi);  	
 	SPSMMath.orrot(dward, Base.rward,rphi);  
-	angletoray(Base.sniperay,0,0);	
+	sr.clr.ra := 1;
+	sr.clr.ga := 1;
+	sr.clr.ba := 1;
+	sr.scale := 1; 
+	sr.tscale:=1;
+	sr.dtl:=10;	
+	angletoray(sr,0,0);	
+	Base.sniperay:=sr;
 	BEGIN{EXCLUSIVE}
 		gotiles;
 		AWAIT((tilesdone=TW*TH) OR FRAMEBOORT)

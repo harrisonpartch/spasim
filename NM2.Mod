@@ -196,6 +196,7 @@ BEGIN
 			ray.xyz.y:=ray.xyz.y +(newxyz.y-xyz.y)/ray.scale;			
 			ray.xyz.z:=ray.xyz.z +(newxyz.z-xyz.z)/ray.scale;			
 			xyz:=newxyz;
+			ray.hitxyz:=xyz;
 			ray.length:=ray.length+vdepth;
 			bounds(ijk.i,ijk.j,ijk.k, out);
 			IF ~out THEN
@@ -350,7 +351,6 @@ BEGIN
 	passable:=TRUE;
 	complex:=TRUE;
 	imposter:=Base.EMPTY;
-	DTL:=0;
 	code:=NCODE; 
 	ncode:=NCODE
 END init;

@@ -196,6 +196,7 @@ BEGIN
 			ray.xyz.y:=ray.xyz.y +(newxyz.y-xyz.y)/ray.scale;			
 			ray.xyz.z:=ray.xyz.z +(newxyz.z-xyz.z)/ray.scale;			
 			xyz:=newxyz;
+			ray.hitxyz:=ray.xyz;
 			ray.length:=ray.length+vdepth;
 			bounds(ijk.i,ijk.j,ijk.k, out);
 			IF ~out THEN
@@ -266,7 +267,6 @@ PROCEDURE mirror(VAR ray: Ray);
 BEGIN
 	ray.hitmirrorTF := TRUE;
 	ray.hitxyz:=ray.xyz;
-	ray.hitdxyz:=ray.dxyz;
 	ray.changed := TRUE;
 	ray.mirrortf:=TRUE;	
 	INC(ray.mirrors);

@@ -241,9 +241,9 @@ BEGIN
 	cvz := cvz*GLIDE+gravityvector.z;
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y;
 	cvl :=cvl*0.5; cvu := cvu*0.5; 
-	IF (0 IN MB) OR (key='K') THEN Marsh.snipeonto;
-	ELSIF  1 IN MB THEN Marsh.snipeinto;
-	ELSIF  2 IN MB THEN Marsh.draw; 
+	IF 0 IN MB THEN Marsh.snipeonto
+	ELSIF  1 IN MB THEN Marsh.snipeinto 
+	ELSIF  2 IN MB THEN Marsh.draw 
 	END;
 	trace;
 	Base.tick
@@ -256,10 +256,10 @@ BEGIN
 	IF CAPTURE THEN 
 		RW.Handle(message);
 		discard:=TRUE;
-		IF (message.msgType=WMMessages.MsgPointer) THEN
+(*		IF (message.msgType=WMMessages.MsgPointer) THEN
 			MB:=message.flags;
 	END
-	END
+*)	END
 END P;
 
 (*! ************* XLTL AMALGAMATION FOLLOWS *)
@@ -362,13 +362,20 @@ PROCEDURE PointerDown(x, y: LONGINT; keys: SET);
 VAR 
 	wmanager: WM.WindowManager;
 BEGIN
-	Out.Char("!");
 	IF ~CAPTURE THEN
 		CAPTURE:= TRUE;
 		wmanager:=WM.GetDefaultManager();
-		wmanager.InstallMessagePreview(P); 
+		wmanager.InstallMessagePreview(P)
+	ELSE
+		Out.Char("!");
+		MB:=keys;		
 	END; 
 END PointerDown;
+
+PROCEDURE PointerUp(x, y: LONGINT; keys: SET);
+BEGIN
+	MB:=keys;		
+END PointerUp;
 	
 PROCEDURE PointerMove(x,y: LONGINT; keys: SET);
 BEGIN
@@ -382,6 +389,7 @@ BEGIN
 			END;
 			mousepreviousx:=x;
 			mousepreviousy:=y;
+			MB:=keys
 	END
 END PointerMove;
 

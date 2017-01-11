@@ -46,7 +46,10 @@ BEGIN
 		conglo.blox[1,1,2]:=conglo;
 		conglo.blox[1,1,1]:=core;
 		cloud.imposter:=reddot;
-		conglo.lockTF:=TRUE
+		cloud.copyonstroke:= TRUE;		
+		conglo.copyonstroke:= TRUE;		
+		core.copyonstroke:= TRUE;		
+
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;

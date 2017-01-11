@@ -91,7 +91,6 @@ PROCEDURE mirror(VAR ray: Ray);
 BEGIN
 	ray.hitmirrorTF := TRUE;
 	ray.hitxyz:=ray.xyz;
-	ray.hitdxyz:=ray.dxyz;
 	ray.changed := TRUE;
 	ray.mirrortf:=TRUE;	
 	reflect(ray.dxyz, ray.fnormal);	
@@ -284,12 +283,12 @@ IF ray.length>0.00000001 THEN
 		ray.clr.r := ray.clr.r +ray.clr.ra;	
 		FOR i := -1 TO 1 DO
 			FOR j:= -1 TO 1 DO
-				IF mip>4 THEN 	
-					color:=texcube.side[ray.face].pixelmip_zero(lx+i,ly+j);
-				ELSIF mip>1 THEN
+				IF mip>8 THEN 	
+					color:=texcube.side[ray.face].pixelmip_one(lx+i,ly+j);
+				ELSIF mip>4 THEN
 					color:=texcube.side[ray.face].pixelmip_one(lx+i,ly-i);
 				ELSE
-					color:=texcube.side[ray.face].pixelmip_two(lx+i,ly+j);		
+					color:=texcube.side[ray.face].pixelmip_one(lx+i,ly+j);		
 				END; 
 				dr:=color.red*dot;
 				dg:=color.green*dot;
@@ -329,7 +328,6 @@ VAR
 BEGIN
 	ray.hitmirrorTF := TRUE;
 	ray.hitxyz:=ray.xyz;
-	ray.hitdxyz:=ray.dxyz;
 	ray.changed := TRUE;
 	ray.mirrortf:=TRUE;	
 	INC(ray.mirrors);
