@@ -209,13 +209,13 @@ TYPE Ray* = RECORD
 	downxyz*,rightxyz*: PT;
 	theta*,phi*, dtheta*,dphi*: REAL;
 (*	r*, g*, b*, ra*, ga*, ba*, bla*,alpha*: REAL; *)
-	clr*: ray_color;
+	clr*, lastclr*: ray_color;
 	mirrors*: INTEGER;
 	texcube*:TexCube;
 	texcubeTF*:BOOLEAN;
 	ncube*: NCube;
 	ncubeTF*: BOOLEAN;
-	terminate*: BOOLEAN;
+	terminate*,patched*: BOOLEAN;
 	scale*,tscale*: REAL;
 	length*: REAL; 
 	len*:PT;

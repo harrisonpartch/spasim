@@ -52,14 +52,13 @@ BEGIN
 			ray:=blankray;
 			angletoray(ray,theta,phi);
 			Base.world.Shade(ray);
-			IF ray.terminate THEN
-				Raster.SetRGB(pixel,ENTIER(ray.clr.r*255),ENTIER(ray.clr.g*255),ENTIER(ray.clr.b*255)); 
-				Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
-			ELSE
+			IF ~ray.terminate THEN
 				ray.clr.b:= ray.clr.b + ray.clr.ba;
 				ray.clr.r:= ray.clr.r + ray.clr.ra/2;
-				ray.clr.g:= ray.clr.g + ray.clr.ga/2;	
-			END;	
+				ray.clr.g:= ray.clr.g + ray.clr.ga/2
+			END;			
+			Raster.SetRGB(pixel,ENTIER(ray.clr.r*255),ENTIER(ray.clr.g*255),ENTIER(ray.clr.b*255)); 
+			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
 			phi:=phi+dphi;
 		END;
 		theta:=theta+dtheta;
@@ -76,23 +75,22 @@ BEGIN
 	ray:=blankpray;
 	angletoray(ray,cam.theta+cam.dtheta/3, cam.phi+cam.dphi/3);	
 	Base.world.Shade(ray);
-	IF ray.terminate THEN
-		IF  PATCH & ray.patchTF THEN
-			FOR i:= 0 TO 2 DO
-				FOR j :=  0 TO 2 DO 
-					Raster.SetRGB(pixel,ENTIER(ray.patch[i,j].r*255),ENTIER(ray.patch[i,j].g*255),ENTIER(ray.patch[i,j].b*255)); 
-					Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy)
-				END
+	IF ~ray.terminate THEN
+		ray.clr.b:= ray.clr.b + ray.clr.ba;
+		ray.clr.r:= ray.clr.r + ray.clr.ra/4;
+		ray.clr.g:= ray.clr.g + ray.clr.ga/4
+	END;	
+	IF  ray.patched THEN
+		FOR i:= 0 TO 2 DO
+			FOR j :=  0 TO 2 DO 
+				Raster.SetRGB(pixel,ENTIER(ray.patch[i,j].r*255),ENTIER(ray.patch[i,j].g*255),ENTIER(ray.patch[i,j].b*255)); 
+				Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy)
 			END
-		ELSE
-			Raster.SetRGB(pixel,ENTIER(ray.clr.r*200),ENTIER(ray.clr.g*200),ENTIER(ray.clr.b*200)); 
-			Raster.Fill(image,cam.imx,cam.imy,cam.imx+3,cam.imy+3,pixel,copy)
 		END
-	ELSE 
-			ray.clr.b:= ray.clr.b + ray.clr.ba;
-			ray.clr.r:= ray.clr.r + ray.clr.ra/4;
-			ray.clr.g:= ray.clr.g + ray.clr.ga/4;	
-	END		
+	ELSE
+		Raster.SetRGB(pixel,ENTIER(ray.clr.r*200),ENTIER(ray.clr.g*200),ENTIER(ray.clr.b*200)); 
+		Raster.Fill(image,cam.imx,cam.imy,cam.imx+3,cam.imy+3,pixel,copy)
+	END
 END tessa;
 
 PROCEDURE ztrace(cam: Camera; level: INTEGER);
@@ -427,11 +425,13 @@ BEGIN
 	blankray.clr.ga := 1;
 	blankray.clr.ba := 1;
 	blankray.scale := 1; 
+	blankray.patched:=TRUE;
 	blankray.tscale:=1;
 	blankray.dtl:=10;	
 	blankpray:=blankray;
 	blankpray.dtl:=5;
 	blankpray.ispatchTF:=TRUE;
+	blankray.patched:=TRUE;
 	FOR a:= 0 TO TW-1  DO
 		FOR b:= 0 TO TH-1 DO
 			NEW(tile[a,b]);

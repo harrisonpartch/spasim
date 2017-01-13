@@ -441,7 +441,7 @@ BEGIN
 	rat.tscale:=16;
 	z2a.FRaster(plane,64);  
 	z2a.FRaster(ball,32); 	
-	z2a.FRaster(noise,32);
+	z2a.FRaster(noise,32); 
  	Base.world:=z2a; 	
 	Base.avatar:=harrison;
 	Base.avatarsize:=1000; 
