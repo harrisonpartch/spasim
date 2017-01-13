@@ -432,8 +432,7 @@ BEGIN
 	Base.setPT(center,1/2,1/2,1/2);
 	NEW(ball,center,0.6);  
 	serp.passable:=FALSE;   
-	conglomerate.copyonstroke:=TRUE;
-	noise.setvoxel(blacksun);	
+	noise.setvoxel(conglomerate);	
 	reddot.tscale:=128;
 	ball.setvoxel(axolotl);
 	Base.setPT(center,1/2,1/2,9/12);

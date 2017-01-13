@@ -280,15 +280,14 @@ IF ray.length>0.00000001 THEN
 		ray.terminate:=TRUE		
 	ELSE
 		ray.patchTF:=TRUE;
-		ray.clr.r := ray.clr.r +ray.clr.ra;	
 		FOR i := -1 TO 1 DO
 			FOR j:= -1 TO 1 DO
-				IF mip>8 THEN 	
-					color:=texcube.side[ray.face].pixelmip_one(lx+i,ly+j);
-				ELSIF mip>4 THEN
+				IF mip>2 THEN 	
+					color:=texcube.side[ray.face].pixelmip_zero(lx+i,ly+j);
+				ELSIF mip>1 THEN
 					color:=texcube.side[ray.face].pixelmip_one(lx+i,ly-i);
 				ELSE
-					color:=texcube.side[ray.face].pixelmip_one(lx+i,ly+j);		
+					color:=texcube.side[ray.face].pixelmip_two(lx+i,ly+j);		
 				END; 
 				dr:=color.red*dot;
 				dg:=color.green*dot;

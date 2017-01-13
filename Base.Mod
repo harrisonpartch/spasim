@@ -206,6 +206,7 @@ END TexCube;
 
 TYPE Ray* = RECORD
 	xyz*, dxyz*, ddxyz*, lxyz*, txyz*, origin*, oxyz*, popdelta*, hitxyz*: PT;	
+	downxyz*,rightxyz*: PT;
 	theta*,phi*, dtheta*,dphi*: REAL;
 (*	r*, g*, b*, ra*, ga*, ba*, bla*,alpha*: REAL; *)
 	clr*: ray_color;

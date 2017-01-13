@@ -38,6 +38,13 @@ BEGIN
 				END
 			END
 		END;
+		FOR i:= 0 TO 10 DO
+			center:=Base.randPT();
+			radius:=Base.rand.Uniform()/28;
+			ball.reset(center,radius);
+			ball.setcolor(i/10, Base.rand.Uniform(),1-i/10,0);
+			cloud.FRaster(ball,27)
+		END;
 		conglo.blox[0,1,1]:=conglo;
 		conglo.blox[1,0,1]:=reddot;		
 		conglo.blox[1,1,0]:=conglo;
@@ -45,11 +52,13 @@ BEGIN
 		conglo.blox[1,2,1]:=core;		
 		conglo.blox[1,1,2]:=conglo;
 		conglo.blox[1,1,1]:=core;
-		cloud.imposter:=reddot;
+		cloud.imposter:=reddot;		
 		cloud.copyonstroke:= TRUE;		
 		conglo.copyonstroke:= TRUE;		
 		core.copyonstroke:= TRUE;		
-
+		cloud.passable:= TRUE;		
+		conglo.passable:= TRUE;		
+		core.passable:= TRUE;						
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;

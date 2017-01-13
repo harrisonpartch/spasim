@@ -24,19 +24,11 @@ TYPE Tile=OBJECT
 VAR
 	GO: BOOLEAN;
 	cam: Camera;
-	blankray, blankpray: Base.Ray;
+
 
 PROCEDURE & init;
 BEGIN
-	blankray.clr.ra := 1;
-	blankray.clr.ga := 1;
-	blankray.clr.ba := 1;
-	blankray.scale := 1; 
-	blankray.tscale:=1;
-	blankray.dtl:=10;	
-	blankpray:=blankray;
-	blankpray.dtl:=5;
-	blankpray.ispatchTF:=TRUE;
+
 END init;
 
 PROCEDURE go;
@@ -208,6 +200,7 @@ BEGIN{ACTIVE, PRIORITY(Objects.High)}
 	UNTIL ~Base.worldalive;
 END antimalice;
 *)
+
 VAR
 	tile: ARRAY TW,TH OF Tile;
 	frameasteps*,framebsteps*:LONGINT;
@@ -228,6 +221,7 @@ VAR
 	FV: REAL;
 	copy: Raster.Mode;
 	PATCH*:BOOLEAN;
+	blankray,blankpray: Ray;
 
 PROCEDURE reflect(VAR p: PT; n: PT);
 VAR 
@@ -247,7 +241,8 @@ BEGIN
 END mirror;
 	
 PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
-VAR d: REAL;
+VAR 
+	d: REAL;
 BEGIN
 	ray.dxyz.x:= Math.cos(theta) * Math.cos(phi);
 	ray.dxyz.y:= Math.sin(theta) * Math.cos(phi);
@@ -256,8 +251,12 @@ BEGIN
 	ray.dxyz.x := ray.dxyz.x/d;
 	ray.dxyz.y := ray.dxyz.y/d;
 	ray.dxyz.z := ray.dxyz.z/d;	
+	ray.downxyz:=Base.dward;
+	ray.rightxyz:=Base.rward;
 	SPSMMath.orrot(ray.dxyz, Base.dward, rtheta);  
-	SPSMMath.orrot(ray.dxyz, rward, rphi);  
+	SPSMMath.orrot(ray.dxyz, Base.rward, rphi);  
+	SPSMMath.orrot(ray.downxyz, Base.rward, rphi);  
+	SPSMMath.orrot(ray.rightxyz, Base.dward, rphi);  	
 	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
@@ -424,6 +423,15 @@ BEGIN
 	Out.String("Retina loading...");
 	Raster.InitMode(copy,Raster.srcCopy);	
 	image := Graphics.LoadImage("granite.jpg", FALSE);
+	blankray.clr.ra := 1;
+	blankray.clr.ga := 1;
+	blankray.clr.ba := 1;
+	blankray.scale := 1; 
+	blankray.tscale:=1;
+	blankray.dtl:=10;	
+	blankpray:=blankray;
+	blankpray.dtl:=5;
+	blankpray.ispatchTF:=TRUE;
 	FOR a:= 0 TO TW-1  DO
 		FOR b:= 0 TO TH-1 DO
 			NEW(tile[a,b]);
