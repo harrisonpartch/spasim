@@ -343,7 +343,8 @@ VAR
 	modnum, bestmode: LONGINT;
 	i: LONGINT;
 	dumysize: Api.XSizeHints;
-
+	defwin: X11.Window;
+	
 BEGIN
 	display := Api.OpenDisplay(":0.0");
 	IF display =0 THEN
@@ -445,8 +446,9 @@ BEGIN
 	glctx := GL.glXCreateContext(display, visinfoptr, 0, GLC.GL_TRUE);
 	IF debug THEN context.out.String("glXCreateContext glctx= "); context.out.Int(glctx, 0); context.out.Ln; context.out.Update; END;
 
+	defwin :=  Api.RootWindow(display, visinfoptr.screen);
 	(* create a color map *)
-	cmap := X11.CreateColormap(display, Api.RootWindow(display,visinfoptr.screen), visinfoptr.visual, X11.AllocNone);
+	cmap := X11.CreateColormap(display,  defwin, visinfoptr.visual, X11.AllocNone);
 	IF cmap = 0 THEN
 		IF debug THEN
 			context.out.String(" cannot create colormap"); context.out.Ln;
@@ -482,7 +484,7 @@ BEGIN
 		winAttr.eventMask :=  Api.ExposureMask + Api.KeyPressMask + Api.ButtonPressMask + Api.StructureNotifyMask ;
 		masks := Api.CWBorderPixel + Api.CWColormap + Api.CWEventMask + Api.CWOverrideRedirect;
 
-		win := Api.CreateWindow(display, Api.RootWindow(display, visinfoptr.screen),  0, 0, dispWidth, dispHeight,
+		win := Api.CreateWindow(display, defwin,  0, 0, dispWidth, dispHeight,
 		        0, visinfoptr.depth, Api.InputOutput,  visinfoptr.visual, masks, winAttr);
 
 		(*Api.WarpPointer(display, Api.None, win, 0, 0, 0, 0, 0, 0);*)
@@ -496,7 +498,7 @@ BEGIN
 		winAttr.eventMask := Api.ExposureMask + Api.KeyPressMask + Api.ButtonPressMask + Api.StructureNotifyMask;
 
 		masks := Api.CWBorderPixel + Api.CWColormap + Api.CWEventMask;
-		win := Api.CreateWindow(display, Api.RootWindow(display, visinfoptr.screen),  100, 100, width, height,
+		win := Api.CreateWindow(display, defwin,  100, 100, width, height,
 		        0, visinfoptr.depth, Api.InputOutput,  visinfoptr.visual, masks, winAttr);
 
 		(* only set window title and handle wm_delete_events if in windowed mode *)
@@ -620,6 +622,7 @@ END SaveImage;
 		dl: Api.Data40l;
 		wmstate, wmfullscreen: X11.Atom;
 		res: LONGINT;
+		defwin: X11.Window;
 	BEGIN
 	wmstate := Api.InternAtom(display, "_NET_WM_STATE", Api.False);
 	wmfullscreen := Api.InternAtom(display, "_NET_WM_STATE_FULLSCREEN", Api.False);
@@ -634,8 +637,8 @@ END SaveImage;
 	dl[2] := 0;
 	cm.data:=SYSTEM.VAL(Api.Data40, dl);
 	xev := SYSTEM.VAL(Api.XEvent, cm);
-
-	res := Api.SendEvent(display, X11.DefaultRootWindow(display), Api.False, Api.SubstructureNotifyMask, ADDRESSOF(xev));
+	defwin := X11.DefaultRootWindow(display);
+	res := Api.SendEvent(display, defwin, Api.False, Api.SubstructureNotifyMask, ADDRESSOF(xev));
 
 	END ToggleFullWindow;
 

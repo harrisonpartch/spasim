@@ -91,7 +91,7 @@ BEGIN
 	END
 END r90z;
 
-PROCEDURE Shade (VAR ray: Ray);
+PROCEDURE Shade(VAR ray: Ray);
 VAR
 	pushxyz, newxyz, xyz: Base.PT;
 	ijk: Base.IPT;
@@ -100,7 +100,13 @@ VAR
 	v: Voxel;
 	vdepth, blainv: REAL;
 	last:BOOLEAN;
+	i,j: LONGINT;
+	patchray: Ray;
+	patchdx, patchdy: PT; 
+	patchradiusx, patchradiusy: REAL;
 BEGIN
+	ray.lastclr:=ray.clr;
+	ray.lastlxyz:=ray.lxyz;
 	ray.scale := ray.scale*M;
 	xyz.x := ABS(ray.lxyz.x-offset.x) * M;  
 	xyz.y := ABS(ray.lxyz.y-offset.y) * M;		
@@ -108,29 +114,81 @@ BEGIN
 	pushxyz:=xyz;
 	IF (ray.length*ray.scale>ray.dtl) THEN
 		IF imposter#NIL THEN
-			imposter.Shade(ray)
+			imposter.Shade(ray);
 		ELSIF nposterTF THEN
 			ray.normalTF:=TRUE;
 			ray.normal:=nposter.normal;
 			nshade(nposter,ray);
-		END	
-	ELSE	
-	SPSME.E(xyz,ijk);
-	bounds(ijk.i,ijk.j,ijk.k,out);
-	IF ~out THEN
-		v:= blox[ijk.i,ijk.j,ijk.k];
-		IF (v#NIL) THEN
-			ray.lxyz.x := ABS(xyz.x - ijk.i);  
-			ray.lxyz.y := ABS(xyz.y - ijk.j);
-			ray.lxyz.z := ABS(xyz.z - ijk.k);
-			ray.popdelta := Base.Origin; 
-			v.Shade(ray);	
-			xyz.x := xyz.x + ray.popdelta.x;    
-			xyz.y := xyz.y + ray.popdelta.y;
-			xyz.z := xyz.z + ray.popdelta.z;
-		ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
-			nshade(nblox[ijk.i,ijk.j,ijk.k],ray);	
+		END;
+		IF ray.terminate THEN (* should always be true unless maybe the imposter is translucent lol *)			
+			IF ray. ispatchTF & ~ray.patched THEN
+				ray.patched:=TRUE;
+				ray.scale:=ray.scale/M;
+				patchradiusx:=Math.sin(ray.dtheta)*ray.length; 
+				patchradiusy:=Math.sin(ray.dphi)*ray.length; 
+				patchdx.x := ray.rightxyz.x*patchradiusx; patchdx.y := ray.rightxyz.y*patchradiusx; patchdx.z := ray.rightxyz.z*patchradiusx; 
+				patchdy.x := ray.downxyz.x*patchradiusy; patchdx.y := ray.downxyz.y*patchradiusy; patchdx.z := ray.downxyz.z*patchradiusy; 
+				FOR i:= 0 TO 2 DO
+					FOR j:= 0 TO 2 DO
+						ray.clr:=ray.lastclr;
+						ray.terminate:=FALSE;
+						ray.lxyz.x := ray.lastlxyz.x + (i-1)*patchdx.x + (j-1)*patchdy.x;
+						ray.lxyz.y :=  ray.lastlxyz.y+ (i-1)*patchdx.y + (j-1)*patchdy.y;
+						ray.lxyz.z := 	 ray.lastlxyz.z + (i-1)*patchdx.z + (j-1)*patchdy.z;	
+						Shade(ray);
+						IF ~ray.terminate THEN (* miss out *)
+							(* convert ray.lxyz that missed to ray.xyz and reshoot *)
+							Base.world.Shade(ray)
+						END;
+						ray.patch[i,j]:=ray.clr;	
+					(*	ray.patch[i,j].b:=1;	*)
+					END
+				END;
+				ray.terminate:=TRUE;				
+			END
 		END
+	ELSE	
+		SPSME.E(xyz,ijk);
+		bounds(ijk.i,ijk.j,ijk.k,out);
+		IF ~out THEN
+			v:= blox[ijk.i,ijk.j,ijk.k];
+			IF (v#NIL) THEN
+				ray.lxyz.x := ABS(xyz.x - ijk.i);  
+				ray.lxyz.y := ABS(xyz.y - ijk.j);
+				ray.lxyz.z := ABS(xyz.z - ijk.k);
+				ray.popdelta := Base.Origin; 
+				ray.lastclr:=ray.clr;
+				v.Shade(ray);	
+				xyz.x := xyz.x + ray.popdelta.x;    
+				xyz.y := xyz.y + ray.popdelta.y;
+				xyz.z := xyz.z + ray.popdelta.z;
+			ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
+				nshade(nblox[ijk.i,ijk.j,ijk.k],ray);				
+			END;
+		IF ray.terminate THEN (* should always be true unless maybe the imposter is translucent lol *)			
+			IF ray.ispatchTF & ~ray.patched THEN
+				ray.patched:=TRUE;
+				ray.scale:=ray.scale/M;
+				patchradiusx:=Math.sin(ray.dtheta)*ray.length; 
+				patchradiusy:=Math.sin(ray.dphi)*ray.length; 
+				patchdx.x := ray.rightxyz.x*patchradiusx; patchdx.y := ray.rightxyz.y*patchradiusx; patchdx.z := ray.rightxyz.z*patchradiusx; 
+				patchdy.x := ray.downxyz.x*patchradiusy; patchdx.y := ray.downxyz.y*patchradiusy; patchdx.z := ray.downxyz.z*patchradiusy; 
+				FOR i:= 0 TO 2 DO
+					FOR j:= 0 TO 2 DO
+						ray.clr:=ray.lastclr;
+						ray.terminate:=FALSE;
+						ray.xyz.x := ray.xyz.x + (i-1)*patchdx.x + (j-1)*patchdy.x;
+						ray.xyz.y :=  ray.xyz.y+ (i-1)*patchdx.y + (j-1)*patchdy.y;
+						ray.xyz.z := 	 ray.xyz.z + (i-1)*patchdx.z + (j-1)*patchdy.z;		
+						Shade(ray);
+						ray.patch[i,j]:=ray.clr;	
+					(*	ray.patch[i,j].b:=1;	*)
+					END
+				END;
+				ray.terminate:=TRUE;				
+			END
+		END
+		END		
 	END;	 
 	IF ~ray.terminate THEN
 		REPEAT
@@ -196,6 +254,7 @@ BEGIN
 			ray.xyz.y:=ray.xyz.y +(newxyz.y-xyz.y)/ray.scale;			
 			ray.xyz.z:=ray.xyz.z +(newxyz.z-xyz.z)/ray.scale;			
 			xyz:=newxyz;
+			ray.hitxyz:=ray.xyz;
 			ray.length:=ray.length+vdepth;
 			bounds(ijk.i,ijk.j,ijk.k, out);
 			IF ~out THEN
@@ -212,16 +271,39 @@ BEGIN
 						ray.normalTF:=FALSE;
 						ray.normal:=ray.fnormal;						
 					END;
-					v.Shade(ray);	
+					v.Shade(ray);
 					xyz.x := xyz.x + ray.popdelta.x;    
 					xyz.y := xyz.y + ray.popdelta.y;
 					xyz.z := xyz.z + ray.popdelta.z;	
 				ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);	
 				END;
-			END;
+		IF ray.terminate THEN (* should always be true unless maybe the imposter is translucent lol *)			
+			IF ray. ispatchTF & ~ray.patched THEN
+				ray.patched:=TRUE;
+				ray.scale:=ray.scale/M;
+				patchradiusx:=Math.sin(ray.dtheta)*ray.length; 
+				patchradiusy:=Math.sin(ray.dphi)*ray.length; 
+				patchdx.x := ray.rightxyz.x*patchradiusx; patchdx.y := ray.rightxyz.y*patchradiusx; patchdx.z := ray.rightxyz.z*patchradiusx; 
+				patchdy.x := ray.downxyz.x*patchradiusy; patchdx.y := ray.downxyz.y*patchradiusy; patchdx.z := ray.downxyz.z*patchradiusy; 
+				FOR i:= 0 TO 2 DO
+					FOR j:= 0 TO 2 DO
+						ray.clr:=ray.lastclr;
+						ray.terminate:=FALSE;
+						ray.xyz.x := ray.xyz.x + (i-1)*patchdx.x + (j-1)*patchdy.x;
+						ray.xyz.y :=  ray.xyz.y+ (i-1)*patchdx.y + (j-1)*patchdy.y;
+						ray.xyz.z := 	ray.xyz.z + (i-1)*patchdx.z + (j-1)*patchdy.z;		
+						Shade(ray);
+						ray.patch[i,j]:=ray.clr;	
+					(*	ray.patch[i,j].b:=1;	*)
+					END
+				END;
+				ray.terminate:=TRUE;				
+			END
+		END
+		END
 		UNTIL out OR ray.terminate;
-	END 		END;
+	END;
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
 	ray.popdelta.y := (xyz.y-pushxyz.y)/M;
 	ray.popdelta.z := (xyz.z-pushxyz.z)/M; 
@@ -266,7 +348,6 @@ PROCEDURE mirror(VAR ray: Ray);
 BEGIN
 	ray.hitmirrorTF := TRUE;
 	ray.hitxyz:=ray.xyz;
-	ray.hitdxyz:=ray.dxyz;
 	ray.changed := TRUE;
 	ray.mirrortf:=TRUE;	
 	INC(ray.mirrors);
@@ -350,7 +431,6 @@ BEGIN
 	passable:=TRUE;
 	complex:=TRUE;
 	imposter:=Base.EMPTY;
-	DTL:=0;
 	code:=NCODE; 
 	ncode:=NCODE
 END init;

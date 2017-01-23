@@ -4,9 +4,6 @@ IMPORT KernelLog, Files, Strings, Containers, Commands, Math, Streams, Reals, WM
 	GLC := OpenGLConst, GL := OpenGL, GLU;
 
 CONST
-	debug = FALSE; (* for writing chunk values *)
-
-CONST
 
 (* Primary Chunk, at the beginning of each file *)
 MAIN3DS  = 4D4DH;
@@ -536,23 +533,23 @@ BEGIN
 		ReadChunk(curChunk);
 
 		(* Check which chunk we just read *)
-		CASE curChunk.ID OF
+		
 
-		OBJ_TRIMESH:					(* This lets us know that we are reading a new object*)
+		IF curChunk.ID = OBJ_TRIMESH THEN					(* This lets us know that we are reading a new object*)
 
 			(* We found a new object, so let's read in it's info using recursion *)
 			ProcessNextObjecChunk(model, object, curChunk);
 
 
-		| TRI_VERTEXL:				(* This is the objects vertices *)
+		ELSIF curChunk.ID = TRI_VERTEXL THEN				(* This is the objects vertices *)
 			ReadVertices(object, curChunk);
 
 
-		| TRI_FACEL1:					(* This is the objects face information *)
+		ELSIF curChunk.ID = TRI_FACEL1 THEN					(* This is the objects face information *)
 			ReadVertexIndices(object, curChunk);
 
 
-		| TRI_MATERIAL:				(* This holds the material name that the object has*)
+		ELSIF curChunk.ID = TRI_MATERIAL THEN				(* This holds the material name that the object has*)
 
 			(* This chunk holds the name of the material that the object has assigned to it.
 			 This could either be just a color or a texture map.  This chunk also holds
@@ -565,13 +562,13 @@ BEGIN
 			ReadObjectMaterial(model, object, curChunk);
 
 
-		| TRI_MAPPINGCOORS:						(* This holds the UV texture coordinates for the object*)
+		ELSIF curChunk.ID = TRI_MAPPINGCOORS THEN						(* This holds the UV texture coordinates for the object*)
 
 			(* This chunk holds all of the UV coordinates for our object.  Let's read them in. *)
 			ReadUVCoordinates(object, curChunk);
 
-		| OBJ_LIGHT   : writer.String("Obj-Light"); writer.Ln; writer.Update;
-		| OBJ_CAMERA:
+		ELSIF curChunk.ID = OBJ_LIGHT THEN writer.String("Obj-Light"); writer.Ln; writer.Update;
+		ELSIF curChunk.ID = OBJ_CAMERA THEN
 			ReadCameraChunk(curChunk);
 		ELSE
 

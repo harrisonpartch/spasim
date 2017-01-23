@@ -1,8 +1,8 @@
 MODULE WMGLDemo6;  (** AUTHOR "fnecati"; PURPOSE "simple radar sweep example "; *)
 
 IMPORT
-	WMRectangles, WMGraphics, Strings, Kernel, Math, Modules,
-	WM := WMWindowManager,  WMMessages, WMDialogs,
+	WMRectangles, Strings, Kernel, Math, Modules,
+	WM := WMWindowManager,  WMMessages, 
 	GL := OpenGL, GLC := OpenGLConst, WMGL:=WMGLWindow;
 
 CONST waittime = 50;
@@ -11,7 +11,7 @@ TYPE
 	KillerMsg = OBJECT
 	END KillerMsg;
 
-	GLWindow* =  OBJECT(WMGL.Window)
+	GLWindow =  OBJECT(WMGL.Window)
 	VAR
 		 timer: Kernel.MilliTimer;
 		alive,  animated: BOOLEAN;
@@ -46,7 +46,6 @@ TYPE
 				| "-" : angle := angle - 3.0; UpdateImage;
 				| "+" : angle := angle + 3.0; UpdateImage;
 
-				| "s": SaveImage;
 				| "q" : Close;
 			ELSE
 			END;
@@ -61,7 +60,7 @@ TYPE
 		END Handle;
 
 		PROCEDURE Close;
-		BEGIN 
+		BEGIN
 			BEGIN {EXCLUSIVE} alive := FALSE; animated := FALSE END;
 			Close^;
 			DecCount
@@ -76,16 +75,6 @@ TYPE
 				Swap();
 			Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 		END UpdateImage;
-
-		PROCEDURE SaveImage;
-		VAR res: LONGINT;
-			fname: ARRAY 128 OF CHAR;
-		BEGIN
-			fname:="mywmgltest.bmp";
-			IF WMDialogs.QueryString(" Save File name: ",fname)=WMDialogs.ResOk THEN
-				WMGraphics.StoreImage(img, fname,res);
-			END;
-		END SaveImage;
 
 	PROCEDURE DrawMode(dm: LONGINT);
 	VAR drawMode: LONGINT;
@@ -204,7 +193,7 @@ END GLWindow;
 
 VAR
 	nofWindows : LONGINT;
-	
+
 PROCEDURE Open*;
 VAR
 	window: GLWindow;

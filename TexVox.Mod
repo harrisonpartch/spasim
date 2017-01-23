@@ -149,128 +149,127 @@ VAR
 	faace:INTEGER;
 	dtl: LONGINT;
 	mip,mipverse,gray,grayinv: REAL;
+	patchradius: REAL;
+	pclr: Base.ray_color;
 BEGIN
-IF ray.length>0.00000001 THEN
-	IF tscale>0 THEN
-		xx:=ray.xyz.x;
-		yy:=ray.xyz.y;
-		zz:=ray.xyz.z;	
-		lx:=xx*90-ENTIER(xx*90);
-		ly:=yy*90-ENTIER(yy*90);
-		lz:=zz*90-ENTIER(zz*90);
-		xx:=xx*tscale-ENTIER(xx*tscale);
-		yy:=yy*tscale-ENTIER(yy*tscale);
-		zz:=zz*tscale-ENTIER(zz*tscale);
-		xxx:=ABS(1/2-xx);
-		yyy:=ABS(1/2-yy);
-		zzz:=ABS(1/2-zz);
-		IF xxx>yyy THEN
-			IF xxx>zzz THEN
-				(* yz pyramid *)  				(*  faces come in pairs: (0,3),(2,5),(1,4) *)
-				lx:=yy; ly:=zz;
-				lx1:=tscale*ray.lxyz.x/ray.scale;
-				CASE ray.face OF
-					0:
-					|1: lx:=lx+lx1;
-					|2:  ly:=ly+lx1; 
-					|3: 
-					|4: lx:=lx+lx1-1;
-					|5: ly:=ly+lx1-1; 
+	IF ray.length>0.00000001 THEN
+		IF tscale>0 THEN
+			xx:=ray.xyz.x;
+			yy:=ray.xyz.y;
+			zz:=ray.xyz.z;	
+			lx:=xx*90-ENTIER(xx*90);
+			ly:=yy*90-ENTIER(yy*90);
+			lz:=zz*90-ENTIER(zz*90);
+			xx:=xx*tscale-ENTIER(xx*tscale);
+			yy:=yy*tscale-ENTIER(yy*tscale);
+			zz:=zz*tscale-ENTIER(zz*tscale);
+			xxx:=ABS(1/2-xx);
+			yyy:=ABS(1/2-yy);
+			zzz:=ABS(1/2-zz);
+			IF xxx>yyy THEN
+				IF xxx>zzz THEN
+					(* yz pyramid *)  				(*  faces come in pairs: (0,3),(2,5),(1,4) *)
+					lx:=yy; ly:=zz;
+					lx1:=tscale*ray.lxyz.x/ray.scale;
+					CASE ray.face OF
+						0:
+						|1: lx:=lx+lx1;
+						|2:  ly:=ly+lx1; 
+						|3: 
+						|4: lx:=lx+lx1-1;
+						|5: ly:=ly+lx1-1; 
+					END
+				ELSE
+					(* xy pyramid *)
+					lx:=xx; ly:=yy;
+					lz1:=tscale*ray.lxyz.z/ray.scale;
+					CASE ray.face OF
+						 0: lx:=lx+lz1;
+						|1:  ly:=ly+lz1;
+						|2: 
+						|3: lx:=lx+lz1-1;
+						|4: ly:=ly+lz1-1;
+						|5:
+					END
 				END
 			ELSE
-				(* xy pyramid *)
-				lx:=xx; ly:=yy;
-				lz1:=tscale*ray.lxyz.z/ray.scale;
-				CASE ray.face OF
-					 0: lx:=lx+lz1;
-					|1:  ly:=ly+lz1;
-					|2: 
-					|3: lx:=lx+lz1-1;
-					|4: ly:=ly+lz1-1;
-					|5:
+				IF yyy>zzz THEN
+					(* xz pyramid *)	
+					lx:=xx; ly:=zz;	
+					ly1:=tscale*ray.lxyz.y/ray.scale;	
+					CASE ray.face OF
+						 0: lx:= lx+ly1;
+						|1:
+						|2: ly:=ly+ly1;
+						|3: lx:= lx+ly1-1;
+						|4:  
+						|5:ly:=ly+ly1-1;
+					END
+				ELSE
+					(* xy pyramid *)
+					lx:=xx; ly:=yy;
+					lz1:=tscale*ray.lxyz.z/ray.scale;
+					CASE ray.face OF
+						 0: lx:=lx+lz1;
+						|1:  ly:=ly+lz1;
+						|2: 
+						|3: lx:=lx+lz1-1;
+						|4: ly:=ly+lz1-1;
+						|5:
+					END
 				END
-			END
+			END 
 		ELSE
-			IF yyy>zzz THEN
-				(* xz pyramid *)	
-				lx:=xx; ly:=zz;	
-				ly1:=tscale*ray.lxyz.y/ray.scale;	
-				CASE ray.face OF
-					 0: lx:= lx+ly1;
-					|1:
-					|2: ly:=ly+ly1;
-					|3: lx:= lx+ly1-1;
-					|4:  
-					|5:ly:=ly+ly1-1;
-				END
-			ELSE
-				(* xy pyramid *)
-				lx:=xx; ly:=yy;
-				lz1:=tscale*ray.lxyz.z/ray.scale;
-				CASE ray.face OF
-					 0: lx:=lx+lz1;
-					|1:  ly:=ly+lz1;
-					|2: 
-					|3: lx:=lx+lz1-1;
-					|4: ly:=ly+lz1-1;
-					|5:
-				END
-			END
-		END 
-	ELSE
-		CASE ray.face OF
-			 0: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
-			|1: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
-			|2: lx := ray.lxyz.x; ly := ray.lxyz.y;
-			|3: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
-			|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
-			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
-		END
-	END;
-	color:=texcube.side[ray.face].pixelmip_one(lx,ly);	
-	dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
-	IF color.alpha<0.99 THEN
-		IF color.alpha>0.97 THEN 
-			mirror(ray,mix)
-		ELSE		
-			dr:=color.red*color.alpha;
-			dg:=color.green*color.alpha;
-			db:=color.blue*color.alpha;	
-			ray.clr.r := ray.clr.r + dr*ray.clr.ra;
-			ray.clr.g := ray.clr.g + dg*ray.clr.ga;
-			ray.clr.b := ray.clr.b + db*ray.clr.ba;
-			ray.clr.ra:=ray.clr.ra -dr;
-			ray.clr.ga:=ray.clr.ga -dg;
-			ray.clr.ba:=ray.clr.ba -db;
-			Base.ExitF(ray,exit,faace);
-			CASE faace OF
+			CASE ray.face OF
 				 0: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
 				|1: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
 				|2: lx := ray.lxyz.x; ly := ray.lxyz.y;
 				|3: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
 				|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
 				|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
-			END;
-			color:=texcube.side[faace].pixelmip_one(lx,ly);			
-			dr:=color.red*color.alpha;
-			dg:=color.green*color.alpha;
-			db:=color.blue*color.alpha;	
-			ray.clr.r := ray.clr.r + dr*ray.clr.ra;
-			ray.clr.g := ray.clr.g + dg*ray.clr.ga;
-			ray.clr.b := ray.clr.b + db*ray.clr.ba;
-			ray.clr.ra:=ray.clr.ra -dr;
-			ray.clr.ga:=ray.clr.ga -dg;
-			ray.clr.ba:=ray.clr.ba -db;								
-		END;					
-	ELSIF ~ray.ispatchTF THEN
+			END
+		END
+	END; 
+	color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
+	dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
+	IF color.alpha<0.99  THEN 
+			mirror(ray,mix)
+		(*all other color with alpha is simply ignored for now *)				
+	ELSIF ray.ispatchTF & ~ray.patched THEN
+		(* this *will terminate, so we can build the patch now*)	
+		ray.patched:=TRUE;
+		patchradius:=Math.sin(ray.dphi)*ray.length*(Base.PRO)*tscale; 
 		mip:=ray.length*ray.scale/12;
-		IF mip>4 THEN 	
+		FOR i:= 0 TO 2 DO
+			FOR j:= 0 TO 2 DO
+				IF mip>4 THEN 	
+					color:=texcube.side[ray.face].pixelmip_zero(lx+(i-1)*patchradius,ly+(j-1)*patchradius);
+				ELSIF mip>1THEN
+					color:=texcube.side[ray.face].pixelmip_one(lx+(i-1)*patchradius,ly+(j-1)*patchradius);
+				ELSE
+					color:=texcube.side[ray.face].pixelmip_two(lx+(i-1)*patchradius,ly+(j-1)*patchradius);		
+				END; 
+				dr:=color.red*dot;
+				dg:=color.green*dot;
+				db:=color.blue*dot;	
+				pclr.r := ray.clr.r + dr*ray.clr.ra;
+				pclr.g := ray.clr.g + dg*ray.clr.ga;
+				pclr.b := ray.clr.b + db*ray.clr.ba;	
+				ray.patch[i,j]:=pclr;	
+	(*			ray.patch[i,j].b:=1;	*)
+			END
+		END;
+		ray.terminate:=TRUE;								
+	ELSE (*not patching. color the ray and let's get out of here *)
+		mip:=ray.length*ray.scale/12;
+(*		IF mip>7 THEN 	
 			color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
-		ELSIF mip>1 THEN
+		ELSIF mip>4 THEN
 			color:=texcube.side[ray.face].pixelmip_one(lx,ly);
 		ELSE
 			color:=texcube.side[ray.face].pixelmip_two(lx,ly);		
 		END; 	
+*)		color:=texcube.side[ray.face].pixelmip_two(lx,ly);
 		dr:=color.red*dot;
 		dg:=color.green*dot;
 		db:=color.blue*dot;	
@@ -278,29 +277,7 @@ IF ray.length>0.00000001 THEN
 		ray.clr.g := ray.clr.g + dg*ray.clr.ga;
 		ray.clr.b := ray.clr.b + db*ray.clr.ba;	
 		ray.terminate:=TRUE		
-	ELSE
-		ray.patchTF:=TRUE;
-		FOR i := -1 TO 1 DO
-			FOR j:= -1 TO 1 DO
-				IF mip>2 THEN 	
-					color:=texcube.side[ray.face].pixelmip_zero(lx+i,ly+j);
-				ELSIF mip>1 THEN
-					color:=texcube.side[ray.face].pixelmip_one(lx+i,ly-i);
-				ELSE
-					color:=texcube.side[ray.face].pixelmip_two(lx+i,ly+j);		
-				END; 
-				dr:=color.red*dot;
-				dg:=color.green*dot;
-				db:=color.blue*dot;	
-				ray.patch[i+1,j+1].r := ray.clr.r + dr*ray.clr.ra;
-				ray.patch[i+1,j+1].g := ray.clr.g + dg*ray.clr.ga;
-				ray.patch[i+1,j+1].b := ray.clr.b + db*ray.clr.ba;			
-				ray.terminate:=TRUE									
-			END
-		END	
 	END
-END 
-
 END Shade;
 
 (*
@@ -329,8 +306,11 @@ BEGIN
 	ray.hitxyz:=ray.xyz;
 	ray.changed := TRUE;
 	ray.mirrortf:=TRUE;	
-	INC(ray.mirrors);
-	IF ray.mirrors<4 THEN reflect(ray.dxyz, ray.normal)	END;
+	ray.clr.ra:= ray.clr.ra + 0.2;
+	ray.clr.ga := ray.clr.ga + 0.2;
+	ray.clr.ba := ray.clr.ba + 0.2;
+	ray.clr.alpha:= ray.clr.alpha - 0.2;	
+	IF ray.clr.alpha < 0.1 THEN ray.terminate:=TRUE END;		
 	n.x:=(ray.normal.x*mix+ray.fnormal.x*(1-mix));
 	n.y:=(ray.normal.y*mix+ray.fnormal.y*(1-mix));	
 	n.z:=(ray.normal.z*mix+ray.fnormal.z*(1-mix));	

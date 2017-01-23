@@ -31,7 +31,7 @@ BEGIN
 		cloud:=Base.VoxelFromName("NM2"); 	
 		ball.setcolor(1,0,1,1/2);			
 		cloud.FRasterSolid(ball,32);		
-		FOR i:=0 TO 2 BY 2 DO
+(*		FOR i:=0 TO 2 BY 2 DO
 			FOR j:=0 TO 2 BY 2 DO
 				FOR k:=0 TO 2 BY 2  DO
 					conglo.blox[i,j,k]:=cloud
@@ -45,14 +45,14 @@ BEGIN
 			ball.setcolor(i/10, Base.rand.Uniform(),1-i/10,0);
 			cloud.FRaster(ball,27)
 		END;
-		conglo.blox[0,1,1]:=conglo;
-		conglo.blox[1,0,1]:=reddot;		
+*)		conglo.blox[0,1,1]:=conglo;
+		conglo.blox[1,0,1]:=conglo;		
 		conglo.blox[1,1,0]:=conglo;
-		conglo.blox[2,1,1]:=reddot;
+		conglo.blox[2,1,1]:=conglo;
 		conglo.blox[1,2,1]:=core;		
 		conglo.blox[1,1,2]:=conglo;
 		conglo.blox[1,1,1]:=core;
-		cloud.imposter:=reddot;		
+		conglo.imposter:=cloud;		
 		cloud.copyonstroke:= TRUE;		
 		conglo.copyonstroke:= TRUE;		
 		core.copyonstroke:= TRUE;		

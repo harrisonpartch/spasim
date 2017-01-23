@@ -66,8 +66,11 @@ TYPE
 		tpanel.fillColor.Set(0FFDFFH);
 		panel.AddContent(tpanel);
 
+
+		
 (* --------------vertext shader -------------- *)
 
+		
 		(* group panel, source *)
 		NEW(grpanel); grpanel.alignment.Set(WMComponents.AlignTop); grpanel.bounds.SetHeight(200);
 		grpanel.fillColor.Set(0FFFFFFFFH); grpanel.caption.SetAOC("vertex shader source:");
@@ -83,8 +86,15 @@ TYPE
 		vsEditor.editor.tv.showBorder.Set(TRUE);
 		grpanel.AddContent(vsEditor);
 
-	(* --------------fragment shader -------------- *)
 
+		
+	(* --------------fragment shader -------------- *)
+		(* resizer *)
+		NEW(vsizer); vsizer.alignment.Set(WMComponents.AlignBottom);	vsizer.bounds.SetHeight(4);
+		 vsizer.clDefault.Set(0FFFF00FFH);
+		grpanel.AddContent(vsizer);
+		(* ---------------- *)
+		
 		(* group panel, source *)
 		NEW(grpanel); grpanel.alignment.Set(WMComponents.AlignTop); grpanel.bounds.SetHeight(200);
 		grpanel.fillColor.Set(0FFFFFFFFH); grpanel.caption.SetAOC("fragment shader source:");
@@ -100,6 +110,12 @@ TYPE
 		fsEditor.editor.tv.showBorder.Set(TRUE);
 		grpanel.AddContent(fsEditor);
 
+		(* resizer *)
+		NEW(vsizer); vsizer.alignment.Set(WMComponents.AlignBottom);	vsizer.bounds.SetHeight(4);
+		 vsizer.clDefault.Set(0FFFF00FFH);
+		grpanel.AddContent(vsizer);
+		(* ---------------- *)
+		
 
 (*		NEW(statusbar); statusbar.alignment.Set(WMComponents.AlignTop);
 		statusbar.fillColor.Set(0FF0FFDFFH); statusbar.bounds.SetHeight(7);
@@ -129,6 +145,8 @@ TYPE
 		grpanel.fillColor.Set(0DDDDDDDDH); grpanel.caption.SetAOC("Build Log:");
 		tpanel.AddContent(grpanel);
 
+
+		
 		(* build result log editor *)
 		NEW(logEditor);
 		logEditor.alignment.Set(WMComponents.AlignClient);
@@ -211,12 +229,12 @@ TYPE
 		tw.String("void main() {"); tw.Ln;
 		tw.String("    "); tw.Ln;
 		tw.String("}"); tw.Ln; tw.Ln; tw.Update;
-		
+
 		fsEditor.editor.SetText(mtext);
 
 		mtext.ReleaseWrite;
 	END NewEmptyShader;
-	
+
 
 	PROCEDURE PrintShaderInfoLog(CONST tit: ARRAY OF CHAR; obj: Uint);
 	VAR infologLength, charsWritten: LONGINT;
@@ -450,7 +468,7 @@ BEGIN
 			wind.LoadFragmentShaderFile(filename);
 		END;
 	ELSE
-		wind.NewEmptyShader();	
+		wind.NewEmptyShader();
 	END;
 END Open;
 
@@ -502,7 +520,7 @@ BEGIN
 	context.Init(100,100);
 END GLShadersBuild.
 
-GLShadersBuild.Open passthroughVS.glsl  toonShadingFS.glsl ~ 
+GLShadersBuild.Open MyDemos/mycd4.vert MyDemos/mycd4.frag ~
 
 GLShadersBuild.Open ~
 

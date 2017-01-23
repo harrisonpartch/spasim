@@ -25,19 +25,19 @@ CONST
 	BASE_DWORD = 32;
 
 TYPE
-	
+
 	LongintArray = POINTER TO ARRAY OF LONGINT;
-	
+
 	SetArray = POINTER TO ARRAY OF SET;
-	
+
 	LongintItem* = POINTER TO RECORD
 		value*: LONGINT;
 	END;
-	
+
 	StringItem* = POINTER TO RECORD
 		value*: Strings.String;
 	END;
-	
+
 	AnyArray* = POINTER TO ARRAY OF ANY;
 
 	(** CompareMethod defines a Method that compares two Objects.
@@ -46,29 +46,29 @@ TYPE
 			0	if both Objects are "equal"
 			1	if the first Object is "greater" then the second Object. *)
 	CompareMethod* = PROCEDURE {DELEGATE} (first, second: ANY): LONGINT;
-	
+
 	(** EqualityCompareMethod defines a Method that compares two Objects.
 		The Methods then returns:
 			TRUE	if both Objects are "equal". *)
 	EqualityCompareMethod* = PROCEDURE {DELEGATE} (first, second: ANY): BOOLEAN;
-	
+
 	(** HashMethod defines a Method that returns hash code for Object.
 		The Methods then returns:
 			hash code. *)
 	HashMethod* = PROCEDURE {DELEGATE} (item: ANY): LONGINT;
 
-	(** Base Vector container *)	
+	(** Base Vector container *)
 	Vector* = OBJECT
-	
+
 		VAR
 			array: AnyArray;
-			
+
 			nCount, nReadLock: LONGINT;
-			
+
 			compare: CompareMethod;
-			
+
 			bSorted, bNoDuplicates: BOOLEAN;
-		
+
 		PROCEDURE &Init*(compare: CompareMethod; options: SET);
 		BEGIN
 			SELF.compare := compare;
@@ -78,7 +78,7 @@ TYPE
 			bNoDuplicates := {VECTOR_NO_DUPLICATES} * options # {};
 			NEW(array, 4)
 		END Init;
-		
+
 		(** Lock prevents modifications to the list. All calls to Lock
 			must be followed by a call to Unlock. Lock can be nested. *)
 		PROCEDURE Lock;
@@ -92,7 +92,7 @@ TYPE
 		BEGIN {EXCLUSIVE}
 			DEC(nReadLock); ASSERT(nReadLock >= 0)
 		END Unlock;
-	
+
 		PROCEDURE Grow;
 		VAR
 			old: AnyArray;
@@ -100,7 +100,7 @@ TYPE
 		BEGIN
 			old := array;
 			nLen := LEN(old);
-			
+
 			(*
 			(*
 				Special list growth strategy for
@@ -115,17 +115,17 @@ TYPE
 				INC(nLen, 2048)
 			END;
 			*)
-			
+
 			(*nLen := nLen + nLen DIV 2;*)
-			
+
 			nLen := nLen*2;
-			
+
 			NEW(array, nLen);
 			FOR i := 0 TO LEN(old) - 1 DO
 				array[i] := old[i]
 			END
 		END Grow;
-		
+
 		PROCEDURE FindSequentially(x: ANY): LONGINT;
 		VAR
 			i: LONGINT;
@@ -170,7 +170,7 @@ TYPE
 			END;
 		END FindPosition;
 		*)
-		
+
 		PROCEDURE FindPosition(x: ANY; VAR bFound: BOOLEAN): LONGINT;
 		VAR
 			lower, middle, upper: LONGINT;
@@ -198,7 +198,7 @@ TYPE
 				RETURN lower
 			END;
 		END FindPosition;
-		
+
 		(** return the index of an object. In a multi-process situation, the process calling the IndexOf method should
 			call Lock before IndexOf and Unlock after the last use of an index based on IndexOf.
 			If the object is not found, -1 is returned *)
@@ -218,7 +218,7 @@ TYPE
 				RETURN FindSequentially(x)
 			END
 		END IndexOf;
-		
+
 		(** return the number of objects in the list. If count is used for indexing elements (e.g. FOR - Loop) in a multi-process
 			situation, the process calling the GetCount method should call Lock before GetCount and Unlock after the
 			last use of an index based on GetCount *)
@@ -226,7 +226,7 @@ TYPE
 		BEGIN
 			RETURN nCount
 		END GetCount;
-		
+
 		(** return an object based on an index. In a multi-process situation, GetItem is only safe in a locked region Lock / Unlock *)
 		PROCEDURE GetItem*(pos: LONGINT): ANY;
 		BEGIN
@@ -241,7 +241,7 @@ TYPE
 			AWAIT(nReadLock = 0);
 			IF bSorted THEN AddUnlocked(x) ELSE AppendUnlocked(x) END
 		END Add;
-		
+
 		PROCEDURE Insert*(pos: LONGINT; x: ANY);
 		BEGIN {EXCLUSIVE}
 			AWAIT(nReadLock = 0);
@@ -269,7 +269,7 @@ TYPE
 			array[pos] := x;
 			INC(nCount)
 		END AddUnlocked;
-		
+
 		PROCEDURE AppendUnlocked(x: ANY);
 		BEGIN
 			IF bNoDuplicates THEN
@@ -279,7 +279,7 @@ TYPE
 			array[nCount] := x;
 			INC(nCount)
 		END AppendUnlocked;
-		
+
 		PROCEDURE InsertUnlocked(pos: LONGINT; x: ANY);
 		VAR
 			i: LONGINT;
@@ -294,7 +294,7 @@ TYPE
 				DEC(i)
 			END;
 			array[pos] := x;
-			INC(nCount)			
+			INC(nCount)
 		END InsertUnlocked;
 
 		(** Remove an object from the list. Remove may block if number of calls to Lock is bigger than the number of calls to Unlock *)
@@ -330,42 +330,42 @@ TYPE
 	CustomVector* = OBJECT
 		VAR
 			vector*: Vector;
-			
+
 		PROCEDURE Lock*;
 		BEGIN
 			vector.Lock
 		END Lock;
-		
+
 		PROCEDURE Unlock*;
 		BEGIN
 			vector.Unlock
 		END Unlock;
-		
+
 		PROCEDURE Remove*(i: LONGINT);
 		BEGIN
 			vector.Remove(i)
 		END Remove;
-		
+
 		PROCEDURE GetCount*(): LONGINT;
 		BEGIN
 			RETURN vector.GetCount()
 		END GetCount;
-		
+
 		PROCEDURE IsEmpty*(): BOOLEAN;
 		BEGIN
 			RETURN vector.GetCount() = 0
 		END IsEmpty;
-			
+
 	END CustomVector;
-	
+
 	(** Vector of LONGINTs *)
 	LongintVector* = OBJECT(CustomVector)
-			
+
 		PROCEDURE &New*(options: SET);
 		BEGIN
 			NEW(vector, Compare, options)
 		END New;
-		
+
 		PROCEDURE Compare(first, second: ANY): LONGINT;
 		VAR
 			nFirst, nSecond: LONGINT;
@@ -380,7 +380,7 @@ TYPE
 				RETURN 0
 			END
 		END Compare;
-		
+
 		PROCEDURE Add*(x: LONGINT);
 		VAR
 			item: LongintItem;
@@ -389,7 +389,7 @@ TYPE
 			item.value := x;
 			vector.Add(item)
 		END Add;
-		
+
 		PROCEDURE Insert*(pos: LONGINT; x: LONGINT);
 		VAR
 			item: LongintItem;
@@ -398,7 +398,7 @@ TYPE
 			item.value := x;
 			vector.Insert(pos, item)
 		END Insert;
-		
+
 		PROCEDURE IndexOf*(x: LONGINT): LONGINT;
 		VAR
 			item: LongintItem;
@@ -407,63 +407,63 @@ TYPE
 			item.value := x;
 			RETURN vector.IndexOf(item)
 		END IndexOf;
-		
+
 		PROCEDURE GetItem*(i: LONGINT): LONGINT;
 		BEGIN
 			RETURN vector.GetItem(i)(LongintItem).value
 		END GetItem;
-			
+
 	END LongintVector;
 
-	(** Vector of LONGINT vectors *)	
+	(** Vector of LONGINT vectors *)
 	LongintVectorVector* = OBJECT(CustomVector)
-			
+
 		PROCEDURE &New*(options: SET);
 		BEGIN
 			NEW(vector, Compare, options)
 		END New;
-		
+
 		PROCEDURE Compare(first, second: ANY): LONGINT;
 		BEGIN
 			RETURN CompareLongintVectors(first(LongintVector), second(LongintVector))
 		END Compare;
-				
+
 		PROCEDURE Add*(x: LongintVector);
 		BEGIN
 			vector.Add(x)
 		END Add;
-		
+
 		PROCEDURE Insert*(pos: LONGINT; x: LongintVector);
 		BEGIN
 			vector.Insert(pos, x)
 		END Insert;
-		
+
 		PROCEDURE IndexOf*(x: LongintVector): LONGINT;
 		BEGIN
 			RETURN vector.IndexOf(x)
 		END IndexOf;
-		
+
 		PROCEDURE GetItem*(i: LONGINT): LongintVector;
 		BEGIN
 			RETURN vector.GetItem(i)(LongintVector)
 		END GetItem;
-		
+
 	END LongintVectorVector;
-	
+
 	(** Vector of strings *)
 	StringVector* = OBJECT(CustomVector)
-			
+
 		PROCEDURE &New*(options: SET);
 		BEGIN
 			NEW(vector, Compare, options)
 		END New;
-		
+
 		PROCEDURE Compare(first, second: ANY): LONGINT;
 		BEGIN
 			RETURN UTF8Strings.Compare(first(StringItem).value^,
 				second(StringItem).value^)
 		END Compare;
-				
+
 		PROCEDURE Add*(CONST x: ARRAY OF CHAR);
 		VAR
 			item: StringItem;
@@ -472,7 +472,7 @@ TYPE
 			item.value := Strings.NewString(x);
 			vector.Add(item)
 		END Add;
-		
+
 		PROCEDURE Insert*(pos: LONGINT; CONST x: ARRAY OF CHAR);
 		VAR
 			item: StringItem;
@@ -481,7 +481,7 @@ TYPE
 			item.value := Strings.NewString(x);
 			vector.Insert(pos, item)
 		END Insert;
-		
+
 		PROCEDURE IndexOf*(CONST x: ARRAY OF CHAR): LONGINT;
 		VAR
 			item: StringItem;
@@ -490,28 +490,28 @@ TYPE
 			item.value := Strings.NewString(x);
 			RETURN vector.IndexOf(item)
 		END IndexOf;
-		
+
 		PROCEDURE GetItem*(i: LONGINT): Strings.String;
 		BEGIN
 			RETURN vector.GetItem(i)(StringItem).value
 		END GetItem;
-		
+
 	END StringVector;
-	
-	(** Base Dictionary container *)	
+
+	(** Base Dictionary container *)
 	Dictionary* = OBJECT
 	VAR
 		array: AnyArray;
 		hashes: LongintArray;
 		deleted: SetArray;
-		
+
 		iterator*: DictionaryIterator;
-		
+
 		nCount, iPrime-, nCollisions-: LONGINT;
-		
+
 		equal: EqualityCompareMethod;
 		hash: HashMethod;
-		
+
 		PROCEDURE &Init*(equal: EqualityCompareMethod; hash: HashMethod);
 		BEGIN
 			SELF.equal := equal;
@@ -522,7 +522,7 @@ TYPE
 			InitArrays;
 			NEW(iterator, SELF);
 		END Init;
-		
+
 		PROCEDURE InitArrays;
 		VAR
 			i, prime: LONGINT;
@@ -538,14 +538,14 @@ TYPE
 				deleted[i] := {}
 			END;
 		END InitArrays;
-		
+
 		PROCEDURE Grow;
 		VAR
 			oldArray: AnyArray;
 			oldHashes: LongintArray;
 			oldDeleted: SetArray;
 			i: LONGINT;
-			
+
 			PROCEDURE Deleted(i: LONGINT): BOOLEAN;
 			VAR
 				iDiv, iMod: LONGINT;
@@ -554,13 +554,13 @@ TYPE
 				iMod := i MOD BASE_DWORD;
 				RETURN oldDeleted[iDiv] * {iMod} # {}
 			END Deleted;
-			
+
 		BEGIN
 			oldArray := array;
 			oldHashes := hashes;
 			oldDeleted := deleted;
 			INC(iPrime);
-			
+
 			InitArrays;
 			iterator.Init(SELF);
 
@@ -570,7 +570,7 @@ TYPE
 				END
 			END
 		END Grow;
-		
+
 		PROCEDURE Delete(i: LONGINT);
 		VAR
 			iDiv, iMod: LONGINT;
@@ -579,7 +579,7 @@ TYPE
 			iMod := i MOD BASE_DWORD;
 			deleted[iDiv] := deleted[iDiv] + {iMod}
 		END Delete;
-		
+
 		PROCEDURE Deleted(i: LONGINT): BOOLEAN;
 		VAR
 			iDiv, iMod: LONGINT;
@@ -588,12 +588,12 @@ TYPE
 			iMod := i MOD BASE_DWORD;
 			RETURN deleted[iDiv] * {iMod} # {}
 		END Deleted;
-		
+
 		PROCEDURE GetCount(): LONGINT;
 		BEGIN
 			RETURN nCount
 		END GetCount;
-		
+
 		PROCEDURE Add*(item: ANY);
 		VAR
 			nHashCode: LONGINT;
@@ -605,14 +605,14 @@ TYPE
 				Grow
 			END;
 		END Add;
-		
+
 		PROCEDURE Contains*(item: ANY): BOOLEAN;
 		VAR
 			nHashCode: LONGINT;
 		BEGIN
 			RETURN hashSearch(item, FALSE, FALSE, nHashCode);
 		END Contains;
-		
+
 		PROCEDURE Get*(item: ANY): ANY;
 		VAR
 			nHashCode: LONGINT;
@@ -624,7 +624,7 @@ TYPE
 			END;
 			RETURN itemResult;
 		END Get;
-		
+
 		PROCEDURE Remove*(item: ANY);
 		VAR
 			nHashCode: LONGINT;
@@ -634,19 +634,19 @@ TYPE
 				DEC(nCount);
 			END;
 		END Remove;
-		
+
 		PROCEDURE hashSearch(item: ANY; bAddAllowed: BOOLEAN; bGrowOperation: BOOLEAN; VAR nHashCode: LONGINT): BOOLEAN;
 		VAR
 			d, nHash, h, prime: LONGINT;
 			bFound, bExit, bOverflow: BOOLEAN;
 		BEGIN
-		
+
 			IF bGrowOperation THEN
 				nHash := nHashCode;
 			ELSE
 				nHash := ABS(hash(item));
 			END;
-			
+
 			LOOP
 
 				d := 1;
@@ -677,38 +677,38 @@ TYPE
 						END
 					END
 				END;
-				
+
 				IF bOverflow THEN
 					Grow
 				ELSE
 					EXIT
 				END
-			
+
 			END;
 
 			RETURN bFound
 
 		END hashSearch;
-		
+
 	END Dictionary;
-	
+
 	(** Iterator for sequental access to the Dictionary *)
 	DictionaryIterator* = OBJECT
-	VAR 
+	VAR
 		iCurrentPos: LONGINT;
 		dictionary: Dictionary;
-		
+
 		PROCEDURE &New(dictionary: Dictionary);
 		BEGIN
 			Init(dictionary);
 		END New;
-		
+
 		PROCEDURE Init(dictionary: Dictionary);
 		BEGIN
 			SELF.dictionary := dictionary;
 			iCurrentPos := -1;
 		END Init;
-			
+
 		PROCEDURE Reset*;
 		BEGIN
 			iCurrentPos := -1;
@@ -738,26 +738,26 @@ TYPE
 			END;
 			RETURN item
 		END GetNext;
-		
+
 	END DictionaryIterator;
-	
+
 	(** Custom Set container for making on top of it of
 		the sets (sets consists of only pure keys without any other data)
 		and maps (maps consists of pairs key:value) for any data types *)
 	CustomSet* = OBJECT
-	VAR 
+	VAR
 		dictionary*: Dictionary;
-		
+
 		PROCEDURE GetCount*(): LONGINT;
 		BEGIN
 			RETURN dictionary.GetCount()
 		END GetCount;
-		
+
 		PROCEDURE IsEmpty*(): BOOLEAN;
 		BEGIN
 			RETURN dictionary.GetCount() = 0
 		END IsEmpty;
-		
+
 		PROCEDURE Reset*;
 		BEGIN
 			dictionary.iterator.Reset
@@ -767,27 +767,27 @@ TYPE
 		BEGIN
 			RETURN dictionary.iterator.HasNext()
 		END HasNext;
-		
+
 	END CustomSet;
-	
+
 	(** Set of LONGINTs *)
 	LongintSet* = OBJECT(CustomSet)
-		
+
 		PROCEDURE LongintItemsEqual(first, second: ANY): BOOLEAN;
 		BEGIN
 			RETURN first(LongintItem).value = second(LongintItem).value
 		END LongintItemsEqual;
-		
+
 		PROCEDURE LongintItemHash(item: ANY): LONGINT;
 		BEGIN
 			RETURN item(LongintItem).value
 		END LongintItemHash;
-		
+
 		PROCEDURE &Init*;
 		BEGIN
 			NEW(dictionary, LongintItemsEqual, LongintItemHash);
 		END Init;
-		
+
 		PROCEDURE Add*(x: LONGINT);
 		VAR
 			item: LongintItem;
@@ -796,7 +796,7 @@ TYPE
 			item.value := x;
 			dictionary.Add(item)
 		END Add;
-		
+
 		PROCEDURE Remove*(x: LONGINT);
 		VAR
 			item: LongintItem;
@@ -805,7 +805,7 @@ TYPE
 			item.value := x;
 			dictionary.Remove(item)
 		END Remove;
-		
+
 		PROCEDURE Contains*(x: LONGINT): BOOLEAN;
 		VAR
 			item: LongintItem;
@@ -819,7 +819,7 @@ TYPE
 		BEGIN
 			RETURN dictionary.iterator.GetNext()(LongintItem).value
 		END GetNext;
-		
+
 		PROCEDURE ToString*(): Strings.String;
 		VAR
 			a: ARRAY 32 OF CHAR;
@@ -839,25 +839,25 @@ TYPE
 		END ToString;
 
 	END LongintSet;
-	
+
 	(** Set of Strings *)
 	StringSet* = OBJECT(CustomSet)
-		
+
 		PROCEDURE StringsEqual(first, second: ANY): BOOLEAN;
 		BEGIN
 			RETURN first(StringItem).value^ = second(StringItem).value^
 		END StringsEqual;
-		
+
 		PROCEDURE StringHash(item: ANY): LONGINT;
 		BEGIN
 			RETURN HashString(item(StringItem).value)
 		END StringHash;
-		
+
 		PROCEDURE &Init*;
 		BEGIN
 			NEW(dictionary, StringsEqual, StringHash);
 		END Init;
-		
+
 		PROCEDURE Add*(CONST x: ARRAY OF CHAR);
 		VAR
 			item: StringItem;
@@ -866,7 +866,7 @@ TYPE
 			item.value := Strings.NewString(x);
 			dictionary.Add(item)
 		END Add;
-		
+
 		PROCEDURE Remove*(CONST x: ARRAY OF CHAR);
 		VAR
 			item: StringItem;
@@ -875,7 +875,7 @@ TYPE
 			item.value := Strings.NewString(x);
 			dictionary.Remove(item)
 		END Remove;
-		
+
 		PROCEDURE Contains*(CONST x: ARRAY OF CHAR): BOOLEAN;
 		VAR
 			item: StringItem;
@@ -891,85 +891,85 @@ TYPE
 		END GetNext;
 
 	END StringSet;
-	
+
 	(** Set of LONGINT sets *)
 	LongintSetSet* = OBJECT(CustomSet)
-			
+
 		PROCEDURE LongintSetsEqual(first, second: ANY): BOOLEAN;
 		BEGIN
 			RETURN EqualityCompareLongintSets(first(LongintSet), second(LongintSet))
 		END LongintSetsEqual;
-		
+
 		PROCEDURE LongintSetHash(item: ANY): LONGINT;
 		BEGIN
 			RETURN HashLongintSet(item(LongintSet))
 		END LongintSetHash;
-		
+
 		PROCEDURE &Init*;
 		BEGIN
 			NEW(dictionary, LongintSetsEqual, LongintSetHash)
 		END Init;
-		
+
 		PROCEDURE Add*(x: LongintSet);
 		BEGIN
 			dictionary.Add(x)
 		END Add;
-		
+
 		PROCEDURE Remove*(x: LongintSet);
 		BEGIN
 			dictionary.Remove(x)
 		END Remove;
-		
+
 		PROCEDURE Contains*(x: LongintSet): BOOLEAN;
 		BEGIN
 			RETURN dictionary.Contains(x)
 		END Contains;
-		
+
 		PROCEDURE GetNext*(): LongintSet;
 		BEGIN
 			RETURN dictionary.iterator.GetNext()(LongintSet)
 		END GetNext;
-		
+
 	END LongintSetSet;
-	
-	(** Vector of LONGINT sets *)	
+
+	(** Vector of LONGINT sets *)
 	LongintSetVector* = OBJECT(CustomVector)
-			
+
 		PROCEDURE &New*(options: SET);
 		BEGIN
 			NEW(vector, Compare, options)
 		END New;
-		
+
 		PROCEDURE Compare(first, second: ANY): LONGINT;
 		BEGIN
 			RETURN CompareLongintSets(first(LongintSet), second(LongintSet))
 		END Compare;
-				
+
 		PROCEDURE Add*(x: LongintSet);
 		BEGIN
 			vector.Add(x)
 		END Add;
-		
+
 		PROCEDURE Insert*(pos: LONGINT; x: LongintSet);
 		BEGIN
 			vector.Insert(pos, x)
 		END Insert;
-		
+
 		PROCEDURE IndexOf*(x: LongintSet): LONGINT;
 		BEGIN
 			RETURN vector.IndexOf(x)
 		END IndexOf;
-		
+
 		PROCEDURE GetItem*(i: LONGINT): LongintSet;
 		BEGIN
 			RETURN vector.GetItem(i)(LongintSet)
 		END GetItem;
-		
+
 	END LongintSetVector;
-	
+
 	(** Binary heap. *)
 	Heap* = OBJECT
-	
+
 		VAR
 			array: AnyArray;
 			nCount, nReadLock: LONGINT;
@@ -982,7 +982,7 @@ TYPE
 			nCount := 0;
 			NEW(array, 8)
 		END Init;
-		
+
 		(** Lock prevents modifications to the list. All calls to Lock
 			must be followed by a call to Unlock. Lock can be nested. *)
 		PROCEDURE Lock*;
@@ -996,7 +996,7 @@ TYPE
 		BEGIN {EXCLUSIVE}
 			DEC(nReadLock); ASSERT(nReadLock >= 0)
 		END Unlock;
-		
+
 		PROCEDURE Grow;
 		VAR
 			old: AnyArray;
@@ -1008,7 +1008,7 @@ TYPE
 				array[i] := old[i]
 			END
 		END Grow;
-		
+
 		(** return the number of objects in the list. If count is used for indexing elements (e.g. FOR - Loop) in a multi-process
 			situation, the process calling the GetCount method should call Lock before GetCount and Unlock after the
 			last use of an index based on GetCount *)
@@ -1016,7 +1016,7 @@ TYPE
 		BEGIN
 			RETURN nCount
 		END GetCount;
-		
+
 		(** Add an object to the list. Add may block if number of
 			calls to Lock is bigger than the number of calls to Unlock *)
 		PROCEDURE Add*(x: ANY);
@@ -1024,7 +1024,7 @@ TYPE
 			AWAIT(nReadLock = 0);
 			AddUnlocked(x);
 		END Add;
-		
+
 		(** Does the actual Adding without locking (should already
 			have been done by the caller) *)
 		PROCEDURE AddUnlocked(x: ANY);
@@ -1047,7 +1047,7 @@ TYPE
 				IF pos = 1 THEN EXIT END
 			END
 		END AddUnlocked;
-		
+
 		PROCEDURE FindSequentially(x: ANY): LONGINT;
 		VAR
 			i: LONGINT;
@@ -1062,7 +1062,7 @@ TYPE
 				RETURN -1
 			END
 		END FindSequentially;
-		
+
 		PROCEDURE Update*(x: ANY);
 		VAR
 			pos: LONGINT;
@@ -1083,7 +1083,7 @@ TYPE
 				END
 			END
 		END Update;
-		
+
 		(** Remove an object from the list. Remove may block if number of calls to Lock is bigger than the number of calls to Unlock *)
 		PROCEDURE Remove*(): ANY;
 		VAR
@@ -1127,43 +1127,43 @@ TYPE
 			END;
 			RETURN x
 		END RemoveUnlocked;
-		
+
 	END Heap;
-	
+
 	CustomHeap* = OBJECT
-	
+
 		VAR
 			heap*: Heap;
-			
+
 		PROCEDURE Lock*;
 		BEGIN
 			heap.Lock
 		END Lock;
-		
+
 		PROCEDURE Unlock*;
 		BEGIN
 			heap.Unlock
 		END Unlock;
-		
+
 		PROCEDURE GetCount*(): LONGINT;
 		BEGIN
 			RETURN heap.GetCount()
 		END GetCount;
-		
+
 		PROCEDURE IsEmpty*(): BOOLEAN;
 		BEGIN
 			RETURN heap.GetCount() = 0
 		END IsEmpty;
-			
+
 	END CustomHeap;
-	
+
 	LongintHeap* = OBJECT(CustomHeap)
-			
+
 		PROCEDURE &New*;
 		BEGIN
 			NEW(heap, Compare)
 		END New;
-		
+
 		PROCEDURE Compare(first, second: ANY): LONGINT;
 		VAR
 			nFirst, nSecond: LONGINT;
@@ -1178,7 +1178,7 @@ TYPE
 				RETURN 0
 			END
 		END Compare;
-		
+
 		PROCEDURE Add*(x: LONGINT);
 		VAR
 			item: LongintItem;
@@ -1187,17 +1187,17 @@ TYPE
 			item.value := x;
 			heap.Add(item);
 		END Add;
-		
+
 		PROCEDURE Remove*(): LONGINT;
 		BEGIN
 			RETURN heap.Remove()(LongintItem).value
 		END Remove;
-		
+
 	END LongintHeap;
-	
+
 	VAR
 		PRIMES: ARRAY 27 OF LONGINT;
-	
+
 	PROCEDURE CompareLongintVectors*(first, second: LongintVector): LONGINT;
 	VAR
 		n, i, nRes: LONGINT;
@@ -1234,7 +1234,7 @@ TYPE
 			END
 		END
 	END CompareLongintVectors;
-	
+
 	PROCEDURE CompareLongintSets*(first, second: LongintSet): LONGINT;
 	VAR
 		n, i, nRes, iF, iS: LONGINT;
@@ -1275,7 +1275,7 @@ TYPE
 			END
 		END
 	END CompareLongintSets;
-	
+
 	PROCEDURE EqualityCompareLongintSets*(first, second: LongintSet): BOOLEAN;
 	VAR
 		bResult: BOOLEAN;
@@ -1287,7 +1287,7 @@ TYPE
 		END;
 		RETURN bResult
 	END EqualityCompareLongintSets;
-	
+
 	PROCEDURE HashLongintSet*(item: LongintSet): LONGINT;
 	VAR
 		i, iValue, iDivSum, iModSum, n: LONGINT;
@@ -1304,13 +1304,13 @@ TYPE
 		i := 0;
 		WHILE item.HasNext() & (i < n) DO
 			iValue := item.GetNext();
-			INC(iDivSum, iValue DIV n); 
+			INC(iDivSum, iValue DIV n);
 			INC(iModSum, iValue MOD n);
 			INC(i)
 		END;
 		RETURN iDivSum + iModSum DIV n
 	END HashLongintSet;
-	
+
 	PROCEDURE HashString*(item: Strings.String): LONGINT;
 	VAR
 		i, iValue, iDivSum, iModSum, n: LONGINT;
@@ -1326,16 +1326,16 @@ TYPE
 		i := 0;
 		WHILE i < n DO
 			iValue := ORD(item^[i]);
-			INC(iDivSum, iValue DIV n); 
+			INC(iDivSum, iValue DIV n);
 			INC(iModSum, iValue MOD n);
 			INC(i)
 		END;
 		RETURN iDivSum + iModSum DIV n
 	END HashString;
-	
+
 	PROCEDURE InitPrimes;
 	BEGIN
-	
+
 		PRIMES[0] := 17;
 		PRIMES[1] := 31;
 		PRIMES[2] := 67;
@@ -1363,9 +1363,9 @@ TYPE
 		PRIMES[24] := 268435459;
 		PRIMES[25] := 536870909;
 		PRIMES[26] := 1073741827;
-		
+
 	END InitPrimes;
-	
+
 	PROCEDURE StringSetTest*(context: Commands.Context);
 	VAR
 		vec: StringVector;
@@ -1397,7 +1397,7 @@ TYPE
 			context.out.Ln;
 		END;
 	END StringSetTest;
-	
+
 BEGIN
 
 	InitPrimes;

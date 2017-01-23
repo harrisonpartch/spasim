@@ -2,15 +2,15 @@ MODULE WMGLDemo2; (** AUTHOR "fnecati"; PURPOSE " axolotl-felix opengl implemeta
  (*  	http://code.google.com/p/axolotl-felix/ *)
 
 IMPORT
-	Raster, WMRectangles, WMGraphics, Strings, Modules,
-	WM := WMWindowManager,  WMMessages, KernelLog, WMDialogs,
+	Raster, WMRectangles, Strings, Modules, WMGraphics,
+	WM := WMWindowManager,  WMMessages, KernelLog, 
 	GL := OpenGL, GLC := OpenGLConst, GLU, WMGL:=WMGLWindow;
 
 TYPE
 	KillerMsg = OBJECT
 	END KillerMsg;
 
-	GLWindow* =  OBJECT(WMGL.Window)
+	GLWindow =  OBJECT(WMGL.Window)
 	VAR
 		drawMode:LONGINT; (* fill, lines, points *)
 		texture: ARRAY [3] OF GL.Uint;  (* Storage For 3 Textures  *)
@@ -62,7 +62,6 @@ TYPE
 						DeActivate();
 						UpdateImage;
 
-				| "s": SaveImage;
 				| "q" : Close;
 			ELSE
 
@@ -98,16 +97,6 @@ TYPE
 			Swap();
 			Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 		END UpdateImage;
-
-		PROCEDURE SaveImage;
-		VAR res: LONGINT;
-			fname: ARRAY 128 OF CHAR;
-		BEGIN
-			fname:="mywmgltest.bmp";
-			IF WMDialogs.QueryString(" Save File name: ",fname)=WMDialogs.ResOk THEN
-				WMGraphics.StoreImage(img, fname,res);
-			END;
-		END SaveImage;
 
 		(* function to load in bitmap as a GL texture *)
 		PROCEDURE LoadGLTextures(CONST fname: ARRAY OF CHAR ): BOOLEAN;
@@ -175,7 +164,7 @@ TYPE
 			GL.MatrixMode(GLC.GL_MODELVIEW);
 			GL.LoadIdentity();
 			GLU.LookAt(0.0, 0.0, 2.0, 0., 0., 0., 0., 1., 0.);
-		DeActivate();
+			DeActivate();
 		END Reshape;
 
 		PROCEDURE InitGL;
@@ -236,7 +225,7 @@ TYPE
 			(* Blending Function For Translucency Based On Source Alpha Value  *)
 			GL.BlendFunc( GLC.GL_SRC_ALPHA, GLC.GL_ONE );
 			IF ~LoadGLTextures("opengloberon/axolotl.png") THEN Close; END;
-			
+
 			DeActivate();
 		END InitGL;
 

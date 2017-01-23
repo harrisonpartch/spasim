@@ -308,7 +308,7 @@ VAR
 	masks: LONGINT;
 	buf: X11.Buffer;
 	attrib : ARRAY [*] OF GL.Int;  (* attributes of GL window *)
-
+	defwin: X11.Window;
 BEGIN
  display := X11.OpenDisplay(0);
  IF display =0 THEN
@@ -349,8 +349,8 @@ END;
 	 	context.out.String("visinfoptr.visual ");  context.out.Int(visinfoptr.visualID, 0); context.out.Ln; context.out.Update;
 	END;
 END;
-
- cmap := X11.CreateColormap(display, X11.DefaultRootWindow(display), visinfoptr.visual, X11.AllocNone);
+ defwin :=  X11.DefaultRootWindow(display);
+ cmap := X11.CreateColormap(display, defwin, visinfoptr.visual, X11.AllocNone);
  IF cmap = 0 THEN
  	IF debug THEN
 	 	context.out.String(" cannot create colormap"); context.out.Ln;
@@ -372,7 +372,7 @@ END;
 
  masks := Api.CWBackPixel + Api.CWBorderPixel + Api.CWColormap + Api.CWEventMask;
 
- win := Api.CreateWindow(display, X11.DefaultRootWindow(display), 0, 0, w, h,
+ win := Api.CreateWindow(display, defwin, 0, 0, w, h,
 		        0, visinfoptr.depth, Api.InputOutput,  visinfoptr.visual, masks, swa);
 
 (*

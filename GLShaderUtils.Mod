@@ -3,7 +3,7 @@ MODULE GLShaderUtils; (** AUTHOR "fnecati"; PURPOSE "OpenGL GLSL utils "; *)
 IMPORT
 	gl := OpenGL, glc := OpenGLConst, Files, Strings, Streams, KernelLog;
 
-CONST 
+CONST
 	debug = FALSE;
 
 TYPE
@@ -171,7 +171,7 @@ BEGIN
 	END;
 	IF debug THEN
 		PrintShaderSource(vs);
-	END;	
+	END;
 	RETURN vs;
 END CompileVertexShader;
 
@@ -198,7 +198,7 @@ BEGIN
 	IF debug THEN
 		PrintShaderSource(fs);
 	END;
-		
+
 	RETURN fs;
 END CompileFragmentShader;
 

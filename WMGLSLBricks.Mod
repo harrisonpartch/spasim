@@ -1,9 +1,9 @@
 MODULE WMGLSLBricks; (** AUTHOR "fnecati"; PURPOSE "opengl GLSL bricks shading example from OrangeBook"; *)
 
 IMPORT
-	WMRectangles, WMGraphics, Strings,  Inputs, Modules,
-	WM := WMWindowManager,  WMMessages, WMDialogs, KernelLog,
-	GL := OpenGL, GLC := OpenGLConst, GLU, WMGL := WMGLWindow, 
+	WMRectangles, Strings,  Inputs, Modules,
+	WM := WMWindowManager,  WMMessages, KernelLog,
+	GL := OpenGL, GLC := OpenGLConst, GLU, WMGL := WMGLWindow,
 	GLLib, GLSUtil := GLShaderUtils;
 
 TYPE
@@ -11,7 +11,7 @@ TYPE
 	KillerMsg = OBJECT
 	END KillerMsg;
 
-	GLWindow* =  OBJECT(WMGL.Window)
+	GLWindow =  OBJECT(WMGL.Window)
 	VAR
 		color: LONGINT;
 
@@ -49,7 +49,6 @@ TYPE
 		END New;
 
 		PROCEDURE initGL(): BOOLEAN;
-		VAR res: BOOLEAN;
 		BEGIN
 			MakeCurrent();
 				GL.DepthFunc(GLC.GL_LESS);
@@ -78,7 +77,6 @@ TYPE
 			| "b": NextClearColor(); UpdateImage;
 			| "-" : fScale := fScale - 0.05; UpdateImage;
 			| "+" :  fScale := fScale + 0.05; UpdateImage;
-			| "s": SaveImage;
 			| "q" : Close;
 		ELSE
 			CASE keysym OF
@@ -125,16 +123,6 @@ TYPE
 
 			Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 		END UpdateImage;
-
-		PROCEDURE SaveImage;
-		VAR res: LONGINT;
-			fname: ARRAY 128 OF CHAR;
-		BEGIN
-			fname:="mywmglsltest.bmp";
-			IF WMDialogs.QueryString(" Save File name: ",fname)=WMDialogs.ResOk THEN
-					WMGraphics.StoreImage(img, fname,res);
-			END;
-		END SaveImage;
 
 		PROCEDURE DrawCube();
 		VAR size, scale, delta: REAL;
@@ -256,10 +244,10 @@ TYPE
 
 			GL.Uniform3f(getUniLoc(brickProg, "MortarColor"), 0.1, 1.0, 0.2);
 			GL.Uniform3f(getUniLoc(brickProg, "LightPosition"), 2.0, 0.0, 2.0);
-			GLLib.SolidTeapot(0.8); 
+			GLLib.SolidTeapot(0.8);
 (*			GLLib.SolidSphere(0.8, 50,40); *)
 (*			GLLib.SolidDodecahedron;*)
-			GLLib.SolidTorus(0.2, 0.9, 10, 40); 
+			GLLib.SolidTorus(0.2, 0.9, 10, 40);
 
 		END Display;
 
@@ -331,7 +319,7 @@ END GLWindow;
 
 VAR
 	nofWindows : LONGINT;
-	
+
 PROCEDURE Open*;
 VAR
 	window: GLWindow;

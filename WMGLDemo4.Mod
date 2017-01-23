@@ -1,8 +1,8 @@
 MODULE WMGLDemo4; (** AUTHOR "fnecati"; PURPOSE "opengl triangle using vertex arrays"; *)
 
 IMPORT
-	WMRectangles, WMGraphics, Strings, Kernel, KernelLog, Modules,
-	WM := WMWindowManager,  WMMessages, WMDialogs,
+	WMRectangles, Strings, Kernel, KernelLog, Modules,
+	WM := WMWindowManager,  WMMessages,
 	GL := OpenGL, GLC := OpenGLConst, GLU, WMGL := WMGLWindow;
 
 CONST waittime=20;
@@ -19,7 +19,7 @@ TYPE
 
 	MyVertex = POINTER TO ARRAY OF Vertex;
 
-	GLWindow* =  OBJECT(WMGL.Window)
+	GLWindow =  OBJECT(WMGL.Window)
 	VAR
 		timer: Kernel.MilliTimer;
 		alive,  animated: BOOLEAN;
@@ -57,7 +57,6 @@ TYPE
 				| "d": drawMode := (drawMode+1) MOD 3; DrawMode(drawMode); UpdateImage;
 				| "-" : angle := angle - 1.0; UpdateImage;
 				| "+" : angle := angle + 1.0; UpdateImage;
-				| "s": SaveImage;
 				| "q" : Close;
 			ELSE
 
@@ -90,7 +89,7 @@ TYPE
 		END DeleteBuffers;
 
 		PROCEDURE Close;
-		BEGIN 
+		BEGIN
 			BEGIN {EXCLUSIVE} alive := FALSE; animated := FALSE END;
 			DeleteBuffers;
 			Close^;
@@ -107,16 +106,6 @@ TYPE
 			Swap();
 			Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 		END UpdateImage;
-
-		PROCEDURE SaveImage;
-		VAR res: LONGINT;
-			fname: ARRAY 128 OF CHAR;
-		BEGIN
-			fname:="mywmgltest.bmp";
-			IF WMDialogs.QueryString(" Save File name: ",fname)=WMDialogs.ResOk THEN
-					WMGraphics.StoreImage(img, fname,res);
-			END;
-		END SaveImage;
 
 	PROCEDURE DrawMode(dm: LONGINT);
 	VAR drawMode: LONGINT;

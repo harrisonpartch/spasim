@@ -205,9 +205,10 @@ END init;
 END TexCube;
 
 TYPE Ray* = RECORD
-	xyz*, dxyz*, ddxyz*, lxyz*, txyz*, origin*, oxyz*, popdelta*, hitxyz*: PT;	
+	xyz*, dxyz*, ddxyz*, lxyz*, lastlxyz*, txyz*, origin*, oxyz*, popdelta*, hitxyz*: PT;	
 	downxyz*,rightxyz*: PT;
 	theta*,phi*, dtheta*,dphi*: REAL;
+	patchdx*, patchdy*: REAL;
 (*	r*, g*, b*, ra*, ga*, ba*, bla*,alpha*: REAL; *)
 	clr*, lastclr*: ray_color;
 	mirrors*: INTEGER;
@@ -243,7 +244,7 @@ TYPE Path*=ARRAY 20 OF ARRAY 3 OF INTEGER;
 TYPE Voxel*=OBJECT(V)
 VAR
 	complex*, passable*: BOOLEAN;
-	imposter*: Voxel;
+	imposter*, texture*: Voxel;
 	lockTF*,copymarker*,emptysplit*: BOOLEAN;
 	DTL*: REAL;
 	code*,ncode*:Name;  
@@ -553,10 +554,11 @@ VAR
 	copy*: Raster.Mode;
 	skydistance*:REAL;
 	rnf*:REAL; (*random number for frame*);
-	sniperay*:Ray;
+	sniperay*, blankray*, blankpray*:Ray;
 	blackspeed*:REAL;
 	defaultimg: Raster.Image;
 	hasher*:CryptoMD5.Hash;
+	PRO*: LONGINT;
 (*	basesource*, texsound*, grainsound*: AL.ALuint;
 	listenerPos*: ARRAY [3] OF AL.ALfloat; (* global position *)
 	sourcePos: ARRAY 3 OF AL.ALfloat;
@@ -1176,6 +1178,7 @@ BEGIN
 	rlimit := 4;
 	iterlimit := 500;
 	DTL:=3;	
+	PRO:=3;
 	Origin:=mkPT(0,0,0);   (* unneeded initialization *)
 	Face[0].x := -1; Face[0].y := 0; Face[0].z := 0; 
 	Face[3].x := 1; Face[3].y := 0; Face[3].z := 0; 
@@ -1183,6 +1186,16 @@ BEGIN
 	Face[2].x := 0; Face[4].y := -1; Face[4].z := 0; 
 	Face[5].x := 0; Face[2].y := 0; Face[2].z := 1; 
 	Face[4].x := 0; Face[5].y := 0; Face[5].z := -1; 	
+	blankray.clr.ra := 1;
+	blankray.clr.ga := 1;
+	blankray.clr.ba := 1;
+	blankray.clr.alpha:=1;
+	blankray.scale := 1; 
+	blankray.tscale:=1;
+	blankray.dtl:=0.075;	
+	blankpray:=blankray;
+	blankpray.dtl:=0.075;
+	blankpray.ispatchTF:=TRUE;
 	m2sdelta:=25;
 	m3sdelta:=25;
 	speed:=0.00051;

@@ -2,7 +2,7 @@ MODULE OGLWindow;  (** AUTHOR "fnecati"; PURPOSE "OpenGL enabled OO Win32 Window
 
 (* stripped from Win32.Display.Mod *)
 (*! todo:
-  _- check and cleanup Message handles, key handling and others	
+  _- check and cleanup Message handles, key handling and others
   - set fullwindow, decorations on/off  window:
   - add window icons
   - etc.
@@ -94,10 +94,10 @@ TYPE
 		frames-:LONGINT;  (** # of frames *)
 		hidecursor-: BOOLEAN; (** hide/show cursor *)
 		currentfms-: LONGINT; (* current frame update time *)
-		
+
 		idletime-: LONGINT; (** ms, for IdleDisplay *)
 		cmdlinerun* : BOOLEAN; (* run from commandline, exe ? *)
-		
+
 		active : BOOLEAN;  (* for main loop control *)
 		fullscreen-, fullwindow-,  decorations-: BOOLEAN;
 		gamemode-: BOOLEAN; (** if true poll Display procedure *)
@@ -105,7 +105,7 @@ TYPE
 		create: CreateStruct;
 		mkeys: SET; (* current mouse keys *)
 		screenSettings: WinApi.DEVMODE;
-		
+
 	(** constructor, initlialize window object, fs: fullscreen: true/false *)
 	PROCEDURE &Init*( w, h, left, top: LONGINT; fs: BOOLEAN );
 	VAR
@@ -114,7 +114,7 @@ TYPE
 		decorations := TRUE;
 		fullscreen := fs;
 		fullwindow := FALSE;
-		
+
 		SELF.left := left; SELF.top := top;
 		(* Initialize the fields of a new Window instance with default values.*)
 		defWindowProc := User32.DefWindowProc;  state := {update};
@@ -129,7 +129,7 @@ TYPE
 		className := "OGLWindow";
 		Strings.Append(className, str);
 		INC(classCount);
-		
+
 		create.x := left; create.y := top;
 		create.w := w;
 		create.h := h;
@@ -147,18 +147,18 @@ TYPE
 	BEGIN
 		RETURN height;
 	END GetHeight;
-	
+
 	(** sets title of window *)
 	PROCEDURE SetTitle*(tit: ARRAY OF CHAR);
 	VAR res: LONGINT;
-	BEGIN 
+	BEGIN
 		COPY(tit, title);
 		res:=User32.SetWindowText(SELF.hWnd, title);
 	END SetTitle;
 
 	(** set idle time  for calling IdleDisplay proc *)
 	PROCEDURE SetIdleTime*(ms: LONGINT);
-	BEGIN 
+	BEGIN
 		IF ms < 0 THEN ms := 0 END;
 		idletime := ms;
 	END SetIdleTime;
@@ -171,7 +171,7 @@ TYPE
 
 	(** gm: TRUE-> Display procedure polled continuously *)
 	PROCEDURE SetGameMode*(gm: BOOLEAN);
-	BEGIN 
+	BEGIN
 		gamemode := gm;
 	END SetGameMode;
 
@@ -193,7 +193,7 @@ TYPE
 	(** swap the GL context contents to the window *)
 	PROCEDURE SwapBuffers*();
 	VAR res: WinApi.BOOL;
-	BEGIN		
+	BEGIN
 		res := WinApi.SwapBuffers(hDC);
 		IF debug THEN KernelLog.String("SwapBuffers res= "); KernelLog.Int(res,0); KernelLog.Ln; END;
 	END SwapBuffers;
@@ -201,21 +201,78 @@ TYPE
 	(** interval=1: vertical sync to video update rate; interval=0: disable vsynch, full speed *)
 	PROCEDURE SetSwapInterval*(interval: LONGINT);
 	VAR bres: BOOLEAN;
-	BEGIN 
+	BEGIN
 		IF GL.wglSwapIntervalEXT # NIL THEN
 			 bres := GL.wglSwapIntervalEXT(interval);
 		END;
 		IF debug THEN
 			IF GL.wglSwapIntervalEXT #NIL THEN
-				KernelLog.String("wglSwapIntervalEXT # NIL "); 
+				KernelLog.String("wglSwapIntervalEXT # NIL ");
 			ELSE
-				KernelLog.String("wglSwapIntervalEXT = NIL "); 
+				KernelLog.String("wglSwapIntervalEXT = NIL ");
 			END;
 			IF bres THEN KernelLog.String("bres=TRUE"); ELSE KernelLog.String("bres= FALSE"); END;
-			KernelLog.Ln; 
+			KernelLog.Ln;
 		END;
 	END SetSwapInterval;
 
+	(** create a new opengl context with opengl version major, minor *)
+	PROCEDURE SetProfile*(major, minor: LONGINT; flags: SET): BOOLEAN;
+	VAR 
+		attr: POINTER TO ARRAY OF LONGINT;
+		tempContext: WinApi.HGLRC;
+		i: LONGINT;
+	BEGIN
+		(* create opengl compatibilitity mode context *)
+		NEW(attr, 13);
+		i := 0;
+		attr[i] := GLC.WGL_CONTEXT_MAJOR_VERSION_ARB;	INC(i); 
+		attr[i] := major; INC(i);
+		attr[i] := GLC.WGL_CONTEXT_MINOR_VERSION_ARB; INC(i);
+		attr[i] := minor; INC(i);
+		
+(*		attr[i] := GLC.WGL_CONTEXT_FLAGS_ARB; INC(i);
+			attr[i] := GLC.WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB; INC(i);
+*)		
+		attr[i] := GLC.WGL_CONTEXT_PROFILE_MASK_ARB; INC(i);
+			(* attr[i] := GLC.WGL_CONTEXT_CORE_PROFILE_BIT_ARB; INC(i); *)
+			attr[i] := GLC.WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB; INC(i);
+		attr[i] := 0; (* end of attribute list *)
+
+(*	attribs:= [
+				GLC.WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
+				GLC.WGL_CONTEXT_MINOR_VERSION_ARB, 1,
+				(* GLC.WGL_CONTEXT_FLAGS_ARB, GLC.WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB, *)
+				GLC.WGL_CONTEXT_PROFILE_MASK_ARB, (*GLC.WGL_CONTEXT_CORE_PROFILE_BIT_ARB,*)
+				GLC.WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+				0 
+			];
+*)	
+		GL.Read_WGL_ARB_create_context(); (* read wglCreateContextAttribsARB function *)
+			
+		IF GL.wglCreateContextAttribsARB = NIL THEN RETURN FALSE END;
+	
+		tempContext := GL.wglCreateContextAttribsARB(hDC,0, ADDRESSOF(attr[0]));
+		IF tempContext = NIL THEN
+			IF debug THEN 
+				(* It's not possible to make a GL 3.x context. Use the old style context (GL 2.1 and before) *)
+				KernelLog.String("Using old style context"); KernelLog.Ln; 
+			END;		 			
+			RETURN FALSE
+		END;
+		
+		GL.wglMakeCurrent(0, 0);
+		GL.wglDeleteContext(hGLRC);
+		hGLRC := tempContext;
+		GL.wglMakeCurrent(hDC,  hGLRC);
+		GL.ReadExtensions();
+		IF debug THEN 
+			KernelLog.String("Using new style context"); KernelLog.Ln; 
+		END;			
+		
+  		RETURN TRUE;
+	END SetProfile;
+	
 	(* create GLRC context *)
 	PROCEDURE CreateGLRC(Options: SET; colorbits, depthbits, stencilbits, accumbits, auxbuffers: LONGINT; layer: LONGINT): BOOLEAN;
 	VAR
@@ -273,8 +330,8 @@ TYPE
 	PROCEDURE GetContext*(): LONGINT;
 	BEGIN
 		RETURN hGLRC;
-	END GetContext;		
-	
+	END GetContext;
+
 	(** Abstract Window Procedures *)
 	(** called when window get focus *)
 	PROCEDURE FocusGot*();
@@ -310,7 +367,7 @@ TYPE
 	(** Close the window *)
 	PROCEDURE Close*();
 	BEGIN (* {EXCLUSIVE} *)
-		active := FALSE; 
+		active := FALSE;
 	END Close;
 
 	(** resize the window *)
@@ -351,9 +408,9 @@ TYPE
 	(** warp pointer to x,y *)
 	PROCEDURE WarpPointer*(w, h: LONGINT; x, y: LONGINT);
 	BEGIN
-		SetMousePosition(x, y);		
+		SetMousePosition(x, y);
 	END WarpPointer;
-	
+
 	(** make null cursor for mouse pointer *)
 	PROCEDURE HideMousePointer*(hide: BOOLEAN);
 	BEGIN
@@ -362,12 +419,12 @@ TYPE
 			(* hide cursor *)
 			User32.SetCapture(hWnd); (*  capture mouse to user window *)
 			User32.ShowCursor(0); (* FALSE *)
-			
+
 		ELSE
 			(* show cursor *)
 			User32.ReleaseCapture(); (*  un-capture mouse from user window *)
 			User32.ShowCursor(1); (* TRUE *)
-		END;	
+		END;
 	END HideMousePointer;
 
 	(** called when mouse wheel changed  *)
@@ -394,7 +451,7 @@ TYPE
 	BEGIN
 		IF (uMsg = User32.WMSetFocus) THEN
 			Kernel32.Sleep( 0 );   (* ????????????????????? *)
-			FocusGot();			
+			FocusGot();
 		ELSIF uMsg = User32.WMKillFocus THEN
 			FocusLost();
 		END
@@ -489,7 +546,7 @@ TYPE
 		GetKeyFlags(msg.flags);
 
 		  msg.ch := ch;  msg.keysym := key;
-			
+
 		(* ch := TranslateKey(wParam, FALSE);  *)
 		(*IF ch # 0X THEN*)
 		lParam := lParam MOD ASH( 1, 16 );
@@ -553,7 +610,7 @@ TYPE
 	PROCEDURE UpdateDisplay(id: LONGINT;  lParam: User32.LParam; wParam: User32.WParam );
 	VAR
 		ps: User32.PaintStruct;
-	BEGIN 
+	BEGIN
 		IF ~(minimized IN state) THEN
 			IF id = resize THEN
 				width := lParam MOD ASH( 1, 16 );
@@ -580,16 +637,16 @@ TYPE
 						KernelLog.String("WMMove"); KernelLog.Ln; *)
 
 				 WinApi.WM_ERASEBKGND: RETURN 1; (* disble flickering *)
-				| WinApi.WM_SIZING :	 
-								
-				| WinApi.WM_SIZE: 
+				| WinApi.WM_SIZING :
+
+				| WinApi.WM_SIZE:
 						IF wParam = User32.SizeMaximized THEN Maximize();  UpdateDisplay( resize, lParam, wParam );
 						ELSIF wParam = User32.SizeMinimized THEN Minimize();
 						ELSIF wParam = User32.SizeRestored THEN Restore();  UpdateDisplay(resize, lParam, wParam );
 						END;
 						RETURN 0;
 
-				| User32.WMPaint: 
+				| User32.WMPaint:
 						UpdateDisplay(redraw, lParam, wParam );
 						RETURN 0;
 				| User32.WMMouseActivate:
@@ -602,7 +659,7 @@ TYPE
 				| User32.WMSetFocus, User32.WMKillFocus:
 						HandleFocus(uMsg, wParam );
 						RETURN 0;
-				| User32.WMClose, User32.WMQuit: 	Close;					
+				| User32.WMClose, User32.WMQuit: 	Close;
 						(*active := FALSE;*)
 						RETURN 0;
 
@@ -611,11 +668,11 @@ TYPE
 						RETURN 0;
 				(*| User32.WMKeyUp:
 						HandleKeyUp(wParam, lParam ); *)
-						(* RETURN 0; *) 
+						(* RETURN 0; *)
 				| User32.WMChar:
 						IF ~KeyHandled THEN
 							HandleChar(wParam, lParam );
-							RETURN 0; 
+							RETURN 0;
 						END;
 				| User32.WMSysKeyDown: HandleKey(wParam, lParam); RETURN 0;
 				| User32.WMSysKeyUp: HandleKeyUp(wParam, lParam); RETURN 0;
@@ -629,7 +686,7 @@ TYPE
 			handled := FALSE;
 		END;
 		IF ~handled THEN RETURN defWindowProc(hWnd,uMsg, wParam, lParam );  ELSE RETURN 0 END;
-		
+
 (*		RETURN User32.DefWindowProc(hWnd,uMsg, wParam, lParam ) *)
 	END WindowHandler;
 
@@ -641,8 +698,8 @@ TYPE
 		windowClass.cbSize := SIZEOF( User32.WndClassEx );
 		windowClass.style := WinApi.CS_OWNDC + WinApi.CS_VREDRAW + WinApi.CS_HREDRAW;   (* Cs_parentdc: INTEGER is 128  = 2^7 *)
 		windowClass.lpfnWndProc := WindowProc;  windowClass.cbClsExtra := 0;  windowClass.cbWndExtra := 4;
-		windowClass.hInstance := Machine.hInstance;  str := "Console";  windowClass.hIcon := User32.LoadIcon( Machine.hInstance, str );
-		str := "Console.Small";  windowClass.hIconSm := User32.LoadIcon( Machine.hInstance, str );  windowClass.hCursor := Kernel32.NULL;
+		windowClass.hInstance := Kernel32.hInstance;  str := "Console";  windowClass.hIcon := User32.LoadIcon( Kernel32.hInstance, str );
+		str := "Console.Small";  windowClass.hIconSm := User32.LoadIcon( Kernel32.hInstance, str );  windowClass.hCursor := Kernel32.NULL;
 		windowClass.hbrBackground := Kernel32.NULL;  windowClass.lpszMenuName := Kernel32.NULL;
 		windowClass.lpszClassName := SYSTEM.VAL( Kernel32.LPSTR, ADDRESSOF(className ) );
 		ret := User32.RegisterClassEx( windowClass );
@@ -652,7 +709,7 @@ TYPE
 	PROCEDURE UnregisterClasses();
 	VAR ret: Kernel32.BOOL;
 	BEGIN
-		ret := User32.UnregisterClass(className, Machine.hInstance );
+		ret := User32.UnregisterClass(className, Kernel32.hInstance );
 	END UnregisterClasses;
 
 	PROCEDURE CreateWindow(): BOOLEAN;
@@ -669,11 +726,11 @@ TYPE
 			IF WinApi.ChangeDisplaySettings(ADDRESSOF(screenSettings), WinApi.CDS_FULLSCREEN) # WinApi.DISP_CHANGE_SUCCESSFUL THEN
 				IF debug THEN KernelLog.String("could not change to fullscreen"); KernelLog.Ln; END;
 
-				(* could not change, so revert to windowed mode *)			
-				fullscreen := FALSE;	
+				(* could not change, so revert to windowed mode *)
+				fullscreen := FALSE;
 			END;
-		END; 
-	
+		END;
+
 		IF fullscreen THEN
 			create.dwExStyle := WinApi.WS_EX_APPWINDOW;
 			create.dwStyle := WinApi.WS_POPUP + WinApi.WS_CLIPSIBLINGS + WinApi.WS_CLIPCHILDREN;
@@ -681,22 +738,22 @@ TYPE
 		ELSE
 			create.dwExStyle := WinApi.WS_EX_APPWINDOW + WinApi.WS_EX_WINDOWEDGE;
 			create.dwStyle := WinApi.WS_OVERLAPPEDWINDOW + WinApi.WS_CLIPSIBLINGS + WinApi.WS_CLIPCHILDREN;
-		END;		
+		END;
 
-		rect.left := 0 ; 
+		rect.left := 0 ;
 		rect.top := 0;
-		
+
 		IF fullscreen THEN
 			left := 0;
 			top := 0;
-		END;	
-		
+		END;
+
 		rect.right := width; 	rect.bottom := height;
 		WinApi.AdjustWindowRectEx(rect, create.dwStyle, 0, create.dwExStyle);
-			
+
 		hWnd :=
 			User32.CreateWindowEx( SYSTEM.VAL(LONGINT, create.dwExStyle) , className, title, create.dwStyle, left, top,  (rect.right - rect.left) , (rect.bottom - rect.top),
-													   0 ,0, Machine.hInstance,
+													   0 ,0, Kernel32.hInstance,
 													   SYSTEM.VAL( User32.LParam, create));
 		RETURN (hWnd # 0);
 	END CreateWindow;
@@ -705,13 +762,13 @@ TYPE
 	PROCEDURE CloseWindow*();
 	VAR res: Kernel32.BOOL;
 		bres : BOOLEAN;
-	BEGIN 
+	BEGIN
 		active := FALSE;
 		IF fullscreen THEN
 			WinApi.ChangeDisplaySettings(0, {});
 			User32.SetCursor(1);
 		END;
-		
+
 		(* do we have a rendering context *)
 		IF  hGLRC # 0 THEN
 			(* Release the DC and RC contexts *)
@@ -733,7 +790,7 @@ TYPE
 			res := User32.DestroyWindow(hWnd );
 			hWnd := Kernel32.NULL;
 		END;
-		
+
 		UnregisterClasses();
 
 		IF cmdlinerun THEN
@@ -757,25 +814,25 @@ TYPE
 			END
 		END;
 	END LoopForEvents;
-		
+
 PROCEDURE GetCurrentFrameMs*():LONGINT;
-BEGIN 
+BEGIN
 	RETURN currentfms;
 END GetCurrentFrameMs;
 
 (*  called in gamemode , use according to your needs *)
 PROCEDURE GameLogic*();
-BEGIN	
+BEGIN
 END GameLogic;
 
 	(** windows main loop *)
 	PROCEDURE MainLoop*();
 	VAR fms,fmsum: LONGINT;
 		ft: ARRAY 10 OF LONGINT;
-		i,ii: LONGINT;	
+		i,ii: LONGINT;
 	BEGIN
 
-		RegisterClasses();  
+		RegisterClasses();
 		IF ~CreateWindow() THEN Close(); RETURN END;
 
 		User32.ShowWindow( hWnd, User32.SWShow);
@@ -784,7 +841,7 @@ END GameLogic;
 		(*User32.UpdateWindow(hWnd);*)
 		(*User32.SetWindowText(hWnd, title);*)
 		(*User32.SetFocus(hWnd);*)
-				
+
 		(* create GL context for this window *)
 		IF ~CreateGLRC({opDoubleBuffered}, 32, 16, 8, 0,0,0) THEN
 			Close;
@@ -796,12 +853,12 @@ END GameLogic;
 		GL.ReadOpenGLCore();
 		GL.Read_WGL_EXT_swap_control; (* needed for swap interval *)
 		(* SetSwapInterval(0); *)
-		
-		OnLoad();	
+
+		OnLoad();
 		Reshape(width, height);
 		Display();
 		active := TRUE;
-		
+
 		WHILE active DO (* loop until WMQuit received *)
 			i:=(i+1)MOD 10;
 			Kernel.SetTimer(fpstimer, 1000);
@@ -810,18 +867,18 @@ END GameLogic;
 			(* ------------ game mode starts ------------- *)
 			IF gamemode THEN
 				IF idletime # 0 THEN
-					IF Kernel.Expired(idletimer) THEN					
-						IdleDisplay;						
+					IF Kernel.Expired(idletimer) THEN
+						IdleDisplay;
 						Kernel.SetTimer(idletimer, idletime);
 					END;
-				ELSE				
+				ELSE
 					Display();
 			(*		Kernel32.Sleep(0); *)
-				END;	
+				END;
 			END;
-			
+
 			Objects.Yield();
-			
+
 			(* measure frame timing info, ms *)
 			IF gamemode & debugframes & (idletime = 0) THEN
 				ft[i]:=Kernel.Elapsed(fpstimer);
@@ -830,20 +887,20 @@ END GameLogic;
 				FOR ii:=0 TO 9 DO
 					fmsum:=fmsum+ft[ii]
 				END;
-				fms:=fmsum DIV 10; 
-				
+				fms:=fmsum DIV 10;
+
 				GameLogic();
-				IF i=9 THEN 	
+				IF i=9 THEN
 					fmsum:=0;
 					KernelLog.Int(fms, 6); KernelLog.String(" ms."); KernelLog.Ln
 				END;
-			END;	
+			END;
 
-		END; (* while *)		
+		END; (* while *)
 		CloseWindow();
 	END MainLoop;
 
-	BEGIN  
+	BEGIN
 		(* MainLoop();*)
 	END Window;
 
@@ -966,7 +1023,7 @@ VAR
 		END;
 
 		CASE uMsg OF
-			 User32.WMCreate:			 	
+			 User32.WMCreate:
 				SYSTEM.GET( lParam, create );  wParam := SYSTEM.VAL( User32.WParam, create );
 				lParam := SYSTEM.VAL( User32.LParam, create.win );
 				ret := User32.PostMessage( hwnd, WMSetup, wParam, lParam );
@@ -977,7 +1034,7 @@ VAR
 				RETURN 0;
 		ELSE
 		END;
-		
+
 		RETURN  User32.DefWindowProc( hwnd, uMsg, wParam, lParam );
 	END WindowProc;
 
@@ -995,8 +1052,8 @@ VAR
 		menuY := User32.GetSystemMetrics( User32.SMCYMenu );
 
 		 str := "Cross";
-		hCurrentCursor := User32.LoadCursor( Machine.hInstance, str );   (* Kernel32.NULL;  *)
-		str := "Cross";  hAlternativeCursor := User32.LoadCursor( Machine.hInstance, str );
+		hCurrentCursor := User32.LoadCursor( Kernel32.hInstance, str );   (* Kernel32.NULL;  *)
+		str := "Cross";  hAlternativeCursor := User32.LoadCursor( Kernel32.hInstance, str );
 
 		Kernel32.InitializeCriticalSection( moduleCS );
 
@@ -1034,5 +1091,5 @@ END OGLWindow.
 
 
 SystemTools.Free OGLWindow ~
- 
+
 SystemTools.FreeDownTo OpenGL ~

@@ -2,7 +2,7 @@ MODULE WMGLDemoFlags; (** AUTHOR "fnecati"; PURPOSE "Flags simulation demo"; *)
 (*  translation from HeNe lesson11a: *)
 IMPORT
 	WMRectangles, WMGraphics, Strings, Kernel, Raster, Math, Modules,
-	WM := WMWindowManager,  WMMessages, WMDialogs,
+	WM := WMWindowManager,  WMMessages,
 	GL := OpenGL, GLC := OpenGLConst, GLU, WMGL:=WMGLWindow;
 
 CONST
@@ -14,7 +14,7 @@ TYPE
 
 	Points=ARRAY 45, 45, 3 OF GL.Float;
 
-	GLWindow* =  OBJECT(WMGL.Window)
+	GLWindow =  OBJECT(WMGL.Window)
 	VAR
 		 timer: Kernel.MilliTimer;
 
@@ -46,8 +46,7 @@ TYPE
 
 	PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
 	BEGIN
-		IF ucs = ORD("s") THEN SaveImage;
-		ELSIF  ucs = ORD("q") THEN Close;
+		IF  ucs = ORD("q") THEN Close;
 		ELSIF  ucs = ORD("a") THEN BEGIN {EXCLUSIVE} animated := ~ animated; END;
 		ELSE
 		END;
@@ -83,16 +82,6 @@ TYPE
 		Swap();
 		Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 	END UpdateImage;
-
-	PROCEDURE SaveImage;
-	VAR res: LONGINT;
-		fname: ARRAY 128 OF CHAR;
-	BEGIN
-		fname:="mywmgltest.bmp";
-		IF WMDialogs.QueryString(" Save File name: ",fname)=WMDialogs.ResOk THEN
-				WMGraphics.StoreImage(img, fname,res);
-		END;
-	END SaveImage;
 
 	PROCEDURE Reshape(w, h: LONGINT);
 	BEGIN
@@ -279,7 +268,7 @@ END GLWindow;
 
 VAR
 	nofWindows : LONGINT;
-	
+
 PROCEDURE Open*;
 VAR
 	window: GLWindow;

@@ -2,7 +2,7 @@ MODULE WMGLDemo9; (** AUTHOR "fnecati"; PURPOSE "a demo using opengl Frame Buffe
 
 IMPORT
 	WMRectangles, WMGraphics, Strings, Kernel, Raster, Inputs, Modules, KernelLog,
-	WM := WMWindowManager,  WMMessages, WMDialogs,
+	WM := WMWindowManager,  WMMessages, 
 	GL := OpenGL, GLC := OpenGLConst, GLU, WMGL := WMGLWindow;
 
 CONST
@@ -15,16 +15,10 @@ TYPE
 TYPE
 	KillerMsg = OBJECT
 	END KillerMsg;
-
-
-	Vertex = RECORD
-		tu, tv: REAL;
-    		x, y, z: REAL;
-	END;
-	(*VertexArray = POINTER TO ARRAY OF Vertex;*)
-	Vector = ARRAY [*] OF REAL;
 	
-	GLWindow* =  OBJECT(WMGL.Window)
+	Vector = ARRAY [*] OF REAL;
+
+	GLWindow =  OBJECT(WMGL.Window)
 	VAR
 		 timer: Kernel.MilliTimer;
 
@@ -36,7 +30,7 @@ TYPE
 		testTextureID, dynamicTextureID: GL.Uint;
 		frameBuffer, depthRenderBuffer: GL.Uint;
 
-		cubeVertices: Vector; 
+		cubeVertices: Vector;
 		(*cubeVertices: VertexArray;*)
 
 		PROCEDURE &New(w, h: LONGINT);
@@ -51,16 +45,8 @@ TYPE
 			alive := TRUE;
 			IF ~initGL() THEN Close END;
 			UpdateImage;
-			
-		  END New;
 
-		PROCEDURE NewVertex(u,v,x, y, z: REAL):Vertex;
-		VAR vert: Vertex;
-		BEGIN
-			vert.tu := u; vert.tv := v;
-			vert.x := x; vert.y := y; vert.z := z;
-			RETURN vert;
-		END NewVertex;
+		  END New;
 
 		PROCEDURE InitVertex;
 		BEGIN
@@ -134,7 +120,6 @@ TYPE
 			ELSIF keysym = Inputs.KsRight  THEN  spinXR := spinXR + 5.0;   UpdateImage; (* Cursor Right *)
 			ELSIF keysym = Inputs.KsDown THEN  spinYL := spinYL - 5.0;   UpdateImage; (* Cursor Down *)
 			ELSIF keysym = Inputs.KsUp THEN  spinYR := spinYR + 5.0;   UpdateImage; (* Cursor Up *)
-			ELSIF ucs = ORD("s") THEN SaveImage;
 			ELSIF  ucs = ORD("q") THEN Close;
 			ELSIF  ucs = ORD("a") THEN BEGIN {EXCLUSIVE} animated := ~ animated; END;
 			ELSE
@@ -174,16 +159,6 @@ TYPE
 
 			Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 		END UpdateImage;
-
-		PROCEDURE SaveImage;
-		VAR res: LONGINT;
-			fname: ARRAY 128 OF CHAR;
-		BEGIN
-			fname:="mywmgltest.bmp";
-			IF WMDialogs.QueryString(" Save File name: ",fname)=WMDialogs.ResOk THEN
-					WMGraphics.StoreImage(img, fname,res);
-			END;
-		END SaveImage;
 
 		PROCEDURE Reshape(w, h: LONGINT);
 		BEGIN

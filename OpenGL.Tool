@@ -1,98 +1,92 @@
  OpenGL Framework for A2- WinAos and LinuxAos versions
 
 # =================================================
-#        OpenGL 4.3 - Headertranslation
-#        Version 4.3
-#        Date : 22.11.2012
-#        Works with : LinuxAos and WinAos
+# OpenGL 4.5 - Header translation
+# Version 4.5
+# Date : 17.10.2014
+# Works with : LinuxAos and WinAos
 #
-#        All contributions and corrections are welcome ...
-#        Available at:  http://code.google.com/p/opengloberon
+# All contributions and corrections are welcome ...
+# Available at:  https://github.com/fnec/opengloberon
 # =================================================
+
+SystemTools.CollectGarbage ~ 
 
 # 1- Compile platform dependent bindings:
 
 # LinuxAos:
 
 Compiler.Compile
-	opengloberon/OpenGLConst.Mod
-	opengloberon/Unix.OpenGL.Mod
-	opengloberon/Unix.GLU.Mod
-	opengloberon/Unix.GLContext.Mod
-	opengloberon/Unix.GLContextPB.Mod
-	opengloberon/Unix.XF86VMode.Mod
-	opengloberon/Unix.OGLWindow.Mod
-	opengloberon/Unix.WMGLWindow.Mod
-	opengloberon/Unix.GLXinfo.Mod
-	opengloberon/GLShaderUtils.Mod
-	opengloberon/GLShadersBuild.Mod
-~
+	OpenGLConst.Mod
+	Unix.OpenGL.Mod
+	Unix.GLU.Mod	
+	GLShaderUtils.Mod
+	Unix.WMGLWindow.Mod
+	Unix.GLContext.Mod
+	Unix.GLContextPB.Mod	
+	Unix.GLXinfo.Mod
+	GLShadersBuild.Mod
+	Unix.XF86VMode.Mod
+	Unix.OGLWindow.Mod	
+	~
 	
-	GLXinfo.Do~  # display opengl info
+	GLXinfo.Do ~  # display opengl info
 	
 # WinAos:
 
 Compiler.Compile
-	opengloberon/OpenGLConst.Mod
-	opengloberon/WinApi.Mod	
-	opengloberon/Win32.OpenGL.Mod
-	opengloberon/Win32.GLU.Mod	
-	opengloberon/Win32.GLContext.Mod
-	opengloberon/Win32.OGLWindow.Mod
-	opengloberon/Win32.WMGLWindow.Mod
-	opengloberon/Win32.WGLinfo.Mod
-	opengloberon/GLShaderUtils.Mod
-	opengloberon/GLShadersBuild.Mod
+	OpenGLConst.Mod
+	Win32.WinApi.Mod	
+	Win32.OpenGL.Mod
+	Win32.GLU.Mod
+	GLShaderUtils.Mod	
+	Win32.WMGLWindow.Mod
+	Win32.GLContext.Mod	
+	Win32.WGLinfo.Mod
+	GLShadersBuild.Mod
+	Win32.OGLWindow.Mod
 	 ~
 
-	WGLinfo.Do ~ 
+	WGLinfo.Do ~ # display opengl info
 #==========================================
 # utilities
 # =========================================
 Compiler.Compile 
-	opengloberon/GLMatrix.Mod
-	opengloberon/GLTextures.Mod
-	opengloberon/GLMaterials.Mod	
-	opengloberon/GLLib.Mod	
-	opengloberon/GLUTGeometry.Mod	
-	opengloberon/Containers.Mod
-	opengloberon/Decoder3DS.Mod	
-	opengloberon/OBJLoader.Mod
-	opengloberon/OBJLoader2x.Mod
-	opengloberon/GLTexture2D.Mod
-	opengloberon/GLTextureFont2D.Mod
-~
+	GLLib.Mod	
+	Containers.Mod
+	Decoder3DS.Mod	
+	~
 
 # =========================================
 # 2- Compile platform independent demo examples of GLContext :
 
 Compiler.Compile
-	 opengloberon/GLTest.Mod
-	 opengloberon/WMGLDemo.Mod
-	 opengloberon/WMGLDemo1.Mod
-	 opengloberon/WMGLDemo2.Mod
-	 opengloberon/WMGLDemo3.Mod
-	 opengloberon/WMGLDemo4.Mod
-	 opengloberon/WMGLDemo6.Mod
-	 opengloberon/WMGLDemo7.Mod
-	 opengloberon/WMGLDemo9.Mod
-	 opengloberon/WMGLDemoFlags.Mod
-	 opengloberon/WMGLDemoLorenz.Mod
-	 opengloberon/WMGLPlotSurface.Mod
-	 opengloberon/WMGLSteamEngine.Mod
-	 opengloberon/WMGLPolyStipple.Mod
-	 opengloberon/WMGLSLBricks.Mod
-	opengloberon/WMSpaceSim3.Mod	 
+	 GLTest.Mod
+	 WMGLDemo.Mod
+	 WMGLDemo1.Mod
+	 WMGLDemo2.Mod
+	 WMGLDemo3.Mod
+	 WMGLDemo4.Mod
+	 WMGLDemo6.Mod
+	 WMGLDemo7.Mod
+	 WMGLDemo9.Mod
+	 WMGLDemoFlags.Mod
+	 WMGLDemoLorenz.Mod
+	 WMGLPlotSurface.Mod
+	 WMGLSteamEngine.Mod
+	 WMGLPolyStipple.Mod
+	 WMGLSLBricks.Mod
+	WMSpaceSim3.Mod	 
 	~
 # =========================================
 
 # LinuxAos specific demos (using linux native X11-Window ):
 Compiler.Compile
-	opengloberon/Unix.X11KeySymDef.Mod
-	opengloberon/MyXGear.Mod
-	opengloberon/MyXGear1.Mod
-	opengloberon/MyXGear2.Mod
-~
+	Unix.X11KeySymDef.Mod
+	MyXGear.Mod
+	MyXGear1.Mod
+	MyXGear2.Mod
+	~
 
 
 # WinAos specific version of WMGLDemo7.Mod by tobj..@ .., thanks :
@@ -121,11 +115,11 @@ Compiler.Compile  Win32.WMGLDemo7b.Mod ~  WMGLDemo7b.Open ~
 # 3- Compile demo examples of OGLWindow:
 
 Compiler.Compile
-	opengloberon/OGLDemo.Mod
-	opengloberon/OGLDemo1.Mod
-	opengloberon/OGLDemo2.Mod
-	opengloberon/SpaceSim3.Mod 
-~
+	OGLDemo.Mod
+	OGLDemo1.Mod
+	OGLDemo2.Mod
+	SpaceSim3.Mod 
+	~
 
 # Run Demos, click Midle Mouse (MM) on the following commands
 

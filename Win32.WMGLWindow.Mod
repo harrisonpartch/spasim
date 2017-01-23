@@ -6,10 +6,12 @@ IMPORT
 
 CONST
 	debug = FALSE;
-
+	COMPATIBILITY_PROFILE* = 0;
+	CORE_PROFILE* = 1;
+	
 CONST
 	WMSetup = User32.WMUser + 1;
-	
+
 CONST
 	opDoubleBuffered = 0;
 	opStereo = 1;
@@ -27,7 +29,7 @@ TYPE
 	END;
 
 	Buffer = POINTER TO ARRAY OF CHAR;
-
+	GLXFBConfigPtr =  POINTER TO ARRAY OF LONGINT;
 
 TYPE
 	Context= OBJECT
@@ -38,7 +40,7 @@ TYPE
 		res: BOOLEAN;
 		buffer: Buffer;	(* for speedup flip image in y*)
 		mode: Raster.Mode;
-		
+
     	PROCEDURE Init(w, h: LONGINT);
     	BEGIN  {EXCLUSIVE}
     		wincreated := FALSE;
@@ -49,17 +51,74 @@ TYPE
 
     		glWin.title:="GLContext.Window";
 		glWin.context := SELF;
-		
+
     		NEW(buffer, w*h*4);
 		Raster.InitMode(mode, Raster.srcCopy);
     		initialized := TRUE;
-    		
+
 		AWAIT (wincreated);
     	END Init;
 
+	(* create a new opengl context with opengl version major, minor *)
+	PROCEDURE SetProfile(major, minor: LONGINT; flags: SET): BOOLEAN;
+	VAR res: LONGINT;
+		attr: POINTER TO ARRAY OF LONGINT;
+		tempContext: WinApi.HGLRC;
+		i: LONGINT;
+	BEGIN
+		(* create opengl compatibilitity mode context *)
+		NEW(attr, 13);
+		i := 0;
+		attr[i] := GLC.WGL_CONTEXT_MAJOR_VERSION_ARB;	INC(i); 
+		attr[i] := major; INC(i);
+		attr[i] := GLC.WGL_CONTEXT_MINOR_VERSION_ARB; INC(i);
+		attr[i] := minor; INC(i);
+		
+(*		attr[i] := GLC.WGL_CONTEXT_FLAGS_ARB; INC(i);
+			attr[i] := GLC.WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB; INC(i);
+*)		
+		attr[i] := GLC.WGL_CONTEXT_PROFILE_MASK_ARB; INC(i);
+			(* attr[i] := GLC.WGL_CONTEXT_CORE_PROFILE_BIT_ARB; INC(i); *)
+			attr[i] := GLC.WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB; INC(i);
+		attr[i] := 0; (* end of attribute list *)
+
+(*	attribs:= [
+				GLC.WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
+				GLC.WGL_CONTEXT_MINOR_VERSION_ARB, 1,
+				(* GLC.WGL_CONTEXT_FLAGS_ARB, GLC.WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB, *)
+				GLC.WGL_CONTEXT_PROFILE_MASK_ARB, (*GLC.WGL_CONTEXT_CORE_PROFILE_BIT_ARB,*)
+				GLC.WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+				0 
+			];
+*)	
+		GL.Read_WGL_ARB_create_context(); (* read wglCreateContextAttribsARB function *)
+			
+		IF GL.wglCreateContextAttribsARB = NIL THEN RETURN FALSE END;
+	
+		tempContext := GL.wglCreateContextAttribsARB(glWin.hDC,0, ADDRESSOF(attr[0]));
+		IF tempContext = NIL THEN
+			IF debug THEN 
+				(* It's not possible to make a GL 3.x context. Use the old style context (GL 2.1 and before) *)
+				KernelLog.String("Using old style context"); KernelLog.Ln; 
+			END;		 			
+			RETURN FALSE
+		END;
+		
+		GL.wglMakeCurrent(0, 0);
+		GL.wglDeleteContext(glWin.hGLRC);
+		glWin.hGLRC := tempContext;
+		GL.wglMakeCurrent(glWin.hDC,  glWin.hGLRC);
+		GL.ReadExtensions();
+		IF debug THEN 
+			KernelLog.String("Using new style context"); KernelLog.Ln; 
+		END;			
+		
+  		RETURN TRUE;
+	END SetProfile;
+	
 	PROCEDURE Close;
 	VAR res: LONGINT;
-	BEGIN 
+	BEGIN
 		 wincreated := FALSE;
 		 res := User32.SendMessage(glWin.hWind, User32.WMQuit, 0, 0);
 
@@ -107,14 +166,22 @@ TYPE
 	VAR
 		i: LONGINT;
 		w, h: LONGINT;
+		sadr, dadr: ADDRESS;
 	BEGIN
 		IF (image = NIL) OR (image.adr = NIL) THEN RETURN END;
 		w := image.width; h := image.height;
 		GL.ReadPixels(0, 0, w, h, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, ADDRESSOF(buffer^[0]));
+		
 		(* flip vertical, y *)
+		sadr := ADDRESSOF(buffer[4*w*(h-1)]); dadr := image.adr;		
 		FOR i := 0 TO h - 1 DO
+			SYSTEM.MOVE(sadr - i*w*4, dadr + i*w*4, w*4);
+		END;
+
+(*		FOR i := 0 TO h - 1 DO
 			Raster.PutPixels(image, 0, h-1-i, w, Raster.BGRA8888, buffer^, i * w * 4, mode)
 		END;
+*)
 	END RenderInto;
 
 	(* handler for this context's window *)
@@ -122,13 +189,13 @@ TYPE
 													  lParam: User32.LParam ): User32.LResult;
 	BEGIN
 		CASE uMsg OF
-			User32.WMQuit: 
+			User32.WMQuit:
 			IF debug THEN KernelLog.String("Get WMQuit message"); KernelLog.Ln; END;
 			CloseWindow(glWin);
 			RETURN 1;
 		ELSE
 		END;
-		RETURN User32.DefWindowProc(glWin.hWind, uMsg, wParam, lParam );  
+		RETURN User32.DefWindowProc(glWin.hWind, uMsg, wParam, lParam );
 	END WindowHandler;
 
 	PROCEDURE MyLoop;
@@ -150,8 +217,8 @@ TYPE
 		LOOP
 
 			(* Check for new window messages *)
-			IF User32.GetMessage(msg, 0, 0, 0) # 0 THEN 
-				IF msg.message=User32.WMClose THEN					
+			IF User32.GetMessage(msg, 0, 0, 0) # 0 THEN
+				IF msg.message=User32.WMClose THEN
 						EXIT;
 				ELSE
 					res := User32.DispatchMessage(msg);
@@ -178,6 +245,13 @@ TYPE
 			context.Init(w, h);
 		END Init;
 
+		PROCEDURE SetProfile*(major, minor: LONGINT; flags: SET): BOOLEAN;
+		VAR res: BOOLEAN;
+		BEGIN
+			res := context.SetProfile(major, minor, flags);
+			RETURN res;
+		END SetProfile;
+			
 		(** *)
 		PROCEDURE Close*();
 		BEGIN
@@ -334,7 +408,7 @@ VAR
     END;
 
 
-    
+
     (* Do we have a window *)
     IF glWin.hWind # 0 THEN
         (* Destroy the window *)
@@ -350,7 +424,7 @@ VAR
         glWin.Instance := Kernel32.NULL;
         IF debug THEN KernelLog.String("unregister class .."); KernelLog.Ln; END;
     END;
-		
+
 	IF debug THEN KernelLog.String("CloseWindow Ok."); KernelLog.Ln; END;
 	END CloseWindow;
 
@@ -421,7 +495,7 @@ END CreateGLRC;
 
 PROCEDURE {WINAPI} WindowProc( wnd: User32.HWND;  uMsg: LONGINT;  wParam: User32.WParam;
 															    lParam: User32.LParam ): User32.LResult;
-VAR 
+VAR
 	glWin: WindowStruct;
 	context: Context;
 	ret: Kernel32.BOOL;
@@ -434,7 +508,7 @@ BEGIN
 
 
 	CASE uMsg OF
-		 User32.WMCreate:			 	
+		 User32.WMCreate:
 			SYSTEM.GET( lParam, glWin );  wParam := SYSTEM.VAL( User32.WParam, glWin );
 			lParam := SYSTEM.VAL( User32.LParam, glWin.context );
 			ret := User32.PostMessage( wnd, WMSetup, wParam, lParam );
@@ -454,4 +528,4 @@ END WMGLWindow.
 
 SystemTools.Free WMGLWindow ~
 
-SystemTools.FreeDownTo OpenGL ~ 
+SystemTools.FreeDownTo OpenGL ~

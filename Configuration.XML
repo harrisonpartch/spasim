@@ -48,15 +48,16 @@ To update: Configuration.Init ~
 			<Setting name="FileTrapWriter" value="FileTrapWriter.Install"/>
 			<Setting name="TrapWriter" value="WMTrapWriter.Install"/>
 			<Setting name="Uptime Monitor" value="UpTime.Install"/>
-			<Setting name="collect garbage" value="SystemTools.CollectGarbage"/>
+			<Setting name="collect garbage" value="Kernel.GC"/>
 			<Setting name="WorkingDir" value="FSTools.Mount 'Work Directory' RelativeFileSystem ."/>
 			<Setting name="SourceDir1" value="FSTools.Mount 'Module Sources' RelativeFileSystem .aoshome/source"/>
 			<Setting name="SourceDir2" value="FSTools.Mount 'Fonts' RelativeFileSystem .aoshome/fonts"/>
 			<Setting name="Start the main menu" value="StartMenu.Open"/>
-			<Setting name="DefaultSkin" value="SkinEngine.Load pklook.skin"/>
+			<Setting name="DefaultSkin" value="SkinEngine.Unload"/>
 			<Setting name="Restore the desktop" value="WMRestorable.Load Auto.dsk"/>
 			<Setting name="navigation manager" value="WMNavigate.Open -vs 1 0 0 Navigation:TaskList"/>
-			<Setting name="Linux to AOS clipboard" value="Clipboard.Install"/>
+			<Setting name="collect garbage" value="Kernel.GC"/>
+			<Setting name="Pie Menu" value="WMTextView.EnablePiemenu"/>
 			
 		<!-- Pinyin Input Method Editor (remove comment to activate)
 			<Setting value="WMPinyinIME.Test"/>
@@ -432,17 +433,17 @@ To update: Configuration.Init ~
 					
 				<!-- No | Yes | Paranoid -->
 					
-					<Setting name="BackupOnCompile" value="TRUE"/>
+					<Setting name="BackupOnCompile" value="FALSE"/>
 					<Setting name="ShowPathInTabs" value="FALSE"/>
-					<Setting name="ScratchPanelHeight" value="10"/>
-					<Setting name="EnableWhitespaceWarnings" value="TRUE"/>
-					<Setting name="ShowLineNumbers" value="TRUE"/>
-					<Setting name="IndicateTabs" value="TRUE"/>
+					<Setting name="ScratchPanelHeight" value="5"/>
+					<Setting name="EnableWhitespaceWarnings" value="FALSE"/>
+					<Setting name="ShowLineNumbers" value="FALSE"/>
+					<Setting name="IndicateTabs" value="FALSE"/>
 					<Setting name="CurrentLineColor" value="0"/>
 				</Section>
 				<Section name="Compilers">
 					<Section name="PACO">
-						<Setting name="caption" value="CompilePaco"/>
+						<Setting name="caption" value="Compile"/>
 						<Setting name="options" value="\Ws"/>
 						<Setting name="fileExtension" value="MOLD"/>
 						<Setting name="loadmodule" value="PC"/>
@@ -450,7 +451,7 @@ To update: Configuration.Init ~
 						<Setting name="findPC" value="TRUE"/>
 					</Section>
 					<Section name="Fox">
-						<Setting name="caption" value="CompileFox"/>
+						<Setting name="caption" value="Compile"/>
 						<Setting name="options" value="-b=AMD --warnings"/>
 						<Setting name="fileExtension" value="MOD"/>
 						<Setting name="loadmodule" value="TextCompiler"/>
@@ -509,6 +510,7 @@ To update: Configuration.Init ~
 				<Section name="SyntaxHighlighter">
 				<!-- Map file extension to SyntaxHighlighter name -->
 					
+					<Setting name="mod" value="oberon"/>
 					<Setting name="MOD" value="Oberon"/>
 					<Setting name="MDF" value="DataflowOberon"/>
 					<Setting name="MOS" value="Oberon"/>

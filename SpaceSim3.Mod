@@ -187,7 +187,7 @@ TYPE
 			GL.PolygonMode (GLC.GL_FRONT_AND_BACK, GLC.GL_FILL);  (* Polygon rasterization mode (polygon filled) *)
 		ELSE
 			GL.PolygonMode (GLC.GL_FRONT_AND_BACK, GLC.GL_LINE);  (* Polygon rasterization mode (polygon outlined) *)
-		END;		
+		END;
 		GL.MatrixMode(GLC.GL_MODELVIEW);  (* Modeling transformation *)
 		GL.LoadIdentity;  (* Initialize the model matrix as identity *)
 

@@ -1,15 +1,15 @@
 MODULE Retina;
 IMPORT  Base, Objects, Kernel, Out:=KernelLog, Noise,
-Math, SPSMMath, Raster, Graphics:=WMGraphics;
+Math, SPSMMath, Raster, Graphics:=WMGraphics, WMRasterScale,  Rect := WMRectangles;
 
 TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=5;        
-	TS=3*32;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=6;
-	TH=6;
+	T=4;        
+	TS=3*16;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
+	TW=12;
+	TH=12;
 	W*=TS*TW;
 	H*=TS*TH;
 	CX=W DIV 2;
@@ -24,8 +24,7 @@ TYPE Tile=OBJECT
 VAR
 	GO: BOOLEAN;
 	cam: Camera;
-
-
+		
 PROCEDURE & init;
 BEGIN
 
@@ -49,8 +48,8 @@ BEGIN
 	FOR i:= 0 TO 2 DO
 		phi:=cam.phi;
 		FOR j :=  0 TO 2 DO 
-			ray:=blankray;
-			angletoray(ray,theta,phi);
+			ray:=Base.blankray;
+			angletoray(ray,theta,phi,dtheta,dphi);
 			Base.world.Shade(ray);
 			IF ~ray.terminate THEN
 				ray.clr.b:= ray.clr.b + ray.clr.ba;
@@ -72,15 +71,16 @@ VAR
 	ray: Base.Ray;
 	pixel: Raster.Pixel;
 BEGIN
-	ray:=blankpray;
-	angletoray(ray,cam.theta+cam.dtheta/3, cam.phi+cam.dphi/3);	
+	ray:=Base.blankpray;
+	angletoray(ray,cam.theta+cam.dtheta/2, cam.phi+cam.dphi/2, cam.dtheta/3,cam.dphi/3);	
 	Base.world.Shade(ray);
 	IF ~ray.terminate THEN
 		ray.clr.b:= ray.clr.b + ray.clr.ba;
 		ray.clr.r:= ray.clr.r + ray.clr.ra/4;
-		ray.clr.g:= ray.clr.g + ray.clr.ga/4
-	END;	
-	IF  ray.patched THEN
+		ray.clr.g:= ray.clr.g + ray.clr.ga/4;
+		Raster.SetRGB(pixel,ENTIER(ray.clr.r*200),ENTIER(ray.clr.g*200),ENTIER(ray.clr.b*200)); 
+		Raster.Fill(image,cam.imx,cam.imy,cam.imx+3,cam.imy+3,pixel,copy)		
+	ELSIF ray.patched THEN
 		FOR i:= 0 TO 2 DO
 			FOR j :=  0 TO 2 DO 
 				Raster.SetRGB(pixel,ENTIER(ray.patch[i,j].r*255),ENTIER(ray.patch[i,j].g*255),ENTIER(ray.patch[i,j].b*255)); 
@@ -103,28 +103,28 @@ BEGIN
 	IF level<2 THEN
 			x:=a.imx - W/2;
 			y:=a.imy-H/2;		
-			IF (~saccade)&((x*x+y*y)<FV) THEN	
+			IF PATCH & (~saccade)&((x*x+y*y)<FV) THEN	
 				tessad3(a); 
 			ELSE
 				tessa(a); 
 			END;
 			x:=b.imx - W/2;
 			y:=b.imy-H/2;		
-			IF (~saccade)&((x*x+y*y)<FV) THEN	
+			IF PATCH & (~saccade)&((x*x+y*y)<FV) THEN	
 				tessad3(b); 
 			ELSE
 				tessa(b); 			
 			END;			
 			x:=c.imx - W/2;
 			y:=c.imy-H/2;		
-			IF (~saccade)&((x*x+y*y)<FV) THEN		
+			IF  PATCH & (~saccade)&((x*x+y*y)<FV) THEN		
 				tessad3(c); 
 			ELSE
 				tessa(c); 
 			END;
 			x:=d.imx - W/2;
 			y:=d.imy-H/2;		
-			IF (~saccade)&((x*x+y*y)<FV) THEN	
+			IF PATCH & (~saccade)&((x*x+y*y)<FV) THEN	
 				tessad3(d); 
 			ELSE
 				tessa(d); 
@@ -159,12 +159,12 @@ BEGIN
 	END;
 END ztraced;
 
-BEGIN{ACTIVE, PRIORITY(Objects.Normal)
-	 }REPEAT
+BEGIN{ACTIVE, PRIORITY(Objects.Low)}
+	REPEAT
 		BEGIN{EXCLUSIVE}
 			AWAIT(GO);
 		END;
-		ztrace(cam,T);	
+		IF PATCH THEN ztraced(cam,T) ELSE ztrace(cam,T) END;
 		BEGIN{EXCLUSIVE}
 			GO:=FALSE;
 			incTD;
@@ -212,14 +212,13 @@ VAR
 	saccade*,SACCADE1*,DTLRAYS*:BOOLEAN;
 	cameratheta*,cameraphi*:REAL;
 	aperture*: Base.Aperture;
-	image*: Raster.Image;
+	image*,fimage*: Raster.Image;
 	rtheta,rphi: REAL; (* camera pitch,roll. global variables because they are the same for all rays in a frame *)
 	fward*, dward*, rward*,camrward*: PT;  
 	foveaparameter:INTEGER;
 	FV: REAL;
 	copy: Raster.Mode;
 	PATCH*:BOOLEAN;
-	blankray,blankpray: Ray;
 
 PROCEDURE reflect(VAR p: PT; n: PT);
 VAR 
@@ -238,7 +237,7 @@ BEGIN
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
 END mirror;
 	
-PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
+PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi,dtheta,dphi: REAL);
 VAR 
 	d: REAL;
 BEGIN
@@ -249,6 +248,8 @@ BEGIN
 	ray.dxyz.x := ray.dxyz.x/d;
 	ray.dxyz.y := ray.dxyz.y/d;
 	ray.dxyz.z := ray.dxyz.z/d;	
+	ray.dtheta:=dtheta;
+	ray.dphi:=dphi;
 	ray.downxyz:=Base.dward;
 	ray.rightxyz:=Base.rward;
 	SPSMMath.orrot(ray.dxyz, Base.dward, rtheta);  
@@ -340,11 +341,21 @@ BEGIN
 		END
 	END
 END gotiles;
-
-PROCEDURE stitchtiles;
+(*
+PROCEDURE filter;
+VAR
+	i,j,sum: LONGINT;
+	pixel: Raster.Pixel;
 BEGIN
-
-END stitchtiles;
+	FOR i:= 1 TO W DO
+		FOR j :=  1 TO H DO 
+	
+			Raster.SetRGB(pixel,ENTIER(ray.patch[i,j].r*255),ENTIER(ray.patch[i,j].g*255),ENTIER(ray.patch[i,j].b*255)); 
+			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy)
+		END
+	END
+END filter;
+*)
 
 PROCEDURE go*(theta,phi,apw,aph: REAL);
 VAR
@@ -352,6 +363,7 @@ VAR
 	ctheta,cphi,dtheta,dphi: REAL;
 	pixel: Raster.Pixel;
 	sr: Ray;
+	r14,r11: Rect.Rectangle;
 BEGIN
 	zeroTD;
 	frameasteps:=0;
@@ -359,6 +371,8 @@ BEGIN
 	dtheta:=apw/TW;
 	dphi:=aph/TH;
 	ctheta:=-apw/2;	
+	Base.blankpray.patchdx:=Math.sin(dtheta/3);
+	Base.blankpray.patchdy:=Math.sin(dphi/3);	
 	FOR i:= 0 TO TW-1  DO	
 		cphi:=-aph/2;
 		FOR j:= 0 TO TH-1 DO
@@ -388,7 +402,7 @@ BEGIN
 	sr.scale := 1; 
 	sr.tscale:=1;
 	sr.dtl:=10;	
-	angletoray(sr,0,0);	
+	angletoray(sr,0,0,1/1000, 1/1000);	
 	Base.sniperay:=sr;
 	BEGIN{EXCLUSIVE}
 		gotiles;
@@ -403,8 +417,9 @@ BEGIN
 	Raster.Put(image,CX+1,CY+1,pixel,copy);	
 	Raster.Put(image,CX-1,CY+1,pixel,copy);	
 	Raster.Put(image,CX-1,CY-1,pixel,copy);	
-	Raster.Put(image,CX+1,CY-1,pixel,copy);			
-	Base.tick;
+	Raster.Put(image,CX+1,CY-1,pixel,copy);	
+(*	WMRasterScale.Scale(image, Rect.MakeRect(0,0,W,H), fimage, Rect.MakeRect(0,0,2*W-1,2*H-1), Rect.MakeRect(0,0,2*W,2*H),1,1);		
+*)	Base.tick;
 END go;
 
 PROCEDURE lsu*;
@@ -421,17 +436,6 @@ BEGIN
 	Out.String("Retina loading...");
 	Raster.InitMode(copy,Raster.srcCopy);	
 	image := Graphics.LoadImage("granite.jpg", FALSE);
-	blankray.clr.ra := 1;
-	blankray.clr.ga := 1;
-	blankray.clr.ba := 1;
-	blankray.scale := 1; 
-	blankray.patched:=TRUE;
-	blankray.tscale:=1;
-	blankray.dtl:=10;	
-	blankpray:=blankray;
-	blankpray.dtl:=5;
-	blankpray.ispatchTF:=TRUE;
-	blankray.patched:=TRUE;
 	FOR a:= 0 TO TW-1  DO
 		FOR b:= 0 TO TH-1 DO
 			NEW(tile[a,b]);

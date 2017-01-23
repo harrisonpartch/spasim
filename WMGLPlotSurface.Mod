@@ -1,8 +1,8 @@
 MODULE WMGLPlotSurface; (** AUTHOR "fnecati"; PURPOSE "a test for 3D function plotting with light"; *)
 
 IMPORT
-	WMRectangles, WMGraphics, Strings, Math:=MathL, Inputs, Modules,
-	WM := WMWindowManager,  WMMessages,  WMDialogs,
+	WMRectangles, Strings, Math:=MathL, Inputs, Modules,
+	WM := WMWindowManager,  WMMessages, 
 	GL := OpenGL, GLC := OpenGLConst, GLU, WMGL := WMGLWindow;
 
 CONST
@@ -23,9 +23,9 @@ TYPE
 	KillerMsg = OBJECT
 	END KillerMsg;
 
-	TVector3d* = ARRAY [3] OF LONGREAL;
+	TVector3d = ARRAY [3] OF LONGREAL;
 
-	GLWindow* =  OBJECT(WMGL.Window)
+	GLWindow =  OBJECT(WMGL.Window)
 	VAR
 
 		ambientLight,  diffuseLight, specularLight,
@@ -51,7 +51,6 @@ TYPE
 	BEGIN
 		CASE CHR(ucs) OF
 			 "d": drawMode := (drawMode+1) MOD 3; DrawMode(drawMode); UpdateImage;
-			| "s":		SaveImage;
 			| "q" :		Close;
 		ELSE
 
@@ -90,7 +89,7 @@ TYPE
 	END Handle;
 
 	PROCEDURE Close;
-	BEGIN 
+	BEGIN
 		Close^;
 		DecCount
 	END Close;
@@ -104,17 +103,6 @@ TYPE
 		Swap();
 		Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 	END UpdateImage;
-
-	PROCEDURE SaveImage;
-	VAR res: LONGINT;
-		fname: ARRAY 128 OF CHAR;
-	BEGIN
-		fname:="mywmgltest.bmp";
-		IF WMDialogs.QueryString(" Save File name: ",fname)=WMDialogs.ResOk THEN
-				WMGraphics.StoreImage(img, fname,res);
-		END;
-	END SaveImage;
-
 
 	(* from W3dVectors.Mod *)
 	PROCEDURE Cross(a, b: TVector3d): TVector3d;
@@ -282,13 +270,13 @@ TYPE
 			GL.Disable(GLC.GL_DEPTH_TEST);
 			(*GL.Disable(GLC.GL_CULL_FACE);*)
 		END;
-		DeActivate(); 
+		DeActivate();
 	END DrawMode;
 
 	PROCEDURE initGL;
 	BEGIN
 		MakeCurrent();
-		
+
 		(* Setup the lighting *)
 		ambientLight := [1.0, 1.0, 1.0, 1.0];
 		diffuseLight := [1.0, 0.9, 0.8, 1.0];
@@ -332,7 +320,7 @@ END GLWindow;
 
 VAR
 	nofWindows : LONGINT;
-	
+
 PROCEDURE Open*;
 VAR
 	window: GLWindow;

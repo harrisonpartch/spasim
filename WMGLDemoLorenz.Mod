@@ -31,7 +31,7 @@ MODULE WMGLDemoLorenz; (** AUTHOR "fnecati"; PURPOSE "opengl Lorenz Strange Attr
 
 IMPORT
 	WMRectangles, WMGraphics, Strings, Kernel, Random, MathL, Modules,
-	WM := WMWindowManager,  WMDialogs, Inputs, WMMessages,
+	WM := WMWindowManager, Inputs, WMMessages,
 	gl := OpenGL, glc := OpenGLConst, WMGL := WMGLWindow;
 
 
@@ -55,7 +55,7 @@ TYPE
 	KillerMsg = OBJECT
 	END KillerMsg;
 
-	GLWindow* =  OBJECT(WMGL.Window)
+	GLWindow =  OBJECT(WMGL.Window)
 	VAR
 		timer: Kernel.MilliTimer;
 		waittime: LONGINT; (* between animation time *)
@@ -92,7 +92,7 @@ TYPE
 
 		canvas.SetFont(canvas.GetFont());
 		array_index:= 0;
-		
+
 	(*	NEW(red_position, NUM_POINTS);
 		NEW(grn_position, NUM_POINTS); *)
 		initGL;
@@ -105,7 +105,7 @@ TYPE
 	PROCEDURE ResetPositions;
 	VAR i: LONGINT;
 	BEGIN
-	
+
 		(* Reset the Lorenz parameters *)
 		sigma := s0 ;  b := b0 ;  r := r0 ;
 		(* Set an initial position *)
@@ -120,7 +120,7 @@ TYPE
 		(* Initialize the arrays *)
 		FOR i := 1 TO NUM_POINTS-1 DO
 			red_position[i,..] := red_position[0,..];
-			
+
 			grn_position[i,..] := grn_position[0,..];
 		END;
 
@@ -129,14 +129,13 @@ TYPE
 	PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
 	BEGIN
 		CASE CHR(ucs) OF
-			"a" :	BEGIN {EXCLUSIVE} animated := ~ animated; END;  
+			"a" :	BEGIN {EXCLUSIVE} animated := ~ animated; END;
 					IF animated THEN animate := 1; ELSE animate := 0 END;
-					
+
 			| "-" :	DEC(waittime,5); IF waittime < 10 THEN waittime := 10; END;
 			| "+" :	INC(waittime,5); IF waittime>1000 THEN waittime := 1000; END;
 			| "r" :	ResetPositions; UpdateImage;
 			| " " : 	animate := 2;  UpdateImage;
-			| "s":	SaveImage;
 			| "q" :	Close; RETURN;
 
 		ELSE
@@ -216,16 +215,6 @@ TYPE
 		Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 	END UpdateImage;
 
-	PROCEDURE SaveImage;
-	VAR res: LONGINT;
-		fname: ARRAY 128 OF CHAR;
-	BEGIN
-		fname:="mywmgltest.bmp";
-		IF WMDialogs.QueryString(" Save File name: ",fname)=WMDialogs.ResOk THEN
-				WMGraphics.StoreImage(img, fname,res);
-		END;
-	END SaveImage;
-
 	PROCEDURE initGL;
 	BEGIN
 		s0 := 10.0; r0 := 28.0; b0 := 8.0/3.0 ;
@@ -287,7 +276,7 @@ TYPE
 
 	 	gl.Color3d ( 0.0, 1.0, 0.0 ) ;  (* Green *)
 	 	DrawCurve ( array_index, grn_position ) ;
-		
+
 	END Display;
 
 	PROCEDURE Reshape(w, h: LONGINT);
@@ -397,7 +386,7 @@ END GLWindow;
 VAR
 	random: Random.Generator;
 	nofWindows : LONGINT;
-	
+
 PROCEDURE Open*;
 VAR
 	window: GLWindow;
@@ -431,10 +420,10 @@ END Cleanup;
 BEGIN
 	NEW(random);
 	random.InitSeed(12345);
-	Modules.InstallTermHandler(Cleanup)	
+	Modules.InstallTermHandler(Cleanup)
 END WMGLDemoLorenz.
 
-SystemTools.Free  WMGLDemoLorenz   ~  
+SystemTools.Free  WMGLDemoLorenz   ~
 
 WMGLDemoLorenz.Open ~
 

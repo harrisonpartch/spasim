@@ -6,5 +6,5 @@ BEGIN
 	RETURN vox
 END thisvox;
 BEGIN
-	NEW(vox,'bluedot.png')
+	NEW(vox,'maga3x.png')
 END Nbluedot. 

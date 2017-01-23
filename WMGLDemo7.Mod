@@ -2,7 +2,7 @@ MODULE WMGLDemo7;  (** AUTHOR "fnecati"; PURPOSE "opengl mirroring effect "; *)
 
 IMPORT
 	WMRectangles, WMGraphics, Strings, Kernel, Modules,
-	WM := WMWindowManager,  WMMessages, WMDialogs,
+	WM := WMWindowManager,  WMMessages,
 	gl := OpenGL, glc := OpenGLConst, GLU, WMGL := WMGLWindow;
 
 TYPE
@@ -10,10 +10,10 @@ TYPE
 	END KillerMsg;
 
 
-	GLWindow* =  OBJECT(WMGL.Window)
+	GLWindow =  OBJECT(WMGL.Window)
 	VAR
 		timer: Kernel.MilliTimer;
-		alive,  animated: BOOLEAN;
+		alive,  animated, dead: BOOLEAN;
 		xrot : REAL;
  		quad: GLU.QuadricObj;
 		drawMode: LONGINT;
@@ -40,7 +40,7 @@ TYPE
 		UpdateImage;
 		animated := FALSE;
 		alive := TRUE;
-		
+
 	END New;
 
 	PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
@@ -53,8 +53,7 @@ TYPE
 			| "-" : xrot := xrot - 1.0;   UpdateImage;
 			| "+" : xrot := xrot + 1.0;  UpdateImage;
 
-			| "s": SaveImage;
-			| "q" : BEGIN {EXCLUSIVE} animated := FALSE; alive := FALSE; END; Close;
+			| "q" : Close;
 		ELSE
 
 		END;
@@ -69,9 +68,8 @@ TYPE
 	END Handle;
 
 	PROCEDURE Close;
-	BEGIN 
-		BEGIN {EXCLUSIVE}  animated := FALSE; alive := FALSE; END; 
-		
+	BEGIN
+		BEGIN {EXCLUSIVE}   animated := FALSE; alive := FALSE; AWAIT(dead) END;		
 		Close^;
 		DecCount
 	END Close;
@@ -79,7 +77,6 @@ TYPE
 	PROCEDURE UpdateImage;
 	VAR
 		textWidth, textHeight: LONGINT;
-		rect: WMRectangles.Rectangle;
 	BEGIN
 		MakeCurrent();
 			Display;
@@ -93,16 +90,6 @@ TYPE
 
 		Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 	END UpdateImage;
-
-	PROCEDURE SaveImage;
-	VAR res: LONGINT;
-		fname: ARRAY 128 OF CHAR;
-	BEGIN
-		fname:="mywmgltest.bmp";
-		IF WMDialogs.QueryString(" Save File name: ",fname)=WMDialogs.ResOk THEN
-				WMGraphics.StoreImage(img, fname,res);
-		END;
-	END SaveImage;
 
 	PROCEDURE DrawMode(dm: LONGINT);
 	VAR drawMode: LONGINT;
@@ -262,8 +249,8 @@ TYPE
 
 BEGIN  {ACTIVE}
 	Kernel.SetTimer(timer, 10);
-	WHILE alive DO
-		BEGIN {EXCLUSIVE} AWAIT(animated) END;
+	WHILE alive DO		
+		IF animated THEN
 	 		UpdateImage();
 	 		xrot := xrot + 1.0;
 
@@ -274,14 +261,16 @@ BEGIN  {ACTIVE}
 				Kernel.SetTimer(timer, 5000);
 				frames := 0;
 			END;
+		END;
 	END;
+	BEGIN {EXCLUSIVE} dead := TRUE END;
 END GLWindow;
 
 VAR
 	nofWindows : LONGINT;
-	
+
 PROCEDURE Open*;
-VAR 
+VAR
 	window: GLWindow;
 BEGIN
 	NEW(window, 256, 256);
@@ -301,7 +290,7 @@ PROCEDURE Cleanup;
 VAR die : KillerMsg;
 	 msg : WMMessages.Message;
 	 m : WM.WindowManager;
-BEGIN 
+BEGIN
 	NEW(die);
 	msg.ext := die;
 	msg.msgType := WMMessages.MsgExt;

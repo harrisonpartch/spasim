@@ -3,7 +3,7 @@ MODULE  GLLib;
 (*  (C)  E. Pokora, 1999.  This module is part of the Ogl subsystem - a binding of OpenGL for BlackBox Component Pascal.*)
 (*  Procedures to draw the famous teapot and some 3d geometric primitives:
 	cube, cone, sphere, torus, tetrahedron, octahedron, dodecahedron, icosahedron.
-	
+
 	uses GLU library.
 *)
 
@@ -72,7 +72,7 @@ BEGIN
 		d := 1.0 / d;
 		v[0] := d * v[0];  v[1] := d * v[1];  v[2] := d * v[2]
 	ELSE
-		KernelLog.String("GLLib: attempt to normalize zero length vector"); KernelLog.Ln; 
+		KernelLog.String("GLLib: attempt to normalize zero length vector"); KernelLog.Ln;
 		v[0] := 1
 	END
 END NormalizeV;
@@ -82,7 +82,7 @@ VAR  n: ARRAY [6,3] OF gl.Float;  faces: ARRAY [6,4] OF gl.Int;
 	v: ARRAY [8,3] OF gl.Float;
 	i: LONGINT;  s: gl.Float;
 BEGIN
-	n := [ 	[ -1.0, 0.0, 0.0], [ 0.0, 1.0, 0.0], [ 1.0, 0.0, 0.0],	
+	n := [ 	[ -1.0, 0.0, 0.0], [ 0.0, 1.0, 0.0], [ 1.0, 0.0, 0.0],
 			[ 0.0, -1.0, 0.0],	[ 0.0, 0.0, 1.0], 	[ 0.0, 0.0, -1.0]	];
 
 	faces := [ [ 0, 1, 2, 3], [ 3, 2, 6, 7], [ 7, 6, 5, 4],
@@ -222,7 +222,7 @@ BEGIN
 END RecordItem;
 
 PROCEDURE  Subdivide (CONST v0, v1, v2: ARRAY [3] OF gl.Float;  shadeType: gl.Enum);
-VAR  depth, i, j, k, n: LONGINT; 
+VAR  depth, i, j, k, n: LONGINT;
 	w0, w1, w2: ARRAY [3] OF gl.Float;
 BEGIN
 	depth := 1;
@@ -574,10 +574,10 @@ BEGIN
 END InitTeapot;
 
 BEGIN
-	
-	tData := [ [ t,  t,   t ], [  t, -t, -t], [ -t,  t, -t], [ -t, -t,  t] ]; 
+
+	tData := [ [ t,  t,   t ], [  t, -t, -t], [ -t,  t, -t], [ -t, -t,  t] ];
 	tIndex := [ [0, 1, 3], [2, 1, 0], [3, 2, 0], [1, 2, 3] ];
-	
+
 	(* Icosaheron data;  radius = 1.0 *)
 	iData := 	[ [ -x, 0, z],  [ x, 0, z],  [ -x, 0, -z],
 				[ x, 0, -z], [ 0, z, x], [ 0, z, -x],
@@ -598,7 +598,7 @@ BEGIN
 
 	oIndex := [	[0, 4, 2], [1, 2, 4], [ 0, 3, 4], [1, 4, 3],
 				[0, 2, 5], [1, 5, 2], [0, 5, 3], [1, 3, 5] ];
-				
+
 	InitDodecahedron;
 
 	(* Teapot data *)

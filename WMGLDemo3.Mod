@@ -2,25 +2,25 @@ MODULE WMGLDemo3; (** AUTHOR "fnecati"; PURPOSE "opengl glxgears implementation"
 
 IMPORT
 	WMRectangles, WMGraphics, Strings, Kernel, Math, Modules,
-	WM := WMWindowManager,  WMMessages, WMDialogs, KernelLog,
+	WM := WMWindowManager,  WMMessages, KernelLog,
 	GL := OpenGL, GLC := OpenGLConst, WMGL:=WMGLWindow;
 
 CONST
-	debug = TRUE;	
+	debug = TRUE;
 	pi = Math.pi;
 
 TYPE
 	KillerMsg = OBJECT
 	END KillerMsg;
 
-	GLWindow* =  OBJECT(WMGL.Window)
+	GLWindow =  OBJECT(WMGL.Window)
 	VAR
 		timer: Kernel.MilliTimer;
 		alive, animated: BOOLEAN;
 		font: WMGraphics.Font;
 		frames: LONGINT;
 		fpsstr: ARRAY 30 OF CHAR;
-				
+
 		ztrans: REAL;
 
 		(* for gears *)
@@ -37,7 +37,7 @@ TYPE
 			canvas.SetColor(WMGraphics.Green);
 			font := canvas.GetFont();
 			fpsstr := "FPS: ";
-			
+
 			angle := 0.0;
 			angley := 0.0;
 			ztrans := -40.0;
@@ -67,7 +67,6 @@ TYPE
 				| "-" : angle := angle - 1.0; UpdateImage;
 				| "+" : angle := angle + 1.0; UpdateImage;
 
-				| "s": SaveImage;
 				| "q" : Close;
 			ELSE
 
@@ -92,40 +91,28 @@ TYPE
 		END Handle;
 
 		PROCEDURE Close;
-		BEGIN 
+		BEGIN
 			BEGIN {EXCLUSIVE} alive := FALSE; animated := FALSE END;
 			Close^;
 			DecCount
 		END Close;
 
 		PROCEDURE UpdateImage;
-			VAR
-			textWidth, textHeight: LONGINT;
-			rect: WMRectangles.Rectangle;
+		VAR textWidth, textHeight: LONGINT;
 		BEGIN
 			MakeCurrent();
 			DrawGears;
 			SwapGLBuffer();
 			DeActivate();
 
-			
+
 			font.GetStringSize(fpsstr, textWidth, textHeight);
 			canvas.DrawString(4, textHeight, fpsstr);
-			
+
 			Swap();
 			Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
-			
-		END UpdateImage;
 
-		PROCEDURE SaveImage;
-		VAR res: LONGINT;
-			fname: ARRAY 128 OF CHAR;
-		BEGIN
-			fname:="mywmgltest.bmp";
-			IF WMDialogs.QueryString(" Save File name: ",fname)=WMDialogs.ResOk THEN
-					WMGraphics.StoreImage(img, fname,res);
-			END;
-		END SaveImage;
+		END UpdateImage;
 
 	PROCEDURE DrawMode(dm: LONGINT);
 	VAR drawMode: LONGINT;
@@ -368,13 +355,13 @@ BEGIN  {ACTIVE}
 	 	UpdateImage();
 	 	angle := angle + 0.5;
 		INC(frames);
-	
+
 		IF Kernel.Expired(timer) THEN
 			Strings.FloatToStr(frames/5.0, 0, 2, 0, fpsstr);
 			Strings.Concat("FPS:", fpsstr, fpsstr);
 			Kernel.SetTimer(timer, 5000);
 			IF debug THEN
-				KernelLog.String(fpsstr); KernelLog.Ln; 
+				KernelLog.String(fpsstr); KernelLog.Ln;
 			END;
 			frames := 0;
 		END;
@@ -421,3 +408,5 @@ END WMGLDemo3.
 SystemTools.Free  WMGLDemo3   ~
 
 WMGLDemo3.Open ~
+
+SystemTools.FreeDownTo WMGLWindow ~ 

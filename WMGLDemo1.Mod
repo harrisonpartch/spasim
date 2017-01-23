@@ -1,8 +1,8 @@
 MODULE WMGLDemo1; (** AUTHOR "fnecati"; PURPOSE "a demo for Vertex Arrays, and lightining"; *)
 
 IMPORT
-	WMRectangles, WMGraphics, Strings, Kernel, KernelLog, Modules,
-	WM := WMWindowManager,  WMMessages, WMDialogs,
+	WMRectangles, Strings, Kernel, KernelLog, Modules,
+	WM := WMWindowManager,  WMMessages, 
 	GL := OpenGL, GLC := OpenGLConst, GLU, WMGL := WMGLWindow;
 
 CONST waittime=50;
@@ -11,7 +11,7 @@ TYPE
 	END KillerMsg;
 
 TYPE
-	GLWindow* =  OBJECT(WMGL.Window)
+	GLWindow =  OBJECT(WMGL.Window)
 	VAR
 		timer: Kernel.MilliTimer;
 
@@ -57,7 +57,6 @@ TYPE
 					UpdateImage;
 			| "-" : angle := angle - 5.0; UpdateImage;
 			| "+" : angle := angle+ 5.0; UpdateImage;
-			| "s": SaveImage;
 			| "q" : Close;
 		ELSE
 
@@ -80,7 +79,7 @@ TYPE
 	END Handle;
 
 	PROCEDURE Close;
-	BEGIN 
+	BEGIN
 		BEGIN{EXCLUSIVE} alive := FALSE; animated := FALSE END;
 		Close^;
 		DecCount
@@ -96,29 +95,19 @@ TYPE
 		 Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 	END UpdateImage;
 
-	PROCEDURE SaveImage;
-	VAR res: LONGINT;
-		fname: ARRAY 128 OF CHAR;
-	BEGIN
-		fname:="mywmgltest.bmp";
-		IF WMDialogs.QueryString(" Save File name: ",fname)=WMDialogs.ResOk THEN
-				WMGraphics.StoreImage(img, fname,res);
-		END;
-	END SaveImage;
-
 	PROCEDURE Reshape(w,h: LONGINT);
 	BEGIN
 		MakeCurrent();
 		GL.Viewport(0,0, w, h);
-		
+
 		GL.MatrixMode(GLC.GL_PROJECTION);
 		GL.LoadIdentity();
 		GLU.Perspective(45, 1, 1, 1000);
 
 		GL.MatrixMode(GLC.GL_MODELVIEW);
 		GL.LoadIdentity();
-		GLU.LookAt(5, 5, eyeposz,   0, 0, 0,   0, 1, 0); (* eye(x,y,z), focal(x,y,z), up(x,y,z) *)		
-		
+		GLU.LookAt(5, 5, eyeposz,   0, 0, 0,   0, 1, 0); (* eye(x,y,z), focal(x,y,z), up(x,y,z) *)
+
 		  DeActivate();
 	END Reshape;
 
@@ -239,7 +228,7 @@ TYPE
 
 
 			GLU.LookAt(5, 5, eyeposz,   0, 0, 0,   0, 1, 0); (* eye(x,y,z), focal(x,y,z), up(x,y,z) *)
-		*)	
+		*)
 		RETURN TRUE;
 	END initGL;
 
@@ -302,7 +291,7 @@ END GLWindow;
 
 VAR
 	nofWindows : LONGINT;
-	
+
 PROCEDURE Open*;
 VAR
 	window: GLWindow;

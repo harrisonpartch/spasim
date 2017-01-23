@@ -1,8 +1,8 @@
 MODULE WMGLPolyStipple; (** AUTHOR "fnecati"; PURPOSE "a demo using glPolygonStipple"; *)
  (* example from OpenGL redbook pdf *)
 IMPORT
-	WMRectangles, WMGraphics, Strings, Kernel, Modules, SYSTEM, KernelLog,
-	WM := WMWindowManager,  WMMessages, WMDialogs,
+	WMRectangles, Strings, Kernel, Modules, SYSTEM, KernelLog,
+	WM := WMWindowManager,  WMMessages, 
 	GL := OpenGL, GLC := OpenGLConst, WMGL := WMGLWindow;
 
 CONST
@@ -14,7 +14,7 @@ TYPE
 	KillerMsg = OBJECT
 	END KillerMsg;
 
-	GLWindow* =  OBJECT(WMGL.Window)
+	GLWindow =  OBJECT(WMGL.Window)
 	VAR
 		 timer: Kernel.MilliTimer;
 		alive, animated: BOOLEAN;
@@ -43,11 +43,10 @@ TYPE
 		BEGIN
 
 		CASE CHR(ucs) OF
-			"a", "A": BEGIN {EXCLUSIVE} animated := ~ animated; END; 
+			"a", "A": BEGIN {EXCLUSIVE} animated := ~ animated; END;
 			| "-" : anglez := anglez - 5.0; UpdateImage;
 			| "+" : anglez := anglez + 5.0; UpdateImage;
 			| "p": PrintVals;
-			| "s": SaveImage;
 			| "q" : Close;
 		ELSE
 
@@ -78,18 +77,6 @@ TYPE
 			Swap();
 			Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 		END UpdateImage;
-
-		PROCEDURE SaveImage;
-		VAR res: LONGINT;
-			fname: ARRAY 128 OF CHAR;
-		BEGIN
-
-		fname:="glstippletest.bmp";
-		IF WMDialogs.QueryString(" Save File name: ",fname)=WMDialogs.ResOk THEN
-				WMGraphics.StoreImage(img, fname,res);
-		END;
-
-		END SaveImage;
 
 		(* print  stipples bits *)
 		PROCEDURE PrintVals;
@@ -239,7 +226,7 @@ END GLWindow;
 
 VAR
 	nofWindows : LONGINT;
-	
+
 PROCEDURE Open*;
 VAR
 	window: GLWindow;

@@ -1,5 +1,5 @@
 MODULE NM3; (*! This module may be either imported or used anonymously *)
-IMPORT Base, SPSME, Noise, Math, Out := KernelLog, Debugging, Streams,Strings;
+IMPORT Base, SPSME, Noise, Math, TexVox, Out := KernelLog, Debugging, Streams,Strings;
 
 (*
 Special voxel containing 27 children arranged in a 3x3x3 grid.
@@ -91,7 +91,7 @@ BEGIN
 	END
 END r90z;
 
-PROCEDURE Shade (VAR ray: Ray);
+PROCEDURE Shade(VAR ray: Ray);
 VAR
 	pushxyz, newxyz, xyz: Base.PT;
 	ijk: Base.IPT;
@@ -101,9 +101,12 @@ VAR
 	vdepth, blainv: REAL;
 	last:BOOLEAN;
 	i,j: LONGINT;
+	patchray: Ray;
 	patchdx, patchdy: PT; 
-	patchradius: REAL;
+	patchradiusx, patchradiusy: REAL;
 BEGIN
+	ray.lastclr:=ray.clr;
+	ray.lastlxyz:=ray.lxyz;
 	ray.scale := ray.scale*M;
 	xyz.x := ABS(ray.lxyz.x-offset.x) * M;  
 	xyz.y := ABS(ray.lxyz.y-offset.y) * M;		
@@ -111,46 +114,39 @@ BEGIN
 	pushxyz:=xyz;
 	IF (ray.length*ray.scale>ray.dtl) THEN
 		IF imposter#NIL THEN
-			ray.lastclr:=ray.clr;
 			imposter.Shade(ray);
-			IF ~ray.patched THEN
-				ray.patched:=TRUE;
-				patchradius:=Math.sin(ray.dtheta);
-				patchdx.x := ray.rightxyz.x*patchradius; patchdx.y := ray.rightxyz.y*patchradius; patchdx.z := ray.rightxyz.z*patchradius; 
-				patchdy.x := ray.downxyz.x*patchradius; patchdx.y := ray.downxyz.y*patchradius; patchdx.z := ray.downxyz.z*patchradius; 
-				FOR i:= 0 TO 2 DO
-					FOR j:= 0 TO 2 DO
-						ray.clr:=ray.lastclr;
-						ray.lxyz.x := ray.lxyz.x + (i-1)*patchdx.x + (j-1)*patchdy.x;
-						ray.lxyz.y :=  ray.lxyz.y+ (i-1)*patchdx.y + (j-1)*patchdy.y;
-						ray.lxyz.z := 	 ray.lxyz.z + (i-1)*patchdx.z + (j-1)*patchdy.z;		
-						imposter.Shade(ray);
-						ray.patch[i,j]:=ray.clr					
-					END
-				END					
-			END
 		ELSIF nposterTF THEN
 			ray.normalTF:=TRUE;
 			ray.normal:=nposter.normal;
-			ray.lastclr:=ray.clr;
 			nshade(nposter,ray);
-			IF ~ray.patched THEN
+		END;
+		IF ray.terminate THEN (* should always be true unless maybe the imposter is translucent lol *)			
+			IF ray.ispatchTF & ~ray.patched THEN
 				ray.patched:=TRUE;
-				patchradius:=Math.sin(ray.dtheta);
-				patchdx.x := ray.rightxyz.x*patchradius; patchdx.y := ray.rightxyz.y*patchradius; patchdx.z := ray.rightxyz.z*patchradius; 
-				patchdy.x := ray.downxyz.x*patchradius; patchdx.y := ray.downxyz.y*patchradius; patchdx.z := ray.downxyz.z*patchradius; 
+				ray.scale:=ray.scale/M;
+				patchradiusx:=Math.sin(ray.dtheta)*ray.length; 
+				patchradiusy:=Math.sin(ray.dphi)*ray.length; 
+				patchdx.x := ray.rightxyz.x*patchradiusx; patchdx.y := ray.rightxyz.y*patchradiusx; patchdx.z := ray.rightxyz.z*patchradiusx; 
+				patchdy.x := ray.downxyz.x*patchradiusy; patchdx.y := ray.downxyz.y*patchradiusy; patchdx.z := ray.downxyz.z*patchradiusy; 
 				FOR i:= 0 TO 2 DO
 					FOR j:= 0 TO 2 DO
 						ray.clr:=ray.lastclr;
-						ray.lxyz.x := ray.lxyz.x + i*patchdx.x + j*patchdy.x;
-						ray.lxyz.y :=  ray.lxyz.y+ i*patchdx.y + j*patchdy.y;
-						ray.lxyz.z := 	 ray.lxyz.z + i*patchdx.z + j*patchdy.z;		
-						nshade(nposter,ray);
-						ray.patch[i,j]:=ray.clr					
+						ray.terminate:=FALSE;
+						ray.lxyz.x := ray.lastlxyz.x + (i-1)*patchdx.x + (j-1)*patchdy.x;
+						ray.lxyz.y :=  ray.lastlxyz.y+ (i-1)*patchdx.y + (j-1)*patchdy.y;
+						ray.lxyz.z := 	 ray.lastlxyz.z + (i-1)*patchdx.z + (j-1)*patchdy.z;	
+						Shade(ray);
+						IF ~ray.terminate THEN (* miss out *)
+							(* convert ray.lxyz that missed to ray.xyz and reshoot *)
+							Base.world.Shade(ray)
+						END;
+						ray.patch[i,j]:=ray.clr;	
+					(*	ray.patch[i,j].b:=1;	*)
 					END
-				END					
+				END;
+				ray.terminate:=TRUE;				
 			END
-		END			
+		END
 	ELSE	
 		SPSME.E(xyz,ijk);
 		bounds(ijk.i,ijk.j,ijk.k,out);
@@ -166,43 +162,33 @@ BEGIN
 				xyz.x := xyz.x + ray.popdelta.x;    
 				xyz.y := xyz.y + ray.popdelta.y;
 				xyz.z := xyz.z + ray.popdelta.z;
-				IF ~ray.patched THEN
-					ray.patched:=TRUE;
-					patchradius:=Math.sin(ray.dtheta);
-					patchdx.x := ray.rightxyz.x*patchradius; patchdx.y := ray.rightxyz.y*patchradius; patchdx.z := ray.rightxyz.z*patchradius; 
-					patchdy.x := ray.downxyz.x*patchradius; patchdx.y := ray.downxyz.y*patchradius; patchdx.z := ray.downxyz.z*patchradius; 
-					FOR i:= 0 TO 2 DO
-						FOR j:= 0 TO 2 DO
-							ray.clr:=ray.lastclr;
-							ray.lxyz.x := ray.lxyz.x + i*patchdx.x + j*patchdy.x;
-							ray.lxyz.y :=  ray.lxyz.y+ i*patchdx.y + j*patchdy.y;
-							ray.lxyz.z := 	 ray.lxyz.z + i*patchdx.z + j*patchdy.z;		
-							imposter.Shade(ray);
-							ray.patch[i,j]:=ray.clr					
-						END
-					END					
-				END
 			ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
-				ray.lastclr:=ray.clr;
 				nshade(nblox[ijk.i,ijk.j,ijk.k],ray);				
-				IF ~ray.patched THEN
-					ray.patched:=TRUE;
-					patchradius:=Math.sin(ray.dtheta);
-					patchdx.x := ray.rightxyz.x*patchradius; patchdx.y := ray.rightxyz.y*patchradius; patchdx.z := ray.rightxyz.z*patchradius; 
-					patchdy.x := ray.downxyz.x*patchradius; patchdx.y := ray.downxyz.y*patchradius; patchdx.z := ray.downxyz.z*patchradius; 
-					FOR i:= 0 TO 2 DO
-						FOR j:= 0 TO 2 DO
-							ray.clr:=ray.lastclr;
-							ray.lxyz.x := ray.lxyz.x + i*patchdx.x + j*patchdy.x;
-							ray.lxyz.y :=  ray.lxyz.y+ i*patchdx.y + j*patchdy.y;
-							ray.lxyz.z := 	 ray.lxyz.z + i*patchdx.z + j*patchdy.z;		
-							nshade(nposter,ray);
-							ray.patch[i,j]:=ray.clr					
-						END
+			END;
+		IF ray.terminate THEN (* should always be true unless maybe the imposter is translucent lol *)			
+			IF ray.ispatchTF & ~ray.patched THEN
+				ray.patched:=TRUE;
+				ray.scale:=ray.scale/M;
+				patchradiusx:=Math.sin(ray.dtheta)*ray.length; 
+				patchradiusy:=Math.sin(ray.dphi)*ray.length; 
+				patchdx.x := ray.rightxyz.x*patchradiusx; patchdx.y := ray.rightxyz.y*patchradiusx; patchdx.z := ray.rightxyz.z*patchradiusx; 
+				patchdy.x := ray.downxyz.x*patchradiusy; patchdx.y := ray.downxyz.y*patchradiusy; patchdx.z := ray.downxyz.z*patchradiusy; 
+				FOR i:= 0 TO 2 DO
+					FOR j:= 0 TO 2 DO
+						ray.clr:=ray.lastclr;
+						ray.terminate:=FALSE;
+						ray.xyz.x := ray.xyz.x + (i-1)*patchdx.x + (j-1)*patchdy.x;
+						ray.xyz.y :=  ray.xyz.y+ (i-1)*patchdx.y + (j-1)*patchdy.y;
+						ray.xyz.z := 	 ray.xyz.z + (i-1)*patchdx.z + (j-1)*patchdy.z;		
+						Shade(ray);
+						ray.patch[i,j]:=ray.clr;	
+					(*	ray.patch[i,j].b:=1;	*)
 					END
-				END					
+				END;
+				ray.terminate:=TRUE;				
 			END
 		END
+		END		
 	END;	 
 	IF ~ray.terminate THEN
 		REPEAT
@@ -285,48 +271,37 @@ BEGIN
 						ray.normalTF:=FALSE;
 						ray.normal:=ray.fnormal;						
 					END;
-					ray.lastclr:=ray.clr;
 					v.Shade(ray);
 					xyz.x := xyz.x + ray.popdelta.x;    
 					xyz.y := xyz.y + ray.popdelta.y;
 					xyz.z := xyz.z + ray.popdelta.z;	
-					IF ~ray.patched THEN
-						ray.patched:=TRUE;
-						patchradius:=Math.sin(ray.dtheta);
-						patchdx.x := ray.rightxyz.x*patchradius; patchdx.y := ray.rightxyz.y*patchradius; patchdx.z := ray.rightxyz.z*patchradius; 
-						patchdy.x := ray.downxyz.x*patchradius; patchdx.y := ray.downxyz.y*patchradius; patchdx.z := ray.downxyz.z*patchradius; 
-						FOR i:= 0 TO 2 DO
-							FOR j:= 0 TO 2 DO
-								ray.clr:=ray.lastclr;
-								ray.lxyz.x := ray.lxyz.x + i*patchdx.x + j*patchdy.x;
-								ray.lxyz.y :=  ray.lxyz.y+ i*patchdx.y + j*patchdy.y;
-								ray.lxyz.z := 	 ray.lxyz.z + i*patchdx.z + j*patchdy.z;		
-								imposter.Shade(ray);
-								ray.patch[i,j]:=ray.clr					
-							END
-						END					
-					END
 				ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
-					ray.lastclr:=ray.clr;
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);	
-					IF ~ray.patched THEN
-						ray.patched:=TRUE;
-						patchradius:=Math.sin(ray.dtheta);
-						patchdx.x := ray.rightxyz.x*patchradius; patchdx.y := ray.rightxyz.y*patchradius; patchdx.z := ray.rightxyz.z*patchradius; 
-						patchdy.x := ray.downxyz.x*patchradius; patchdx.y := ray.downxyz.y*patchradius; patchdx.z := ray.downxyz.z*patchradius; 
-						FOR i:= 0 TO 2 DO
-							FOR j:= 0 TO 2 DO
-								ray.clr:=ray.lastclr;
-								ray.lxyz.x := ray.lxyz.x + i*patchdx.x + j*patchdy.x;
-								ray.lxyz.y :=  ray.lxyz.y+ i*patchdx.y + j*patchdy.y;
-								ray.lxyz.z := 	 ray.lxyz.z + i*patchdx.z + j*patchdy.z;		
-								nshade(nposter,ray);
-								ray.patch[i,j]:=ray.clr					
-							END
-						END					
-					END	
 				END;
-			END;
+		IF ray.terminate THEN (* should always be true unless maybe the imposter is translucent lol *)			
+			IF ray. ispatchTF & ~ray.patched THEN
+				ray.patched:=TRUE;
+				ray.scale:=ray.scale/M;
+				patchradiusx:=Math.sin(ray.dtheta)*ray.length; 
+				patchradiusy:=Math.sin(ray.dphi)*ray.length; 
+				patchdx.x := ray.rightxyz.x*patchradiusx; patchdx.y := ray.rightxyz.y*patchradiusx; patchdx.z := ray.rightxyz.z*patchradiusx; 
+				patchdy.x := ray.downxyz.x*patchradiusy; patchdx.y := ray.downxyz.y*patchradiusy; patchdx.z := ray.downxyz.z*patchradiusy; 
+				FOR i:= 0 TO 2 DO
+					FOR j:= 0 TO 2 DO
+						ray.clr:=ray.lastclr;
+						ray.terminate:=FALSE;
+						ray.xyz.x := ray.xyz.x + (i-1)*patchdx.x + (j-1)*patchdy.x;
+						ray.xyz.y :=  ray.xyz.y+ (i-1)*patchdx.y + (j-1)*patchdy.y;
+						ray.xyz.z := 	ray.xyz.z + (i-1)*patchdx.z + (j-1)*patchdy.z;		
+						Shade(ray);
+						ray.patch[i,j]:=ray.clr;	
+					(*	ray.patch[i,j].b:=1;	*)
+					END
+				END;
+				ray.terminate:=TRUE;				
+			END
+		END
+		END
 		UNTIL out OR ray.terminate;
 	END;
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
@@ -340,24 +315,28 @@ VAR
 	dr,dg,db,mix,dot,dot1,dot2: REAL;
 	light: Base.Light;	
 BEGIN
-	dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z); 
-	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-	mix:=ray.length*ray.scale/10;
-	IF mix>1 THEN mix:=1 END;
-	dot:=mix*dot1+(1-mix)*dot2;
-	dr:=nc.color.red*dot*ray.clr.ra;
-	dg:=nc.color.green*dot*ray.clr.ga;
-	db:=nc.color.blue*dot*ray.clr.ba;	
-	ray.clr.r := ray.clr.r + dr;
-	ray.clr.g := ray.clr.g + dg;
-	ray.clr.b := ray.clr.b + db;	
-	ray.clr.ra:=ray.clr.ra-dr;
-	ray.clr.ga:=ray.clr.ga-dg;
-	ray.clr.ba:=ray.clr.ba-db;
-	ray.clr.r := ray.clr.r + nc.color.red * ray.clr.ra*dot;
-	ray.clr.g := ray.clr.g + nc.color.green * ray.clr.ga*dot;
-	ray.clr.b := ray.clr.b + nc.color.blue * ray.clr.ba*dot; 	
-	ray.terminate:=TRUE
+	IF texture#NIL THEN
+		texture.Shade(ray)
+	ELSE
+		dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z); 
+		dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
+		mix:=ray.length*ray.scale/10;
+		IF mix>1 THEN mix:=1 END;
+		dot:=mix*dot1+(1-mix)*dot2;
+		dr:=nc.color.red*dot*ray.clr.ra;
+		dg:=nc.color.green*dot*ray.clr.ga;
+		db:=nc.color.blue*dot*ray.clr.ba;	
+		ray.clr.r := ray.clr.r + dr;
+		ray.clr.g := ray.clr.g + dg;
+		ray.clr.b := ray.clr.b + db;	
+		ray.clr.ra:=ray.clr.ra-dr;
+		ray.clr.ga:=ray.clr.ga-dg;
+		ray.clr.ba:=ray.clr.ba-db;
+		ray.clr.r := ray.clr.r + nc.color.red * ray.clr.ra*dot;
+		ray.clr.g := ray.clr.g + nc.color.green * ray.clr.ga*dot;
+		ray.clr.b := ray.clr.b + nc.color.blue * ray.clr.ba*dot; 	
+		ray.terminate:=TRUE
+	END
 END nshade;
 
 PROCEDURE reflect(VAR p: PT; n: PT);

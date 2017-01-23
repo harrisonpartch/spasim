@@ -53,7 +53,7 @@ BEGIN
 	Base.setPT(worldcenter,1/2,1/2,1/2);
 	cx:=1/3; cy:=1/2; cz:=1/2;
 	fisheye:=1;
-	GLIDE:=0.98;
+	GLIDE:=0.985;
 	hop;
 END init;
 
@@ -217,8 +217,8 @@ PROCEDURE up (ph: REAL);
 BEGIN
 	cvu:=cvu+ph;
 	cameraphi := cameraphi + cvu;
-	IF cameraphi > 1.61 THEN cameraphi := 1.61 END;
-	IF cameraphi < -1.61 THEN cameraphi := -1.61 END
+	IF cameraphi > 1.51 THEN cameraphi := 1.61 END;
+	IF cameraphi < -1.51 THEN cameraphi := -1.61 END
 END up;
 
 PROCEDURE tick;
@@ -237,7 +237,7 @@ BEGIN
 	d:=Retina.fward.x*0.0021; e:=Retina.fward.y*0.0021;  f:=Retina.fward.z*0.0021;
 	Base.updatecamera(cx,cy,cz,a,b,c,d,e,f);
 	IF avaTF THEN Marsh.drawavatar END;
-	GLIDE:=0.90;
+	GLIDE:=0.98;
 	cvz := cvz*GLIDE+gravityvector.z;
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y;
 	cvl :=cvl*0.5; cvu := cvu*0.5; 
@@ -273,6 +273,7 @@ VAR
 	warpvent,rlock: BOOLEAN;
 	saccade: BOOLEAN;
 	mstarget: INTEGER;
+	mainloopgo: BOOLEAN;
 
 PROCEDURE &openwincam(W,H: INTEGER);
 BEGIN
@@ -285,7 +286,8 @@ BEGIN
 	RWcentery:=100+(H DIV 2);
      WM.LoadCursor("blankrecticle.png", 3,3, pi);
 	SetPointerInfo(pi);
-	mstarget:=60;
+	mstarget:=21;
+	mainloopgo:= TRUE;
 END openwincam;
 
 PROCEDURE uncapture;
@@ -307,8 +309,8 @@ BEGIN
 	CASE ucs OF
 		   27: uncapture
 		| 164: uncapture; Close; Base.worldalive:=FALSE
-		| 193: INC(mstarget);  INC(mstarget);  INC(mstarget);  INC(mstarget); Out.Int(framedt,4); Out.Ln
-		| 194: DEC(mstarget); DEC(mstarget); DEC(mstarget); DEC(mstarget); Out.Int(framedt,4); Out.Ln
+		| 193: INC(Base.PRO); Out.Int(Base.PRO,4); Out.Ln
+		| 194: DEC(Base.PRO); Out.Int(Base.PRO,4); Out.Ln
 (*		| 195: camera.left(0.03)
 		| 196: camera.left(-0.03)
 *)		| 195: Base.DTL:= Base.DTL*2/3;
@@ -333,7 +335,7 @@ BEGIN
 			| "3" : Base.gravity:= Base.gravity/1.5
 			| "4" : Base.gravity:= 1.5*Base.gravity
 			| "5" : Base.STOPGO; Retina.PATCH:= ~Retina.PATCH;
-			| "6" : avaTF:=~avaTF
+			| "6" : BEGIN{EXCLUSIVE} mainloopgo:=~mainloopgo END; avaTF:=~avaTF
 			| "?" : Out.Int(Base.world.count(7),4); Out.Ln
 			| "h" : camera.hop
 			| "]": camera.aperture.width := camera.aperture.width * 101/99; camera.aperture.height := camera.aperture.height *101/99;
@@ -346,7 +348,7 @@ BEGIN
 			| "8": Base.cursordist:=Base.cursordist/1.3
 			| "l": Marsh.lines:=~Marsh.lines
 			| "b": Marsh.showcode;
-			| "=": uncapture;
+			| "=": Out.Int(framedt,5); Out.Ln;;
 			| "+": uncapture; Close;	
 			| " ": rlock:= ~rlock
 			| "-": Out.Int(framedt,4); Out.Ln
@@ -382,7 +384,7 @@ BEGIN
 	IF CAPTURE THEN
 			mousedx:=x-mousepreviousx;
 			mousedy:=y-mousepreviousy;
-			IF (mousedx+mousedy)>50 THEN saccade:=TRUE ELSE saccade:=FALSE END;
+			IF (mousedx+mousedy)>30 THEN saccade:=TRUE ELSE saccade:=FALSE END;
 			IF ~rlock THEN
 				camera.up(-mousedy*ABS(mousedy)/(10000*upsticky)); 
 				camera.left(mousedx*ABS(mousedx)/(10000*leftsticky))
@@ -403,21 +405,21 @@ BEGIN
 END WheelMove;
 
 PROCEDURE detail();
-	BEGIN
-		IF saccade THEN 
-			Retina.saccade:=TRUE
-		ELSE	
-			Retina.saccade:=FALSE;
-			IF framedt < mstarget THEN
-				 timer.Sleep(mstarget-framedt - 10); 
-				Retina.moredetail; 
-			ELSIF framedt > (mstarget+10) THEN
-				Retina.lessdetail; 
-			END
- END 
+BEGIN
+	IF saccade THEN 
+		Retina.saccade:=TRUE
+	ELSE	
+		Retina.saccade:=FALSE;
+		IF framedt < mstarget THEN
+		(*	Retina.moredetail; *)
+			ftimer.Sleep(10);
+(*		ELSIF framedt > (mstarget+10) THEN
+			Retina.lessdetail; 
+*)		END
+	END;
 END detail;
 
-	BEGIN {ACTIVE}
+	BEGIN {ACTIVE, PRIORITY(Objects.Normal)}
 		NEW(rand);
 		foveasize := 100;
 		multicore:=TRUE;
@@ -436,17 +438,23 @@ END detail;
 		upsticky:=10.0;
 		Out.String('*line 1217!*');
 		msd:=30;		
-		NEW(timer);
+		NEW(ftimer);
 		REPEAT
-			Retina.image := backImg;
+			Retina.image := backImg; 
+	(*		Retina.fimage:=img;*)
 			t1:=Kernel.GetTicks();
-			camera.tick;
-			framedt:=Kernel.GetTicks()-t1;	
-			detail;
-			Swap; 
-			Invalidate(Rectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
+			IF mainloopgo THEN 
+				camera.tick;
+				framedt:=Kernel.GetTicks()-t1;	
+				IF framedt < mstarget THEN 
+					ftimer.Sleep(3); 
+					framedt:=Kernel.GetTicks()-t1;
+				END;			
+				Swap; 
+				Invalidate(Rectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
+			END;
 			IF CAPTURE THEN 
-				WarpMouse.warp(500,500); (* WarpMouse.warp(500+bounds.l,500+bounts.t); *)
+			(* 	WarpMouse.warp(500,500); *) WarpMouse.warp(500+bounds.l,500+bounds.t); 
 				mousepreviousx:=500; 
 				mousepreviousy:=500;
 			END
@@ -484,7 +492,7 @@ rand: Random.Generator;
 	msd: REAL;
 	RW:  RayWindow;
 	RWcenterx, RWcentery,mousedx,mousedy: LONGINT;
-	timer: Kernel.Timer;
+	ftimer: Kernel.Timer;
 	key: CHAR;
 
 PROCEDURE speedup;

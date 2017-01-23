@@ -7,7 +7,7 @@ MODULE WMSpaceSim3;
 TYPE
 	KillerMsg = OBJECT
 	END KillerMsg;
-	
+
 TYPE
 	(* our space simulation window object *)
 	SpaceWindow = OBJECT(WMGL.Window)
@@ -40,7 +40,7 @@ TYPE
 		fname := "opengloberon/spaceship.3ds";
 		SetTitle(Strings.NewString(fname));
 		IF ~OnLoad() THEN Close; RETURN END;
-		UpdateImage();		
+		UpdateImage();
 	END New;
 
 	(* Used to initialize OpenGL and to setup our world *)
@@ -79,7 +79,7 @@ TYPE
 
 		(* If the last function returns -1 it means the file was not found so we exit from the program *)
 		IF (textureId = -1) THEN
-			KernelLog.String('Image file: spaceshiptexture.bmp not found'); KernelLog.Ln;			
+			KernelLog.String('Image file: spaceshiptexture.bmp not found'); KernelLog.Ln;
 			RETURN FALSE;
 		END;
 		DeActivate();
@@ -143,7 +143,7 @@ TYPE
 		ELSE Handle^(m)
 		END
 	END Handle;
-			
+
 	PROCEDURE DrawObjectVert(object: ML.Object3D );
 		VAR  i: LONGINT;
 	BEGIN
@@ -209,8 +209,8 @@ TYPE
 			GL.PolygonMode (GLC.GL_FRONT_AND_BACK, GLC.GL_FILL);  (* Polygon rasterization mode (polygon filled) *)
 		ELSE
 			GL.PolygonMode (GLC.GL_FRONT_AND_BACK, GLC.GL_LINE);  (* Polygon rasterization mode (polygon outlined) *)
-		END;	
-		
+		END;
+
 		GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT);  (* This clear the background color to dark blue *)
 		GL.MatrixMode(GLC.GL_MODELVIEW);  (* Modeling transformation *)
 		GL.LoadIdentity;  (* Initialize the model matrix as identity *)
@@ -265,7 +265,7 @@ END SpaceWindow;
 
 VAR
 	nofWindows : LONGINT;
-	
+
 (** Open window command procedure *)
 PROCEDURE Open*;
 VAR win : SpaceWindow;

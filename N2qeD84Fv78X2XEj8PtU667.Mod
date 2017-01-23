@@ -40,34 +40,16 @@ VAR
 	path: Path;
 PROCEDURE draw;
 BEGIN	 
-	bluedot:=Base.VoxelFromName("NM2");
-	reddot:=Base.VoxelFromName("NM2");
-	greendot:=Base.VoxelFromName("NM3");
-	Base.setPT(center,1/2,1/2,1/2);
-	rdot:=Base.VoxelFromName("Nreddot");  
-	bdot:=Base.VoxelFromName("Nbluedot");
-	gdot:=Base.VoxelFromName("Ngreendot");	
-	tblue:=Base.VoxelFromName("Ntblue");	
-	NEW(ball,center,0.45);	
-	ball.setvoxel(tblue);	
+	reddot:=Base.VoxelFromName("NM3");
+
 	NEW(ball,center,0.57);
-	ball.setvoxel(bdot);	
-	bluedot.FRaster(ball,16);
+
 	ball.setvoxel(NIL);	
 	ball.setcolor(1,1,1,1);
 	reddot.FRaster(ball,64);	
-	ball.setvoxel(NIL);	
-	ball.setcolor(1,1,1/2,1);	
-	greendot.FRaster(ball,81);	
-	NEW(shell,reddot,Base.mkPT(0,1,0),Base.mkPT(0,0,1),0.03,0.01);
-	FOR i:=0 TO 100 DO
-		Base.randsphPT(p,n,center,0.45);
-		reddot.stroke(p,16, bluedot);
-		Base.randsphPT(p,n,center,0.45);
-		reddot.stroke(p,16,bdot);
-	END;	
-	greendot.copyonstroke:=TRUE;
-	greendot.DTL:=200;
+	reddot.texture:=rdot;
+
+
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;

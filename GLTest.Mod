@@ -993,5 +993,5 @@ GLTest.Quadric ~
 
 SystemTools.Free GLTest  GLContextFB  ~
 
-SystemTools.FreeDownTo OpenGL ~ 
+SystemTools.FreeDownTo OpenGL ~
 

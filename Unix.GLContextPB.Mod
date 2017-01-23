@@ -32,11 +32,12 @@ TYPE Context* = OBJECT
 		res: LONGINT;
 		att: POINTER TO  ARRAY OF GL.Int;
 	  	dumy1, dumy2: LONGINT;
+	  	defwin: X11.Window;
 	BEGIN
-		NEW(glWin);	
+		NEW(glWin);
 		glWin.width := w; glWin.height := h;
 		Machine.Acquire( Machine.X11 );
-		
+
 	(*  get a connection *)
 		glWin.display := X11.OpenDisplay(0);
 		IF glWin.display =0 THEN
@@ -61,7 +62,7 @@ TYPE Context* = OBJECT
 		att[4] := GLC.GLX_STENCIL_SIZE;	att[5] := 8;
 		att[6] := GLC.GLX_RED_SIZE;  	att[7] := 8;
 		att[8] := GLC.GLX_GREEN_SIZE;	att[9] := 8;
-		att[10] := GLC.GLX_RED_SIZE;	att[11] := 8;
+		att[10] := GLC.GLX_BLUE_SIZE;	att[11] := 8;
 		att[12] := 0 ;
 
 		doublebuffered := TRUE;
@@ -79,8 +80,9 @@ TYPE Context* = OBJECT
 			 	KernelLog.String("visualInfoPtr.screen ");  KernelLog.Int(glWin.visualInfoPtr.screen, 0); KernelLog.Ln;
 			 END;
 		END;
-
-		glWin.pixmap := X11.CreatePixmap(glWin.display, X11.DefaultRootWindow(glWin.display), w, h, glWin.visualInfoPtr.depth);
+		
+		defwin := X11.DefaultRootWindow(glWin.display);
+		glWin.pixmap := X11.CreatePixmap(glWin.display, defwin, w, h, glWin.visualInfoPtr.depth);
 		IF glWin.pixmap = 0 THEN
 			Machine.Release( Machine.X11 );
 			KernelLog.String(" glWin.pixmap ERROR"); KernelLog.Ln;
@@ -88,7 +90,7 @@ TYPE Context* = OBJECT
 			RETURN;
 		END;
 
-		glWin.glxpixmap := GL.glXCreateGLXPixmap(glWin.display,glWin.visualInfoPtr, glWin.pixmap);
+		glWin.glxpixmap := GL.glXCreateGLXPixmap(glWin.display, glWin.visualInfoPtr, glWin.pixmap);
 
 		IF glWin.glxpixmap = 0 THEN
 			Machine.Release( Machine.X11 );
@@ -172,7 +174,7 @@ TYPE Context* = OBJECT
 
 		Machine.Release( Machine.X11 );
  	END CloseWindow;
-	
+
 	(** *)
 	PROCEDURE CreatePixmaps(w, h: LONGINT): BOOLEAN;
 	VAR
@@ -215,7 +217,7 @@ TYPE Context* = OBJECT
 	BEGIN
 		RETURN glWin.width;
 	END GetWidth;
-	
+
 	PROCEDURE GetHeight*(): LONGINT;
 	BEGIN
 		RETURN glWin.height;
@@ -235,7 +237,7 @@ TYPE Context* = OBJECT
 	BEGIN
 		RETURN 0; (*context.glWin.screen*)
 	END GetScreen;
-	
+
 	PROCEDURE Resize*(w, h: LONGINT);
 	BEGIN
 		buffer := NIL;
@@ -300,7 +302,7 @@ TYPE Context* = OBJECT
 		END;
  		Machine.Release( Machine.X11 );
 	END SwapBuffers;
-	
+
 	(** *)
 	PROCEDURE Info;
 	VAR res: LONGINT;

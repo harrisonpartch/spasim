@@ -273,7 +273,7 @@ VAR
 	undo,rd, rdpseudosolid, blu, die,gren,granite,sand,whiteblock,lazy,pdestroyer,axolotl,xen,sky1,sky2,tigerlily,cloud: Voxel;
 	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison,fuse:Voxel;
 	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,
-	w3,z3,z3a,z2,z2a,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp,acidcats, badopossum, raccoon: Voxel;
+	w3,z3,z3a,z2,z4,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp,acidcats, badopossum, raccoon: Voxel;
 	ball: FRep.sphere;
 	noise: FRep.noise;	 
 BEGIN
@@ -285,10 +285,11 @@ BEGIN
   	w10:=Base.VoxelFromName("NM3");	
  	z10:=Base.VoxelFromName("NM2");	
 	w3:=Base.VoxelFromName("NM3");	 
+	z2:=Base.VoxelFromName("NM2");
 	z3:=Base.VoxelFromName("NM3");	
 	z3a:=Base.VoxelFromName("NM4");	
-	z2:=Base.VoxelFromName("NM2");
-	z2a:=Base.VoxelFromName("NM3");	
+	z4:=Base.VoxelFromName("NM4");	
+	
 	harrison:=Base.VoxelFromName("Nharrisonavatar"); 
 	push(harrison);
 	doge:=Base.VoxelFromName("Ndogepearl"); 
@@ -298,7 +299,8 @@ BEGIN
 (*     floop:=Base.VoxelFromName("NFLOOP");  
      push(floop);
 *) 
-	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX666"); 	
+	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX666"); 
+	push(serp);	
 	badopossum:=Base.VoxelFromName("Nbadopossum"); 	
 	raccoon:=Base.VoxelFromName("Nraccoon"); 	
 	push(treeserp);	
@@ -417,7 +419,7 @@ BEGIN
 	tigerlily:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  				
 	push(tigerlily);	
 	NEW(noise);		
-	noise.seed:=33666;		
+	noise.seed:=777666;		
 	noise.a:=1;
 	noise.b:=1;
 	noise.c:=1;		
@@ -432,17 +434,20 @@ BEGIN
 	Base.setPT(center,1/2,1/2,1/2);
 	NEW(ball,center,0.6);  
 	serp.passable:=FALSE;   
-	noise.setvoxel(conglomerate);	
-	reddot.tscale:=128;
-	ball.setvoxel(axolotl);
+	noise.setvoxel(reddot);	
+	reddot.tscale:=10;
+	ball.setvoxel(serp);
 	Base.setPT(center,1/2,1/2,9/12);
 	NEW(plane,center,up);
-	plane.vox:=rat;	
+	plane.vox:=reddot;	
 	rat.tscale:=16;
-	z2a.FRaster(plane,64);  
-	z2a.FRaster(ball,32); 	
-	z2a.FRaster(noise,32); 
- 	Base.world:=z2a; 	
+
+	z3.FRaster(noise,27); 
+	z3.FRaster(plane,27);  
+	z3.FRaster(ball,27); 	
+
+	Base.world:=z3; 	
+	
 	Base.avatar:=harrison;
 	Base.avatarsize:=1000; 
 END dawn;

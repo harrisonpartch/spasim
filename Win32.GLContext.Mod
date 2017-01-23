@@ -8,7 +8,7 @@ CONST
 
 CONST
 	WMSetup = User32.WMUser + 1;
-	
+
 CONST
 	opDoubleBuffered = 0;
 	opStereo = 1;
@@ -37,7 +37,7 @@ TYPE
 		res: BOOLEAN;
 		buffer: Buffer;	(* for speedup flip image in y*)
 		mode: Raster.Mode;
-		
+
     	PROCEDURE Init*(w, h: LONGINT);
     	BEGIN  {EXCLUSIVE}
     		wincreated := FALSE;
@@ -48,17 +48,17 @@ TYPE
 
     		glWin.title:="GLContext.Window";
 		glWin.context := SELF;
-		
+
     		NEW(buffer, w*h*4);
 		Raster.InitMode(mode, Raster.srcCopy);
     		initialized := TRUE;
-    		
+
 		AWAIT (wincreated);
     	END Init;
-	
+
 	PROCEDURE Close*();
 	VAR res: LONGINT;
-	BEGIN 
+	BEGIN
 		 wincreated := FALSE;
 		res := User32.SendMessage(glWin.hWind, User32.WMQuit, 0, 0);
 		IF debug THEN KernelLog.String("Close SendMessage res = "); KernelLog.Int(res, 0); KernelLog.Ln; END;
@@ -68,7 +68,7 @@ TYPE
 	BEGIN
 		RETURN glWin.width;
 	END GetWidth;
-	
+
 	PROCEDURE GetHeight*(): LONGINT;
 	BEGIN
 		RETURN glWin.height;
@@ -94,9 +94,9 @@ TYPE
 		buffer := NIL;
 		NEW(buffer, w*h*4);
 		MoveResizeWindow(0,0, w, h);
-		glWin.width := w; glWin.height := h;		
+		glWin.width := w; glWin.height := h;
 	END Resize;
-		
+
 	PROCEDURE MakeCurrent*();
 	BEGIN
 		res := GL.wglMakeCurrent(glWin.hDC, glWin.hGLRC);
@@ -138,19 +138,19 @@ TYPE
 	 	 	GL.Flush();
 		END;
 	END SwapBuffers;
-	
+
 	(* handler for this context's window *)
 	PROCEDURE WindowHandler( uMsg: LONGINT;  wParam: User32.WParam;
 													  lParam: User32.LParam ): User32.LResult;
 	BEGIN
 		CASE uMsg OF
-			User32.WMQuit: 
+			User32.WMQuit:
 			IF debug THEN KernelLog.String("Get WMQuit message"); KernelLog.Ln; END;
 			CloseWindow(glWin);
 			RETURN 1;
 		ELSE
 		END;
-		RETURN User32.DefWindowProc(glWin.hWind, uMsg, wParam, lParam );  
+		RETURN User32.DefWindowProc(glWin.hWind, uMsg, wParam, lParam );
 	END WindowHandler;
 
 	PROCEDURE MyLoop;
@@ -172,8 +172,8 @@ TYPE
 		LOOP
 
 			(* Check for new window messages *)
-			IF User32.GetMessage(msg, 0, 0, 0) # 0 THEN 
-				IF msg.message=User32.WMClose THEN					
+			IF User32.GetMessage(msg, 0, 0, 0) # 0 THEN
+				IF msg.message=User32.WMClose THEN
 						EXIT;
 				ELSE
 					res := User32.DispatchMessage(msg);
@@ -290,7 +290,7 @@ VAR
     END;
 
 
-    
+
     (* Do we have a window *)
     IF glWin.hWind # 0 THEN
         (* Destroy the window *)
@@ -306,7 +306,7 @@ VAR
         glWin.Instance := Kernel32.NULL;
         IF debug THEN KernelLog.String("unregister class .."); KernelLog.Ln; END;
     END;
-		
+
 	IF debug THEN KernelLog.String("CloseWindow Ok."); KernelLog.Ln; END;
 	END CloseWindow;
 
@@ -377,7 +377,7 @@ END CreateGLRC;
 
 PROCEDURE {WINAPI} WindowProc( wnd: User32.HWND;  uMsg: LONGINT;  wParam: User32.WParam;
 															    lParam: User32.LParam ): User32.LResult;
-VAR 
+VAR
 	glWin: WindowStruct;
 	context: Context;
 	ret: Kernel32.BOOL;
@@ -390,7 +390,7 @@ BEGIN
 
 
 	CASE uMsg OF
-		 User32.WMCreate:			 	
+		 User32.WMCreate:
 			SYSTEM.GET( lParam, glWin );  wParam := SYSTEM.VAL( User32.WParam, glWin );
 			lParam := SYSTEM.VAL( User32.LParam, glWin.context );
 			ret := User32.PostMessage( wnd, WMSetup, wParam, lParam );

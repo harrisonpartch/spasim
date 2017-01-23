@@ -28,17 +28,14 @@ BEGIN
 	depth:=Base.dist(ray.lxyz,exit);
 	dr := r*depth*ray.clr.ra;
 	dg := g*depth*ray.clr.ga;
-	db := b*depth*ray.bla;
+	db := b*depth*ray.clr.ba;
 	dbl:=black*depth;
-	ray.r := ray.r + dr;
-	ray.g := ray.g + dg;
-	ray.b := ray.b + db; 
-	ray.ra := (ray.ra - dr);
-	ray.ga := (ray.ga - dg);
-	ray.ba := (ray.ba - db); 
-	ray.bla:=ray.bla-dbl;
-	ray.alpha:=ray.alpha-alpha;
-	IF (ray.bla<0.1) OR (ray.alpha<0.1) THEN ray.terminate:=TRUE END;
+	ray.clr.r := ray.clr.r + dr;
+	ray.clr.g := ray.clr.g + dg;
+	ray.clr.b := ray.clr.b + db; 
+	ray.clr.ra := (ray.clr.ra - dr);
+	ray.clr.ga := (ray.clr.ga - dg);
+	ray.clr.ba := (ray.clr.ba - db); 
 END Shade;
 
 END TransparaVox;  
@@ -57,30 +54,20 @@ BEGIN
 	bpossum:=Base.VoxelFromName("Nbadopossum"); 
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	red:=Base.VoxelFromName("Ndiffusered"); 
-	reddot:=Base.VoxelFromName("Ndiffusereddot"); 
+	reddot:=Base.VoxelFromName("Nreddot"); 
 	gmdot:=Base.VoxelFromName("Nr3kPtbyEYLFK3AN2UUVrqg"); 	
 	NEW(s0);
 	NEW(s1);
 	NEW(s2);
 	s2.setcolor(0,0,0,1/3,1/3);
 	NEW(alphablue);
-	alphablue.setcolor(0,0,1/5,1/12,1/15);
+	alphablue.setcolor(0,0,1,1/12,1/15);
 
-	s0.fillsierp(s0,s1);	
-	s0.imposter:=raccoon;
+	s0.fillsierp(s0,red);	
+	s0.imposter:=reddot;
 	s0.copyonstroke:=TRUE;
-	s0.DTL:=5;
-	
-	s1.fillsierp(s1,alphablue);	
-	s1.imposter:=red;
-	s1.copyonstroke:=TRUE;
-	s1.DTL:=5;
-	s1.passable:=FALSE;
 
-	s2.fillsierp(alphablue,s2);	
-	s2.blox[1,1,1]:=gmdot;
-	s2.imposter:=gmdot;
-	s2.copyonstroke:=TRUE;
+
 
 	RETURN s0
 END thisvox;
