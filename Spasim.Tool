@@ -22,7 +22,7 @@ RotaVox.Mod
 NCompiler.Mod
 NanonyPET.Mod
 Marsh.Mod
-Render.Mod ~
+OGLRender.Mod ~
 
 NCompiler.ncompile  <== Middle mouse click on this
 
@@ -38,4 +38,6 @@ Snowfall2.Mod
 
 
 SystemTools.FreeDownTo  Base ~   <== Don't worry about this
+
+OpenGL.Tool
 
