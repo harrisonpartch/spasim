@@ -128,19 +128,13 @@ BEGIN
 			ELSE
 			END;
 			ray.terminate := TRUE; 
-			ray.r:=0;
-			ray.g:=0;
-			ray.b :=0;		
+			ray.clr.r:=0;
+			ray.clr.g:=0;
+			ray.clr.b :=0;		
 		ELSE
-			ray.r := ray.r + ray.bla*dot;
-			ray.g := ray.g + ray.bla*dot;
-			ray.b := ray.b + ray.bla*dot; 
 			ray.terminate:=TRUE;
 		END 
 	ELSE 
-		ray.r := ray.r + ray.bla*dot;
-		ray.g := ray.g + ray.bla*dot;
-		ray.b := ray.b + ray.bla*dot; 
 		ray.terminate:=TRUE;
 	END;
 END Shade;

@@ -160,9 +160,9 @@ BEGIN
 	Out.Int(ENTIER(ray.clr.b*255),4);	
 	Out.Ln;
 	p:=ray.hitxyz;
-	p.x:=p.x+ray.dxyz.x/1000000;
-	p.y:=p.y+ray.dxyz.y/1000000;
-	p.z:=p.z+ray.dxyz.z/1000000;
+	p.x:=p.x+ray.dxyz.x/1000;
+	p.y:=p.y+ray.dxyz.y/1000;
+	p.z:=p.z+ray.dxyz.z/1000;
 	Base.cursorPT:=p; 	
 	stroke(p,cursorsize,marshv.vox)
 END snipeinto;
@@ -286,8 +286,8 @@ BEGIN
  	z10:=Base.VoxelFromName("NM2");	
 	w3:=Base.VoxelFromName("NM3");	 
 	z2:=Base.VoxelFromName("NM2");
-	z3:=Base.VoxelFromName("NM3");	
-	z3a:=Base.VoxelFromName("NM4");	
+	z3:=Base.VoxelFromName("NM2");	
+	z3a:=Base.VoxelFromName("NM3");	
 	z4:=Base.VoxelFromName("NM4");	
 	
 	harrison:=Base.VoxelFromName("Nharrisonavatar"); 
@@ -419,7 +419,7 @@ BEGIN
 	tigerlily:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  				
 	push(tigerlily);	
 	NEW(noise);		
-	noise.seed:=777666;		
+	noise.seed:=666555;		
 	noise.a:=1;
 	noise.b:=1;
 	noise.c:=1;		
@@ -435,17 +435,17 @@ BEGIN
 	NEW(ball,center,0.6);  
 	serp.passable:=FALSE;   
 	noise.setvoxel(reddot);	
-	reddot.tscale:=10;
+	reddot.tscale:=0;
 	ball.setvoxel(serp);
 	Base.setPT(center,1/2,1/2,9/12);
 	NEW(plane,center,up);
 	plane.vox:=reddot;	
 	rat.tscale:=16;
 
-	z3.FRaster(noise,27); 
+	z3.setcolor(0,0,0,3,3);
 	z3.FRaster(plane,27);  
 	z3.FRaster(ball,27); 	
-
+	z3.FRaster(noise,64); 
 	Base.world:=z3; 	
 	
 	Base.avatar:=harrison;

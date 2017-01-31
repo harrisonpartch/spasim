@@ -286,7 +286,7 @@ BEGIN
 	RWcentery:=100+(H DIV 2);
      WM.LoadCursor("blankrecticle.png", 3,3, pi);
 	SetPointerInfo(pi);
-	mstarget:=21;
+	mstarget:=30;
 	mainloopgo:= TRUE;
 END openwincam;
 
@@ -334,7 +334,7 @@ BEGIN
 			| "2" : Marsh.darken
 			| "3" : Base.gravity:= Base.gravity/1.5
 			| "4" : Base.gravity:= 1.5*Base.gravity
-			| "5" : Base.STOPGO; Retina.PATCH:= ~Retina.PATCH;
+			| "5" : Retina.PATCH:= ~Retina.PATCH;
 			| "6" : BEGIN{EXCLUSIVE} mainloopgo:=~mainloopgo END; avaTF:=~avaTF
 			| "?" : Out.Int(Base.world.count(7),4); Out.Ln
 			| "h" : camera.hop
@@ -411,11 +411,10 @@ BEGIN
 	ELSE	
 		Retina.saccade:=FALSE;
 		IF framedt < mstarget THEN
-		(*	Retina.moredetail; *)
-			ftimer.Sleep(10);
-(*		ELSIF framedt > (mstarget+10) THEN
+			Retina.moredetail; 
+		ELSIF framedt > (mstarget+5) THEN
 			Retina.lessdetail; 
-*)		END
+		END
 	END;
 END detail;
 
