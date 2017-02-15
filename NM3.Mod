@@ -104,6 +104,7 @@ VAR
 	patchray: Ray;
 	patchdx, patchdy: PT;
 	patchradiusx, patchradiusy: REAL;
+	lastlength:REAL;
 BEGIN
 	ray.lastclr:=ray.clr;
 	ray.lastlxyz:=ray.lxyz;
@@ -123,7 +124,8 @@ BEGIN
 		IF ray.terminate THEN (* should always be true unless maybe the imposter is translucent lol *)
 			IF ray.ispatchTF & ~ray.patched THEN
 				ray.patched:=TRUE;
-				ray.scale:=ray.scale/M;
+				ray.lastclr:=ray.clr;
+				lastlength:=ray.length;
 				patchradiusx:=Math.sin(ray.dtheta)*ray.length;
 				patchradiusy:=Math.sin(ray.dphi)*ray.length;
 				patchdx.x := ray.rightxyz.x*patchradiusx; patchdx.y := ray.rightxyz.y*patchradiusx; patchdx.z := ray.rightxyz.z*patchradiusx;
@@ -131,20 +133,15 @@ BEGIN
 				FOR i:= 0 TO 2 DO
 					FOR j:= 0 TO 2 DO
 						ray.clr:=ray.lastclr;
+						ray.length:=lastlength;
 						ray.terminate:=FALSE;
 						ray.lxyz.x := ray.lastlxyz.x + (i-1)*patchdx.x + (j-1)*patchdy.x;
 						ray.lxyz.y :=  ray.lastlxyz.y+ (i-1)*patchdx.y + (j-1)*patchdy.y;
 						ray.lxyz.z := 	 ray.lastlxyz.z + (i-1)*patchdx.z + (j-1)*patchdy.z;
 						Shade(ray);
-						IF ~ray.terminate THEN (* miss out *)
-							(* convert ray.lxyz that missed to ray.xyz and reshoot *)
-							Base.world.Shade(ray)
-						END;
 						ray.patch[i,j]:=ray.clr;
-					(*	ray.patch[i,j].b:=1;	*)
 					END
 				END;
-				ray.terminate:=TRUE;
 			END
 		END
 	ELSE
@@ -168,7 +165,8 @@ BEGIN
 		IF ray.terminate THEN (* should always be true unless maybe the imposter is translucent lol *)
 			IF ray.ispatchTF & ~ray.patched THEN
 				ray.patched:=TRUE;
-				ray.scale:=ray.scale/M;
+				ray.lastclr:=ray.clr;
+				lastlength:=ray.length;
 				patchradiusx:=Math.sin(ray.dtheta)*ray.length;
 				patchradiusy:=Math.sin(ray.dphi)*ray.length;
 				patchdx.x := ray.rightxyz.x*patchradiusx; patchdx.y := ray.rightxyz.y*patchradiusx; patchdx.z := ray.rightxyz.z*patchradiusx;
@@ -176,16 +174,15 @@ BEGIN
 				FOR i:= 0 TO 2 DO
 					FOR j:= 0 TO 2 DO
 						ray.clr:=ray.lastclr;
+						ray.length:=lastlength;
 						ray.terminate:=FALSE;
 						ray.xyz.x := ray.xyz.x + (i-1)*patchdx.x + (j-1)*patchdy.x;
 						ray.xyz.y :=  ray.xyz.y+ (i-1)*patchdx.y + (j-1)*patchdy.y;
 						ray.xyz.z := 	 ray.xyz.z + (i-1)*patchdx.z + (j-1)*patchdy.z;
 						Shade(ray);
 						ray.patch[i,j]:=ray.clr;
-					(*	ray.patch[i,j].b:=1;	*)
 					END
 				END;
-				ray.terminate:=TRUE;
 			END
 		END
 		END
@@ -294,7 +291,8 @@ BEGIN
 		IF ray.terminate THEN (* should always be true unless maybe the imposter is translucent lol *)
 			IF ray. ispatchTF & ~ray.patched THEN
 				ray.patched:=TRUE;
-				ray.scale:=ray.scale/M;
+				ray.lastclr:=ray.clr;
+				lastlength:=ray.length;
 				patchradiusx:=Math.sin(ray.dtheta)*ray.length;
 				patchradiusy:=Math.sin(ray.dphi)*ray.length;
 				patchdx.x := ray.rightxyz.x*patchradiusx; patchdx.y := ray.rightxyz.y*patchradiusx; patchdx.z := ray.rightxyz.z*patchradiusx;
@@ -302,13 +300,13 @@ BEGIN
 				FOR i:= 0 TO 2 DO
 					FOR j:= 0 TO 2 DO
 						ray.clr:=ray.lastclr;
+						ray.length:=lastlength;
 						ray.terminate:=FALSE;
 						ray.xyz.x := ray.xyz.x + (i-1)*patchdx.x + (j-1)*patchdy.x;
 						ray.xyz.y :=  ray.xyz.y+ (i-1)*patchdx.y + (j-1)*patchdy.y;
 						ray.xyz.z := 	ray.xyz.z + (i-1)*patchdx.z + (j-1)*patchdy.z;
 						Shade(ray);
 						ray.patch[i,j]:=ray.clr;
-					(*	ray.patch[i,j].b:=1;	*)
 					END
 				END;
 				ray.terminate:=TRUE;

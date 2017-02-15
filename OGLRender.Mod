@@ -69,9 +69,9 @@ END aperjust;
 PROCEDURE hop;
 BEGIN
 	stop;
-	cx :=cx+Base.rand.Uniform()/500-1/1000; 
-	cy :=cy+Base.rand.Uniform()/500-1/1000; 
-	cz :=cz+Base.rand.Uniform()/500-1/1000; 
+	cx :=cx+Base.rand.Uniform()/50-1/100; 
+	cy :=cy+Base.rand.Uniform()/50-1/100; 
+	cz :=cz+Base.rand.Uniform()/50-1/100; 
 END hop;
 
 PROCEDURE move;
@@ -328,7 +328,7 @@ BEGIN
 	leftsticky:=10.0;
 	upsticky:=10.0;	
 	Out.String('*line 1217!*');
-	msd:=30;
+	msd:=40;
 END OnLoad;
 
 PROCEDURE Reshape(w, h: LONGINT);
@@ -590,14 +590,14 @@ END KeyEvent;
 			programs[10] := InitShader("passthroughVS.glsl", "sharpenFS.glsl");
 			programs[11] := InitShader("passthroughVS.glsl", "nightVisionFS.glsl");
 			programs[12] := InitShader("weirdVS.glsl", "passthroughFS.glsl");
-			curprogram := 0;
+			curprogram := 6;
 			  
 		RETURN TRUE;
 	END InitGL;
 
 	PROCEDURE Display();
 	BEGIN
-		IF ~splashscreen THEN	camera.tick; END;
+		IF ~splashscreen THEN	camera.tick; END; 
 		GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT) ;
 		
 		GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height,  0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr);
@@ -610,9 +610,9 @@ END KeyEvent;
 	(* change detail according to frame speed, called in GLWindow.MainLoop *)
 	PROCEDURE GameLogic();
 	BEGIN
-		IF GetCurrentFrameMs() <20 THEN 
+		IF GetCurrentFrameMs() < 25 THEN 
 			Retina.moredetail;
-		ELSIF GetCurrentFrameMs() >30 THEN 
+		ELSIF GetCurrentFrameMs() > 35 THEN 
 			Retina.lessdetail;
 		END; 
 	END GameLogic;

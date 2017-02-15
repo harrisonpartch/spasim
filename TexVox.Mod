@@ -237,40 +237,16 @@ BEGIN
 		(*all other color with alpha is simply ignored for now *)				
 	ELSIF ray.ispatchTF & ~ray.patched THEN
 		(* this *will terminate, so we can build the patch now*)	
-		ray.patched:=TRUE;
-		patchradius:=Math.sin(ray.dphi)*ray.length*(Base.PRO); 
-		mip:=ray.length*ray.scale/12;
-		FOR i:= 0 TO 2 DO
-			FOR j:= 0 TO 2 DO
-				IF mip> 3 THEN 	
-					color:=texcube.side[ray.face].pixelmip_zero(lx+(i-1)*patchradius,ly+(j-1)*patchradius);
-				ELSIF mip>2 THEN
-					color:=texcube.side[ray.face].pixelmip_one(lx+(i-1)*patchradius,ly+(j-1)*patchradius);
-				ELSE
-					color:=texcube.side[ray.face].pixelmip_two(lx+(i-1)*patchradius,ly+(j-1)*patchradius);		
-				END; 		
-				dr:=color.red*dot;
-				dg:=color.green*dot;
-				db:=color.blue*dot;	
-				pclr.r := ray.clr.r + dr*ray.clr.ra;
-				pclr.g := ray.clr.g + dg*ray.clr.ga;
-				pclr.b := ray.clr.b + db*ray.clr.ba;	
-				ray.patch[i,j]:=pclr;	
-				ray.patch[i,j].b:=1;	
-			END
-		END;
 		ray.terminate:=TRUE;								
 	ELSE 
 		mip:=ray.length*ray.scale/12;
-(*		IF mip>7 THEN 	
+		IF mip>7 THEN 	
 			color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
 		ELSIF mip>4 THEN
 			color:=texcube.side[ray.face].pixelmip_one(lx,ly);
 		ELSE
 			color:=texcube.side[ray.face].pixelmip_two(lx,ly);		
 		END; 	
-*)		
-		color:=texcube.side[ray.face].pixelmip_two(lx,ly);
 		dr:=color.red*dot;
 		dg:=color.green*dot;
 		db:=color.blue*dot;	

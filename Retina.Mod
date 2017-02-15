@@ -6,10 +6,10 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=5;        
-	TS=3*32;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
+	T=4;        
+	TS=3*16;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
 	TW=8;
-	TH=6;
+	TH=8;
 	W*=TS*TW;
 	H*=TS*TH;
 	CX=W DIV 2;
@@ -76,20 +76,17 @@ BEGIN
 	Base.world.Shade(ray);
 	IF ~ray.terminate THEN
 		ray.clr.b:= ray.clr.b + ray.clr.ba;
-		ray.clr.r:= ray.clr.r + ray.clr.ra/4;
-		ray.clr.g:= ray.clr.g + ray.clr.ga/4;
-		Raster.SetRGB(pixel,ENTIER(ray.clr.r*200),ENTIER(ray.clr.g*200),ENTIER(ray.clr.b*200)); 
+		ray.clr.r:= ray.clr.r + ray.clr.ra/3;
+		ray.clr.g:= ray.clr.g + ray.clr.ga/3;
+		Raster.SetRGB(pixel,ENTIER(ray.clr.r*200),ENTIER(ray.clr.g*200),ENTIER(ray.clr.b*255)); 
 		Raster.Fill(image,cam.imx,cam.imy,cam.imx+3,cam.imy+3,pixel,copy)		
-	ELSIF ray.patched THEN
+	ELSE 
 		FOR i:= 0 TO 2 DO
 			FOR j :=  0 TO 2 DO 
 				Raster.SetRGB(pixel,ENTIER(ray.patch[i,j].r*255),ENTIER(ray.patch[i,j].g*255),ENTIER(ray.patch[i,j].b*255)); 
 				Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy)
 			END
 		END
-	ELSE
-		Raster.SetRGB(pixel,ENTIER(ray.clr.r*200),ENTIER(ray.clr.g*200),ENTIER(ray.clr.b*200)); 
-		Raster.Fill(image,cam.imx,cam.imy,cam.imx+3,cam.imy+3,pixel,copy)
 	END
 END tessa;
 

@@ -65,9 +65,9 @@ END aperjust;
 PROCEDURE hop;
 BEGIN
 	stop;
-	cx :=cx+Base.rand.Uniform()/50-1/100;
-	cy :=cy+Base.rand.Uniform()/50-1/100;
-	cz :=cz+Base.rand.Uniform()/50-1/100;
+	cx :=cx+Base.rand.Uniform()/5-1/10;
+	cy :=cy+Base.rand.Uniform()/5-1/10;
+	cz :=cz+Base.rand.Uniform()/5-1/10;
 END hop;
 
 PROCEDURE move;

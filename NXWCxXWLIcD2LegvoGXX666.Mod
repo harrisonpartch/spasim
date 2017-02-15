@@ -61,9 +61,9 @@ BEGIN
 	NEW(s2);
 	s2.setcolor(0,0,0,1/3,1/3);
 	NEW(alphablue);
-	alphablue.setcolor(0,0,1,1/12,1/15);
+	alphablue.setcolor(0,0,1,1,1);
 
-	s0.fillsierp(s0,red);	
+	s0.fillsierp(s0,bpossum);	
 	s0.imposter:=reddot;
 	s0.copyonstroke:=TRUE;
 

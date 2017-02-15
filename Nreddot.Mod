@@ -6,6 +6,6 @@ BEGIN
 	RETURN vox
 END thisvox;
 BEGIN
-	NEW(vox,'greenman.png');
+	NEW(vox,'armjourth.png');
 	vox.tscale:=10
 END Nreddot. 

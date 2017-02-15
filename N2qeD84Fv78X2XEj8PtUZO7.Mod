@@ -21,7 +21,6 @@ BEGIN
 	core:=Base.VoxelFromName("NM3"); 
 	reddot:=Base.VoxelFromName("Nreddot"); 
 	conglo.setcolor(10,100,10,100,1);	
-	conglo.copyonstroke:=TRUE;
 	NEW(ball,center,6/12);	
 		Base.setPT(center,1/2,1/2,1/2);
 		radius:=1/2;
@@ -38,21 +37,21 @@ BEGIN
 				END
 			END
 		END;
-		FOR i:= 0 TO 10 DO
+*)		FOR i:= 0 TO 100 DO
 			center:=Base.randPT();
 			radius:=Base.rand.Uniform()/28;
 			ball.reset(center,radius);
 			ball.setcolor(i/10, Base.rand.Uniform(),1-i/10,0);
-			cloud.FRaster(ball,27)
+			conglo.FRaster(ball,27)
 		END;
-*)		conglo.blox[0,1,1]:=conglo;
+(*		conglo.blox[0,1,1]:=conglo;
 		conglo.blox[1,0,1]:=conglo;		
 		conglo.blox[1,1,0]:=conglo;
 		conglo.blox[2,1,1]:=conglo;
 		conglo.blox[1,2,1]:=core;		
 		conglo.blox[1,1,2]:=conglo;
 		conglo.blox[1,1,1]:=core;
-		conglo.imposter:=cloud;		
+*)		conglo.imposter:=cloud;		
 		cloud.copyonstroke:= TRUE;		
 		conglo.copyonstroke:= TRUE;		
 		core.copyonstroke:= TRUE;		

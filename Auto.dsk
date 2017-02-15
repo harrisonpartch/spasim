@@ -13,11 +13,11 @@
 			</Tab>
 		</PETData>
 	</Window>
-	<Window name="PET" loader="PET.Restore" l="738" t="448" r="1538" b="1048" flags="{0..2,13}">
+	<Window name="PET" loader="PET.Restore" l="794" t="303" r="1594" b="903" flags="{0..2,13}">
 		<PETData>
-			<General SelectedPageNr="5" ProjectTextFile=""/>
+			<General SelectedPageNr="2" ProjectTextFile=""/>
 			<Tab file="/home/sr/spasim/Spasim.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="6" cursorPos="270"/>
+				<Editor firstLine="6" cursorPos="305"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
@@ -37,15 +37,8 @@
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="148" scratchHeight="5"/>
 			</Tab>
-			<Tab file="Render.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="0"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="178" scratchHeight="5"/>
-			</Tab>
 			<Tab file="Retina.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="0"/>
+				<Editor firstLine="0" cursorPos="313"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>

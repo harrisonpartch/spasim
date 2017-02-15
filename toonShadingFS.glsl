@@ -13,8 +13,8 @@ void main(void)
 {
 	vec3 color = texture2D(u_image, v_Texcoords).rgb;
 	float luminance = dot(color, W);
-	
-    float accumHor = 0.0;
+
+  float accumHor = 0.0;
 	float accumVert = 0.0;
 
 	for (int i = 0; i < KERNEL_WIDTH; ++i)
@@ -26,18 +26,18 @@ void main(void)
 			accumHor +=  dotProd * hor[i][j];
 			accumVert += dotProd * vert[i][j];
 		}
-	}	
+	}
 
 	float len = length(vec2(accumHor, accumVert));
-	if (len > 0.36)
+	if (len > 0.66)
 		gl_FragColor = vec4(vec3(0),1.0);
 	else
 	{
-		float quantize = 6.3;
-		color.rgb *= quantize;
-		color.rgb += vec3(0.5);
-		ivec3 irgb = ivec3(color.rgb);
-		color.rgb = vec3(irgb) / quantize;
+//	float quantize = 96.3;
+//		color.rgb *= quantize;
+//	color.rgb += vec3(0.5);
+//		ivec3 irgb = ivec3(color.rgb);
+//		color.rgb = vec3(irgb) / quantize;
 		gl_FragColor = vec4(vec3(color), 1.0);
 	}
 }
