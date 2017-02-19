@@ -559,6 +559,7 @@ VAR
 	defaultimg: Raster.Image;
 	hasher*:CryptoMD5.Hash;
 	PRO*: LONGINT;
+	patchx*, patchy*: LONGINT;
 (*	basesource*, texsound*, grainsound*: AL.ALuint;
 	listenerPos*: ARRAY [3] OF AL.ALfloat; (* global position *)
 	sourcePos: ARRAY 3 OF AL.ALfloat;
@@ -1179,6 +1180,8 @@ BEGIN
 	iterlimit := 500;
 	DTL:=3;	
 	PRO:=1;
+	patchx:=1;
+	patchy:=1;
 	Origin:=mkPT(0,0,0);   (* unneeded initialization *)
 	Face[0].x := -1; Face[0].y := 0; Face[0].z := 0; 
 	Face[3].x := 1; Face[3].y := 0; Face[3].z := 0; 

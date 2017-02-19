@@ -126,8 +126,8 @@ BEGIN
 				ray.patched:=TRUE;
 				ray.lastclr:=ray.clr;
 				lastlength:=ray.length;
-				patchradiusx:=Math.sin(ray.dtheta)*ray.length;
-				patchradiusy:=Math.sin(ray.dphi)*ray.length;
+				patchradiusx:=Math.sin(ray.dtheta)*ray.length*Base.patchx/10;
+				patchradiusy:=Math.sin(ray.dphi)*ray.length*Base.patchy/10;
 				patchdx.x := ray.rightxyz.x*patchradiusx; patchdx.y := ray.rightxyz.y*patchradiusx; patchdx.z := ray.rightxyz.z*patchradiusx;
 				patchdy.x := ray.downxyz.x*patchradiusy; patchdx.y := ray.downxyz.y*patchradiusy; patchdx.z := ray.downxyz.z*patchradiusy;
 				FOR i:= 0 TO 2 DO
@@ -135,9 +135,9 @@ BEGIN
 						ray.clr:=ray.lastclr;
 						ray.length:=lastlength;
 						ray.terminate:=FALSE;
-						ray.lxyz.x := ray.lastlxyz.x + (i-1)*patchdx.x + (j-1)*patchdy.x;
-						ray.lxyz.y :=  ray.lastlxyz.y+ (i-1)*patchdx.y + (j-1)*patchdy.y;
-						ray.lxyz.z := 	 ray.lastlxyz.z + (i-1)*patchdx.z + (j-1)*patchdy.z;
+						ray.xyz.x := ray.lastlxyz.x + (i-1)*patchdx.x + (j-1)*patchdy.x;
+						ray.xyz.y :=  ray.lastlxyz.y+ (i-1)*patchdx.y + (j-1)*patchdy.y;
+						ray.xyz.z := 	 ray.lastlxyz.z + (i-1)*patchdx.z + (j-1)*patchdy.z;
 						Shade(ray);
 						ray.patch[i,j]:=ray.clr;
 					END
@@ -167,8 +167,8 @@ BEGIN
 				ray.patched:=TRUE;
 				ray.lastclr:=ray.clr;
 				lastlength:=ray.length;
-				patchradiusx:=Math.sin(ray.dtheta)*ray.length;
-				patchradiusy:=Math.sin(ray.dphi)*ray.length;
+				patchradiusx:=Math.sin(ray.dtheta)*ray.length*Base.patchx/10;
+				patchradiusy:=Math.sin(ray.dphi)*ray.length*Base.patchy/10;
 				patchdx.x := ray.rightxyz.x*patchradiusx; patchdx.y := ray.rightxyz.y*patchradiusx; patchdx.z := ray.rightxyz.z*patchradiusx;
 				patchdy.x := ray.downxyz.x*patchradiusy; patchdx.y := ray.downxyz.y*patchradiusy; patchdx.z := ray.downxyz.z*patchradiusy;
 				FOR i:= 0 TO 2 DO
@@ -293,8 +293,8 @@ BEGIN
 				ray.patched:=TRUE;
 				ray.lastclr:=ray.clr;
 				lastlength:=ray.length;
-				patchradiusx:=Math.sin(ray.dtheta)*ray.length;
-				patchradiusy:=Math.sin(ray.dphi)*ray.length;
+				patchradiusx:=Math.sin(ray.dtheta)*ray.length*Base.patchx/10;
+				patchradiusy:=Math.sin(ray.dphi)*ray.length*Base.patchy/10;
 				patchdx.x := ray.rightxyz.x*patchradiusx; patchdx.y := ray.rightxyz.y*patchradiusx; patchdx.z := ray.rightxyz.z*patchradiusx;
 				patchdy.x := ray.downxyz.x*patchradiusy; patchdx.y := ray.downxyz.y*patchradiusy; patchdx.z := ray.downxyz.z*patchradiusy;
 				FOR i:= 0 TO 2 DO

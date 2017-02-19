@@ -367,16 +367,12 @@ VAR
 	key: CHAR;
 BEGIN
 	key:=CHR(ucs);
-	CASE ucs OF
-		 193: INC(Base.PRO); Out.Int(Base.PRO,4); Out.Ln
-		| 194: DEC(Base.PRO); Out.Int(Base.PRO,4); Out.Ln
-(*		| 195: camera.left(0.03)
-		| 196: camera.left(-0.03)
-*)		| 195: Base.DTL:= Base.DTL*2/3;
-		| 196: Base.DTL:= Base.DTL*3/2
-	ELSE
 		CASE CHR(ucs) OF		
-			   "s" : camera.forward(-0.51*Base.speed)
+			"S": INC(Base.patchy); Out.String("patchy "); Out.Int(Base.patchy,4); Out.Ln;
+			| "W": DEC(Base.patchy); Out.String("patchy "); Out.Int(Base.patchy,4); Out.Ln;
+			| "A": INC(Base.patchx); Out.String("patchx "); Out.Int(Base.patchx,4); Out.Ln;		
+			| "D": DEC(Base.patchx); Out.String("patchx "); Out.Int(Base.patchx,4); Out.Ln;		
+			|   "s" : camera.forward(-0.51*Base.speed)
 			| "w" :camera.forward(0.51*Base.speed) 
 			| "a" :camera.rightstrafe(-0.5*Base.speed)	
 			| "d" :camera.rightstrafe(0.5*Base.speed)
@@ -426,9 +422,7 @@ BEGIN
 			|	Inputs.KsF1:
 					Out.String("F1- Close"); Out.Ln;
 					(* Marsh.engrain; *)
-					Close();	
-					
-					
+					Close();				
 			| Inputs.KsF11: fullwindow:=~fullwindow; SetFullWindow(fullwindow); 
 			| Inputs.KsF2: Base.gravity:= -Base.gravity;
 
@@ -440,7 +434,6 @@ BEGIN
 				Out.String("keysym: "); Out.Hex(keysym,4); Out.Ln;
 			END;
 		END
-	END
 END KeyEvent;
 
 	PROCEDURE PointerDown(x, y: LONGINT; keys: SET);
