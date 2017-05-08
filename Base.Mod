@@ -1196,8 +1196,14 @@ BEGIN
 	blankray.scale := 1; 
 	blankray.tscale:=1;
 	blankray.dtl:=0.075;	
-	blankpray:=blankray;
-	blankpray.dtl:=0.075;
+	blankray.ispatchTF:=FALSE;
+	blankpray.clr.ra := 1;
+	blankpray.clr.ga := 1;
+	blankpray.clr.ba := 1;
+	blankpray.clr.alpha:=1;
+	blankpray.scale := 1; 
+	blankpray.tscale:=1;
+	blankpray.dtl:=0.075;	
 	blankpray.ispatchTF:=TRUE;
 	m2sdelta:=25;
 	m3sdelta:=25;

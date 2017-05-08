@@ -1,7 +1,7 @@
 <Desktop>
-	<Window name="FileManager" loader="WMFileManager.Restore" l="997" t="142" r="1638" b="538" flags="{0..2,13}"/>
 	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="1032" t="666" r="1672" b="1054" flags="{0..2,13}"/>
-	<Window name="PET" loader="PET.Restore" l="705" t="107" r="1505" b="707" flags="{0..2,13}">
+	<Window name="FileManager" loader="WMFileManager.Restore" l="997" t="142" r="1638" b="538" flags="{0..2,13}"/>
+	<Window name="PET" loader="PET.Restore" l="941" t="81" r="1741" b="681" flags="{0..2,13}">
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>
 			<Tab file="/home/sr/spasim/NM3.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
@@ -13,11 +13,11 @@
 			</Tab>
 		</PETData>
 	</Window>
-	<Window name="PET" loader="PET.Restore" l="794" t="303" r="1594" b="903" flags="{0..2,13}">
+	<Window name="PET" loader="PET.Restore" l="502" t="60" r="1357" b="1005" flags="{0..2,13}">
 		<PETData>
-			<General SelectedPageNr="2" ProjectTextFile=""/>
+			<General SelectedPageNr="0" ProjectTextFile=""/>
 			<Tab file="/home/sr/spasim/Spasim.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="6" cursorPos="305"/>
+				<Editor firstLine="0" cursorPos="470"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
@@ -31,21 +31,28 @@
 				<SidePanel visible="true" width="136" scratchHeight="5"/>
 			</Tab>
 			<Tab file="OGLRender.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="0"/>
+				<Editor firstLine="366" cursorPos="0"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="148" scratchHeight="5"/>
 			</Tab>
 			<Tab file="Retina.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="313"/>
+				<Editor firstLine="54" cursorPos="885"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<SearchPanel visible="true" wrap="true" casesensitive="true" backwards="false" highlight="false" searchString="blank" replaceString=""/>
 				<LogPanel height="130"/>
-				<SidePanel visible="true" width="133" scratchHeight="5"/>
+				<SidePanel visible="true" width="202" scratchHeight="5"/>
 			</Tab>
 			<Tab file="Marsh.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
 				<Editor firstLine="0" cursorPos="0"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="Base.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="1203" cursorPos="25604"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>

@@ -8,8 +8,8 @@ TYPE
 CONST
 	T=4;        
 	TS=3*16;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=8;
-	TH=8;
+	TW=12;
+	TH=12;
 	W*=TS*TW;
 	H*=TS*TH;
 	CX=W DIV 2;
@@ -24,7 +24,7 @@ TYPE Tile=OBJECT
 VAR
 	GO: BOOLEAN;
 	cam: Camera;
-		
+
 PROCEDURE & init;
 BEGIN
 
@@ -48,7 +48,14 @@ BEGIN
 	FOR i:= 0 TO 2 DO
 		phi:=cam.phi;
 		FOR j :=  0 TO 2 DO 
-			ray:=Base.blankray;
+			ray.clr.ra := 1;
+			ray.clr.ga := 1;
+			ray.clr.ba := 1;
+			ray.clr.alpha:=1;
+			ray.scale := 1; 
+			ray.tscale:=1;
+			ray.dtl:=0.075;	
+			ray.ispatchTF:=FALSE;		
 			angletoray(ray,theta,phi,dtheta,dphi);
 			Base.world.Shade(ray);
 			IF ~ray.terminate THEN
@@ -71,7 +78,16 @@ VAR
 	ray: Base.Ray;
 	pixel: Raster.Pixel;
 BEGIN
-	ray:=Base.blankpray;
+	ray.clr.ra := 1;
+	ray.clr.ga := 1;
+	ray.clr.ba := 1;
+	ray.clr.alpha:=1;
+	ray.scale := 1; 
+	ray.tscale:=1;
+	ray.dtl:=0.075;	
+	ray.patchdx:=Patchdx;
+	ray.patchdy:=Patchdy;
+	ray.ispatchTF:=TRUE;
 	angletoray(ray,cam.theta+cam.dtheta/2, cam.phi+cam.dphi/2, cam.dtheta/3,cam.dphi/3);	
 	Base.world.Shade(ray);
 	IF ~ray.terminate THEN
@@ -100,28 +116,28 @@ BEGIN
 	IF level<2 THEN
 			x:=a.imx - W/2;
 			y:=a.imy-H/2;		
-			IF PATCH & (~saccade)&((x*x+y*y)<FV) THEN	
+			IF (~saccade)&((x*x+y*y)<FV) THEN	
 				tessad3(a); 
 			ELSE
 				tessa(a); 
 			END;
 			x:=b.imx - W/2;
 			y:=b.imy-H/2;		
-			IF PATCH & (~saccade)&((x*x+y*y)<FV) THEN	
+			IF  (~saccade)&((x*x+y*y)<FV) THEN	
 				tessad3(b); 
 			ELSE
 				tessa(b); 			
 			END;			
 			x:=c.imx - W/2;
 			y:=c.imy-H/2;		
-			IF  PATCH & (~saccade)&((x*x+y*y)<FV) THEN		
+			IF  (~saccade)&((x*x+y*y)<FV) THEN		
 				tessad3(c); 
 			ELSE
 				tessa(c); 
 			END;
 			x:=d.imx - W/2;
 			y:=d.imy-H/2;		
-			IF PATCH & (~saccade)&((x*x+y*y)<FV) THEN	
+			IF  (~saccade)&((x*x+y*y)<FV) THEN	
 				tessad3(d); 
 			ELSE
 				tessa(d); 
@@ -161,7 +177,7 @@ BEGIN{ACTIVE, PRIORITY(Objects.Low)}
 		BEGIN{EXCLUSIVE}
 			AWAIT(GO);
 		END;
-		ztrace(cam,T);
+		IF PATCH THEN ztrace(cam,T) ELSE ztraced(cam,T) END;
 		BEGIN{EXCLUSIVE}
 			GO:=FALSE;
 			incTD;
@@ -216,7 +232,9 @@ VAR
 	FV: REAL;
 	copy: Raster.Mode;
 	PATCH*:BOOLEAN;
-
+	beamarray: ARRAY W+1,H+1 OF Ray;
+	Patchdx, Patchdy: REAL;
+	
 PROCEDURE reflect(VAR p: PT; n: PT);
 VAR 
 	a,b,c,dot: REAL;
@@ -368,8 +386,8 @@ BEGIN
 	dtheta:=apw/TW;
 	dphi:=aph/TH;
 	ctheta:=-apw/2;	
-	Base.blankpray.patchdx:=Math.sin(dtheta/3);
-	Base.blankpray.patchdy:=Math.sin(dphi/3);	
+	Patchdx:=Math.sin(dtheta/3);
+	Patchdy:=Math.sin(dphi/3);	
 	FOR i:= 0 TO TW-1  DO	
 		cphi:=-aph/2;
 		FOR j:= 0 TO TH-1 DO

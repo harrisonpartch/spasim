@@ -234,10 +234,7 @@ BEGIN
 	dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
 	IF color.alpha<0.99  THEN 
 			mirror(ray,mix)
-		(*all other color with alpha is simply ignored for now *)				
-	ELSIF ray.ispatchTF & ~ray.patched THEN
-		(* this *will terminate, so we can build the patch now*)	
-		ray.terminate:=TRUE;								
+		(*all other color with alpha is simply ignored for now *)										
 	ELSE 
 		mip:=ray.length*ray.scale/12;
 		IF mip>7 THEN 	

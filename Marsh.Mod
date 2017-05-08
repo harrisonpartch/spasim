@@ -351,7 +351,7 @@ BEGIN
   	push(dieone);   	
    	ash:=Base.VoxelFromName("NDQ0mOQYqpYYaLXJy4MS8BQ");	
   	push(ash);
-	dotz:=Base.VoxelFromName("Nahf6T7P6CYGfcImQTejDpg");	
+	dotz:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU666");	
 	btx:=Base.VoxelFromName("NVY1hEGnyr7z8DtULRMOZIQ");	
 	conglomerate:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7"); 			
 	
@@ -420,9 +420,9 @@ BEGIN
 	push(tigerlily);	
 	NEW(noise);		
 	noise.seed:=1234567890;		
-	noise.a:=1;
-	noise.b:=1;
-	noise.c:=1;		
+	noise.a:=2.5;
+	noise.b:=2.5;
+	noise.c:=2.5;		
 	noise.octaves:=4;
 
 	noise.persistence:=3.51;
@@ -436,7 +436,7 @@ BEGIN
 	serp.passable:=FALSE;   
 	noise.setvoxel(reddot);	
 	reddot.tscale:=0;
-	ball.setvoxel(conglomerate);
+	ball.setvoxel(dotz);
 	Base.setPT(center,1/2,1/2,9/12);
 	NEW(plane,center,up);
 	plane.vox:=reddot;	

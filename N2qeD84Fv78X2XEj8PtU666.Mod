@@ -8,26 +8,28 @@ TYPE Ray = Base.Ray;
 VAR 
 	ball: FRep.sphere;
 	cyl: FRep.hexgrid;
-	dot,bludot,sand,v: Voxel;
+	yellow,bludot,MCUBE,v: Voxel;
 	center, p1, p2,n:  PT;
 	i:LONGINT;
 	rand: Random.Generator;
 	vu: Voxel;
 	
 PROCEDURE draw;
+VAR
+	i: LONGINT;
 BEGIN
-	dot:=Base.VoxelFromName("NM3");
-	Base.setPT(center,1/2,1/2,1/2);
-	sand:=Base.VoxelFromName("NFLOOP");  
-	NEW(ball,center,8/12);	
-	ball.setvoxel(sand);		
-	dot.FRaster(ball,27);
-	dot.copyonstroke:=TRUE;	
+	yellow:=Base.VoxelFromName("NM3");
+	yellow.setcolor(1,1,0,0,1);
+   	MCUBE:=Base.VoxelFromName("Nr3kPtbyEYLFK3AN2UUVrqg");
+	FOR i:=0 TO 100 DO
+		yellow.stroke(Base.randPT(),9,MCUBE);
+	END;
+	yellow.copyonstroke:=TRUE;	
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN	
-	RETURN dot
+	RETURN yellow
 END thisvox;
 
 BEGIN 
