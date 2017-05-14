@@ -22,51 +22,6 @@ TYPE PT = Base.PT;
  	NCube=Base.NCube;
  	LCube=Base.LightCube;
 
-PROCEDURE rot90z(VAR blx: ARRAY 2,2,2 OF Voxel);
-VAR
-	b: ARRAY 2,2,2 OF Voxel;
-BEGIN
-	b[1,0,0]:= blx[0,0,0];
-	b[1,1,0]:= blx[1,0,0];
-	b[0,1,0]:= blx[1,1,0];
-	b[0,0,0]:= blx[0,1,0];
-	b[1,0,1]:= blx[0,0,1];
-	b[1,1,1]:= blx[1,0,1];
-	b[0,1,1]:= blx[1,1,1];
-	b[0,0,1]:= blx[0,1,1];
-	blx:=b;
-END rot90z;
-
-PROCEDURE rot90zB(VAR blx: ARRAY 2,2,2 OF BOOLEAN);
-VAR
-	b: ARRAY 2,2,2 OF BOOLEAN;
-BEGIN
-	b[1,0,0]:= blx[0,0,0];
-	b[1,1,0]:= blx[1,0,0];
-	b[0,1,0]:= blx[1,1,0];
-	b[0,0,0]:= blx[0,1,0];
-	b[1,0,1]:= blx[0,0,1];
-	b[1,1,1]:= blx[1,0,1];
-	b[0,1,1]:= blx[1,1,1];
-	b[0,0,1]:= blx[0,1,1];
-	blx:=b;
-END rot90zB;
-
-PROCEDURE rot90zNC(VAR blx: ARRAY 2,2,2 OF NCube);
-VAR
-	b: ARRAY 2,2,2 OF NCube;
-BEGIN
-	b[1,0,0]:= blx[0,0,0];
-	b[1,1,0]:= blx[1,0,0];
-	b[0,1,0]:= blx[1,1,0];
-	b[0,0,0]:= blx[0,1,0];
-	b[1,0,1]:= blx[0,0,1];
-	b[1,1,1]:= blx[1,0,1];
-	b[0,1,1]:= blx[1,1,1];
-	b[0,0,1]:= blx[0,1,1];
-	blx:=b;
-END rot90zNC;
-
 TYPE cell* = OBJECT(Voxel);
 VAR
 	blox*: ARRAY M,M,M OF Voxel;
@@ -75,21 +30,6 @@ VAR
 	nposterTF*:BOOLEAN;
 	nposter*: NCube;
 	light: Base.Light;
-
-PROCEDURE r90z;
-VAR i,j,k: INTEGER;
-BEGIN
-	rot90z(blox);
-	rot90zB(nbloxTF);
-	rot90zNC(nblox);
-	FOR i:=0 TO 1 DO
-		FOR j:=0 TO 1 DO
-			FOR k:=0 TO 1 DO
-				IF blox[i,j,k]#NIL THEN blox[i,j,k].r90z END
-			END
-		END
-	END
-END r90z;
 
 PROCEDURE Shade(VAR ray: Ray);
 VAR
@@ -101,11 +41,13 @@ VAR
 	vdepth, blainv: REAL;
 	last:BOOLEAN;
 	i,j: LONGINT;
-	patchray: Ray;
+	patchray,pray: Ray;
 	patchdx, patchdy: PT;
 	patchradiusx, patchradiusy: REAL;
+	lastlength:REAL;
 BEGIN
 	ray.lastclr:=ray.clr;
+	patchray:=ray;
 	ray.lastlxyz:=ray.lxyz;
 	ray.scale := ray.scale*M;
 	xyz.x := ABS(ray.lxyz.x-offset.x) * M;
@@ -120,33 +62,6 @@ BEGIN
 			ray.normal:=nposter.normal;
 			nshade(nposter,ray);
 		END;
-		IF ray.terminate THEN (* should always be true unless maybe the imposter is translucent lol *)
-			IF ray.ispatchTF & ~ray.patched THEN
-				ray.patched:=TRUE;
-				ray.scale:=ray.scale/M;
-				patchradiusx:=Math.sin(ray.dtheta)*ray.length;
-				patchradiusy:=Math.sin(ray.dphi)*ray.length;
-				patchdx.x := ray.rightxyz.x*patchradiusx; patchdx.y := ray.rightxyz.y*patchradiusx; patchdx.z := ray.rightxyz.z*patchradiusx;
-				patchdy.x := ray.downxyz.x*patchradiusy; patchdx.y := ray.downxyz.y*patchradiusy; patchdx.z := ray.downxyz.z*patchradiusy;
-				FOR i:= 0 TO 2 DO
-					FOR j:= 0 TO 2 DO
-						ray.clr:=ray.lastclr;
-						ray.terminate:=FALSE;
-						ray.lxyz.x := ray.lastlxyz.x + (i-1)*patchdx.x + (j-1)*patchdy.x;
-						ray.lxyz.y :=  ray.lastlxyz.y+ (i-1)*patchdx.y + (j-1)*patchdy.y;
-						ray.lxyz.z := 	 ray.lastlxyz.z + (i-1)*patchdx.z + (j-1)*patchdy.z;
-						Shade(ray);
-						IF ~ray.terminate THEN (* miss out *)
-							(* convert ray.lxyz that missed to ray.xyz and reshoot *)
-							Base.world.Shade(ray)
-						END;
-						ray.patch[i,j]:=ray.clr;
-					(*	ray.patch[i,j].b:=1;	*)
-					END
-				END;
-				ray.terminate:=TRUE;
-			END
-		END
 	ELSE
 		SPSME.E(xyz,ijk);
 		bounds(ijk.i,ijk.j,ijk.k,out);
@@ -165,29 +80,6 @@ BEGIN
 			ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 				nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
 			END;
-		IF ray.terminate THEN (* should always be true unless maybe the imposter is translucent lol *)
-			IF ray.ispatchTF & ~ray.patched THEN
-				ray.patched:=TRUE;
-				ray.scale:=ray.scale/M;
-				patchradiusx:=Math.sin(ray.dtheta)*ray.length;
-				patchradiusy:=Math.sin(ray.dphi)*ray.length;
-				patchdx.x := ray.rightxyz.x*patchradiusx; patchdx.y := ray.rightxyz.y*patchradiusx; patchdx.z := ray.rightxyz.z*patchradiusx;
-				patchdy.x := ray.downxyz.x*patchradiusy; patchdx.y := ray.downxyz.y*patchradiusy; patchdx.z := ray.downxyz.z*patchradiusy;
-				FOR i:= 0 TO 2 DO
-					FOR j:= 0 TO 2 DO
-						ray.clr:=ray.lastclr;
-						ray.terminate:=FALSE;
-						ray.xyz.x := ray.xyz.x + (i-1)*patchdx.x + (j-1)*patchdy.x;
-						ray.xyz.y :=  ray.xyz.y+ (i-1)*patchdx.y + (j-1)*patchdy.y;
-						ray.xyz.z := 	 ray.xyz.z + (i-1)*patchdx.z + (j-1)*patchdy.z;
-						Shade(ray);
-						ray.patch[i,j]:=ray.clr;
-					(*	ray.patch[i,j].b:=1;	*)
-					END
-				END;
-				ray.terminate:=TRUE;
-			END
-		END
 		END
 	END;
 	IF ~ray.terminate THEN
@@ -290,31 +182,8 @@ BEGIN
 					xyz.z := xyz.z + ray.popdelta.z;
 				ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
-				END;
-		IF ray.terminate THEN (* should always be true unless maybe the imposter is translucent lol *)
-			IF ray. ispatchTF & ~ray.patched THEN
-				ray.patched:=TRUE;
-				ray.scale:=ray.scale/M;
-				patchradiusx:=Math.sin(ray.dtheta)*ray.length;
-				patchradiusy:=Math.sin(ray.dphi)*ray.length;
-				patchdx.x := ray.rightxyz.x*patchradiusx; patchdx.y := ray.rightxyz.y*patchradiusx; patchdx.z := ray.rightxyz.z*patchradiusx;
-				patchdy.x := ray.downxyz.x*patchradiusy; patchdx.y := ray.downxyz.y*patchradiusy; patchdx.z := ray.downxyz.z*patchradiusy;
-				FOR i:= 0 TO 2 DO
-					FOR j:= 0 TO 2 DO
-						ray.clr:=ray.lastclr;
-						ray.terminate:=FALSE;
-						ray.xyz.x := ray.xyz.x + (i-1)*patchdx.x + (j-1)*patchdy.x;
-						ray.xyz.y :=  ray.xyz.y+ (i-1)*patchdx.y + (j-1)*patchdy.y;
-						ray.xyz.z := 	ray.xyz.z + (i-1)*patchdx.z + (j-1)*patchdy.z;
-						Shade(ray);
-						ray.patch[i,j]:=ray.clr;
-					(*	ray.patch[i,j].b:=1;	*)
-					END
-				END;
-				ray.terminate:=TRUE;
+				END
 			END
-		END
-		END
 		UNTIL out OR ray.terminate;
 	END;
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;

@@ -6,10 +6,10 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=4;        
-	TS=3*16;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=12;
-	TH=12;
+	T=5;        
+	TS=3*32;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
+	TW=9;
+	TH=9;
 	W*=TS*TW;
 	H*=TS*TH;
 	CX=W DIV 2;
@@ -54,16 +54,16 @@ BEGIN
 			ray.clr.alpha:=1;
 			ray.scale := 1; 
 			ray.tscale:=1;
-			ray.dtl:=0.075;	
+			ray.dtl:=0.031;	
 			ray.ispatchTF:=FALSE;		
 			angletoray(ray,theta,phi,dtheta,dphi);
 			Base.world.Shade(ray);
 			IF ~ray.terminate THEN
-				ray.clr.b:= ray.clr.b + ray.clr.ba;
-				ray.clr.r:= ray.clr.r + ray.clr.ra/2;
-				ray.clr.g:= ray.clr.g + ray.clr.ga/2
+				ray.clr.b:= ray.clr.b + ray.clr.ba/2;
+				ray.clr.r:= ray.clr.r + ray.clr.ra/3;
+				ray.clr.g:= ray.clr.g + ray.clr.ga/3
 			END;			
-			Raster.SetRGB(pixel,ENTIER(ray.clr.r*255),ENTIER(ray.clr.g*255),ENTIER(ray.clr.b*255)); 
+			Raster.SetRGB(pixel,ENTIER(ray.clr.r*250),ENTIER(ray.clr.g*250),ENTIER(ray.clr.b*250)); 
 			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
 			phi:=phi+dphi;
 		END;
@@ -84,26 +84,16 @@ BEGIN
 	ray.clr.alpha:=1;
 	ray.scale := 1; 
 	ray.tscale:=1;
-	ray.dtl:=0.075;	
-	ray.patchdx:=Patchdx;
-	ray.patchdy:=Patchdy;
-	ray.ispatchTF:=TRUE;
+	ray.dtl:=0.01;	
 	angletoray(ray,cam.theta+cam.dtheta/2, cam.phi+cam.dphi/2, cam.dtheta/3,cam.dphi/3);	
 	Base.world.Shade(ray);
 	IF ~ray.terminate THEN
 		ray.clr.b:= ray.clr.b + ray.clr.ba;
 		ray.clr.r:= ray.clr.r + ray.clr.ra/3;
 		ray.clr.g:= ray.clr.g + ray.clr.ga/3;
-		Raster.SetRGB(pixel,ENTIER(ray.clr.r*200),ENTIER(ray.clr.g*200),ENTIER(ray.clr.b*255)); 
-		Raster.Fill(image,cam.imx,cam.imy,cam.imx+3,cam.imy+3,pixel,copy)		
-	ELSE 
-		FOR i:= 0 TO 2 DO
-			FOR j :=  0 TO 2 DO 
-				Raster.SetRGB(pixel,ENTIER(ray.patch[i,j].r*255),ENTIER(ray.patch[i,j].g*255),ENTIER(ray.patch[i,j].b*255)); 
-				Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy)
-			END
-		END
-	END
+	END;
+	Raster.SetRGB(pixel,ENTIER(ray.clr.r*250),ENTIER(ray.clr.g*250),ENTIER(ray.clr.b*250)); 
+	Raster.Fill(image,cam.imx,cam.imy,cam.imx+3,cam.imy+3,pixel,copy)			
 END tessa;
 
 PROCEDURE ztrace(cam: Camera; level: INTEGER);
@@ -180,37 +170,11 @@ BEGIN{ACTIVE, PRIORITY(Objects.Low)}
 		IF PATCH THEN ztrace(cam,T) ELSE ztraced(cam,T) END;
 		BEGIN{EXCLUSIVE}
 			GO:=FALSE;
-			incTD;
+		incTD; 
 		END;
-		UNTIL ~Base.worldalive;
+		UNTIL ~Base.worldalive; 
 END Tile;
 
-(*TYPE antimalice=OBJECT
-VAR
-	timer: Kernel.Timer;
-PROCEDURE frameguaard;
-VAR
-	i:LONGINT;
-BEGIN
-	i:=0;
-	BEGIN{EXCLUSIVE} FRAMEBOORT:=FALSE END;
-	timer.Sleep(200);
-	BEGIN{EXCLUSIVE} FRAMEBOORT:=TRUE END
-END frameguaard;
-
-BEGIN{ACTIVE, PRIORITY(Objects.High)}
-	NEW(timer);
-	REPEAT
-		BEGIN{EXCLUSIVE}
-			AWAIT(FGUAARD);
-		END;
-		frameguaard;
-		BEGIN{EXCLUSIVE}
-			FGUAARD:=FALSE;
-		END;
-	UNTIL ~Base.worldalive;
-END antimalice;
-*)
 
 VAR
 	tile: ARRAY TW,TH OF Tile;
@@ -232,9 +196,6 @@ VAR
 	FV: REAL;
 	copy: Raster.Mode;
 	PATCH*:BOOLEAN;
-	beamarray: ARRAY W+1,H+1 OF Ray;
-	Patchdx, Patchdy: REAL;
-	
 PROCEDURE reflect(VAR p: PT; n: PT);
 VAR 
 	a,b,c,dot: REAL;
@@ -386,8 +347,6 @@ BEGIN
 	dtheta:=apw/TW;
 	dphi:=aph/TH;
 	ctheta:=-apw/2;	
-	Patchdx:=Math.sin(dtheta/3);
-	Patchdy:=Math.sin(dphi/3);	
 	FOR i:= 0 TO TW-1  DO	
 		cphi:=-aph/2;
 		FOR j:= 0 TO TH-1 DO
@@ -423,7 +382,7 @@ BEGIN
 		gotiles;
 		AWAIT((tilesdone=TW*TH) OR FRAMEBOORT)
 	END;
-	Raster.SetRGB(pixel,255,255,255);
+(*	Raster.SetRGB(pixel,255,255,255);
 	Raster.Put(image,CX+2,CY+2,pixel,copy);	
 	Raster.Put(image,CX-2,CY+2,pixel,copy);	
 	Raster.Put(image,CX-2,CY-2,pixel,copy);	
@@ -435,6 +394,7 @@ BEGIN
 	Raster.Put(image,CX+1,CY-1,pixel,copy);	
 (*	WMRasterScale.Scale(image, Rect.MakeRect(0,0,W,H), fimage, Rect.MakeRect(0,0,2*W-1,2*H-1), Rect.MakeRect(0,0,2*W,2*H),1,1);		
 *)	Base.tick;
+*)
 END go;
 
 PROCEDURE lsu*;
@@ -463,5 +423,5 @@ BEGIN
  	aperture.width:=1;
  	aperture.height:=1;
  	foveaparameter:=50;
- 	Out.String("loaded...");
+ 	Out.String("loaded...");	
 END Retina.

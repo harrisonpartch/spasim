@@ -12,8 +12,8 @@ BEGIN
 END thisvox;
 
 BEGIN
-	NEW(cv,"hexglass.png");
-	cv.passable:=TRUE;
+	NEW(cv,"leo.png");
+	cv.passable:=FALSE;
 	cv.tscale:=0;	
 END Nharrisonavatar. 
  

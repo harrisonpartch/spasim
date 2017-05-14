@@ -278,6 +278,7 @@ VAR
 	programs: ARRAY 13 OF Uint;
 	curprogram: Uint;
 	splashscreen, fullwindow: BOOLEAN;
+	mstarget: REAL;
 	
 PROCEDURE &openwincam(w,h: INTEGER);
 BEGIN
@@ -289,8 +290,8 @@ BEGIN
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
+	mstarget:=30;
 	
-	(* cmdlinerun := TRUE;*)
 END openwincam;
 
 (* called when idling *)
@@ -395,10 +396,10 @@ BEGIN
 			| "6" : avaTF:=~avaTF
 			| "h" : camera.hop	
 			| " " :  IF hidecursor THEN HideMousePointer(FALSE) ELSE HideMousePointer(TRUE) END; AVATAR:=~AVATAR;
-			| "]": camera.aperture.width := camera.aperture.width * 101/99; camera.aperture.height := camera.aperture.height *101/99;
-				(*    Out.String("] pressed"); Out.Ln; *)
-			| "[":  camera.aperture.width := camera.aperture.width * 99/101;  camera.aperture.height := camera.aperture.height *99/101;
-				(*Out.String("[ pressed"); Out.Ln;*)
+			| "]" : mstarget:= mstarget * 102/98; 
+			| "[" : mstarget:= mstarget * 98/102; 
+			| "}": camera.aperture.width := camera.aperture.width * 101/99; camera.aperture.height := camera.aperture.height *101/99;
+			| "{":  camera.aperture.width := camera.aperture.width * 99/101;  camera.aperture.height := camera.aperture.height *99/101;
 			| "9": IF Marsh.cursorsize<999999 THEN Marsh.cursorsize:=Marsh.cursorsize * 2; Base.cursordist:=Base.cursordist/2 END
 			| "0": IF Marsh.cursorsize>1 THEN Marsh.cursorsize:=Marsh.cursorsize DIV 2; Base.cursordist:=Base.cursordist*2 END
 			| "7": Base.cursordist:=Base.cursordist*1.3
@@ -464,8 +465,7 @@ END KeyEvent;
 			temporaljust := msd/GetCurrentFrameMs();
 			
 			xr := ENTIER((x-centerx)*temporaljust); yr :=ENTIER((y-centery)*temporaljust);
-		
-		
+			
 			IF CAPTUREMOUSE & (ABS(xr)+ABS(yr)>5) THEN
 				left:=ABS(xr)*xr;
 				up:=-ABS(yr)*yr; 
@@ -590,22 +590,21 @@ END KeyEvent;
 
 	PROCEDURE Display();
 	BEGIN
-		IF ~splashscreen THEN	camera.tick; END; 
-		GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT) ;
-		
+		camera.tick; 
+		GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT) ;	
 		GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height,  0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr);
 		GL.UseProgram(programs[curprogram]);
 			GL.DrawElements(GLC.GL_TRIANGLES, 6, GLC.GL_UNSIGNED_SHORT, 0);
-		GL.UseProgram(0);	
-		SwapBuffers();	
+		GL.UseProgram(0); 	
+		SwapBuffers();	 
 	END Display;
 
 	(* change detail according to frame speed, called in GLWindow.MainLoop *)
 	PROCEDURE GameLogic();
 	BEGIN
-		IF GetCurrentFrameMs() < 25 THEN 
+		IF GetCurrentFrameMs() < (mstarget-5) THEN 
 			Retina.moredetail;
-		ELSIF GetCurrentFrameMs() > 35 THEN 
+		ELSIF GetCurrentFrameMs() > mstarget THEN 
 			Retina.lessdetail;
 		END; 
 	END GameLogic;

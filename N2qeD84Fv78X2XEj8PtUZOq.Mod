@@ -26,7 +26,7 @@ END draw;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	RETURN avatar
+	RETURN dot
 END thisvox;
 
 BEGIN

@@ -51,7 +51,7 @@ VAR
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	raccoon:=Base.VoxelFromName("Nraccoon"); 
-	bpossum:=Base.VoxelFromName("Nbadopossum"); 
+	bpossum:=Base.VoxelFromName("Ndiffuseblue"); 
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	red:=Base.VoxelFromName("Ndiffusered"); 
 	reddot:=Base.VoxelFromName("Nreddot"); 
@@ -59,17 +59,16 @@ BEGIN
 	NEW(s0);
 	NEW(s1);
 	NEW(s2);
-	s2.setcolor(0,0,0,1/3,1/3);
 	NEW(alphablue);
-	alphablue.setcolor(0,0,1,1,1);
-
-	s0.fillsierp(s0,bpossum);	
-	s0.imposter:=reddot;
+	alphablue.setcolor(1/2,0,0,1/2,1/2);
+	s2.setcolor(1,0,0,1/3,1/3);
+	s2.fill(s0);
+	s2.passable:=FALSE;
+	s0.fillsierp(s0,alphablue);
+	s0.imposter:=bpossum;	
 	s0.copyonstroke:=TRUE;
 
-
-
-	RETURN s0
+	RETURN s2
 END thisvox;
  END NXWCxXWLIcD2LegvoGXX666. 
  

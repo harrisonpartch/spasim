@@ -303,7 +303,7 @@ BEGIN
 	push(serp);	
 	badopossum:=Base.VoxelFromName("Nbadopossum"); 	
 	raccoon:=Base.VoxelFromName("Nraccoon"); 	
-	push(treeserp);	
+	push(raccoon);	
  	gorge:=Base.VoxelFromName("NxxxGAernhjFK40xASZZVoQ"); 
 	push(gorge);
 	xot2:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 	
@@ -419,13 +419,13 @@ BEGIN
 	tigerlily:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  				
 	push(tigerlily);	
 	NEW(noise);		
-	noise.seed:=1234567890;		
-	noise.a:=2.5;
-	noise.b:=2.5;
-	noise.c:=2.5;		
+	noise.seed:=1534666690;		
+	noise.a:=3.5;
+	noise.b:=3.5;
+	noise.c:=3.5;		
 	noise.octaves:=4;
 
-	noise.persistence:=3.51;
+	noise.persistence:=3.21;
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,9/10);
@@ -434,7 +434,8 @@ BEGIN
 	Base.setPT(center,1/2,1/2,1/2);
 	NEW(ball,center,0.6);  
 	serp.passable:=FALSE;   
-	noise.setvoxel(reddot);	
+	noise.setvoxel(serp);	
+	etile2.passable:=FALSE;
 	reddot.tscale:=0;
 	ball.setvoxel(dotz);
 	Base.setPT(center,1/2,1/2,9/12);
@@ -446,13 +447,12 @@ BEGIN
 	Base.EMPTY.red:=3;
 	Base.EMPTY.black:=6;
 	Base.EMPTY.alpha:=6;
-	z3.setcolor(0,0,1,2,6);
-	z3.FRaster(noise,81);  
-	z3.FRaster(plane,27);  
-	z3.FRaster(ball,27); 	
+	z3.setcolor(0,3,0,5,5); 
+
+	z3.FRaster(noise,81);
 	Base.world:=z3; 	
 	
-	Base.avatar:=harrison;
+	Base.avatar:=conglo2;
 	Base.avatarsize:=1000; 
 END dawn;
 

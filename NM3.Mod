@@ -122,26 +122,6 @@ BEGIN
 			ray.normal:=nposter.normal;
 			nshade(nposter,ray);
 		END;
-		IF ray.terminate THEN (* should always be true unless maybe the imposter is translucent lol *)
-			IF ray.ispatchTF & ~ray.patched THEN
-				ray.patched:=TRUE;
-				lastlength:=ray.length;
-				patchradiusx:=Math.sin(ray.dtheta)*ray.length*Base.patchx;
-				patchradiusy:=Math.sin(ray.dphi)*ray.length*Base.patchy/10;
-				patchdx.x := ray.rightxyz.x*patchradiusx; patchdx.y := ray.rightxyz.y*patchradiusx; patchdx.z := ray.rightxyz.z*patchradiusx;
-				patchdy.x := ray.downxyz.x*patchradiusx; patchdy.y := ray.downxyz.y*patchradiusx; patchdy.z := ray.downxyz.z*patchradiusx;
-				FOR i:= 0 TO 2 DO
-					FOR j:= 0 TO 2 DO
-						pray:=patchray;
-						pray.lxyz.x := ray.lastlxyz.x -ray.dxyz.x + (i-1)*patchdx.x + (j-1)*patchdy.x;
-						pray.lxyz.y := ray.lastlxyz.y -ray.dxyz.y + (i-1)*patchdx.y + (j-1)*patchdy.y;
-						pray.lxyz.z := ray.lastlxyz.z -ray.dxyz.z + (i-1)*patchdx.z + (j-1)*patchdy.z;
-						Shade(pray);					
-						ray.patch[i,j]:=pray.clr;
-					END
-				END
-			END
-		END
 	ELSE
 		SPSME.E(xyz,ijk);
 		bounds(ijk.i,ijk.j,ijk.k,out);
@@ -160,26 +140,6 @@ BEGIN
 			ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 				nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
 			END;
-		IF ray.terminate THEN (* should always be true unless maybe the imposter is translucent lol *)
-			IF ray.ispatchTF & ~ray.patched THEN
-				ray.patched:=TRUE;
-				lastlength:=ray.length;
-				patchradiusx:=Math.sin(ray.dtheta)*ray.length*Base.patchx;
-				patchradiusy:=Math.sin(ray.dphi)*ray.length*Base.patchy/10;
-				patchdx.x := ray.rightxyz.x*patchradiusx; patchdx.y := ray.rightxyz.y*patchradiusx; patchdx.z := ray.rightxyz.z*patchradiusx;
-				patchdy.x := ray.downxyz.x*patchradiusx; patchdy.y := ray.downxyz.y*patchradiusx; patchdy.z := ray.downxyz.z*patchradiusx;
-				FOR i:= 0 TO 2 DO
-					FOR j:= 0 TO 2 DO
-						pray:=patchray;
-						pray.lxyz.x := ray.lastlxyz.x -ray.dxyz.x + (i-1)*patchdx.x + (j-1)*patchdy.x;
-						pray.lxyz.y := ray.lastlxyz.y -ray.dxyz.y + (i-1)*patchdx.y + (j-1)*patchdy.y;
-						pray.lxyz.z := ray.lastlxyz.z -ray.dxyz.z + (i-1)*patchdx.z + (j-1)*patchdy.z;
-						Shade(pray);					
-						ray.patch[i,j]:=pray.clr;
-					END
-				END
-			END
-			END 
 		END
 	END;
 	IF ~ray.terminate THEN
@@ -282,28 +242,8 @@ BEGIN
 					xyz.z := xyz.z + ray.popdelta.z;
 				ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
-				END;
-		IF ray.terminate THEN 
-		IF ray.ispatchTF & ~ray.patched THEN
-				ray.patched:=TRUE;
-				lastlength:=ray.length;
-				patchradiusx:=Math.sin(ray.dtheta)*ray.length*Base.patchx;
-				patchradiusy:=Math.sin(ray.dphi)*ray.length*Base.patchy/10;
-				patchdx.x := ray.rightxyz.x*patchradiusx; patchdx.y := ray.rightxyz.y*patchradiusx; patchdx.z := ray.rightxyz.z*patchradiusx;
-				patchdy.x := ray.downxyz.x*patchradiusx; patchdy.y := ray.downxyz.y*patchradiusx; patchdy.z := ray.downxyz.z*patchradiusx;
-				FOR i:= 0 TO 2 DO
-					FOR j:= 0 TO 2 DO
-						pray:=patchray;
-						pray.lxyz.x := ray.lastlxyz.x -ray.dxyz.x + (i-1)*patchdx.x + (j-1)*patchdy.x;
-						pray.lxyz.y := ray.lastlxyz.y -ray.dxyz.y + (i-1)*patchdx.y + (j-1)*patchdy.y;
-						pray.lxyz.z := ray.lastlxyz.z -ray.dxyz.z + (i-1)*patchdx.z + (j-1)*patchdy.z;
-						Shade(pray);					
-						ray.patch[i,j]:=pray.clr;
-					END
 				END
 			END
-			END 
-		END
 		UNTIL out OR ray.terminate;
 	END;
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
@@ -548,7 +488,7 @@ VAR
 	X,Y,Z: REAL;
 	i,j,k: LONGINT;
 BEGIN
-	IF probelock THEN RETURN FALSE END;
+	IF ~passable THEN RETURN FALSE END;
 	Base.clamPT(p);
 	X := p.x*M; Y := p.y*M; Z := p.z*M;
 	i := ENTIER(X);
