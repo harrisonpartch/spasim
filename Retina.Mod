@@ -8,8 +8,8 @@ TYPE
 CONST
 	T=5;        
 	TS=3*32;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=9;
-	TH=9;
+	TW=4;
+	TH=4;
 	W*=TS*TW;
 	H*=TS*TH;
 	CX=W DIV 2;
@@ -54,7 +54,7 @@ BEGIN
 			ray.clr.alpha:=1;
 			ray.scale := 1; 
 			ray.tscale:=1;
-			ray.dtl:=0.031;	
+			ray.dtl:=0.021;	
 			ray.ispatchTF:=FALSE;		
 			angletoray(ray,theta,phi,dtheta,dphi);
 			Base.world.Shade(ray);
