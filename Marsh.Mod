@@ -438,7 +438,7 @@ BEGIN
 	ball.setvoxel(greenball);
 	serp.passable:=FALSE;   
 	conglo2.copyonstroke:=TRUE;
-	noise.setvoxel(axolotl);	
+	noise.setvoxel(xot2);	
 	etile2.passable:=FALSE;
 	reddot.tscale:=0;
 	
@@ -451,7 +451,7 @@ BEGIN
 	Base.EMPTY.red:=3;
 	Base.EMPTY.black:=6;
 	Base.EMPTY.alpha:=6;
-	z3.setcolor(1/3,0,0,2/3,2/3); 
+	z3.setcolor(7,0,0,13,2/3); 
 	z3.FRaster(plane,27); 
 	z3.FRaster(noise,81); 
 	Base.world:=z3; 	

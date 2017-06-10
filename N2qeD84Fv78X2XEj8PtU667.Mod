@@ -42,10 +42,12 @@ PROCEDURE draw;
 BEGIN	 
 	center:=Base.mkPT(1/2,1/2,1/2);
 	reddot:=Base.VoxelFromName("NM3");
-	NEW(ball,center,0.57);
-	ball.setvoxel(NIL);	
-	ball.setcolor(1,1,1,1);
-	reddot.FRaster(ball,81);	
+	NEW(ball,center,0.47);
+	ball.setcolor(0.7,0.6,0,1);
+	reddot.FRaster(ball,27);	
+	NEW(ball,center,0.57);	
+	ball.setcolor(0.9,0.2,0,1);
+	reddot.FRaster(ball,27);	
 	reddot.setcolor(5,0,0,10,20);
 END draw;
 
