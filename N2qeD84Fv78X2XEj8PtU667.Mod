@@ -40,16 +40,13 @@ VAR
 	path: Path;
 PROCEDURE draw;
 BEGIN	 
+	center:=Base.mkPT(1/2,1/2,1/2);
 	reddot:=Base.VoxelFromName("NM3");
-
 	NEW(ball,center,0.57);
-
 	ball.setvoxel(NIL);	
 	ball.setcolor(1,1,1,1);
-	reddot.FRaster(ball,64);	
-	reddot.texture:=rdot;
-
-
+	reddot.FRaster(ball,81);	
+	reddot.setcolor(5,0,0,10,20);
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;

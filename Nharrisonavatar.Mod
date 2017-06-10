@@ -12,9 +12,11 @@ BEGIN
 END thisvox;
 
 BEGIN
-	NEW(cv,"leo.png");
+	NEW(cv,"harrisonavatar.0.png");
 	cv.passable:=FALSE;
-	cv.tscale:=0;	
+	cv.tscale:=1000;	
 END Nharrisonavatar. 
  
- XNXLMarsh.Rez Nharrisonavtar ~
+ XNXLMarsh.Rez Nharrisonavatar ~
+ 
+	NEW(cv,"seahorse.png"); 	

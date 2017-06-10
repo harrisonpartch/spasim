@@ -142,6 +142,8 @@ PROCEDURE stroke(p:PT; resolution:LONGINT; voxel:Voxel);
 BEGIN
 	A:=B;
 	B:=p;
+	Out.String(voxel.code);
+	Out.Ln;
 	Base.world.stroke(p,resolution, voxel);
 	IF lines THEN line END
 END stroke;
@@ -432,27 +434,30 @@ BEGIN
 	Base.setPT(up,0,0,1);
 
 	Base.setPT(center,1/2,1/2,1/2);
-	NEW(ball,center,0.6);  
+	NEW(ball,center,0.55);  
+	ball.setvoxel(greenball);
 	serp.passable:=FALSE;   
-	noise.setvoxel(serp);	
+	conglo2.copyonstroke:=TRUE;
+	noise.setvoxel(axolotl);	
 	etile2.passable:=FALSE;
 	reddot.tscale:=0;
-	ball.setvoxel(dotz);
+	
 	Base.setPT(center,1/2,1/2,9/12);
 	NEW(plane,center,up);
-	plane.vox:=reddot;	
+	plane.vox:=axolotl;	
 	rat.tscale:=16;
 
 
 	Base.EMPTY.red:=3;
 	Base.EMPTY.black:=6;
 	Base.EMPTY.alpha:=6;
-	z3.setcolor(0,3,0,5,5); 
-
-	z3.FRaster(noise,81);
+	z3.setcolor(1/3,0,0,2/3,2/3); 
+	z3.FRaster(plane,27); 
+	z3.FRaster(noise,81); 
 	Base.world:=z3; 	
 	
-	Base.avatar:=conglo2;
+	Base.avatar:=harrison;
+	harrison.passable:=TRUE;
 	Base.avatarsize:=1000; 
 END dawn;
 

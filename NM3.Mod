@@ -243,7 +243,7 @@ BEGIN
 				ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
 				END
-			END
+			END;
 		UNTIL out OR ray.terminate;
 	END;
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
@@ -506,6 +506,7 @@ VAR
 	i,j,k: LONGINT;
 BEGIN
 	Base.clamPT(p);
+	IF copyonstroke THEN Out.Char('*') END;
 	IF voxel#NIL THEN
 		strokerec(p,resolution,1, voxel);
 	END

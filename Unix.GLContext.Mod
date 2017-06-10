@@ -5,7 +5,7 @@ IMPORT
 
 (*! not resizeble, SetProfile 3, 3 added *)
 
-CONST debug = TRUE;
+CONST debug = FALSE;
 
 	   COMPATIBILITY_PROFILE* = 0;
 	   CORE_PROFILE* = 1;

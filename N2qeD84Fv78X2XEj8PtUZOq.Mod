@@ -15,13 +15,14 @@ VAR
 PROCEDURE draw;
 BEGIN
 	dot:=Base.VoxelFromName("NM3"); 	
-	NEW(avatar,"shellyduvall.png");
-	avatar.tscale:=0;
-	dot.copyonstroke:=TRUE;
+	NEW(avatar,"harrisonavatar.0.png");
+	avatar.copyonstroke:=TRUE;
+	avatar.tscale:=1729; 
 	Base.setPT(center,1/2,1/2,1/2);
 	NEW(ball,center,1/2);	
 	ball.setvoxel(avatar);		
 	dot.FRaster(ball,9);
+	dot.copyonstroke:=TRUE;
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;

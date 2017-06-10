@@ -63,12 +63,13 @@ BEGIN
 	alphablue.setcolor(1/2,0,0,1/2,1/2);
 	s2.setcolor(1,0,0,1/3,1/3);
 	s2.fill(s0);
-	s2.passable:=FALSE;
+	s0.passable:=FALSE;
+	s2.passable:=FALSE;	
 	s0.fillsierp(s0,alphablue);
 	s0.imposter:=bpossum;	
 	s0.copyonstroke:=TRUE;
 
-	RETURN s2
+	RETURN s0
 END thisvox;
  END NXWCxXWLIcD2LegvoGXX666. 
  

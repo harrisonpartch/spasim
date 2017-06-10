@@ -3677,6 +3677,9 @@ TYPE
 	TglXBindTexImageEXT* = PROCEDURE{C}(dpy: DisplayPtr; drawable: GLXDrawable; buffer: Int; attriblist: PInt);
 	TglXReleaseTexImageEXT* = PROCEDURE{C}(dpy: DisplayPtr; drawable: GLXDrawable; buffer: Int);
 
+	(* GLX_EXT_swap_control *)
+	TglXSwapIntervalEXT* = PROCEDURE{C}(dpy: DisplayPtr; drawable: GLXDrawable; interval: Int);
+
   VAR
 
 	(*! GL_VERSION_1_0 *)
@@ -6642,6 +6645,9 @@ TYPE
 	glXBindTexImageEXT- : TglXBindTexImageEXT;
 	glXReleaseTexImageEXT- : TglXReleaseTexImageEXT;
 
+	(* GLX_EXT_swap_control *)
+	glXSwapIntervalEXT- : TglXSwapIntervalEXT;
+	
 (** wrapper procedure  *)
 PROCEDURE GetProcAddress*(CONST funcName: ARRAY OF CHAR; adr: ADDRESS);
 VAR address: ADDRESS;
@@ -10368,6 +10374,10 @@ BEGIN
 	GetProcAddress( 'glReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fvSUN' , ADDRESSOF( ReplacementCodeuiTexCoord2fColor4fNormal3fVertex3fvSUN ));
 END Read_GL_SUN_vertex;
 
+PROCEDURE Read_GLX_EXT_swap_control*;
+BEGIN
+	GetProcAddress( 'glXSwapIntervalEXT' , ADDRESSOF( glXSwapIntervalEXT ));
+END Read_GLX_EXT_swap_control;
 
 PROCEDURE ReadExtensions*;
 BEGIN
@@ -10575,6 +10585,8 @@ BEGIN
 
 	Read_GL_ARB_ES3_2_compatibility;
 	Read_GL_ARB_parallel_shader_compile;
+
+	Read_GLX_EXT_swap_control;
 
 (*	KernelLog.String(" Ok. "); KernelLog.Ln;*)
 END ReadExtensions;

@@ -291,7 +291,7 @@ BEGIN
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
 	mstarget:=30;
-	
+	SetFullWindow(TRUE); 	
 END openwincam;
 
 (* called when idling *)
@@ -596,7 +596,7 @@ END KeyEvent;
 		GL.UseProgram(programs[curprogram]);
 			GL.DrawElements(GLC.GL_TRIANGLES, 6, GLC.GL_UNSIGNED_SHORT, 0);
 		GL.UseProgram(0); 	
-		SwapBuffers();	 
+	SwapBuffers();	 
 	END Display;
 
 	(* change detail according to frame speed, called in GLWindow.MainLoop *)
@@ -737,7 +737,7 @@ END cursorsizeminus;
 PROCEDURE Open* ;
 VAR w: GLWindow;
 BEGIN
-	NEW(w, Retina.W,Retina.H);
+	NEW(w, ENTIER(Retina.W*1.5),ENTIER(Retina.H*1.5));
 (*	Debugging.DisableGC; *)
 	Base.STOPGO
 END Open;

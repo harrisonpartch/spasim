@@ -22,6 +22,51 @@ TYPE PT = Base.PT;
  	NCube=Base.NCube;
  	LCube=Base.LightCube;
 
+PROCEDURE rot90z(VAR blx: ARRAY 3,3,3 OF Voxel);
+VAR
+	b: ARRAY 3,3,3 OF Voxel;
+BEGIN
+	b[1,0,0]:= blx[0,0,0];
+	b[1,1,0]:= blx[1,0,0];
+	b[0,1,0]:= blx[1,1,0];
+	b[0,0,0]:= blx[0,1,0];
+	b[1,0,1]:= blx[0,0,1];
+	b[1,1,1]:= blx[1,0,1];
+	b[0,1,1]:= blx[1,1,1];
+	b[0,0,1]:= blx[0,1,1];
+	blx:=b;
+END rot90z;
+
+PROCEDURE rot90zB(VAR blx: ARRAY 3,3,3 OF BOOLEAN);
+VAR
+	b: ARRAY 3,3,3 OF BOOLEAN;
+BEGIN
+	b[1,0,0]:= blx[0,0,0];
+	b[1,1,0]:= blx[1,0,0];
+	b[0,1,0]:= blx[1,1,0];
+	b[0,0,0]:= blx[0,1,0];
+	b[1,0,1]:= blx[0,0,1];
+	b[1,1,1]:= blx[1,0,1];
+	b[0,1,1]:= blx[1,1,1];
+	b[0,0,1]:= blx[0,1,1];
+	blx:=b;
+END rot90zB;
+
+PROCEDURE rot90zNC(VAR blx: ARRAY 3,3,3 OF NCube);
+VAR
+	b: ARRAY 3,3,3 OF NCube;
+BEGIN
+	b[1,0,0]:= blx[0,0,0];
+	b[1,1,0]:= blx[1,0,0];
+	b[0,1,0]:= blx[1,1,0];
+	b[0,0,0]:= blx[0,1,0];
+	b[1,0,1]:= blx[0,0,1];
+	b[1,1,1]:= blx[1,0,1];
+	b[0,1,1]:= blx[1,1,1];
+	b[0,0,1]:= blx[0,1,1];
+	blx:=b;
+END rot90zNC;
+
 TYPE cell* = OBJECT(Voxel);
 VAR
 	blox*: ARRAY M,M,M OF Voxel;
@@ -30,6 +75,7 @@ VAR
 	nposterTF*:BOOLEAN;
 	nposter*: NCube;
 	light: Base.Light;
+
 
 PROCEDURE Shade(VAR ray: Ray);
 VAR
@@ -183,7 +229,7 @@ BEGIN
 				ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
 				END
-			END
+			END;
 		UNTIL out OR ray.terminate;
 	END;
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
@@ -428,7 +474,7 @@ VAR
 	X,Y,Z: REAL;
 	i,j,k: LONGINT;
 BEGIN
-	IF probelock THEN RETURN FALSE END;
+	IF ~passable THEN RETURN FALSE END;
 	Base.clamPT(p);
 	X := p.x*M; Y := p.y*M; Z := p.z*M;
 	i := ENTIER(X);
@@ -446,6 +492,7 @@ VAR
 	i,j,k: LONGINT;
 BEGIN
 	Base.clamPT(p);
+	IF copyonstroke THEN Out.Char('*') END;
 	IF voxel#NIL THEN
 		strokerec(p,resolution,1, voxel);
 	END

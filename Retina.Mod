@@ -8,12 +8,13 @@ TYPE
 CONST
 	T=5;        
 	TS=3*32;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=4;
-	TH=4;
+	TW=10;
+	TH=7;
 	W*=TS*TW;
 	H*=TS*TH;
 	CX=W DIV 2;
 	CY=H DIV 2;
+	GAMMA=250; 
 
 TYPE Camera= RECORD			(* solid angle *)
 	dtheta, dphi, theta, phi,rphi:REAL;
@@ -41,13 +42,14 @@ VAR
 	theta,phi,dtheta,dphi: REAL;
 	ray: Base.Ray;
 	pixel: Raster.Pixel;
+	r,b,g: REAL;
 BEGIN
 	theta:=cam.theta;
 	dtheta:=cam.dtheta/3;
 	dphi:=cam.dphi/3;
 	FOR i:= 0 TO 2 DO
 		phi:=cam.phi;
-		FOR j :=  0 TO 2 DO 
+		FOR j := 0 TO 2 DO 
 			ray.clr.ra := 1;
 			ray.clr.ga := 1;
 			ray.clr.ba := 1;
@@ -58,12 +60,17 @@ BEGIN
 			ray.ispatchTF:=FALSE;		
 			angletoray(ray,theta,phi,dtheta,dphi);
 			Base.world.Shade(ray);
-			IF ~ray.terminate THEN
-				ray.clr.b:= ray.clr.b + ray.clr.ba/2;
-				ray.clr.r:= ray.clr.r + ray.clr.ra/3;
-				ray.clr.g:= ray.clr.g + ray.clr.ga/3
-			END;			
-			Raster.SetRGB(pixel,ENTIER(ray.clr.r*250),ENTIER(ray.clr.g*250),ENTIER(ray.clr.b*250)); 
+			IF ray.terminate THEN
+				r:=ray.clr.r;
+				g:=ray.clr.g;
+				b:=ray.clr.b; 
+			ELSE
+				b:= ray.clr.b + ray.clr.ba;
+				r:= ray.clr.r + ray.clr.ra/3;
+				g:= ray.clr.g + ray.clr.ga/3 
+			END;
+			Base.clamp3(r,g,b);			
+			Raster.SetRGB(pixel,ENTIER(r*GAMMA),ENTIER(g*GAMMA),ENTIER(b*GAMMA)); 
 			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
 			phi:=phi+dphi;
 		END;
@@ -92,7 +99,7 @@ BEGIN
 		ray.clr.r:= ray.clr.r + ray.clr.ra/3;
 		ray.clr.g:= ray.clr.g + ray.clr.ga/3;
 	END;
-	Raster.SetRGB(pixel,ENTIER(ray.clr.r*250),ENTIER(ray.clr.g*250),ENTIER(ray.clr.b*250)); 
+	Raster.SetRGB(pixel,ENTIER(ray.clr.r*GAMMA),ENTIER(ray.clr.g*GAMMA),ENTIER(ray.clr.b*GAMMA)); 
 	Raster.Fill(image,cam.imx,cam.imy,cam.imx+3,cam.imy+3,pixel,copy)			
 END tessa;
 
@@ -236,8 +243,8 @@ BEGIN
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
 	ray.lxyz:=Base.cameraPT;
-	ray.xyz:=Base.cameraPT;
-	ray.oxyz:=Base.cameraPT;
+	ray.xyz:= Base.cameraPT;
+	ray.oxyz:= Base.cameraPT;
 	ray.dtl:=Base.DTL*ray.dtl;
 	ray.texdtl:=1;	
 END angletoray;

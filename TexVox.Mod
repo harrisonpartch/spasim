@@ -228,14 +228,7 @@ BEGIN
 				|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
 				|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 			END
-		END
-	END; 
-	color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
-	dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
-	IF color.alpha<0.99  THEN 
-			mirror(ray,mix)
-		(*all other color with alpha is simply ignored for now *)										
-	ELSE 
+		END;										
 		mip:=ray.length*ray.scale/12;
 		IF mip>7 THEN 	
 			color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
@@ -243,14 +236,37 @@ BEGIN
 			color:=texcube.side[ray.face].pixelmip_one(lx,ly);
 		ELSE
 			color:=texcube.side[ray.face].pixelmip_two(lx,ly);		
-		END; 	
-		dr:=color.red*dot;
-		dg:=color.green*dot;
-		db:=color.blue*dot;	
-		ray.clr.r := ray.clr.r + dr*ray.clr.ra;
-		ray.clr.g := ray.clr.g + dg*ray.clr.ga;
-		ray.clr.b := ray.clr.b + db*ray.clr.ba;	
-		ray.terminate:=TRUE		
+		END; 
+		IF color.alpha<0.99 THEN
+			IF color.alpha>0.69 THEN 
+				mirror(ray,mix)
+			ELSE
+				dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
+				dr:=color.red*dot;
+				dg:=color.green*dot;
+				db:=color.blue*dot;	
+				ray.clr.r := ray.clr.r + dr*ray.clr.ra;
+				ray.clr.g := ray.clr.g + dg*ray.clr.ga;
+				ray.clr.b := ray.clr.b + db*ray.clr.ba;	
+				ray.clr.ra:= ray.clr.ra-dr;
+				ray.clr.ga:= ray.clr.ga-dg;
+				ray.clr.ba:= ray.clr.ba-db;
+				ray.clr.alpha:=ray.clr.alpha-0.1;
+				IF ray.clr.alpha<0.1 THEN ray.terminate:=TRUE END;
+			END
+		ELSE
+			dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
+			dr:=color.red*dot;
+			dg:=color.green*dot;
+			db:=color.blue*dot;	
+			ray.clr.r := ray.clr.r + dr*ray.clr.ra;
+			ray.clr.g := ray.clr.g + dg*ray.clr.ga;
+			ray.clr.b := ray.clr.b + db*ray.clr.ba;	
+			ray.clr.alpha:=0;	
+			ray.terminate:=TRUE;
+		END
+	ELSE
+	  (* camera is inside textured cube *)
 	END
 END Shade;
 
@@ -420,7 +436,7 @@ BEGIN
 			ray.clr.ga:=ray.clr.ga-(dg*color.alpha)-0.1;
 			ray.clr.b := ray.clr.b + db*color.alpha;
 			ray.clr.ba:=ray.clr.ba-(db*color.alpha)-0.1;
-			IF color.alpha>0.5 THEN 
+			IF color.alpha>0.85 THEN 
 				mirror(ray,dot) 
 			ELSE (* if the pixel is transparent, trace to the back side of the cube *)
 				Base.ExitF(ray,lxyz,face);
