@@ -267,6 +267,10 @@ BEGIN
 		END
 	ELSE
 	  (* camera is inside textured cube *)
+		ray.clr.ra:= ray.clr.ra-0.1;
+		ray.clr.ga:= ray.clr.ga-0.1;
+		ray.clr.ba:= ray.clr.ba-0.1;	  
+		ray.clr.alpha:=ray.clr.alpha-0.1;	
 	END
 END Shade;
 

@@ -296,7 +296,7 @@ BEGIN
 	push(harrison);
 	doge:=Base.VoxelFromName("Ndogepearl"); 
 	push(doge);		
-	xot:=Base.VoxelFromName("N5a2g4M6HYjPJxYSNQvYyv7"); 
+	xot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU666"); 
 	push(xot);
 (*     floop:=Base.VoxelFromName("NFLOOP");  
      push(floop);
@@ -438,7 +438,7 @@ BEGIN
 	ball.setvoxel(greenball);
 	serp.passable:=FALSE;   
 	conglo2.copyonstroke:=TRUE;
-	noise.setvoxel(xot2);	
+	noise.setvoxel(cthulhu);	
 	etile2.passable:=FALSE;
 	reddot.tscale:=0;
 	
@@ -451,7 +451,7 @@ BEGIN
 	Base.EMPTY.red:=3;
 	Base.EMPTY.black:=6;
 	Base.EMPTY.alpha:=6;
-	z3.setcolor(7,0,0,13,2/3); 
+	z3.setcolor(1,0,0,5,5); 
 	z3.FRaster(plane,27); 
 	z3.FRaster(noise,81); 
 	Base.world:=z3; 	

@@ -383,7 +383,7 @@ BEGIN
 			| "m": leftsticky:=leftsticky/1.3; upsticky:=upsticky/1.3;
 			| "o": GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_NEAREST)
 			| "t": GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR)
-			| "v":Marsh.engrain
+			| "v": ReloadShader
 			| "c": Marsh.sprout 
 			| "x": Marsh.incVN
 			| "z": Marsh.decVN		
@@ -587,6 +587,11 @@ END KeyEvent;
 			  
 		RETURN TRUE;
 	END InitGL;
+		
+	PROCEDURE  ReloadShader;
+	BEGIN
+		programs[6] := InitShader("passthroughVS.glsl", "toonShadingFS.glsl");	
+	END ReloadShader;
 
 	PROCEDURE Display();
 	BEGIN
@@ -737,7 +742,7 @@ END cursorsizeminus;
 PROCEDURE Open* ;
 VAR w: GLWindow;
 BEGIN
-	NEW(w, ENTIER(Retina.W*1.0),ENTIER(Retina.H*1.0));
+	NEW(w, Retina.W,Retina.H);
 (*	Debugging.DisableGC; *)
 	Base.STOPGO
 END Open;

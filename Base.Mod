@@ -608,9 +608,9 @@ END clamp;
 
 PROCEDURE clamp3*(VAR r,g,b: REAL);
 BEGIN
-	IF r < 0 THEN r := 0 ELSIF r>1 THEN r := 0.9999999 END;
-	IF g < 0 THEN g := 0 ELSIF g>1 THEN g := 0.9999999 END;
-	IF b < 0 THEN b := 0 ELSIF b>1 THEN b := 0.9999999 END;
+	IF r < 0 THEN r := 0 ELSIF r>1 THEN r := 0.99 END;
+	IF g < 0 THEN g := 0 ELSIF g>1 THEN g := 0.99 END;
+	IF b < 0 THEN b := 0 ELSIF b>1 THEN b := 0.99 END;
 END clamp3;
 
 PROCEDURE clamPT*(VAR a: PT);

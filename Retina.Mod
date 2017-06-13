@@ -14,7 +14,7 @@ CONST
 	H*=TS*TH;
 	CX=W DIV 2;
 	CY=H DIV 2;
-	GAMMA=250; 
+	GAMMA=255; 
 
 TYPE Camera= RECORD			(* solid angle *)
 	dtheta, dphi, theta, phi,rphi:REAL;
@@ -44,9 +44,9 @@ VAR
 	pixel: Raster.Pixel;
 	r,b,g: REAL;
 BEGIN
-	theta:=cam.theta;
 	dtheta:=cam.dtheta/3;
 	dphi:=cam.dphi/3;
+	theta:=cam.theta;
 	FOR i:= 0 TO 2 DO
 		phi:=cam.phi;
 		FOR j := 0 TO 2 DO 
@@ -56,8 +56,7 @@ BEGIN
 			ray.clr.alpha:=1;
 			ray.scale := 1; 
 			ray.tscale:=1;
-			ray.dtl:=0.021;	
-			ray.ispatchTF:=FALSE;		
+			ray.dtl:=0.1;	
 			angletoray(ray,theta,phi,dtheta,dphi);
 			Base.world.Shade(ray);
 			IF ray.terminate THEN
@@ -91,7 +90,7 @@ BEGIN
 	ray.clr.alpha:=1;
 	ray.scale := 1; 
 	ray.tscale:=1;
-	ray.dtl:=0.01;	
+	ray.dtl:=0.1;	
 	angletoray(ray,cam.theta+cam.dtheta/2, cam.phi+cam.dphi/2, cam.dtheta/3,cam.dphi/3);	
 	Base.world.Shade(ray);
 	IF ~ray.terminate THEN
@@ -111,7 +110,11 @@ VAR
 BEGIN
 	splitcam(cam,a,b,c,d);
 	IF level<2 THEN
-			x:=a.imx - W/2;
+(*			tessa(a);
+			tessa(b);
+			tessa(c);
+			tessa(d);
+*)			x:=a.imx - W/2;
 			y:=a.imy-H/2;		
 			IF (~saccade)&((x*x+y*y)<FV) THEN	
 				tessad3(a); 
@@ -324,21 +327,6 @@ BEGIN
 		END
 	END
 END gotiles;
-(*
-PROCEDURE filter;
-VAR
-	i,j,sum: LONGINT;
-	pixel: Raster.Pixel;
-BEGIN
-	FOR i:= 1 TO W DO
-		FOR j :=  1 TO H DO 
-	
-			Raster.SetRGB(pixel,ENTIER(ray.patch[i,j].r*255),ENTIER(ray.patch[i,j].g*255),ENTIER(ray.patch[i,j].b*255)); 
-			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy)
-		END
-	END
-END filter;
-*)
 
 PROCEDURE go*(theta,phi,apw,aph: REAL);
 VAR
@@ -389,7 +377,7 @@ BEGIN
 		gotiles;
 		AWAIT((tilesdone=TW*TH) OR FRAMEBOORT)
 	END;
-(*	Raster.SetRGB(pixel,255,255,255);
+	Raster.SetRGB(pixel,255,255,255);
 	Raster.Put(image,CX+2,CY+2,pixel,copy);	
 	Raster.Put(image,CX-2,CY+2,pixel,copy);	
 	Raster.Put(image,CX-2,CY-2,pixel,copy);	
@@ -399,9 +387,8 @@ BEGIN
 	Raster.Put(image,CX-1,CY+1,pixel,copy);	
 	Raster.Put(image,CX-1,CY-1,pixel,copy);	
 	Raster.Put(image,CX+1,CY-1,pixel,copy);	
-(*	WMRasterScale.Scale(image, Rect.MakeRect(0,0,W,H), fimage, Rect.MakeRect(0,0,2*W-1,2*H-1), Rect.MakeRect(0,0,2*W,2*H),1,1);		
-*)	Base.tick;
-*)
+	Base.tick;
+
 END go;
 
 PROCEDURE lsu*;

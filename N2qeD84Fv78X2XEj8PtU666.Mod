@@ -20,8 +20,8 @@ VAR
 BEGIN
 	yellow:=Base.VoxelFromName("NM3");
 	yellow.setcolor(1,1,0,0,1);
-   	MCUBE:=Base.VoxelFromName("Nr3kPtbyEYLFK3AN2UUVrqg");
-	FOR i:=0 TO 100 DO
+   	MCUBE:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667");
+	FOR i:=0 TO 500 DO
 		yellow.stroke(Base.randPT(),9,MCUBE);
 	END;
 	yellow.copyonstroke:=TRUE;	

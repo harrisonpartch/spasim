@@ -69,13 +69,11 @@ END rot90zNC;
 
 TYPE cell* = OBJECT(Voxel);
 VAR
+	nposterTF*:BOOLEAN;
+	nposter*: NCube;
 	blox*: ARRAY M,M,M OF Voxel;
 	nbloxTF*: ARRAY M,M,M OF BOOLEAN;
 	nblox*: ARRAY M,M,M OF NCube;
-	nposterTF*:BOOLEAN;
-	nposter*: NCube;
-	light: Base.Light;
-
 PROCEDURE r90z;
 VAR i,j,k: INTEGER;
 BEGIN
@@ -553,10 +551,10 @@ BEGIN
 				IF  blox[i,j,k].copyonstroke THEN
 					copyv:=blox[i,j,k].deepcopy();
 					copyv.copyonstroke:=FALSE;
-					copyv.strokerec(p, resolution,nextscale, voxel);
+					copyv.strokerec(p, resolution,nextscale,voxel);
 					blox[i,j,k]:=copyv;
 				ELSIF blox[i,j,k].complex THEN
-					blox[i,j,k].strokerec(p, resolution,nextscale,  voxel)
+					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
 				ELSE
 					NEW(c);
 					c.fill(blox[i,j,k]);
@@ -854,30 +852,24 @@ VAR
 	cv,child:Voxel;
 	i,j,k: INTEGER;
 BEGIN
-	IF code=NCODE THEN
-		copymarker:=TRUE;
-		NEW(c);
-		c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; c.alpha:=alpha;
-		c.nbloxTF:=nbloxTF;
-		c.nblox:=nblox;
-		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
-			child:=blox[i,j,k];
-			IF (child#NIL) THEN
-				IF ~child.copymarker THEN
-					 c.blox[i,j,k]:=child.deepcopy();
-				ELSE
-					c.blox[i,j,k]:=child
-				END
+	copymarker:=TRUE;
+	NEW(c);
+	c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; c.alpha:=alpha;
+	c.nbloxTF:=nbloxTF;
+	c.nblox:=nblox;
+	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
+		child:=blox[i,j,k];
+		IF (child#NIL) THEN
+			IF ~child.copymarker & ~ child.copyonstroke THEN
+				 c.blox[i,j,k]:=child.deepcopy();
+			ELSE
+				c.blox[i,j,k]:=child
 			END
-		END END END;
-		copymarker:=FALSE;
-		RETURN c
-	ELSE
-		cv:= Base.VoxelFromName(code);
-		RETURN cv
-	END;
+		END
+	END END END;
+	copymarker:=FALSE;
+	RETURN c
 END deepcopy;
-
 PROCEDURE count*(level: INTEGER):LONGINT;
 VAR
 	c: LONGINT;
