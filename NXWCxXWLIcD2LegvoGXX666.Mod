@@ -65,7 +65,7 @@ BEGIN
 	s2.fill(s0);
 	s0.passable:=FALSE;
 	s2.passable:=FALSE;	
-	s0.fillsierp(s0,alphablue);
+	s0.fillsierp(s0,bpossum);
 	s0.imposter:=bpossum;	
 	s0.copyonstroke:=TRUE;
 

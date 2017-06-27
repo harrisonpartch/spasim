@@ -5,8 +5,8 @@ VAR vox: HalfSpace.halfvox; v: TexVox.TexVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	 NEW(v, 'bluedot.png'); 
-	 v.tscale:=100;
-	 NEW(vox,v,Base.randPT(),Base.randPT());
+	 v.tscale:=0;
+	 v.lockTF:=TRUE;
 	RETURN v
 END thisvox;
 END Ndiffuseblue. 

@@ -7,8 +7,8 @@ CONST
 	patchsize*=2; 
 	NL*=24;
 	MIP0=8;
-	MIP1=64;
-	MIP2=729;
+	MIP1=256;
+	MIP2=1024;
 
 TYPE Name*=ARRAY NL OF CHAR;
 
@@ -559,7 +559,6 @@ VAR
 	defaultimg: Raster.Image;
 	hasher*:CryptoMD5.Hash;
 	PRO*: LONGINT;
-	patchx*, patchy*: LONGINT;
 (*	basesource*, texsound*, grainsound*: AL.ALuint;
 	listenerPos*: ARRAY [3] OF AL.ALfloat; (* global position *)
 	sourcePos: ARRAY 3 OF AL.ALfloat;
@@ -1164,6 +1163,7 @@ BEGIN
 	Out.String("Base loading...");
 	WMFontManager.Install;
 	NEW(rand);
+	fog:=0.01;
 (*	XNXLAudio.OpenDevice;
 	NEW(clock); *)
 	fward:=mkPT(1,0,0);
@@ -1180,8 +1180,6 @@ BEGIN
 	iterlimit := 500;
 	DTL:=3;	
 	PRO:=1;
-	patchx:=1;
-	patchy:=1;
 	Origin:=mkPT(0,0,0);   (* unneeded initialization *)
 	Face[0].x := -1; Face[0].y := 0; Face[0].z := 0; 
 	Face[3].x := 1; Face[3].y := 0; Face[3].z := 0; 

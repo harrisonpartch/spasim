@@ -32,13 +32,13 @@ BEGIN
 	dg := g*depth;
 	db := b*depth;
 	dbl:=black*depth;
-	ray.r := ray.r + dr;
-	ray.g := ray.g + dg;
-	ray.b := ray.b + db; 
-	ray.ra := (ray.ra - dr)-dbl;
-	ray.ga := (ray.ga - dg)-dbl;
-	ray.ba := (ray.ba - db)-dbl; 
-	IF (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1) THEN ray.terminate:=TRUE 
+	ray.clr.r := ray.clr.r + dr;
+	ray.clr.g := ray.clr.g + dg;
+	ray.clr.b := ray.clr.b + db; 
+	ray.clr.ra := (ray.clr.ra - dr)-dbl;
+	ray.clr.ga := (ray.clr.ga - dg)-dbl;
+	ray.clr.ba := (ray.clr.ba - db)-dbl; 
+	IF (ray.clr.ra<0.1)&(ray.clr.ga<0.1)&(ray.clr.ba<0.1) THEN ray.terminate:=TRUE 
 	ELSE ray.lxyz:=exit;
 	END
 END Shade;
@@ -86,12 +86,12 @@ BEGIN
 	IF (ray.lxyz.y <0.011) OR (ray.lxyz.y > 0.989) THEN INC(ecount) END;
 	IF (ray.lxyz.z < 0.011) OR (ray.lxyz.z > 0.989) THEN INC(ecount) END;
 	IF (ecount > 1) THEN
-		ray.r := ray.r + or * ray.ra*oa;
-		ray.g := ray.g + og * ray.ga*oa;
-		ray.b := ray.b + ob * ray.ba*oa;
-			ray.ra:= ray.ra - oa;
-		ray.ga:=ray.ga-oa;
-		ray.ba:=ray.ba-oa;
+		ray.clr.r := ray.clr.r + or * ray.clr.ra*oa;
+		ray.clr.g := ray.clr.g + og * ray.clr.ga*oa;
+		ray.clr.b := ray.clr.b + ob * ray.clr.ba*oa;
+		ray.clr.ra:= ray.clr.ra - oa;
+		ray.clr.ga:=ray.clr.ga-oa;
+		ray.clr.ba:=ray.clr.ba-oa;
 	END;
 	exit:= Base.Exit(ray);
 	ecount:=0;
@@ -100,13 +100,13 @@ BEGIN
 	IF (exit.z < 0.011) OR (exit.z > 0.989) THEN INC(ecount) END;
 	IF (ecount > 1) THEN
 		a:=1/2;
-		ray.r := ray.r + or * ray.ra*a;
-		ray.g := ray.g + og * ray.ga*a;
-		ray.b := ray.b + ob * ray.ba*a;
+		ray.clr.r := ray.clr.r + or * ray.clr.ra*a;
+		ray.clr.g := ray.clr.g + og * ray.clr.ga*a;
+		ray.clr.b := ray.clr.b + ob * ray.clr.ba*a;
 		a:=1-a;
-		ray.ra:= ray.ra - a;
-		ray.ga:=ray.ga-a;
-		ray.ba:=ray.ba-a;
+		ray.clr.ra:= ray.clr.ra - a;
+		ray.clr.ga:=ray.clr.ga-a;
+		ray.clr.ba:=ray.clr.ba-a;
 	END;	
 END Shade;
 
@@ -120,7 +120,7 @@ END OutlineVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	NEW(cage);
-	cage.setoutline(0,0,0,1);
+	cage.setoutline(1,0,0,1);
 	RETURN cage
 END thisvox;
 

@@ -1,5 +1,5 @@
 MODULE Render;
-IMPORT Kernel, Objects, Random, Marsh,(* ALUT := OpenALUtil, SPSMAudio,*)
+IMPORT Kernel, Objects, Random, Marsh,
  Out := KernelLog, Math,SPSMMath, Base,  Retina, GLW := OGLWindow, 
 	 GL:=OpenGL, GLC := OpenGLConst,  GLSL:= GLShaderUtils,
 	 Inputs,  Raster, Strings, Streams, Debugging;
@@ -290,7 +290,7 @@ BEGIN
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
-	mstarget:=30;
+	mstarget:=33;
 	SetFullWindow(TRUE); 	
 END openwincam;
 
@@ -369,10 +369,6 @@ VAR
 BEGIN
 	key:=CHR(ucs);
 		CASE CHR(ucs) OF		
-			"S": INC(Base.patchy); Out.String("patchy "); Out.Int(Base.patchy,4); Out.Ln;
-			| "W": DEC(Base.patchy); Out.String("patchy "); Out.Int(Base.patchy,4); Out.Ln;
-			| "A": INC(Base.patchx); Out.String("patchx "); Out.Int(Base.patchx,4); Out.Ln;		
-			| "D": DEC(Base.patchx); Out.String("patchx "); Out.Int(Base.patchx,4); Out.Ln;		
 			|   "s" : camera.forward(-0.51*Base.speed)
 			| "w" :camera.forward(0.51*Base.speed) 
 			| "a" :camera.rightstrafe(-0.5*Base.speed)	
@@ -381,13 +377,12 @@ BEGIN
 			| "q": camera.upstrafe(0.51*Base.speed)	
 			| "n": leftsticky:=leftsticky*1.3; upsticky:=upsticky*1.3;
 			| "m": leftsticky:=leftsticky/1.3; upsticky:=upsticky/1.3;
-			| "o": GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_NEAREST)
-			| "t": GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR)
+			| "o": Retina.moredetail
+			| "p": Retina.lessdetail
 			| "v": ReloadShader
 			| "c": Marsh.sprout 
 			| "x": Marsh.incVN
 			| "z": Marsh.decVN		
-			| "p":  camera.stop	
 			| "1":  INC(Base.PRO); Out.Int(Base.PRO,4); Out.Ln		
 			| "2" :  DEC(Base.PRO); Out.Int(Base.PRO,4); Out.Ln
 			| "3" : Base.gravity:= Base.gravity/1.5	
@@ -606,11 +601,14 @@ END KeyEvent;
 
 	(* change detail according to frame speed, called in GLWindow.MainLoop *)
 	PROCEDURE GameLogic();
+	VAR
+		ms: LONGINT;
 	BEGIN
-		IF GetCurrentFrameMs() < (mstarget-5) THEN 
-			Retina.moredetail;
-		ELSIF GetCurrentFrameMs() > mstarget THEN 
-			Retina.lessdetail;
+		ms:= GetCurrentFrameMs();
+		IF  ms < (mstarget) THEN 
+			IF Base.fog>0.0021 THEN Base.fog:=Base.fog*(12/13); Retina.moredetail END;
+		ELSIF ms > mstarget THEN 
+			IF Base.fog<0.021 THEN Base.fog:=Base.fog*(13/12); Retina.lessdetail END
 		END; 
 	END GameLogic;
 
@@ -640,20 +638,15 @@ VAR
 	MLseen, MMseen, MRseen: BOOLEAN;	
 	chatting: BOOLEAN;
 	chatvoxel: Voxel;
-	warpedthemouse: BOOLEAN;	
-	
+	warpedthemouse: BOOLEAN;		
 	MB : SET;	(* 0, 1, 2 *)
-
 	MOUSEDOWN, CAPTUREMOUSE, GO,TRAIL,AVATAR,SCULL,METASLASH: BOOLEAN;	
 	camera:Camera;
 	fogdensity:REAL;
 	leftsticky,upsticky: REAL;
 	centerx,centery: LONGINT;
-
-	GLIDE:REAL;
-		
-	msd: REAL;	
-	
+	GLIDE:REAL;		
+	msd: REAL;		
 
 PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
 VAR d: REAL;
@@ -742,7 +735,7 @@ END cursorsizeminus;
 PROCEDURE Open* ;
 VAR w: GLWindow;
 BEGIN
-	NEW(w, Retina.W,Retina.H);
+	NEW(w, ENTIER(Retina.W*1.8),ENTIER(Retina.H*1.8));
 (*	Debugging.DisableGC; *)
 	Base.STOPGO
 END Open;
