@@ -206,7 +206,7 @@ BEGIN
 			xyz:=newxyz;
 			ray.hitxyz:=ray.xyz;
 			ray.length:=ray.length+vdepth;
-			blr:=black*vdepth+Base.fog;
+			blr:=black*vdepth;
 			blainv:=1-blr;
 			rr := red*vdepth*ray.clr.ra*blainv;
 			gr := green*vdepth*ray.clr.ga*blainv;
@@ -217,7 +217,7 @@ BEGIN
 			ray.clr.ra := (ray.clr.ra-rr)-blr;
 			ray.clr.ga := (ray.clr.ga-gr)-blr;
 			ray.clr.ba := (ray.clr.ba-br)-blr;
-			ray.clr.alpha:=ray.clr.alpha-blr;
+			ray.clr.alpha:=ray.clr.alpha-black*vdepth;
 			IF ray.clr.alpha<0.1 THEN ray.terminate:=TRUE; out:=TRUE END;
 			bounds(ijk.i,ijk.j,ijk.k, out);
 			IF ~out THEN
@@ -340,13 +340,13 @@ VAR
 	i,j,k: INTEGER;
 BEGIN
 	fill(v);
-	blox[1,1,0]:=w;	
+	blox[1,1,0]:=w;
+
 	blox[0,1,1]:=w;
+
 	blox[1,0,1]:=w;
-	blox[1,1,2]:=w;	
-	blox[2,1,1]:=w;
-	blox[1,2,1]:=w;	
-	blox[1,1,1]:=w;	
+
+	blox[1,1,1]:=w;
 END fillsierp;
 
 PROCEDURE fillcqr2*(v,w: Voxel);
@@ -852,29 +852,23 @@ VAR
 	cv,child:Voxel;
 	i,j,k: INTEGER;
 BEGIN
-	IF code=NCODE THEN
-		copymarker:=TRUE;
-		NEW(c);
-		c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; c.alpha:=alpha;
-		c.nbloxTF:=nbloxTF;
-		c.nblox:=nblox;
-		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
-			child:=blox[i,j,k];
-			IF (child#NIL) THEN
-				IF ~child.copymarker & ~child.copyonstroke & (child.code=NCODE) THEN
-					 c.blox[i,j,k]:=child.deepcopy();
-				ELSE
-					c.blox[i,j,k]:=child
-				END
+	copymarker:=TRUE;
+	NEW(c);
+	c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; c.alpha:=alpha;
+	c.nbloxTF:=nbloxTF;
+	c.nblox:=nblox;
+	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
+		child:=blox[i,j,k];
+		IF (child#NIL) THEN
+			IF ~child.copymarker & ~ child.copyonstroke THEN
+				 c.blox[i,j,k]:=child.deepcopy();
+			ELSE
+				c.blox[i,j,k]:=child
 			END
-		END END END;
-		copymarker:=FALSE;
-		RETURN c
-	ELSE
-		cv:=Base.VoxelFromName(code);
-		RETURN(cv)
-	END
-	
+		END
+	END END END;
+	copymarker:=FALSE;
+	RETURN c
 END deepcopy;
 PROCEDURE count*(level: INTEGER):LONGINT;
 VAR

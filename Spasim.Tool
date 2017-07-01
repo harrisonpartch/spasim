@@ -22,7 +22,6 @@ NCompiler.Mod
 NanonyPET.Mod
 Marsh.Mod
 Retina.Mod
-Render.Mod ~
 OGLRender.Mod ~
 
 NCompiler.ncompile  <== Middle mouse click on this

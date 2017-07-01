@@ -11425,7 +11425,7 @@ BEGIN
 	libraryPaths[0] := "/usr/lib32";
 
 	(* amd, ati *)
-	libraryPaths[1] := "/usr/lib/i386-linux-gnu";
+	libraryPaths[1] := "/usr/lib/i386-linux-gnu/fglrx";
 
 
 	(* mesa *)

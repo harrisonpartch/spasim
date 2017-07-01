@@ -41,25 +41,23 @@ VAR
 PROCEDURE draw;
 BEGIN	 
 	center:=Base.mkPT(1/2,1/2,1/2);
-	reddot:=Base.VoxelFromName("NM3");
+	reddot:=Base.VoxelFromName("NM6");
 	NEW(ball,center,0.47);
 	ball.setcolor(0.7,0.6,0,1);
-	reddot.FRaster(ball,9);	
+	reddot.FRaster(ball,36);	
 	NEW(ball,center,0.57);	
 	ball.setcolor(0.9,0.2,0,1);
-	reddot.FRaster(ball,27);	
-(*	FOR i:=0 TO 2500 DO
-		reddot.stroke(Base.randPT(),9,reddot);
-	END;
-*)	reddot.copyonstroke:=TRUE;
+	reddot.FRaster(ball,36);	
+	reddot.copyonstroke:=TRUE;
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	draw;
 	RETURN reddot
 END thisvox;
 
+BEGIN
+	draw
 END N2qeD84Fv78X2XEj8PtU667. 
  
 XNXLMarsh.Rez N2qeD84Fv78X2XEj8PtUZOQ ~

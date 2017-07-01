@@ -14,9 +14,9 @@ VAR
 	inside: BOOLEAN;
 BEGIN
 	d := (nx*ray.dxyz.x + ny*ray.dxyz.y+ nz*ray.dxyz.z); 
-	ray.clr.ra := ray.clr.ra- 0.1; 
-	ray.clr.ga := ray.clr.ga- 0.1; 
-	ray.clr.ba := ray.clr.ba- 0.1; 	
+	ray.ra := ray.ra- 0.1; 
+	ray.ga := ray.ga- 0.1; 
+	ray.ba := ray.ba- 0.1; 	
 	mirror(ray);
 END Shade;
 
@@ -25,7 +25,7 @@ VAR
 	a,b,c,dot: REAL;
 BEGIN
 	dot := p.x*n.x+p.y*n.y+p.z*n.z;
-	a := 2*n.x*dot; b := 2*n.y*dot; c := 2*n.z*dot;
+	a := n.x*dot; b := n.y*dot; c := n.z*dot;
 	p.x := p.x-a; p.y := p.y-b; p.z := p.z-c;
 END reflect;
 
@@ -33,9 +33,9 @@ PROCEDURE mirror(VAR ray: Ray);
 BEGIN
 	ray.hitmirrorTF := TRUE;
 	ray.hitxyz:=ray.xyz;
+	ray.hitdxyz:=ray.dxyz;
 	ray.changed := TRUE;
 	ray.mirrortf:=TRUE;	
-	INC(ray.mirrors);
 	reflect(ray.dxyz, ray.normal);	
 	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;

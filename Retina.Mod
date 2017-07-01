@@ -6,10 +6,10 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=4;        
-	TS=3*16;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=16;
-	TH=12;
+	T=5;        
+	TS=3*32;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
+	TW=10;
+	TH=7;
 	W*=TS*TW;
 	H*=TS*TH;
 	CX=W DIV 2;
@@ -56,7 +56,7 @@ BEGIN
 			ray.clr.alpha:=1;
 			ray.scale := 1; 
 			ray.tscale:=1;
-			ray.dtl:=0.021;	
+			ray.dtl:=0.1;	
 			angletoray(ray,theta,phi,dtheta,dphi);
 			Base.world.Shade(ray);
 			IF ray.terminate THEN
@@ -90,7 +90,7 @@ BEGIN
 	ray.clr.alpha:=1;
 	ray.scale := 1; 
 	ray.tscale:=1;
-	ray.dtl:=0.01;	
+	ray.dtl:=0.1;	
 	angletoray(ray,cam.theta+cam.dtheta/2, cam.phi+cam.dphi/2, cam.dtheta/3,cam.dphi/3);	
 	Base.world.Shade(ray);
 	IF ~ray.terminate THEN
@@ -172,7 +172,7 @@ BEGIN
 	END;
 END ztraced;
 
-BEGIN{ACTIVE, PRIORITY(Objects.Normal)}
+BEGIN{ACTIVE, PRIORITY(Objects.Low)}
 	REPEAT
 		BEGIN{EXCLUSIVE}
 			AWAIT(GO);

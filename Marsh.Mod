@@ -1,5 +1,5 @@
 MODULE Marsh;
-IMPORT  Base, Engrainer, Random, CellAuto,
+IMPORT  Base , Retina, Engrainer, Random, CellAuto,
  FRep, Files, Streams, Commands, Out:=KernelLog;
 
 CONST sfile="marshstrokes.text"
@@ -274,7 +274,7 @@ VAR
 	sfish,gxy,w10,w11,v,lobster, btx,ash, dotz, GREEN,PURPLE,MCUBE:Voxel;
 	undo,rd, rdpseudosolid, blu, die,gren,granite,sand,whiteblock,lazy,pdestroyer,axolotl,xen,sky1,sky2,tigerlily,cloud: Voxel;
 	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison,fuse:Voxel;
-	sky,dieone, serp, serp2,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,
+	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,
 	w3,z3,z3a,z2,z4,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp,acidcats, badopossum, raccoon: Voxel;
 	ball: FRep.sphere;
 	noise: FRep.noise;	 
@@ -302,9 +302,7 @@ BEGIN
      push(floop);
 *) 
 	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX666"); 
-	push(serp);
-	serp2:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX679"); 
-	push(serp2);		
+	push(serp);	
 	badopossum:=Base.VoxelFromName("Nbadopossum"); 	
 	raccoon:=Base.VoxelFromName("Nraccoon"); 	
 	push(raccoon);	
@@ -440,13 +438,13 @@ BEGIN
 	ball.setvoxel(greenball);
 	serp.passable:=FALSE;   
 	conglo2.copyonstroke:=TRUE;
-	noise.setvoxel(serp);	
+	noise.setvoxel(cthulhu);	
 	etile2.passable:=FALSE;
 	reddot.tscale:=0;
 	
 	Base.setPT(center,1/2,1/2,9/12);
 	NEW(plane,center,up);
-	plane.vox:=gxy;	
+	plane.vox:=axolotl;	
 	rat.tscale:=16;
 
 
