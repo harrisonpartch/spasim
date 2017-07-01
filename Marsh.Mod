@@ -438,7 +438,7 @@ BEGIN
 	ball.setvoxel(greenball);
 	serp.passable:=FALSE;   
 	conglo2.copyonstroke:=TRUE;
-	noise.setvoxel(cthulhu);	
+	noise.setvoxel(reddot);	
 	etile2.passable:=FALSE;
 	reddot.tscale:=0;
 	

@@ -4,11 +4,10 @@ IMPORT  Math:=Math, Random, Kernel, Out:=KernelLog (*DebugLog*), Objects, (* AL:
 Strings, Streams, CryptoMD5, WMFontManager, Raster, WMRasterScale, WMRectangles, Graphics := WMGraphics, Commands(*, XNXLAudio*);
 
 CONST
-	patchsize*=2; 
 	NL*=24;
-	MIP0=8;
-	MIP1=64;
-	MIP2=729;
+	MIP0=32;
+	MIP1=256;
+	MIP2=1024;
 
 TYPE Name*=ARRAY NL OF CHAR;
 
@@ -93,8 +92,8 @@ BEGIN
 	NEW(mip_zero);
 	NEW(mip_one);	
 	NEW(mip_two);
-	Raster.Create(mip_zero,8,8,Raster.BGRA8888);
-	Raster.Create(mip_one,64,64,Raster.BGRA8888);		
+	Raster.Create(mip_zero,MIP0,MIP0,Raster.BGRA8888);
+	Raster.Create(mip_one,MIP1,MIP1,Raster.BGRA8888);		
 	Raster.Create(mip_two,MIP2,MIP2,Raster.BGRA8888);		
 	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height), mip_zero,
 			WMRectangles.MakeRect(0,0, mip_zero.width, mip_zero.height),

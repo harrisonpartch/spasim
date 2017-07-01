@@ -742,7 +742,7 @@ END cursorsizeminus;
 PROCEDURE Open* ;
 VAR w: GLWindow;
 BEGIN
-	NEW(w, Retina.W,Retina.H);
+	NEW(w, Retina.W*2,Retina.H*2);
 (*	Debugging.DisableGC; *)
 	Base.STOPGO
 END Open;
