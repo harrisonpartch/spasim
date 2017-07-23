@@ -1,0 +1,12 @@
+Assuming a linux amd64 system:
+dpkg --add-architecture i386
+apt-get update
+apt-get install libc6:i386
+apt-get install libx11-6:i386
+install aos from http://www.informatik.uni-bremen.de/~fld/UnixAos/rev.7086/
+get LinuxAos.tgz and in
+as root: chmod +x install.UnixAos
+./install.UnixAos LinuxAos.tgz
+apt-get install libgl1-mesa-dri:i386 libgl1-mesa-glx:i386
+apt-get install libglu1-mesa:i386
+as user: cd spasim; aos
