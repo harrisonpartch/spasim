@@ -290,7 +290,7 @@ BEGIN
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
-	mstarget:=30;
+	mstarget:=50;
 	SetFullWindow(TRUE); 	
 END openwincam;
 

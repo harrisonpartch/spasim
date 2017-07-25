@@ -11429,7 +11429,8 @@ BEGIN
 
 
 	(* mesa *)
-	libraryPaths[2] := "/usr/lib/i386-linux-gnu/mesa";
+	libraryPaths[2] := "/usr/lib/i386-linux-gnu";
+	
 
 	(* local, libGL.so.1 needs to be 32bit *)
 	libraryPaths[3] := "/usr/local/lib";

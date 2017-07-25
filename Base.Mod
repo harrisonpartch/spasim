@@ -6,8 +6,8 @@ Strings, Streams, CryptoMD5, WMFontManager, Raster, WMRasterScale, WMRectangles,
 CONST
 	NL*=24;
 	MIP0=32;
-	MIP1=256;
-	MIP2=1024;
+	MIP1=128;
+	MIP2=512;
 
 TYPE Name*=ARRAY NL OF CHAR;
 
@@ -89,6 +89,8 @@ BEGIN
 	IF img=NIL THEN 
 		img := defaultimg;
 	END;
+	W:=img.width;
+	H:=img.height;
 	NEW(mip_zero);
 	NEW(mip_one);	
 	NEW(mip_two);
@@ -151,6 +153,19 @@ BEGIN
 	c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
 	RETURN c
 END pixelmip_two;
+
+PROCEDURE pixel*(x,y:REAL):Color;
+VAR
+	i,j: LONGINT;
+	p: Raster.Pixel;
+	c: Color;
+BEGIN
+	i:= ENTIER(x*W) MOD W;
+	j:=ENTIER(y*H) MOD H;
+	Raster.Get(img,i,j,p,copy); 
+	c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
+	RETURN c
+END pixel;
 
 PROCEDURE pixelT*(x,y:REAL; T: LONGINT):Color;
 VAR

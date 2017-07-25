@@ -275,7 +275,8 @@ VAR
 	undo,rd, rdpseudosolid, blu, die,gren,granite,sand,whiteblock,lazy,pdestroyer,axolotl,xen,sky1,sky2,tigerlily,cloud: Voxel;
 	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison,fuse:Voxel;
 	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,
-	w3,z3,z3a,z2,z4,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp,acidcats, badopossum, raccoon: Voxel;
+	w3,z3,z3a,z2,z4,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp,acidcats, badopossum, raccoon,
+	bottle1,bottle2,bottle3,bottlepossum,bottlegrounds: Voxel;
 	ball: FRep.sphere;
 	noise: FRep.noise;	 
 BEGIN
@@ -287,7 +288,7 @@ BEGIN
   	w10:=Base.VoxelFromName("NM3");	
  	z10:=Base.VoxelFromName("NM2");	
 	w3:=Base.VoxelFromName("NM3");	 
-	z2:=Base.VoxelFromName("NM2");
+	z2:=Base.VoxelFromName("NM3");
 	z3:=Base.VoxelFromName("NM3");	
 	z3a:=Base.VoxelFromName("NM3");	
 	z4:=Base.VoxelFromName("NM4");	
@@ -420,14 +421,23 @@ BEGIN
 	push(sky2);
 	tigerlily:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  				
 	push(tigerlily);	
+	bottle1:=Base.VoxelFromName("Nbottle1");  
+	push(bottle1);
+	bottle2:=Base.VoxelFromName("Nbottle2");  
+	push(bottle2);
+	bottle3:=Base.VoxelFromName("Nbottle3");  
+	push(bottle3);
+	bottlepossum:=Base.VoxelFromName("Nbottlepossum");  
+	push(bottlepossum);	
+	bottlegrounds:=Base.VoxelFromName("Nbottlegrounds");  
 	NEW(noise);		
 	noise.seed:=1534666690;		
-	noise.a:=3.5;
-	noise.b:=3.5;
-	noise.c:=3.5;		
+	noise.a:=7.5;
+	noise.b:=7.5;
+	noise.c:=7.5;		
 	noise.octaves:=4;
 
-	noise.persistence:=3.21;
+	noise.persistence:=3.61;
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,9/10);
@@ -435,18 +445,17 @@ BEGIN
 
 	Base.setPT(center,1/2,1/2,1/2);
 	NEW(ball,center,0.55);  
-	ball.setvoxel(greenball);
+	ball.setvoxel(bottle1);
 	serp.passable:=FALSE;   
 	conglo2.copyonstroke:=TRUE;
-	noise.setvoxel(reddot);	
+	noise.setvoxel(bottlegrounds);	
 	etile2.passable:=FALSE;
 	reddot.tscale:=0;
 	
 	Base.setPT(center,1/2,1/2,9/12);
 	NEW(plane,center,up);
-	plane.vox:=axolotl;	
+	plane.vox:=bottlepossum;	
 	rat.tscale:=16;
-
 
 	Base.EMPTY.red:=3;
 	Base.EMPTY.black:=6;
