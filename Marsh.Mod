@@ -276,7 +276,7 @@ VAR
 	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison,fuse:Voxel;
 	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,
 	w3,z3,z3a,z2,z4,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp,acidcats, badopossum, raccoon,
-	bottle1,bottle2,bottle3,bottlepossum,bottlegrounds: Voxel;
+	bottle1,bottle2,bottle3,bottlepossum,bottlegrounds,greensuncouple: Voxel;
 	ball: FRep.sphere;
 	noise: FRep.noise;	 
 BEGIN
@@ -430,11 +430,12 @@ BEGIN
 	bottlepossum:=Base.VoxelFromName("Nbottlepossum");  
 	push(bottlepossum);	
 	bottlegrounds:=Base.VoxelFromName("Nbottlegrounds");  
+	greensuncouple:=Base.VoxelFromName("Ngreensuncouple");  
 	NEW(noise);		
 	noise.seed:=1534666690;		
-	noise.a:=7.5;
-	noise.b:=7.5;
-	noise.c:=7.5;		
+	noise.a:=4.5;
+	noise.b:=4.5;
+	noise.c:=4.5;		
 	noise.octaves:=4;
 
 	noise.persistence:=3.61;
@@ -448,19 +449,19 @@ BEGIN
 	ball.setvoxel(bottle1);
 	serp.passable:=FALSE;   
 	conglo2.copyonstroke:=TRUE;
-	noise.setvoxel(bottlegrounds);	
+	noise.setvoxel(greensuncouple);	
 	etile2.passable:=FALSE;
 	reddot.tscale:=0;
 	
 	Base.setPT(center,1/2,1/2,9/12);
 	NEW(plane,center,up);
-	plane.vox:=bottlepossum;	
+	plane.vox:=bottlegrounds;	
 	rat.tscale:=16;
 
 	Base.EMPTY.red:=3;
 	Base.EMPTY.black:=6;
 	Base.EMPTY.alpha:=6;
-	z3.setcolor(1,0,0,5,5); 
+	z3.setcolor(5,0,5,20,15); 
 	z3.FRaster(plane,27); 
 	z3.FRaster(noise,81); 
 	Base.world:=z3; 	
