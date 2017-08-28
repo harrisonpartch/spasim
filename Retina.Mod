@@ -8,8 +8,8 @@ TYPE
 CONST
 	T=5;        
 	TS=3*32;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=8;
-	TH=5;
+	TW=16;
+	TH=9;
 	W*=TS*TW;
 	H*=TS*TH;
 	CX=W DIV 2;
@@ -56,7 +56,7 @@ BEGIN
 			ray.clr.alpha:=1;
 			ray.scale := 1; 
 			ray.tscale:=1;
-			ray.dtl:=0.1;	
+			ray.dtl:=D2;	
 			angletoray(ray,theta,phi,dtheta,dphi);
 			Base.world.Shade(ray);
 			IF ray.terminate THEN
@@ -90,7 +90,7 @@ BEGIN
 	ray.clr.alpha:=1;
 	ray.scale := 1; 
 	ray.tscale:=1;
-	ray.dtl:=0.1;	
+	ray.dtl:=DETAIL;	
 	angletoray(ray,cam.theta+cam.dtheta/2, cam.phi+cam.dphi/2, cam.dtheta/3,cam.dphi/3);	
 	Base.world.Shade(ray);
 	IF ~ray.terminate THEN
@@ -206,6 +206,7 @@ VAR
 	FV: REAL;
 	copy: Raster.Mode;
 	PATCH*:BOOLEAN;
+	DETAIL,D2: REAL;
 PROCEDURE reflect(VAR p: PT; n: PT);
 VAR 
 	a,b,c,dot: REAL;
@@ -297,15 +298,28 @@ END splitcam;
 
 PROCEDURE lessdetail*;
 BEGIN
-	IF foveaparameter<150 THEN foveaparameter:=foveaparameter+1 END;
+	IF foveaparameter<150 THEN foveaparameter:=foveaparameter+20 END;
 	FV:=W*W/foveaparameter;
 END lessdetail;
 
 PROCEDURE moredetail*;
 BEGIN
-	foveaparameter:=ABS(foveaparameter-1);
+	foveaparameter:=ABS(foveaparameter-20);
 	FV:=W*W/foveaparameter	;
 END moredetail;
+
+PROCEDURE decdetail*;
+BEGIN
+	DETAIL:=DETAIL*2/3;
+	D2:=DETAIL*5;
+END decdetail;
+
+PROCEDURE incdetail*;
+BEGIN
+	DETAIL:=DETAIL*3/2;
+	D2:=DETAIL*5;
+END incdetail;
+
 
 PROCEDURE incTD;
 BEGIN{EXCLUSIVE}
@@ -413,6 +427,8 @@ BEGIN
 	EDGE:=0.001;
 	AFTER:=2;
  	FAST:=3;
+ 	DETAIL:=0.1;
+ 	D2:=0.5;
  	lsense:=0.2;
  	aperture.width:=1;
  	aperture.height:=1;

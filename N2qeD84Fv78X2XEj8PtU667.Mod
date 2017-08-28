@@ -31,7 +31,7 @@ VAR
 	noise: FRep.noise;
 	cyl: FRep.hexgrid;
 	tblue: Voxel;
-	dot,bdot,rdot,gdot,reddot,bluedot,greendot, tigerlily,v: Voxel;
+	dot,bdot,rdot,gdot,reddot,bluedot,greendot, bottlepossum,v: Voxel;
 	center, p,p1, p2,n:  PT;
 	i:LONGINT;
 	rand: Random.Generator;
@@ -41,18 +41,20 @@ VAR
 PROCEDURE draw;
 BEGIN	 
 	center:=Base.mkPT(1/2,1/2,1/2);
-	reddot:=Base.VoxelFromName("NM6");
+	reddot:=Base.VoxelFromName("NM3");
+	bottlepossum:=Base.VoxelFromName("Nbottlepossum"); 
 	NEW(ball,center,0.47);
 	ball.setcolor(0.7,0.6,0,1);
-	reddot.FRaster(ball,36);	
-	NEW(ball,center,0.57);	
-	ball.setcolor(0.9,0.2,0,1);
-	reddot.FRaster(ball,36);	
-	reddot.copyonstroke:=TRUE;
+	reddot.FRaster(ball,27);	
+(*	NEW(ball,center,0.57);	
+	ball.setvoxel(bottlepossum);
+	reddot.FRaster(ball,27);	
+*)	reddot.copyonstroke:=TRUE;
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
+	reddot.copyonstroke:=TRUE;
 	RETURN reddot
 END thisvox;
 

@@ -1,4 +1,4 @@
-MODULE NM3; (*! This module may be either imported or used anonymously *)
+MODULE NM4; (*! This module may be either imported or used anonymously *)
 IMPORT Base, SPSME, Noise, Math, TexVox, Out := KernelLog, Debugging, Streams,Strings;
 
 (*
@@ -6,10 +6,10 @@ Special voxel containing 27 children arranged in a 3x3x3 grid.
 Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
 *)
 
-CONST M=3; (* defines grid size *)
+CONST M=4; (* defines grid size *)
 	MMO=M-1;
 	CUBERADIUS=0.9;   (*change to sqrt(3)/2 ???*)
-	NCODE="NM3";
+	NCODE="NM4";
 	NL=Base.NL;
 
 TYPE PT = Base.PT;
@@ -69,13 +69,11 @@ END rot90zNC;
 
 TYPE cell* = OBJECT(Voxel);
 VAR
+	nposterTF*:BOOLEAN;
+	nposter*: NCube;
 	blox*: ARRAY M,M,M OF Voxel;
 	nbloxTF*: ARRAY M,M,M OF BOOLEAN;
 	nblox*: ARRAY M,M,M OF NCube;
-	nposterTF*:BOOLEAN;
-	nposter*: NCube;
-	light: Base.Light;
-
 PROCEDURE r90z;
 VAR i,j,k: INTEGER;
 BEGIN
@@ -101,11 +99,13 @@ VAR
 	vdepth, blainv: REAL;
 	last:BOOLEAN;
 	i,j: LONGINT;
-	patchray: Ray;
+	patchray,pray: Ray;
 	patchdx, patchdy: PT;
 	patchradiusx, patchradiusy: REAL;
+	lastlength:REAL;
 BEGIN
 	ray.lastclr:=ray.clr;
+	patchray:=ray;
 	ray.lastlxyz:=ray.lxyz;
 	ray.scale := ray.scale*M;
 	xyz.x := ABS(ray.lxyz.x-offset.x) * M;
@@ -120,33 +120,6 @@ BEGIN
 			ray.normal:=nposter.normal;
 			nshade(nposter,ray);
 		END;
-		IF ray.terminate THEN (* should always be true unless maybe the imposter is translucent lol *)
-			IF ray.ispatchTF & ~ray.patched THEN
-				ray.patched:=TRUE;
-				ray.scale:=ray.scale/M;
-				patchradiusx:=Math.sin(ray.dtheta)*ray.length;
-				patchradiusy:=Math.sin(ray.dphi)*ray.length;
-				patchdx.x := ray.rightxyz.x*patchradiusx; patchdx.y := ray.rightxyz.y*patchradiusx; patchdx.z := ray.rightxyz.z*patchradiusx;
-				patchdy.x := ray.downxyz.x*patchradiusy; patchdx.y := ray.downxyz.y*patchradiusy; patchdx.z := ray.downxyz.z*patchradiusy;
-				FOR i:= 0 TO 2 DO
-					FOR j:= 0 TO 2 DO
-						ray.clr:=ray.lastclr;
-						ray.terminate:=FALSE;
-						ray.lxyz.x := ray.lastlxyz.x + (i-1)*patchdx.x + (j-1)*patchdy.x;
-						ray.lxyz.y :=  ray.lastlxyz.y+ (i-1)*patchdx.y + (j-1)*patchdy.y;
-						ray.lxyz.z := 	 ray.lastlxyz.z + (i-1)*patchdx.z + (j-1)*patchdy.z;
-						Shade(ray);
-						IF ~ray.terminate THEN (* miss out *)
-							(* convert ray.lxyz that missed to ray.xyz and reshoot *)
-							Base.world.Shade(ray)
-						END;
-						ray.patch[i,j]:=ray.clr;
-					(*	ray.patch[i,j].b:=1;	*)
-					END
-				END;
-				ray.terminate:=TRUE;
-			END
-		END
 	ELSE
 		SPSME.E(xyz,ijk);
 		bounds(ijk.i,ijk.j,ijk.k,out);
@@ -165,29 +138,6 @@ BEGIN
 			ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 				nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
 			END;
-		IF ray.terminate THEN (* should always be true unless maybe the imposter is translucent lol *)
-			IF ray.ispatchTF & ~ray.patched THEN
-				ray.patched:=TRUE;
-				ray.scale:=ray.scale/M;
-				patchradiusx:=Math.sin(ray.dtheta)*ray.length;
-				patchradiusy:=Math.sin(ray.dphi)*ray.length;
-				patchdx.x := ray.rightxyz.x*patchradiusx; patchdx.y := ray.rightxyz.y*patchradiusx; patchdx.z := ray.rightxyz.z*patchradiusx;
-				patchdy.x := ray.downxyz.x*patchradiusy; patchdx.y := ray.downxyz.y*patchradiusy; patchdx.z := ray.downxyz.z*patchradiusy;
-				FOR i:= 0 TO 2 DO
-					FOR j:= 0 TO 2 DO
-						ray.clr:=ray.lastclr;
-						ray.terminate:=FALSE;
-						ray.xyz.x := ray.xyz.x + (i-1)*patchdx.x + (j-1)*patchdy.x;
-						ray.xyz.y :=  ray.xyz.y+ (i-1)*patchdx.y + (j-1)*patchdy.y;
-						ray.xyz.z := 	 ray.xyz.z + (i-1)*patchdx.z + (j-1)*patchdy.z;
-						Shade(ray);
-						ray.patch[i,j]:=ray.clr;
-					(*	ray.patch[i,j].b:=1;	*)
-					END
-				END;
-				ray.terminate:=TRUE;
-			END
-		END
 		END
 	END;
 	IF ~ray.terminate THEN
@@ -290,31 +240,8 @@ BEGIN
 					xyz.z := xyz.z + ray.popdelta.z;
 				ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
-				END;
-		IF ray.terminate THEN (* should always be true unless maybe the imposter is translucent lol *)
-			IF ray. ispatchTF & ~ray.patched THEN
-				ray.patched:=TRUE;
-				ray.scale:=ray.scale/M;
-				patchradiusx:=Math.sin(ray.dtheta)*ray.length;
-				patchradiusy:=Math.sin(ray.dphi)*ray.length;
-				patchdx.x := ray.rightxyz.x*patchradiusx; patchdx.y := ray.rightxyz.y*patchradiusx; patchdx.z := ray.rightxyz.z*patchradiusx;
-				patchdy.x := ray.downxyz.x*patchradiusy; patchdx.y := ray.downxyz.y*patchradiusy; patchdx.z := ray.downxyz.z*patchradiusy;
-				FOR i:= 0 TO 2 DO
-					FOR j:= 0 TO 2 DO
-						ray.clr:=ray.lastclr;
-						ray.terminate:=FALSE;
-						ray.xyz.x := ray.xyz.x + (i-1)*patchdx.x + (j-1)*patchdy.x;
-						ray.xyz.y :=  ray.xyz.y+ (i-1)*patchdx.y + (j-1)*patchdy.y;
-						ray.xyz.z := 	ray.xyz.z + (i-1)*patchdx.z + (j-1)*patchdy.z;
-						Shade(ray);
-						ray.patch[i,j]:=ray.clr;
-					(*	ray.patch[i,j].b:=1;	*)
-					END
-				END;
-				ray.terminate:=TRUE;
-			END
-		END
-		END
+				END
+			END;
 		UNTIL out OR ray.terminate;
 	END;
 	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
@@ -559,7 +486,7 @@ VAR
 	X,Y,Z: REAL;
 	i,j,k: LONGINT;
 BEGIN
-	IF probelock THEN RETURN FALSE END;
+	IF ~passable THEN RETURN FALSE END;
 	Base.clamPT(p);
 	X := p.x*M; Y := p.y*M; Z := p.z*M;
 	i := ENTIER(X);
@@ -577,6 +504,7 @@ VAR
 	i,j,k: LONGINT;
 BEGIN
 	Base.clamPT(p);
+	IF copyonstroke THEN Out.Char('&') END;  (* but Base.world is never copyonstroke *)
 	IF voxel#NIL THEN
 		strokerec(p,resolution,1, voxel);
 	END
@@ -623,10 +551,10 @@ BEGIN
 				IF  blox[i,j,k].copyonstroke THEN
 					copyv:=blox[i,j,k].deepcopy();
 					copyv.copyonstroke:=FALSE;
-					copyv.strokerec(p, resolution,nextscale, voxel);
-					blox[i,j,k]:=copyv;
+					copyv.strokerec(p, resolution,nextscale,voxel);
+					blox[i,j,k]:=copyv; Out.Char('*');
 				ELSIF blox[i,j,k].complex THEN
-					blox[i,j,k].strokerec(p, resolution,nextscale,  voxel)
+					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
 				ELSE
 					NEW(c);
 					c.fill(blox[i,j,k]);
@@ -924,30 +852,24 @@ VAR
 	cv,child:Voxel;
 	i,j,k: INTEGER;
 BEGIN
-	IF code=NCODE THEN
-		copymarker:=TRUE;
-		NEW(c);
-		c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; c.alpha:=alpha;
-		c.nbloxTF:=nbloxTF;
-		c.nblox:=nblox;
-		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
-			child:=blox[i,j,k];
-			IF (child#NIL) THEN
-				IF ~child.copymarker THEN
-					 c.blox[i,j,k]:=child.deepcopy();
-				ELSE
-					c.blox[i,j,k]:=child
-				END
+	copymarker:=TRUE;
+	NEW(c);
+	c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; c.alpha:=alpha;
+	c.nbloxTF:=nbloxTF;
+	c.nblox:=nblox;
+	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
+		child:=blox[i,j,k];
+		IF (child#NIL) THEN
+			IF ~child.copymarker & ~ child.copyonstroke THEN
+				 c.blox[i,j,k]:=child.deepcopy();
+			ELSE
+				c.blox[i,j,k]:=child
 			END
-		END END END;
-		copymarker:=FALSE;
-		RETURN c
-	ELSE
-		cv:= Base.VoxelFromName(code);
-		RETURN cv
-	END;
+		END
+	END END END;
+	copymarker:=FALSE;
+	RETURN c
 END deepcopy;
-
 PROCEDURE count*(level: INTEGER):LONGINT;
 VAR
 	c: LONGINT;
@@ -1039,4 +961,4 @@ END thisvox;
 
 BEGIN
 
-END NM3.
+END NM4.

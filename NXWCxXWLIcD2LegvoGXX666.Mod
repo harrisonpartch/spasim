@@ -51,7 +51,7 @@ VAR
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	raccoon:=Base.VoxelFromName("Nraccoon"); 
-	bpossum:=Base.VoxelFromName("Ndiffuseblue"); 
+	bpossum:=Base.VoxelFromName("Ngreensuncouple"); 
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	red:=Base.VoxelFromName("Ndiffusered"); 
 	reddot:=Base.VoxelFromName("Nreddot"); 

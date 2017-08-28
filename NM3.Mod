@@ -504,7 +504,7 @@ VAR
 	i,j,k: LONGINT;
 BEGIN
 	Base.clamPT(p);
-	IF copyonstroke THEN Out.Char('*') END;
+	IF copyonstroke THEN Out.Char('&') END;  (* but Base.world is never copyonstroke *)
 	IF voxel#NIL THEN
 		strokerec(p,resolution,1, voxel);
 	END
@@ -552,7 +552,7 @@ BEGIN
 					copyv:=blox[i,j,k].deepcopy();
 					copyv.copyonstroke:=FALSE;
 					copyv.strokerec(p, resolution,nextscale,voxel);
-					blox[i,j,k]:=copyv;
+					blox[i,j,k]:=copyv; Out.Char('*');
 				ELSIF blox[i,j,k].complex THEN
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
 				ELSE

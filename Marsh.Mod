@@ -276,9 +276,9 @@ VAR
 	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison,fuse:Voxel;
 	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,
 	w3,z3,z3a,z2,z4,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp,acidcats, badopossum, raccoon,
-	bottle1,bottle2,bottle3,bottlepossum,bottlegrounds,greensuncouple: Voxel;
+	bottle1,bottle2,bottle3,bottlepossum,bottlegrounds,greensuncouple,wstar,starspider: Voxel;
 	ball: FRep.sphere;
-	noise: FRep.noise;	 
+	noise,noise2: FRep.noise;	 
 BEGIN
 	NEW(ms);
 	NEW(EMPTY);
@@ -431,39 +431,42 @@ BEGIN
 	push(bottlepossum);	
 	bottlegrounds:=Base.VoxelFromName("Nbottlegrounds");  
 	greensuncouple:=Base.VoxelFromName("Ngreensuncouple");  
+	wstar:=Base.VoxelFromName("Nwstar");  
+	starspider:=Base.VoxelFromName("Nstarspider");  
 	NEW(noise);		
 	noise.seed:=1534666690;		
-	noise.a:=4.5;
-	noise.b:=4.5;
-	noise.c:=4.5;		
+	noise.a:=1.5;
+	noise.b:=1.5;
+	noise.c:=1.5;		
 	noise.octaves:=4;
-
-	noise.persistence:=3.61;
+	noise.persistence:=3.61;	
+	noise.setvoxel(wstar);			
+	NEW(noise2);		
+	noise2.seed:=666666;		
+	noise2.a:=1.5;
+	noise2.b:=1.5;
+	noise2.c:=1.5;		
+	noise2.octaves:=4;
+	noise2.persistence:=3.61;
+	noise2.setvoxel(xot2);		
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,9/10);
 	Base.setPT(up,0,0,1);
-
-	Base.setPT(center,1/2,1/2,1/2);
-	NEW(ball,center,0.55);  
-	ball.setvoxel(bottle1);
 	serp.passable:=FALSE;   
 	conglo2.copyonstroke:=TRUE;
-	noise.setvoxel(greensuncouple);	
+
 	etile2.passable:=FALSE;
-	reddot.tscale:=0;
 	
 	Base.setPT(center,1/2,1/2,9/12);
-	NEW(plane,center,up);
-	plane.vox:=bottlegrounds;	
-	rat.tscale:=16;
 
-	Base.EMPTY.red:=3;
-	Base.EMPTY.black:=6;
-	Base.EMPTY.alpha:=6;
-	z3.setcolor(5,0,5,20,15); 
-	z3.FRaster(plane,27); 
+	NEW(plane,center,up);
+	plane.vox:=starspider;	
+	
+	z3.setcolor(1,0,3,5,12); 
+	z3.FRaster(plane,81); 
 	z3.FRaster(noise,81); 
+(*	z3.FRaster(noise2,27); 	*)
 	Base.world:=z3; 	
 	
 	Base.avatar:=harrison;

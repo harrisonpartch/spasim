@@ -236,8 +236,12 @@ BEGIN
 			color:=texcube.side[ray.face].pixelmip_one(lx,ly);
 		ELSIF mip>2 THEN
 			color:=texcube.side[ray.face].pixelmip_two(lx,ly);			
+		ELSIF mip > 1.5 THEN
+			color1:=texcube.side[ray.face].pixel(lx,ly);
+			color2:=texcube.side[ray.face].pixel(lx*10,ly*10);  (* Base.Texture.pixel applies MODulo *)
+			color:=Base.mixcolor(color1,color2,1.5);	
 		ELSE
-			color:=texcube.side[ray.face].pixel(lx,ly);		
+			color:=texcube.side[ray.face].pixel(lx*10,ly*10);
 		END; 
 		IF color.alpha<0.99 THEN
 			IF color.alpha>0.69 THEN 

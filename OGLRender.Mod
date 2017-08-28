@@ -282,7 +282,7 @@ VAR
 	
 PROCEDURE &openwincam(w,h: INTEGER);
 BEGIN
-	Init(w,h, 0,0, FALSE );
+	Init(w,h, 0,0, TRUE );
 	NEW(camera,Retina.W, Retina.H); 
 	camera.aperjust(w, h);
 	SetTitle("SPASIM");
@@ -290,7 +290,7 @@ BEGIN
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
-	mstarget:=35;
+	mstarget:=100;
 	SetFullWindow(TRUE); 	
 END openwincam;
 
@@ -369,10 +369,8 @@ VAR
 BEGIN
 	key:=CHR(ucs);
 		CASE CHR(ucs) OF		
-			"S": INC(Base.patchy); Out.String("patchy "); Out.Int(Base.patchy,4); Out.Ln;
-			| "W": DEC(Base.patchy); Out.String("patchy "); Out.Int(Base.patchy,4); Out.Ln;
-			| "A": INC(Base.patchx); Out.String("patchx "); Out.Int(Base.patchx,4); Out.Ln;		
-			| "D": DEC(Base.patchx); Out.String("patchx "); Out.Int(Base.patchx,4); Out.Ln;		
+			"S": Retina.incdetail; Out.String("inc detail"); 
+			| "W":Retina.decdetail; Out.String("dec detail"); 
 			|   "s" : camera.forward(-0.51*Base.speed)
 			| "w" :camera.forward(0.51*Base.speed) 
 			| "a" :camera.rightstrafe(-0.5*Base.speed)	
@@ -607,7 +605,7 @@ END KeyEvent;
 	(* change detail according to frame speed, called in GLWindow.MainLoop *)
 	PROCEDURE GameLogic();
 	BEGIN
-		IF GetCurrentFrameMs() < (mstarget-5) THEN 
+		IF GetCurrentFrameMs() < (mstarget) THEN 
 			Retina.moredetail;
 		ELSIF GetCurrentFrameMs() > mstarget THEN 
 			Retina.lessdetail;
@@ -742,7 +740,7 @@ END cursorsizeminus;
 PROCEDURE Open* ;
 VAR w: GLWindow;
 BEGIN
-	NEW(w, Retina.W*2,Retina.H*2);
+	NEW(w, Retina.W,Retina.H);
 (*	Debugging.DisableGC; *)
 	Base.STOPGO
 END Open;

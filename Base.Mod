@@ -692,6 +692,16 @@ BEGIN
 	RETURN(c);
 END mkcolor;
 
+PROCEDURE mixcolor*(a,b: Color; m: REAL):Color;
+VAR
+	c:Color;
+	tmm:REAL;
+BEGIN
+	tmm:=2-m;
+	c.red:=(a.red*m+b.red*tmm)/2; c.green:=(a.green*m+b.green*tmm)/2; c.blue:=(a.blue*m+b.blue*tmm)/2; c.alpha:=(a.alpha*m+b.alpha*tmm)/2;
+	RETURN(c);
+END mixcolor;
+
 PROCEDURE avgcolor*(a,b: Color): Color;
 VAR
 	c:Color;
