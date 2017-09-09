@@ -2,8 +2,7 @@ MODULE NM2; (*! This module may be either imported or used anonymously *)
 IMPORT Base, SPSME, Noise, Math, TexVox, Out := KernelLog, Debugging, Streams,Strings;
 
 (*
-Special voxel containing 27 children arranged in a 3x3x3 grid.
-Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
+Special voxel containing 8 children.
 *)
 
 CONST M=2; (* defines grid size *)
