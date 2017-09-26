@@ -299,8 +299,7 @@ END P;
 
 BEGIN
 	r:=Base.VoxelFromName("Ndiffusered"); 	
-	b:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODh");
-	y:=Base.VoxelFromName("NUeconrGpx7plz7ym76ibLw");
+	b:=Base.VoxelFromName("NmOgKSH5ZXYP3DODELOkO7g");
 	NEW(vox,b,NIL,NIL);
 	vox.passable:=TRUE
 END Nrdvolvox.

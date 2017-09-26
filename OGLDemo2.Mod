@@ -17,7 +17,7 @@ TYPE
 			anglez := 30.0;
 			eyeposz := 10.0;
 		SetTitle("OGLDemo2");
-		SetIdleTime(1000); (* set idle time to 50ms *)
+		SetIdleTime(100); (* set idle time to 5ms *)
 
 		SetGameMode(TRUE);
 	END New;
@@ -26,10 +26,10 @@ TYPE
 	PROCEDURE IdleDisplay();
 	BEGIN
 			IF left THEN
-			anglez := anglez - 5.0;
+			anglez := anglez - 15.0;
 			IF anglez < 0 THEN anglez := 360 ; END;
 
-		ELSE  anglez := anglez + 5.0;
+		ELSE  anglez := anglez + 15.0;
 			  IF anglez > 360 THEN anglez := 0; END;
 		END;
 		 ReDisplay();

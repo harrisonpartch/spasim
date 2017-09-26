@@ -315,9 +315,9 @@ BEGIN
 	push(reddot);
 	msphere:=Base.VoxelFromName("NBsHFiBKkSckXBAd46Zbsss"); 	
 	 push(msphere);	
-(* 	volvox:=Base.VoxelFromName("Nrdvolvox");  	
-      push(volvox);
-*)       rdpseudosolid:=Base.VoxelFromName("Nrdpseudosolid"); 
+ (*	volvox:=Base.VoxelFromName("Nrdvolvox");  	
+      push(volvox); *)
+      rdpseudosolid:=Base.VoxelFromName("Nrdpseudosolid"); 
        push(rdpseudosolid);
 	beatrix:=Base.VoxelFromName("NwPicBWw4NfcserX4ELaQ3b"); 
 	acidcats:=Base.VoxelFromName("Nacidcats"); 
@@ -440,15 +440,15 @@ BEGIN
 	noise.c:=1.5;		
 	noise.octaves:=4;
 	noise.persistence:=3.61;	
-	noise.setvoxel(wstar);			
+	noise.setvoxel(xot2);			
 	NEW(noise2);		
 	noise2.seed:=666666;		
-	noise2.a:=1.5;
-	noise2.b:=1.5;
-	noise2.c:=1.5;		
+	noise2.a:=10.5;
+	noise2.b:=10.5;
+	noise2.c:=10.5;		
 	noise2.octaves:=4;
 	noise2.persistence:=3.61;
-	noise2.setvoxel(xot2);		
+	noise2.setvoxel(axolotl);		
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,9/10);
@@ -461,12 +461,12 @@ BEGIN
 	Base.setPT(center,1/2,1/2,9/12);
 
 	NEW(plane,center,up);
-	plane.vox:=starspider;	
+	plane.vox:=bottle3;	
 	
 	z3.setcolor(1,0,3,5,12); 
 	z3.FRaster(plane,81); 
-	z3.FRaster(noise,81); 
-(*	z3.FRaster(noise2,27); 	*)
+	z3.FRaster(noise2,81); 
+	z3.FRaster(noise,27); 	
 	Base.world:=z3; 	
 	
 	Base.avatar:=harrison;
@@ -492,7 +492,7 @@ BEGIN
 	dawn;
 	cursorsize:=81;
 	cursorTF:=TRUE;
-	atmdark:=1.2;
+	atmdark:=0;
 	SNIPEINTO:=TRUE;
 END Marsh.
 

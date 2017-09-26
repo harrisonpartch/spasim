@@ -1,5 +1,5 @@
 MODULE Retina;
-IMPORT  Base, Objects, Kernel, Out:=KernelLog, Noise,
+IMPORT  Base, Objects, Kernel, Out:=DebugLog, Noise,
 Math, SPSMMath, Raster, Graphics:=WMGraphics, WMRasterScale,  Rect := WMRectangles;
 
 TYPE
@@ -8,13 +8,13 @@ TYPE
 CONST
 	T=5;        
 	TS=3*32;  (*  TS MUST BE 5 (or 9, 16, etc, depending on tessa version) MULTIPLIED BY 2**T *)
-	TW=16;
-	TH=9;
+	TW=4;
+	TH=3;
 	W*=TS*TW;
 	H*=TS*TH;
 	CX=W DIV 2;
 	CY=H DIV 2;
-	GAMMA=255; 
+	GAMMA=250; 
 
 TYPE Camera= RECORD			(* solid angle *)
 	dtheta, dphi, theta, phi,rphi:REAL;
@@ -44,12 +44,13 @@ VAR
 	pixel: Raster.Pixel;
 	r,b,g: REAL;
 BEGIN
-	dtheta:=cam.dtheta/3;
-	dphi:=cam.dphi/3;
+	dtheta:=cam.dtheta;
+	dphi:=cam.dphi;
 	theta:=cam.theta;
 	FOR i:= 0 TO 2 DO
 		phi:=cam.phi;
 		FOR j := 0 TO 2 DO 
+			ray:=Base.blankray;		
 			ray.clr.ra := 1;
 			ray.clr.ga := 1;
 			ray.clr.ba := 1;
@@ -57,7 +58,7 @@ BEGIN
 			ray.scale := 1; 
 			ray.tscale:=1;
 			ray.dtl:=D2;	
-			angletoray(ray,theta,phi,dtheta,dphi);
+			angletoray(ray,theta,phi);
 			Base.world.Shade(ray);
 			IF ray.terminate THEN
 				r:=ray.clr.r;
@@ -68,7 +69,7 @@ BEGIN
 				r:= ray.clr.r + ray.clr.ra/3;
 				g:= ray.clr.g + ray.clr.ga/3 
 			END;
-			Base.clamp3(r,g,b);			
+(*			Base.clamp3(r,g,b);			*)
 			Raster.SetRGB(pixel,ENTIER(r*GAMMA),ENTIER(g*GAMMA),ENTIER(b*GAMMA)); 
 			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
 			phi:=phi+dphi;
@@ -83,26 +84,37 @@ VAR
 	theta,phi,dtheta,dphi: REAL;
 	ray: Base.Ray;
 	pixel: Raster.Pixel;
+	r,b,g: REAL;
 BEGIN
+	angletoray(ray,cam.theta+cam.dtheta/2, cam.phi+cam.dphi/2);
 	ray.clr.ra := 1;
 	ray.clr.ga := 1;
 	ray.clr.ba := 1;
 	ray.clr.alpha:=1;
 	ray.scale := 1; 
 	ray.tscale:=1;
-	ray.dtl:=DETAIL;	
-	angletoray(ray,cam.theta+cam.dtheta/2, cam.phi+cam.dphi/2, cam.dtheta/3,cam.dphi/3);	
+	ray.dtl:=D2;	
 	Base.world.Shade(ray);
-	IF ~ray.terminate THEN
-		ray.clr.b:= ray.clr.b + ray.clr.ba;
-		ray.clr.r:= ray.clr.r + ray.clr.ra/3;
-		ray.clr.g:= ray.clr.g + ray.clr.ga/3;
+	IF ray.terminate THEN
+		r:=ray.clr.r;
+		g:=ray.clr.g;
+		b:=ray.clr.b; 
+	ELSE
+		b:= ray.clr.b + ray.clr.ba;
+		r:= ray.clr.r + ray.clr.ra/3;
+		g:= ray.clr.g + ray.clr.ga/3
 	END;
-	Raster.SetRGB(pixel,ENTIER(ray.clr.r*GAMMA),ENTIER(ray.clr.g*GAMMA),ENTIER(ray.clr.b*GAMMA)); 
-	Raster.Fill(image,cam.imx,cam.imy,cam.imx+3,cam.imy+3,pixel,copy)			
+	Base.clamp3(r,g,b);	
+	Raster.SetRGB(pixel,ENTIER(r*GAMMA),ENTIER(g*GAMMA),ENTIER(b*GAMMA)); 
+(*	Raster.Fill(image,cam.imx,cam.imy,cam.imx+3,cam.imy+3,pixel,copy)		*)
+	FOR i:=0 TO 2 DO 
+		FOR j:= 0 TO 2 DO
+			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
+		END
+	END
 END tessa;
 
-PROCEDURE ztrace(cam: Camera; level: INTEGER);
+PROCEDURE ztraceu(cam: Camera; level: INTEGER);
 VAR
 	a,b,c,d: Camera;
 	l: INTEGER;
@@ -110,11 +122,28 @@ VAR
 BEGIN
 	splitcam(cam,a,b,c,d);
 	IF level<2 THEN
-(*			tessa(a);
+			tessa(a);
 			tessa(b);
 			tessa(c);
 			tessa(d);
-*)			x:=a.imx - W/2;
+	ELSE
+		l:=level-1;
+		ztraceu(a,l);
+		ztraceu(b,l);
+		ztraceu(c,l);
+		ztraceu(d,l) 	
+	END;
+END ztraceu;
+
+PROCEDURE ztracef(cam: Camera; level: INTEGER);
+VAR
+	a,b,c,d: Camera;
+	l: INTEGER;
+	x,y: REAL;
+BEGIN
+	splitcam(cam,a,b,c,d);
+	IF level<2 THEN
+			x:=a.imx - W/2;
 			y:=a.imy-H/2;		
 			IF (~saccade)&((x*x+y*y)<FV) THEN	
 				tessad3(a); 
@@ -144,12 +173,12 @@ BEGIN
 			END; 
 	ELSE
 		l:=level-1;
-		ztrace(a,l);
-		ztrace(b,l);
-		ztrace(c,l);
-		ztrace(d,l) 	
+		ztracef(a,l);
+		ztracef(b,l);
+		ztracef(c,l);
+		ztracef(d,l) 	
 	END;
-END ztrace;
+END ztracef;
 
 PROCEDURE ztraced(cam: Camera; level: INTEGER);
 VAR
@@ -177,7 +206,12 @@ BEGIN{ACTIVE, PRIORITY(Objects.Low)}
 		BEGIN{EXCLUSIVE}
 			AWAIT(GO);
 		END;
-		IF PATCH THEN ztrace(cam,T) ELSE ztraced(cam,T) END;
+		CASE TESSA OF
+			  0: ztraceu(cam,T); 
+			| 1: ztracef(cam,T) 
+			| 2: ztraced(cam,T) 
+		ELSE
+		END;
 		BEGIN{EXCLUSIVE}
 			GO:=FALSE;
 		incTD; 
@@ -185,9 +219,9 @@ BEGIN{ACTIVE, PRIORITY(Objects.Low)}
 		UNTIL ~Base.worldalive; 
 END Tile;
 
-
 VAR
 	tile: ARRAY TW,TH OF Tile;
+	TESSA: INTEGER;
 	frameasteps*,framebsteps*:LONGINT;
 	a,b: LONGINT;
 	tilesdone:INTEGER;
@@ -207,6 +241,13 @@ VAR
 	copy: Raster.Mode;
 	PATCH*:BOOLEAN;
 	DETAIL,D2: REAL;
+	
+PROCEDURE Res*;
+BEGIN
+	INC(TESSA);
+	TESSA:=TESSA MOD 3;
+END Res;
+
 PROCEDURE reflect(VAR p: PT; n: PT);
 VAR 
 	a,b,c,dot: REAL;
@@ -224,7 +265,7 @@ BEGIN
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
 END mirror;
 	
-PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi,dtheta,dphi: REAL);
+PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
 VAR 
 	d: REAL;
 BEGIN
@@ -235,9 +276,9 @@ BEGIN
 	ray.dxyz.x := ray.dxyz.x/d;
 	ray.dxyz.y := ray.dxyz.y/d;
 	ray.dxyz.z := ray.dxyz.z/d;	
-	ray.dtheta:=dtheta;
+(*	ray.dtheta:=dtheta;
 	ray.dphi:=dphi;
-	ray.downxyz:=Base.dward;
+*)	ray.downxyz:=Base.dward;
 	ray.rightxyz:=Base.rward;
 	SPSMMath.orrot(ray.dxyz, Base.dward, rtheta);  
 	SPSMMath.orrot(ray.dxyz, Base.rward, rphi);  
@@ -298,13 +339,13 @@ END splitcam;
 
 PROCEDURE lessdetail*;
 BEGIN
-	IF foveaparameter<150 THEN foveaparameter:=foveaparameter+20 END;
+	IF foveaparameter<150 THEN foveaparameter:=foveaparameter+2 END;
 	FV:=W*W/foveaparameter;
 END lessdetail;
 
 PROCEDURE moredetail*;
 BEGIN
-	foveaparameter:=ABS(foveaparameter-20);
+	foveaparameter:=ABS(foveaparameter-2);
 	FV:=W*W/foveaparameter	;
 END moredetail;
 
@@ -319,7 +360,6 @@ BEGIN
 	DETAIL:=DETAIL*3/2;
 	D2:=DETAIL*5;
 END incdetail;
-
 
 PROCEDURE incTD;
 BEGIN{EXCLUSIVE}
@@ -385,7 +425,7 @@ BEGIN
 	sr.clr.ba := 1;
 	sr.clr.alpha:=1;
 	sr.scale := 1; 
-	angletoray(sr,0,0,1/1000, 1/1000);	
+	angletoray(sr,0,0);	
 	Base.sniperay:=sr;
 	BEGIN{EXCLUSIVE}
 		gotiles;
@@ -402,7 +442,6 @@ BEGIN
 	Raster.Put(image,CX-1,CY-1,pixel,copy);	
 	Raster.Put(image,CX+1,CY-1,pixel,copy);	
 	Base.tick;
-
 END go;
 
 PROCEDURE lsu*;

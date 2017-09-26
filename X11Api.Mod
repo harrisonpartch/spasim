@@ -1108,7 +1108,7 @@ PROCEDURE LoadX11Functions;
 BEGIN
 
 		xlib := Unix.Dlopen( Unix.libX11name, 2 );
-		Unix.Dlsym( xlib, "XInitThreads", ADDRESSOF( InitThreads));
+(*		Unix.Dlsym( xlib, "XInitThreads", ADDRESSOF( InitThreads)); *)
 		Unix.Dlsym( xlib, "XOpenDisplay", ADDRESSOF( OpenDisplay));
 		Unix.Dlsym( xlib, "XCloseDisplay", ADDRESSOF( CloseDisplay));
 		Unix.Dlsym( xlib, "XCreateWindow", ADDRESSOF( CreateWindow));

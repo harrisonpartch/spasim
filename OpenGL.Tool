@@ -28,8 +28,7 @@ Compiler.Compile
 	GLShadersBuild.Mod
 	Unix.XF86VMode.Mod
 	Unix.OGLWindow.Mod	
-	~
-	
+	~	
 	GLXinfo.Do ~  # display opengl info
 	
 # WinAos:
