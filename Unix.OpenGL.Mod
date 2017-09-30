@@ -10755,18 +10755,16 @@ BEGIN
 		IF (GetIntegerv # NIL) & (XglGetStringi # NIL) THEN
 			GetIntegerv(GLC.GL_NUM_EXTENSIONS, ADDRESSOF(extensionCount));
 			NEW(strarray, extensionCount);
-			(*KernelLog.String("Extension Count: "); KernelLog.Int(extensionCount, 0); KernelLog.Ln;*)
+			KernelLog.String("Extension Count: "); KernelLog.Int(extensionCount, 0); KernelLog.Ln;
 			FOR i:=0 TO extensionCount-1 DO
 				es := GetStringi(GLC.GL_EXTENSIONS, i);
 				strarray[i] := es;
 			END;
-			buffer0 := Strings.Join(strarray, 0, extensionCount-1, " ");
-
+			IF extensionCount>0 THEN buffer0 := Strings.Join(strarray, 0, extensionCount-1, " ") END;
 		END;
 	ELSE
 		(* general extension string  *)
 		IF XglGetString = NIL THEN GetProcAddress ("glGetString", ADDRESSOF( XglGetString)); END;
-
 		IF XglGetString # NIL THEN buffer0 := GetString(GLC.GL_EXTENSIONS); END;
 	END;
 (*

@@ -27,13 +27,13 @@ BEGIN
 	dg := g*depth;
 	db := b*depth;
 	dbl:=black*depth;
-	ray.r := ray.r + dr;
-	ray.g := ray.g + dg;
-	ray.b := ray.b + db; 
-	ray.ra := ray.ra -dbl;
-	ray.ga := ray.ga -dbl;
-	ray.ba := ray.ba -dbl; 
-	IF (ray.ra<0.1)&(ray.ga<0.1)&(ray.ba<0.1) THEN ray.terminate:=TRUE END;
+	ray.clr.r := ray.clr.r + dr;
+	ray.clr.g := ray.clr.g + dg;
+	ray.clr.b := ray.clr.b + db; 
+	ray.clr.ra := ray.clr.ra -dbl;
+	ray.clr.ga := ray.clr.ga -dbl;
+	ray.clr.ba := ray.clr.ba -dbl; 
+	IF (ray.clr.ra<0.1)&(ray.clr.ga<0.1)&(ray.clr.ba<0.1) THEN ray.terminate:=TRUE END;
 END Shade;
 
 END TransparaVox;

@@ -95,7 +95,7 @@ BEGIN
 	d := d2(a.x, a.y, a.z);
 	IF d < D2 THEN	
 		dot := ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
-		ray.r := ray.r + dot*ray.ra; 
+		ray.clr.r := ray.color.red + dot*ray.ra; 
 		ray.g := ray.g + dot*ray.ga;
 		ray.b := ray.b +dot*ray.ba; 
 		ray.terminate := TRUE;		

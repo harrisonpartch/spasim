@@ -440,7 +440,7 @@ BEGIN
 	noise.c:=1.5;		
 	noise.octaves:=4;
 	noise.persistence:=3.61;	
-	noise.setvoxel(xot2);			
+	noise.setvoxel(greensuncouple);			
 	NEW(noise2);		
 	noise2.seed:=666666;		
 	noise2.a:=10.5;
@@ -448,7 +448,7 @@ BEGIN
 	noise2.c:=10.5;		
 	noise2.octaves:=4;
 	noise2.persistence:=3.61;
-	noise2.setvoxel(axolotl);		
+	noise2.setvoxel(bottlepossum);		
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,9/10);
@@ -463,15 +463,16 @@ BEGIN
 	NEW(plane,center,up);
 	plane.vox:=bottle3;	
 	
-	z3.setcolor(1,0,3,5,12); 
-	z3.FRaster(plane,81); 
-	z3.FRaster(noise2,81); 
+	z3.setcolor(1,0,23,105,12); 
+	z3.FRaster(plane,27); 
+	z3.FRaster(noise2,27); 
 	z3.FRaster(noise,27); 	
-	Base.world:=z3; 	
 	
 	Base.avatar:=harrison;
 	harrison.passable:=TRUE;
 	Base.avatarsize:=1000; 
+	
+	Base.world:=z3;
 END dawn;
 
 PROCEDURE darken*;
@@ -489,7 +490,7 @@ END lighten
 BEGIN
 	NEW(marshv);
 	push(Base.EMPTY);
-	dawn;
+	dawn; 
 	cursorsize:=81;
 	cursorTF:=TRUE;
 	atmdark:=0;

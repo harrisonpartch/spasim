@@ -229,7 +229,7 @@ BEGIN
 	res := FALSE;
 	(* Create shaders *)
 	vs := CompileVertexShader(vertshader);
-(*	IF vs # -1 THEN
+	IF vs # -1 THEN
 		fs := CompileFragmentShader(fragshader);
 		IF fs # -1 THEN
 			(* Create a program and attach the two compiled shaders *)
@@ -237,10 +237,6 @@ BEGIN
 			res := AttachAndLinkProgram(prog, vs, fs);  
 		END;
 	END;
-<<<<<<< HEAD
-=======
-*)
->>>>>>> d68e9de319c6d5eea480dc4c5f8fbe643a3ab29b
 	RETURN res;
 END LoadTheseShaders;
 
