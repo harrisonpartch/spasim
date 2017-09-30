@@ -276,7 +276,7 @@ VAR
 	
 PROCEDURE &openwincam(w,h: INTEGER);
 BEGIN
-	Init(w,h, 0,0, TRUE );
+	Init(w,h, 0,0, FALSE);
 	NEW(camera,Retina.W, Retina.H); 
 	camera.aperjust(w, h);
 	SetTitle("SPASIM");
@@ -414,7 +414,7 @@ BEGIN
 					Out.String("F1- Close"); Out.Ln;
 					(* Marsh.engrain; *)
 					Close();				
-			| Inputs.KsF11: fullwindow:=~fullwindow; SetFullWindow(fullwindow); 
+			| Inputs.KsF11: fullwindow:=~fullwindow; SetFullWindow(fullwindow); Out.String("FW"); Out.Ln;
 			| Inputs.KsF2: Base.gravity:= -Base.gravity;
 
 			| Inputs.KsControlL: AVATAR:=~AVATAR; 
@@ -550,7 +550,7 @@ END KeyEvent;
 		GL.ReadImplementationProperties;
 
 
-		GL.ClearColor(0.0, 0.0, 0.0, 0.0);
+		GL.ClearColor(0.3, 0.3, 1.0, 0.0);
 
 		(* create texture object for image *)
 		GL.GenTextures(1, ADDRESSOF(image));
@@ -591,8 +591,13 @@ END KeyEvent;
 		camera.tick;  
 		GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT) ;			
 		GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height,  0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr);	
+<<<<<<< Updated upstream
 			GL.UseProgram(programs[curprogram]); 		
 			GL.DrawElements(GLC.GL_TRIANGLES, 6, GLC.GL_UNSIGNED_SHORT, 0);	
+=======
+			GL.UseProgram(programs[curprogram]); 
+			GL.DrawElements(GLC.GL_TRIANGLES, 6, GLC.GL_UNSIGNED_SHORT, 0);			
+>>>>>>> Stashed changes
 		GL.UseProgram(0); 
      SwapBuffers();	
 	END Display;
@@ -613,6 +618,7 @@ END KeyEvent;
 
 
 VAR
+	glw: GLWindow;
 	FRAMERATE: REAL;
 	rand: Random.Generator;
 	wcount: INTEGER;
@@ -728,16 +734,22 @@ END cursorsizeplus;
 
 PROCEDURE cursorsizeminus;
 BEGIN
-	Marsh.cursorsize:=ENTIER(Marsh.cursorsize*1.5)
+	
 END cursorsizeminus;
 
-PROCEDURE Open* ;
-VAR w: GLWindow;
+PROCEDURE shaders*;
+VAR	b: BOOLEAN;
 BEGIN
-	NEW(w, Retina.W*2+1,Retina.H*2+1);
-(*	Debugging.DisableGC; *)
+	b:= glw.InitGL();
+END shaders;
+
+PROCEDURE Open* ;
+BEGIN
+	NEW(glw, Retina.W,Retina.H);
 	Base.STOPGO 
 END Open;
+
+
 
 BEGIN
 
