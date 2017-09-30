@@ -167,7 +167,7 @@ BEGIN
 	NEW(mywin, 300,300);
 END Open;
 
-BEGIN {ACTIVE}
+BEGIN 
 END OGLDemo1.
 
 OGLDemo1.Open~

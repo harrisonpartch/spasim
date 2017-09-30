@@ -591,7 +591,7 @@ END KeyEvent;
 		camera.tick;  
 		GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT) ;			
 		GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height,  0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr);	
-(*			GL.UseProgram(programs[curprogram]); 	*)	
+			GL.UseProgram(programs[curprogram]); 		
 			GL.DrawElements(GLC.GL_TRIANGLES, 6, GLC.GL_UNSIGNED_SHORT, 0);	
 		GL.UseProgram(0); 
      SwapBuffers();	
@@ -607,7 +607,7 @@ END KeyEvent;
 		END; 
 	END GameLogic;
 	
- 	BEGIN   {ACTIVE}
+ 	BEGIN   
 		MainLoop; 
 	END GLWindow;
 
