@@ -409,13 +409,13 @@ VAR
 		attr[i] := GLC.GLX_CONTEXT_MINOR_VERSION_ARB; INC(i);
 		attr[3]:=minor; INC(i);
     
-(*		 attr[i] := GLC.GLX_CONTEXT_FLAGS_ARB; INC(i);
-			 attr[i] := GLC.GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB; INC(i);
-*)   
+		attr[i] := GLC.GLX_CONTEXT_FLAGS_ARB; INC(i);
+		attr[i] := GLC.GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB; INC(i);
+ 
    
 		attr[i] := GLC.GLX_CONTEXT_PROFILE_MASK_ARB; INC(i);
-	(*		attr[i] := GLC.GLX_CONTEXT_CORE_PROFILE_BIT_ARB; INC(i) *)		
-			attr[i] := GLC.GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB; INC(i);
+		attr[i] := GLC.GLX_CONTEXT_CORE_PROFILE_BIT_ARB; INC(i); 	
+		attr[i] := GLC.GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB; INC(i);
 
   
 		attr[i] := 0; (* end of attribute list *)
@@ -934,9 +934,8 @@ END GameLogic;
 
 	END MainLoop;
 
-BEGIN (*  {ACTIVE}
-	MainLoop;
-	*)
+BEGIN
+	
 END Window;
 
 PROCEDURE InitKeysym;

@@ -230,6 +230,7 @@ VAR
 
 VAR
 	(* Xlib calls: *)
+	XInitThreads-:			PROCEDURE {C}();
 	OpenDisplay-:			PROCEDURE {C} ( name: ADDRESS ): DisplayPtr;
 	DefaultScreen-:			PROCEDURE {C} ( d: DisplayPtr ): LONGINT;
 	DisplayWidth-,
@@ -340,7 +341,7 @@ VAR
 	GetPixel-:				PROCEDURE {C} ( image: Image;  x, y: LONGINT ): LONGINT;
 	AddPixel-:				PROCEDURE {C} ( image: Image;  value: LONGINT );
 	Free-:						PROCEDURE {C} ( data: ADDRESS );
-(*	SetErrorHandler-:		PROCEDURE {C} ( handler: ErrorHandler );	*)
+	SetErrorHandler-:		PROCEDURE {C} ( handler: ErrorHandler );	
 	GetErrorText-:			PROCEDURE {C} ( d: DisplayPtr;  errcode: LONGINT; VAR buf: Buffer; length: LONGINT );
 	StoreBytes-:				PROCEDURE {C} ( d: DisplayPtr;  bytes, nbytes: LONGINT );
 	FetchBytes-:			PROCEDURE {C} ( d: DisplayPtr;  VAR nbytes: LONGINT ): LONGINT;
@@ -376,7 +377,7 @@ VAR
 		IF xlib = 0 THEN
 			Trace.StringLn( "X11.LinkToX:  Unix.Dlopen( libX11.so ) failed " );  Unix.exit( 3 )
 		END;
-
+		Unix.Dlsym( xlib, "XInitThreads", ADDRESSOF( XInitThreads ) ); 
 		Unix.Dlsym( xlib, "XOpenDisplay", ADDRESSOF( OpenDisplay ) );
 		Unix.Dlsym( xlib, "XDefaultScreen", ADDRESSOF( DefaultScreen ) );
 		Unix.Dlsym( xlib, "XDisplayWidth", ADDRESSOF( DisplayWidth ) );
@@ -462,7 +463,7 @@ VAR
 		Unix.Dlsym( xlib, "XGetPixel", ADDRESSOF( GetPixel ) );
 		Unix.Dlsym( xlib, "XAddPixel", ADDRESSOF( AddPixel ) );
 		Unix.Dlsym( xlib, "XFree", ADDRESSOF( Free ) );
-	(*	Unix.Dlsym( xlib, "XSetErrorHandler", ADDRESSOF( SetErrorHandler ) )	*)
+		Unix.Dlsym( xlib, "XSetErrorHandler", ADDRESSOF( SetErrorHandler ) );	 
 		Unix.Dlsym( xlib, "XSetIOErrorHandler", ADDRESSOF( SetIOErrorHandler ) );	
 		Unix.Dlsym( xlib, "XGetErrorText", ADDRESSOF( GetErrorText ) );
 		Unix.Dlsym( xlib, "XStoreBytes", ADDRESSOF( StoreBytes ) );
@@ -480,7 +481,7 @@ VAR
 		Unix.Dlsym( xlib, "XGetGeometry", ADDRESSOF( GetGeometry ) );
 		Unix.Dlsym( xlib, "XResizeWindow", ADDRESSOF( ResizeWindow ) );
 		Unix.Dlsym( xlib, "XSynchronize", ADDRESSOF( Synchronize ) );
-		Unix.Dlsym( xlib, "XAllocColor", ADDRESSOF( AllocColor ) );
+		Unix.Dlsym( xlib, "XAllocColor", ADDRESSOF( AllocColor ) );  
 	END LinkToX;
 
 	PROCEDURE MyErrorHandler( d: DisplayPtr;  err: ErrorEventPtr; p3, p4: LONGINT ): LONGINT;

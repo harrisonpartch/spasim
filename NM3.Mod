@@ -104,7 +104,7 @@ VAR
 	patchradiusx, patchradiusy: REAL;
 	lastlength:REAL;
 BEGIN
-	ray.lastclr:=ray.clr;
+(*	ray.lastclr:=ray.clr; *)
 	patchray:=ray;
 	ray.lastlxyz:=ray.lxyz;
 	ray.scale := ray.scale*M;
@@ -130,7 +130,7 @@ BEGIN
 				ray.lxyz.y := ABS(xyz.y - ijk.j);
 				ray.lxyz.z := ABS(xyz.z - ijk.k);
 				ray.popdelta := Base.Origin;
-				ray.lastclr:=ray.clr;
+(*				ray.lastclr:=ray.clr; *)
 				v.Shade(ray);
 				xyz.x := xyz.x + ray.popdelta.x;
 				xyz.y := xyz.y + ray.popdelta.y;
@@ -206,7 +206,7 @@ BEGIN
 			xyz:=newxyz;
 			ray.hitxyz:=ray.xyz;
 			ray.length:=ray.length+vdepth;
-			blr:=black*vdepth;
+	(*		blr:=black*vdepth;
 			blainv:=1-blr;
 			rr := red*vdepth*ray.clr.ra*blainv;
 			gr := green*vdepth*ray.clr.ga*blainv;
@@ -219,7 +219,7 @@ BEGIN
 			ray.clr.ba := (ray.clr.ba-br)-blr;
 			ray.clr.alpha:=ray.clr.alpha-black*vdepth;
 			IF ray.clr.alpha<0.1 THEN ray.terminate:=TRUE; out:=TRUE END;
-			bounds(ijk.i,ijk.j,ijk.k, out);
+	*)		bounds(ijk.i,ijk.j,ijk.k, out);
 			IF ~out THEN
 				v := blox[ijk.i,ijk.j,ijk.k];
 				IF (v#NIL) THEN
@@ -227,14 +227,14 @@ BEGIN
 					ray.lxyz.y := ABS(xyz.y - ijk.j);
 					ray.lxyz.z := ABS(xyz.z - ijk.k);
 					ray.popdelta := Base.Origin; (* because many shaders don't set it *)
-					IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
+(*					IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 						ray.normalTF:=TRUE;
 						ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal
 					ELSE
 						ray.normalTF:=FALSE;
 						ray.normal:=ray.fnormal;
 					END;
-					v.Shade(ray);
+*)					v.Shade(ray);
 					xyz.x := xyz.x + ray.popdelta.x;
 					xyz.y := xyz.y + ray.popdelta.y;
 					xyz.z := xyz.z + ray.popdelta.z;

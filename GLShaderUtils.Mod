@@ -229,14 +229,18 @@ BEGIN
 	res := FALSE;
 	(* Create shaders *)
 	vs := CompileVertexShader(vertshader);
-	IF vs # -1 THEN
+(*	IF vs # -1 THEN
 		fs := CompileFragmentShader(fragshader);
 		IF fs # -1 THEN
 			(* Create a program and attach the two compiled shaders *)
 			prog := gl.CreateProgram();
-			res := AttachAndLinkProgram(prog, vs, fs);
+			res := AttachAndLinkProgram(prog, vs, fs);  
 		END;
 	END;
+<<<<<<< HEAD
+=======
+*)
+>>>>>>> d68e9de319c6d5eea480dc4c5f8fbe643a3ab29b
 	RETURN res;
 END LoadTheseShaders;
 
@@ -301,7 +305,7 @@ BEGIN
 		fss :=TextFileRead(fragshaderFile);
 		IF fss # NIL THEN
 			ok := LoadTheseShaders2(vss^, fss^, locat0, locat1, program);
-			IF ~ ok THEN program := 0 END;
+			IF ~ok THEN program := 0 END;
 		END;
 	END;
 	RETURN program

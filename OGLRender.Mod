@@ -172,12 +172,6 @@ PROCEDURE forward(x:REAL);
 VAR
 	fward,dward,rward:PT;
 BEGIN
-(*	fward:=Base.mkPT(1,0,0);
-	dward:=Base.mkPT(0,0,1);
-	rward:=Base.mkPT(0,1,0);	
-	SPSMMath.orrot(fward, dward,cameraphi);   
-	SPSMMath.orrot(rward, dward,cameraphi);   		
-	SPSMMath.orrot(fward, rward,cameratheta);  	*)
 	fward:=Retina.fward;
 	cvx :=cvx+(x*fward.x); 
 	cvy :=cvy+(x*fward.y); 	
@@ -291,7 +285,11 @@ BEGIN
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
 	mstarget:=30;
+<<<<<<< HEAD
 	SetFullWindow(FALSE); 	
+=======
+	SetFullWindow(TRUE); 	
+>>>>>>> d68e9de319c6d5eea480dc4c5f8fbe643a3ab29b
 END openwincam;
 
 (* called when idling *)
@@ -303,15 +301,13 @@ END IdleDisplay;
 (* is called by OGLWindow before MainLoop started *)
 PROCEDURE OnLoad ;
 BEGIN
-	
+
 	IF ~InitGL() THEN Close; RETURN END;	
 	Display; (* display splash screen *)
-	
 	NEW(Retina.image);
 	Raster.Create(Retina.image,Retina.W,Retina.H,Raster.BGRA8888);
-	
-	splashscreen := FALSE;
-		
+
+			
 	NEW(rand);
 	foveasize := 100;
 	multicore:=TRUE;
@@ -329,7 +325,7 @@ BEGIN
 	leftsticky:=10.0;
 	upsticky:=10.0;	
 	Out.String('*line 1217!*');
-	msd:=100;
+	msd:=50;
 END OnLoad;
 
 PROCEDURE Reshape(w, h: LONGINT);
@@ -390,7 +386,7 @@ BEGIN
 			| "2" :  DEC(Base.PRO); Out.Int(Base.PRO,4); Out.Ln
 			| "3" : Base.gravity:= Base.gravity/1.5	
 			| "4" : Base.gravity:= 1.5*Base.gravity		
-			| "5" : Retina.PATCH:=~Retina.PATCH
+			| "5" : Retina.Res;
 			| "6" : avaTF:=~avaTF
 			| "h" : camera.hop	
 			| " " :  IF hidecursor THEN HideMousePointer(FALSE) ELSE HideMousePointer(TRUE) END; AVATAR:=~AVATAR;
@@ -491,7 +487,7 @@ END KeyEvent;
 		Out.String("Loading Shaders: "); Out.String(vertexShaderPath);
 		Out.String(" and "); Out.String(fragmentShaderPath); Out.Ln;
 		
-		program := GLSL.LoadShadersFromFile(vertexShaderPath, fragmentShaderPath);
+		program := GLSL.LoadShadersFromFile(vertexShaderPath, fragmentShaderPath); 
 		GL.UseProgram(program);
 
 		location := GL.GetUniformLocation(program, "u_image");
@@ -513,6 +509,8 @@ END KeyEvent;
 		vertexBufferObjID: ARRAY [3] OF Uint;
 		positionLocation, texcoordsLocation: Uint;
 	BEGIN
+		GL.ReadCoreVersion();
+		
 		(* A2 Image origin is top-left, opengl's image left-bottom; so, flip indices in horizontal  *)
 		vertices := [-1.0, -1.0, 	1.0, -1.0, 1.0, 1.0, -1.0, 1.0  ];
 		texcoords := [0.0, 1.0,  1.0, 1.0,  1.0, 0.0,	0.0, 0.0 ];
@@ -567,7 +565,7 @@ END KeyEvent;
 		GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height, 0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr);
 		
 		InitVAO();
-			(* load shader programs *)
+			(* load shader programs *) (* ONE OF THESE STATEMENTS CRASHES. maybe they all crash. *)
 			programs[0] := InitShader("passthroughVS.glsl", "passthroughFS.glsl");
 			programs[1] := InitShader("passthroughVS.glsl", "boxBlurFS.glsl");
 			programs[2] := InitShader("passthroughVS.glsl", "negativeFS.glsl");
@@ -580,9 +578,10 @@ END KeyEvent;
 			programs[9] := InitShader("passthroughVS.glsl", "unsharpMaskFS.glsl");
 			programs[10] := InitShader("passthroughVS.glsl", "sharpenFS.glsl");
 			programs[11] := InitShader("passthroughVS.glsl", "nightVisionFS.glsl");
-			programs[12] := InitShader("weirdVS.glsl", "passthroughFS.glsl");
-			curprogram := 6;
-			  
+			programs[12] := InitShader("weirdVS.glsl", "passthroughFS.glsl"); 
+		curprogram := 6;	  
+		Out.String("InitGL");
+		Out.Ln;
 		RETURN TRUE;
 	END InitGL;
 		
@@ -593,13 +592,13 @@ END KeyEvent;
 
 	PROCEDURE Display();
 	BEGIN
-		camera.tick; 
-		GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT) ;	
-		GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height,  0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr);
-		GL.UseProgram(programs[curprogram]);
-			GL.DrawElements(GLC.GL_TRIANGLES, 6, GLC.GL_UNSIGNED_SHORT, 0);
-		GL.UseProgram(0); 	
-	SwapBuffers();	 
+		camera.tick;  
+		GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT) ;			
+		GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height,  0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr);	
+(*			GL.UseProgram(programs[curprogram]); 	*)	
+			GL.DrawElements(GLC.GL_TRIANGLES, 6, GLC.GL_UNSIGNED_SHORT, 0);	
+		GL.UseProgram(0); 
+     SwapBuffers();	
 	END Display;
 
 	(* change detail according to frame speed, called in GLWindow.MainLoop *)
@@ -611,8 +610,8 @@ END KeyEvent;
 			Retina.lessdetail;
 		END; 
 	END GameLogic;
-
-	BEGIN {ACTIVE}
+	
+ 	BEGIN   {ACTIVE}
 		MainLoop; 
 	END GLWindow;
 
@@ -652,7 +651,6 @@ VAR
 		
 	msd: REAL;	
 	
-
 PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
 VAR d: REAL;
 BEGIN
@@ -740,8 +738,14 @@ END cursorsizeminus;
 PROCEDURE Open* ;
 VAR w: GLWindow;
 BEGIN
+<<<<<<< HEAD
 	NEW(w, Retina.W,Retina.H);
 	Base.STOPGO
+=======
+	NEW(w, Retina.W*2+1,Retina.H*2+1);
+(*	Debugging.DisableGC; *)
+	Base.STOPGO 
+>>>>>>> d68e9de319c6d5eea480dc4c5f8fbe643a3ab29b
 END Open;
 
 BEGIN

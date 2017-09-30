@@ -192,12 +192,12 @@ BEGIN
 	r:=ENTIER(mesh1[i, j] * 255)/255;
 	g:=ENTIER(mesh2[i, j] * 55)/255;
 	b:= ENTIER(mesh1[i, j] * 1357)/255;			
-	dr:=r*dot*ray.ra;
-	dg:=g*dot*ray.ga;
-	db:=b*dot*ray.ba;	
-	ray.r := ray.r + dr;
-	ray.g := ray.g + dg;
-	ray.b := ray.b + db;	
+	dr:=r*dot*ray.clr.ra;
+	dg:=g*dot*ray.clr.ga;
+	db:=b*dot*ray.clr.ba;	
+	ray.clr.r := ray.clr.r + dr;
+	ray.clr.g := ray.clr.g + dg;
+	ray.clr.b := ray.clr.b + db;	
 	ray.terminate:=TRUE
 END Shade;		
 END rdps;

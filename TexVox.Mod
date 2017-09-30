@@ -152,7 +152,7 @@ VAR
 	patchradius: REAL;
 	pclr: Base.ray_color;
 BEGIN
-	IF ray.length>0.00000001 THEN
+	IF ray.length>0 THEN
 		IF tscale>0 THEN
 			xx:=ray.xyz.x;
 			yy:=ray.xyz.y;
@@ -229,7 +229,7 @@ BEGIN
 				|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 			END
 		END;										
-		mip:=ray.length*ray.scale/3;
+(*		mip:=ray.length*ray.scale/3;
 		IF mip>7 THEN 	
 			color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
 		ELSIF mip>4 THEN
@@ -243,14 +243,15 @@ BEGIN
 		ELSE
 			color:=texcube.side[ray.face].pixel(lx*10,ly*10);
 		END; 
+*)			color:=texcube.side[ray.face].pixel(lx*10,ly*10);
 		IF color.alpha<0.99 THEN
 			IF color.alpha>0.69 THEN 
 				mirror(ray,mix)
 			ELSE
 				dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
-				dr:=color.red*dot;
-				dg:=color.green*dot;
-				db:=color.blue*dot;	
+				dr:=color.red*color.alpha*dot;
+				dg:=color.green*color.alpha*dot;
+				db:=color.blue*color.alpha*dot;	
 				ray.clr.r := ray.clr.r + dr*ray.clr.ra;
 				ray.clr.g := ray.clr.g + dg*ray.clr.ga;
 				ray.clr.b := ray.clr.b + db*ray.clr.ba;	
@@ -273,10 +274,11 @@ BEGIN
 		END
 	ELSE
 	  (* camera is inside textured cube *)
-		ray.clr.ra:= ray.clr.ra-0.1;
-		ray.clr.ga:= ray.clr.ga-0.1;
-		ray.clr.ba:= ray.clr.ba-0.1;	  
-		ray.clr.alpha:=ray.clr.alpha-0.1;	
+	(*  
+		ray.clr.ra:= ray.clr.ra-0.51;
+		ray.clr.ga:= ray.clr.ga-0.51;
+		ray.clr.ba:= ray.clr.ba-0.51;	  
+		ray.clr.alpha:=ray.clr.alpha-0.51;	*)
 	END
 END Shade;
 
