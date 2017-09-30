@@ -237,7 +237,6 @@ BEGIN
 			res := AttachAndLinkProgram(prog, vs, fs);
 		END;
 	END;
-
 	RETURN res;
 END LoadTheseShaders;
 

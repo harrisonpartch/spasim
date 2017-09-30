@@ -282,7 +282,7 @@ VAR
 	
 PROCEDURE &openwincam(w,h: INTEGER);
 BEGIN
-	Init(w,h, 0,0, TRUE );
+	Init(w,h, 0,0, FALSE );
 	NEW(camera,Retina.W, Retina.H); 
 	camera.aperjust(w, h);
 	SetTitle("SPASIM");
@@ -290,8 +290,8 @@ BEGIN
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
-	mstarget:=100;
-	SetFullWindow(TRUE); 	
+	mstarget:=30;
+	SetFullWindow(FALSE); 	
 END openwincam;
 
 (* called when idling *)
@@ -741,7 +741,6 @@ PROCEDURE Open* ;
 VAR w: GLWindow;
 BEGIN
 	NEW(w, Retina.W,Retina.H);
-(*	Debugging.DisableGC; *)
 	Base.STOPGO
 END Open;
 
