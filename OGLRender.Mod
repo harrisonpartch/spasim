@@ -266,7 +266,7 @@ VAR
 	image: Uint; (* image texture name *)
 	programs: ARRAY 13 OF Uint;
 	curprogram: Uint;
-	splashscreen, fullwindow: BOOLEAN;
+	splashscreen: BOOLEAN;
 	mstarget: REAL;
 	
 PROCEDURE &openwincam(w,h: INTEGER);
@@ -409,17 +409,16 @@ BEGIN
 					(* Marsh.engrain; *)
 					Close();				
 
-			| Inputs.KsF11: fullwindow:=~fullwindow; SetFullWindow(fullwindow); Out.String("FW"); Out.Ln;
+			| Inputs.KsF11: IF ~fullwindow THEN SetFullWindow(TRUE) ELSE SetFullWindow(FALSE) END; Out.String("FW"); Out.Ln;
 
 			| Inputs.KsF2: Base.gravity:= -Base.gravity;
 
 			| Inputs.KsControlL: AVATAR:=~AVATAR; 
-
 			(*? KsControlR does not work on LinuxAos  *)
-			| Inputs.KsControlR (* Inputs.KsInsert*): Marsh.SNIPEINTO:=~Marsh.SNIPEINTO;
+			| Inputs.KsControlR (* Inputs.KsInsert*): Marsh.SNIPEINTO:=~Marsh.SNIPEINTO
 			ELSE
 				Out.String("keysym: "); Out.Hex(keysym,4); Out.Ln;
-			END;
+			END
 		END
 END KeyEvent;
 
