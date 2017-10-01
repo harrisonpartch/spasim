@@ -279,7 +279,6 @@ BEGIN
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
 	mstarget:=30;
-	SetFullWindow(FALSE); 	
 END openwincam;
 
 (* called when idling *)
@@ -734,7 +733,7 @@ END shaders;
 
 PROCEDURE Open* ;
 BEGIN
-	NEW(glw, Retina.W,Retina.H);
+	NEW(glw,1940,1120);
 	Base.STOPGO 
 END Open;
 

@@ -463,9 +463,9 @@ BEGIN
 	NEW(plane,center,up);
 	plane.vox:=bottle3;	
 	
-	z3.setcolor(1,0,23,105,12); 
+	z3.setcolor(1,0,13,25,12); 
 	z3.FRaster(plane,27); 
-	z3.FRaster(noise2,27); 
+	z3.FRaster(noise2,81); 
 	z3.FRaster(noise,27); 	
 	
 	Base.avatar:=harrison;

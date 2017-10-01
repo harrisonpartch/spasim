@@ -1,25 +1,25 @@
 <Desktop>
-	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="96" t="81" r="736" b="469" flags="{0..2,13}"/>
 	<Window name="FileManager" loader="WMFileManager.Restore" l="105" t="535" r="746" b="931" flags="{0..2,13}"/>
-	<Window name="PET" loader="PET.Restore" l="393" t="71" r="1708" b="1020" flags="{0..2,13}">
+	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="96" t="81" r="736" b="469" flags="{0..2,13}"/>
+	<Window name="PET" loader="PET.Restore" l="185" t="106" r="1500" b="1053" flags="{0..2,13}">
 		<PETData>
-			<General SelectedPageNr="1" ProjectTextFile=""/>
+			<General SelectedPageNr="6" ProjectTextFile=""/>
 			<Tab file="/home/harrison/spasim/Spasim.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="314"/>
+				<Editor firstLine="0" cursorPos="499"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
+				<SidePanel visible="true" width="49" scratchHeight="5"/>
 			</Tab>
 			<Tab file="OGLRender.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="408" cursorPos="10212"/>
+				<Editor firstLine="671" cursorPos="19709"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
 			<Tab file="OpenGL.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="12" cursorPos="676"/>
+				<Editor firstLine="12" cursorPos="504"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
@@ -43,6 +43,13 @@
 				<Editor firstLine="0" cursorPos="0"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="Unix.OpenGL.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="10741" cursorPos="621527"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="true" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="Int_Get" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>

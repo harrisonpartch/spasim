@@ -229,7 +229,7 @@ BEGIN
 				|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 			END
 		END;										
-(*		mip:=ray.length*ray.scale/3;
+		mip:=ray.length*ray.scale/3;
 		IF mip>7 THEN 	
 			color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
 		ELSIF mip>4 THEN
@@ -238,12 +238,11 @@ BEGIN
 			color:=texcube.side[ray.face].pixelmip_two(lx,ly);			
 		ELSIF mip > 1.5 THEN
 			color1:=texcube.side[ray.face].pixel(lx,ly);
-			color2:=texcube.side[ray.face].pixel(lx*10,ly*10);  (* Base.Texture.pixel applies MODulo *)
+			color2:=texcube.side[ray.face].pixel(lx*3,ly*3);  (* Base.Texture.pixel applies MODulo *)
 			color:=Base.mixcolor(color1,color2,1.5);	
 		ELSE
 			color:=texcube.side[ray.face].pixel(lx*10,ly*10);
 		END; 
-*)			color:=texcube.side[ray.face].pixel(lx*10,ly*10);
 		IF color.alpha<0.99 THEN
 			IF color.alpha>0.69 THEN 
 				mirror(ray,mix)
