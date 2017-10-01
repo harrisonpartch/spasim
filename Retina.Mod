@@ -60,6 +60,7 @@ BEGIN
 			ray.dtl:=D2;	
 			angletoray(ray,theta,phi);
 			Base.world.Shade(ray);
+			Base.clamp3(ray.clr.r,ray.clr.g,ray.clr.b);
 			IF ray.terminate THEN
 				r:=ray.clr.r;
 				g:=ray.clr.g;
@@ -100,8 +101,9 @@ BEGIN
 			ray.scale := 1; 
 			ray.tscale:=1;
 			ray.dtl:=D2;	
-			angletoray(ray,theta,phi);
+			angletoray(ray,theta,phi);	
 			Base.world.Shade(ray);
+			Base.clamp3(ray.clr.r,ray.clr.g,ray.clr.b);
 			IF ray.terminate THEN
 				patch[i,j].red:=ray.clr.r;
 				patch[i,j].green:=ray.clr.g;
@@ -174,6 +176,7 @@ BEGIN
 	ray.tscale:=1;
 	ray.dtl:=D2;	
 	Base.world.Shade(ray);
+	Base.clamp3(ray.clr.r,ray.clr.g,ray.clr.b);
 	IF ray.terminate THEN
 		r:=ray.clr.r;
 		g:=ray.clr.g;

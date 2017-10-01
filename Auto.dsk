@@ -1,9 +1,9 @@
 <Desktop>
 	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="96" t="81" r="736" b="469" flags="{0..2,13}"/>
 	<Window name="FileManager" loader="WMFileManager.Restore" l="105" t="535" r="746" b="931" flags="{0..2,13}"/>
-	<Window name="PET" loader="PET.Restore" l="730" t="79" r="1516" b="1041" flags="{0..2,13}">
+	<Window name="PET" loader="PET.Restore" l="393" t="71" r="1708" b="1020" flags="{0..2,13}">
 		<PETData>
-			<General SelectedPageNr="5" ProjectTextFile=""/>
+			<General SelectedPageNr="1" ProjectTextFile=""/>
 			<Tab file="/home/harrison/spasim/Spasim.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
 				<Editor firstLine="0" cursorPos="314"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
@@ -12,7 +12,7 @@
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
 			<Tab file="OGLRender.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="722" cursorPos="19778"/>
+				<Editor firstLine="408" cursorPos="10212"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
