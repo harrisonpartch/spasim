@@ -1,5 +1,5 @@
 MODULE Render;
-IMPORT Kernel, Objects, Random, Marsh,(* ALUT := OpenALUtil, SPSMAudio,*)
+IMPORT Kernel, Objects, Random, Marsh,
  Out := KernelLog, Math,SPSMMath, Base,  Retina, GLW := OGLWindow, 
 	 GL:=OpenGL, GLC := OpenGLConst,  GLSL:= GLShaderUtils,
 	 Inputs,  Raster, Strings, Streams, Debugging;
@@ -110,11 +110,6 @@ BEGIN
 	pass := Base.world.passprobe(p);
 
 	IF ~pass THEN
-	(*	SPSMAudio.LoadWav("grain.wav");
-		SPSMAudio.Play ;	
-		ALUT.Play(Base.grainsound);
-		
-		Out.String("grain!");*)
 		x := cx + cvx; y := cy + cvy; z := cz;	
 		q:=Base.mkPT(x,y,z);
 		pass := Base.world.passprobe(q);
@@ -257,7 +252,7 @@ BEGIN
 		END;	
 	END;
 	trace; 
-	Base.tick
+	Base.tick 
 END tick;
  
 END Camera;
@@ -280,12 +275,11 @@ BEGIN
 	NEW(camera,Retina.W, Retina.H); 
 	camera.aperjust(w, h);
 	SetTitle("SPASIM");
-
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
 	mstarget:=30;
-	SetFullWindow(TRUE); 	
+	SetFullWindow(FALSE); 	
 END openwincam;
 
 (* called when idling *)
@@ -414,7 +408,9 @@ BEGIN
 					Out.String("F1- Close"); Out.Ln;
 					(* Marsh.engrain; *)
 					Close();				
+
 			| Inputs.KsF11: fullwindow:=~fullwindow; SetFullWindow(fullwindow); Out.String("FW"); Out.Ln;
+
 			| Inputs.KsF2: Base.gravity:= -Base.gravity;
 
 			| Inputs.KsControlL: AVATAR:=~AVATAR; 
@@ -591,13 +587,8 @@ END KeyEvent;
 		camera.tick;  
 		GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT) ;			
 		GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height,  0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr);	
-<<<<<<< Updated upstream
 			GL.UseProgram(programs[curprogram]); 		
 			GL.DrawElements(GLC.GL_TRIANGLES, 6, GLC.GL_UNSIGNED_SHORT, 0);	
-=======
-			GL.UseProgram(programs[curprogram]); 
-			GL.DrawElements(GLC.GL_TRIANGLES, 6, GLC.GL_UNSIGNED_SHORT, 0);			
->>>>>>> Stashed changes
 		GL.UseProgram(0); 
      SwapBuffers();	
 	END Display;
@@ -615,7 +606,6 @@ END KeyEvent;
  	BEGIN   
 		MainLoop; 
 	END GLWindow;
-
 
 VAR
 	glw: GLWindow;
@@ -756,7 +746,6 @@ BEGIN
 END Render.
 
 Render.Open ~ 
-
 SystemTools.Free Render ~ 
 
 

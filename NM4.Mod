@@ -77,7 +77,7 @@ VAR
 PROCEDURE r90z;
 VAR i,j,k: INTEGER;
 BEGIN
-	rot90z(blox);
+(*	rot90z(blox);
 	rot90zB(nbloxTF);
 	rot90zNC(nblox);
 	FOR i:=0 TO 1 DO
@@ -86,7 +86,7 @@ BEGIN
 				IF blox[i,j,k]#NIL THEN blox[i,j,k].r90z END
 			END
 		END
-	END
+	END *)
 END r90z;
 
 PROCEDURE Shade(VAR ray: Ray);

@@ -934,6 +934,8 @@ END GameLogic;
 
 	END MainLoop;
 
+BEGIN   {ACTIVE}
+	MainLoop; 
 END Window;
 
 PROCEDURE InitKeysym;

@@ -206,7 +206,7 @@ BEGIN
 			xyz:=newxyz;
 			ray.hitxyz:=ray.xyz;
 			ray.length:=ray.length+vdepth;
-	(*		blr:=black*vdepth;
+			blr:=black*vdepth;
 			blainv:=1-blr;
 			rr := red*vdepth*ray.clr.ra*blainv;
 			gr := green*vdepth*ray.clr.ga*blainv;
@@ -219,7 +219,7 @@ BEGIN
 			ray.clr.ba := (ray.clr.ba-br)-blr;
 			ray.clr.alpha:=ray.clr.alpha-black*vdepth;
 			IF ray.clr.alpha<0.1 THEN ray.terminate:=TRUE; out:=TRUE END;
-	*)		bounds(ijk.i,ijk.j,ijk.k, out);
+			bounds(ijk.i,ijk.j,ijk.k, out);
 			IF ~out THEN
 				v := blox[ijk.i,ijk.j,ijk.k];
 				IF (v#NIL) THEN
