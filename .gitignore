@@ -10,5 +10,5 @@ sprout
 
 testfile
 *Obj
-.GofU
-SymU
+*.GofU
+*.SymU
