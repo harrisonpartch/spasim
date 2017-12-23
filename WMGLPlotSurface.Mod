@@ -105,7 +105,7 @@ TYPE
 	END UpdateImage;
 
 	(* from W3dVectors.Mod *)
-	PROCEDURE Cross(a, b: TVector3d): TVector3d;
+	PROCEDURE Cross(CONST a, b: TVector3d): TVector3d;
 	VAR result : TVector3d;
 	BEGIN
 		result[0]:=a[1]*b[2]-a[2]*b[1];
@@ -119,9 +119,10 @@ TYPE
 		RETURN x * x
 	END Sqr;
 
-	PROCEDURE VLength3(a: TVector3d):LONGREAL;
-	VAR t: LONGREAL;
+	PROCEDURE VLength3(CONST aa: TVector3d):LONGREAL;
+	VAR t: LONGREAL; a: TVector3d;
 	BEGIN
+		a:=aa;
 		a[0] := ABS(a[0]); a[1]:= ABS(a[1]); a[2]:=ABS(a[2]);
 		IF a[0] > a[1] THEN t := a[0]; a[0] := a[1]; a[1]:=t END;
 		IF a[1] > a[2] THEN t := a[1]; a[1] := a[2]; a[2]:=t END;
@@ -131,14 +132,14 @@ TYPE
 		END
 	END VLength3;
 
-	PROCEDURE VScaled3(a:TVector3d; factor:LONGREAL):TVector3d;
+	PROCEDURE VScaled3(CONST a:TVector3d; factor:LONGREAL):TVector3d;
 	VAR result : TVector3d;
 	BEGIN
 	       result := factor*a;
 		RETURN result
 	END VScaled3;
 
-	PROCEDURE VNormed3(a: TVector3d):TVector3d;
+	PROCEDURE VNormed3(CONST a: TVector3d):TVector3d;
 	BEGIN
 		RETURN VScaled3(a, 1/VLength3(a))
 	END VNormed3;

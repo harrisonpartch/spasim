@@ -14,9 +14,8 @@ END thisvox;
 BEGIN
 	NEW(cv,"archaeopteryx.png");
 	cv.passable:=TRUE;
-	cv.tscale:=125;	
+	cv.tscale:=0;	
 END Narchaeopteryx. 
  
 Marsh.Rez Narchaeopteryx ~
  
-	NEW(cv,"seahorse.png"); 	

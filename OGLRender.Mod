@@ -241,10 +241,6 @@ BEGIN
 	d:=Retina.fward.x*0.0021; e:=Retina.fward.y*0.0021;  f:=Retina.fward.z*0.0021; 
 	Base.updatecamera(cx,cy,cz,a,b,c,d,e,f);	
 	IF avaTF THEN Marsh.drawavatar END;
-	GLIDE:=0.99;	
-	cvz := cvz*GLIDE+gravityvector.z; 
-	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y; 
-	cvl :=cvl*0.0; cvu := cvu*0.0;
 	IF MOUSEDOWN THEN	
 		IF GLW.ML IN MB THEN Marsh.draw;
 		ELSIF  GLW.MM IN MB THEN Marsh.snipeinto; 
@@ -252,7 +248,11 @@ BEGIN
 		END;	
 	END;
 	trace; 
-	Base.tick 
+	Base.tick;	
+	GLIDE:=0.96;	
+	cvz := cvz*GLIDE+gravityvector.z; 
+	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y; 
+	cvl :=cvl*0.0; cvu := cvu*0.0;
 END tick;
  
 END Camera;
@@ -278,7 +278,7 @@ BEGIN
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
-	mstarget:=30;
+	mstarget:=60;
 END openwincam;
 
 (* called when idling *)
@@ -370,9 +370,9 @@ BEGIN
 			| "c": Marsh.sprout 
 			| "x": Marsh.incVN
 			| "z": Marsh.decVN		
-			| "p":  camera.stop	
-			| "1":  INC(Base.PRO); Out.Int(Base.PRO,4); Out.Ln		
-			| "2" :  DEC(Base.PRO); Out.Int(Base.PRO,4); Out.Ln
+			| "p":  
+			| "1": Base.STOPGO		
+			| "2" :  camera.stop	
 			| "3" : Base.gravity:= Base.gravity/1.5	
 			| "4" : Base.gravity:= 1.5*Base.gravity		
 			| "5" : Retina.Res;
@@ -594,7 +594,7 @@ END KeyEvent;
 	(* change detail according to frame speed, called in GLWindow.MainLoop *)
 	PROCEDURE GameLogic();
 	BEGIN
-		IF GetCurrentFrameMs() < (mstarget) THEN 
+		IF GetCurrentFrameMs() < (mstarget-20) THEN 
 			Retina.moredetail;
 		ELSIF GetCurrentFrameMs() > mstarget THEN 
 			Retina.lessdetail;
@@ -733,7 +733,8 @@ END shaders;
 
 PROCEDURE Open* ;
 BEGIN
-	NEW(glw,1940,1120);
+	NEW(glw,Retina.W,Retina.H);
+(*	Debugging.DisableGC; *)
 	Base.STOPGO 
 END Open;
 

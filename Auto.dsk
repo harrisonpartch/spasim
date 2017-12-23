@@ -1,55 +1,39 @@
 <Desktop>
-	<Window name="FileManager" loader="WMFileManager.Restore" l="105" t="535" r="746" b="931" flags="{0..2,13}"/>
-	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="96" t="81" r="736" b="469" flags="{0..2,13}"/>
-	<Window name="PET" loader="PET.Restore" l="185" t="106" r="1500" b="1053" flags="{0..2,13}">
+	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="4" t="87" r="644" b="448" flags="{0..2,13}"/>
+	<Window name="FileManager" loader="WMFileManager.Restore" l="4" t="473" r="645" b="860" flags="{0..2,13}"/>
+	<Window name="PET" loader="PET.Restore" l="737" t="65" r="1537" b="665" flags="{0..2,13}">
 		<PETData>
-			<General SelectedPageNr="6" ProjectTextFile=""/>
+			<General SelectedPageNr="0" ProjectTextFile=""/>
+			<Tab file="/home/harrison/spasim/NFLOOP.Mod" codecFormat="AUTO" compilerOptions="-p=Linux32G -b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="0"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+		</PETData>
+	</Window>
+	<Window name="PET" loader="PET.Restore" l="907" t="85" r="1707" b="685" flags="{0..2,13}">
+		<PETData>
+			<General SelectedPageNr="0" ProjectTextFile=""/>
 			<Tab file="/home/harrison/spasim/Spasim.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="499"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="49" scratchHeight="5"/>
-			</Tab>
-			<Tab file="OGLRender.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="671" cursorPos="19709"/>
+				<Editor firstLine="24" cursorPos="596"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
-			<Tab file="OpenGL.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="12" cursorPos="504"/>
+			<Tab file="Marsh.Mod" codecFormat="AUTO" compilerOptions="-p=Linux32G -b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="307" cursorPos="6044"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
-			<Tab file="Unix.OGLWindow.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="922" cursorPos="27144"/>
+			<Tab file="TexVox.Mod" codecFormat="AUTO" compilerOptions="-p=Linux32G -b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="533" cursorPos="13184"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-			<Tab file="Marsh.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="0"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-			<Tab file="Retina.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="0"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-			<Tab file="Unix.OpenGL.Mod" codecFormat="AUTO" compilerOptions="-b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="10741" cursorPos="621527"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="true" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="Int_Get" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>

@@ -74,20 +74,6 @@ VAR
 	blox*: ARRAY M,M,M OF Voxel;
 	nbloxTF*: ARRAY M,M,M OF BOOLEAN;
 	nblox*: ARRAY M,M,M OF NCube;
-PROCEDURE r90z;
-VAR i,j,k: INTEGER;
-BEGIN
-(*	rot90z(blox);
-	rot90zB(nbloxTF);
-	rot90zNC(nblox);
-	FOR i:=0 TO 1 DO
-		FOR j:=0 TO 1 DO
-			FOR k:=0 TO 1 DO
-				IF blox[i,j,k]#NIL THEN blox[i,j,k].r90z END
-			END
-		END
-	END *)
-END r90z;
 
 PROCEDURE Shade(VAR ray: Ray);
 VAR
@@ -104,7 +90,6 @@ VAR
 	patchradiusx, patchradiusy: REAL;
 	lastlength:REAL;
 BEGIN
-	ray.lastclr:=ray.clr;
 	patchray:=ray;
 	ray.lastlxyz:=ray.lxyz;
 	ray.scale := ray.scale*M;
@@ -130,7 +115,6 @@ BEGIN
 				ray.lxyz.y := ABS(xyz.y - ijk.j);
 				ray.lxyz.z := ABS(xyz.z - ijk.k);
 				ray.popdelta := Base.Origin;
-				ray.lastclr:=ray.clr;
 				v.Shade(ray);
 				xyz.x := xyz.x + ray.popdelta.x;
 				xyz.y := xyz.y + ray.popdelta.y;
@@ -227,13 +211,6 @@ BEGIN
 					ray.lxyz.y := ABS(xyz.y - ijk.j);
 					ray.lxyz.z := ABS(xyz.z - ijk.k);
 					ray.popdelta := Base.Origin; (* because many shaders don't set it *)
-					IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
-						ray.normalTF:=TRUE;
-						ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal
-					ELSE
-						ray.normalTF:=FALSE;
-						ray.normal:=ray.fnormal;
-					END;
 					v.Shade(ray);
 					xyz.x := xyz.x + ray.popdelta.x;
 					xyz.y := xyz.y + ray.popdelta.y;

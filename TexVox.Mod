@@ -1,5 +1,5 @@
 MODULE TexVox;
-IMPORT Base, (* ALUT := OpenALUtil, *)  SPSMMath, Noise, FilmLoop, Raster, Graphics := WMGraphics, Random, Math,Out := KernelLog; 
+IMPORT Base, Files,SPSMMath, Noise, FilmLoop, Raster, Graphics := WMGraphics, Random, Math,Out := KernelLog; 
 
 TYPE PT = Base.PT;
 	Color = Base.Color;
@@ -52,7 +52,7 @@ BEGIN
 			|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
 			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 		END;	
-		color:=texcube.side[ray.face].pixelmip_one(lx,ly);
+		color:=texcube.side[ray.face].pixel(lx,ly);
 		dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
 		dr:=color.red*dot;
 		dg:=color.green*dot;
@@ -107,13 +107,13 @@ VAR
 	txTF*: BOOLEAN;
 	texcube*: TexCube;
 	texscale*:LONGINT;
-	name: Name;
+	name*: Name;
 
 PROCEDURE & init*(n: Name);
 BEGIN
 	NEW(texcube,n,FALSE);
 	name:=n;
-	tscale:=10;
+	tscale:=27;
 	texscale:=900;
 END init;
 
@@ -238,11 +238,12 @@ BEGIN
 			color:=texcube.side[ray.face].pixelmip_two(lx,ly);			
 		ELSIF mip > 1.5 THEN
 			color1:=texcube.side[ray.face].pixel(lx,ly);
-			color2:=texcube.side[ray.face].pixel(lx*3,ly*3);  (* Base.Texture.pixel applies MODulo *)
+			color2:=texcube.side[ray.face].pixelmip_two(lx,ly);  (* Base.Texture.pixel applies MODulo *)
 			color:=Base.mixcolor(color1,color2,1.5);	
 		ELSE
-			color:=texcube.side[ray.face].pixel(lx*10,ly*10);
+			color:=texcube.side[ray.face].pixel(lx,ly);
 		END; 
+		color:=texcube.side[ray.face].pixel(lx,ly);
 		IF color.alpha<0.99 THEN
 			IF color.alpha>0.69 THEN 
 				mirror(ray,mix)
@@ -335,7 +336,7 @@ TYPE TexCubeVox* = OBJECT(TexVox);
 
 PROCEDURE & init*(n: Name);
 BEGIN
-	NEW(texcube,n,TRUE);
+	NEW(texcube,n,FALSE);
 	name:=n;
 	tscale:=1;
 	texscale:=1;
@@ -435,7 +436,7 @@ BEGIN
 			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 		END
 	END;
-	color:=texcube.side[ray.face].pixelmip_two(lx,ly);	
+	color:=texcube.side[ray.face].pixel(lx,ly);	
 	dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
 	dr:=color.red*dot*ray.clr.ra;
 	dg:=color.green*dot*ray.clr.ra;
@@ -459,7 +460,7 @@ BEGIN
 					|4: lx := lxyz.x; ly := 1-lxyz.z; 
 					|5: lx := lxyz.x; ly := lxyz.y;  
 				END;
-				color:=texcube.side[ray.face].pixelmip_two(lx,ly);	
+				color:=texcube.side[ray.face].pixel(lx,ly);	
 				dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
 				dr:=color.red*dot*ray.clr.ra;
 				dg:=color.green*dot*ray.clr.ra;
@@ -501,15 +502,48 @@ END reflect;
 
 END TexCubeVox;
 
+(*
+TYPE FilmVox=OBJECT(Voxel);
+VAR 
+	e: Files.Enumerator;
+	name: ARRAY 256 OF CHAR; 
+	flags: SET;
+	time,date,size: LONGINT;
+	go:BOOLEAN;
+
+PROCEDURE  & new(n: Name);
+BEGIN
+     NEW(e);
+     e.Open("ngs/*.png",{});
+     register;
+END new;
+
+PROCEDURE tick;
+	BEGIN
+(*	Out.Char("Z"); *)
+	IF e.HasMoreEntries() THEN
+		IF e.GetEntry(name,flags,time,date,size) THEN
+			NEW(texcube,name,FALSE)
+		END;
+	ELSE
+		Out.Char("Y");
+		NEW(e);
+     	e.Open("ngs/*.png",{});		
+	END;  	
+END tick;
+
+END FilmVox;
+*)
 TYPE FloopVox* = OBJECT(Voxel);
 VAR
 	fl: FilmLoop.floop;
 	tscale*: REAL;
 
-PROCEDURE&init*(fname: Name);
+PROCEDURE&init*(fname: Name; fnumber: LONGINT);
 BEGIN
-	NEW(fl,fname);
-	tscale:=81;
+	NEW(fl,fname,fnumber);
+	fl.register;
+	tscale:=243;
 	lock;
 END init;
 
@@ -589,28 +623,52 @@ BEGIN
 			END
 		END
 	END;
-	lx1:=lx*3-ENTIER(lx*3);
-	ly1:=ly*3-ENTIER(ly*3);
-	lx2:=lx*79-ENTIER(lx*79);
-	ly2:=ly*79-ENTIER(ly*79);
-	fl.shade(lx1,ly1,color1);
-	fl.shade(lx1,ly1,color2);
-	tq:=ray.length*ray.scale/3;
-	Base.clamp(tq);	
-	color.red:=(color1.red*tq+color2.red*(1-tq));
-	color.green:=(color1.green*tq+color2.green*(1-tq));
-	color.blue:=(color1.blue*tq+color2.blue*(1-tq));
-	dot := ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z); 	
-	dr:=color.red*dot*ray.clr.ra;
-	dg:=color.green*dot*ray.clr.ga;
-	db:=color.blue*dot*ray.clr.ba;	
-	ray.clr.r := ray.clr.r + dr;
-	ray.clr.g := ray.clr.g + dg;
-	ray.clr.b := ray.clr.b + db;
+	fl.shade(lx,ly,color);
+	IF ((color.green>0.20) & ((color.red+color.blue)<0.2)) THEN
+		mirror(ray)
+	ELSE
+		dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 	
+		dr:=color.red*dot*ray.clr.ra;
+		dg:=color.green*dot*ray.clr.ga;
+		db:=color.blue*dot*ray.clr.ba;	
+		ray.clr.r := ray.clr.r + dr;
+		ray.clr.g := ray.clr.g+dg;
+		ray.clr.b := ray.clr.b + db;
+	END;
 	ray.terminate:=TRUE;
 END Shade;
 
+PROCEDURE reflect(VAR p: PT; n: PT);
+VAR 
+	a,b,c,dot: REAL;
+BEGIN
+	dot := p.x*n.x+p.y*n.y+p.z*n.z;
+	a := 2*n.x*dot; b := 2*n.y*dot; c := 2*n.z*dot;
+	p.x := p.x-a; p.y := p.y-b; p.z := p.z-c;
+END reflect;
+
+PROCEDURE mirror(VAR ray: Ray);
+VAR
+	n: PT;
+BEGIN
+	ray.hitmirrorTF := TRUE;
+	ray.hitxyz:=ray.xyz;
+	ray.changed := TRUE;
+	ray.mirrortf:=TRUE;	
+	ray.clr.ra:= ray.clr.ra + 0.2;
+	ray.clr.ga := ray.clr.ga + 0.2;
+	ray.clr.ba := ray.clr.ba + 0.2;
+	ray.clr.alpha:= ray.clr.alpha - 0.2;	
+	IF ray.clr.alpha < 0.1 THEN ray.terminate:=TRUE END;		
+	reflect(ray.dxyz, ray.normal);	
+	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
+	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
+	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
+END mirror;
+
 END FloopVox;
+
+
 
 TYPE NoiseVox* = OBJECT(Voxel);
 VAR

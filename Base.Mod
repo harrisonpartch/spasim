@@ -1,6 +1,6 @@
 MODULE Base;
 
-IMPORT  Math:=Math, Random, Kernel, Out:=KernelLog (*DebugLog*), Objects, (* AL:=OpenAL, ALUT := OpenALUtil,  *)
+IMPORT  Math, Random, Kernel, Out:=KernelLog, Objects, (*AL:=OpenAL, ALUT := OpenALUtil,  *)
 Strings, Streams, CryptoMD5, WMFontManager, Raster, WMRasterScale, WMRectangles, Graphics := WMGraphics, Commands(*, XNXLAudio*);
 
 CONST
@@ -75,7 +75,7 @@ END V;
 
 TYPE Texture*=OBJECT(V)
 VAR
-	img,mip_zero,mip_one,mip_two: Raster.Image;
+	img*,mip_zero,mip_one,mip_two: Raster.Image;
 	W*,H*, bpr,adr: LONGINT;
 	transparent*: BOOLEAN;
 	copy: Raster.Mode;
@@ -85,7 +85,7 @@ VAR
 	i,j,ix,jy: LONGINT;
 BEGIN
 	Raster.InitMode(copy,Raster.srcCopy);
-	img :=Graphics.LoadImage(n, TRUE); (* img format is BGRA8888 *)
+	img :=Graphics.LoadImage(n, FALSE); (* img format is BGRA8888 *)
 	IF img=NIL THEN 
 		img := defaultimg;
 	END;
@@ -127,6 +127,7 @@ BEGIN
 	c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
 	RETURN c
 END pixelmip_zero;
+
 
 PROCEDURE pixelmip_one*(x,y:REAL):Color;
 VAR
@@ -216,6 +217,17 @@ BEGIN
 		side[5]:=side[0];		
 	END
 END init;	
+
+PROCEDURE reload*(CONST name: ARRAY OF CHAR);
+BEGIN
+	side[0].img :=Graphics.LoadImage(name, FALSE); (* img format is BGRA8888 *)
+	IF side[0].img=NIL THEN 
+		side[0].img := defaultimg;
+	END;
+	side[0].W:=side[0].img.width;
+	side[0].H:=side[0].img.height;	
+END reload;
+
 END TexCube;
 
 TYPE Ray* = RECORD
@@ -230,7 +242,7 @@ TYPE Ray* = RECORD
 	texcubeTF*:BOOLEAN;
 	ncube*: NCube;
 	ncubeTF*: BOOLEAN;
-	terminate*,patched*: BOOLEAN;
+	terminate*,patchterminate*: BOOLEAN;
 	scale*,tscale*: REAL;
 	length*: REAL; 
 	len*:PT;
@@ -537,6 +549,8 @@ TYPE P=PROCEDURE (v:Voxel):Voxel;
 VAR
 	voxelist: ARRAY 100 OF V;
 (*	clock*: Clock;*)
+	TICK*: BOOLEAN;
+	TOCK*: BOOLEAN;
 	fog*:REAL;
 	rlimit*: INTEGER;
 	iterlimit*: LONGINT;
@@ -755,9 +769,10 @@ END fzz3;
 PROCEDURE tick*;
 VAR i: INTEGER;
 BEGIN
-	IF ~STOP THEN
+(*	Out.String("t"); *)
+	IF  TRUE THEN
 		i := 0;
-		WHILE i < 20 DO
+		WHILE i < 90 DO
 			IF voxelist[i] # NIL THEN voxelist[i].tick END;
 			INC(i);
 		END;

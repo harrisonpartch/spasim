@@ -1,5 +1,5 @@
 MODULE FilmLoop;
-IMPORT MPEG, Kernel, Codec := Codecs, Raster, Base, Files, Strings, Objects, Out:=KernelLog;
+IMPORT MPEG,Kernel, Codec := Codecs, Raster, Base, Files, Strings, Objects, Out:=KernelLog;
 
 TYPE Name=Base.Name;
 
@@ -17,15 +17,19 @@ VAR
 	img: Raster.Image;
 	mode: Raster.Mode;
 	go:BOOLEAN;
+	gReen: REAL;
+	frames,f: LONGINT;
 	
-PROCEDURE&init*(fname:Name);
+PROCEDURE&init*(fname:Name; frn: LONGINT);
 BEGIN
 	filename:=fname;
+	frames:=frn;
 	file := Files.Old(filename);
 	IF file = NIL THEN
 		Out.String("Couldn't open File "); Out.String(filename);
 		Out.Ln()
 	ELSE
+		Out.String("Opened File "); Out.String(filename);
 		alive:=TRUE	
 	END;	
 	register
@@ -43,30 +47,28 @@ VAR
 	pix: Raster.Pixel;
 	
 BEGIN
-	IF alive THEN
-		w:= ENTIER(x*img.width) MOD img.width;
-		y:=1-y;
-		h:= ENTIER(y*img.height) MOD img.height;
-		Raster.Get(img,w,h, pix, mode);
-		Raster.GetRGBA(pix,red,green,blue,alpha);
-		c.red:=red/256; 
-		c.green:=green/256;
-		c.blue:=blue/256
-	END
+	w:= ENTIER(x*img.width) MOD img.width;
+(*	y:=1-y; *)
+	h:= ENTIER(y*img.height) MOD img.height;
+	Raster.Get(img,w,h, pix, mode);
+	Raster.GetRGBA(pix,red,green,blue,alpha);
+	c.red:=red/256; 
+	c.green:=green/256;
+	c.blue:=blue/256;
+	tick;
 END shade;
 
 
 PROCEDURE tick*;
 BEGIN{EXCLUSIVE}
-	go:=TRUE
+	go:=TRUE;
+(*	gReen:=Base.rand.Uniform();
+	Out.String("floop tick") *)
 END tick;
-VAR
-	timer: Kernel.Timer
 
 BEGIN{ACTIVE, PRIORITY(Objects.Low)}
 	IF alive THEN
 		Raster.InitMode(mode, Raster.srcCopy);
-		NEW(timer);
 		NEW(fileinputstream, file, 0);
 		NEW(demux);
 		demux.Open(fileinputstream, result);
@@ -83,17 +85,17 @@ BEGIN{ACTIVE, PRIORITY(Objects.Low)}
 			Out.Int(W,6); Out.Ln;
 			Out.Int(H,6); Out.Ln;
 				REPEAT
+					f:=0;
 					REPEAT
 						BEGIN{EXCLUSIVE}
 							AWAIT(go);
 							go:=FALSE
 						END;
-						IF ~decoder.loop THEN 
-							decoder.Next();
-							decoder.Render(img) 
-						END
-					UNTIL decoder.loop;
-					decoder.loop:=FALSE;
+						INC(f);
+						(* Out.Int(f,4); *)
+						decoder.Next();
+						decoder.Render(img) 
+					UNTIL f=frames;
 					file := Files.Old(filename);	
 					IF file = NIL THEN
 						Out.String("Couldn't open File "); Out.String(filename);

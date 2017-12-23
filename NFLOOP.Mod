@@ -9,7 +9,8 @@ BEGIN
 END thisvox;
 
 BEGIN
-	NEW(vox,"ket.mpg");
-	vox.tscale:=50;
-	vox.copyonstroke:=FALSE
+	NEW(vox,"film/medley.mpeg",300000);
+	vox.register
 END NFLOOP. 
+
+Marsh.Rez NFLOOP

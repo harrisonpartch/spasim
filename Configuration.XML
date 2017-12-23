@@ -56,7 +56,7 @@ To update: Configuration.Init ~
 			<Setting name="DefaultSkin" value="SkinEngine.Unload"/>
 			<Setting name="Restore the desktop" value="WMRestorable.Load Auto.dsk"/>
 			<Setting name="navigation manager" value="WMNavigate.Open -vs 1 0 0 Navigation:TaskList"/>
-			<Setting name="collect garbage" value="Kernel.GC"/>
+			<Setting name="compiler default" value="Compiler.SetDefaultPlatform Linux32G"/>
 			<Setting name="Pie Menu" value="WMTextView.EnablePiemenu"/>
 			
 		<!-- Pinyin Input Method Editor (remove comment to activate)
@@ -345,7 +345,7 @@ To update: Configuration.Init ~
 				<Setting name="Open archive" value="WMArchives.Open"/>
 			</Section>
 			<Section name="svg">
-				<Setting name="Open" value="WebBrowser.Open"/>
+				<Setting name="Open" value="WebBrowser.OpenFile"/>
 			</Section>
 			<Section name="tar">
 				<Setting name="Open" value="WMArchives.Open"/>
@@ -433,13 +433,13 @@ To update: Configuration.Init ~
 					
 				<!-- No | Yes | Paranoid -->
 					
-					<Setting name="BackupOnCompile" value="TRUE"/>
+					<Setting name="BackupOnCompile" value="FALSE"/>
 					<Setting name="ShowPathInTabs" value="FALSE"/>
 					<Setting name="ScratchPanelHeight" value="5"/>
 					<Setting name="EnableWhitespaceWarnings" value="FALSE"/>
-					<Setting name="ShowLineNumbers" value="TRUE"/>
+					<Setting name="ShowLineNumbers" value="FALSE"/>
 					<Setting name="IndicateTabs" value="FALSE"/>
-					<Setting name="CurrentLineColor" value="1"/>
+					<Setting name="CurrentLineColor" value="0"/>
 				</Section>
 				<Section name="Compilers">
 					<Section name="PACO">
@@ -452,7 +452,7 @@ To update: Configuration.Init ~
 					</Section>
 					<Section name="Fox">
 						<Setting name="caption" value="Compile"/>
-						<Setting name="options" value="-b=AMD --warnings"/>
+						<Setting name="options" value="-p=Linux32G -b=AMD --warnings"/>
 						<Setting name="fileExtension" value="MOD"/>
 						<Setting name="loadmodule" value="TextCompiler"/>
 						<Setting name="genTree" value="PETModuleTree.GenModuleTree"/>

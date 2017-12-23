@@ -57,7 +57,7 @@ BEGIN
 	a[12] := a12;  a[13] := a13;  a[14] := a14;  a[15] := a15
 END Set16i;
 
-PROCEDURE Cross (a, b: ARRAY [3] OF gl.Float;  VAR c: ARRAY [3] OF gl.Float);
+PROCEDURE Cross (VAR a, b: ARRAY [3] OF gl.Float;  VAR c: ARRAY [3] OF gl.Float);
 BEGIN
 	c[0] := a[1] * b[2] - a[2] * b[1];
 	c[1] := a[2] * b[0] - a[0] * b[2];

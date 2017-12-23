@@ -1,4 +1,4 @@
-MODULE Render;
+MODULE WMRender;
 IMPORT Kernel, Objects, Random, Marsh, Rectangles := WMRectangles, WM := WMWindowManager, WMMessages,
  Out := KernelLog, Math,SPSMMath, Base, Retina,  WarpMouse,
 	 Inputs,  Raster, Strings, Streams, Debugging;
@@ -241,12 +241,12 @@ BEGIN
 	cvz := cvz*GLIDE+gravityvector.z;
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y;
 	cvl :=cvl*0.5; cvu := cvu*0.5; 
+	Base.tick
 	IF 0 IN MB THEN Marsh.snipeonto
 	ELSIF  1 IN MB THEN Marsh.snipeinto 
 	ELSIF  2 IN MB THEN Marsh.draw 
 	END;
 	trace;
-	Base.tick
 END tick;
   
 END Camera;
@@ -547,8 +547,8 @@ END Close;
 
 BEGIN
 
-END Render.
+END WMRender.
 
-Render.Open ~
+WMRender.Open ~
 
-SystemTools.Free Render ~
+SystemTools.Free WMRender ~

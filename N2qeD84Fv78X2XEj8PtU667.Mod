@@ -32,7 +32,7 @@ VAR
 	cyl: FRep.hexgrid;
 	tblue: Voxel;
 	dot,bdot,rdot,gdot,reddot,bluedot,greendot, bottlepossum,v: Voxel;
-	center, p,p1, p2,n:  PT;
+	center, pole ,p1, p2,n:  PT;
 	i:LONGINT;
 	rand: Random.Generator;
 	shell: RotaVox.RVox;
@@ -41,15 +41,14 @@ VAR
 PROCEDURE draw;
 BEGIN	 
 	center:=Base.mkPT(1/2,1/2,1/2);
+	pole:=Base.mkPT(1/2,1/2,1);	
 	reddot:=Base.VoxelFromName("NM3");
 	bottlepossum:=Base.VoxelFromName("Nbottlepossum"); 
 	NEW(ball,center,0.47);
 	ball.setcolor(0.7,0.6,0,1);
 	reddot.FRaster(ball,27);	
-(*	NEW(ball,center,0.57);	
-	ball.setvoxel(bottlepossum);
-	reddot.FRaster(ball,27);	
-*)	reddot.copyonstroke:=TRUE;
+	reddot.copyonstroke:=TRUE;
+	NEW(shell,center,pole,0.1,0.1);
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;

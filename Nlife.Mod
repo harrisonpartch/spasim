@@ -155,3 +155,5 @@ BEGIN
 	NEW(vox);
 	vox.lock;
 END Nlife. 
+
+Marsh.Rez Nlife ~

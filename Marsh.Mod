@@ -276,22 +276,29 @@ VAR
 	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison,fuse:Voxel;
 	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,
 	w3,z3,z3a,z2,z4,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp,acidcats, badopossum, raccoon,
-	bottle1,bottle2,bottle3,bottlepossum,bottlegrounds,greensuncouple,wstar,starspider: Voxel;
+	akatrump, archillect,arkilekt,kat,muratpak,
+	jordan, bottle1,bottle2,bottle3,bottlepossum,bottlegrounds,greensuncouple,wstar,starspider,arevclock: Voxel;
 	ball: FRep.sphere;
-	noise,noise2: FRep.noise;	 
+	medley: Voxel;
+	noise: ARRAY 5 OF FRep.noise;	 
 BEGIN
 	NEW(ms);
 	NEW(EMPTY);
 	EMPTY.passable:=TRUE;
-      rand:=Base.rand;	
+     rand:=Base.rand;	
+	
+	akatrump:=Base.VoxelFromName("Nakatrump"); 
+	push(akatrump);
+	archillect:=Base.VoxelFromName("Narchillect"); 
+	push(archillect);
+	arkilekt:=Base.VoxelFromName("Narkilekt"); 
+	push(arkilekt);
+	kat:=Base.VoxelFromName("Nkat"); 
+	push(kat);
+	muratpak:=Base.VoxelFromName("Nmuratpak"); 
+	push(muratpak);
 
-  	w10:=Base.VoxelFromName("NM3");	
- 	z10:=Base.VoxelFromName("NM2");	
-	w3:=Base.VoxelFromName("NM3");	 
-	z2:=Base.VoxelFromName("NM3");
-	z3:=Base.VoxelFromName("NM3");	
-	z3a:=Base.VoxelFromName("NM3");	
-	z4:=Base.VoxelFromName("NM4");	
+	
 	
 	harrison:=Base.VoxelFromName("Nharrisonavatar"); 
 	push(harrison);
@@ -299,9 +306,8 @@ BEGIN
 	push(doge);		
 	xot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU666"); 
 	push(xot);
-(*     floop:=Base.VoxelFromName("NFLOOP");  
-     push(floop);
-*) 
+    medley:=Base.VoxelFromName("NFLOOP");  
+     push(medley);
 	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX666"); 
 	push(serp);	
 	badopossum:=Base.VoxelFromName("Nbadopossum"); 	
@@ -433,27 +439,54 @@ BEGIN
 	greensuncouple:=Base.VoxelFromName("Ngreensuncouple");  
 	wstar:=Base.VoxelFromName("Nwstar");  
 	starspider:=Base.VoxelFromName("Nstarspider");  
-	NEW(noise);		
-	noise.seed:=1534666690;		
-	noise.a:=1.5;
-	noise.b:=1.5;
-	noise.c:=1.5;		
-	noise.octaves:=4;
-	noise.persistence:=3.61;	
-	noise.setvoxel(greensuncouple);			
-	NEW(noise2);		
-	noise2.seed:=666666;		
-	noise2.a:=10.5;
-	noise2.b:=10.5;
-	noise2.c:=10.5;		
-	noise2.octaves:=4;
-	noise2.persistence:=3.61;
-	noise2.setvoxel(bottlepossum);		
+	arevclock:=Base.VoxelFromName("Narevclock");  
+	push(arevclock);
+	jordan:=Base.VoxelFromName("Njbp");  	
+	NEW(noise[0]);		
+	noise[0].seed:=1534666690;		
+	noise[0].a:=1.5;
+	noise[0].b:=1.5;
+	noise[0].c:=1.5;		
+	noise[0].octaves:=4;
+	noise[0].persistence:=3.61;	
+	noise[0].setvoxel(akatrump);			
+	NEW(noise[1]);		
+	noise[1].seed:=678;		
+	noise[1].a:=1.5;
+	noise[1].b:=1.5;
+	noise[1].c:=1.5;		
+	noise[1].octaves:=4;
+	noise[1].persistence:=3.61;	
+	noise[1].setvoxel(arkilekt);		
+	NEW(noise[2]);		
+	noise[2].seed:=900009;		
+	noise[2].a:=1.5;
+	noise[2].b:=1.5;
+	noise[2].c:=1.5;		
+	noise[2].octaves:=4;
+	noise[2].persistence:=3.61;	
+	noise[2].setvoxel(archillect);		
+	NEW(noise[3]);		
+	noise[3].seed:=11111111;		
+	noise[3].a:=1.5;
+	noise[3].b:=1.5;
+	noise[3].c:=1.5;		
+	noise[3].octaves:=4;
+	noise[3].persistence:=3.61;	
+	noise[3].setvoxel(serp);		
+	NEW(noise[4]);		
+	noise[4].seed:=123456;		
+	noise[4].a:=1.5;
+	noise[4].b:=1.5;
+	noise[4].c:=1.5;		
+	noise[4].octaves:=4;
+	noise[4].persistence:=3.61;	
+	noise[4].setvoxel(medley);		
+	
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,9/10);
 	Base.setPT(up,0,0,1);
-	serp.passable:=FALSE;   
 	conglo2.copyonstroke:=TRUE;
 
 	etile2.passable:=FALSE;
@@ -461,18 +494,27 @@ BEGIN
 	Base.setPT(center,1/2,1/2,9/12);
 
 	NEW(plane,center,up);
-	plane.vox:=bottle3;	
+	plane.vox:=archillect;	
 	
-	z3.setcolor(1,0,13,25,12); 
-	z3.FRaster(plane,27); 
-	z3.FRaster(noise2,81); 
-	z3.FRaster(noise,27); 	
+	z3:=Base.VoxelFromName("NM3");	
+	z3a:=Base.VoxelFromName("NM3");	
+	z3a.setcolor(0,0,10,10,10); 
+
+	z3.FRaster(noise[0],27); 
+	noise[0].setvoxel(z3);	
+	z3a.FRaster(noise[0],27);
+ 
+	z3:=Base.VoxelFromName("NM3");
+	z3.FRaster(noise[4],27); 
+	noise[2].setvoxel(z3);	
+	z3a.FRaster(noise[2],27); 		
 	
-	Base.avatar:=harrison;
+
+ 	Base.avatar:=harrison;
 	harrison.passable:=TRUE;
 	Base.avatarsize:=1000; 
 	
-	Base.world:=z3;
+	Base.world:=z3a;
 END dawn;
 
 PROCEDURE darken*;

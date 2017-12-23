@@ -337,7 +337,7 @@ TYPE
 	(* ********** Functions ***************** *)
 
 	(* The Lorenz Attractor *)
-	PROCEDURE CalcDeriv ( position: Vector3d; VAR deriv: Vector3d);
+	PROCEDURE CalcDeriv ( VAR position: Vector3d; VAR deriv: Vector3d);
 	BEGIN
 		(* Calculate the Lorenz attractor derivatives *)
 	 	deriv[0] := sigma * ( position[1] - position[0] ) ;
@@ -345,7 +345,7 @@ TYPE
 	 	deriv[2] := -position[0] * position[1] - b * position[2] ;
 	END CalcDeriv;
 
-	PROCEDURE AdvanceInTime (time_step: LONGREAL;  position: Vector3d; VAR new_position: Vector3d );
+	PROCEDURE AdvanceInTime (time_step: LONGREAL;  VAR position: Vector3d; VAR new_position: Vector3d );
 	VAR
 	       deriv0, deriv1, deriv2, deriv3: Vector3d;
 	BEGIN

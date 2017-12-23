@@ -122,7 +122,7 @@ TYPE
 		time: LONGINT;								(* current time in milliseconds *)
 		mspf: LONGINT;								(* milliseconds per frame *)
 
-		hasMoreFrames: BOOLEAN;					(* FALSE at the end of a video sequence *)
+		hasMoreFrames*: BOOLEAN;					(* FALSE at the end of a video sequence *)
 
 		(* MPEG-2 stuff *)
 		MPEG2: BOOLEAN;							(* TRUE -> MPEG-2; FALSE -> MPEG-1 *)
@@ -720,8 +720,8 @@ TYPE
 
 		BEGIN
 			IF ~hasMoreFrames THEN 
-				KernelLog.String("LOOPING "); 
 				loop:=TRUE;
+				KernelLog.String("LOOPING "); 
 			RETURN 
 			END;
 
@@ -2411,6 +2411,7 @@ TYPE
 
 	VAR
 		wnd: PW;
+		hasMoreFrames: BOOLEAN;
 		
 	PROCEDURE Close*;
 	BEGIN
@@ -2497,21 +2498,31 @@ TYPE
 			NEW(wnd, w, h, FALSE);
 			wnd.SetTitle(WM.NewString("XNXL MPEG Player"));
 			REPEAT
+				total:=0;
+				KernelLog.String("Pre-Eep");
+				decoder.Next();
 				REPEAT
-					decoder.Next();
-					decoder.Render(wnd.img);
+					INC(total);
+					(* KernelLog.Int(total,5);*)
+					IF decoder.hasMoreFrames THEN decoder.Render(wnd.img) END;
 					wnd.Invalidate(Rectangles.MakeRect( 0, 0, wnd.img.width, wnd.img.height ) );
-				UNTIL decoder.loop;
-				decoder.loop:=FALSE;
+					decoder.Next()
+				UNTIL ~decoder.hasMoreFrames;
+				KernelLog.String("Eep");
 				file := Files.Old(filename);	
+				KernelLog.String("Eep0");
 				IF file = NIL THEN
 					KernelLog.String("Couldn't open File "); KernelLog.String(filename);
 					KernelLog.Ln();
 					RETURN;
-				END;						
+				END;			
+				KernelLog.String("Eep1");			
 				NEW(fileinputstream, file, 0);
+				KernelLog.String("Eep2");
 				NEW(demux);
+				KernelLog.String("Eep3");
 				demux.Open(fileinputstream, result);
+				KernelLog.String("Eep4");
 				IF result # Codec.ResOk THEN
 					KernelLog.String("error opening the demultiplexer"); KernelLog.Ln;
 				END;			
@@ -2519,7 +2530,8 @@ TYPE
 				NEW(decoder);
 				decoder.Open(vstream, result);			
 				decoder.GetVideoInfo(w, h, ms);
-			UNTIL FALSE
+			UNTIL FALSE;
+				KernelLog.String("bark!")
 		ELSE KernelLog.String("bork!")
 		END
 	END Test;
@@ -2527,9 +2539,9 @@ TYPE
 END MPEG.
 
 
-SystemTools.Free XNXLMPEG ~
+SystemTools.Free MPEG ~
 MPEG.Test delver.mpg~
-MPEG.Test memecatloop.mpg~
+MPEG.Test archillect.mpeg~
 
 
 (* end of file *)
