@@ -32,9 +32,9 @@ BEGIN
 	ray.clr.r := ray.clr.r + dr;
 	ray.clr.g := ray.clr.g + dg;
 	ray.clr.b := ray.clr.b + db; 
-	ray.clr.ra := (ray.clr.ra - dr - dbl);
-	ray.clr.ga := (ray.clr.ga - dg - dbl);
-	ray.clr.ba := (ray.clr.ba - db - dbl); 	
+	ray.clr.ra := (ray.clr.ra - (dr + dbl));
+	ray.clr.ga := (ray.clr.ga - (dg + dbl));
+	ray.clr.ba := (ray.clr.ba - (db + dbl)); 	
 	ray.clr.alpha:=ray.clr.alpha-dbl-(dr+dg+db)/3;
 	IF ray.clr.alpha<0.1 THEN ray.terminate:=TRUE END;	
 END Shade;
@@ -59,7 +59,7 @@ BEGIN
 	NEW(s4);	
 	
 	NEW(alphablue);
-	alphablue.setcolor(0,1,0,1/3,0);
+	alphablue.setcolor(1/2,1/2,0,2/3,0);
 	s0.passable:=FALSE;
 	s1.passable:=TRUE;	
 	s2.passable:=TRUE;	

@@ -19,7 +19,7 @@ BEGIN
 	v.setcolor(0.7,0,0.3,0,0);
 	Base.setPT(center,1/2,1/2,1/2);
 	NEW(ball,center,6/12);
-	ball.vox:=w;
+	ball.vox:=v;
 	bb.FRaster(ball,27);
 (*	NEW(ball,center,7/12);	
 	ball.vox:=v;
@@ -34,3 +34,5 @@ END thisvox;
 BEGIN
 
 END NnviGAernhjFK40xASZZVoQ. 
+
+Marsh.Rez NnviGAernhjFK40xASZZVoQ ~

@@ -298,8 +298,8 @@ PROCEDURE P*;
 END P;
 
 BEGIN
-	r:=Base.VoxelFromName("Ndiffusered"); 	
-	b:=Base.VoxelFromName("NmOgKSH5ZXYP3DODELOkO7g");
+	r:=Base.VoxelFromName("Nkat"); 	
+	b:=Base.VoxelFromName("Nmuratpak");
 	NEW(vox,b,NIL,NIL);
 	vox.passable:=TRUE
 END Nrdvolvox.

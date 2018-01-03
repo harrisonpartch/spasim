@@ -74,6 +74,18 @@ VAR
 	blox*: ARRAY M,M,M OF Voxel;
 	nbloxTF*: ARRAY M,M,M OF BOOLEAN;
 	nblox*: ARRAY M,M,M OF NCube;
+PROCEDURE r90z;
+VAR i,j,k: INTEGER;
+BEGIN
+
+	FOR i:=0 TO 1 DO
+		FOR j:=0 TO 1 DO
+			FOR k:=0 TO 1 DO
+				IF blox[i,j,k]#NIL THEN blox[i,j,k].r90z END
+			END
+		END
+	END
+END r90z;
 
 PROCEDURE Shade(VAR ray: Ray);
 VAR
@@ -192,16 +204,16 @@ BEGIN
 			ray.length:=ray.length+vdepth;
 			blr:=black*vdepth;
 			blainv:=1-blr;
-			rr := red*vdepth*ray.clr.ra*blainv;
-			gr := green*vdepth*ray.clr.ga*blainv;
-			br := blue*vdepth*ray.clr.ba*blainv;
+			rr := red*vdepth*ray.clr.ra;
+			gr := green*vdepth*ray.clr.ga;
+			br := blue*vdepth*ray.clr.ba;
 			ray.clr.r := ray.clr.r+rr;
 			ray.clr.g:= ray.clr.g+gr;
 			ray.clr.b := ray.clr.b+br;
-			ray.clr.ra := (ray.clr.ra-rr)-blr;
-			ray.clr.ga := (ray.clr.ga-gr)-blr;
-			ray.clr.ba := (ray.clr.ba-br)-blr;
-			ray.clr.alpha:=ray.clr.alpha-black*vdepth;
+			ray.clr.ra := (ray.clr.ra-(rr+blr));
+			ray.clr.ga := (ray.clr.ga-(gr+blr));
+			ray.clr.ba := (ray.clr.ba-(br+blr));
+			ray.clr.alpha:=ray.clr.alpha-blr;
 			IF ray.clr.alpha<0.1 THEN ray.terminate:=TRUE; out:=TRUE END;
 			bounds(ijk.i,ijk.j,ijk.k, out);
 			IF ~out THEN
@@ -318,12 +330,12 @@ VAR
 BEGIN
 	fill(v);
 	blox[1,1,0]:=w;
-
 	blox[0,1,1]:=w;
-
 	blox[1,0,1]:=w;
-
 	blox[1,1,1]:=w;
+	blox[1,1,2]:=w;
+	blox[2,1,1]:=w;
+	blox[1,2,1]:=w;	
 END fillsierp;
 
 PROCEDURE fillcqr2*(v,w: Voxel);
@@ -868,7 +880,7 @@ END count;
 
 (*
 Engrains this voxel and it's children recursively in the following format:
-"NM3"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
+"NM4"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
 <----- Voxel data -----><------                     children data                     ------>
 Children data contains 27 boolean-child pairs, each boolean being TRUE if a child is contained in that position.
 In case of FALSE the length of child data is 0 for that child (i.e. no data is being written except for the FALSE).

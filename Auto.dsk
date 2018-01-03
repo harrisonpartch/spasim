@@ -1,37 +1,18 @@
 <Desktop>
 	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="4" t="87" r="644" b="448" flags="{0..2,13}"/>
-	<Window name="FileManager" loader="WMFileManager.Restore" l="4" t="473" r="645" b="860" flags="{0..2,13}"/>
-	<Window name="PET" loader="PET.Restore" l="737" t="65" r="1537" b="665" flags="{0..2,13}">
-		<PETData>
-			<General SelectedPageNr="0" ProjectTextFile=""/>
-			<Tab file="/home/harrison/spasim/NFLOOP.Mod" codecFormat="AUTO" compilerOptions="-p=Linux32G -b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="0"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-		</PETData>
-	</Window>
-	<Window name="PET" loader="PET.Restore" l="907" t="85" r="1707" b="685" flags="{0..2,13}">
+	<Window name="FileManager" loader="WMFileManager.Restore" l="136" t="455" r="636" b="855" flags="{0..2,13}"/>
+	<Window name="PET" loader="PET.Restore" l="966" t="103" r="1766" b="703" flags="{0..2,13}">
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>
 			<Tab file="/home/harrison/spasim/Spasim.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="24" cursorPos="596"/>
+				<Editor firstLine="6" cursorPos="327"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
 			<Tab file="Marsh.Mod" codecFormat="AUTO" compilerOptions="-p=Linux32G -b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="307" cursorPos="6044"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-			<Tab file="TexVox.Mod" codecFormat="AUTO" compilerOptions="-p=Linux32G -b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="533" cursorPos="13184"/>
+				<Editor firstLine="0" cursorPos="0"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>

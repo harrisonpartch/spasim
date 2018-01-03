@@ -12,8 +12,8 @@ const mat3 hor = mat3(vec3(-1,0,1), vec3(-2,0,2), vec3(-1,0,1));
 void main(void)
 {
 	float luminance = dot(texture2D(u_image, v_Texcoords).rgb, W);
-	
-    float accumHor = 0.0;
+
+	float accumHor = 0.0;
 	float accumVert = 0.0;
 
 	for (int i = 0; i < KERNEL_WIDTH; ++i)
@@ -25,7 +25,7 @@ void main(void)
 			accumHor +=  dotProd * hor[i][j];
 			accumVert += dotProd * vert[i][j];
 		}
-	}	
+	}
 
     gl_FragColor = vec4(vec3(length(vec2(accumHor, accumVert))), 1.0);
 }

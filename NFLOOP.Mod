@@ -9,8 +9,8 @@ BEGIN
 END thisvox;
 
 BEGIN
-	NEW(vox,"film/medley.mpeg",300000);
-	vox.register
+	NEW(vox,"medley.mpeg",300000);
+	vox.tscale:=27;
 END NFLOOP. 
 
 Marsh.Rez NFLOOP

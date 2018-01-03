@@ -924,10 +924,6 @@ END GameLogic;
 
 				GameLogic();
 
-				IF i=9 THEN
-					fmsum:=0;
-					KernelLog.Int(fms, 6); KernelLog.String(" ms."); KernelLog.Ln
-				END;
 			END;
 		END;
 		CloseWindow();

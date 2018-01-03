@@ -317,7 +317,9 @@ BEGIN
 		| 196: Base.DTL:= Base.DTL*3/2;
 	ELSE
 		CASE CHR(ucs) OF
-			   "s" : camera.forward(-0.51*Base.speed)
+			"S": Retina.incdetail; Out.String("inc detail"); 
+			| "W":Retina.decdetail; Out.String("dec detail"); 
+			|   "s" : camera.forward(-0.51*Base.speed)
 			| "w" :camera.forward(0.51*Base.speed)
 			| "a" :camera.rightstrafe(-0.5*Base.speed)
 			| "d" :camera.rightstrafe(0.5*Base.speed)
@@ -334,7 +336,7 @@ BEGIN
 			| "2" : Marsh.darken
 			| "3" : Base.gravity:= Base.gravity/1.5
 			| "4" : Base.gravity:= 1.5*Base.gravity
-			| "5" : Retina.PATCH:= ~Retina.PATCH;
+			| "5" : Retina.Res;
 			| "6" : BEGIN{EXCLUSIVE} mainloopgo:=~mainloopgo END; avaTF:=~avaTF
 			| "?" : Out.Int(Base.world.count(7),4); Out.Ln
 			| "h" : camera.hop

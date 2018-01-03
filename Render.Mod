@@ -1,5 +1,5 @@
 MODULE WMRender;
-IMPORT Kernel, Objects, Random, Marsh, Rectangles := WMRectangles, WM := WMWindowManager, WMMessages,
+IMPORT Kernel, Objects, Random, Marsh, Graphics:=WMGraphics, Rectangles := WMRectangles, WM := WMWindowManager, WMMessages,
  Out := KernelLog, Math,SPSMMath, Base, Retina,  WarpMouse,
 	 Inputs,  Raster, Strings, Streams, Debugging;
 
@@ -241,7 +241,7 @@ BEGIN
 	cvz := cvz*GLIDE+gravityvector.z;
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y;
 	cvl :=cvl*0.5; cvu := cvu*0.5; 
-	Base.tick
+	Base.tick;
 	IF 0 IN MB THEN Marsh.snipeonto
 	ELSIF  1 IN MB THEN Marsh.snipeinto 
 	ELSIF  2 IN MB THEN Marsh.draw 
@@ -279,6 +279,8 @@ PROCEDURE &openwincam(W,H: INTEGER);
 BEGIN
 	Init(W, H, TRUE);
 	NEW(camera, Retina.W, Retina.H);
+	NEW(Retina.image);
+	Raster.Create(Retina.image,Retina.W,Retina.H,Raster.BGRA8888);
 	camera.aperjust(W,H);
 	manager := WM.GetDefaultManager();
 	manager.Add(100,100, SELF, { WM.FlagFrame, WM.FlagClose, WM.FlagStayOnTop});
@@ -437,10 +439,11 @@ END detail;
 		upsticky:=10.0;
 		Out.String('*line 1217!*');
 		msd:=30;		
+		img:= Graphics.LoadImage("granite.jpg", FALSE);
 		NEW(ftimer);
 		REPEAT
 			Retina.image := backImg; 
-	(*		Retina.fimage:=img;*)
+			Retina.fimage:=img;
 			t1:=Kernel.GetTicks();
 			IF mainloopgo THEN 
 				camera.tick;

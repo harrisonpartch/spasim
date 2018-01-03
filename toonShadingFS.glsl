@@ -29,13 +29,13 @@ void main(void)
 	}
 
 	float len = length(vec2(accumHor, accumVert));
-	if (len > 0.53)
+	if (len > 0.5)
 		gl_FragColor = vec4(vec3(0),1.0);
 	else
 	{
-//	float quantize = 96.3;
+//	float quantize =16.3;
 //		color.rgb *= quantize;
-//	color.rgb += vec3(0.5);
+//	color.rgb += vec3(0.6);
 //		ivec3 irgb = ivec3(color.rgb);
 //		color.rgb = vec3(irgb) / quantize;
 		gl_FragColor = vec4(vec3(color), 1.0);

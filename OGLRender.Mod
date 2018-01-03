@@ -249,10 +249,10 @@ BEGIN
 	END;
 	trace; 
 	Base.tick;	
-	GLIDE:=0.96;	
+	GLIDE:=0.99;	
 	cvz := cvz*GLIDE+gravityvector.z; 
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y; 
-	cvl :=cvl*0.0; cvu := cvu*0.0;
+	cvl :=cvl*0; cvu := cvu*0;
 END tick;
  
 END Camera;
@@ -278,7 +278,7 @@ BEGIN
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
-	mstarget:=60;
+	mstarget:=55;
 END openwincam;
 
 (* called when idling *)
@@ -295,8 +295,7 @@ BEGIN
 	Display; (* display splash screen *)
 	NEW(Retina.image);
 	Raster.Create(Retina.image,Retina.W,Retina.H,Raster.BGRA8888);
-
-			
+		
 	NEW(rand);
 	foveasize := 100;
 	multicore:=TRUE;
@@ -314,7 +313,6 @@ BEGIN
 	leftsticky:=10.0;
 	upsticky:=10.0;	
 	Out.String('*line 1217!*');
-	msd:=50;
 END OnLoad;
 
 PROCEDURE Reshape(w, h: LONGINT);
@@ -389,8 +387,8 @@ BEGIN
 			| "8": Base.cursordist:=Base.cursordist/1.3
 			| "l": Marsh.lines:=~Marsh.lines
 			| "b": Marsh.showcode;		
-			| "f": curprogram := (curprogram +1 ) MOD 13; 
-					Out.String("curprogram="); Out.Int(curprogram,0); Out.Ln;			
+			| "f": curprogram := (curprogram+1 ) MOD 13; 
+			| "F": curprogram := (curprogram-1 ) MOD 13; 									
 		ELSE (* use keysm *)
 			Out.String("ucs: "); Out.Hex(ucs,4); Out.String("keysym: "); Out.Hex(keysym,4); Out.Ln;
 			CASE keysym OF
@@ -446,7 +444,7 @@ END KeyEvent;
 		temporaljust: REAL; 
 		BEGIN
 			MB := keys;
-			temporaljust := msd/GetCurrentFrameMs();
+			temporaljust := mstarget/GetCurrentFrameMs();
 			
 			xr := ENTIER((x-centerx)*temporaljust); yr :=ENTIER((y-centery)*temporaljust);
 			
@@ -540,7 +538,7 @@ END KeyEvent;
 
 	 	RETURN FALSE;
 	 END;
-         GL.ReadExtensions(); (* read all opengl extension functions *)	
+          GL.ReadExtensions(); (* read all opengl extension functions *)	
 		GL.ReadImplementationProperties;
 
 
@@ -568,7 +566,8 @@ END KeyEvent;
 			programs[9] := InitShader("passthroughVS.glsl", "unsharpMaskFS.glsl");
 			programs[10] := InitShader("passthroughVS.glsl", "sharpenFS.glsl");
 			programs[11] := InitShader("passthroughVS.glsl", "nightVisionFS.glsl");
-			programs[12] := InitShader("weirdVS.glsl", "passthroughFS.glsl"); 
+(*			programs[12]:=InitShader("passthroughVS.glsl", "passthroughFS.glsl");*)
+			programs[12] := InitShader("passthroughVS.glsl", "kuwahara.glsl"); 
 		curprogram := 6;	  
 		Out.String("InitGL");
 		Out.Ln;
@@ -577,7 +576,8 @@ END KeyEvent;
 		
 	PROCEDURE  ReloadShader;
 	BEGIN
-		programs[6] := InitShader("passthroughVS.glsl", "toonShadingFS.glsl");	
+		programs[6] := InitShader("passthroughVS.glsl", "toonShadingFS.glsl");
+		programs[12] := InitShader("passthroughVS.glsl", "kuwahara.glsl");	
 	END ReloadShader;
 
 	PROCEDURE Display();
@@ -594,7 +594,7 @@ END KeyEvent;
 	(* change detail according to frame speed, called in GLWindow.MainLoop *)
 	PROCEDURE GameLogic();
 	BEGIN
-		IF GetCurrentFrameMs() < (mstarget-20) THEN 
+		IF GetCurrentFrameMs() < (mstarget-5) THEN 
 			Retina.moredetail;
 		ELSIF GetCurrentFrameMs() > mstarget THEN 
 			Retina.lessdetail;
@@ -638,8 +638,7 @@ VAR
 	centerx,centery: LONGINT;
 
 	GLIDE:REAL;
-		
-	msd: REAL;	
+
 	
 PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
 VAR d: REAL;

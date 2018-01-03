@@ -9,7 +9,7 @@ CONST
 	MIP1=128;
 	MIP2=512;
 
-TYPE Name*=ARRAY NL OF CHAR;
+TYPE Name*=ARRAY 32 OF CHAR;
 
 TYPE Pixel*=Raster.Pixel;
 
@@ -602,13 +602,13 @@ PROCEDURE VoxelFromName*(modname: Name): Voxel;
 				voxel := fackery();		 
 			END;
 			IF voxel=NIL THEN 
-				Out.String("failed voxelfromname 1");
+				(* Out.String("failed voxelfromname 1"); *)
 				voxel:=EMPTY
 			ELSE
 				voxel.code:=modname;
 			END;
 		ELSE
-			Out.String("failed voxelfromname 2");
+			 (* Out.String("failed voxelfromname 2"); *)
 			voxel:=EMPTY
 		END;
 		RETURN voxel
