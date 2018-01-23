@@ -3,7 +3,7 @@ MODULE Nrdvolvox;
 IMPORT Base, SPSME, FRep,Objects;
 
 CONST	
-	M=20;
+	M=50;
 	A = 80;
 	B = 20;
 	C = 0.03;
@@ -29,9 +29,6 @@ BEGIN
 	RED := red;
 	BLUE := blue;
 	YELLOW:= yellow;
-	IF RED=NIL THEN NEW(RED) END;
-	IF BLUE=NIL THEN NEW(BLUE) END;	
-	IF YELLOW=NIL THEN NEW(YELLOW) END;
 	clere;
 	seed;
 	tock := 1;
@@ -298,13 +295,11 @@ PROCEDURE P*;
 END P;
 
 BEGIN
-	r:=Base.VoxelFromName("Nkat"); 	
-	b:=Base.VoxelFromName("Nmuratpak");
-	NEW(vox,b,NIL,NIL);
+	r:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODh"); 	
+	b:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU666");
+(*	b:=Base.EMPTY;*)
+	NEW(vox,r,b,b);
 	vox.passable:=TRUE
 END Nrdvolvox.
 
-
- 
- 
- Marsh.Rez Nrdvolvox~
+Marsh.Rez Nrdvolvox~

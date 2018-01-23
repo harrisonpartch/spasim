@@ -1,10 +1,9 @@
 MODULE Ngreen;
-IMPORT Base, TexVox, RotaVox;
+IMPORT Base, TexVox;
   
 VAR 
 	cv: TexVox.TexVox;
-	center: Base.PT;
-
+	
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	RETURN cv

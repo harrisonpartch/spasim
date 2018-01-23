@@ -1,6 +1,6 @@
 MODULE FRep;
 
-IMPORT Math, SPSMMath, Base, Raster, Graphics:=WMGraphics, Noise;
+IMPORT Math, Random, SPSMMath, Base, Raster, Graphics:=WMGraphics, Noise;
 	
 CONST
 	twopi = 2*Math.pi;
@@ -38,7 +38,8 @@ VAR
 	radius*, rsquared*: REAL;
 	center*:PT;
 	cxf*:BOOLEAN;
-	
+	rand*:Random.Sequence;
+		
 PROCEDURE &init*(c:PT; r: REAL);
 VAR
 	i,j: INTEGER;
@@ -46,6 +47,7 @@ VAR
 	normal: PT;
 	color: Color;
 BEGIN
+	NEW(rand);
 	radius:=ABS(r);
 	rsquared:=r*r;
 	r:=r*1.00001; (* don't want the sphere to quite touch the box *)
@@ -63,13 +65,11 @@ PROCEDURE color*(p:PT):Color;
 VAR
 	c: Color;
 BEGIN
-(*	c.red:=0.5;
-	c.green:=p.y;	
-	c.blue:=p.z;	
-	IF ~cxf THEN RETURN cxolor ELSE  RETURN c END; 
-	*)
-	cxolor.alpha:=1/2;
-	RETURN cxolor
+	c.red:=cxolor.red+(0.20-rand.Uniform()/10);
+	c.green:=cxolor.green+(0.20-rand.Uniform()/10);
+	c.blue:=cxolor.blue+(0.20-rand.Uniform()/10);
+	Base.clamp3(c.red,c.green,c.blue);
+	RETURN c
 END color;
 
 PROCEDURE reset*(c:PT; r: REAL);
@@ -156,6 +156,15 @@ BEGIN
 	RETURN(Noise.noise3dperlin(a*p.x,b*p.y,c*p.z, seed,octaves,persistence)/1000 - 1/2000)	
 END d2s;
 
+PROCEDURE color*(p:PT):Color;
+BEGIN	
+	RETURN Base.randColor()		
+END color;
+
+PROCEDURE normal*(p:PT):PT;
+BEGIN
+	RETURN Base.randPT	()
+END normal;
 END noise;
 
 TYPE ellipsoid*= OBJECT(FR)

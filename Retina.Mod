@@ -45,16 +45,15 @@ BEGIN
 	FOR i:= 0 TO 1 DO
 		phi:=cam.phi;
 		FOR j := 0 TO 1 DO 
-			ray:=Base.blankray;		
 			ray.clr.ra := 1;
 			ray.clr.ga := 1;
 			ray.clr.ba := 1;
 			ray.clr.alpha:=1;
 			ray.scale := 1; 
 			ray.tscale:=1;
-			ray.dtl:=D2;	
+			ray.dtl:=DETAIL;	
 			angletoray(ray,theta,phi);
-			Base.world.Shade(ray);
+			Base.world.Shade(ray);	
 			IF ray.terminate THEN
 				r:=ray.clr.r;
 				g:=ray.clr.g;
@@ -64,7 +63,8 @@ BEGIN
 				r:= ray.clr.r + ray.clr.ra/3;
 				g:= ray.clr.g + ray.clr.ga/3 
 			END;
-			Raster.SetRGB(pixel,ENTIER(r),ENTIER(g),ENTIER(b)); 
+			Base.clamp3(r,g,b);
+			Raster.SetRGB(pixel,ENTIER(r*GAMMA),ENTIER(g*GAMMA),ENTIER(b*GAMMA)); 
 			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
 			phi:=phi+dphi;
 		END;
@@ -92,7 +92,7 @@ BEGIN
 			ray.clr.alpha:=1;
 			ray.scale := 1; 
 			ray.tscale:=1;
-			ray.dtl:=D2;	
+			ray.dtl:=DETAIL;	
 			angletoray(ray,theta,phi);
 			Base.world.Shade(ray);	
 			IF ray.terminate THEN
@@ -135,7 +135,7 @@ BEGIN
 			ray.clr.alpha:=1;
 			ray.scale := 1; 
 			ray.tscale:=1;
-			ray.dtl:=D2;	
+			ray.dtl:=DETAIL;	
 			angletoray(ray,theta,phi);
 			Base.world.Shade(ray);
 			IF ray.terminate THEN
@@ -190,6 +190,104 @@ BEGIN
 	END;		
 END tessad5;
 
+PROCEDURE tessax5(cam: Camera);
+VAR
+	i,j: LONGINT;
+	theta,phi,dtheta,dphi: REAL;
+	ray: Base.Ray;
+	pixel: Raster.Pixel;
+	r,b,g: REAL;
+	patch: ARRAY 5,5 OF Base.Color;
+BEGIN
+	dtheta:=cam.dtheta/5;
+	dphi:=cam.dphi/5;
+	theta:=cam.theta;
+	FOR i:= 0 TO 4 BY 4 DO
+		phi:=cam.phi;
+		FOR j := 0 TO 4 BY 4 DO 
+			ray:=Base.blankray;		
+			ray.clr.ra := 1;
+			ray.clr.ga := 1;
+			ray.clr.ba := 1;
+			ray.clr.alpha:=1;
+			ray.scale := 1; 
+			ray.tscale:=1;
+			ray.dtl:=DETAIL;	
+			angletoray(ray,theta,phi);
+			Base.world.Shade(ray);
+			IF ray.terminate THEN
+				patch[i,j].red:=ray.clr.r;
+				patch[i,j].green:=ray.clr.g;
+				patch[i,j].blue:=ray.clr.b; 
+			ELSE
+				patch[i,j].blue:= ray.clr.b + ray.clr.ba;
+				patch[i,j].red:= ray.clr.r + ray.clr.ra/3;
+				patch[i,j].green:= ray.clr.g + ray.clr.ga/3 
+			END;
+			phi:=phi+dphi*4;
+		END;
+		theta:=theta+dtheta*4;
+	END;
+	
+	patch[0,2].red:=(patch[0,0].red+patch[0,4].red)/2;
+	patch[0,2].green:=(patch[0,0].green+patch[0,4].green)/2;
+	patch[0,2].blue:=(patch[0,0].blue+patch[0,4].blue)/2;	
+
+	patch[4,2].red:=(patch[4,0].red+patch[4,4].red)/2;
+	patch[4,2].green:=(patch[4,0].green+patch[4,4].green)/2;
+	patch[4,2].blue:=(patch[4,0].blue+patch[4,4].blue)/2;	
+	
+	patch[2,0].red:=(patch[0,0].red+patch[4,0].red)/2;
+	patch[2,0].green:=(patch[0,0].green+patch[4,0].green)/2;
+	patch[2,0].blue:=(patch[0,0].blue+patch[4,0].blue)/2;	
+	
+	patch[2,4].red:=(patch[0,4].red+patch[4,4].red)/2;
+	patch[2,4].green:=(patch[0,4].green+patch[4,4].green)/2;
+	patch[2,4].blue:=(patch[0,4].blue+patch[4,4].blue)/2;	
+	
+	patch[2,2].red:=(patch[0,0].red+patch[4,4].red)/2;
+	patch[2,2].green:=(patch[0,0].green+patch[4,4].green)/2;
+	patch[2,2].blue:=(patch[0,0].blue+patch[4,4].blue)/2;	
+	
+	patch[0,1].red:=(patch[0,0].red+patch[0,2].red)/2;
+	patch[0,1].green:=(patch[0,0].green+patch[0,2].green)/2;
+	patch[0,1].blue:=(patch[0,0].blue+patch[0,2].blue)/2;
+			
+	patch[0,3].red:=(patch[0,2].red+patch[0,4].red)/2;
+	patch[0,3].green:=(patch[0,2].green+patch[0,4].green)/2;
+	patch[0,3].blue:=(patch[0,2].blue+patch[0,4].blue)/2;			
+			
+	patch[2,1].red:=(patch[2,0].red+patch[2,2].red)/2;
+	patch[2,1].green:=(patch[2,0].green+patch[2,2].green)/2;
+	patch[2,1].blue:=(patch[2,0].blue+patch[2,2].blue)/2;
+			
+	patch[2,3].red:=(patch[2,2].red+patch[2,4].red)/2;
+	patch[2,3].green:=(patch[2,2].green+patch[2,4].green)/2;
+	patch[2,3].blue:=(patch[2,2].blue+patch[2,4].blue)/2;			
+
+	patch[4,1].red:=(patch[4,0].red+patch[4,2].red)/2;
+	patch[4,1].green:=(patch[4,0].green+patch[4,2].green)/2;
+	patch[4,1].blue:=(patch[4,0].blue+patch[4,2].blue)/2;
+			
+	patch[4,3].red:=(patch[4,2].red+patch[4,4].red)/2;
+	patch[4,3].green:=(patch[4,2].green+patch[4,4].green)/2;
+	patch[4,3].blue:=(patch[4,2].blue+patch[4,4].blue)/2;		
+	
+	FOR i:=1 TO 3 BY 2 DO
+		FOR j:= 0 TO 4 DO
+			patch[i,j].red:=(patch[i-1,j].red+patch[i+1,j].red)/2;
+			patch[i,j].green:=(patch[i-1,j].green+patch[i+1,j].green)/2;		
+			patch[i,j].blue:=(patch[i-1,j].blue+patch[i+1,j].blue)/2
+		END
+	END;
+	FOR i:=0 TO 4 DO
+		FOR j:= 0 TO 4 DO
+			Raster.SetRGB(pixel,ENTIER(patch[i,j].red*GAMMA),ENTIER(patch[i,j].green*GAMMA),ENTIER(patch[i,j].blue*GAMMA)); 
+			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
+		END
+	END;		
+END tessax5;
+
 PROCEDURE tessa3(cam: Camera);
 VAR
 	i,j: LONGINT;
@@ -205,7 +303,7 @@ BEGIN
 	ray.clr.alpha:=1;
 	ray.scale := 1; 
 	ray.tscale:=1;
-	ray.dtl:=D2;	
+	ray.dtl:=DETAIL;	
 	Base.world.Shade(ray);
 	IF ray.terminate THEN
 		r:=ray.clr.r;
@@ -225,6 +323,41 @@ BEGIN
 	END;	
 END tessa3;
 
+PROCEDURE tessa2(cam: Camera);
+VAR
+	i,j: LONGINT;
+	theta,phi,dtheta,dphi: REAL;
+	ray: Base.Ray;
+	pixel: Raster.Pixel;
+	r,b,g: REAL;
+BEGIN
+	angletoray(ray,cam.theta+cam.dtheta/2, cam.phi+cam.dphi/2);
+	ray.clr.ra := 1;
+	ray.clr.ga := 1;
+	ray.clr.ba := 1;
+	ray.clr.alpha:=1;
+	ray.scale := 1; 
+	ray.tscale:=1;
+	ray.dtl:=DETAIL;	
+	Base.world.Shade(ray);
+	IF ray.terminate THEN
+		r:=ray.clr.r;
+		g:=ray.clr.g;
+		b:=ray.clr.b; 
+	ELSE
+		b:= ray.clr.b + ray.clr.ba;
+		r:= ray.clr.r + ray.clr.ra/3;
+		g:= ray.clr.g + ray.clr.ga/3
+	END;
+	Base.clamp3(r,g,b);	
+	Raster.SetRGB(pixel,ENTIER(r*GAMMA),ENTIER(g*GAMMA),ENTIER(b*GAMMA)); 
+	FOR i := 0 TO 1 DO
+		FOR j := 0 TO 1 DO
+			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
+		END
+	END;	
+END tessa2;
+
 PROCEDURE tessa5(cam: Camera);
 VAR
 	i,j: LONGINT;
@@ -240,7 +373,7 @@ BEGIN
 	ray.clr.alpha:=1;
 	ray.scale := 1; 
 	ray.tscale:=1;
-	ray.dtl:=D2;	
+	ray.dtl:=DETAIL;	
 	Base.world.Shade(ray);
 	IF ray.terminate THEN
 		r:=ray.clr.r;
@@ -368,7 +501,7 @@ BEGIN{ACTIVE, PRIORITY(Objects.Low)}
 			GO:=FALSE;
 		incTD; 
 		END;
-		UNTIL ~Base.worldalive; 
+	UNTIL ~Base.worldalive; 
 END Tile;
 
 VAR
@@ -392,7 +525,7 @@ VAR
 	FV: REAL;
 	copy: Raster.Mode;
 	PATCH*:BOOLEAN;
-	DETAIL,D2: REAL;
+	DETAIL: REAL;
 	
 PROCEDURE Res*;
 BEGIN
@@ -505,13 +638,11 @@ END lessdetail;
 PROCEDURE decdetail*;
 BEGIN
 	DETAIL:=DETAIL*2/3;
-	D2:=DETAIL*3/2;
 END decdetail;
 
 PROCEDURE incdetail*;
 BEGIN
 	DETAIL:=DETAIL*3/2;
-	D2:=DETAIL*3/2;
 END incdetail;
 
 PROCEDURE incTD;
@@ -619,7 +750,6 @@ BEGIN
 	AFTER:=2;
  	FAST:=3;
  	DETAIL:=100;
- 	D2:=150;
  	lsense:=0.2;
  	aperture.width:=1;
  	aperture.height:=1;

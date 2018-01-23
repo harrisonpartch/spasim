@@ -4,8 +4,10 @@ MODULE NnKyXYNiHwdxuM6wHrbxwuQ;
 VAR vox: TexVox.TexVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	IF vox=NIL THEN NEW(vox,'rahowacat.png')  END;
 	RETURN vox
 END thisvox;
 
- END NnKyXYNiHwdxuM6wHrbxwuQ. 
+BEGIN
+NEW(vox,'rahowacat.png');
+vox.tscale:=256; 
+END NnKyXYNiHwdxuM6wHrbxwuQ. 

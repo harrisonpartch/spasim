@@ -50,14 +50,17 @@ VAR
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
+	RETURN s2
+END thisvox;
+
+BEGIN
 	green:=Base.VoxelFromName("Ngreen");  	
-	xot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 
+	xot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU666"); 
 	NEW(s0);
 	NEW(s1);
 	NEW(s2);
 	NEW(s3);
 	NEW(s4);	
-	
 	NEW(alphablue);
 	alphablue.setcolor(1/2,1/2,0,2/3,0);
 	s0.passable:=FALSE;
@@ -66,17 +69,15 @@ BEGIN
 	s3.passable:=TRUE;	
 	s4.passable:=TRUE;	
 	s0.fillsierp(green,xot);
-	s1.fillsierp(s0,alphablue);	
-	s2.fillsierp(s1,alphablue);
-	s3.fillsierp(s2,alphablue);	
-	s4.fillsierp(s3,alphablue);
+	s1.fillsierp(s0,xot);	
+	s2.fillsierp(s1,xot);
+	s3.fillsierp(s2,xot);	
+	s4.fillsierp(s3,xot);
 	s0.imposter:=green;	
 	s0.copyonstroke:=TRUE;
 	s1.copyonstroke:=TRUE;	
 	s2.copyonstroke:=TRUE;	
 	s3.copyonstroke:=TRUE;
-	RETURN s4
-END thisvox;
- END NXWCxXWLIcD2LegvoGXX666. 
+END NXWCxXWLIcD2LegvoGXX666. 
  
  Marsh.Rez NXWCxXWLIcD2LegvoGXX666

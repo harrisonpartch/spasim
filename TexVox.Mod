@@ -8,6 +8,7 @@ TYPE PT = Base.PT;
 	FR = Base.FR;
 	Name = Base.Name;
  	NCube=Base.NCube;
+ 	Texture=Base.Texture;
 	TexCube= Base.TexCube;
 
 (* pseudosolid texture *)
@@ -28,14 +29,16 @@ VAR
 	p: Raster.Pixel;
 	x,y,xi,yj: LONGINT;
 	dr,dg,db,a: REAL;
+	dot1,dot2,mix: REAL;
 	lx,ly: REAL;
 	i,j,face: INTEGER;
 	dot: REAL;	
 	xov,yov,zov:REAL;
 	inside: BOOLEAN;
-	color: Base.Color;
+	color: Color;
+	raycolor: Base.ray_color;
 	exit:PT;
-	xx,yy,zz: REAL;
+	xx,yy,zz,ai,ainv: REAL;
 BEGIN
 	IF ray.length>0.00001 THEN
 		xx:=ray.xyz.x;
@@ -51,30 +54,60 @@ BEGIN
 			|3: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
 			|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
 			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
-		END;	
+		END;											
 		color:=texcube.side[ray.face].pixel(lx,ly);
-		dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
-		dr:=color.red*dot;
-		dg:=color.green*dot;
-		db:=color.blue*dot;	
-		IF color.alpha<0.98 THEN
-			IF color.alpha>0.7 THEN
-				ray.clr.alpha:=ray.clr.alpha-0.2;
-				mirror(ray)
+		dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
+		dr:=color.red*color.alpha*dot;
+		dg:=color.green*color.alpha*dot;
+		db:=color.blue*color.alpha*dot;	
+		(*
+		0<alpha<1/2 is interpreted as alpha on (0,1)
+		1/2<alpha<1 is mirror+texture mixed
+		*)
+		IF color.alpha<0.99 THEN
+			IF color.alpha>0.5 THEN 
+				ai:=(2*color.alpha)/2;
+				ainv:=(1-ai)/2;
+				ai:=ai/2;
+				raycolor:=ray.clr;
+				mirror(ray,0);
+				raycolor.r := raycolor.r + dr*raycolor.ra;
+				raycolor.g := raycolor.g + dg*raycolor.ga;
+				raycolor.b := raycolor.b + db*raycolor.ba;		
+				ray.clr.r := (ray.clr.r*ai + raycolor.r*ainv);
+				ray.clr.g := (ray.clr.g*ai + raycolor.g*ainv) ;
+				ray.clr.b := (ray.clr.b*ai + raycolor.b*ainv);					
 			ELSE
-				ray.clr.r := ray.clr.r + dr;
-				ray.clr.ra:=ray.clr.ra-dr;
-				ray.clr.g := ray.clr.g + dg;
-				ray.clr.ga:=ray.clr.ga-dg;
-				ray.clr.b := ray.clr.b + db;
-				ray.clr.ba:=ray.clr.ba-db;
+				dot1:=ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
+				dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
+				mix:=ray.length*ray.scale;
+				IF mix>1 THEN mix:=1 END;
+				dot:=mix*dot1+(1-mix)*dot2;	
+				dr:=color.red*color.alpha*dot;
+				dg:=color.green*color.alpha*dot;
+				db:=color.blue*color.alpha*dot;	
+				ray.clr.r := ray.clr.r + dr*ray.clr.ra;
+				ray.clr.g := ray.clr.g + dg*ray.clr.ga;
+				ray.clr.b := ray.clr.b + db*ray.clr.ba;	
+				ray.clr.ra:= ray.clr.ra-dr;
+				ray.clr.ga:= ray.clr.ga-dg;
+				ray.clr.ba:= ray.clr.ba-db;
+				ray.clr.alpha:=ray.clr.alpha-0.1;
+				IF ray.clr.alpha<0.1 THEN ray.terminate:=TRUE END;
 			END
 		ELSE
-			ray.clr.r := ray.clr.r + dr;
-			ray.clr.g := ray.clr.g + dg;
-			ray.clr.b := ray.clr.b + db;	
-			ray.terminate:=TRUE
+			dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
+			dr:=color.red*dot;
+			dg:=color.green*dot;
+			db:=color.blue*dot;	
+			ray.clr.r := ray.clr.r + dr*ray.clr.ra;
+			ray.clr.g := ray.clr.g + dg*ray.clr.ga;
+			ray.clr.b := ray.clr.b + db*ray.clr.ba;	
+			ray.clr.alpha:=0;	
+			ray.terminate:=TRUE;
 		END
+	ELSE
+	  (* camera is inside textured cube *)
 	END
 END Shade;
 
@@ -87,14 +120,20 @@ BEGIN
 	p.x := p.x-a; p.y := p.y-b; p.z := p.z-c;
 END reflect;
 
-PROCEDURE mirror(VAR ray: Ray);
+PROCEDURE mirror(VAR ray: Ray; CONST mix: REAL);
+VAR
+	n: PT;
 BEGIN
 	ray.hitmirrorTF := TRUE;
 	ray.hitxyz:=ray.xyz;
 	ray.changed := TRUE;
 	ray.mirrortf:=TRUE;	
+	ray.clr.ra:= ray.clr.ra + 0.2;
+	ray.clr.ga := ray.clr.ga + 0.2;
+	ray.clr.ba := ray.clr.ba + 0.2;
+	ray.clr.alpha:= ray.clr.alpha - 0.2;	
+	IF ray.clr.alpha < 0.1 THEN ray.terminate:=TRUE END;		
 	reflect(ray.dxyz, ray.fnormal);	
-	ray.clr.alpha:=ray.clr.alpha-0.1;
 	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
@@ -102,12 +141,48 @@ END mirror;
 
 END AvaVox;
 
+
+TYPE BilbVox* = OBJECT(Voxel);
+VAR
+	texture*: Texture;
+	name*: Name; 
+
+PROCEDURE & init*(n: Name);
+BEGIN
+	NEW(texture,n);
+	name:=n;
+END init;	
+
+PROCEDURE Shade (VAR ray: Ray);
+VAR
+	p: Raster.Pixel;
+	cp: PT;
+	x,y,z: REAL;
+	color: Base.Color;
+BEGIN
+	IF ray.length>0 THEN
+		(* find the closest point on the ray to the center of the hit cube *)
+		cp:=Base.midPT(ray.lxyz,Base.Exit(ray));
+		(* first approx: dirty: throw out the smallest of x y z *)
+		x:= cp.x; y:= cp.y; z:=cp.z;
+		IF z>y THEN y:=z ELSIF z>x THEN  x:=z END;	
+		color:=texture.pixel(x,y);
+		ray.clr.r := ray.clr.r + color.red*ray.clr.ra;
+		ray.clr.g := ray.clr.g + color.green*ray.clr.ga;
+		ray.clr.b := ray.clr.b + color.blue*ray.clr.ba;	
+		ray.clr.alpha:=0;	
+		ray.terminate:=TRUE;	
+	END
+END Shade;
+
+END BilbVox;
+
 TYPE TexVox* = OBJECT(Voxel);
 VAR
 	txTF*: BOOLEAN;
 	texcube*: TexCube;
 	texscale*:LONGINT;
-	name*: Name;
+	name*: Name; 
 
 PROCEDURE & init*(n: Name);
 BEGIN
@@ -116,16 +191,6 @@ BEGIN
 	tscale:=27;
 	texscale:=900;
 END init;
-
-PROCEDURE deepcopy*():Voxel;
-VAR
-	v: TexVox;
-BEGIN
-	NEW(v,"fake");
-	v.texcube:=texcube;
-	v.tscale:=tscale;	
-	RETURN v
-END deepcopy;
 
 PROCEDURE Shade (VAR ray: Ray);
 VAR
@@ -140,7 +205,8 @@ VAR
 	bpdx,bpdy,cq: REAL;
 	xov,yov,zov:REAL;
 	inside: BOOLEAN;
-	color,color1,color2: Base.Color;
+	color,color1,color2: Base.Color;	
+	raycolor: Base.ray_color;
 	txcube: TexCube;
 	rlf: REAL;
 	rlm: BOOLEAN;
@@ -151,6 +217,7 @@ VAR
 	mip,mipverse,gray,grayinv: REAL;
 	patchradius: REAL;
 	pclr: Base.ray_color;
+	ai,ainv:REAL;
 BEGIN
 	IF ray.length>0 THEN
 		IF tscale>0 THEN
@@ -243,12 +310,33 @@ BEGIN
 		ELSE
 			color:=texcube.side[ray.face].pixel(lx,ly);
 		END; 
-		color:=texcube.side[ray.face].pixel(lx,ly);
+		dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
+		dr:=color.red*color.alpha*dot;
+		dg:=color.green*color.alpha*dot;
+		db:=color.blue*color.alpha*dot;	
+		(*
+		0<alpha<1/2 is interpreted as alpha on (0,1)
+		1/2<alpha<1 is mirror+texture mixed
+		*)
 		IF color.alpha<0.99 THEN
-			IF color.alpha>0.69 THEN 
-				mirror(ray,mix)
+			IF color.alpha>0.5 THEN 
+				ai:=(2*color.alpha)/2;
+				ainv:=(1-ai)/2;
+				ai:=ai/2;
+				raycolor:=ray.clr;
+				mirror(ray,0);
+				raycolor.r := raycolor.r + dr*raycolor.ra;
+				raycolor.g := raycolor.g + dg*raycolor.ga;
+				raycolor.b := raycolor.b + db*raycolor.ba;		
+				ray.clr.r := (ray.clr.r*ai + raycolor.r*ainv);
+				ray.clr.g := (ray.clr.g*ai + raycolor.g*ainv) ;
+				ray.clr.b := (ray.clr.b*ai + raycolor.b*ainv);					
 			ELSE
-				dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
+				dot1:=ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
+				dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
+				mix:=ray.length*ray.scale;
+				IF mix>1 THEN mix:=1 END;
+				dot:=mix*dot1+(1-mix)*dot2;	
 				dr:=color.red*color.alpha*dot;
 				dg:=color.green*color.alpha*dot;
 				db:=color.blue*color.alpha*dot;	
@@ -274,18 +362,13 @@ BEGIN
 		END
 	ELSE
 	  (* camera is inside textured cube *)
-	(*  
-		ray.clr.ra:= ray.clr.ra-0.51;
-		ray.clr.ga:= ray.clr.ga-0.51;
-		ray.clr.ba:= ray.clr.ba-0.51;	  
-		ray.clr.alpha:=ray.clr.alpha-0.51;	*)
 	END
 END Shade;
-
 (*
 texture patch rays: diverge by dtheta, dphi: so distance between them at the hit is approximately
 sin(dtheta)*ray.length -- screw it. this should be handled in the mspace shader!
 X X X
+
 X x X
 X X X 
 
@@ -313,10 +396,7 @@ BEGIN
 	ray.clr.ba := ray.clr.ba + 0.2;
 	ray.clr.alpha:= ray.clr.alpha - 0.2;	
 	IF ray.clr.alpha < 0.1 THEN ray.terminate:=TRUE END;		
-	n.x:=(ray.normal.x*mix+ray.fnormal.x*(1-mix));
-	n.y:=(ray.normal.y*mix+ray.fnormal.y*(1-mix));	
-	n.z:=(ray.normal.z*mix+ray.fnormal.z*(1-mix));	
-	reflect(ray.dxyz, n);	
+	reflect(ray.dxyz, ray.fnormal);	
 	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
@@ -499,6 +579,29 @@ BEGIN
 	a := 2*n.x*dot; b := 2*n.y*dot; c := 2*n.z*dot;
 	p.x := p.x-a; p.y := p.y-b; p.z := p.z-c;
 END reflect;
+
+
+PROCEDURE mirror(VAR ray: Ray; CONST mix: REAL);
+VAR
+	n: PT;
+BEGIN
+	ray.hitmirrorTF := TRUE;
+	ray.hitxyz:=ray.xyz;
+	ray.changed := TRUE;
+	ray.mirrortf:=TRUE;	
+	ray.clr.ra:= ray.clr.ra + 0.2;
+	ray.clr.ga := ray.clr.ga + 0.2;
+	ray.clr.ba := ray.clr.ba + 0.2;
+	ray.clr.alpha:= ray.clr.alpha - 0.2;	
+	IF ray.clr.alpha < 0.1 THEN ray.terminate:=TRUE END;		
+	n.x:=(ray.normal.x*mix+ray.fnormal.x*(1-mix));
+	n.y:=(ray.normal.y*mix+ray.fnormal.y*(1-mix));	
+	n.z:=(ray.normal.z*mix+ray.fnormal.z*(1-mix));	
+	reflect(ray.dxyz, n);	
+	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
+	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
+	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
+END mirror;
 
 END TexCubeVox;
 

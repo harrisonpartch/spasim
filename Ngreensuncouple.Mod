@@ -4,7 +4,7 @@ VAR vox: TexVox.TexVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	IF vox=NIL THEN NEW(vox,'greensuncouple.png')  END;
-	vox.tscale:=81;
+	vox.tscale:=0;
 	vox.passable:=FALSE;
 	RETURN vox
 END thisvox;

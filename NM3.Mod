@@ -1,5 +1,5 @@
 MODULE NM3; (*! This module may be either imported or used anonymously *)
-IMPORT Base, SPSME, Noise, Math, TexVox, Out := KernelLog, Debugging, Streams,Strings;
+IMPORT Objects, Base, SPSME, Noise, Math, TexVox, Out := KernelLog, Debugging, Streams,Strings;
 
 (*
 Special voxel containing 27 children arranged in a 3x3x3 grid.
@@ -22,51 +22,6 @@ TYPE PT = Base.PT;
  	NCube=Base.NCube;
  	LCube=Base.LightCube;
 
-PROCEDURE rot90z(VAR blx: ARRAY 3,3,3 OF Voxel);
-VAR
-	b: ARRAY 3,3,3 OF Voxel;
-BEGIN
-	b[1,0,0]:= blx[0,0,0];
-	b[1,1,0]:= blx[1,0,0];
-	b[0,1,0]:= blx[1,1,0];
-	b[0,0,0]:= blx[0,1,0];
-	b[1,0,1]:= blx[0,0,1];
-	b[1,1,1]:= blx[1,0,1];
-	b[0,1,1]:= blx[1,1,1];
-	b[0,0,1]:= blx[0,1,1];
-	blx:=b;
-END rot90z;
-
-PROCEDURE rot90zB(VAR blx: ARRAY 3,3,3 OF BOOLEAN);
-VAR
-	b: ARRAY 3,3,3 OF BOOLEAN;
-BEGIN
-	b[1,0,0]:= blx[0,0,0];
-	b[1,1,0]:= blx[1,0,0];
-	b[0,1,0]:= blx[1,1,0];
-	b[0,0,0]:= blx[0,1,0];
-	b[1,0,1]:= blx[0,0,1];
-	b[1,1,1]:= blx[1,0,1];
-	b[0,1,1]:= blx[1,1,1];
-	b[0,0,1]:= blx[0,1,1];
-	blx:=b;
-END rot90zB;
-
-PROCEDURE rot90zNC(VAR blx: ARRAY 3,3,3 OF NCube);
-VAR
-	b: ARRAY 3,3,3 OF NCube;
-BEGIN
-	b[1,0,0]:= blx[0,0,0];
-	b[1,1,0]:= blx[1,0,0];
-	b[0,1,0]:= blx[1,1,0];
-	b[0,0,0]:= blx[0,1,0];
-	b[1,0,1]:= blx[0,0,1];
-	b[1,1,1]:= blx[1,0,1];
-	b[0,1,1]:= blx[1,1,1];
-	b[0,0,1]:= blx[0,1,1];
-	blx:=b;
-END rot90zNC;
-
 TYPE cell* = OBJECT(Voxel);
 VAR
 	nposterTF*:BOOLEAN;
@@ -74,20 +29,7 @@ VAR
 	blox*: ARRAY M,M,M OF Voxel;
 	nbloxTF*: ARRAY M,M,M OF BOOLEAN;
 	nblox*: ARRAY M,M,M OF NCube;
-PROCEDURE r90z;
-VAR i,j,k: INTEGER;
-BEGIN
-	rot90z(blox);
-	rot90zB(nbloxTF);
-	rot90zNC(nblox);
-	FOR i:=0 TO 1 DO
-		FOR j:=0 TO 1 DO
-			FOR k:=0 TO 1 DO
-				IF blox[i,j,k]#NIL THEN blox[i,j,k].r90z END
-			END
-		END
-	END
-END r90z;
+	deepcopyofme:cell;
 
 PROCEDURE Shade(VAR ray: Ray);
 VAR
@@ -129,6 +71,7 @@ BEGIN
 				ray.lxyz.y := ABS(xyz.y - ijk.j);
 				ray.lxyz.z := ABS(xyz.z - ijk.k);
 				ray.popdelta := Base.Origin;
+				ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal;
 				v.Shade(ray);
 				xyz.x := xyz.x + ray.popdelta.x;
 				xyz.y := xyz.y + ray.popdelta.y;
@@ -198,6 +141,7 @@ BEGIN
 				newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
 			END;
 			vdepth:=Base.distance(newxyz,xyz)/ray.scale;
+		
 			ray.xyz.x:=ray.xyz.x +(newxyz.x-xyz.x)/ray.scale;
 			ray.xyz.y:=ray.xyz.y +(newxyz.y-xyz.y)/ray.scale;
 			ray.xyz.z:=ray.xyz.z +(newxyz.z-xyz.z)/ray.scale;
@@ -205,7 +149,8 @@ BEGIN
 			ray.hitxyz:=ray.xyz;
 			ray.length:=ray.length+vdepth;
 			blr:=black*vdepth;
-			blainv:=1-blr;
+			blainv:=1-blr;	
+			IF localcolor THEN vdepth:=vdepth*ray.scale END;
 			rr := red*vdepth*ray.clr.ra;
 			gr := green*vdepth*ray.clr.ga;
 			br := blue*vdepth*ray.clr.ba;
@@ -225,6 +170,7 @@ BEGIN
 					ray.lxyz.y := ABS(xyz.y - ijk.j);
 					ray.lxyz.z := ABS(xyz.z - ijk.k);
 					ray.popdelta := Base.Origin; (* because many shaders don't set it *)
+					ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal;
 					v.Shade(ray);
 					xyz.x := xyz.x + ray.popdelta.x;
 					xyz.y := xyz.y + ray.popdelta.y;
@@ -241,7 +187,7 @@ BEGIN
 	ray.scale := ray.scale/M;
 END Shade;
 
-PROCEDURE nshade*(CONST nc: NCube; VAR ray: Ray);
+PROCEDURE nshade(nc: NCube; VAR ray: Ray);
 VAR
 	dr,dg,db,mix,dot,dot1,dot2: REAL;
 	light: Base.Light;
@@ -254,15 +200,6 @@ BEGIN
 		mix:=ray.length*ray.scale/10;
 		IF mix>1 THEN mix:=1 END;
 		dot:=mix*dot1+(1-mix)*dot2;
-		dr:=nc.color.red*dot*ray.clr.ra;
-		dg:=nc.color.green*dot*ray.clr.ga;
-		db:=nc.color.blue*dot*ray.clr.ba;
-		ray.clr.r := ray.clr.r + dr;
-		ray.clr.g := ray.clr.g + dg;
-		ray.clr.b := ray.clr.b + db;
-		ray.clr.ra:=ray.clr.ra-dr;
-		ray.clr.ga:=ray.clr.ga-dg;
-		ray.clr.ba:=ray.clr.ba-db;
 		ray.clr.r := ray.clr.r + nc.color.red * ray.clr.ra*dot;
 		ray.clr.g := ray.clr.g + nc.color.green * ray.clr.ga*dot;
 		ray.clr.b := ray.clr.b + nc.color.blue * ray.clr.ba*dot;
@@ -335,9 +272,6 @@ BEGIN
 	blox[0,1,1]:=w;
 	blox[1,0,1]:=w;
 	blox[1,1,1]:=w;
-	blox[1,1,2]:=w;
-	blox[2,1,1]:=w;
-	blox[1,2,1]:=w;	
 END fillsierp;
 
 PROCEDURE fillcqr2*(v,w: Voxel);
@@ -490,26 +424,21 @@ BEGIN
 	END
 END passprobe;
 
+PROCEDURE copyprime;
+BEGIN
+	copyonstroke:=TRUE;
+	copyengine.add(SELF);	
+END copyprime;
+
 PROCEDURE stroke*(p:PT; resolution: LONGINT; voxel :Voxel);
 VAR
 	i,j,k: LONGINT;
 BEGIN
 	Base.clamPT(p);
-	IF copyonstroke THEN Out.Char('&') END;  (* but Base.world is never copyonstroke *)
 	IF voxel#NIL THEN
 		strokerec(p,resolution,1, voxel);
 	END
 END stroke;
-
-PROCEDURE strokephemeral(p:PT; resolution:LONGINT; voxel,voxundo:Voxel);
-VAR
-	i,j,k: LONGINT;
-BEGIN
-	Base.clamPT(p);
-	IF voxel#NIL THEN
-		strokephemeralrec(p,resolution,1,voxel,voxundo);
-	END
-END strokephemeral;
 
 PROCEDURE nstroke(p:PT; resolution:LONGINT; normal:PT; color: Color);
 VAR
@@ -540,14 +469,17 @@ BEGIN
 		ELSE
 			IF blox[i,j,k]#NIL THEN
 				IF  blox[i,j,k].copyonstroke THEN
-					copyv:=blox[i,j,k].deepcopy();
-					copyv.copyonstroke:=FALSE;
-					copyv.strokerec(p, resolution,nextscale,voxel);
-					blox[i,j,k]:=copyv; Out.Char('*');
+					copyv:= blox[i,j,k].deepcopyofme;
+					IF (copyv#NIL) & (copyv.baked) THEN
+						copyv.strokerec(p, resolution,nextscale,voxel);
+						copyengine.add(blox[i,j,k]);
+						blox[i,j,k]:=copyv	
+					END	
 				ELSIF blox[i,j,k].complex THEN
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
 				ELSE
 					NEW(c);
+					c.red:=red; c.blue:=blue; c.green:=green; c.black:=black; c.localcolor:=localcolor;
 					c.fill(blox[i,j,k]);
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
@@ -676,6 +608,14 @@ BEGIN
 	END
 END line;
 
+PROCEDURE FRaster*( f: FR; resolution: LONGINT);
+VAR
+	origin: PT;
+BEGIN
+	origin.x:=0; origin.y:=0; origin.z:=0;
+	FRasterrec(f,resolution,origin,1);   (* origin is (0,0,0) *)
+END FRaster;
+
 PROCEDURE FRasterrec(f: FR; resolution: LONGINT; origin: PT; scale: LONGINT); (*origin is always in world space*)
 VAR
 	i,j,k: INTEGER;
@@ -700,6 +640,7 @@ BEGIN
 				IF blox[i,j,k]=NIL THEN
 					NEW(newcell);
 					newcell.setcolor(red,green,blue,black,alpha);
+					newcell.localcolor:=localcolor;
 					blox[i,j,k]:=newcell;
 					IF f.normaltf(p) THEN
 						newcell.nposterTF:=TRUE;
@@ -733,10 +674,18 @@ BEGIN
 				blox[i,j,k]:=f.voxel(p);
 			END
 		END END END
-	END;
+	END
 END FRasterrec;
 
-PROCEDURE FRasterrecSolid(f: FR; resolution: LONGINT; origin: PT; scale: LONGINT);
+PROCEDURE FRasterSolid*( f: FR; resolution: LONGINT);
+VAR
+	origin: PT;
+BEGIN
+	origin.x:=0; origin.y:=0; origin.z:=0;
+	SFRasterrec(f,resolution,origin,1);   (* origin is (0,0,0) *)
+END FRasterSolid;
+
+PROCEDURE SFRasterrec(f: FR; resolution: LONGINT; origin: PT; scale: LONGINT);
 VAR
 	i,j,k,ii,jj,kk: INTEGER;
 	o,p:PT;
@@ -761,11 +710,12 @@ BEGIN
 				IF blox[i,j,k]=NIL THEN
 					NEW(newcell);
 					newcell.setcolor(red,green,blue,black,alpha);
+					newcell.localcolor:=localcolor;
 					newcell.imposter:=f.voxel(p);
 					newcell.nposterTF:=TRUE;
 					newcell.nposter.normal:=f.normal(p);
 					newcell.nposter.color:=f.color(p);
-					newcell.FRasterrecSolid(f,resolution,o,nextscale);
+					newcell.SFRasterrec(f,resolution,o,nextscale);
 					blox[i,j,k]:=newcell
 				ELSE
 				 	v:=blox[i,j,k];
@@ -775,7 +725,7 @@ BEGIN
 							v.nposterTF:=TRUE;
 							v.nposter.normal:=f.normal(p);
 							v.nposter.color:=f.color(p);
-							v.FRasterrecSolid(f,resolution,o,nextscale)
+							v.SFRasterrec(f,resolution,o,nextscale)
 				 		END
 				 	END
 				 END;
@@ -798,23 +748,7 @@ BEGIN
 			END
 		END END END
 	END;
-END FRasterrecSolid;
-
-PROCEDURE FRaster*( f: FR; resolution: LONGINT);
-VAR
-	origin: PT;
-BEGIN
-	origin.x:=0; origin.y:=0; origin.z:=0;
-	FRasterrec(f,resolution,origin,1);   (* origin is (0,0,0) *)
-END FRaster;
-
-PROCEDURE FRasterSolid*( f: FR; resolution: LONGINT);
-VAR
-	origin: PT;
-BEGIN
-	origin.x:=0; origin.y:=0; origin.z:=0;
-	FRasterrecSolid(f,resolution,origin,1);   (* origin is (0,0,0) *)
-END FRasterSolid;
+END SFRasterrec;
 
 PROCEDURE copy():Voxel;
 VAR c: cell;
@@ -845,13 +779,13 @@ VAR
 BEGIN
 	copymarker:=TRUE;
 	NEW(c);
-	c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; c.alpha:=alpha;
+	c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; c.localcolor:=localcolor;
 	c.nbloxTF:=nbloxTF;
 	c.nblox:=nblox;
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 		child:=blox[i,j,k];
 		IF (child#NIL) THEN
-			IF ~child.copymarker & ~ child.copyonstroke THEN
+			IF ~child.copymarker  & ~child.copyonstroke THEN
 				 c.blox[i,j,k]:=child.deepcopy();
 			ELSE
 				c.blox[i,j,k]:=child
@@ -859,8 +793,10 @@ BEGIN
 		END
 	END END END;
 	copymarker:=FALSE;
+	c.baked:=TRUE; (* baked means done copying *)
 	RETURN c
 END deepcopy;
+
 PROCEDURE count*(level: INTEGER):LONGINT;
 VAR
 	c: LONGINT;
@@ -942,6 +878,33 @@ END sprout;
 
 END cell;
 
+TYPE CopyEngine = OBJECT(Base.V);
+VAR
+	tobecopied: Voxel;	
+	COPYGO:BOOLEAN;
+PROCEDURE add(CONST v:Voxel);
+BEGIN
+	tobecopied:=v;
+	go
+END add;
+PROCEDURE go;
+BEGIN
+	BEGIN {EXCLUSIVE} COPYGO:=TRUE END;
+END go;
+
+BEGIN{ACTIVE, PRIORITY(Objects.Low)}
+REPEAT
+	Out.String("COPYENGINE");
+	BEGIN {EXCLUSIVE} AWAIT(COPYGO) END;
+	tobecopied.deepcopyofme:=tobecopied.deepcopy();
+	Out.String("COPYENGINE");
+	BEGIN {EXCLUSIVE} COPYGO:=FALSE END;
+UNTIL FALSE
+END CopyEngine;
+
+VAR
+	copyengine: CopyEngine;
+
 PROCEDURE thisvox*():Voxel;
 VAR
 	v: cell;
@@ -951,5 +914,5 @@ BEGIN
 END thisvox;
 
 BEGIN
-
+	NEW(copyengine)
 END NM3.

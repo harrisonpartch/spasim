@@ -28,7 +28,7 @@ BEGIN
 	dr := r*depth*ray.clr.ra;
 	dg := g*depth*ray.clr.ga;
 	db := b*depth*ray.clr.ba;
-	dbl:=black*depth;
+	dbl:=1-black*depth;
 	ray.clr.r := ray.clr.r + dr;
 	ray.clr.g := ray.clr.g + dg;
 	ray.clr.b := ray.clr.b + db; 
@@ -48,5 +48,5 @@ END thisvox;
 
 BEGIN
 NEW(vox); 
-vox.setcolor(0, 1/3, 1/2, 1/7 ,1 /2);
+vox.setcolor(0, 1/3, 1/2, 1/7,1);
 END NIXARXB2vH6ieKZmsc6mODh. 

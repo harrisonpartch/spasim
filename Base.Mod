@@ -80,7 +80,7 @@ VAR
 	transparent*: BOOLEAN;
 	copy: Raster.Mode;
 
-PROCEDURE & init(n: ARRAY OF CHAR);
+PROCEDURE & init*(CONST n: ARRAY OF CHAR);
 VAR
 	i,j,ix,jy: LONGINT;
 BEGIN
@@ -270,13 +270,13 @@ TYPE Path*=ARRAY 20 OF ARRAY 3 OF INTEGER;
 TYPE Voxel*=OBJECT(V)
 VAR
 	complex*, passable*: BOOLEAN;
-	imposter*, texture*: Voxel;
+	imposter*, texture*, deepcopyofme*: Voxel;
 	lockTF*,copymarker*,emptysplit*: BOOLEAN;
 	DTL*: REAL;
 	code*,ncode*:Name;  
 	tscale*: LONGINT;
 	red*,green*,blue*,black*,alpha*: REAL;
-	colored*,frozen*,probelock*,copyonstroke*,copyonstrokerecursion*:BOOLEAN;
+	colored*,frozen*,probelock*,copyonstroke*,copyonstrokerecursion, baked*,localcolor*:BOOLEAN;
 	offset*:PT;
 	
 PROCEDURE r90z*;
@@ -319,6 +319,8 @@ PROCEDURE setcolor* (r,g,b,bl,a: REAL);
 END setcolor;
 PROCEDURE erase*(p:PT; resolution:LONGINT);
 END erase;
+PROCEDURE copyprime*;
+END copyprime;
 PROCEDURE deepcopy*():Voxel;
 BEGIN
 	RETURN(SELF)

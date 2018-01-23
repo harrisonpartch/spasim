@@ -1,10 +1,8 @@
 MODULE Nharrisonavatar;
-IMPORT Base, TexVox, RotaVox;
+IMPORT Base, TexVox;
   
 VAR 
 	cv: TexVox.TexVox;
-	sabot, vox,v,sphere: Base.Voxel;
-	center: Base.PT;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
@@ -12,9 +10,9 @@ BEGIN
 END thisvox;
 
 BEGIN
-	NEW(cv,"harrisonavatar.0.png");
+	NEW(cv,"ugandaknuckles.png");
 	cv.passable:=FALSE;
-	cv.tscale:=1000;	
+	cv.tscale:=0;
 END Nharrisonavatar. 
  
  XNXLMarsh.Rez Nharrisonavatar ~

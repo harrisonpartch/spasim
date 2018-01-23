@@ -53,7 +53,7 @@ To update: Configuration.Init ~
 			<Setting name="SourceDir1" value="FSTools.Mount 'Module Sources' RelativeFileSystem .aoshome/source"/>
 			<Setting name="SourceDir2" value="FSTools.Mount 'Fonts' RelativeFileSystem .aoshome/fonts"/>
 			<Setting name="Start the main menu" value="StartMenu.Open"/>
-			<Setting name="DefaultSkin" value="SkinEngine.Unload"/>
+			<Setting name="DefaultSkin" value="SkinEngine.Load stijnbw.skin"/>
 			<Setting name="Restore the desktop" value="WMRestorable.Load Auto.dsk"/>
 			<Setting name="navigation manager" value="WMNavigate.Open -vs 1 0 0 Navigation:TaskList"/>
 			<Setting name="compiler default" value="Compiler.SetDefaultPlatform Linux32G"/>
@@ -79,7 +79,7 @@ To update: Configuration.Init ~
 			<Section name="FontManager">
 				<Section name="DefaultFont">
 					<Setting name="Name" value="Oberon"/>
-					<Setting name="Size" value="12"/>
+					<Setting name="Size" value="16"/>
 				</Section>
 				<Section name="FontLoaders">
 					<Section name="OberonFonts">
@@ -437,9 +437,9 @@ To update: Configuration.Init ~
 					<Setting name="ShowPathInTabs" value="FALSE"/>
 					<Setting name="ScratchPanelHeight" value="5"/>
 					<Setting name="EnableWhitespaceWarnings" value="FALSE"/>
-					<Setting name="ShowLineNumbers" value="FALSE"/>
-					<Setting name="IndicateTabs" value="FALSE"/>
-					<Setting name="CurrentLineColor" value="0"/>
+					<Setting name="ShowLineNumbers" value="TRUE"/>
+					<Setting name="IndicateTabs" value="TRUE"/>
+					<Setting name="CurrentLineColor" value="1"/>
 				</Section>
 				<Section name="Compilers">
 					<Section name="PACO">

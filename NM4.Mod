@@ -1,5 +1,5 @@
 MODULE NM4; (*! This module may be either imported or used anonymously *)
-IMPORT Base, SPSME, Noise, Math, TexVox, Out := KernelLog, Debugging, Streams,Strings;
+IMPORT Objects, Base, SPSME, Noise, Math, TexVox, Out := KernelLog, Debugging, Streams,Strings;
 
 (*
 Special voxel containing 27 children arranged in a 3x3x3 grid.
@@ -74,10 +74,10 @@ VAR
 	blox*: ARRAY M,M,M OF Voxel;
 	nbloxTF*: ARRAY M,M,M OF BOOLEAN;
 	nblox*: ARRAY M,M,M OF NCube;
+	deepcopyofme:cell;
 PROCEDURE r90z;
 VAR i,j,k: INTEGER;
 BEGIN
-
 	FOR i:=0 TO 1 DO
 		FOR j:=0 TO 1 DO
 			FOR k:=0 TO 1 DO
@@ -239,7 +239,7 @@ BEGIN
 	ray.scale := ray.scale/M;
 END Shade;
 
-PROCEDURE nshade*(CONST nc: NCube; VAR ray: Ray);
+PROCEDURE nshade(nc: NCube; VAR ray: Ray);
 VAR
 	dr,dg,db,mix,dot,dot1,dot2: REAL;
 	light: Base.Light;
@@ -252,15 +252,6 @@ BEGIN
 		mix:=ray.length*ray.scale/10;
 		IF mix>1 THEN mix:=1 END;
 		dot:=mix*dot1+(1-mix)*dot2;
-		dr:=nc.color.red*dot*ray.clr.ra;
-		dg:=nc.color.green*dot*ray.clr.ga;
-		db:=nc.color.blue*dot*ray.clr.ba;
-		ray.clr.r := ray.clr.r + dr;
-		ray.clr.g := ray.clr.g + dg;
-		ray.clr.b := ray.clr.b + db;
-		ray.clr.ra:=ray.clr.ra-dr;
-		ray.clr.ga:=ray.clr.ga-dg;
-		ray.clr.ba:=ray.clr.ba-db;
 		ray.clr.r := ray.clr.r + nc.color.red * ray.clr.ra*dot;
 		ray.clr.g := ray.clr.g + nc.color.green * ray.clr.ga*dot;
 		ray.clr.b := ray.clr.b + nc.color.blue * ray.clr.ba*dot;
@@ -488,26 +479,22 @@ BEGIN
 	END
 END passprobe;
 
+PROCEDURE copyprime;
+BEGIN
+	copyonstroke:=TRUE;
+	Out.String("COPY PRIMING");
+	copyengine.add(SELF);	
+END copyprime;
+
 PROCEDURE stroke*(p:PT; resolution: LONGINT; voxel :Voxel);
 VAR
 	i,j,k: LONGINT;
 BEGIN
 	Base.clamPT(p);
-	IF copyonstroke THEN Out.Char('&') END;  (* but Base.world is never copyonstroke *)
 	IF voxel#NIL THEN
 		strokerec(p,resolution,1, voxel);
 	END
 END stroke;
-
-PROCEDURE strokephemeral(p:PT; resolution:LONGINT; voxel,voxundo:Voxel);
-VAR
-	i,j,k: LONGINT;
-BEGIN
-	Base.clamPT(p);
-	IF voxel#NIL THEN
-		strokephemeralrec(p,resolution,1,voxel,voxundo);
-	END
-END strokephemeral;
 
 PROCEDURE nstroke(p:PT; resolution:LONGINT; normal:PT; color: Color);
 VAR
@@ -538,10 +525,12 @@ BEGIN
 		ELSE
 			IF blox[i,j,k]#NIL THEN
 				IF  blox[i,j,k].copyonstroke THEN
-					copyv:=blox[i,j,k].deepcopy();
-					copyv.copyonstroke:=FALSE;
-					copyv.strokerec(p, resolution,nextscale,voxel);
-					blox[i,j,k]:=copyv; Out.Char('*');
+					copyv:= blox[i,j,k].deepcopyofme;
+					IF (copyv#NIL) & (copyv.baked) THEN
+						copyv.strokerec(p, resolution,nextscale,voxel);
+						copyengine.add(blox[i,j,k]);
+						blox[i,j,k]:=copyv	
+					END	
 				ELSIF blox[i,j,k].complex THEN
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
 				ELSE
@@ -674,6 +663,14 @@ BEGIN
 	END
 END line;
 
+PROCEDURE FRaster*( f: FR; resolution: LONGINT);
+VAR
+	origin: PT;
+BEGIN
+	origin.x:=0; origin.y:=0; origin.z:=0;
+	FRasterrec(f,resolution,origin,1);   (* origin is (0,0,0) *)
+END FRaster;
+
 PROCEDURE FRasterrec(f: FR; resolution: LONGINT; origin: PT; scale: LONGINT); (*origin is always in world space*)
 VAR
 	i,j,k: INTEGER;
@@ -731,10 +728,18 @@ BEGIN
 				blox[i,j,k]:=f.voxel(p);
 			END
 		END END END
-	END;
+	END
 END FRasterrec;
 
-PROCEDURE FRasterrecSolid(f: FR; resolution: LONGINT; origin: PT; scale: LONGINT);
+PROCEDURE FRasterSolid*( f: FR; resolution: LONGINT);
+VAR
+	origin: PT;
+BEGIN
+	origin.x:=0; origin.y:=0; origin.z:=0;
+	SFRasterrec(f,resolution,origin,1);   (* origin is (0,0,0) *)
+END FRasterSolid;
+
+PROCEDURE SFRasterrec(f: FR; resolution: LONGINT; origin: PT; scale: LONGINT);
 VAR
 	i,j,k,ii,jj,kk: INTEGER;
 	o,p:PT;
@@ -763,7 +768,7 @@ BEGIN
 					newcell.nposterTF:=TRUE;
 					newcell.nposter.normal:=f.normal(p);
 					newcell.nposter.color:=f.color(p);
-					newcell.FRasterrecSolid(f,resolution,o,nextscale);
+					newcell.SFRasterrec(f,resolution,o,nextscale);
 					blox[i,j,k]:=newcell
 				ELSE
 				 	v:=blox[i,j,k];
@@ -773,7 +778,7 @@ BEGIN
 							v.nposterTF:=TRUE;
 							v.nposter.normal:=f.normal(p);
 							v.nposter.color:=f.color(p);
-							v.FRasterrecSolid(f,resolution,o,nextscale)
+							v.SFRasterrec(f,resolution,o,nextscale)
 				 		END
 				 	END
 				 END;
@@ -796,23 +801,7 @@ BEGIN
 			END
 		END END END
 	END;
-END FRasterrecSolid;
-
-PROCEDURE FRaster*( f: FR; resolution: LONGINT);
-VAR
-	origin: PT;
-BEGIN
-	origin.x:=0; origin.y:=0; origin.z:=0;
-	FRasterrec(f,resolution,origin,1);   (* origin is (0,0,0) *)
-END FRaster;
-
-PROCEDURE FRasterSolid*( f: FR; resolution: LONGINT);
-VAR
-	origin: PT;
-BEGIN
-	origin.x:=0; origin.y:=0; origin.z:=0;
-	FRasterrecSolid(f,resolution,origin,1);   (* origin is (0,0,0) *)
-END FRasterSolid;
+END SFRasterrec;
 
 PROCEDURE copy():Voxel;
 VAR c: cell;
@@ -849,7 +838,7 @@ BEGIN
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 		child:=blox[i,j,k];
 		IF (child#NIL) THEN
-			IF ~child.copymarker & ~ child.copyonstroke THEN
+			IF ~child.copymarker  & ~child.copyonstroke THEN
 				 c.blox[i,j,k]:=child.deepcopy();
 			ELSE
 				c.blox[i,j,k]:=child
@@ -857,8 +846,10 @@ BEGIN
 		END
 	END END END;
 	copymarker:=FALSE;
+	c.baked:=TRUE; (* baked means done copying *)
 	RETURN c
 END deepcopy;
+
 PROCEDURE count*(level: INTEGER):LONGINT;
 VAR
 	c: LONGINT;
@@ -940,6 +931,33 @@ END sprout;
 
 END cell;
 
+TYPE CopyEngine = OBJECT(Base.V);
+VAR
+	tobecopied: Voxel;	
+	COPYGO:BOOLEAN;
+PROCEDURE add(CONST v:Voxel);
+BEGIN
+	tobecopied:=v;
+	go
+END add;
+PROCEDURE go;
+BEGIN
+	BEGIN {EXCLUSIVE} COPYGO:=TRUE END;
+END go;
+
+BEGIN{ACTIVE, PRIORITY(Objects.Low)}
+REPEAT
+	Out.String("COPYENGINE");
+	BEGIN {EXCLUSIVE} AWAIT(COPYGO) END;
+	tobecopied.deepcopyofme:=tobecopied.deepcopy();
+	Out.String("COPYENGINE");
+	BEGIN {EXCLUSIVE} COPYGO:=FALSE END;
+UNTIL FALSE
+END CopyEngine;
+
+VAR
+	copyengine: CopyEngine;
+
 PROCEDURE thisvox*():Voxel;
 VAR
 	v: cell;
@@ -949,5 +967,5 @@ BEGIN
 END thisvox;
 
 BEGIN
-
+	NEW(copyengine)
 END NM4.

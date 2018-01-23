@@ -122,7 +122,7 @@ BEGIN
 			IF pass THEN 
 				cvy:=0
 			ELSE			
-				x := cx; y := cy + cvy; z := cz+cvz+0.001;	
+				x := cx; y := cy + cvy; z := cz+cvz+0.01;	
 				q:=Base.mkPT(x,y,z);
 				pass := Base.world.passprobe(q);
 				IF pass THEN 
@@ -278,7 +278,7 @@ BEGIN
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
-	mstarget:=55;
+	mstarget:=60;
 END openwincam;
 
 (* called when idling *)
@@ -312,7 +312,6 @@ BEGIN
 	fogdensity:=0.11;
 	leftsticky:=10.0;
 	upsticky:=10.0;	
-	Out.String('*line 1217!*');
 END OnLoad;
 
 PROCEDURE Reshape(w, h: LONGINT);
@@ -352,8 +351,8 @@ VAR
 BEGIN
 	key:=CHR(ucs);
 		CASE CHR(ucs) OF		
-			"S": Retina.incdetail; Out.String("inc detail"); 
-			| "W":Retina.decdetail; Out.String("dec detail"); 
+			"S": Retina.incdetail;
+			| "W":Retina.decdetail; 
 			|   "s" : camera.forward(-0.51*Base.speed)
 			| "w" :camera.forward(0.51*Base.speed) 
 			| "a" :camera.rightstrafe(-0.5*Base.speed)	
@@ -368,7 +367,7 @@ BEGIN
 			| "c": Marsh.sprout 
 			| "x": Marsh.incVN
 			| "z": Marsh.decVN		
-			| "p":  
+			| "p":  Marsh.engrain; 
 			| "1": Base.STOPGO		
 			| "2" :  camera.stop	
 			| "3" : Base.gravity:= Base.gravity/1.5	
@@ -376,7 +375,7 @@ BEGIN
 			| "5" : Retina.Res;
 			| "6" : avaTF:=~avaTF
 			| "h" : camera.hop	
-			| " " :  IF hidecursor THEN HideMousePointer(FALSE) ELSE HideMousePointer(TRUE) END; AVATAR:=~AVATAR;
+			| " " :  Marsh.tunnelinto;
 			| "]" : mstarget:= mstarget * 102/98; 
 			| "[" : mstarget:= mstarget * 98/102; 
 			| "}": camera.aperture.width := camera.aperture.width * 101/99; camera.aperture.height := camera.aperture.height *101/99;
@@ -390,7 +389,7 @@ BEGIN
 			| "f": curprogram := (curprogram+1 ) MOD 13; 
 			| "F": curprogram := (curprogram-1 ) MOD 13; 									
 		ELSE (* use keysm *)
-			Out.String("ucs: "); Out.Hex(ucs,4); Out.String("keysym: "); Out.Hex(keysym,4); Out.Ln;
+			Out.String("ucs: "); Out.Hex(ucs,4); Out.String("keysym: "); Out.Hex(keysym,4); Out.Ln; 
 			CASE keysym OF
 			| Inputs.KsEscape (*1BH*) : IF CAPTUREMOUSE THEN 
 								CAPTUREMOUSE := FALSE;
@@ -402,9 +401,7 @@ BEGIN
 							END;
 							(* Out.String("KsEscape.."); Out.Ln;*)
 			|	Inputs.KsF1:
-					Out.String("F1- Close"); Out.Ln;
-					(* Marsh.engrain; *)
-					Close();				
+				Close();				
 
 			| Inputs.KsF11: IF ~fullwindow THEN SetFullWindow(TRUE) ELSE SetFullWindow(FALSE) END; Out.String("FW"); Out.Ln;
 
@@ -414,7 +411,7 @@ BEGIN
 			(*? KsControlR does not work on LinuxAos  *)
 			| Inputs.KsControlR (* Inputs.KsInsert*): Marsh.SNIPEINTO:=~Marsh.SNIPEINTO
 			ELSE
-				Out.String("keysym: "); Out.Hex(keysym,4); Out.Ln;
+				(* Out.String("keysym: "); Out.Hex(keysym,4); Out.Ln; *)
 			END
 		END
 END KeyEvent;
@@ -461,8 +458,8 @@ END KeyEvent;
 	PROCEDURE WheelMove(dz: LONGINT);
 	BEGIN
 	IF TRUE  THEN
-		IF dz > 0 THEN slowdown; Out.String("slowdown dz="); Out.Int(dz, 0); Out.Ln;
-		ELSE speedup; Out.String("speedup dz="); Out.Int(dz, 0); Out.Ln;
+		IF dz > 0 THEN slowdown; (* Out.String("slowdown dz="); Out.Int(dz, 0); *) Out.Ln;
+		ELSE speedup; (* Out.String("speedup dz="); Out.Int(dz, 0); *) Out.Ln;
 		END;
 	END;	
 	END WheelMove;
@@ -628,18 +625,14 @@ VAR
 	chatting: BOOLEAN;
 	chatvoxel: Voxel;
 	warpedthemouse: BOOLEAN;	
-	
 	MB : SET;	(* 0, 1, 2 *)
-
 	MOUSEDOWN, CAPTUREMOUSE, GO,TRAIL,AVATAR,SCULL,METASLASH: BOOLEAN;	
 	camera:Camera;
 	fogdensity:REAL;
 	leftsticky,upsticky: REAL;
 	centerx,centery: LONGINT;
-
 	GLIDE:REAL;
 
-	
 PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
 VAR d: REAL;
 BEGIN

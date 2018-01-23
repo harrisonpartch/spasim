@@ -1,17 +1,54 @@
 <Desktop>
-	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="4" t="87" r="644" b="448" flags="{0..2,13}"/>
-	<Window name="FileManager" loader="WMFileManager.Restore" l="136" t="455" r="636" b="855" flags="{0..2,13}"/>
-	<Window name="PET" loader="PET.Restore" l="966" t="103" r="1766" b="703" flags="{0..2,13}">
+	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="77" t="153" r="538" b="487" flags="{0..2,13}"/>
+	<Window name="Backdrop" loader="WMBackdrop.Restore" l="0" t="0" r="1912" b="1078" flags="{7,9}">
+		<Configuration Image="Clouds.jp2" ChangeInterval="0" Fullscreen="false" FullscreenX="0" FullscreenY="0" FullscreenW="0" FullscreenH="0"/>
+	</Window>
+	<Window name="PET" loader="PET.Restore" l="629" t="30" r="1605" b="993" flags="{0..2,13}">
 		<PETData>
-			<General SelectedPageNr="0" ProjectTextFile=""/>
-			<Tab file="/home/harrison/spasim/Spasim.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="6" cursorPos="327"/>
+			<General SelectedPageNr="5" ProjectTextFile=""/>
+			<Tab file="Spasim.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
+				<Editor firstLine="23" cursorPos="917"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="Turing.Mod" codecFormat="AUTO" compilerOptions="-p=Linux32G -b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="192" cursorPos="4750"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="Nrdvolvox.Mod" codecFormat="AUTO" compilerOptions="-p=Linux32G -b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="283" cursorPos="7325"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="Retina.Mod" codecFormat="AUTO" compilerOptions="-p=Linux32G -b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="0"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="OGLRender.Mod" codecFormat="AUTO" compilerOptions="-p=Linux32G -b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="0"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
 			<Tab file="Marsh.Mod" codecFormat="AUTO" compilerOptions="-p=Linux32G -b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="0"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="NM2.Mod" codecFormat="AUTO" compilerOptions="-p=Linux32G -b=AMD --warnings" showLabels="false" wordWrap="false">
 				<Editor firstLine="0" cursorPos="0"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>

@@ -7,5 +7,5 @@ BEGIN
 END thisvox;
 BEGIN
 	NEW(vox,'ravenmatrix.png');
-	vox.tscale:=10
+	vox.tscale:=30
 END Nreddot. 
