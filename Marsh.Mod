@@ -302,6 +302,8 @@ BEGIN
 	EMPTY.passable:=TRUE;
      rand:=Base.rand;	
 	
+	xot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU666"); 
+	push(xot);
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	push(greenball);
 	akatrump:=Base.VoxelFromName("Nakatrump"); 
@@ -319,8 +321,6 @@ BEGIN
 	push(harrison);
 	doge:=Base.VoxelFromName("Ndogepearl"); 
 	push(doge);		
-	xot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU666"); 
-	push(xot);
  (*    medley:=Base.VoxelFromName("NFLOOP");  
      push(medley);
 	 volvox:=Base.VoxelFromName("Nrdvolvox");  	
@@ -466,18 +466,18 @@ BEGIN
 	noise[0].setvoxel(axolotl);			
 	NEW(noise[1]);		
 	noise[1].seed:=678;		
-	noise[1].a:=10.5;
-	noise[1].b:=10.5;
-	noise[1].c:=10.5;		
+	noise[1].a:=2.5;
+	noise[1].b:=2.5;
+	noise[1].c:=2.5;		
 	noise[1].octaves:=4;
 	noise[1].persistence:=3.91;	
 	noise[1].setcolor(0.8,0.8,0,1/2);	
 	noise[1].setvoxel(axolotl);		
 	NEW(noise[2]);	
 	noise[2].seed:=900909;		
-	noise[2].a:=10.5;
-	noise[2].b:=10.5;
-	noise[2].c:=10.5;		
+	noise[2].a:=1.5;
+	noise[2].b:=1.5;
+	noise[2].c:=1.5;		
 	noise[2].octaves:=4;
 	noise[2].persistence:=3.61;	
 	noise[2].setvoxel(axolotl);		
@@ -488,14 +488,14 @@ BEGIN
 	noise[3].c:=1;		
 	noise[3].octaves:=4;
 	noise[3].persistence:=3.51;	
-	noise[3].setvoxel(greensuncouple);		
+	noise[3].setvoxel(xot);	
 	NEW(noise[4]);		
 	noise[4].seed:=123456;		
 	noise[4].a:=1.5;
 	noise[4].b:=1.5;
 	noise[4].c:=1.5;		
 	noise[4].octaves:=4;
-	noise[4].persistence:=3.61;	
+	noise[4].persistence:=3.31;	
 	noise[4].setvoxel(greenball);		
 
 	Out.String("EEEEP!");
@@ -506,27 +506,19 @@ BEGIN
 	Base.setPT(center,1/2,1/2,9/12);
 	
 	z3:=Base.VoxelFromName("NM2");	
-	z3a:=Base.VoxelFromName("NM2");	
-	z3.setcolor(0,0,1,1.5,1); 
-	z3a.setcolor(0.5,0,0,1,1); 
-	z3a.localcolor:=TRUE;
-
-(*	z3a.FRaster(noise[1],64);	
-	z3a.copyprime;
-	noise[2].setvoxel(z3a);		
-*)
-
-	z3.FRaster(noise[2],256);	
-		
+	z3.setcolor(0,7,1.5,8.2,1); 
+	z3.FRaster(noise[2],64);		
+	z3.FRaster(noise[3],64);				
 	NEW(plane,center,up);
 	plane.setvoxel(kat);	
 
-	z3.FRaster(plane,32);
+	z3.FRaster(plane,16);
 	
  	Base.avatar:=harrison;
 	Base.avatarsize:=1000; 
 
 	Base.world:=z3;
+
 END dawn;
 
 PROCEDURE darken*;

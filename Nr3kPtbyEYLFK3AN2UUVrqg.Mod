@@ -14,9 +14,9 @@ VAR
 	inside: BOOLEAN;
 BEGIN
 	d := (nx*ray.dxyz.x + ny*ray.dxyz.y+ nz*ray.dxyz.z); 
-	ray.ra := ray.ra- 0.1; 
-	ray.ga := ray.ga- 0.1; 
-	ray.ba := ray.ba- 0.1; 	
+	ray.clr.ra := ray.clr.ra- 0.1; 
+	ray.clr.ga := ray.clr.ga- 0.1; 
+	ray.clr.ba := ray.clr.ba- 0.1; 	
 	mirror(ray);
 END Shade;
 
@@ -33,7 +33,6 @@ PROCEDURE mirror(VAR ray: Ray);
 BEGIN
 	ray.hitmirrorTF := TRUE;
 	ray.hitxyz:=ray.xyz;
-	ray.hitdxyz:=ray.dxyz;
 	ray.changed := TRUE;
 	ray.mirrortf:=TRUE;	
 	reflect(ray.dxyz, ray.normal);	

@@ -276,7 +276,7 @@ VAR
 	code*,ncode*:Name;  
 	tscale*: LONGINT;
 	red*,green*,blue*,black*,alpha*: REAL;
-	colored*,frozen*,probelock*,copyonstroke*,copyonstrokerecursion, baked*,localcolor*:BOOLEAN;
+	colored*,frozen*,probelock*,copyonstroke*,copyonstrokerecursion, baked*:BOOLEAN;
 	offset*:PT;
 	
 PROCEDURE r90z*;

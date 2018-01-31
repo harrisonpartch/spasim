@@ -3,11 +3,11 @@
 	<Window name="Backdrop" loader="WMBackdrop.Restore" l="0" t="0" r="1912" b="1078" flags="{7,9}">
 		<Configuration Image="Clouds.jp2" ChangeInterval="0" Fullscreen="false" FullscreenX="0" FullscreenY="0" FullscreenW="0" FullscreenH="0"/>
 	</Window>
-	<Window name="PET" loader="PET.Restore" l="629" t="30" r="1605" b="993" flags="{0..2,13}">
+	<Window name="PET" loader="PET.Restore" l="661" t="62" r="1637" b="1025" flags="{0..2,13}">
 		<PETData>
-			<General SelectedPageNr="5" ProjectTextFile=""/>
+			<General SelectedPageNr="0" ProjectTextFile=""/>
 			<Tab file="Spasim.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="23" cursorPos="917"/>
+				<Editor firstLine="32" cursorPos="526"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
@@ -42,13 +42,34 @@
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
 			<Tab file="Marsh.Mod" codecFormat="AUTO" compilerOptions="-p=Linux32G -b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="0"/>
+				<Editor firstLine="478" cursorPos="11993"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
 			<Tab file="NM2.Mod" codecFormat="AUTO" compilerOptions="-p=Linux32G -b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="0"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="N2qeD84Fv78X2XEj8PtU666.Mod" codecFormat="AUTO" compilerOptions="-p=Linux32G -b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="573"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="NM2.Mod" codecFormat="AUTO" compilerOptions="-p=Linux32G -b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="682" cursorPos="16954"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="N2qeD84Fv78X2XEj8PtU666.Mod" codecFormat="AUTO" compilerOptions="-p=Linux32G -b=AMD --warnings" showLabels="false" wordWrap="false">
 				<Editor firstLine="0" cursorPos="0"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>

@@ -28,30 +28,30 @@ BEGIN
 		ball.setcolor(1,1,0,1/2);	
 		core.FRasterSolid(ball,27);	
 		cloud:=Base.VoxelFromName("NM2"); 	
-		ball.setcolor(1,0,1,1/2);			
-		cloud.FRasterSolid(ball,32);		
-(*		FOR i:=0 TO 2 BY 2 DO
+		ball.setcolor(1,0,1,1/2);	
+		cloud.FRasterSolid(ball,16);		
+		FOR i:=0 TO 2 BY 2 DO
 			FOR j:=0 TO 2 BY 2 DO
 				FOR k:=0 TO 2 BY 2  DO
 					conglo.blox[i,j,k]:=cloud
 				END
 			END
 		END;
-*)		FOR i:= 0 TO 100 DO
+		FOR i:= 0 TO 100 DO
 			center:=Base.randPT();
 			radius:=Base.rand.Uniform()/28;
 			ball.reset(center,radius);
 			ball.setcolor(i/10, Base.rand.Uniform(),1-i/10,0);
 			conglo.FRaster(ball,27)
 		END;
-(*		conglo.blox[0,1,1]:=conglo;
+		conglo.blox[0,1,1]:=conglo;
 		conglo.blox[1,0,1]:=conglo;		
 		conglo.blox[1,1,0]:=conglo;
 		conglo.blox[2,1,1]:=conglo;
 		conglo.blox[1,2,1]:=core;		
 		conglo.blox[1,1,2]:=conglo;
 		conglo.blox[1,1,1]:=core;
-*)		conglo.imposter:=cloud;		
+		conglo.imposter:=cloud;		
 		cloud.copyonstroke:= TRUE;		
 		conglo.copyonstroke:= TRUE;		
 		core.copyonstroke:= TRUE;		
@@ -69,5 +69,5 @@ BEGIN
 	draw
 END N2qeD84Fv78X2XEj8PtUZO7. 
  
-XNXLMarsh.Rez N2qeD84Fv78X2XEj8PtUZO7 ~
+Marsh.Rez N2qeD84Fv78X2XEj8PtUZO7 ~
  

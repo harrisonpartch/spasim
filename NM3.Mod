@@ -150,7 +150,6 @@ BEGIN
 			ray.length:=ray.length+vdepth;
 			blr:=black*vdepth;
 			blainv:=1-blr;	
-			IF localcolor THEN vdepth:=vdepth*ray.scale END;
 			rr := red*vdepth*ray.clr.ra;
 			gr := green*vdepth*ray.clr.ga;
 			br := blue*vdepth*ray.clr.ba;
@@ -161,7 +160,7 @@ BEGIN
 			ray.clr.ga := (ray.clr.ga-(gr+blr));
 			ray.clr.ba := (ray.clr.ba-(br+blr));
 			ray.clr.alpha:=ray.clr.alpha-blr;
-			IF ray.clr.alpha<0.1 THEN ray.terminate:=TRUE; out:=TRUE END;
+			IF (ray.clr.alpha<0.1) OR (ray.clr.ra<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ba<0.1)  THEN ray.terminate:=TRUE; out:=TRUE END;
 			bounds(ijk.i,ijk.j,ijk.k, out);
 			IF ~out THEN
 				v := blox[ijk.i,ijk.j,ijk.k];
@@ -479,7 +478,7 @@ BEGIN
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
 				ELSE
 					NEW(c);
-					c.red:=red; c.blue:=blue; c.green:=green; c.black:=black; c.localcolor:=localcolor;
+					c.red:=red; c.blue:=blue; c.green:=green; c.black:=black; 
 					c.fill(blox[i,j,k]);
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
@@ -640,7 +639,6 @@ BEGIN
 				IF blox[i,j,k]=NIL THEN
 					NEW(newcell);
 					newcell.setcolor(red,green,blue,black,alpha);
-					newcell.localcolor:=localcolor;
 					blox[i,j,k]:=newcell;
 					IF f.normaltf(p) THEN
 						newcell.nposterTF:=TRUE;
@@ -710,13 +708,12 @@ BEGIN
 				IF blox[i,j,k]=NIL THEN
 					NEW(newcell);
 					newcell.setcolor(red,green,blue,black,alpha);
-					newcell.localcolor:=localcolor;
 					newcell.imposter:=f.voxel(p);
 					newcell.nposterTF:=TRUE;
 					newcell.nposter.normal:=f.normal(p);
 					newcell.nposter.color:=f.color(p);
 					newcell.SFRasterrec(f,resolution,o,nextscale);
-					blox[i,j,k]:=newcell
+					blox[i,j,k]:=newcell				
 				ELSE
 				 	v:=blox[i,j,k];
 				 	IF v IS cell THEN
@@ -728,7 +725,7 @@ BEGIN
 							v.SFRasterrec(f,resolution,o,nextscale)
 				 		END
 				 	END
-				 END;
+				 END
 			ELSIF d2s<0 THEN
 				nbloxTF[i,j,k]:=TRUE;
 				nblox[i,j,k].color:=f.color(p);
@@ -779,7 +776,7 @@ VAR
 BEGIN
 	copymarker:=TRUE;
 	NEW(c);
-	c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; c.localcolor:=localcolor;
+	c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; 
 	c.nbloxTF:=nbloxTF;
 	c.nblox:=nblox;
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO

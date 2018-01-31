@@ -65,9 +65,9 @@ PROCEDURE color*(p:PT):Color;
 VAR
 	c: Color;
 BEGIN
-	c.red:=cxolor.red+(0.20-rand.Uniform()/10);
-	c.green:=cxolor.green+(0.20-rand.Uniform()/10);
-	c.blue:=cxolor.blue+(0.20-rand.Uniform()/10);
+	c.red:=cxolor.red+(0.10-rand.Uniform()/5);
+	c.green:=cxolor.green+(0.10-rand.Uniform()/5);
+	c.blue:=cxolor.blue+(0.10-rand.Uniform()/5);
 	Base.clamp3(c.red,c.green,c.blue);
 	RETURN c
 END color;

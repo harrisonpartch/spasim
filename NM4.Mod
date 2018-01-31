@@ -8,7 +8,7 @@ Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
 
 CONST M=4; (* defines grid size *)
 	MMO=M-1;
-	CUBERADIUS=0.9;   (*change to sqrt(3)/2 ???*)
+	CUBERADIUS=0.85;   (*change to sqrt(3)/2 ???*)
 	NCODE="NM4";
 	NL=Base.NL;
 
@@ -22,51 +22,6 @@ TYPE PT = Base.PT;
  	NCube=Base.NCube;
  	LCube=Base.LightCube;
 
-PROCEDURE rot90z(VAR blx: ARRAY 3,3,3 OF Voxel);
-VAR
-	b: ARRAY 3,3,3 OF Voxel;
-BEGIN
-	b[1,0,0]:= blx[0,0,0];
-	b[1,1,0]:= blx[1,0,0];
-	b[0,1,0]:= blx[1,1,0];
-	b[0,0,0]:= blx[0,1,0];
-	b[1,0,1]:= blx[0,0,1];
-	b[1,1,1]:= blx[1,0,1];
-	b[0,1,1]:= blx[1,1,1];
-	b[0,0,1]:= blx[0,1,1];
-	blx:=b;
-END rot90z;
-
-PROCEDURE rot90zB(VAR blx: ARRAY 3,3,3 OF BOOLEAN);
-VAR
-	b: ARRAY 3,3,3 OF BOOLEAN;
-BEGIN
-	b[1,0,0]:= blx[0,0,0];
-	b[1,1,0]:= blx[1,0,0];
-	b[0,1,0]:= blx[1,1,0];
-	b[0,0,0]:= blx[0,1,0];
-	b[1,0,1]:= blx[0,0,1];
-	b[1,1,1]:= blx[1,0,1];
-	b[0,1,1]:= blx[1,1,1];
-	b[0,0,1]:= blx[0,1,1];
-	blx:=b;
-END rot90zB;
-
-PROCEDURE rot90zNC(VAR blx: ARRAY 3,3,3 OF NCube);
-VAR
-	b: ARRAY 3,3,3 OF NCube;
-BEGIN
-	b[1,0,0]:= blx[0,0,0];
-	b[1,1,0]:= blx[1,0,0];
-	b[0,1,0]:= blx[1,1,0];
-	b[0,0,0]:= blx[0,1,0];
-	b[1,0,1]:= blx[0,0,1];
-	b[1,1,1]:= blx[1,0,1];
-	b[0,1,1]:= blx[1,1,1];
-	b[0,0,1]:= blx[0,1,1];
-	blx:=b;
-END rot90zNC;
-
 TYPE cell* = OBJECT(Voxel);
 VAR
 	nposterTF*:BOOLEAN;
@@ -75,17 +30,6 @@ VAR
 	nbloxTF*: ARRAY M,M,M OF BOOLEAN;
 	nblox*: ARRAY M,M,M OF NCube;
 	deepcopyofme:cell;
-PROCEDURE r90z;
-VAR i,j,k: INTEGER;
-BEGIN
-	FOR i:=0 TO 1 DO
-		FOR j:=0 TO 1 DO
-			FOR k:=0 TO 1 DO
-				IF blox[i,j,k]#NIL THEN blox[i,j,k].r90z END
-			END
-		END
-	END
-END r90z;
 
 PROCEDURE Shade(VAR ray: Ray);
 VAR
@@ -127,6 +71,7 @@ BEGIN
 				ray.lxyz.y := ABS(xyz.y - ijk.j);
 				ray.lxyz.z := ABS(xyz.z - ijk.k);
 				ray.popdelta := Base.Origin;
+				ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal;
 				v.Shade(ray);
 				xyz.x := xyz.x + ray.popdelta.x;
 				xyz.y := xyz.y + ray.popdelta.y;
@@ -196,6 +141,7 @@ BEGIN
 				newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
 			END;
 			vdepth:=Base.distance(newxyz,xyz)/ray.scale;
+		
 			ray.xyz.x:=ray.xyz.x +(newxyz.x-xyz.x)/ray.scale;
 			ray.xyz.y:=ray.xyz.y +(newxyz.y-xyz.y)/ray.scale;
 			ray.xyz.z:=ray.xyz.z +(newxyz.z-xyz.z)/ray.scale;
@@ -203,7 +149,7 @@ BEGIN
 			ray.hitxyz:=ray.xyz;
 			ray.length:=ray.length+vdepth;
 			blr:=black*vdepth;
-			blainv:=1-blr;
+			blainv:=1-blr;	
 			rr := red*vdepth*ray.clr.ra;
 			gr := green*vdepth*ray.clr.ga;
 			br := blue*vdepth*ray.clr.ba;
@@ -223,6 +169,7 @@ BEGIN
 					ray.lxyz.y := ABS(xyz.y - ijk.j);
 					ray.lxyz.z := ABS(xyz.z - ijk.k);
 					ray.popdelta := Base.Origin; (* because many shaders don't set it *)
+					ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal;
 					v.Shade(ray);
 					xyz.x := xyz.x + ray.popdelta.x;
 					xyz.y := xyz.y + ray.popdelta.y;
@@ -324,9 +271,6 @@ BEGIN
 	blox[0,1,1]:=w;
 	blox[1,0,1]:=w;
 	blox[1,1,1]:=w;
-	blox[1,1,2]:=w;
-	blox[2,1,1]:=w;
-	blox[1,2,1]:=w;	
 END fillsierp;
 
 PROCEDURE fillcqr2*(v,w: Voxel);
@@ -482,7 +426,6 @@ END passprobe;
 PROCEDURE copyprime;
 BEGIN
 	copyonstroke:=TRUE;
-	Out.String("COPY PRIMING");
 	copyengine.add(SELF);	
 END copyprime;
 
@@ -535,6 +478,7 @@ BEGIN
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
 				ELSE
 					NEW(c);
+					c.red:=red; c.blue:=blue; c.green:=green; c.black:=black; 
 					c.fill(blox[i,j,k]);
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
@@ -832,7 +776,7 @@ VAR
 BEGIN
 	copymarker:=TRUE;
 	NEW(c);
-	c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; c.alpha:=alpha;
+	c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; 
 	c.nbloxTF:=nbloxTF;
 	c.nblox:=nblox;
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO

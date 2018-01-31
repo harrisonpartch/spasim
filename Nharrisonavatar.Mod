@@ -11,7 +11,7 @@ END thisvox;
 
 BEGIN
 	NEW(cv,"ugandaknuckles.png");
-	cv.passable:=FALSE;
+	cv.passable:=TRUE;
 	cv.tscale:=0;
 END Nharrisonavatar. 
  

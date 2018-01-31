@@ -8,7 +8,7 @@ Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
 
 CONST M=2; (* defines grid size *)
 	MMO=M-1;
-	CUBERADIUS=0.9;   (*change to sqrt(3)/2 ???*)
+	CUBERADIUS=0.7;   (*change to sqrt(3)/2 ???*)
 	NCODE="NM2";
 	NL=Base.NL;
 
@@ -150,7 +150,6 @@ BEGIN
 			ray.length:=ray.length+vdepth;
 			blr:=black*vdepth;
 			blainv:=1-blr;	
-			IF localcolor THEN vdepth:=vdepth*ray.scale END;
 			rr := red*vdepth*ray.clr.ra;
 			gr := green*vdepth*ray.clr.ga;
 			br := blue*vdepth*ray.clr.ba;
@@ -479,7 +478,7 @@ BEGIN
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
 				ELSE
 					NEW(c);
-					c.red:=red; c.blue:=blue; c.green:=green; c.black:=black; c.localcolor:=localcolor;
+					c.red:=red; c.blue:=blue; c.green:=green; c.black:=black; 
 					c.fill(blox[i,j,k]);
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
@@ -640,7 +639,6 @@ BEGIN
 				IF blox[i,j,k]=NIL THEN
 					NEW(newcell);
 					newcell.setcolor(red,green,blue,black,alpha);
-					newcell.localcolor:=localcolor;
 					blox[i,j,k]:=newcell;
 					IF f.normaltf(p) THEN
 						newcell.nposterTF:=TRUE;
@@ -710,7 +708,6 @@ BEGIN
 				IF blox[i,j,k]=NIL THEN
 					NEW(newcell);
 					newcell.setcolor(red,green,blue,black,alpha);
-					newcell.localcolor:=localcolor;
 					newcell.imposter:=f.voxel(p);
 					newcell.nposterTF:=TRUE;
 					newcell.nposter.normal:=f.normal(p);
@@ -779,7 +776,7 @@ VAR
 BEGIN
 	copymarker:=TRUE;
 	NEW(c);
-	c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; c.localcolor:=localcolor;
+	c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; 
 	c.nbloxTF:=nbloxTF;
 	c.nblox:=nblox;
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO

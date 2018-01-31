@@ -122,7 +122,7 @@ BEGIN
 			IF pass THEN 
 				cvy:=0
 			ELSE			
-				x := cx; y := cy + cvy; z := cz+cvz+0.01;	
+				x := cx; y := cy + cvy; z := cz+cvz-0.0001;	
 				q:=Base.mkPT(x,y,z);
 				pass := Base.world.passprobe(q);
 				IF pass THEN 
@@ -232,15 +232,17 @@ VAR
 	gravityvector: PT;
 	gravity: REAL;
 BEGIN
-	move;	
-	cam.x := cx; cam.y := cy; cam.z := cz;
-	gravityvector:=Base.mkPT(0,0,1);		
-	gravity:=Base.gravity;
-	gravityvector:=Base.mulPT(gravityvector,Base.gravity);
-	a:=Retina.fward.x*Base.cursordist; b:=Retina.fward.y*Base.cursordist; c:=Retina.fward.z*Base.cursordist;
-	d:=Retina.fward.x*0.0021; e:=Retina.fward.y*0.0021;  f:=Retina.fward.z*0.0021; 
-	Base.updatecamera(cx,cy,cz,a,b,c,d,e,f);	
-	IF avaTF THEN Marsh.drawavatar END;
+	IF ~CAMLOCK THEN
+		move;	
+		cam.x := cx; cam.y := cy; cam.z := cz;
+		gravityvector:=Base.mkPT(0,0,1);		
+		gravity:=Base.gravity;
+		gravityvector:=Base.mulPT(gravityvector,Base.gravity);
+		a:=Retina.fward.x*Base.cursordist; b:=Retina.fward.y*Base.cursordist; c:=Retina.fward.z*Base.cursordist;
+		d:=Retina.fward.x*0.0021; e:=Retina.fward.y*0.0021;  f:=Retina.fward.z*0.0021; 
+		Base.updatecamera(cx,cy,cz,a,b,c,d,e,f);	
+		IF avaTF THEN Marsh.drawavatar END
+	END;
 	IF MOUSEDOWN THEN	
 		IF GLW.ML IN MB THEN Marsh.draw;
 		ELSIF  GLW.MM IN MB THEN Marsh.snipeinto; 
@@ -278,7 +280,7 @@ BEGIN
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
-	mstarget:=60;
+	mstarget:=50;
 END openwincam;
 
 (* called when idling *)
@@ -364,14 +366,15 @@ BEGIN
 			| "o": GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_NEAREST)
 			| "t": GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR)
 			| "v": ReloadShader
-			| "c": Marsh.sprout 
+			| "P": Marsh.sprout 
 			| "x": Marsh.incVN
 			| "z": Marsh.decVN		
 			| "p":  Marsh.engrain; 
-			| "1": Base.STOPGO		
-			| "2" :  camera.stop	
-			| "3" : Base.gravity:= Base.gravity/1.5	
-			| "4" : Base.gravity:= 1.5*Base.gravity		
+			| "1": 	CAMLOCK:=~CAMLOCK
+			| "2" : Base.gravity:= Base.gravity/1.5		
+			| "@" : Base.gravity:= 1.5*Base.gravity
+			| "3" : 
+			| "4" : Base.STOPGO
 			| "5" : Retina.Res;
 			| "6" : avaTF:=~avaTF
 			| "h" : camera.hop	
@@ -389,7 +392,6 @@ BEGIN
 			| "f": curprogram := (curprogram+1 ) MOD 13; 
 			| "F": curprogram := (curprogram-1 ) MOD 13; 									
 		ELSE (* use keysm *)
-			Out.String("ucs: "); Out.Hex(ucs,4); Out.String("keysym: "); Out.Hex(keysym,4); Out.Ln; 
 			CASE keysym OF
 			| Inputs.KsEscape (*1BH*) : IF CAPTUREMOUSE THEN 
 								CAPTUREMOUSE := FALSE;
@@ -422,11 +424,11 @@ END KeyEvent;
 		PAUSE:=FALSE;
 		MOUSEDOWN:=TRUE;	
 		MB := keys;
-		IF GLW.ML IN MB THEN Out.String("ML");
+(*		IF GLW.ML IN MB THEN Out.String("ML");
 		ELSIF  GLW.MM IN MB THEN Out.String("MM"); 
 		ELSIF  GLW.MR IN MB THEN Out.String("MR");
 		END;	
-	END PointerDown;
+*)	END PointerDown;
 
 		(** called when mouse button up  *)
 	PROCEDURE PointerUp(x, y: LONGINT; keys: SET);
@@ -447,11 +449,10 @@ END KeyEvent;
 			
 			IF CAPTUREMOUSE & (ABS(xr)+ABS(yr)>5) THEN
 				left:=ABS(xr)*xr;
-				up:=-ABS(yr)*yr; 
+				up:=-ABS(yr)*yr;  
 				camera.up(-up/(15000*leftsticky)); 
 				camera.left(left/(6000*leftsticky));
-				
-				WarpPointer(1000,1000, centerx,centery);
+				WarpPointer(1000,1000, centerx,centery)
 			END
 	END PointerMove;
 	 
@@ -626,7 +627,7 @@ VAR
 	chatvoxel: Voxel;
 	warpedthemouse: BOOLEAN;	
 	MB : SET;	(* 0, 1, 2 *)
-	MOUSEDOWN, CAPTUREMOUSE, GO,TRAIL,AVATAR,SCULL,METASLASH: BOOLEAN;	
+	MOUSEDOWN, CAPTUREMOUSE, CAMLOCK,GO,TRAIL,AVATAR,SCULL,METASLASH: BOOLEAN;	
 	camera:Camera;
 	fogdensity:REAL;
 	leftsticky,upsticky: REAL;
@@ -725,7 +726,7 @@ END shaders;
 
 PROCEDURE Open* ;
 BEGIN
-	NEW(glw,Retina.W,Retina.H);
+	NEW(glw,1920,1080);
 (*	Debugging.DisableGC; *)
 	Base.STOPGO 
 END Open;
