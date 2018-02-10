@@ -6,8 +6,8 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=5;        
-	TS=5*32;  (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
+	T=3;        
+	TS=17*8;  (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
 	TW=16;
 	TH=9;
 	W*=TS*TW;
@@ -113,57 +113,47 @@ BEGIN
 	END;
 END tessad3;
 
-PROCEDURE tessaid5(cam:Camera);
+PROCEDURE tessadd17(cam:Camera);
 
 	PROCEDURE luma(CONST ca,cb: Base.ray_color):REAL;
 	BEGIN
 		RETURN (ca.r*ca.r+ca.g+ca.g+ca.g+ca.g)/6
 	END luma;
 	
-	PROCEDURE interpray(CONST ra,rb: Base.Ray): Base.Ray;
+	PROCEDURE interpclr(CONST ra,rb: Base.Color): Base.Color;
 	VAR
-		r: Base.Ray
+		r: Base.Color;
 	BEGIN
-		r.dxyz.x:= (ra.dxyz.x+rb.dxyz.x)/2;
-		r.dxyz.y:= (ra.dxyz.y+rb.dxyz.y)/2;		
-		r.dxyz.x:= (ra.dxyz.y+rb.dxyz.y)/2;
+		r.red:= (ra.red+rb.red)/2;
+		r.green:= (ra.green+rb.green)/2;
+		r.blue:= (ra.blue+rb.blue)/2;				
 		RETURN r;
-	END interpray;
+	END interpclr;
 	
-
-
 VAR
 	i,j: LONGINT;
 	theta,phi,dtheta,dphi: REAL;
 	ray: Base.Ray;
-	rays: ARRAY 5,5 OF Base.Ray;
+	rays: ARRAY 9,9 OF Base.Ray;
 	pixel: Raster.Pixel;
 	r,b,g: REAL;
-	patch: ARRAY 5,5 OF Base.Color;
+	patch: ARRAY 19,19 OF Base.Color;
+	ia,ib: LONGINT;
+	
 BEGIN
-	dtheta:=cam.dtheta/5;
-	dphi:=cam.dphi/5;
+	dtheta:=cam.dtheta/9;
+	dphi:=cam.dphi/9;
 	theta:=cam.theta;
-	
-	(*  establish the ray.dxyz for the corners of the 5x5 patch*)
-	
-	FOR i:= 0 TO 4 BY 4 DO
+	FOR i:= 0 TO 8 DO
 		phi:=cam.phi;
-		FOR j := 0 TO 4 BY 4 DO 
+		FOR j := 0 TO 8 DO 
 			angletoray(rays[i,j],theta,phi);
-			phi:=phi+dphi*4;
+			phi:=phi+dphi;
 		END;
-		theta:=theta+dtheta*4;
-	END;	
-	
-	(* interpolate all rays.dxyz in 5x5 patch before shooting any. wasteful because most of these will never
-	be used but whatever*)
-
-
-	(*  trace the corner rays  *)
-	
-	FOR i:= 0 TO 4 BY 4 DO
-		FOR j := 0 TO 4 BY 4 DO 
+		theta:=theta+dtheta;
+	END;
+	FOR i:= 0 TO 8 DO
+		FOR j := 0 TO 8 DO 
 			rays[i,j].clr.ra := 1;
 			rays[i,j].clr.ga := 1;
 			rays[i,j].clr.ba := 1;
@@ -172,62 +162,121 @@ BEGIN
 			rays[i,j].tscale:=1;
 			rays[i,j].dtl:=DETAIL;	
 			Base.world.Shade(rays[i,j]);
+			ia:=i*2; ib:=j*2;		
 			IF rays[i,j].terminate THEN
-				patch[i,j].red:=rays[i,j].clr.r;
-				patch[i,j].green:=rays[i,j].clr.g;
-				patch[i,j].blue:=rays[i,j].clr.b; 
+				patch[ia,ib].red:=rays[i,j].clr.r;
+				patch[ia,ib].green:=rays[i,j].clr.g;
+				patch[ia,ib].blue:=rays[i,j].clr.b; 
 			ELSE
-				patch[i,j].blue:= rays[i,j].clr.b + rays[i,j].clr.ba;
-				patch[i,j].red:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
-				patch[i,j].green:= rays[i,j].clr.g + rays[i,j].clr.ga/3 
-			END;
+				patch[ia,ib].blue:= rays[i,j].clr.b + rays[i,j].clr.ba;
+				patch[ia,ib].red:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
+				patch[ia,ib].green:= rays[i,j].clr.g + rays[i,j].clr.ga/3 
+			END
+			(* Base.clamp3(patch[i,j].red,patch[i,j].green, patch[i,j].blue); 		*)
 		END;
-	END;		
-	
-	
-	
-	patch[0,1].red:=(patch[0,0].red+patch[0,2].red)/2;
-	patch[0,1].green:=(patch[0,0].green+patch[0,2].green)/2;
-	patch[0,1].blue:=(patch[0,0].blue+patch[0,2].blue)/2;
-			
-	patch[0,3].red:=(patch[0,2].red+patch[0,4].red)/2;
-	patch[0,3].green:=(patch[0,2].green+patch[0,4].green)/2;
-	patch[0,3].blue:=(patch[0,2].blue+patch[0,4].blue)/2;			
-			
-	patch[2,1].red:=(patch[2,0].red+patch[2,2].red)/2;
-	patch[2,1].green:=(patch[2,0].green+patch[2,2].green)/2;
-	patch[2,1].blue:=(patch[2,0].blue+patch[2,2].blue)/2;
-			
-	patch[2,3].red:=(patch[2,2].red+patch[2,4].red)/2;
-	patch[2,3].green:=(patch[2,2].green+patch[2,4].green)/2;
-	patch[2,3].blue:=(patch[2,2].blue+patch[2,4].blue)/2;			
-
-	patch[4,1].red:=(patch[4,0].red+patch[4,2].red)/2;
-	patch[4,1].green:=(patch[4,0].green+patch[4,2].green)/2;
-	patch[4,1].blue:=(patch[4,0].blue+patch[4,2].blue)/2;
-			
-	patch[4,3].red:=(patch[4,2].red+patch[4,4].red)/2;
-	patch[4,3].green:=(patch[4,2].green+patch[4,4].green)/2;
-	patch[4,3].blue:=(patch[4,2].blue+patch[4,4].blue)/2;	
-		
-	FOR i:=1 TO 3 BY 2 DO
-		FOR j:= 0 TO 4 DO
-			patch[i,j].red:=(patch[i-1,j].red+patch[i+1,j].red)/2;
-			patch[i,j].green:=(patch[i-1,j].green+patch[i+1,j].green)/2;		
-			patch[i,j].blue:=(patch[i-1,j].blue+patch[i+1,j].blue)/2
-		END
+	END;			
+	FOR i:= 0 TO 14 BY 2 DO 
+		FOR j := 0 TO 14 BY 2 DO  
+ 			patch[i+1,j]:=interpclr(patch[i,j],patch[i+2,j]);
+ 			patch[i,j+1]:=interpclr(patch[i,j],patch[i,j+2]);
+ 			patch[i+2,j+1]:=interpclr(patch[i+2,j],patch[i+2,j+2]);
+ 			patch[i+1,j+2]:=interpclr(patch[i,j+2],patch[i+2,j+2]); 
+ 			patch[i+1,j+1]:=interpclr(patch[i,j],patch[i+2,j+2])
+ 		END
 	END;
-	FOR i:=0 TO 4 DO
-		FOR j:= 0 TO 4 DO
-			Base.clamp3(patch[i,j].red,patch[i,j].green, patch[i,j].blue); 
+	FOR i:=0 TO 16 DO
+		FOR j:= 0 TO 16 DO	
 			Raster.SetRGB(pixel,ENTIER(patch[i,j].red*GAMMA),ENTIER(patch[i,j].green*GAMMA),ENTIER(patch[i,j].blue*GAMMA)); 
 			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
 		END
 	END;		
-END tessaid5;
+END tessadd17;
 
+PROCEDURE tessaid17(cam:Camera);
 
-
+	PROCEDURE luma(CONST ca,cb: Base.ray_color):REAL;
+	BEGIN
+		RETURN (ca.r*ca.r+ca.g+ca.g+ca.g+ca.g)/6
+	END luma;
+	
+	PROCEDURE interpclr(CONST ra,rb: Base.Color): Base.Color;
+	VAR
+		r: Base.Color;
+	BEGIN
+		r.red:= (ra.red+rb.red)/2;
+		r.green:= (ra.green+rb.green)/2;
+		r.blue:= (ra.blue+rb.blue)/2;				
+		RETURN r;
+	END interpclr;
+	
+VAR
+	i,j: LONGINT;
+	theta,phi,dtheta,dphi: REAL;
+	ray: Base.Ray;
+	rays: ARRAY 5,5 OF Base.Ray;
+	pixel: Raster.Pixel;
+	r,b,g: REAL;
+	patch: ARRAY 19,19 OF Base.Color;
+	ia,ib: LONGINT;
+	
+BEGIN
+	dtheta:=cam.dtheta/5;
+	dphi:=cam.dphi/5;
+	theta:=cam.theta;
+	FOR i:= 0 TO 4 DO
+		phi:=cam.phi;
+		FOR j := 0 TO 4 DO 
+			angletoray(rays[i,j],theta,phi);
+			phi:=phi+dphi;
+		END;
+		theta:=theta+dtheta;
+	END;
+	
+	FOR i:= 0 TO 4 DO
+		FOR j := 0 TO 4 DO 
+			rays[i,j].clr.ra := 1;
+			rays[i,j].clr.ga := 1;
+			rays[i,j].clr.ba := 1;
+			rays[i,j].clr.alpha:=1;
+			rays[i,j].scale := 1; 
+			rays[i,j].tscale:=1;
+			rays[i,j].dtl:=DETAIL;	
+			Base.world.Shade(rays[i,j]);
+			ia:=i*4; ib:=j*4;		
+			IF rays[i,j].terminate THEN
+				patch[ia,ib].red:=rays[i,j].clr.r;
+				patch[ia,ib].green:=rays[i,j].clr.g;
+				patch[ia,ib].blue:=rays[i,j].clr.b; 
+			ELSE
+				patch[ia,ib].blue:= rays[i,j].clr.b + rays[i,j].clr.ba;
+				patch[ia,ib].red:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
+				patch[ia,ib].green:= rays[i,j].clr.g + rays[i,j].clr.ga/3 
+			END
+			(* Base.clamp3(patch[i,j].red,patch[i,j].green, patch[i,j].blue); 		*)
+		END;
+	END;			
+	FOR i:= 0 TO 12 BY 4 DO 
+		FOR j := 0 TO 12 BY 4 DO  
+ 			patch[i+2,j]:=interpclr(patch[i,j],patch[i+4,j]);
+ 			patch[i+1,j]:=interpclr(patch[i,j],patch[i+2,j]);
+ 			patch[i+3,j]:=interpclr(patch[i+2,j],patch[i+4,j]);
+  			patch[i+2,j+4]:=interpclr(patch[i,j+4],patch[i+4,j+4]);
+ 			patch[i+1,j+4]:=interpclr(patch[i,j+4],patch[i+2,j+4]);
+ 			patch[i+3,j+4]:=interpclr(patch[i+2,j+4],patch[i+4,j+4]);		
+ 			FOR ia:=0 TO 4 DO
+  				patch[i+ia,j+2]:=interpclr(patch[i+ia,j],patch[i+ia,j+4]);
+ 				patch[i+ia,j+1]:=interpclr(patch[i+ia,j],patch[i+ia,j+2]);
+ 				patch[i+ia,j+3]:=interpclr(patch[i+ia,j+2],patch[i+ia,j+4]) 		
+ 			END;		
+		END;	 
+	END;
+	FOR i:=0 TO 16 DO
+		FOR j:= 0 TO 16 DO	
+			Raster.SetRGB(pixel,ENTIER(patch[i,j].red*GAMMA),ENTIER(patch[i,j].green*GAMMA),ENTIER(patch[i,j].blue*GAMMA)); 
+			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
+		END
+	END;		
+END tessaid17;
 
 PROCEDURE tessad5(cam: Camera);
 VAR
@@ -550,30 +599,30 @@ BEGIN
 			x:=a.imx - W/2;
 			y:=a.imy-H/2;		
 			IF (~saccade)&((x*x+y*y)<FV) THEN	
-				tessad5(a); 
+				tessadd17(a); 
 			ELSE
-				tessa5(a); 
+				tessaid17(a); 
 			END;
 			x:=b.imx - W/2;
 			y:=b.imy-H/2;		
 			IF  (~saccade)&((x*x+y*y)<FV) THEN	
-				tessad5(b); 
+				tessadd17(b); 
 			ELSE
-				tessa5(b); 			
+				tessaid17(b); 			
 			END;			
 			x:=c.imx - W/2;
 			y:=c.imy-H/2;		
 			IF  (~saccade)&((x*x+y*y)<FV) THEN		
-				tessad5(c); 
+				tessadd17(c); 
 			ELSE
-				tessa5(c); 
+				tessadd17(c); 
 			END;
 			x:=d.imx - W/2;
 			y:=d.imy-H/2;		
 			IF  (~saccade)&((x*x+y*y)<FV) THEN	
-				tessad5(d); 
+				tessadd17(d); 
 			ELSE
-				tessa5(d); 
+				tessaid17(d); 
 			END; 
 	ELSE
 		l:=level-1;
@@ -605,15 +654,15 @@ BEGIN
 	END;
 END ztraced;
 
-BEGIN{ACTIVE, PRIORITY(Objects.Low)}
+BEGIN{ACTIVE, PRIORITY(Objects.Normal)}
 	REPEAT
 		BEGIN{EXCLUSIVE}
 			AWAIT(GO);
 		END;
 		CASE TESSA OF
 			  0: ztracef(cam,T); 
-			| 1: ztraced(cam,T) 
-			| 2: ztraceu(cam,T) 
+			| 1: ztracef(cam,T) 
+			| 2: ztracef(cam,T) 
 		ELSE
 		END;
 		BEGIN{EXCLUSIVE}
@@ -744,14 +793,14 @@ END splitcam;
 PROCEDURE moredetail*;
 BEGIN
 	foveaparameter:=ABS(foveaparameter-1);
-	FV:=W*W/foveaparameter;
+	FV:=(W*W)/foveaparameter;
 END moredetail;
 
 PROCEDURE lessdetail*;
 BEGIN
 	foveaparameter:=(foveaparameter+1);
-	IF foveaparameter>250 THEN foveaparameter:=250 END;
-	FV:=W*W/foveaparameter	;
+	IF foveaparameter>300 THEN foveaparameter:=300 END;
+	FV:=(W*W)/foveaparameter	;
 END lessdetail;
 
 PROCEDURE decdetail*;

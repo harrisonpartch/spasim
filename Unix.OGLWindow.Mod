@@ -930,7 +930,7 @@ END GameLogic;
 
 	END MainLoop;
 
-BEGIN   {ACTIVE}
+BEGIN   {ACTIVE,PRIORITY(Objects.High)}
 	MainLoop; 
 END Window;
 

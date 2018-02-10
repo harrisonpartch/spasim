@@ -3,7 +3,7 @@
 	<Window name="Backdrop" loader="WMBackdrop.Restore" l="0" t="0" r="1912" b="1078" flags="{7,9}">
 		<Configuration Image="Clouds.jp2" ChangeInterval="0" Fullscreen="false" FullscreenX="0" FullscreenY="0" FullscreenW="0" FullscreenH="0"/>
 	</Window>
-	<Window name="PET" loader="PET.Restore" l="661" t="62" r="1637" b="1025" flags="{0..2,13}">
+	<Window name="PET" loader="PET.Restore" l="123" t="33" r="1099" b="996" flags="{0..2,13}">
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>
 			<Tab file="Spasim.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">

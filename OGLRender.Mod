@@ -251,7 +251,7 @@ BEGIN
 	END;
 	trace; 
 	Base.tick;	
-	GLIDE:=0.99;	
+	GLIDE:=0.96;	
 	cvz := cvz*GLIDE+gravityvector.z; 
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y; 
 	cvl :=cvl*0; cvu := cvu*0;
@@ -726,9 +726,8 @@ END shaders;
 
 PROCEDURE Open* ;
 BEGIN
-	NEW(glw,1920,1080);
-(*	Debugging.DisableGC; *)
-	Base.STOPGO 
+	NEW(glw,Retina.W,Retina.H);
+	Debugging.DisableGC
 END Open;
 
 

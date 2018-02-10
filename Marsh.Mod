@@ -506,7 +506,7 @@ BEGIN
 	Base.setPT(center,1/2,1/2,9/12);
 	
 	z3:=Base.VoxelFromName("NM2");	
-	z3.setcolor(0,7,1.5,8.2,1); 
+	z3.setcolor(3,3,1,7,1); 
 	z3.FRaster(noise[2],64);		
 	z3.FRaster(noise[3],64);				
 	NEW(plane,center,up);
