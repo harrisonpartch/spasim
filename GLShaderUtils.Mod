@@ -105,13 +105,14 @@ PROCEDURE PrintShaderSource*(obj: Uint);
 VAR sourceLength, sslength: LONGINT;
 	ssource: Strings.String;
 BEGIN
-	gl.GetShaderiv(obj, glc.GL_SHADER_SOURCE_LENGTH, ADDRESSOF(sourceLength));
+(*	gl.GetShaderiv(obj, glc.GL_SHADER_SOURCE_LENGTH, ADDRESSOF(sourceLength));
 	(* wr.Int(obj, 0);  wr.String(" sourceLength= "); wr.Int(sourceLength, 0); wr.Ln; *)
 	NEW(ssource, sourceLength);
 	gl.GetShaderSource(obj, sourceLength, sslength, ADDRESSOF(ssource^[0]));
 	wr.String("************** SOURCE *********************************"); wr.Ln;
 	wr.String(ssource^); wr.Ln;
 	wr.String("*******************************************************"); wr.Ln; wr.Update;
+*)
 END PrintShaderSource;
 
 PROCEDURE PrintShaderInfoLog*(CONST tit: ARRAY OF CHAR; obj: Uint);

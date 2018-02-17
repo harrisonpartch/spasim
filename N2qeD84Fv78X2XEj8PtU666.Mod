@@ -28,7 +28,7 @@ BEGIN
 	ball.setvoxel(yellow);
 	yellow.FRaster(ball,5);
 *)	NEW(ball,center,6/12);
-	v:=Base.VoxelFromName("Ngreensuncouple");  
+	v:=Base.VoxelFromName("Nmarmory");  
 	ball.setvoxel(v);
 	yellow.FRasterSolid(ball,9);
 (*	cage:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");	

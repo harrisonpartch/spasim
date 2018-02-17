@@ -4,6 +4,8 @@ XDisplay.Mod
 WarpMouse.Mod
 WMRender.Mod ~
 
+OpenGL.Tool
+
 Compiler.Compile 
 Base.Mod
 SPSME.Mod 
@@ -77,6 +79,7 @@ NIXARXB2vH6ieKZmsc6mODh.Mod
 Nharrisonavatar.Mod
 
 Ngreensuncouple.Mod
+Nmarmory.Mod
 
 NnKyXYNiHwdxuM6wHrbxwuQ.Mod
 

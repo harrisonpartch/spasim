@@ -480,7 +480,7 @@ BEGIN
 	noise[2].c:=1.5;		
 	noise[2].octaves:=4;
 	noise[2].persistence:=3.61;	
-	noise[2].setvoxel(axolotl);		
+	noise[2].setvoxel(Base.VoxelFromName("Nmarmory"));		
 	NEW(noise[3]);		
 	noise[3].seed:=11117111;		
 	noise[3].a:=1;
@@ -496,7 +496,7 @@ BEGIN
 	noise[4].c:=1.5;		
 	noise[4].octaves:=4;
 	noise[4].persistence:=3.31;	
-	noise[4].setvoxel(greenball);		
+	noise[4].setvoxel(harrison);		
 
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
@@ -506,9 +506,10 @@ BEGIN
 	Base.setPT(center,1/2,1/2,9/12);
 	
 	z3:=Base.VoxelFromName("NM2");	
-	z3.setcolor(3,3,1,7,1); 
-	z3.FRaster(noise[2],64);		
-	z3.FRaster(noise[3],64);				
+	z3.setcolor(1,1,0,3,1); 
+	z3.FRaster(noise[2],32);		
+	z3.FRaster(noise[3],32);	
+	z3.FRaster(noise[4],128);					
 	NEW(plane,center,up);
 	plane.setvoxel(kat);	
 

@@ -78,12 +78,12 @@ BEGIN
 				ray.clr.g := (ray.clr.g*ai + raycolor.g*ainv) ;
 				ray.clr.b := (ray.clr.b*ai + raycolor.b*ainv);					
 			ELSE
-				dot1:=ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
-				dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
+				dot:=ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
+(*				dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
 				mix:=ray.length*ray.scale;
 				IF mix>1 THEN mix:=1 END;
 				dot:=mix*dot1+(1-mix)*dot2;	
-				dr:=color.red*color.alpha*dot;
+*)				dr:=color.red*color.alpha*dot;
 				dg:=color.green*color.alpha*dot;
 				db:=color.blue*color.alpha*dot;	
 				ray.clr.r := ray.clr.r + dr*ray.clr.ra;
@@ -297,7 +297,8 @@ BEGIN
 			END
 		END;										
 		mip:=ray.length*ray.scale;
-		IF mip>7 THEN 	
+		color:=texcube.side[ray.face].pixel(lx,ly);
+(*		IF mip>7 THEN 	
 			color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
 		ELSIF mip>4 THEN
 			color:=texcube.side[ray.face].pixelmip_one(lx,ly);
@@ -317,7 +318,7 @@ BEGIN
 			mix:=1+ mip;
 			color:=Base.mixcolor(color1,color2,mix);			
 		END; 
-		dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
+*)		dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
 		dr:=color.red*color.alpha*dot;
 		dg:=color.green*color.alpha*dot;
 		db:=color.blue*color.alpha*dot;	
@@ -339,12 +340,12 @@ BEGIN
 				ray.clr.g := (ray.clr.g*ai + raycolor.g*ainv) ;
 				ray.clr.b := (ray.clr.b*ai + raycolor.b*ainv);					
 			ELSE
-				dot1:=ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
-				dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
+				dot:=ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
+(*				dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
 				mix:=ray.length*ray.scale;
 				IF mix>1 THEN mix:=1 END;
 				dot:=mix*dot1+(1-mix)*dot2;	
-				dr:=color.red*color.alpha*dot;
+*)				dr:=color.red*color.alpha*dot;
 				dg:=color.green*color.alpha*dot;
 				db:=color.blue*color.alpha*dot;	
 				ray.clr.r := ray.clr.r + dr*ray.clr.ra;

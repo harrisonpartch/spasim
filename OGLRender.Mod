@@ -57,7 +57,7 @@ BEGIN
 	Base.setPT(worldcenter,1/2,1/2,1/2);	
 	cx:=1/2; cy:=1/2; cz:=1/2;
 	fisheye:=1;
-	GLIDE:=0.98;
+	GLIDE:=0.995;
 	hop; 
 END init;
 
@@ -160,7 +160,7 @@ END stop;
 
 PROCEDURE glidetoggle;
 BEGIN
-	IF GLIDE<1/2 THEN GLIDE:=0.95 ELSE GLIDE:=0.3 END;
+	IF GLIDE<1/2 THEN GLIDE:=0.995 ELSE GLIDE:=0.3 END;
 END glidetoggle;
 
 PROCEDURE forward(x:REAL);
@@ -251,7 +251,7 @@ BEGIN
 	END;
 	trace; 
 	Base.tick;	
-	GLIDE:=0.96;	
+	GLIDE:=0.995;	
 	cvz := cvz*GLIDE+gravityvector.z; 
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y; 
 	cvl :=cvl*0; cvu := cvu*0;
@@ -355,7 +355,7 @@ BEGIN
 		CASE CHR(ucs) OF		
 			"S": Retina.incdetail;
 			| "W":Retina.decdetail; 
-			|   "s" : camera.forward(-0.51*Base.speed)
+			|  "s" : camera.forward(-0.51*Base.speed)
 			| "w" :camera.forward(0.51*Base.speed) 
 			| "a" :camera.rightstrafe(-0.5*Base.speed)	
 			| "d" :camera.rightstrafe(0.5*Base.speed)
@@ -388,6 +388,7 @@ BEGIN
 			| "7": Base.cursordist:=Base.cursordist*1.3
 			| "8": Base.cursordist:=Base.cursordist/1.3
 			| "l": Marsh.lines:=~Marsh.lines
+			| "g": camera.glidetoggle		
 			| "b": Marsh.showcode;		
 			| "f": curprogram := (curprogram+1 ) MOD 13; 
 			| "F": curprogram := (curprogram-1 ) MOD 13; 									
@@ -726,8 +727,8 @@ END shaders;
 
 PROCEDURE Open* ;
 BEGIN
-	NEW(glw,Retina.W,Retina.H);
-	Debugging.DisableGC
+	NEW(glw,1920,1280);
+(*	Debugging.DisableGC *)
 END Open;
 
 
