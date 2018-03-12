@@ -9,8 +9,8 @@ MODULE OGLWindow;  (** AUTHOR "fnecati"; PURPOSE "OpenGL enabled OO Win32 Window
 
  *)
 
-IMPORT SYSTEM, Machine, Kernel32, User32, Kernel, Modules, KernelLog,
-	Inputs, Objects, GL:=OpenGL, Strings, WinApi;
+IMPORT SYSTEM, Kernel32, User32, Kernel, Modules, KernelLog,
+	Inputs, Objects, GL:=OpenGL, Strings, WinApi, GLC := OpenGLConst;
 
 CONST
 	debug = FALSE;
@@ -279,13 +279,15 @@ TYPE
 		pfd: WinApi.PIXELFORMATDESCRIPTOR;
 		pixelformat : LONGINT;
 		res: LONGINT;
+		tmpflag: SET;
 	BEGIN
 		pfd.nSize := SIZEOF(WinApi.PIXELFORMATDESCRIPTOR);
 		pfd.nVersion := 1;
-		pfd.dwFlags := WinApi.PFD_SUPPORT_OPENGL + WinApi.PFD_DRAW_TO_WINDOW + WinApi.PFD_DOUBLEBUFFER;
+		 tmpflag := WinApi.PFD_SUPPORT_OPENGL + WinApi.PFD_DRAW_TO_WINDOW + WinApi.PFD_DOUBLEBUFFER;
 
-		IF opStereo IN Options THEN pfd.dwFlags := pfd.dwFlags + WinApi.PFD_STEREO; END;
-
+		IF opStereo IN Options THEN  tmpflag :=  tmpflag + WinApi.PFD_STEREO; END;
+		
+		pfd.dwFlags := Kernel32.SetToDW(tmpflag); 
 		pfd.iPixelType := CHR(WinApi.PFD_TYPE_RGBA);
 		pfd.cColorBits := CHR(colorbits);
 		pfd.cDepthBits := CHR(depthbits);
@@ -323,13 +325,13 @@ TYPE
 	(** get current display of this window *)
 	PROCEDURE GetDisplay*(): LONGINT;
 	BEGIN
-		RETURN hDC;
+		RETURN LONGINT(hDC);
 	END GetDisplay;
 
 	(** get current gl context of this window *)
 	PROCEDURE GetContext*(): LONGINT;
 	BEGIN
-		RETURN hGLRC;
+		RETURN LONGINT(hGLRC);
 	END GetContext;
 
 	(** Abstract Window Procedures *)
@@ -459,12 +461,12 @@ TYPE
 
 	PROCEDURE HandleMouse(uMsg: LONGINT;  wParam: User32.WParam;  lParam: User32.LParam );
 	VAR m: Inputs.AbsMouseMsg;
-		ret: Kernel32.BOOL;
+		ret: Kernel32.HANDLE;
 		keys: SET;
 	BEGIN
 		User32.SetCursor(hCurrentCursor);
-		m.x := lParam MOD ASH( 1, 16 )  ;
-		m.y := height-1-ASH( lParam, -16 ); (* opengl coordinates origin is lower-left  *)
+		m.x := LONGINT(lParam MOD ASH( 1, 16 ));
+		m.y := LONGINT(height-1-ASH( lParam, -16 )); (* opengl coordinates origin is lower-left  *)
 	(*	m.y := ASH( lParam, -16 ) -1;*)
 		keys := mkeys;
 
@@ -495,7 +497,7 @@ TYPE
 						EXCL( keys, MX );
 						PointerUp(m.x, m.y, keys);
 		| User32.WMMouseWheel:
-				IF SHORT( ASH( wParam, -16 ) ) > 0 THEN m.dz := -1 ELSE m.dz := 1 END;
+				IF LONGINT(wParam) DIV 10000H  > 0  THEN m.dz := -1 ELSE m.dz := 1 END;
 				WheelMove(m.dz);
 
 		ELSE
@@ -526,7 +528,7 @@ TYPE
 	PROCEDURE HandleChar(wParam: User32.WParam;  lParam: User32.LParam );
 	VAR ch: CHAR;  msg: Inputs.KeyboardMsg;  key: LONGINT;
 	BEGIN
-		GetChar( wParam, lParam, ch, key );
+		GetChar( LONGINT(wParam), LONGINT(lParam), ch, key );
 		GetKeyFlags(msg.flags);
 		msg.ch := ch;  msg.keysym := key;
 
@@ -542,7 +544,7 @@ TYPE
 	PROCEDURE HandleKey(wParam: User32.WParam;  lParam: User32.LParam );
 	VAR ch: CHAR;  msg: Inputs.KeyboardMsg;  key : LONGINT;
 	BEGIN
-		DecomposeKeyEvent( wParam, lParam, ch, key, FALSE );
+		DecomposeKeyEvent( LONGINT(wParam), LONGINT(lParam), ch, key, FALSE );
 		GetKeyFlags(msg.flags);
 
 		  msg.ch := ch;  msg.keysym := key;
@@ -566,7 +568,7 @@ TYPE
 	PROCEDURE HandleKeyUp( wParam: User32.WParam;  lParam: User32.LParam );
 	VAR ch: CHAR;  msg: Inputs.KeyboardMsg; key : LONGINT;
 	BEGIN
-		DecomposeKeyEvent( wParam, lParam, ch, key, TRUE );
+		DecomposeKeyEvent( LONGINT(wParam), LONGINT(lParam), ch, key, TRUE );
 		GetKeyFlags(msg.flags);
 		msg.flags := msg.flags  + {Inputs.Release};
 		msg.ch := ch;
@@ -600,7 +602,7 @@ TYPE
 	VAR pos: User32.WindowPos;
 	BEGIN
 		SYSTEM.MOVE( lParam, ADDRESSOF( pos ), SIZEOF( User32.WindowPos ) );
-		IF ~(User32.SWPNoMove IN pos.flags) THEN
+		IF ~(User32.SWPNoMove IN Kernel32.DWToSet(pos.flags)) THEN
 			IF (pos.x < -width) & (pos.y < -height) THEN Minimize()
 			ELSIF (pos.x >= 0) & (pos.y >= 0) THEN Restore()
 			END
@@ -613,8 +615,8 @@ TYPE
 	BEGIN
 		IF ~(minimized IN state) THEN
 			IF id = resize THEN
-				width := lParam MOD ASH( 1, 16 );
-				height := lParam DIV ASH( 1, 16 );
+				width := LONGINT(lParam) MOD ASH( 1, 16 );
+				height := LONGINT(lParam) DIV ASH( 1, 16 );
 				Reshape(width, height);
 
 			ELSIF id = redraw THEN
@@ -629,7 +631,7 @@ TYPE
 	(** Common base handler for all visual windows (document or control) provided by this module. *)
 	PROCEDURE WindowHandler( uMsg: LONGINT;  wParam: User32.WParam;
 													  lParam: User32.LParam ): User32.LResult;
-	VAR handled: BOOLEAN; ret: Kernel32.BOOL;
+	VAR handled: BOOLEAN; ret: Kernel32.HANDLE;
 	BEGIN
 				handled := TRUE;
 				CASE uMsg OF
@@ -696,7 +698,7 @@ TYPE
 		windowClass: User32.WndClassEx;
 	BEGIN
 		windowClass.cbSize := SIZEOF( User32.WndClassEx );
-		windowClass.style := WinApi.CS_OWNDC + WinApi.CS_VREDRAW + WinApi.CS_HREDRAW;   (* Cs_parentdc: INTEGER is 128  = 2^7 *)
+		windowClass.style := Kernel32.SetToDW(WinApi.CS_OWNDC + WinApi.CS_VREDRAW + WinApi.CS_HREDRAW);   (* Cs_parentdc: INTEGER is 128  = 2^7 *)
 		windowClass.lpfnWndProc := WindowProc;  windowClass.cbClsExtra := 0;  windowClass.cbWndExtra := 4;
 		windowClass.hInstance := Kernel32.hInstance;  str := "Console";  windowClass.hIcon := User32.LoadIcon( Kernel32.hInstance, str );
 		str := "Console.Small";  windowClass.hIconSm := User32.LoadIcon( Kernel32.hInstance, str );  windowClass.hCursor := Kernel32.NULL;
@@ -749,10 +751,10 @@ TYPE
 		END;
 
 		rect.right := width; 	rect.bottom := height;
-		WinApi.AdjustWindowRectEx(rect, create.dwStyle, 0, create.dwExStyle);
+		WinApi.AdjustWindowRectEx(rect, Kernel32.SetToDW(create.dwStyle), 0, Kernel32.SetToDW(create.dwExStyle));
 
 		hWnd :=
-			User32.CreateWindowEx( SYSTEM.VAL(LONGINT, create.dwExStyle) , className, title, create.dwStyle, left, top,  (rect.right - rect.left) , (rect.bottom - rect.top),
+			User32.CreateWindowEx( SYSTEM.VAL(LONGINT, create.dwExStyle) , className, title, Kernel32.SetToDW(create.dwStyle), left, top,  (rect.right - rect.left) , (rect.bottom - rect.top),
 													   0 ,0, Kernel32.hInstance,
 													   SYSTEM.VAL( User32.LParam, create));
 		RETURN (hWnd # 0);
@@ -851,8 +853,8 @@ END GameLogic;
 		MakeCurrent();
 
 		GL.ReadOpenGLCore();
-		GL.Read_WGL_EXT_swap_control; (* needed for swap interval *)
-		(* SetSwapInterval(0); *)
+	(*	GL.Read_WGL_EXT_swap_control; (* needed for swap interval *)
+		SetSwapInterval(0); *)
 
 		OnLoad();
 		Reshape(width, height);
@@ -900,8 +902,8 @@ END GameLogic;
 		CloseWindow();
 	END MainLoop;
 
-	BEGIN
-		(* MainLoop();*)
+	BEGIN {ACTIVE, PRIORITY (Objects.Normal) }
+		MainLoop;
 	END Window;
 
 VAR
@@ -1029,7 +1031,7 @@ VAR
 				ret := User32.PostMessage( hwnd, WMSetup, wParam, lParam );
 				RETURN 0;
 			| WMSetup:
-				win := SYSTEM.VAL( Window, lParam );  ret := User32.SetWindowLong( hwnd, WinApi.GWL_USERDATA, lParam );
+				win := SYSTEM.VAL( Window, lParam );  ret := User32.SetWindowLong( hwnd, WinApi.GWL_USERDATA, LONGINT( lParam ));
 				create := SYSTEM.VAL( CreateStruct, wParam );
 				RETURN 0;
 		ELSE

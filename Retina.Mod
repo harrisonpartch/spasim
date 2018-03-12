@@ -6,10 +6,10 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=3;        
-	TS=9*8;  (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
-	TW=16
-	TH=9;
+	T=4;        
+	TS=5*16;  (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
+	TW=8;
+	TH=5;
 	W*=TS*TW;
 	H*=TS*TH;
 	CX=W DIV 2;
@@ -30,6 +30,35 @@ PROCEDURE go;
 BEGIN{EXCLUSIVE}
      GO:=TRUE
 END go;
+
+PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
+VAR 
+	d: REAL;
+BEGIN
+	ray.dxyz.x:= Math.cos(theta) * Math.cos(phi);
+	ray.dxyz.y:= Math.sin(theta) * Math.cos(phi);
+	ray.dxyz.z := Math.sin(phi);
+	d := Math.sqrt(ray.dxyz.x*ray.dxyz.x + ray.dxyz.y* ray.dxyz.y+ray.dxyz.z*ray.dxyz.z);  (* Norma! Liza! Ray! Front and center, oh dark thirty!*)
+	ray.dxyz.x := ray.dxyz.x/d;
+	ray.dxyz.y := ray.dxyz.y/d;
+	ray.dxyz.z := ray.dxyz.z/d;	
+(*	ray.dtheta:=dtheta;
+	ray.dphi:=dphi;
+*)	ray.downxyz:=Base.dward;
+	ray.rightxyz:=Base.rward;
+	SPSMMath.orrot(ray.dxyz, Base.dward, rtheta);  
+	SPSMMath.orrot(ray.dxyz, Base.rward, rphi);  
+	SPSMMath.orrot(ray.downxyz, Base.rward, rphi);  
+	SPSMMath.orrot(ray.rightxyz, Base.dward, rphi);  	
+	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
+	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
+	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
+	ray.lxyz:=Base.cameraPT;
+	ray.xyz:= Base.cameraPT;
+	ray.oxyz:= Base.cameraPT;
+	ray.dtl:=Base.DTL;
+	ray.texdtl:=1;	
+END angletoray;
 
 PROCEDURE interpclr(CONST ra,rb: Base.Color): Base.Color;
 VAR
@@ -424,6 +453,122 @@ BEGIN
 	END;		
 END tessaid9;
 
+PROCEDURE tessadd5(cam:Camera);
+	
+VAR
+	i,j: LONGINT;
+	theta,phi,dtheta,dphi: REAL;
+	ray: Base.Ray;
+	rays: ARRAY 5,5 OF Base.Ray;
+	pixel: Raster.Pixel;
+	r,b,g: REAL;
+	patch: ARRAY 5,5 OF Base.Color;
+	
+BEGIN
+	dtheta:=cam.dtheta/5;
+	dphi:=cam.dphi/5;
+	theta:=cam.theta;
+		FOR i:= 0 TO 4 DO
+		phi:=cam.phi;
+		FOR j := 0 TO 4 DO 
+			angletoray(rays[i,j],theta,phi);
+			phi:=phi+dphi;
+		END;
+		theta:=theta+dtheta;
+	END;
+	FOR i:= 0 TO 4 DO
+		FOR j := 0 TO 4 DO 
+			rays[i,j].clr.ra := 1;
+			rays[i,j].clr.ga := 1;
+			rays[i,j].clr.ba := 1;
+			rays[i,j].clr.alpha:=1;
+			rays[i,j].scale := 1; 
+			rays[i,j].tscale:=1;
+			rays[i,j].dtl:=DETAIL;	
+			Base.world.Shade(rays[i,j]);
+			IF rays[i,j].terminate THEN
+				patch[i,j].red:=rays[i,j].clr.r;
+				patch[i,j].green:=rays[i,j].clr.g;
+				patch[i,j].blue:=rays[i,j].clr.b; 
+			ELSE
+				patch[i,j].blue:= rays[i,j].clr.b + rays[i,j].clr.ba;
+				patch[i,j].red:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
+				patch[i,j].green:= rays[i,j].clr.g + rays[i,j].clr.ga/3 
+			END
+		END;
+	END;			
+	FOR i:=0 TO 4 DO
+		FOR j:= 0 TO 4 DO	
+			Raster.SetRGB(pixel,ENTIER(patch[i,j].red*GAMMA),ENTIER(patch[i,j].green*GAMMA),ENTIER(patch[i,j].blue*GAMMA)); 
+			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
+		END
+	END;		
+END tessadd5;
+
+PROCEDURE tessaid5(cam:Camera);
+	
+VAR
+	i,j: LONGINT;
+	theta,phi,dtheta,dphi: REAL;
+	ray: Base.Ray;
+	rays: ARRAY 3,3 OF Base.Ray;
+	pixel: Raster.Pixel;
+	r,b,g: REAL;
+	patch: ARRAY 5,5 OF Base.Color;
+	ia,ib: LONGINT;
+	
+BEGIN
+	dtheta:=cam.dtheta/5;
+	dphi:=cam.dphi/5;
+	theta:=cam.theta;
+	FOR i:= 0 TO 2 DO
+		phi:=cam.phi;
+		FOR j := 0 TO 2 DO 
+			angletoray(rays[i,j],theta,phi);
+			phi:=phi+dphi;
+		END;
+		theta:=theta+dtheta;
+	END;	
+	FOR i:= 0 TO 2  DO
+		FOR j := 0 TO 2 DO 
+			rays[i,j].clr.ra := 1;
+			rays[i,j].clr.ga := 1;
+			rays[i,j].clr.ba := 1;
+			rays[i,j].clr.alpha:=1;
+			rays[i,j].scale := 1; 
+			rays[i,j].tscale:=1;
+			rays[i,j].dtl:=DETAIL;	
+			Base.world.Shade(rays[i,j]);
+			ia:=i*2; ib:=j*2;		
+			IF rays[i,j].terminate THEN
+				patch[ia,ib].red:=rays[i,j].clr.r;
+				patch[ia,ib].green:=rays[i,j].clr.g;
+				patch[ia,ib].blue:=rays[i,j].clr.b; 
+			ELSE
+				patch[ia,ib].blue:= rays[i,j].clr.b + rays[i,j].clr.ba;
+				patch[ia,ib].red:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
+				patch[ia,ib].green:= rays[i,j].clr.g + rays[i,j].clr.ga/3 
+			END
+		END;
+	END;		
+	FOR j:= 0 TO 4 BY 2 DO 
+		FOR i := 0 TO 2 BY 2 DO  
+ 			patch[i+1,j]:=interpclr(patch[i,j],patch[i+2,j]);	
+		END;	 
+	END;			
+	FOR i:= 0 TO 4 DO 
+		FOR j := 0 TO 2 BY 2 DO  
+ 			patch[i,j+1]:=interpclr(patch[i,j],patch[i,j+2]);		
+		END;	 
+	END;
+	FOR i:=0 TO 4 DO
+		FOR j:= 0 TO 4 DO	
+			Raster.SetRGB(pixel,ENTIER(patch[i,j].red*GAMMA),ENTIER(patch[i,j].green*GAMMA),ENTIER(patch[i,j].blue*GAMMA)); 
+			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
+		END
+	END;		
+END tessaid5;
+
 PROCEDURE tessad5(cam: Camera);
 VAR
 	i,j: LONGINT;
@@ -721,10 +866,10 @@ VAR
 BEGIN
 	splitcam(cam,a,b,c,d);
 	IF level<2 THEN
-			tessaid9(a);
-			tessaid9(b);
-			tessaid9(c);
-			tessaid9(d);
+			tessaid5(a);
+			tessaid5(b);
+			tessaid5(c);
+			tessaid5(d);
 	ELSE
 		l:=level-1;
 		ztraceu(a,l);
@@ -745,30 +890,30 @@ BEGIN
 			x:=a.imx - W/2;
 			y:=a.imy-H/2;		
 			IF (~saccade)&((x*x+y*y)<FV) THEN	
-				tessadd9(a); 
+				tessadd5(a); 
 			ELSE
-				tessaid9(a); 
+				tessaid5(a); 
 			END;
 			x:=b.imx - W/2;
 			y:=b.imy-H/2;		
 			IF  (~saccade)&((x*x+y*y)<FV) THEN	
-				tessadd9(b); 
+				tessadd5(b); 
 			ELSE
-				tessaid9(b); 			
+				tessaid5(b); 			
 			END;			
 			x:=c.imx - W/2;
 			y:=c.imy-H/2;		
 			IF  (~saccade)&((x*x+y*y)<FV) THEN		
-				tessadd9(c); 
+				tessadd5(c); 
 			ELSE
-				tessaid9(c); 
+				tessaid5(c); 
 			END;
 			x:=d.imx - W/2;
 			y:=d.imy-H/2;		
 			IF  (~saccade)&((x*x+y*y)<FV) THEN	
-				tessadd9(d); 
+				tessadd5(d); 
 			ELSE
-				tessaid9(d); 
+				tessaid5(d); 
 			END; 
 	ELSE
 		l:=level-1;
@@ -787,10 +932,10 @@ VAR
 BEGIN
 	splitcam(cam,a,b,c,d);
 	IF level<2 THEN
-			tessadd9(a); 
-			tessadd9(b); 
-			tessadd9(c); 
-			tessadd9(d); 
+			tessadd5(a); 
+			tessadd5(b); 
+			tessadd5(c); 
+			tessadd5(d); 
 	ELSE
 		l:=level-1;
 		ztraced(a,l);
@@ -807,8 +952,8 @@ BEGIN{ACTIVE, PRIORITY(Objects.Normal)}
 		END;
 		CASE TESSA OF
 			  0: ztraceu(cam,T); 
-			| 1: ztraced(cam,T) 
-			| 2: ztracef(cam,T) 
+			| 1: IF ~saccade THEN ztraced(cam,T) ELSE ztraceu(cam,T) END;
+			| 2: IF ~saccade THEN ztracef(cam,T) ELSE ztraceu(cam,T) END;
 		ELSE
 		END;
 		BEGIN{EXCLUSIVE}

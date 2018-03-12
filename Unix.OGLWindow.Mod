@@ -30,7 +30,8 @@ TYPE
 		status: LONGINT;
 	END;
 
-	GLXFBConfigPtr =  POINTER TO ARRAY OF LONGINT;
+	GLXFBConfig = POINTER {UNSAFE} TO RECORD END;
+	GLXFBConfigPtr =  POINTER {UNSAFE} TO ARRAY OF GLXFBConfig;
 	
 VAR
 	keySymbol: ARRAY 256 OF LONGINT;
@@ -50,7 +51,7 @@ VAR
 	glctx : GL.GLXContext;  (* GL context handle *)
 
 	(* original desktop mode which we save so we can restore it later *)
-	 desktopMode :  V.XF86VidModeModeInfo;
+	 desktopMode :  V.ModeInfo;
 
 	title-: ARRAY 128 OF CHAR; (** title of window *)
 	active : BOOLEAN; (* for main loop control *)
@@ -68,12 +69,11 @@ VAR
 
 
 	glxMajor, glxMinor, wmMajor, wmMinor: LONGINT;
-	dispWidth, dispHeight: LONGINT;
+(*	dispWidth, dispHeight: LONGINT; *)
 
 	gamemode-: BOOLEAN; (** if true poll Display procedure *)
 	hidecursor-: BOOLEAN; (** hide/show cursor *)
 	currentfms-: LONGINT; (* current frame update time *)
-	noCursor: X11.Cursor;
 	wmDelete : X11.Atom;
 (*	wmstate, wmfullscreen: X11.Atom; *)
 
@@ -229,9 +229,9 @@ VAR
 
 		(* switch back to original desktop resolution if we were in fullscreen *)
 		IF fullscreen THEN
-			res := V.XF86VidModeSwitchToMode(display, screen, desktopMode);
+			res := V.SwitchToMode(display, screen, desktopMode);
 			X11.Flush(display);
-			res := V.XF86VidModeSetViewPort(display, screen, 0, 0);
+			res := V.SetViewPort(display, screen, 0, 0);
 			IF debug THEN KernelLog.String("switching desktop resolution"); KernelLog.Ln; END;
 		END;
 
@@ -325,15 +325,19 @@ VAR
 
 	(** interval=1: vertical sync to video update rate; interval=0: disable vsynch, full speed *)
 	PROCEDURE SetSwapInterval*(interval: LONGINT);
-	VAR bres: BOOLEAN;
+	VAR bres: LONGINT;
 	BEGIN
-	(*
-		IF GL.glXSwapIntervalSGI # NIL THEN
-			 bres := GL.glxSwapIntervalSGI(interval);
+		IF GL.glXSwapIntervalEXT # NIL THEN
+			GL.glXSwapIntervalEXT(display, win, interval);
+			(* KernelLog.String("GL.glXSwapIntervalEXT # NIL"); KernelLog.Ln; *)
+		ELSIF GL.glXSwapIntervalSGI # NIL THEN
+			bres := GL.glXSwapIntervalSGI(interval);
+			(* KernelLog.String("GL.glXSwapIntervalSGI # NIL"); KernelLog.Ln; *)
+		ELSIF GL.glXSwapIntervalMESA # NIL THEN
+			bres := GL.glXSwapIntervalMESA(interval);
+			(* KernelLog.String("GL.glXSwapIntervalMESA # NIL"); KernelLog.Ln; *)
 		END;
-	*)
 	END SetSwapInterval;
-
 
 	 (** set  window decorartion on/off *)
 	PROCEDURE SetDecorations*(decor: BOOLEAN);
@@ -381,8 +385,8 @@ VAR
 	PROCEDURE SetProfile*(major, minor: LONGINT; flags: SET): BOOLEAN;
 	VAR
 		elemc, res, i: LONGINT;
-		fbcfg: GL.XID; (*GLXFBConfigPtr;*)
-		fbcfgPtr: GLXFBConfigPtr;
+		fbcfg {UNTRACED}: GLXFBConfig;
+		fbcfgPtr {UNTRACED} : GLXFBConfigPtr;
 (*		str: Strings.String;*)
 		attr: POINTER TO  ARRAY OF GL.Int;
 		newctxt: GL.GLXContext;
@@ -391,16 +395,13 @@ VAR
 		res := GL.glXMakeCurrent(display, 0, 0);
 		
 		(* We need this for OpenGL3 *)
-		fbcfg := GL.glXChooseFBConfig(display, 0, 0, elemc);
-		IF fbcfg = 0 THEN
+		fbcfgPtr := GL.glXChooseFBConfig(display, 0, 0, elemc);
+		IF fbcfg = NIL THEN
 			KernelLog.String("Couldn't get FB configs"); KernelLog.Ln;
 		ELSE
 			KernelLog.String("# of Got FB configs: "); 
 			KernelLog.Int(elemc, 0); KernelLog.Ln;
 		END;
-  
-		NEW(fbcfgPtr, elemc);  	
-		fbcfgPtr := SYSTEM.VAL(GLXFBConfigPtr, fbcfg);
 
 		NEW(attr, 13);
 		(* for example OpenGL 3.3*)
@@ -409,18 +410,18 @@ VAR
 		attr[i] := GLC.GLX_CONTEXT_MINOR_VERSION_ARB; INC(i);
 		attr[3]:=minor; INC(i);
     
-		attr[i] := GLC.GLX_CONTEXT_FLAGS_ARB; INC(i);
-		attr[i] := GLC.GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB; INC(i);
- 
+(*		 attr[i] := GLC.GLX_CONTEXT_FLAGS_ARB; INC(i);
+		 attr[i] := GLC.GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB; INC(i);
+*)   
    
 		attr[i] := GLC.GLX_CONTEXT_PROFILE_MASK_ARB; INC(i);
-		attr[i] := GLC.GLX_CONTEXT_CORE_PROFILE_BIT_ARB; INC(i); 	
+	(*		attr[i] := GLC.GLX_CONTEXT_CORE_PROFILE_BIT_ARB; INC(i) *)		
 		attr[i] := GLC.GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB; INC(i);
-
   
 		attr[i] := 0; (* end of attribute list *)
-
-		newctxt := GL.glXCreateContextAttribsARB(display, SYSTEM.VAL(LONGINT, fbcfgPtr[0]), 0, X11.True, ADDRESSOF(attr[0]));
+		fbcfg := fbcfgPtr[0];
+		
+		newctxt := GL.glXCreateContextAttribsARB(display, fbcfg, 0, X11.True, ADDRESSOF(attr[0]));
 		IF newctxt = NIL THEN 
 			KernelLog.String("could not create OpenGL "); KernelLog.Int(major, 0); KernelLog.Char("."); KernelLog.Int(minor, 0); 
 			KernelLog.String(" context"); KernelLog.Ln; 
@@ -450,7 +451,7 @@ VAR
 		str := GL.GetString(GLC.GL_VERSION); 
 		KernelLog.String(" Version: "); KernelLog.String(str^); KernelLog.Ln;
 *)
-		X11.Free(fbcfg);	
+		X11.Free(fbcfgPtr);	
   		RETURN TRUE;
 	END SetProfile;
 	
@@ -465,9 +466,10 @@ VAR
 
 		sizehints: Api.XSizeHints;
 
-		modes : V.PPXF86VidModeModeInfo;
-		bmodes : V.XF86VidModeModeInfo;
-		modnum, bestmode: LONGINT;
+		modeInfos {UNTRACED}: V.PModeInfo;
+		bestmodeInfo {UNTRACED} : V.ModeInfo;
+		numModes, bestmodeNum: LONGINT;
+		
 		i: LONGINT;
 		isbestFound: BOOLEAN;
 		rootwin: Api.Window;
@@ -484,49 +486,13 @@ VAR
 (* ========================= *)
 
 		screen := X11.DefaultScreen(display);
-		res := V.XF86VidModeQueryVersion(display, wmMajor, wmMinor);
+		res := V.QueryVersion(display, wmMajor, wmMinor);
 		IF debug THEN
 			KernelLog.String("XF86 VideoMode extension version ");
 			KernelLog.Int(wmMajor,0); KernelLog.Char(".");
 			KernelLog.Int(wmMinor,0); KernelLog.Ln;
 		END;
-
-		res := V.VidModeGetAllModeLines(display, screen, modes);
-		modnum := LEN(modes,0);
-
-		(* save desktop-resolution before switching modes *)
-		desktopMode := modes[0]^;
-		bmodes := modes[0]^;
-
-		IF debug THEN
-			FOR i:=0 TO modnum-1 DO
- 				bmodes := modes[i]^;
- 				KernelLog.Int(i, 0); KernelLog.Char(":"); KernelLog.Int( bmodes.hdisplay, 6);
- 				KernelLog.Int(bmodes.vdisplay, 6);
-				KernelLog.Ln;
-			END;
-		END;
-
-		(* look for mode with the requested resolution and choose the best matched one *)
-	    i := 0;
-	    bestmode := 0;
-	    isbestFound := FALSE;
-
-		WHILE (i < modnum-1) & (~isbestFound) DO
- 			bmodes := modes[i]^;
- 			IF (bmodes.hdisplay = width) & (bmodes.vdisplay = height) THEN
- 				bestmode := i;
- 				isbestFound := TRUE;
- 			END;
- 			INC(i);
-		 END;
-
-		(* if cant find the required mode choose desktop mode *)
-		IF ~isbestFound THEN
-			bmodes := desktopMode;
-			fullscreen := FALSE;
-		END;
-
+			
 (* ======================================= *)
 
 		NEW(attrib, 13);
@@ -567,7 +533,7 @@ VAR
 
 		IF debug THEN
 			KernelLog.String("visinfoptr.depth= "); KernelLog.Int(visinfoptr.depth,0); KernelLog.Ln;
-			KernelLog.String("visinfoptr.visual ");  KernelLog.Int(visinfoptr.visualID, 0); KernelLog.Ln;
+			KernelLog.String("visinfoptr.visual ");  KernelLog.Hex(visinfoptr.visualID, -4); KernelLog.String("H"); KernelLog.Ln;
 		END;
 
 		resb := GL.glXQueryVersion(display, glxMajor, glxMinor);
@@ -591,28 +557,78 @@ VAR
 		END;
 
 		
- 		IF fullscreen THEN
+		IF fullscreen THEN
 
-			dispWidth := bmodes.hdisplay;
-			dispHeight := bmodes.vdisplay;
+			res := V.GetAllModeLines(display, screen, numModes, modeInfos);
 
+			(* save desktop-resolution before switching modes *)
+			desktopMode := modeInfos[0];
+			IF debug THEN
+ 				KernelLog.String("Desktop Mode Info:");KernelLog.Int(desktopMode.hdisplay, 6);
+ 				KernelLog.Int(desktopMode.vdisplay, 6);
+				KernelLog.Ln;
+				KernelLog.String("Other Modes: "); KernelLog.Ln; 
+				FOR i := 0 TO numModes-1 DO
+					 KernelLog.Int(i, 0); KernelLog.Char(":"); 
+					 KernelLog.Int(modeInfos[i].hdisplay, 6); 
+					 KernelLog.Int(modeInfos[i].vdisplay, 6); 
+					 KernelLog.Ln;
+				 END;
+			END;
+
+			(* look for mode with the requested resolution and choose the best matched one *)		
+			i := 0;
+		    bestmodeNum := 0;
+		    WHILE (i < numModes) & (~isbestFound) DO
+				bestmodeInfo := modeInfos[i];
+	 			IF (bestmodeInfo.hdisplay = width) & (bestmodeInfo.vdisplay = height) THEN
+	 				bestmodeNum := i;
+	 				isbestFound := TRUE;
+	 			END;
+	 			INC(i);
+			 END;
+
+			(* if cant find the required mode choose desktop mode *)
+			IF ~isbestFound THEN
+				bestmodeInfo := desktopMode;
+				fullscreen := FALSE;			
+				KernelLog.String("Full screen mode is not found: "); 
+				KernelLog.String("width= "); KernelLog.Int(width, 0); 
+				KernelLog.String(", height= "); KernelLog.Int(height, 0); 
+				KernelLog.Ln; 
+			ELSE
+				bestmodeInfo := modeInfos[bestmodeNum];
+			END;
+
+			IF debug THEN
+				KernelLog.String("bestmodeNum = "); KernelLog.Int(bestmodeNum, 0); KernelLog.Ln; 
+				KernelLog.String("bestmodeInfo.hdisplay= "); KernelLog.Int(bestmodeInfo.hdisplay, 0);  KernelLog.Ln; 
+				KernelLog.String("bestmodeInfo.vdisplay= "); KernelLog.Int(bestmodeInfo.vdisplay, 5); KernelLog.Ln; 
+			END;			
+		END;
+
+		IF fullscreen & isbestFound THEN
+			width := bestmodeInfo.hdisplay;
+			height := bestmodeInfo.vdisplay;
+			
 			left := 0; top := 0;
-			width := dispWidth; 	height := dispHeight;
-
+			IF debug THEN
+				KernelLog.String("Full screen width: "); KernelLog.Int(width, 0); 
+				KernelLog.String(" height= "); KernelLog.Int(height, 5);
+				KernelLog.String(" bestmodeNum= "); KernelLog.Int(bestmodeNum, 0); 
+				KernelLog.Ln; 
+			END;
 			(* Use the XF86VidMode extension to control video resolution *)
 			(* Change the current video mode, switch to fullscreen *)
 			(* Unlock mode switch if necessary *)
-			res := V.XF86VidModeLockModeSwitch(display, screen, 0);
-
+			res := V.LockModeSwitch(display, screen, 0);
 			(* Change the video mode to the desired mode *)
-			res := V.XF86VidModeSwitchToMode(display, screen, bmodes);
+			res := V.SwitchToMode(display, screen, bestmodeInfo);		
 			X11.Flush(display);
 			(* Set viewport to upper left corner (where our window will be) *)
-	       	res:= V.XF86VidModeSetViewPort(display, screen, 0, 0);
-
+	       	res:= V.SetViewPort(display, screen, 0, 0);
 	       	(* Lock mode switch *)
-			res := V.XF86VidModeLockModeSwitch(display, screen, 1);
-
+			res := V.LockModeSwitch(display, screen, 1);
 			swa.overrideRedirect := TRUE;
 			 (* window event masks *)
 			swa.eventMask := Api.KeyPressMask + Api.KeyReleaseMask + Api.ButtonPressMask+ Api.ButtonReleaseMask + Api.PointerMotionMask +
@@ -620,11 +636,13 @@ VAR
 
 			masks := Api.CWBorderPixel + Api.CWColormap + Api.CWEventMask + Api.CWOverrideRedirect;
 			
-			win := Api.CreateWindow(display,  rootwin, 0, 0, dispWidth, dispHeight,
+			win := Api.CreateWindow(display,  rootwin, 0, 0, width, height,
 				        0, visinfoptr.depth, Api.InputOutput,  visinfoptr.visual, masks, swa);
-
+				        
+			IF win = NIL THEN RETURN FALSE END;
+			
 			(* Api.WarpPointer(display, Api.None, win, 0, 0, 0, 0, 0, 0);*)
-			Api.WarpPointer(display, Api.None, win, 0, 0, 0, 0, dispWidth DIV 2, dispHeight DIV 2);
+			Api.WarpPointer(display, Api.None, win, 0, 0, 0, 0, width DIV 2, height DIV 2);
 			Api.MapWindow(display, win);
 			res := Api.GrabKeyboard(display, win, Api.True, Api.GrabModeAsync , Api.GrabModeAsync, Api.CurrentTime);
 			res := Api.GrabPointer(display, win, Api.True, Api.ButtonPressMask, Api.GrabModeAsync, Api.GrabModeAsync, win, X11.None, Api.CurrentTime);
@@ -639,7 +657,8 @@ VAR
 
 	 		win := Api.CreateWindow(display, rootwin, left, top, width, height,
 			        0, visinfoptr.depth, Api.InputOutput,  visinfoptr.visual, masks, swa);
-
+			IF win = NIL THEN RETURN FALSE END;
+			
 			(* set wm_delete_events if in windowed mode *)
 			wmDelete := Api.InternAtom(display, "WM_DELETE_WINDOW", Api.True);
 			res := Api.SetWMProtocols(display, win, ADDRESSOF(wmDelete), 1);
@@ -648,10 +667,8 @@ VAR
 			sizehints.x := left;  sizehints.y := top;  sizehints.width := width; sizehints.height := height;
 			Api.SetStandardProperties(display, win, title, title, 0, 0, 0, sizehints);
 	 		Api.MapWindow(display, win);
-
 		END;
-
-
+		
 		IF ~fullscreen & fullwindow THEN
 			SetFullWindow(TRUE);
 		END;
@@ -924,14 +941,18 @@ END GameLogic;
 
 				GameLogic();
 
+				IF i=9 THEN
+					fmsum:=0;
+					KernelLog.Int(fms, 6); KernelLog.String(" ms."); KernelLog.Ln
+				END;
 			END;
 		END;
 		CloseWindow();
 
 	END MainLoop;
 
-BEGIN   {ACTIVE,PRIORITY(Objects.Normal)}
-	MainLoop; 
+BEGIN  {ACTIVE, PRIORITY (Objects.Normal) }
+	MainLoop;
 END Window;
 
 PROCEDURE InitKeysym;

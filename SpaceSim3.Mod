@@ -228,7 +228,7 @@ TYPE
 	END Display;
 
 BEGIN
-	MainLoop();
+
 END SpaceWindow;
 
 (** Open window command procedure *)

@@ -51,7 +51,7 @@ VAR
 
 (* original desktop mode which we save so we can restore it later *)
 
-	 desktopMode: V.XF86VidModeModeInfo;
+	 desktopMode: V.ModeInfo;
 	width, height : LONGINT; (* size of window *)
 
 	alive : BOOLEAN; (* for main loop control *)
@@ -189,7 +189,7 @@ END MakeGear;
 PROCEDURE  InitGears;
 VAR
 	red, green, blue, lightPos: ARRAY [4] OF GL.Float;
-
+     interval, bres: LONGINT;
 BEGIN
 	rotx := 20;  roty := 30;  rotz := 0;  angle := 20;
 
@@ -199,6 +199,19 @@ BEGIN
 	green := [ 0.0, 0.8, 0.2, 1.0];
 	blue := [ 0.2, 0.2, 1.0, 1.0];
 *)
+	interval := 0;
+		IF GL.glXSwapIntervalEXT # NIL THEN
+			GL.glXSwapIntervalEXT(display, win, interval);
+			context.out.String("GL.glXSwapIntervalEXT # NIL"); context.out.Ln; 
+		ELSIF GL.glXSwapIntervalSGI # NIL THEN
+			bres := GL.glXSwapIntervalSGI(interval);
+			context.out.String("GL.glXSwapIntervalSGI # NIL"); context.out.Ln; 
+		ELSIF GL.glXSwapIntervalMESA # NIL THEN
+			bres := GL.glXSwapIntervalMESA(interval);
+			context.out.String("GL.glXSwapIntervalMESA # NIL"); context.out.Ln; 
+		END;
+	context.out.Ln; context.out.Update;
+	
 
     lightPos[0] := 5.0;	lightPos[1] := 5.0;  lightPos[2] := 10.0; lightPos[3] := 1.0;
     red[0] := 0.8; red[1] := 0.1; red[2] := 0.0; red[3] := 1.0;
@@ -304,8 +317,8 @@ END Reshape;
 
 	(* switch back to original desktop resolution if we were in fullscreen *)
 	IF fullscreen THEN
-		res := V.XF86VidModeSwitchToMode(display, screen, desktopMode);
-		res := V.XF86VidModeSetViewPort(display, screen, 0, 0);
+		res := V.SwitchToMode(display, screen, desktopMode);
+		res := V.SetViewPort(display, screen, 0, 0);
 	END;
 
 
@@ -335,11 +348,11 @@ VAR
 
 	visinfoptr : Api.VisualInfoPtr; (* pointer to X11 VisualInfo *)
 	cmap : X11.Colormap; (* colormap for window *)
-	att : ARRAY [*] OF GL.Int;  (* attributes of GL window *)
+	att : POINTER TO ARRAY OF GL.Int;  (* attributes of GL window *)
 	glxMajor, glxMinor, wmMajor, wmMinor: LONGINT;
 	dispWidth, dispHeight: LONGINT;
-	modes : V.PPXF86VidModeModeInfo;
-	bmodes : V.XF86VidModeModeInfo;
+	modes : V.PModeInfo;
+	bmodes : V.ModeInfo;
 	modnum, bestmode: LONGINT;
 	i: LONGINT;
 	dumysize: Api.XSizeHints;
@@ -353,7 +366,7 @@ BEGIN
 	END;
 
 	screen := X11.DefaultScreen(display);
-	res := V.XF86VidModeQueryVersion(display, wmMajor, wmMinor);
+	res := V.QueryVersion(display, wmMajor, wmMinor);
 	IF debug THEN
 		context.out.String("XF86 VideoMode extension version ");
 		context.out.Int(wmMajor,0); context.out.Char(".");
@@ -361,11 +374,10 @@ BEGIN
 	END;
 
 
-	res := V.VidModeGetAllModeLines(display, screen, modes);
-	modnum := LEN(modes,0);
+	res := V.GetAllModeLines(display, screen, modnum, modes);
 
 	(* save desktop-resolution before switching modes *)
-	desktopMode := modes[0]^;
+	desktopMode := modes[0];
 	IF debug THEN
 		context.out.String("desktopMode=");
 		context.out.Int( desktopMode.hdisplay, 6);
@@ -378,7 +390,7 @@ BEGIN
 
 	(* look for mode with requested resolution *)
 	 FOR i:=0 TO modnum-1 DO
- 		bmodes := modes[i]^;
+ 		bmodes := modes[i];
  		IF (bmodes.hdisplay=width) & (bmodes.vdisplay = height) THEN bestmode:=i; END;
  		IF debug THEN
  			context.out.Int(i+1, 0); context.out.Char(":");
@@ -387,7 +399,7 @@ BEGIN
 			context.out.Update;
 		END;
 	 END;
-	bmodes := modes[bestmode]^;
+	bmodes := modes[bestmode];
 	dispWidth := bmodes.hdisplay;
 	dispHeight := bmodes.vdisplay;
 
@@ -397,6 +409,8 @@ BEGIN
 		context.out.Int(dispHeight, 0); context.out.Ln; context.out.Update;
  	END;
 
+(*	X11.Free(ADDRESSOF(modes));*)
+	
 	doubleBuffered := TRUE;
 
 (*  NEW(att, 13);
@@ -406,7 +420,7 @@ BEGIN
   att[4] := GLC.GLX_STENCIL_SIZE;	att[5] := 8;
   att[6] := GLC.GLX_RED_SIZE;  		att[7] := 8;
   att[8] := GLC.GLX_GREEN_SIZE;	att[9] := 8;
-  att[10] := GLC.GLX_RED_SIZE;		att[11] := 8;
+  att[10] := GLC.GLX_BLUE_SIZE;		att[11] := 8;
   att[12] := 0 ;
 *)
 
@@ -416,7 +430,7 @@ BEGIN
   att[2] := GLC.GLX_DEPTH_SIZE;		att[3] := 16;
   att[4] := GLC.GLX_RED_SIZE;  		att[5] := 4;
   att[6] := GLC.GLX_GREEN_SIZE;	att[7] := 4;
-  att[8] := GLC.GLX_RED_SIZE;		att[9] := 4;
+  att[8] := GLC.GLX_BLUE_SIZE;		att[9] := 4;
   att[10] := 0 ;
 
 
@@ -465,16 +479,17 @@ BEGIN
 
 
 	IF fullscreen THEN
+		context.out.String("fullscreen"); context.out.Ln; context.out.Update;
 		(* Use the XF86VidMode extension to control video resolution *)
 		(* Change the current video mode, switch to fullscreen *)
 		(* Unlock mode switch if necessary *)
-		res := V.XF86VidModeLockModeSwitch(display, screen, 0);
+		res := V.LockModeSwitch(display, screen, 0);
 		(* Change the video mode to the desired mode *)
-		res := V.XF86VidModeSwitchToMode(display, screen, bmodes);
+		res := V.SwitchToMode(display, screen, bmodes);
 		(* Set viewport to upper left corner (where our window will be) *)
-       	res:= V.XF86VidModeSetViewPort(display, screen, 0, 0);
+       	res:= V.SetViewPort(display, screen, 0, 0);
        	(* Lock mode switch *)
-  		res := V.XF86VidModeLockModeSwitch(display, screen, 1);
+  		res := V.LockModeSwitch(display, screen, 1);
 
 		context.out.String("resolution-2 "); context.out.Int(dispWidth,0); context.out.Char("x"); context.out.Int(dispHeight, 0);
 		context.out.Ln; context.out.Update;
@@ -492,7 +507,9 @@ BEGIN
 		Api.MapWindow(display, win);
 		res := Api.GrabKeyboard(display, win, Api.True, Api.GrabModeAsync , Api.GrabModeAsync, Api.CurrentTime);
 		res := Api.GrabPointer(display, win, Api.True, Api.ButtonPressMask, Api.GrabModeAsync, Api.GrabModeAsync, win, X11.None, Api.CurrentTime);
+		context.out.String("fullscreen ends"); context.out.Ln; context.out.Update;
 	ELSE
+		context.out.String("NOT fullscreen"); context.out.Ln; context.out.Update;
 		(* create a window in windowed mode *)
 		(* window event masks *)
 		winAttr.eventMask := Api.ExposureMask + Api.KeyPressMask + Api.ButtonPressMask + Api.StructureNotifyMask;
@@ -511,7 +528,8 @@ BEGIN
 		Close;
 		RETURN FALSE;
 	END;
-
+	
+	
 	res := GL.glXMakeCurrent(display, win, glctx);
 	IF res = 0 THEN
 		Close;
@@ -527,7 +545,7 @@ BEGIN
 		END;
 		context.out.Update;
 	END;
-
+	
  RETURN TRUE;
 END InitWindow;
 
@@ -714,22 +732,20 @@ END SaveImage;
 								(* keysym := Api.LookupKeysym(ke, 0); *)
 								WrKey(keycount, buffer, keysym);
 
-								CASE keysym OF
-									KS.XK_Escape, KS.XK_q1, KS.XK_Q: alive := FALSE;
-								|	KS.XK_F1: Wr("F1 pressed"); (* start from begining *)
+								IF (keysym = KS.XK_Escape) OR (keysym = KS.XK_q1) OR (keysym = KS.XK_Q) THEN alive := FALSE
+
+								ELSIF	(keysym = KS.XK_F1) THEN  Wr("F1 pressed"); (* start from begining *)
 											Close;
 											fullscreen := ~ fullscreen;
 											IF InitWindow() THEN
 												InitGears;
 												Reshape(width, height);
 											END;
-								| KS.XK_Up: Wr("K_Up"); roty := roty + 5.0;
-								| KS.XK_Down: Wr("K_Down"); roty := roty -5.0;
-								| KS.XK_F11: ToggleFullWindow;
-								| KS.XK_F12: ToggleDecorations;
-								| KS.XK_m1: ChangeCursor();
-
-								ELSE
+								ELSIF (keysym = KS.XK_Up) THEN  Wr("K_Up"); roty := roty + 5.0;
+								ELSIF (keysym = KS.XK_Down) THEN Wr("K_Down"); roty := roty -5.0;
+								ELSIF (keysym = KS.XK_F11) THEN ToggleFullWindow;
+								ELSIF (keysym = KS.XK_F12) THEN ToggleDecorations;
+								ELSIF (keysym = KS.XK_m1) THEN ChangeCursor();
 								END;
 
 				| Api.ClientMessage: Wr("ClientMessage");
@@ -791,11 +807,12 @@ PROCEDURE Open*;
 BEGIN
 	context := StdIO.env;
 
-	width := 300; height := 300; (* window size*)
+	width := 800; height := 600; (* window size*)
 	fullscreen := FALSE;
-	fullwindow := FALSE;
+(*	fullwindow := TRUE; *)
 	windecorations := TRUE;
 	IF ~ InitWindow() THEN RETURN; END;
+	GL.ReadExtensions();
 	InitGears();
 	Reshape(width, height);
 
@@ -814,3 +831,5 @@ END MyXGear2.
 MyXGear2.Open~
 
 SystemTools.Free MyXGear2 ~ 
+
+SystemTools.FreeDownTo OpenGL ~ 

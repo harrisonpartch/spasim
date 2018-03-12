@@ -480,7 +480,7 @@ BEGIN
 	noise[2].c:=1.5;		
 	noise[2].octaves:=4;
 	noise[2].persistence:=3.61;	
-	noise[2].setvoxel(Base.VoxelFromName("Nmarmory"));		
+	noise[2].setvoxel(Base.VoxelFromName("Nbenice"));		
 	NEW(noise[3]);		
 	noise[3].seed:=11117111;		
 	noise[3].a:=1;
@@ -496,24 +496,39 @@ BEGIN
 	noise[4].c:=1.5;		
 	noise[4].octaves:=4;
 	noise[4].persistence:=3.31;	
-	noise[4].setvoxel(harrison);		
+	noise[4].setvoxel(Base.VoxelFromName("NXWCxXWLIcD2LegvoGXXBiQ"));		
 
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,9/10);
 	Base.setPT(up,0,0,1);
 	
-	Base.setPT(center,1/2,1/2,9/12);
+	Base.setPT(center,1/2,1/2,1/2);
 	
-	z3:=Base.VoxelFromName("NM2");	
-	z3.setcolor(1,1,0,3,1); 
-	z3.FRaster(noise[2],32);		
-	z3.FRaster(noise[3],32);	
-	z3.FRaster(noise[4],128);					
+	z3:=Base.VoxelFromName("NM3");	
+	z3a:=Base.VoxelFromName("NM3");	
+	z3.setcolor(0,0,3,4.5,1); 
+	z3.stroke(center,1,z3a);
+	z3.FRaster(noise[2],27);		
+	z3.FRaster(noise[3],27);	
+	z3a.FRaster(noise[4],81);					
+
+
+
+
+
 	NEW(plane,center,up);
 	plane.setvoxel(kat);	
-
-	z3.FRaster(plane,16);
+	z3.FRaster(plane,9);
+	plane.setvoxel(Base.EMPTY);	
+	Base.setPT(center,1/2,1/2,0.4);
+	z3.FRaster(plane,3);
+	Base.setPT(center,1/2,1/2,0.3);
+	z3.FRaster(plane,9);	
+	Base.setPT(center,1/2,1/2,0.2);
+	z3.FRaster(plane,9);
+	Base.setPT(center,1/2,1/2,0.1);
+	z3.FRaster(plane,9);			
 	
  	Base.avatar:=harrison;
 	Base.avatarsize:=1000; 

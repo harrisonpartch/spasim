@@ -13,11 +13,11 @@ TYPE
 
 	PROCEDURE &New(w, h: LONGINT );
 	BEGIN
-		Init(w,h, 400,300, FALSE);
+		Init(w, h, 400, 300, FALSE);
 			anglez := 30.0;
 			eyeposz := 10.0;
 		SetTitle("OGLDemo2");
-		SetIdleTime(100); (* set idle time to 5ms *)
+		SetIdleTime(1000); (* set idle time to 50ms *)
 
 		SetGameMode(TRUE);
 	END New;
@@ -26,10 +26,10 @@ TYPE
 	PROCEDURE IdleDisplay();
 	BEGIN
 			IF left THEN
-			anglez := anglez - 15.0;
+			anglez := anglez - 5.0;
 			IF anglez < 0 THEN anglez := 360 ; END;
 
-		ELSE  anglez := anglez + 15.0;
+		ELSE  anglez := anglez + 5.0;
 			  IF anglez > 360 THEN anglez := 0; END;
 		END;
 		 ReDisplay();
@@ -72,22 +72,20 @@ TYPE
 	(** *)
 	PROCEDURE KeyEvent* (ucs : LONGINT; flags : SET; keysym : LONGINT);
 	BEGIN
-		CASE keysym OF
-			Inputs.KsLeft: left := TRUE; ReDisplay;
-			| Inputs.KsRight: left := FALSE; ReDisplay;
-			| Inputs.KsUp:  	SetIdleTime(1+ ENTIER(idletime/1.2)); (* faster *)
-				KernelLog.String("idletime= "); KernelLog.Int(idletime, 0); KernelLog.Ln;
-			| Inputs.KsDown: SetIdleTime(1+ ENTIER(idletime*1.2)); (* slowdown *)
-				KernelLog.String("idletime= "); KernelLog.Int(idletime, 0); KernelLog.Ln;
+		IF keysym = Inputs.KsLeft THEN left := TRUE; ReDisplay;
+		ELSIF keysym = Inputs.KsRight THEN left := FALSE; ReDisplay;
+		 ELSIF keysym = Inputs.KsUp THEN 
+		 	SetIdleTime(1+ ENTIER(idletime/1.2)); (* faster *)
+			KernelLog.String("idletime= "); KernelLog.Int(idletime, 0); KernelLog.Ln;
+		ELSIF keysym = Inputs.KsDown THEN
+			SetIdleTime(1+ ENTIER(idletime*1.2)); (* slowdown *)
+			KernelLog.String("idletime= "); KernelLog.Int(idletime, 0); KernelLog.Ln;
 
-			| ORD("r") : MoveResizeWindow(10,10, 400, 400);
-			| ORD("d"): SetDecorations(FALSE);
- 			| ORD("D"): SetDecorations(TRUE);
-			| ORD("q") : Close;
-		ELSE
-
+		ELSIF keysym =  ORD("r") THEN MoveResizeWindow(10,10, 400, 400);
+		ELSIF keysym =  ORD("d") THEN SetDecorations(FALSE);
+ 		ELSIF keysym =  ORD("D") THEN SetDecorations(TRUE);
+		ELSIF keysym =  ORD("q") THEN Close;
 		END;
-
 	END KeyEvent ;
 
 	PROCEDURE DrawAQuad();
@@ -184,7 +182,7 @@ TYPE
 
 		GL.MatrixMode(GLC.GL_PROJECTION);
 		GL.LoadIdentity();
-		GLU.Perspective(45.0, 1.0, 0.1, 100.0);
+		GLU.Perspective(45.0, MAX(w, h)/MIN(w, h), 0.1, 100.0);
 
 		GL.MatrixMode(GLC.GL_MODELVIEW);
 		GL.LoadIdentity();
@@ -192,14 +190,14 @@ TYPE
 	END Reshape;
 
 	BEGIN
-		MainLoop();
+
 	END MyGLControl;
 
 PROCEDURE Open*;
 VAR
 	mywin: MyGLControl;
 BEGIN
-	NEW(mywin, 300,300);
+	NEW(mywin, 800, 600);
 END Open;
 
 BEGIN

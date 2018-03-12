@@ -288,7 +288,7 @@ VAR
 	res: LONGINT;
 	masks: LONGINT;
 	buf: X11.Buffer;
-	attrib : ARRAY [*] OF GL.Int;  (* attributes of GL window *)
+	attrib : POINTER TO ARRAY OF GL.Int;  (* attributes of GL window *)
 	defwin: X11.Window;
 BEGIN
  display := X11.OpenDisplay(0);

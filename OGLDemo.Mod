@@ -45,7 +45,7 @@ TYPE
 	END Reshape;
 
 	BEGIN
-		MainLoop(); (* run the event processing *)
+
 	END MyGLControl;
 
 (* open a window *)

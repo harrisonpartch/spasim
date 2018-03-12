@@ -280,7 +280,7 @@ BEGIN
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
-	mstarget:=50;
+	mstarget:=35;
 END openwincam;
 
 (* called when idling *)
@@ -312,7 +312,7 @@ BEGIN
 	R2:=150;
 	Base.worldalive := TRUE;	
 	fogdensity:=0.11;
-	leftsticky:=10.0;
+	leftsticky:=100.0;
 	upsticky:=10.0;	
 END OnLoad;
 
@@ -453,7 +453,12 @@ END KeyEvent;
 				up:=-ABS(yr)*yr;  
 				camera.up(-up/(15000*leftsticky)); 
 				camera.left(left/(6000*leftsticky));
-				WarpPointer(1000,1000, centerx,centery)
+				WarpPointer(1000,1000, centerx,centery);
+				IF (ABS(xr)+ABS(yr)>100) THEN
+					Retina.saccade:=TRUE
+				ELSE
+					Retina.saccade:=FALSE
+				END
 			END
 	END PointerMove;
 	 
@@ -600,8 +605,6 @@ END KeyEvent;
 		END; 
 	END GameLogic;
 	
- 	BEGIN   
-		MainLoop; 
 	END GLWindow;
 
 VAR
@@ -727,7 +730,7 @@ END shaders;
 
 PROCEDURE Open* ;
 BEGIN
-	NEW(glw,1920,1280);
+	NEW(glw,Retina.W,Retina.H);
 (*	Debugging.DisableGC *)
 END Open;
 

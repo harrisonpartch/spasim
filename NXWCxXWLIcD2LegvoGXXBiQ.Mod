@@ -29,14 +29,14 @@ BEGIN
 	dg := g*depth;
 	db := b*depth;
 	dbl:=black*depth;
-	ray.r := ray.r + dr;
-	ray.g := ray.g + dg;
-	ray.b := ray.b + db; 
-	ray.ra := (ray.ra - dr);
-	ray.ga := (ray.ga - dg);
-	ray.ba := (ray.ba - db); 
-	ray.bla:=ray.bla-dbl;
-	IF (ray.bla<0.1) THEN ray.terminate:=TRUE END;
+	ray.clr.r := ray.clr.r + dr;
+	ray.clr.g := ray.clr.g + dg;
+	ray.clr.b := ray.clr.b + db; 
+	ray.clr.ra := (ray.clr.ra - dr);
+	ray.clr.ga := (ray.clr.ga - dg);
+	ray.clr.ba := (ray.clr.ba - db); 
+	ray.clr.alpha:=ray.clr.alpha-dbl;
+	IF (ray.clr.alpha<0.1) THEN ray.terminate:=TRUE END;
 END Shade;
 
 END TransparaVox;  
@@ -51,7 +51,7 @@ VAR
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	badopossum:=Base.VoxelFromName("Nbadopossum"); 
+	badopossum:=Base.VoxelFromName("Ngreensuncouple"); 
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	blue:=Base.VoxelFromName("Ndiffuseblue"); 
 	red:=Base.VoxelFromName("Ndiffusered"); 	
@@ -65,22 +65,33 @@ BEGIN
 	NEW(s3);
 	NEW(s4);	
 	NEW(alphablue);
-	alphablue.setcolor(0,0,1,1,1);
+	alphablue.setcolor(0,0,1/2,2/3,1);
 
-	s0.fillsierp(alphablue,s0);	
+	s0.fillsierp(s1,alphablue);	
 	s0.imposter:=badopossum;
 	s0.copyonstroke:=TRUE;
-	s0.DTL:=10;
+	s0.DTL:=60;
 	
-	s1.fillsierp(s2,blue);	
+	s1.fillsierp(red,s2);	
 	s1.imposter:=blue;
 	s1.copyonstroke:=TRUE;
 	s1.DTL:=60;
 
-	s2.fillsierp(s2,reddot);	
+	s2.fillsierp(blue,s3);	
 	s2.imposter:=blue;
+	s2.copyonstroke:=TRUE;
 	s2.DTL:=60;
-	s2.lockTF:=TRUE;
+
+	s3.fillsierp(red,s4);	
+	s3.imposter:=red;
+	s3.copyonstroke:=TRUE;
+	s3.DTL:=60;
+	
+	s4.fillsierp(blue,red);	
+	s4.imposter:=blue;
+	s4.copyonstroke:=TRUE;
+	s4.DTL:=60;
+	
 	
 	RETURN s0
 END thisvox;

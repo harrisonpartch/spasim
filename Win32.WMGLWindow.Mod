@@ -29,7 +29,6 @@ TYPE
 	END;
 
 	Buffer = POINTER TO ARRAY OF CHAR;
-	GLXFBConfigPtr =  POINTER TO ARRAY OF LONGINT;
 
 TYPE
 	Context= OBJECT
@@ -290,13 +289,17 @@ TYPE
 		END Resized;
 
 		PROCEDURE GetDisplay*(): LONGINT;
+		VAR x: LONGINT;
 		BEGIN
-			RETURN context.glWin.hDC;
+			x := SYSTEM.VAL(LONGINT, context.glWin.hDC);
+			RETURN x;
 		END GetDisplay;
 
 		PROCEDURE GetContext*(): LONGINT;
+		VAR x: LONGINT;
 		BEGIN
-			RETURN context.glWin.hGLRC;
+			x := SYSTEM.VAL(LONGINT, context.glWin.hGLRC);
+			RETURN x
 		END GetContext;
 
 		PROCEDURE GetScreen*(): LONGINT;
@@ -312,7 +315,7 @@ VAR
     PROCEDURE CreateHWND(VAR glWin:WindowStruct): BOOLEAN;
 		VAR res: Kernel32.BOOL;
 			 dwStyle: SET;
-			 dwExStyle: LONGINT;
+			 dwExStyle: SET;
 			 windowClass: User32.WndClassEx;
 			 bres: BOOLEAN;
 			 scnt: ARRAY 16 OF CHAR;
@@ -327,7 +330,7 @@ VAR
 		IF debug THEN KernelLog.String("glWin.windowClassName= "); KernelLog.String(glWin.windowClassName); KernelLog.Ln; END;
 
 		windowClass.cbSize := SIZEOF( User32.WndClassEx );
-		windowClass.style := WinApi.CS_OWNDC + WinApi.CS_VREDRAW + WinApi.CS_HREDRAW;
+		windowClass.style :=Kernel32.SetToDW(WinApi.CS_OWNDC + WinApi.CS_VREDRAW + WinApi.CS_HREDRAW);
 		windowClass.lpfnWndProc := WindowProc; (* Message handler *)
 		windowClass.cbClsExtra := 0;
 		windowClass.cbWndExtra := 0;
@@ -349,11 +352,11 @@ VAR
 			RETURN FALSE;
 		END;
 
-		dwExStyle :=0;
+		dwExStyle :={};
 		dwStyle := WinApi.WS_POPUP +  WinApi.WS_CLIPSIBLINGS + WinApi.WS_CLIPCHILDREN;
 
 		 (* create the window *)
-		glWin.hWind := User32.CreateWindowEx(SYSTEM.VAL(LONGINT, dwExStyle) , glWin.windowClassName, glWin.title, dwStyle , 10, 10, glWin.width, glWin.height, 0, 0,  glWin.Instance, SYSTEM.VAL( User32.LParam, glWin));
+		glWin.hWind := User32.CreateWindowEx(SYSTEM.VAL(LONGINT, dwExStyle) , glWin.windowClassName, glWin.title, Kernel32.SetToDW(dwStyle) , 10, 10, glWin.width, glWin.height, 0, 0,  glWin.Instance, SYSTEM.VAL( User32.LParam, glWin));
 		IF glWin.hWind = 0 THEN
 			IF debug THEN
 				KernelLog.String("CreateWindowEx hWind= "); KernelLog.Int(glWin.hWind, 0); KernelLog.Ln;
@@ -434,17 +437,18 @@ VAR
   pfd: WinApi.PIXELFORMATDESCRIPTOR;
   pixelformat : LONGINT;
   res: LONGINT;
-
+  tmpflag: SET; 
 BEGIN
 
     pfd.nSize := SIZEOF(WinApi.PIXELFORMATDESCRIPTOR);
     pfd.nVersion := 1;
-    pfd.dwFlags := WinApi.PFD_SUPPORT_OPENGL + WinApi.PFD_DRAW_TO_WINDOW + WinApi.PFD_DOUBLEBUFFER;
+    tmpflag := WinApi.PFD_SUPPORT_OPENGL + WinApi.PFD_DRAW_TO_WINDOW + WinApi.PFD_DOUBLEBUFFER;
 
-   IF opStereo IN Options THEN
-      pfd.dwFlags := pfd.dwFlags + WinApi.PFD_STEREO;
-   END;
-
+    IF opStereo IN Options THEN
+        tmpflag := tmpflag + WinApi.PFD_STEREO;
+    END;
+   
+    pfd.dwFlags := Kernel32.SetToDW(tmpflag);
     pfd.iPixelType := CHR(WinApi.PFD_TYPE_RGBA);
     pfd.cColorBits := CHR(colorbits);
     pfd.cDepthBits := CHR(depthbits);
@@ -514,7 +518,7 @@ BEGIN
 			ret := User32.PostMessage( wnd, WMSetup, wParam, lParam );
 			RETURN 0;
 		| WMSetup:
-			context := SYSTEM.VAL( Context, lParam );  ret := User32.SetWindowLong( wnd, WinApi.GWL_USERDATA, lParam );
+			context := SYSTEM.VAL( Context, lParam );  ret := User32.SetWindowLong( wnd, WinApi.GWL_USERDATA, SYSTEM.VAL(LONGINT, lParam ));
 			glWin := SYSTEM.VAL( WindowStruct, wParam );
 			RETURN 0;
 	ELSE

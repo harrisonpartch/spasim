@@ -55,7 +55,7 @@ BEGIN
 			|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
 			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 		END;											
-		color:=texcube.side[ray.face].pixel(lx,ly);
+		color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
 		dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
 		dr:=color.red*color.alpha*dot;
 		dg:=color.green*color.alpha*dot;
@@ -297,19 +297,13 @@ BEGIN
 			END
 		END;										
 		mip:=ray.length*ray.scale;
-		color:=texcube.side[ray.face].pixel(lx,ly);
-(*		IF mip>7 THEN 	
+		IF mip>3 THEN 	
 			color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
-		ELSIF mip>4 THEN
+		ELSIF mip>1 THEN
 			color:=texcube.side[ray.face].pixelmip_one(lx,ly);
-		ELSIF mip>2 THEN
+		ELSIF mip>0.5 THEN
 			color1:=texcube.side[ray.face].pixelmip_two(lx,ly);		
 			color2:=texcube.side[ray.face].pixelmip_one(lx*3,ly*3);	
-			mix:=1+(4-mip)/10;
-			color:=Base.mixcolor(color1,color2,mix);	
-		ELSIF mip>1 THEN 
-			color1:=texcube.side[ray.face].pixel(lx,ly);
-			color2:=texcube.side[ray.face].pixelmip_two(lx*3,ly*3);  (* Base.Texture.pixel applies MODulo *)
 			mix:=1+(4-mip)/10;
 			color:=Base.mixcolor(color1,color2,mix);	
 		ELSE
@@ -318,7 +312,7 @@ BEGIN
 			mix:=1+ mip;
 			color:=Base.mixcolor(color1,color2,mix);			
 		END; 
-*)		dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
+		dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
 		dr:=color.red*color.alpha*dot;
 		dg:=color.green*color.alpha*dot;
 		db:=color.blue*color.alpha*dot;	

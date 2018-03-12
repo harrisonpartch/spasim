@@ -9,7 +9,7 @@ END thisvox;
 
 BEGIN
 	NEW(v, 'reddot.png'); 
-		v.tscale:=0;
+		v.tscale:=100;
 END Ndiffusered. 
 
 reddot.png

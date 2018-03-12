@@ -54,13 +54,15 @@ BEGIN
 	xyz.z := ABS(ray.lxyz.z-offset.z)* M;
 	pushxyz:=xyz;
 	IF (ray.length*ray.scale>ray.dtl) THEN
-		IF imposter#NIL THEN
+		ray.terminate:=TRUE;
+		ray.clr.r:=1;
+		(*IF imposter#NIL THEN
 			imposter.Shade(ray);
 		ELSIF nposterTF THEN
 			ray.normalTF:=TRUE;
 			ray.normal:=nposter.normal;
 			nshade(nposter,ray);
-		END;
+		END;*)
 	ELSE
 		SPSME.E(xyz,ijk);
 		bounds(ijk.i,ijk.j,ijk.k,out);

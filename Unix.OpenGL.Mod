@@ -17,10 +17,11 @@ VAR
 	(* handle to library  *)
 	libHandle: ADDRESS;
 
-	libraryPaths: ARRAY 4 OF ARRAY 64 OF CHAR;
+	libraryPaths: ARRAY 3 OF ARRAY 64 OF CHAR;
 
 CONST
 	debug = FALSE; (* used in ReadImplementationProperties, when extension is not available  *)
+	(* libName = '/usr/lib/i386-linux-gnu/mesa/libGL.so.1';*)
 	libName = 'libGL.so.1';
 
 TYPE
@@ -35,7 +36,7 @@ TYPE
 	Byte* = SIGNED8; 		(* 1 byte signed *)
 	Short* = INTEGER; 	(* 2 bytes signed *)
 	Int* = LONGINT; 	(* 4 bytes signed *)
-	Sizei* = SIZE; 	(* 4 bytes signed *)
+	Sizei* = LONGINT; 	(* 4 bytes signed	 SIZE ??? *)
 	Ubyte* = UNSIGNED8; 		(* 1 byte unsigned *)
 	Ushort* = UNSIGNED16;	(* 2 bytes unsigned *)
 	Uint* = UNSIGNED32;	(* 4 bytes unsigned *)
@@ -661,7 +662,10 @@ VAR
 	GLX_EXT_texture_from_pixmap*,
 	GLX_EXT_swap_control*,
 	GLX_ARB_context_flush_control*,
-	GLX_EXT_create_context_es2_profile* : BOOLEAN;
+	GLX_EXT_create_context_es2_profile*,
+	
+	GLX_SGI_swap_control*,
+	GLX_MESA_swap_control* : BOOLEAN;
 
 TYPE
 
@@ -3679,7 +3683,11 @@ TYPE
 
 	(* GLX_EXT_swap_control *)
 	TglXSwapIntervalEXT* = PROCEDURE{C}(dpy: DisplayPtr; drawable: GLXDrawable; interval: Int);
-
+	(* GLX_SGI_swap_control *)
+	TglXSwapIntervalSGI* = PROCEDURE{C}(interval: Int): Int;
+	(* GLX_MESA_swap_control *)
+	TglXSwapIntervalMESA* = PROCEDURE{C}(interval: Uint): Int;
+	
   VAR
 
 	(*! GL_VERSION_1_0 *)
@@ -6647,6 +6655,10 @@ TYPE
 
 	(* GLX_EXT_swap_control *)
 	glXSwapIntervalEXT- : TglXSwapIntervalEXT;
+	(* GLX_SGI_swap_control *)
+	glXSwapIntervalSGI- : TglXSwapIntervalSGI;
+	(* GLX_MESA_swap_control *)
+	glXSwapIntervalMESA- : TglXSwapIntervalMESA;
 	
 (** wrapper procedure  *)
 PROCEDURE GetProcAddress*(CONST funcName: ARRAY OF CHAR; adr: ADDRESS);
@@ -6690,7 +6702,7 @@ BEGIN
 			KernelLog.String("ERROR: could not find a suitable file for libGL.so.1 - "); KernelLog.String(libName); KernelLog.Ln;
 		END;
 	ELSE
-		KernelLog.String("using LinuxAos path: "); KernelLog.String(libName); KernelLog.Ln;
+		KernelLog.String("using LinuxAos searh path: "); KernelLog.String(libName); KernelLog.Ln;
 	END;
 	RETURN h
 END Dlopen;
@@ -10379,6 +10391,17 @@ BEGIN
 	GetProcAddress( 'glXSwapIntervalEXT' , ADDRESSOF( glXSwapIntervalEXT ));
 END Read_GLX_EXT_swap_control;
 
+PROCEDURE Read_GLX_SGI_swap_control*;
+BEGIN
+	GetProcAddress( 'glXSwapIntervalSGI' , ADDRESSOF( glXSwapIntervalSGI ));
+END Read_GLX_SGI_swap_control;
+
+PROCEDURE Read_GLX_MESA_swap_control*;
+BEGIN
+	GetProcAddress( 'glXSwapIntervalMESA' , ADDRESSOF( glXSwapIntervalMESA ));
+END Read_GLX_MESA_swap_control;
+
+
 PROCEDURE ReadExtensions*;
 BEGIN
 	(*  ReadOpenGLCore; *)
@@ -10587,12 +10610,45 @@ BEGIN
 	Read_GL_ARB_parallel_shader_compile;
 
 	Read_GLX_EXT_swap_control;
-
+	Read_GLX_SGI_swap_control;
+	Read_GLX_MESA_swap_control;
+	
 (*	KernelLog.String(" Ok. "); KernelLog.Ln;*)
 END ReadExtensions;
 
 (* utilities  *)
+
 (* Get string from address  *)
+PROCEDURE GetStringFromAddr*(adr0: ADDRESS): Strings.String;
+VAR s {UNTRACED}: POINTER {UNSAFE} TO ARRAY OF CHAR;
+	str: Strings.String;
+	size, pos: SIZE; 
+BEGIN
+	
+	s := adr0;
+	pos := 0;
+	IF adr0 # NIL THEN 
+		WHILE s[pos] # 0X DO
+			INC(pos);
+		END;
+		size := pos + 1;
+		NEW(str, size);
+		pos := 0;
+		WHILE s[pos] # 0X DO
+			str[pos] := s[pos];
+			INC(pos);
+		END;
+		
+	ELSE NEW(str, 1);
+	END;
+	
+	str[pos] := 0X;
+	RETURN str;	
+	
+END GetStringFromAddr;
+
+(*
+
 PROCEDURE GetStringFromAddr*(adr: ADDRESS): Strings.String;
 VAR
 	sadr, sadr1: ADDRESS;
@@ -10624,6 +10680,7 @@ BEGIN
 	END;
 	RETURN s;
 END GetStringFromAddr;
+*)
 
 (* wrapper procedures  *)
 PROCEDURE GetString*(name: Enum): Strings.String;
@@ -10755,16 +10812,18 @@ BEGIN
 		IF (GetIntegerv # NIL) & (XglGetStringi # NIL) THEN
 			GetIntegerv(GLC.GL_NUM_EXTENSIONS, ADDRESSOF(extensionCount));
 			NEW(strarray, extensionCount);
-			KernelLog.String("Extension Count: "); KernelLog.Int(extensionCount, 0); KernelLog.Ln;
+			(*KernelLog.String("Extension Count: "); KernelLog.Int(extensionCount, 0); KernelLog.Ln;*)
 			FOR i:=0 TO extensionCount-1 DO
 				es := GetStringi(GLC.GL_EXTENSIONS, i);
 				strarray[i] := es;
 			END;
-			IF extensionCount>0 THEN buffer0 := Strings.Join(strarray, 0, extensionCount-1, " ") END;
+			buffer0 := Strings.Join(strarray, 0, extensionCount-1, " ");
+
 		END;
 	ELSE
 		(* general extension string  *)
 		IF XglGetString = NIL THEN GetProcAddress ("glGetString", ADDRESSOF( XglGetString)); END;
+
 		IF XglGetString # NIL THEN buffer0 := GetString(GLC.GL_EXTENSIONS); END;
 	END;
 (*
@@ -11352,6 +11411,9 @@ BEGIN
 	GLX_EXT_swap_control := Int_CheckExtension(Buffer, 'GLX_EXT_swap_control');
 	GLX_EXT_create_context_es2_profile := Int_CheckExtension(Buffer, 'GLX_EXT_create_context_es2_profile');
 	GLX_ARB_context_flush_control := Int_CheckExtension(Buffer, 'GLX_ARB_context_flush_control');
+	
+	GLX_SGI_swap_control := Int_CheckExtension(Buffer, 'GLX_SGI_swap_control');
+	GLX_MESA_swap_control := Int_CheckExtension(Buffer, 'GLX_MESA_swap_control');
 
 	(* ImplementationRead := TRUE; *)
 END ReadImplementationProperties;
@@ -11416,24 +11478,21 @@ END OnClose;
 
 BEGIN
 
-	Modules.InstallTermHandler(OnClose);
-
 	(* add following serach paths for libGL.so.1 to mulitiarch i386 systems*)
-	(* nvidia *)
-	libraryPaths[0] := "/usr/lib32";
 
 	(* amd, ati *)
-	libraryPaths[1] := "/usr/lib/i386-linux-gnu/fglrx";
-
+	libraryPaths[0] := "/usr/lib/i386-linux-gnu/fglrx";
 
 	(* mesa *)
-	libraryPaths[2] := "/usr/lib/i386-linux-gnu";
-	
+	libraryPaths[1] := "/usr/lib/i386-linux-gnu/mesa";
 
 	(* local, libGL.so.1 needs to be 32bit *)
-	libraryPaths[3] := "/usr/local/lib";
+	libraryPaths[2] := "/usr/local/lib";
 
 	InitOpenGL();
 	ReadOpenGLCore();
+	
+	Modules.InstallTermHandler(OnClose);
+		
 END OpenGL.
 

@@ -157,16 +157,17 @@ TYPE
 
 
 	BEGIN
-		MainLoop();
+
 	END MyGLControl;
 
 PROCEDURE Open*;
 VAR
 	mywin: MyGLControl;
 BEGIN
-	NEW(mywin, 300,300);
+	NEW(mywin, 640, 480);
 END Open;
 
+BEGIN
 END OGLDemo1.
 
 OGLDemo1.Open~

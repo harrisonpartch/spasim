@@ -2,7 +2,7 @@ MODULE N2qeD84Fv78X2XEj8PtU666;(*anonymous module created by saboteur*)
   
 IMPORT Objects, Base,  FRep, Out:=KernelLog, Random;
 
-TYPE Ray = Base.Ray;
+TYPE
 	Voxel = Base.Voxel;  
 	PT =Base.PT;
 VAR 

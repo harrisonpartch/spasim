@@ -102,17 +102,17 @@ BEGIN
 END PrintOpenGLError;
 
 PROCEDURE PrintShaderSource*(obj: Uint);
-VAR sourceLength, sslength: LONGINT;
+VAR sourceLength: LONGINT;
 	ssource: Strings.String;
+	sslength: gl.Sizei;
 BEGIN
-(*	gl.GetShaderiv(obj, glc.GL_SHADER_SOURCE_LENGTH, ADDRESSOF(sourceLength));
+	gl.GetShaderiv(obj, glc.GL_SHADER_SOURCE_LENGTH, ADDRESSOF(sourceLength));
 	(* wr.Int(obj, 0);  wr.String(" sourceLength= "); wr.Int(sourceLength, 0); wr.Ln; *)
 	NEW(ssource, sourceLength);
 	gl.GetShaderSource(obj, sourceLength, sslength, ADDRESSOF(ssource^[0]));
 	wr.String("************** SOURCE *********************************"); wr.Ln;
 	wr.String(ssource^); wr.Ln;
 	wr.String("*******************************************************"); wr.Ln; wr.Update;
-*)
 END PrintShaderSource;
 
 PROCEDURE PrintShaderInfoLog*(CONST tit: ARRAY OF CHAR; obj: Uint);
@@ -235,9 +235,10 @@ BEGIN
 		IF fs # -1 THEN
 			(* Create a program and attach the two compiled shaders *)
 			prog := gl.CreateProgram();
-			res := AttachAndLinkProgram(prog, vs, fs);  
+			res := AttachAndLinkProgram(prog, vs, fs);
 		END;
 	END;
+
 	RETURN res;
 END LoadTheseShaders;
 
@@ -302,7 +303,7 @@ BEGIN
 		fss :=TextFileRead(fragshaderFile);
 		IF fss # NIL THEN
 			ok := LoadTheseShaders2(vss^, fss^, locat0, locat1, program);
-			IF ~ok THEN program := 0 END;
+			IF ~ ok THEN program := 0 END;
 		END;
 	END;
 	RETURN program

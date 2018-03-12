@@ -346,8 +346,9 @@ CONST
 	WM_MBUTTONDOWN* = 519 (* {0..2, 9} *);
 	WM_MBUTTONUP* = 520 (* {3, 9} *);
 	WM_MBUTTONDBLCLK* = 521 (* {0, 3, 9} *);
-	WM_MOUSELAST* = 521 (* {0, 3, 9} *);
 	WM_MOUSEWHEEL* = 522;
+	WM_MOUSELAST* = 522 (* {1, 3, 9} *);
+	
 	WM_PARENTNOTIFY* = 528 (* {4, 9} *);
 	MENULOOP_WINDOW* = 0 (* {} *);
 	MENULOOP_POPUP* = 1 (* {0} *);
@@ -616,8 +617,8 @@ CONST
 	HWND* = HANDLE;
 	HBITMAP* = HANDLE;
 	HFONT* = HANDLE;
-(*	WORD* = INTEGER;
-	DWORD* = LONGINT; *)
+(*	WORD* = INTEGER;*)
+	DWORD* = LONGINT;
 
 	RGBQUAD* = RECORD
 		rgbBlur*, rgbGreen*, rgbRed*, rgbReserved*: CHAR;
@@ -668,10 +669,10 @@ CONST
 	END;
 
 
-	PIXELFORMATDESCRIPTOR* = RECORD
+	PIXELFORMATDESCRIPTOR* = RECORD 
 		nSize*: INTEGER;
 		nVersion*: INTEGER;
-		dwFlags*: SET;
+		dwFlags*:DWORD ;
 		iPixelType*: CHAR;
 		cColorBits*: CHAR;
 		cRedBits*: CHAR;
@@ -692,9 +693,9 @@ CONST
 		cAuxBuffers*: CHAR;
 		iLayerType*: CHAR;
 		bReserved*: CHAR;
-		dwLayerMask*: SET;
-		dwVisibleMask*: SET;
-		dwDamageMask*: SET;
+		dwLayerMask*: DWORD;
+		dwVisibleMask*: DWORD;
+		dwDamageMask*: DWORD;
 	END;
 
 	CREATESTRUCTA* = RECORD
@@ -706,10 +707,10 @@ CONST
 		cx*: LONGINT;
 		y*: LONGINT;
 		x*: LONGINT;
-		style*: SET;
+		style*: DWORD;
 		lpszName*: LONGINT;
 		lpszClass*:LONGINT;
-		dwExStyle*: SET;
+		dwExStyle*: DWORD;
 	END;
 
 	CREATESTRUCTW* = RECORD
@@ -721,10 +722,10 @@ CONST
 		cx*: LONGINT;
 		y*: LONGINT;
 		x*: LONGINT;
-		style*: SET;
+		style*: DWORD;
 		lpszName*: LONGINT;
 		lpszClass*: LONGINT;
-		dwExStyle*: SET;
+		dwExStyle*: DWORD;
 	END;
 	CREATESTRUCT* = CREATESTRUCTA;
 
@@ -865,7 +866,7 @@ VAR
 
 
 	(* USER32.dll *)
-	AdjustWindowRectEx-: PROCEDURE {WINAPI} (VAR lpRect: User32.Rect (* ADDRESS *); dwStyle: SET; bMenu: BOOL; dwExStyle: SET): BOOL;
+	AdjustWindowRectEx-: PROCEDURE {WINAPI} (VAR lpRect: User32.Rect (* ADDRESS *); dwStyle: DWORD; bMenu: BOOL; dwExStyle: DWORD): BOOL;
 	ClientToScreen- : PROCEDURE {WINAPI} (hWnd: HWND; VAR lpPoint: User32.Point): BOOL;
 	FindWindow- : PROCEDURE {WINAPI} (CONST lpClassName: ARRAY OF CHAR; CONST lpWindowName: ARRAY OF CHAR): HWND;
 	GetDesktopWindow-: PROCEDURE {WINAPI} (): HWND;
@@ -876,6 +877,7 @@ VAR
 *)
 	ChangeDisplaySettings-: PROCEDURE{WINAPI} (lpDevMode: ADDRESS (*DEVMODEA*); dwFlags: SET): LONGINT;
 
+(*
 
 PROCEDURE GetDC*(hwn: HANDLE): HDC;
 BEGIN
@@ -892,7 +894,7 @@ BEGIN
 	RETURN User32.ReleaseDC(hwn, hdc);
 END ReleaseDC;
 
-PROCEDURE SelectObject*(hdc: HDC; hbm: HBITMAP): LONGINT;
+PROCEDURE SelectObject*(hdc: HDC; hbm: HBITMAP): ;
 BEGIN
 	RETURN GDI32.SelectObject(hdc, hbm);
 END SelectObject;
@@ -906,6 +908,7 @@ PROCEDURE CreateCompatibleDC*(hdc: HDC): HDC;
 BEGIN
 	RETURN GDI32.CreateCompatibleDC(hdc);
 END CreateCompatibleDC;
+*)
 
 PROCEDURE InitWinApiLibs;
 BEGIN

@@ -33,7 +33,7 @@ TYPE
 	Byte* = SIGNED8; 		(* 1 byte signed *)
 	Short* = INTEGER; 	(* 2 bytes signed *)
 	Int* = LONGINT; 	(* 4 bytes signed *)
-	Sizei* = SIZE; 	(* 4 bytes signed *)
+	Sizei* = LONGINT; 	(* 4 bytes signed	 SIZE ??? *)
 	Ubyte* = UNSIGNED8; 		(* 1 byte unsigned *)
 	Ushort* = UNSIGNED16;	(* 2 bytes unsigned *)
 	Uint* = UNSIGNED32;	(* 4 bytes unsigned *)
@@ -3691,7 +3691,7 @@ TYPE
 
 	WGLSWAP* = RECORD
 		hdc*: HDC;
-	    	uiFlags: Uint;
+	    	uiFlags*: Uint;
 	END;
 	PWGLSWAP* = POINTER TO ARRAY 16 OF WGLSWAP; (* WGL_SWAPMULTIPLE_MAX = 16 *)
 
@@ -11176,6 +11176,37 @@ END ReadExtensions;
 
 (* utilities *)
 (* Get string from address *)
+
+(* Get string from address  *)
+PROCEDURE GetStringFromAddr*(adr0: ADDRESS): Strings.String;
+VAR s {UNTRACED}: POINTER {UNSAFE} TO ARRAY OF CHAR;
+	str: Strings.String;
+	size, pos: SIZE; 
+BEGIN
+	
+	s := adr0;
+	pos := 0;
+	IF adr0 # NIL THEN 
+		WHILE s[pos] # 0X DO
+			INC(pos);
+		END;
+		size := pos + 1;
+		NEW(str, size);
+		pos := 0;
+		WHILE s[pos] # 0X DO
+			str[pos] := s[pos];
+			INC(pos);
+		END;
+		
+	ELSE NEW(str, 1);
+	END;
+	
+	str[pos] := 0X;
+	RETURN str;	
+	
+END GetStringFromAddr;
+
+(*
 PROCEDURE GetStringFromAddr*(adr: ADDRESS): Strings.String;
 VAR
 	sadr, sadr1: ADDRESS;
@@ -11207,6 +11238,7 @@ BEGIN
 	END;
 	RETURN s;
 END GetStringFromAddr;
+*)
 
 (* wrapper procedures  *)
 PROCEDURE GetString*(name: Enum): Strings.String;

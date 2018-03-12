@@ -318,7 +318,7 @@ END GetProcAddress;
 PROCEDURE InitGLU();
 BEGIN
 	lib := Unix.Dlopen(libname, 2);
-	ASSERT(lib # 0,102);
+	ASSERT(lib # 0, 102);
 
 	(* load GLU functions *)
 	GetProcAddress(lib, 'gluBeginCurve', ADDRESSOF( BeginCurve ));
@@ -384,7 +384,7 @@ BEGIN
 END OnClose;
 
 BEGIN
-	Modules.InstallTermHandler(OnClose);
 	InitGLU();
 	ReadVersion;
+	Modules.InstallTermHandler(OnClose);
 END GLU.

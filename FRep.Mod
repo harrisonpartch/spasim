@@ -41,11 +41,7 @@ VAR
 	rand*:Random.Sequence;
 		
 PROCEDURE &init*(c:PT; r: REAL);
-VAR
-	i,j: INTEGER;
-	theta, phi: REAL;
-	normal: PT;
-	color: Color;
+
 BEGIN
 	NEW(rand);
 	radius:=ABS(r);
@@ -121,6 +117,47 @@ BEGIN
 END mirror;
 	
 END sphere;
+
+TYPE benice*= OBJECT(FR);
+VAR 
+	D,A,B,C: REAL;
+	P,Q,R:INTEGER;
+	center*:PT;
+	rand*:Random.Sequence;
+	
+PROCEDURE pow(x: REAL; p: INTEGER): REAL;
+VAR
+	i: INTEGER;
+	r: REAL;
+BEGIN
+	r:=1;
+	FOR i:=1 TO p DO
+		r:=r*x
+	END;
+	RETURN r
+END pow;
+	
+PROCEDURE &init*(cen:PT; d,a,b,c: REAL; p,q,r: INTEGER);
+BEGIN
+	NEW(rand);
+	center:=cen;	
+	D:=d; A:=a; B:=b; C:=c; P:=p; Q:=q;
+END init;
+
+PROCEDURE d2s*(p:PT):REAL;  (* distance to surface *)
+VAR
+	x,y,z: REAL;
+BEGIN
+	x:= ABS(center.x - p.x)-A;
+	y:= ABS(center.y - p.y)-B;
+	z:= ABS(center.z - p.z)-C;
+	IF x>0 THEN x:=pow(x,P) ELSE x:=0 END;
+	IF y>0 THEN y:=pow(y,Q) ELSE y:=0 END;
+	IF z>0 THEN z:=pow(z,R) ELSE z:=0 END;		
+	RETURN(D-(x+y+z))	
+END d2s;
+
+END benice;
 
 TYPE tilednoise*= OBJECT(FR)
 VAR
