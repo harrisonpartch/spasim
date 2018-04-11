@@ -6,10 +6,10 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=2;        
-	TS=9*4;  (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
-	TW=32;
-	TH=18;
+	T=3;        
+	TS=9*8;  (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
+	TW=16;
+	TH=9;
 	W*=TS*TW;
 	H*=TS*TH;
 	CX=W DIV 2;
@@ -472,8 +472,8 @@ BEGIN
 	dphi:=cam.dphi/3;
 	theta:=cam.theta;
 	FOR i:= 0 TO 2  DO
+		phi:=cam.phi;
 		FOR j := 0 TO 2 DO 
-			phi:=cam.phi;
 			angletoray(rays[i,j],theta,phi);
 			phi:=phi+dphi;
 		END;
@@ -533,13 +533,18 @@ BEGIN
 	dphi:=cam.dphi/3;
 	theta:=cam.theta;
 	FOR i:= 0 TO 2  DO
+		phi:=cam.phi;
 		FOR j := 0 TO 2 DO 
-			phi:=cam.phi;
 			angletoray(rays[i,j],theta,phi);
 			phi:=phi+dphi;
 		END;
 		theta:=theta+dtheta;
 	END;	
+(*	angletoray(rays[0,0],cam.theta,cam.phi);
+	angletoray(rays[0,8],cam.theta,cam.phi);	
+	angletoray(rays[8,8],cam.theta,cam.phi);
+	angletoray(rays[8,0],cam.theta,cam.phi);
+*)	
 	FOR i:= 0 TO 2  DO
 		FOR j := 0 TO 2 DO 
 			rays[i,j].clr.ra := 1;
@@ -576,6 +581,41 @@ BEGIN
 		END
 	END;		
 END tessalid9;
+
+PROCEDURE tessa9(cam: Camera);
+VAR
+	i,j: LONGINT;
+	theta,phi,dtheta,dphi: REAL;
+	ray: Base.Ray;
+	pixel: Raster.Pixel;
+	r,b,g: REAL;
+BEGIN
+	angletoray(ray,cam.theta+cam.dtheta/2, cam.phi+cam.dphi/2);
+	ray.clr.ra := 1;
+	ray.clr.ga := 1;
+	ray.clr.ba := 1;
+	ray.clr.alpha:=1;
+	ray.scale := 1; 
+	ray.tscale:=1;
+	ray.dtl:=DETAIL;	
+	Base.world.Shade(ray);
+	IF ray.terminate THEN
+		r:=ray.clr.r;
+		g:=ray.clr.g;
+		b:=ray.clr.b; 
+	ELSE
+		b:= ray.clr.b + ray.clr.ba;
+		r:= ray.clr.r + ray.clr.ra/3;
+		g:= ray.clr.g + ray.clr.ga/3
+	END;
+	Base.clamp3(r,g,b);
+	Raster.SetRGB(pixel,ENTIER(r*GAMMA),ENTIER(g*GAMMA),ENTIER(b*GAMMA)); 	
+	FOR i:=0 TO 8 DO 
+		FOR j:= 0 TO 8 DO
+			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
+		END
+	END 
+END tessa9;
 
 PROCEDURE tessadd5(cam:Camera);
 	
@@ -992,10 +1032,10 @@ VAR
 BEGIN
 	splitcam(cam,a,b,c,d);
 	IF level<2 THEN
-			tessaiid9(a);
-			tessaiid9(b);
-			tessaiid9(c);
-			tessaiid9(d);
+			tessa9(a);
+			tessa9(b);
+			tessa9(c);
+			tessa9(d);
 	ELSE
 		l:=level-1;
 		ztraceu(a,l);
@@ -1016,30 +1056,30 @@ BEGIN
 			x:=a.imx - W/2;
 			y:=a.imy-H/2;		
 			IF (~saccade)&((x*x+y*y)<FV) THEN	
-				tessaid9(a); 
-			ELSE
 				tessaiid9(a); 
+			ELSE
+				tessalid9(a); 
 			END;
 			x:=b.imx - W/2;
 			y:=b.imy-H/2;		
 			IF  (~saccade)&((x*x+y*y)<FV) THEN	
-				tessaid9(b); 
+				tessaiid9(b); 
 			ELSE
-				tessaiid9(b); 			
+				tessalid9(b); 			
 			END;			
 			x:=c.imx - W/2;
 			y:=c.imy-H/2;		
 			IF  (~saccade)&((x*x+y*y)<FV) THEN		
-				tessaid9(c); 
-			ELSE
 				tessaiid9(c); 
+			ELSE
+				tessalid9(c); 
 			END;
 			x:=d.imx - W/2;
 			y:=d.imy-H/2;		
 			IF  (~saccade)&((x*x+y*y)<FV) THEN	
-				tessaid9(d); 
-			ELSE
 				tessaiid9(d); 
+			ELSE
+				tessalid9(d); 
 			END; 
 	ELSE
 		l:=level-1;
@@ -1209,14 +1249,15 @@ END splitcam;
 
 PROCEDURE moredetail*;
 BEGIN
-	foveaparameter:=ABS(foveaparameter-1);
+	foveaparameter:=foveaparameter-5;
+	IF foveaparameter<5 THEN foveaparameter:=5 END;
 	FV:=(W*W)/foveaparameter;
 END moredetail;
 
 PROCEDURE lessdetail*;
 BEGIN
-	foveaparameter:=(foveaparameter+1);
-	IF foveaparameter>30 THEN foveaparameter:=30 END;
+	foveaparameter:=(foveaparameter+5);
+	IF foveaparameter>90 THEN foveaparameter:=90 END;
 	FV:=(W*W)/foveaparameter	;
 END lessdetail;
 

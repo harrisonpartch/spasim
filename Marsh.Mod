@@ -463,16 +463,16 @@ BEGIN
 	noise[0].c:=1;		
 	noise[0].octaves:=4;
 	noise[0].persistence:=3.61;	
-	noise[0].setvoxel(axolotl);			
+	noise[0].setvoxel(sand);			
 	NEW(noise[1]);		
 	noise[1].seed:=678;		
-	noise[1].a:=2.5;
-	noise[1].b:=2.5;
-	noise[1].c:=2.5;		
+	noise[1].a:=7.5;
+	noise[1].b:=7.5;
+	noise[1].c:=7.5;		
 	noise[1].octaves:=4;
 	noise[1].persistence:=3.91;	
 	noise[1].setcolor(0.8,0.8,0,1/2);	
-	noise[1].setvoxel(axolotl);		
+	noise[1].setvoxel(serp);		
 	NEW(noise[2]);	
 	noise[2].seed:=900909;		
 	noise[2].a:=11.5;
@@ -480,7 +480,7 @@ BEGIN
 	noise[2].c:=11.5;		
 	noise[2].octaves:=4;
 	noise[2].persistence:=3.61;	
-	noise[2].setvoxel(Base.VoxelFromName("Nbenice"));		
+	noise[2].setvoxel(Base.VoxelFromName("Ngold"));		
 	NEW(noise[3]);		
 	noise[3].seed:=11117111;		
 	noise[3].a:=11;
@@ -488,7 +488,7 @@ BEGIN
 	noise[3].c:=11;		
 	noise[3].octaves:=4;
 	noise[3].persistence:=3.51;	
-	noise[3].setvoxel(xot);	
+	noise[3].setvoxel(gxy);	
 	NEW(noise[4]);		
 	noise[4].seed:=123456;		
 	noise[4].a:=11.5;
@@ -496,39 +496,25 @@ BEGIN
 	noise[4].c:=11.5;		
 	noise[4].octaves:=4;
 	noise[4].persistence:=3.31;	
-	noise[4].setvoxel(Base.VoxelFromName("NXWCxXWLIcD2LegvoGXXBiQ"));		
+	noise[4].setvoxel(wstar);		
 
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,9/10);
 	Base.setPT(up,0,0,1);
 	
-	Base.setPT(center,1/2,1/2,1/2);
+	Base.setPT(center,1/2,1/2,7/8);
 	
-	z3:=Base.VoxelFromName("NM3");	
+	z3:=Base.VoxelFromName("NM2");	
 	z3a:=Base.VoxelFromName("NM3");	
 	z3.setcolor(0,0,3,4.5,1); 
-	z3.stroke(center,1,z3a);
-	z3.FRaster(noise[2],27);		
-	z3.FRaster(noise[3],27);	
-	z3a.FRaster(noise[4],81);					
-
-
-
-
-
+	z3.FRaster(noise[1],64);		
+	z3.FRaster(noise[4],64);					
+(*	z3.stroke(center,1,z3a); *)
+	
 	NEW(plane,center,up);
-	plane.setvoxel(kat);	
-	z3.FRaster(plane,9);
-	plane.setvoxel(Base.EMPTY);	
-	Base.setPT(center,1/2,1/2,0.4);
-	z3.FRaster(plane,3);
-	Base.setPT(center,1/2,1/2,0.3);
-	z3.FRaster(plane,9);	
-	Base.setPT(center,1/2,1/2,0.2);
-	z3.FRaster(plane,9);
-	Base.setPT(center,1/2,1/2,0.1);
-	z3.FRaster(plane,9);			
+	plane.setvoxel(sfish);	
+	z3.FRaster(plane,4);
 	
  	Base.avatar:=harrison;
 	Base.avatarsize:=1000; 

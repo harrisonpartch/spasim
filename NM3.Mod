@@ -143,7 +143,6 @@ BEGIN
 				newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
 			END;
 			vdepth:=Base.distance(newxyz,xyz)/ray.scale;
-		
 			ray.xyz.x:=ray.xyz.x +(newxyz.x-xyz.x)/ray.scale;
 			ray.xyz.y:=ray.xyz.y +(newxyz.y-xyz.y)/ray.scale;
 			ray.xyz.z:=ray.xyz.z +(newxyz.z-xyz.z)/ray.scale;
@@ -273,6 +272,11 @@ BEGIN
 	blox[0,1,1]:=w;
 	blox[1,0,1]:=w;
 	blox[1,1,1]:=w;
+
+	blox[1,1,2]:=w;
+	blox[2,1,1]:=w;
+	blox[1,2,1]:=w;
+	
 END fillsierp;
 
 PROCEDURE fillcqr2*(v,w: Voxel);
