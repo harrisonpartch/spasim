@@ -472,7 +472,7 @@ BEGIN
 	noise[1].octaves:=4;
 	noise[1].persistence:=3.91;	
 	noise[1].setcolor(0.8,0.8,0,1/2);	
-	noise[1].setvoxel(serp);		
+	noise[1].setvoxel(Base.VoxelFromName("Njealouscthulhu"));		
 	NEW(noise[2]);	
 	noise[2].seed:=900909;		
 	noise[2].a:=11.5;
@@ -480,7 +480,7 @@ BEGIN
 	noise[2].c:=11.5;		
 	noise[2].octaves:=4;
 	noise[2].persistence:=3.61;	
-	noise[2].setvoxel(Base.VoxelFromName("Ngold"));		
+	noise[2].setvoxel(Base.VoxelFromName("Njealouscthulhu"));		
 	NEW(noise[3]);		
 	noise[3].seed:=11117111;		
 	noise[3].a:=11;
@@ -505,11 +505,11 @@ BEGIN
 	
 	Base.setPT(center,1/2,1/2,7/8);
 	
-	z3:=Base.VoxelFromName("NM2");	
+	z3:=Base.VoxelFromName("NM3");	
 	z3a:=Base.VoxelFromName("NM3");	
 	z3.setcolor(0,0,3,4.5,1); 
-	z3.FRaster(noise[1],64);		
-	z3.FRaster(noise[4],64);					
+	z3.FRaster(noise[1],81);		
+	z3.FRaster(noise[4],81);					
 (*	z3.stroke(center,1,z3a); *)
 	
 	NEW(plane,center,up);

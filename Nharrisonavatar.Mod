@@ -10,9 +10,9 @@ BEGIN
 END thisvox;
 
 BEGIN
-	NEW(cv,"ugandaknuckles.png");
+	NEW(cv,"diffusiontensors.png");
 	cv.passable:=TRUE;
-	cv.tscale:=0;
+	cv.tscale:=32;
 END Nharrisonavatar. 
  
  XNXLMarsh.Rez Nharrisonavatar ~
