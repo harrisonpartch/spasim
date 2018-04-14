@@ -55,7 +55,7 @@ BEGIN
 			|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
 			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 		END;											
-		color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
+		color:=texcube.side[ray.face].pixelmip_zero(lx,-ly);
 		dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
 		dr:=color.red*color.alpha*dot;
 		dg:=color.green*color.alpha*dot;
@@ -166,7 +166,7 @@ BEGIN
 		(* first approx: dirty: throw out the smallest of x y z *)
 		x:= cp.x; y:= cp.y; z:=cp.z;
 		IF z>y THEN y:=z ELSIF z>x THEN  x:=z END;	
-		color:=texture.pixel(x,y);
+		color:=texture.pixel(x,-y);
 		ray.clr.r := ray.clr.r + color.red*ray.clr.ra;
 		ray.clr.g := ray.clr.g + color.green*ray.clr.ga;
 		ray.clr.b := ray.clr.b + color.blue*ray.clr.ba;	
@@ -302,54 +302,33 @@ BEGIN
 		ELSIF mip>4 THEN
 			color:=texcube.side[ray.face].pixelmip_one(lx,ly);
 		ELSIF mip>2 THEN
-			color:=texcube.side[ray.face].pixelmip_two(lx,ly);		
-(*			color2:=texcube.side[ray.face].pixelmip_one(lx*3,ly*3);	
+			color1:=texcube.side[ray.face].pixelmip_two(lx,ly);		
+			color2:=texcube.side[ray.face].pixelmip_one(lx*3,ly*3);	
 			mix:=1+(4-mip)/10;
-			color:=Base.mixcolor(color1,color2,mix);	*)
+			color:=Base.mixcolor(color1,color2,mix);	
 		ELSE
-			color:=texcube.side[ray.face].pixel(lx,ly);
-(*			color2:=texcube.side[ray.face].pixelmip_two(lx*3,ly*3);  (* Base.Texture.pixel applies MODulo *)
+			color1:=texcube.side[ray.face].pixel(lx,ly);
+			color2:=texcube.side[ray.face].pixelmip_two(lx*3,ly*3);  (* Base.Texture.pixel applies MODulo *)
 			mix:=1+mip;
-			color:=Base.mixcolor(color1,color2,mix);		*)	
+			color:=Base.mixcolor(color1,color2,mix);			
 		END; 
-		dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
-		dr:=color.red*color.alpha*dot;
-		dg:=color.green*color.alpha*dot;
-		db:=color.blue*color.alpha*dot;	
-		(*
-		0<alpha<1/2 is interpreted as alpha on (0,1)
-		1/2<alpha<1 is mirror+texture mixed
-		*)
 		IF color.alpha<0.99 THEN
-			IF color.alpha>0.5 THEN 
-				ai:=(2*color.alpha)/2;
-				ainv:=(1-ai)/2;
-				ai:=ai/2;
-				raycolor:=ray.clr;
-				mirror(ray,0);
-				raycolor.r := raycolor.r + dr*raycolor.ra;
-				raycolor.g := raycolor.g + dg*raycolor.ga;
-				raycolor.b := raycolor.b + db*raycolor.ba;		
-				ray.clr.r := (ray.clr.r*ai + raycolor.r*ainv);
-				ray.clr.g := (ray.clr.g*ai + raycolor.g*ainv) ;
-				ray.clr.b := (ray.clr.b*ai + raycolor.b*ainv);					
+			IF color.alpha>0.8 THEN 
+					mirror(ray,0);			
 			ELSE
-				dot:=ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
-(*				dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
-				mix:=ray.length*ray.scale;
-				IF mix>1 THEN mix:=1 END;
-				dot:=mix*dot1+(1-mix)*dot2;	
-*)				dr:=color.red*color.alpha*dot;
-				dg:=color.green*color.alpha*dot;
-				db:=color.blue*color.alpha*dot;	
-				ray.clr.r := ray.clr.r + dr*ray.clr.ra;
-				ray.clr.g := ray.clr.g + dg*ray.clr.ga;
-				ray.clr.b := ray.clr.b + db*ray.clr.ba;	
+				dot:=ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
+				dr:=color.red*color.alpha*dot*ray.clr.ra;
+				dg:=color.green*color.alpha*dot*ray.clr.ga;
+				db:=color.blue*color.alpha*dot*ray.clr.b;	
+				ray.clr.r := ray.clr.r + dr;
+				ray.clr.g := ray.clr.g + dg;
+				ray.clr.b := ray.clr.b + db;	
 				ray.clr.ra:= ray.clr.ra-dr;
 				ray.clr.ga:= ray.clr.ga-dg;
 				ray.clr.ba:= ray.clr.ba-db;
-				ray.clr.alpha:=ray.clr.alpha-0.1;
-				IF ray.clr.alpha<0.1 THEN ray.terminate:=TRUE END;
+				ray.clr.alpha:=ray.clr.alpha-(dr+dg+db)/3;
+				(* IF ray.clr.alpha<0.1 THEN ray.terminate:=TRUE END; *)
+				ray.terminate:=TRUE;
 			END
 		ELSE
 			dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
@@ -359,7 +338,6 @@ BEGIN
 			ray.clr.r := ray.clr.r + dr*ray.clr.ra;
 			ray.clr.g := ray.clr.g + dg*ray.clr.ga;
 			ray.clr.b := ray.clr.b + db*ray.clr.ba;	
-			ray.clr.alpha:=0;	
 			ray.terminate:=TRUE;
 		END
 	ELSE
@@ -402,6 +380,7 @@ BEGIN
 	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
+	Base.world.Shade(ray);
 END mirror;
 
 PROCEDURE play*();
@@ -555,7 +534,7 @@ BEGIN
 				ray.clr.b := ray.clr.b + db*color.alpha;
 				ray.clr.ba:=ray.clr.ba-(db*color.alpha)-0.1;
 					IF color.alpha>0.5 THEN 
-						mirror(ray,dot) 	
+						mirror(ray,dot); 	
 					END	
 				ELSE
 					ray.clr.r := ray.clr.r + dr;

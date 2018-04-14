@@ -280,7 +280,7 @@ BEGIN
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
-	mstarget:=40;
+	mstarget:=30;
 END openwincam;
 
 (* called when idling *)

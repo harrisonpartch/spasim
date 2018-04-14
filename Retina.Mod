@@ -98,391 +98,6 @@ BEGIN
 	RETURN r;
 END interpclr;
 
-PROCEDURE tessad2(cam: Camera);
-VAR
-	i,j: LONGINT;
-	theta,phi,dtheta,dphi: REAL;
-	ray: Base.Ray;
-	pixel: Raster.Pixel;
-	r,b,g: REAL;
-BEGIN
-	dtheta:=cam.dtheta/2;
-	dphi:=cam.dphi/2;
-	theta:=cam.theta;
-	FOR i:= 0 TO 1 DO
-		phi:=cam.phi;
-		FOR j := 0 TO 1 DO 
-			ray.clr.ra := 1;
-			ray.clr.ga := 1;
-			ray.clr.ba := 1;
-			ray.clr.alpha:=1;
-			ray.scale := 1; 
-			ray.tscale:=1;
-			ray.dtl:=DETAIL;	
-			angletoray(ray,theta,phi);
-			Base.world.Shade(ray);	
-			IF ray.terminate THEN
-				r:=ray.clr.r;
-				g:=ray.clr.g;
-				b:=ray.clr.b; 
-			ELSE
-				b:= ray.clr.b + ray.clr.ba;
-				r:= ray.clr.r + ray.clr.ra/3;
-				g:= ray.clr.g + ray.clr.ga/3 
-			END;
-			Base.clamp3(r,g,b);
-			Raster.SetRGB(pixel,ENTIER(r*GAMMA),ENTIER(g*GAMMA),ENTIER(b*GAMMA)); 
-			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
-			phi:=phi+dphi;
-		END;
-		theta:=theta+dtheta;
-	END;
-END tessad2;
-
-PROCEDURE tessad3(cam: Camera);
-VAR
-	i,j: LONGINT;
-	theta,phi,dtheta,dphi: REAL;
-	ray: Base.Ray;
-	pixel: Raster.Pixel;
-	r,b,g: REAL;
-BEGIN
-	dtheta:=cam.dtheta/3;
-	dphi:=cam.dphi/3;
-	theta:=cam.theta;
-	FOR i:= 0 TO 2 DO
-		phi:=cam.phi;
-		FOR j := 0 TO 2 DO 
-			ray.clr.ra := 1;
-			ray.clr.ga := 1;
-			ray.clr.ba := 1;
-			ray.clr.alpha:=1;
-			ray.scale := 1; 
-			ray.tscale:=1;
-			ray.dtl:=DETAIL;	
-			angletoray(ray,theta,phi);
-			Base.world.Shade(ray);	
-			IF ray.terminate THEN
-				r:=ray.clr.r;
-				g:=ray.clr.g;
-				b:=ray.clr.b; 
-			ELSE
-				b:= ray.clr.b + ray.clr.ba;
-				r:= ray.clr.r + ray.clr.ra/3;
-				g:= ray.clr.g + ray.clr.ga/3 
-			END;
-			Base.clamp3(r,g,b);
-			Raster.SetRGB(pixel,ENTIER(r*GAMMA),ENTIER(g*GAMMA),ENTIER(b*GAMMA)); 
-			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
-			phi:=phi+dphi;
-		END;
-		theta:=theta+dtheta;
-	END;
-END tessad3;
-
-PROCEDURE tessadd17(cam:Camera);
-
-	PROCEDURE luma(CONST ca,cb: Base.ray_color):REAL;
-	BEGIN
-		RETURN (ca.r*ca.r+ca.g+ca.g+ca.g+ca.g)/6
-	END luma;
-	
-	PROCEDURE interpray(CONST ra,rb: Base.Ray; a: LONGINT; VAR r: Base.Ray);
-	VAR
-		b: LONGINT;
-	BEGIN
-		r.dxyz.x:= (b*ra.dxyz.x+a*rb.dxyz.x)/8;
-		r.dxyz.y:= (b*ra.dxyz.y+a*rb.dxyz.y)/8;		
-		r.dxyz.z:= (b*ra.dxyz.z+a*rb.dxyz.z)/8;	
-		r.lxyz:=Base.cameraPT;
-		r.xyz:= Base.cameraPT;
-		r.oxyz:= Base.cameraPT;
-		r.dtl:=Base.DTL;
-		r.texdtl:=1;			
-	END interpray;	
-	
-VAR
-	i,j: LONGINT;
-	theta,phi,dtheta,dphi: REAL;
-	ray: Base.Ray;
-	rays: ARRAY 9,9 OF Base.Ray;
-	pixel: Raster.Pixel;
-	r,b,g: REAL;
-	patch: ARRAY 19,19 OF Base.Color;
-	ia,ib: LONGINT;
-	
-BEGIN
-	dtheta:=cam.dtheta/9;
-	dphi:=cam.dphi/9;
-	theta:=cam.theta;
-	FOR i:= 0 TO 8  DO
-		phi:=cam.phi;
-		FOR j := 0 TO 8 DO 
-			angletoray(rays[i,j],theta,phi);
-			phi:=phi+dphi;
-		END;
-		theta:=theta+dtheta;
-	END;
-	FOR i:= 0 TO 8 BY 8 DO
-		phi:=cam.phi;
-		FOR j := 0 TO 8 BY 8 DO 
-			angletoray(rays[i,j],theta,phi);
-			phi:=phi+dphi*8;
-		END;
-		theta:=theta+dtheta*8;
-	END;
-(*	FOR j := 0 TO 8 BY 8 DO 
-		FOR i:= 1 TO 7 DO 
-			interpray(rays[0,j],rays[8,j],i,rays[i,j])
-		END
-	END;
-	FOR i:= 0 TO 8 DO
-		FOR j := 1 TO 7 DO 
-			interpray(rays[i,0],rays[i,8],j,rays[i,j])
-		END;
-	END;		
-*)
-	FOR i:= 0 TO 8 DO
-		FOR j := 0 TO 8 DO 
-			rays[i,j].clr.ra := 1;
-			rays[i,j].clr.ga := 1;
-			rays[i,j].clr.ba := 1;
-			rays[i,j].clr.alpha:=1;
-			rays[i,j].scale := 1; 
-			rays[i,j].tscale:=1;
-			rays[i,j].dtl:=DETAIL;	
-			Base.world.Shade(rays[i,j]);
-			ia:=i*2; ib:=j*2;		
-			IF rays[i,j].terminate THEN
-				patch[ia,ib].red:=rays[i,j].clr.r;
-				patch[ia,ib].green:=rays[i,j].clr.g;
-				patch[ia,ib].blue:=rays[i,j].clr.b; 
-			ELSE
-				patch[ia,ib].blue:= rays[i,j].clr.b + rays[i,j].clr.ba;
-				patch[ia,ib].red:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
-				patch[ia,ib].green:= rays[i,j].clr.g + rays[i,j].clr.ga/3 
-			END
-		END;
-	END;			
-	FOR i:= 0 TO 14 BY 2 DO 
-		FOR j := 0 TO 14 BY 2 DO  
- 			patch[i+1,j]:=interpclr(patch[i,j],patch[i+2,j]);
- 			patch[i,j+1]:=interpclr(patch[i,j],patch[i,j+2]);
- 			patch[i+2,j+1]:=interpclr(patch[i+2,j],patch[i+2,j+2]);
- 			patch[i+1,j+2]:=interpclr(patch[i,j+2],patch[i+2,j+2]); 
- 			patch[i+1,j+1]:=interpclr(patch[i,j],patch[i+2,j+2])
- 		END
-	END;
-	FOR i:=0 TO 16 DO
-		FOR j:= 0 TO 16 DO	
-			Raster.SetRGB(pixel,ENTIER(patch[i,j].red*GAMMA),ENTIER(patch[i,j].green*GAMMA),ENTIER(patch[i,j].blue*GAMMA)); 
-			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
-		END
-	END;		
-END tessadd17;
-
-PROCEDURE tessaid17(cam:Camera);
-
-	PROCEDURE luma(CONST ca,cb: Base.ray_color):REAL;
-	BEGIN
-		RETURN (ca.r*ca.r+ca.g+ca.g+ca.g+ca.g)/6
-	END luma;
-	
-VAR
-	i,j: LONGINT;
-	theta,phi,dtheta,dphi: REAL;
-	ray: Base.Ray;
-	rays: ARRAY 5,5 OF Base.Ray;
-	pixel: Raster.Pixel;
-	r,b,g: REAL;
-	patch: ARRAY 19,19 OF Base.Color;
-	ia,ib: LONGINT;
-	
-BEGIN
-	dtheta:=cam.dtheta/6;
-	dphi:=cam.dphi/6;
-	theta:=cam.theta;
-	FOR i:= 0 TO 4 DO
-		phi:=cam.phi;
-		FOR j := 0 TO 4 DO 
-			angletoray(rays[i,j],theta,phi);
-			phi:=phi+dphi;
-		END;
-		theta:=theta+dtheta;
-	END;
-	
-	FOR i:= 0 TO 4  DO
-		FOR j := 0 TO 4  DO 
-			rays[i,j].clr.ra := 1;
-			rays[i,j].clr.ga := 1;
-			rays[i,j].clr.ba := 1;
-			rays[i,j].clr.alpha:=1;
-			rays[i,j].scale := 1; 
-			rays[i,j].tscale:=1;
-			rays[i,j].dtl:=DETAIL;	
-			Base.world.Shade(rays[i,j]);
-			ia:=i*4; ib:=j*4;		
-			IF rays[i,j].terminate THEN
-				patch[ia,ib].red:=rays[i,j].clr.r;
-				patch[ia,ib].green:=rays[i,j].clr.g;
-				patch[ia,ib].blue:=rays[i,j].clr.b; 
-			ELSE
-				patch[ia,ib].blue:= rays[i,j].clr.b + rays[i,j].clr.ba;
-				patch[ia,ib].red:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
-				patch[ia,ib].green:= rays[i,j].clr.g + rays[i,j].clr.ga/3 
-			END
-		END;
-	END;		
-	FOR i:= 0 TO 8 BY 8 DO 
-		FOR j := 0 TO 8 BY 8 DO  
- 			patch[i+4,j]:=interpclr(patch[i,j],patch[i+8,j]);
- 			patch[i,j+4]:=interpclr(patch[i,j],patch[i,j+8]);
-  			patch[i+4,j+4]:=interpclr(patch[i+4,j],patch[i+8,j]);
- 			patch[i+4,j+8]:=interpclr(patch[i+8,j+8],patch[i,j+8]);	
- 			patch[i+8,j+4]:=interpclr(patch[i+8,j+8],patch[i+8,j]);		
-		END;	 
-	END;			
-	FOR i:= 0 TO 12 BY 4 DO 
-		FOR j := 0 TO 12 BY 4 DO  
- 			patch[i+2,j]:=interpclr(patch[i,j],patch[i+4,j]);
- 			patch[i+1,j]:=interpclr(patch[i,j],patch[i+2,j]);
- 			patch[i+3,j]:=interpclr(patch[i+2,j],patch[i+4,j]);
-  			patch[i+2,j+4]:=interpclr(patch[i,j+4],patch[i+4,j+4]);
- 			patch[i+1,j+4]:=interpclr(patch[i,j+4],patch[i+2,j+4]);
- 			patch[i+3,j+4]:=interpclr(patch[i+2,j+4],patch[i+4,j+4]);		
- 			FOR ia:=0 TO 4 DO
-  				patch[i+ia,j+2]:=interpclr(patch[i+ia,j],patch[i+ia,j+4]);
- 				patch[i+ia,j+1]:=interpclr(patch[i+ia,j],patch[i+ia,j+2]);
- 				patch[i+ia,j+3]:=interpclr(patch[i+ia,j+2],patch[i+ia,j+4]) 		
- 			END;		
-		END;	 
-	END;
-	FOR i:=0 TO 16 DO
-		FOR j:= 0 TO 16 DO	
-			Raster.SetRGB(pixel,ENTIER(patch[i,j].red*GAMMA),ENTIER(patch[i,j].green*GAMMA),ENTIER(patch[i,j].blue*GAMMA)); 
-			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
-		END
-	END;		
-END tessaid17;
-
-PROCEDURE tessadd9(cam:Camera);
-	
-VAR
-	i,j: LONGINT;
-	theta,phi,dtheta,dphi: REAL;
-	ray: Base.Ray;
-	rays: ARRAY 9,9 OF Base.Ray;
-	pixel: Raster.Pixel;
-	r,b,g: REAL;
-	patch: ARRAY 9,9 OF Base.Color;
-	
-BEGIN
-	dtheta:=cam.dtheta/9;
-	dphi:=cam.dphi/9;
-	theta:=cam.theta;
-		FOR i:= 0 TO 8  DO
-		phi:=cam.phi;
-		FOR j := 0 TO 8  DO 
-			angletoray(rays[i,j],theta,phi);
-			phi:=phi+dphi;
-		END;
-		theta:=theta+dtheta;
-	END;
-	FOR i:= 0 TO 8 DO
-		FOR j := 0 TO 8 DO 
-			rays[i,j].clr.ra := 1;
-			rays[i,j].clr.ga := 1;
-			rays[i,j].clr.ba := 1;
-			rays[i,j].clr.alpha:=1;
-			rays[i,j].scale := 1; 
-			rays[i,j].tscale:=1;
-			rays[i,j].dtl:=DETAIL;	
-			Base.world.Shade(rays[i,j]);
-			IF rays[i,j].terminate THEN
-				patch[i,j].red:=rays[i,j].clr.r;
-				patch[i,j].green:=rays[i,j].clr.g;
-				patch[i,j].blue:=rays[i,j].clr.b; 
-			ELSE
-				patch[i,j].blue:= rays[i,j].clr.b + rays[i,j].clr.ba;
-				patch[i,j].red:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
-				patch[i,j].green:= rays[i,j].clr.g + rays[i,j].clr.ga/3 
-			END
-		END;
-	END;			
-	FOR i:=0 TO 8 DO
-		FOR j:= 0 TO 8 DO	
-			Base.clamp3(patch[i,j].red,patch[i,j].green, patch[i,j].blue); 
-			Raster.SetRGB(pixel,ENTIER(patch[i,j].red*GAMMA),ENTIER(patch[i,j].green*GAMMA),ENTIER(patch[i,j].blue*GAMMA)); 
-			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
-		END
-	END;		
-END tessadd9;
-
-PROCEDURE tessaid9(cam:Camera);
-	
-VAR
-	i,j: LONGINT;
-	theta,phi,dtheta,dphi: REAL;
-	ray: Base.Ray;
-	rays: ARRAY 5,5 OF Base.Ray;
-	pixel: Raster.Pixel;
-	r,b,g: REAL;
-	patch: ARRAY 9,9 OF Base.Color;
-	ia,ib: LONGINT;
-	
-BEGIN
-	dtheta:=cam.dtheta/5;
-	dphi:=cam.dphi/5;
-	theta:=cam.theta;
-	FOR i:= 0 TO 4 DO
-		phi:=cam.phi;
-		FOR j := 0 TO 4 DO 
-			angletoray(rays[i,j],theta,phi);
-			phi:=phi+dphi;
-		END;
-		theta:=theta+dtheta;
-	END;	
-	FOR i:= 0 TO 4  DO
-		FOR j := 0 TO 4 DO 
-			rays[i,j].clr.ra := 1;
-			rays[i,j].clr.ga := 1;
-			rays[i,j].clr.ba := 1;
-			rays[i,j].clr.alpha:=1;
-			rays[i,j].scale := 1; 
-			rays[i,j].tscale:=1;
-			rays[i,j].dtl:=DETAIL;	
-			Base.world.Shade(rays[i,j]);
-			ia:=i*2; ib:=j*2;		
-			IF rays[i,j].terminate THEN
-				patch[ia,ib].red:=rays[i,j].clr.r;
-				patch[ia,ib].green:=rays[i,j].clr.g;
-				patch[ia,ib].blue:=rays[i,j].clr.b; 
-			ELSE
-				patch[ia,ib].blue:= rays[i,j].clr.b + rays[i,j].clr.ba;
-				patch[ia,ib].red:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
-				patch[ia,ib].green:= rays[i,j].clr.g + rays[i,j].clr.ga/3 
-			END
-		END;
-	END;		
-	FOR j:= 0 TO 8 BY 2 DO 
-		FOR i := 0 TO 6 BY 2 DO  
- 			patch[i+1,j]:=interpclr(patch[i,j],patch[i+2,j]);	
-		END;	 
-	END;			
-	FOR i:= 0 TO 8 DO 
-		FOR j := 0 TO 6 BY 2 DO  
- 			patch[i,j+1]:=interpclr(patch[i,j],patch[i,j+2]);		
-		END;	 
-	END;
-	FOR i:=0 TO 8 DO
-		FOR j:= 0 TO 8 DO	
-			Base.clamp3(patch[i,j].red,patch[i,j].green, patch[i,j].blue); 
-			Raster.SetRGB(pixel,ENTIER(patch[i,j].red*GAMMA),ENTIER(patch[i,j].green*GAMMA),ENTIER(patch[i,j].blue*GAMMA)); 
-			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
-		END
-	END;		
-END tessaid9;
-
 PROCEDURE tessatile9(cam:Camera);	
 VAR
 	i,j,k,ia,ja: LONGINT;
@@ -603,6 +218,134 @@ BEGIN
 	END;		
 END tessax9;
 
+PROCEDURE tessaxd9(cam:Camera);	
+VAR
+	i,j,k: LONGINT;
+	theta,phi,dtheta,dphi: REAL;
+	ray: Base.Ray;
+	rays: ARRAY 9,9 OF Base.Ray;
+	pixel: Raster.Pixel;
+	r,b,g: REAL;
+	patch: ARRAY 9,9 OF Base.Color;
+	ia,ib: LONGINT;
+BEGIN
+	angletoray(rays[0,0],cam.theta,cam.phi);
+	angletoray(rays[8,0],cam.theta+cam.dtheta,cam.phi);
+	angletoray(rays[0,8],cam.theta,cam.phi+cam.dphi);
+	angletoray(rays[8,8],cam.theta+cam.dtheta,cam.phi+cam.dphi);	
+	rays[4,0]:=interpray(rays[0,0],rays[8,0]);
+	rays[2,0]:=interpray(rays[0,0],rays[4,0]);
+	rays[1,0]:=interpray(rays[0,0],rays[2,0]);	
+	rays[3,0]:=interpray(rays[2,0],rays[4,0]);	
+	rays[6,0]:=interpray(rays[4,0],rays[8,0]);
+	rays[5,0]:=interpray(rays[4,0],rays[6,0]);	
+	rays[7,0]:=interpray(rays[6,0],rays[8,0]);		
+	rays[4,8]:=interpray(rays[0,8],rays[8,8]);
+	rays[2,8]:=interpray(rays[0,8],rays[4,8]);
+	rays[1,8]:=interpray(rays[0,8],rays[2,8]);	
+	rays[3,8]:=interpray(rays[2,8],rays[4,8]);	
+	rays[6,8]:=interpray(rays[4,8],rays[8,8]);
+	rays[5,8]:=interpray(rays[4,8],rays[6,8]);	
+	rays[7,8]:=interpray(rays[6,8],rays[8,8]);			
+	FOR i := 0 TO 8 DO
+		rays[i,4]:= interpray(rays[i,0],rays[i,8]);
+		rays[i,2]:= interpray(rays[i,0],rays[i,4]);
+		rays[i,1]:= interpray(rays[i,0],rays[i,2]);
+		rays[i,3]:= interpray(rays[i,2],rays[i,4]);
+		rays[i,6]:= interpray(rays[i,4],rays[i,8]);
+		rays[i,5]:= interpray(rays[i,4],rays[i,6]);
+		rays[i,7]:= interpray(rays[i,6],rays[i,8]);		
+	END;			
+	FOR i:= 0 TO 8  DO
+		FOR j := 0 TO 8 DO 
+			Base.world.Shade(rays[i,j]);	
+			IF rays[i,j].terminate THEN
+				patch[i,j].red:=rays[i,j].clr.r;
+				patch[i,j].green:=rays[i,j].clr.g;
+				patch[i,j].blue:=rays[i,j].clr.b; 
+			ELSE
+				patch[i,j].blue:= rays[i,j].clr.b + rays[i,j].clr.ba;
+				patch[i,j].red:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
+				patch[i,j].green:= rays[i,j].clr.g + rays[i,j].clr.ga/3 
+			END
+		END;
+	END;		
+	FOR i:=0 TO 8 DO
+		FOR j:= 0 TO 8 DO	
+			Base.clamp3(patch[i,j].red,patch[i,j].green, patch[i,j].blue); 
+			Raster.SetRGB(pixel,ENTIER(patch[i,j].red*GAMMA),ENTIER(patch[i,j].green*GAMMA),ENTIER(patch[i,j].blue*GAMMA)); 
+			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
+		END
+	END;		
+END tessaxd9;
+
+PROCEDURE tessaxhd9(cam:Camera);	
+VAR
+	i,j,k: LONGINT;
+	theta,phi,dtheta,dphi: REAL;
+	ray: Base.Ray;
+	rays: ARRAY 9,9 OF Base.Ray;
+	pixel: Raster.Pixel;
+	r,b,g: REAL;
+	patch: ARRAY 9,9 OF Base.Color;
+	ia,ib: LONGINT;
+BEGIN
+	angletoray(rays[0,0],cam.theta,cam.phi);
+	angletoray(rays[8,0],cam.theta+cam.dtheta,cam.phi);
+	angletoray(rays[0,8],cam.theta,cam.phi+cam.dphi);
+	angletoray(rays[8,8],cam.theta+cam.dtheta,cam.phi+cam.dphi);	
+	rays[4,0]:=interpray(rays[0,0],rays[8,0]);
+	rays[2,0]:=interpray(rays[0,0],rays[4,0]);
+	rays[1,0]:=interpray(rays[0,0],rays[2,0]);	
+	rays[3,0]:=interpray(rays[2,0],rays[4,0]);	
+	rays[6,0]:=interpray(rays[4,0],rays[8,0]);
+	rays[5,0]:=interpray(rays[4,0],rays[6,0]);	
+	rays[7,0]:=interpray(rays[6,0],rays[8,0]);		
+	rays[4,8]:=interpray(rays[0,8],rays[8,8]);
+	rays[2,8]:=interpray(rays[0,8],rays[4,8]);
+	rays[1,8]:=interpray(rays[0,8],rays[2,8]);	
+	rays[3,8]:=interpray(rays[2,8],rays[4,8]);	
+	rays[6,8]:=interpray(rays[4,8],rays[8,8]);
+	rays[5,8]:=interpray(rays[4,8],rays[6,8]);	
+	rays[7,8]:=interpray(rays[6,8],rays[8,8]);			
+	FOR i := 0 TO 8 BY 2 DO
+		rays[i,4]:= interpray(rays[i,0],rays[i,8]);
+		rays[i,2]:= interpray(rays[i,0],rays[i,4]);
+		rays[i,1]:= interpray(rays[i,0],rays[i,2]);
+		rays[i,3]:= interpray(rays[i,2],rays[i,4]);
+		rays[i,6]:= interpray(rays[i,4],rays[i,8]);
+		rays[i,5]:= interpray(rays[i,4],rays[i,6]);
+		rays[i,7]:= interpray(rays[i,6],rays[i,8]);		
+	END;			
+	FOR i:= 0 TO 8  BY 2 DO
+		FOR j := 0 TO 8 DO 
+			Base.world.Shade(rays[i,j]);	
+			IF rays[i,j].terminate THEN
+				patch[i,j].red:=rays[i,j].clr.r;
+				patch[i,j].green:=rays[i,j].clr.g;
+				patch[i,j].blue:=rays[i,j].clr.b; 
+			ELSE
+				patch[i,j].blue:= rays[i,j].clr.b + rays[i,j].clr.ba;
+				patch[i,j].red:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
+				patch[i,j].green:= rays[i,j].clr.g + rays[i,j].clr.ga/3 
+			END
+		END;
+	END;	
+	FOR i:= 1 TO 7 BY 2 DO
+		FOR j := 0 TO 8 DO 
+			patch[i,j]:=interpclr(patch[i-1,j],patch[i+1,j]);	
+		END
+	END;	
+	FOR i:=0 TO 8 DO
+		FOR j:= 0 TO 8 DO	
+			Base.clamp3(patch[i,j].red,patch[i,j].green, patch[i,j].blue); 
+			Raster.SetRGB(pixel,ENTIER(patch[i,j].red*GAMMA),ENTIER(patch[i,j].green*GAMMA),ENTIER(patch[i,j].blue*GAMMA)); 
+			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
+		END
+	END;		
+END tessaxhd9;
+
+
 PROCEDURE tessaix9(cam:Camera);
 	
 VAR
@@ -646,7 +389,7 @@ BEGIN
 			patch[i+1,j]:=interpclr(patch[i,j],patch[i+2,j]);  
  			patch[i+3,j]:=interpclr(patch[i+2,j],patch[i+4,j]);	
 			patch[i+2,j+4]:=interpclr(patch[i,j+4],patch[i+4,j+4]);
-			patch[i+1,j+4]:=interpclr(patch[i,j+4],patch[i+3,j+4]);  
+			patch[i+1,j+4]:=interpclr(patch[i,j+4],patch[i+2,j+4]);  
  			patch[i+3,j+4]:=interpclr(patch[i+2,j+4],patch[i+4,j+4]);	
 		  	FOR k := 0 TO 4 DO
 				patch[i+k,j+2]:= interpclr(patch[i+k,j],patch[i+k,j+4]);
@@ -663,133 +406,6 @@ BEGIN
 		END
 	END;		
 END tessaix9;
-
-PROCEDURE tessaiid9(cam:Camera);
-	
-VAR
-	i,j: LONGINT;
-	theta,phi,dtheta,dphi: REAL;
-	ray: Base.Ray;
-	rays: ARRAY 3,3 OF Base.Ray;
-	pixel: Raster.Pixel;
-	r,b,g: REAL;
-	patch: ARRAY 9,9 OF Base.Color;
-	ia,ja: LONGINT;
-	
-BEGIN
-	dtheta:=cam.dtheta/3;
-	dphi:=cam.dphi/3;
-	theta:=cam.theta;
-	FOR i:= 0 TO 2  DO
-		phi:=cam.phi;
-		FOR j := 0 TO 2 DO 
-			angletoray(rays[i,j],theta,phi);
-			phi:=phi+dphi;
-		END;
-		theta:=theta+dtheta;
-	END;	
-	FOR i:= 0 TO 2  DO
-		FOR j := 0 TO 2 DO 
-			rays[i,j].clr.ra := 1;
-			rays[i,j].clr.ga := 1;
-			rays[i,j].clr.ba := 1;
-			rays[i,j].clr.alpha:=1;
-			rays[i,j].scale := 1; 
-			rays[i,j].tscale:=1;
-			rays[i,j].dtl:=DETAIL;	
-			Base.world.Shade(rays[i,j]);
-			IF rays[i,j].terminate THEN
-				r:=rays[i,j].clr.r;
-				g:=rays[i,j].clr.g;
-				b:=rays[i,j].clr.b; 
-			ELSE
-				r:= rays[i,j].clr.b + rays[i,j].clr.ba;
-				g:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
-				b:= rays[i,j].clr.g + rays[i,j].clr.ga/3 
-			END;
-			FOR ia:= 0 TO 2  DO
-				FOR ja := 0 TO 2 DO 
-					patch[i*3+ia,j*3+ja].red:=r;
-					patch[i*3+ia,j*3+ja].green:=g;
-					patch[i*3+ia,j*3+ja].blue:=b;
-				END
-			END
-		END
-	END;		
-	FOR i:=0 TO 8 DO
-		FOR j:= 0 TO 8 DO	
-			Base.clamp3(patch[i,j].red,patch[i,j].green, patch[i,j].blue); 
-			Raster.SetRGB(pixel,ENTIER(patch[i,j].red*GAMMA),ENTIER(patch[i,j].green*GAMMA),ENTIER(patch[i,j].blue*GAMMA)); 
-			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
-		END
-	END;		
-END tessaiid9;
-
-PROCEDURE tessalid9(cam:Camera);
-	
-VAR
-	i,j: LONGINT;
-	theta,phi,dtheta,dphi: REAL;
-	ray: Base.Ray;
-	rays: ARRAY 3,3 OF Base.Ray;
-	pixel: Raster.Pixel;
-	r,b,g: REAL;
-	patch: ARRAY 9,9 OF Base.Color;
-	ia,ja: LONGINT;
-	
-BEGIN
-	dtheta:=cam.dtheta/3;
-	dphi:=cam.dphi/3;
-	theta:=cam.theta;
-	FOR i:= 0 TO 2  DO
-		phi:=cam.phi;
-		FOR j := 0 TO 2 DO 
-			angletoray(rays[i,j],theta,phi);
-			phi:=phi+dphi;
-		END;
-		theta:=theta+dtheta;
-	END;	
-(*	angletoray(rays[0,0],cam.theta,cam.phi);
-	angletoray(rays[0,8],cam.theta,cam.phi);	
-	angletoray(rays[8,8],cam.theta,cam.phi);
-	angletoray(rays[8,0],cam.theta,cam.phi);
-*)	
-	FOR i:= 0 TO 2  DO
-		FOR j := 0 TO 2 DO 
-			rays[i,j].clr.ra := 1;
-			rays[i,j].clr.ga := 1;
-			rays[i,j].clr.ba := 1;
-			rays[i,j].clr.alpha:=1;
-			rays[i,j].scale := 1; 
-			rays[i,j].tscale:=1;
-			rays[i,j].dtl:=DETAIL;	
-			Base.world.Shade(rays[i,j]);
-			IF rays[i,j].terminate THEN
-				r:=rays[i,j].clr.r;
-				g:=rays[i,j].clr.g;
-				b:=rays[i,j].clr.b; 
-			ELSE
-				r:= rays[i,j].clr.b + rays[i,j].clr.ba;
-				g:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
-				b:= rays[i,j].clr.g + rays[i,j].clr.ga/3 
-			END;
-			FOR ia:= 0 TO 2  DO
-				FOR ja := 0 TO 2 DO 
-					patch[i*3+ia,j*3+ja].red:=r;
-					patch[i*3+ia,j*3+ja].green:=g;
-					patch[i*3+ia,j*3+ja].blue:=b;
-				END
-			END
-		END
-	END;		
-	FOR i:=0 TO 8 DO
-		FOR j:= 0 TO 8 DO	
-			Base.clamp3(patch[i,j].red,patch[i,j].green, patch[i,j].blue); 
-			Raster.SetRGB(pixel,ENTIER(patch[i,j].red*GAMMA),ENTIER(patch[i,j].green*GAMMA),ENTIER(patch[i,j].blue*GAMMA)); 
-			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
-		END
-	END;		
-END tessalid9;
 
 PROCEDURE tessa9(cam: Camera);
 VAR
@@ -826,406 +442,6 @@ BEGIN
 	END 
 END tessa9;
 
-PROCEDURE tessadd5(cam:Camera);
-	
-VAR
-	i,j: LONGINT;
-	theta,phi,dtheta,dphi: REAL;
-	ray: Base.Ray;
-	rays: ARRAY 5,5 OF Base.Ray;
-	pixel: Raster.Pixel;
-	r,b,g: REAL;
-	patch: ARRAY 5,5 OF Base.Color;
-	
-BEGIN
-	dtheta:=cam.dtheta/5;
-	dphi:=cam.dphi/5;
-	theta:=cam.theta;
-		FOR i:= 0 TO 4 DO
-		phi:=cam.phi;
-		FOR j := 0 TO 4 DO 
-			angletoray(rays[i,j],theta,phi);
-			phi:=phi+dphi;
-		END;
-		theta:=theta+dtheta;
-	END;
-	FOR i:= 0 TO 4 DO
-		FOR j := 0 TO 4 DO 
-			rays[i,j].clr.ra := 1;
-			rays[i,j].clr.ga := 1;
-			rays[i,j].clr.ba := 1;
-			rays[i,j].clr.alpha:=1;
-			rays[i,j].scale := 1; 
-			rays[i,j].tscale:=1;
-			rays[i,j].dtl:=DETAIL;	
-			Base.world.Shade(rays[i,j]);
-			IF rays[i,j].terminate THEN
-				patch[i,j].red:=rays[i,j].clr.r;
-				patch[i,j].green:=rays[i,j].clr.g;
-				patch[i,j].blue:=rays[i,j].clr.b; 
-			ELSE
-				patch[i,j].blue:= rays[i,j].clr.b + rays[i,j].clr.ba;
-				patch[i,j].red:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
-				patch[i,j].green:= rays[i,j].clr.g + rays[i,j].clr.ga/3 
-			END
-		END;
-	END;			
-	FOR i:=0 TO 4 DO
-		FOR j:= 0 TO 4 DO	
-			Base.clamp3(patch[i,j].red,patch[i,j].green, patch[i,j].blue); 
-			Raster.SetRGB(pixel,ENTIER(patch[i,j].red*GAMMA),ENTIER(patch[i,j].green*GAMMA),ENTIER(patch[i,j].blue*GAMMA)); 
-			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
-		END
-	END;		
-END tessadd5;
-
-PROCEDURE tessaid5(cam:Camera);
-	
-VAR
-	i,j: LONGINT;
-	theta,phi,dtheta,dphi: REAL;
-	ray: Base.Ray;
-	rays: ARRAY 3,3 OF Base.Ray;
-	pixel: Raster.Pixel;
-	r,b,g: REAL;
-	patch: ARRAY 5,5 OF Base.Color;
-	ia,ib: LONGINT;
-	
-BEGIN
-	dtheta:=cam.dtheta/5;
-	dphi:=cam.dphi/5;
-	theta:=cam.theta;
-	FOR i:= 0 TO 2 DO
-		phi:=cam.phi;
-		FOR j := 0 TO 2 DO 
-			angletoray(rays[i,j],theta,phi);
-			phi:=phi+dphi;
-		END;
-		theta:=theta+dtheta;
-	END;	
-	FOR i:= 0 TO 2  DO
-		FOR j := 0 TO 2 DO 
-			rays[i,j].clr.ra := 1;
-			rays[i,j].clr.ga := 1;
-			rays[i,j].clr.ba := 1;
-			rays[i,j].clr.alpha:=1;
-			rays[i,j].scale := 1; 
-			rays[i,j].tscale:=1;
-			rays[i,j].dtl:=DETAIL;	
-			Base.world.Shade(rays[i,j]);
-			ia:=i*2; ib:=j*2;		
-			IF rays[i,j].terminate THEN
-				patch[ia,ib].red:=rays[i,j].clr.r;
-				patch[ia,ib].green:=rays[i,j].clr.g;
-				patch[ia,ib].blue:=rays[i,j].clr.b; 
-			ELSE
-				patch[ia,ib].blue:= rays[i,j].clr.b + rays[i,j].clr.ba;
-				patch[ia,ib].red:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
-				patch[ia,ib].green:= rays[i,j].clr.g + rays[i,j].clr.ga/3 
-			END
-		END;
-	END;		
-	FOR j:= 0 TO 4 BY 2 DO 
-		FOR i := 0 TO 2 BY 2 DO  
- 			patch[i+1,j]:=interpclr(patch[i,j],patch[i+2,j]);	
-		END;	 
-	END;			
-	FOR i:= 0 TO 4 DO 
-		FOR j := 0 TO 2 BY 2 DO  
- 			patch[i,j+1]:=interpclr(patch[i,j],patch[i,j+2]);		
-		END;	 
-	END;
-	FOR i:=0 TO 4 DO
-		FOR j:= 0 TO 4 DO	
-			Base.clamp3(patch[i,j].red,patch[i,j].green, patch[i,j].blue); 
-			Raster.SetRGB(pixel,ENTIER(patch[i,j].red*GAMMA),ENTIER(patch[i,j].green*GAMMA),ENTIER(patch[i,j].blue*GAMMA)); 
-			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
-		END
-	END;		
-END tessaid5;
-
-PROCEDURE tessad5(cam: Camera);
-VAR
-	i,j: LONGINT;
-	theta,phi,dtheta,dphi: REAL;
-	ray,bray: Base.Ray;
-	pixel: Raster.Pixel;
-	r,b,g: REAL;
-	patch: ARRAY 5,5 OF Base.Color;
-BEGIN
-	dtheta:=cam.dtheta/5;
-	dphi:=cam.dphi/5;
-	theta:=cam.theta;
-	FOR i:= 0 TO 4 BY 2 DO
-		phi:=cam.phi;
-		FOR j := 0 TO 4 BY 2 DO 
-			ray:=bray;
-			angletoray(ray,theta,phi);
-			ray.clr.ra := 1;
-			ray.clr.ga := 1;
-			ray.clr.ba := 1;
-			ray.clr.alpha:=1;
-			ray.scale := 1; 
-			ray.tscale:=1;
-			ray.dtl:=DETAIL;	
-			Base.world.Shade(ray);
-			IF ray.terminate THEN
-				patch[i,j].red:=ray.clr.r;
-				patch[i,j].green:=ray.clr.g;
-				patch[i,j].blue:=ray.clr.b; 
-			ELSE
-				patch[i,j].blue:= ray.clr.b + ray.clr.ba;
-				patch[i,j].red:= ray.clr.r + ray.clr.ra/3;
-				patch[i,j].green:= ray.clr.g + ray.clr.ga/3 
-			END;
-			phi:=phi+dphi*2;
-		END;
-		theta:=theta+dtheta*2;
-	END;
-	patch[0,1].red:=(patch[0,0].red+patch[0,2].red)/2;
-	patch[0,1].green:=(patch[0,0].green+patch[0,2].green)/2;
-	patch[0,1].blue:=(patch[0,0].blue+patch[0,2].blue)/2;
-			
-	patch[0,3].red:=(patch[0,2].red+patch[0,4].red)/2;
-	patch[0,3].green:=(patch[0,2].green+patch[0,4].green)/2;
-	patch[0,3].blue:=(patch[0,2].blue+patch[0,4].blue)/2;			
-			
-	patch[2,1].red:=(patch[2,0].red+patch[2,2].red)/2;
-	patch[2,1].green:=(patch[2,0].green+patch[2,2].green)/2;
-	patch[2,1].blue:=(patch[2,0].blue+patch[2,2].blue)/2;
-			
-	patch[2,3].red:=(patch[2,2].red+patch[2,4].red)/2;
-	patch[2,3].green:=(patch[2,2].green+patch[2,4].green)/2;
-	patch[2,3].blue:=(patch[2,2].blue+patch[2,4].blue)/2;			
-
-	patch[4,1].red:=(patch[4,0].red+patch[4,2].red)/2;
-	patch[4,1].green:=(patch[4,0].green+patch[4,2].green)/2;
-	patch[4,1].blue:=(patch[4,0].blue+patch[4,2].blue)/2;
-			
-	patch[4,3].red:=(patch[4,2].red+patch[4,4].red)/2;
-	patch[4,3].green:=(patch[4,2].green+patch[4,4].green)/2;
-	patch[4,3].blue:=(patch[4,2].blue+patch[4,4].blue)/2;		
-	
-	FOR i:=1 TO 3 BY 2 DO
-		FOR j:= 0 TO 4 DO
-			patch[i,j].red:=(patch[i-1,j].red+patch[i+1,j].red)/2;
-			patch[i,j].green:=(patch[i-1,j].green+patch[i+1,j].green)/2;		
-			patch[i,j].blue:=(patch[i-1,j].blue+patch[i+1,j].blue)/2
-		END
-	END;
-	FOR i:=0 TO 4 DO
-		FOR j:= 0 TO 4 DO
-			Base.clamp3(patch[i,j].red,patch[i,j].green, patch[i,j].blue); 
-			Raster.SetRGB(pixel,ENTIER(patch[i,j].red*GAMMA),ENTIER(patch[i,j].green*GAMMA),ENTIER(patch[i,j].blue*GAMMA)); 
-			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
-		END
-	END;		
-END tessad5;
-
-PROCEDURE tessax5(cam: Camera);
-VAR
-	i,j: LONGINT;
-	theta,phi,dtheta,dphi: REAL;
-	ray: Base.Ray;
-	pixel: Raster.Pixel;
-	r,b,g: REAL;
-	patch: ARRAY 5,5 OF Base.Color;
-BEGIN
-	dtheta:=cam.dtheta/5;
-	dphi:=cam.dphi/5;
-	theta:=cam.theta;
-	FOR i:= 0 TO 4 BY 4 DO
-		phi:=cam.phi;
-		FOR j := 0 TO 4 BY 4 DO 
-			ray:=Base.blankray;		
-			ray.clr.ra := 1;
-			ray.clr.ga := 1;
-			ray.clr.ba := 1;
-			ray.clr.alpha:=1;
-			ray.scale := 1; 
-			ray.tscale:=1;
-			ray.dtl:=DETAIL;	
-			angletoray(ray,theta,phi);
-			Base.world.Shade(ray);
-			IF ray.terminate THEN
-				patch[i,j].red:=ray.clr.r;
-				patch[i,j].green:=ray.clr.g;
-				patch[i,j].blue:=ray.clr.b; 
-			ELSE
-				patch[i,j].blue:= ray.clr.b + ray.clr.ba;
-				patch[i,j].red:= ray.clr.r + ray.clr.ra/3;
-				patch[i,j].green:= ray.clr.g + ray.clr.ga/3 
-			END;
-			phi:=phi+dphi*4;
-		END;
-		theta:=theta+dtheta*4;
-	END;
-	
-	patch[0,2].red:=(patch[0,0].red+patch[0,4].red)/2;
-	patch[0,2].green:=(patch[0,0].green+patch[0,4].green)/2;
-	patch[0,2].blue:=(patch[0,0].blue+patch[0,4].blue)/2;	
-
-	patch[4,2].red:=(patch[4,0].red+patch[4,4].red)/2;
-	patch[4,2].green:=(patch[4,0].green+patch[4,4].green)/2;
-	patch[4,2].blue:=(patch[4,0].blue+patch[4,4].blue)/2;	
-	
-	patch[2,0].red:=(patch[0,0].red+patch[4,0].red)/2;
-	patch[2,0].green:=(patch[0,0].green+patch[4,0].green)/2;
-	patch[2,0].blue:=(patch[0,0].blue+patch[4,0].blue)/2;	
-	
-	patch[2,4].red:=(patch[0,4].red+patch[4,4].red)/2;
-	patch[2,4].green:=(patch[0,4].green+patch[4,4].green)/2;
-	patch[2,4].blue:=(patch[0,4].blue+patch[4,4].blue)/2;	
-	
-	patch[2,2].red:=(patch[0,0].red+patch[4,4].red)/2;
-	patch[2,2].green:=(patch[0,0].green+patch[4,4].green)/2;
-	patch[2,2].blue:=(patch[0,0].blue+patch[4,4].blue)/2;	
-	
-	patch[0,1].red:=(patch[0,0].red+patch[0,2].red)/2;
-	patch[0,1].green:=(patch[0,0].green+patch[0,2].green)/2;
-	patch[0,1].blue:=(patch[0,0].blue+patch[0,2].blue)/2;
-			
-	patch[0,3].red:=(patch[0,2].red+patch[0,4].red)/2;
-	patch[0,3].green:=(patch[0,2].green+patch[0,4].green)/2;
-	patch[0,3].blue:=(patch[0,2].blue+patch[0,4].blue)/2;			
-			
-	patch[2,1].red:=(patch[2,0].red+patch[2,2].red)/2;
-	patch[2,1].green:=(patch[2,0].green+patch[2,2].green)/2;
-	patch[2,1].blue:=(patch[2,0].blue+patch[2,2].blue)/2;
-			
-	patch[2,3].red:=(patch[2,2].red+patch[2,4].red)/2;
-	patch[2,3].green:=(patch[2,2].green+patch[2,4].green)/2;
-	patch[2,3].blue:=(patch[2,2].blue+patch[2,4].blue)/2;			
-
-	patch[4,1].red:=(patch[4,0].red+patch[4,2].red)/2;
-	patch[4,1].green:=(patch[4,0].green+patch[4,2].green)/2;
-	patch[4,1].blue:=(patch[4,0].blue+patch[4,2].blue)/2;
-			
-	patch[4,3].red:=(patch[4,2].red+patch[4,4].red)/2;
-	patch[4,3].green:=(patch[4,2].green+patch[4,4].green)/2;
-	patch[4,3].blue:=(patch[4,2].blue+patch[4,4].blue)/2;		
-	
-	FOR i:=1 TO 3 BY 2 DO
-		FOR j:= 0 TO 4 DO
-			patch[i,j].red:=(patch[i-1,j].red+patch[i+1,j].red)/2;
-			patch[i,j].green:=(patch[i-1,j].green+patch[i+1,j].green)/2;		
-			patch[i,j].blue:=(patch[i-1,j].blue+patch[i+1,j].blue)/2
-		END
-	END;
-	FOR i:=0 TO 4 DO
-		FOR j:= 0 TO 4 DO
-			Base.clamp3(patch[i,j].red,patch[i,j].green, patch[i,j].blue); 
-			Raster.SetRGB(pixel,ENTIER(patch[i,j].red*GAMMA),ENTIER(patch[i,j].green*GAMMA),ENTIER(patch[i,j].blue*GAMMA)); 
-			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
-		END
-	END;		
-END tessax5;
-
-PROCEDURE tessa5(cam: Camera);
-VAR
-	i,j: LONGINT;
-	theta,phi,dtheta,dphi: REAL;
-	ray: Base.Ray;
-	pixel: Raster.Pixel;
-	r,b,g: REAL;
-BEGIN
-	angletoray(ray,cam.theta+cam.dtheta/2, cam.phi+cam.dphi/2);
-	ray.clr.ra := 1;
-	ray.clr.ga := 1;
-	ray.clr.ba := 1;
-	ray.clr.alpha:=1;
-	ray.scale := 1; 
-	ray.tscale:=1;
-	ray.dtl:=DETAIL;	
-	Base.world.Shade(ray);
-	IF ray.terminate THEN
-		r:=ray.clr.r;
-		g:=ray.clr.g;
-		b:=ray.clr.b; 
-	ELSE
-		b:= ray.clr.b + ray.clr.ba;
-		r:= ray.clr.r + ray.clr.ra/3;
-		g:= ray.clr.g + ray.clr.ga/3
-	END;
-	Base.clamp3(r,g,b);
-	Raster.SetRGB(pixel,ENTIER(r*GAMMA),ENTIER(g*GAMMA),ENTIER(b*GAMMA)); 	
-	FOR i:=0 TO 4 DO 
-		FOR j:= 0 TO 4 DO
-			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
-		END
-	END 
-END tessa5;
-
-PROCEDURE tessa3(cam: Camera);
-VAR
-	i,j: LONGINT;
-	theta,phi,dtheta,dphi: REAL;
-	ray: Base.Ray;
-	pixel: Raster.Pixel;
-	r,b,g: REAL;
-BEGIN
-	angletoray(ray,cam.theta+cam.dtheta/2, cam.phi+cam.dphi/2);
-	ray.clr.ra := 1;
-	ray.clr.ga := 1;
-	ray.clr.ba := 1;
-	ray.clr.alpha:=1;
-	ray.scale := 1; 
-	ray.tscale:=1;
-	ray.dtl:=DETAIL;	
-	Base.world.Shade(ray);
-	IF ray.terminate THEN
-		r:=ray.clr.r;
-		g:=ray.clr.g;
-		b:=ray.clr.b; 
-	ELSE
-		b:= ray.clr.b + ray.clr.ba;
-		r:= ray.clr.r + ray.clr.ra/3;
-		g:= ray.clr.g + ray.clr.ga/3
-	END;
-	Base.clamp3(r,g,b);	
-	Raster.SetRGB(pixel,ENTIER(r*GAMMA),ENTIER(g*GAMMA),ENTIER(b*GAMMA)); 
-	FOR i := 0 TO 2 DO
-		FOR j := 0 TO 2 DO
-			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
-		END
-	END;	
-END tessa3;
-
-PROCEDURE tessa2(cam: Camera);
-VAR
-	i,j: LONGINT;
-	theta,phi,dtheta,dphi: REAL;
-	ray: Base.Ray;
-	pixel: Raster.Pixel;
-	r,b,g: REAL;
-BEGIN
-	angletoray(ray,cam.theta+cam.dtheta/2, cam.phi+cam.dphi/2);
-	ray.clr.ra := 1;
-	ray.clr.ga := 1;
-	ray.clr.ba := 1;
-	ray.clr.alpha:=1;
-	ray.scale := 1; 
-	ray.tscale:=1;
-	ray.dtl:=DETAIL;	
-	Base.world.Shade(ray);
-	IF ray.terminate THEN
-		r:=ray.clr.r;
-		g:=ray.clr.g;
-		b:=ray.clr.b; 
-	ELSE
-		b:= ray.clr.b + ray.clr.ba;
-		r:= ray.clr.r + ray.clr.ra/3;
-		g:= ray.clr.g + ray.clr.ga/3
-	END;
-	Base.clamp3(r,g,b);	
-	Raster.SetRGB(pixel,ENTIER(r*GAMMA),ENTIER(g*GAMMA),ENTIER(b*GAMMA)); 
-	FOR i := 0 TO 1 DO
-		FOR j := 0 TO 1 DO
-			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
-		END
-	END;	
-END tessa2;
-
 PROCEDURE atrace(cam: Camera);
 VAR
 
@@ -1241,10 +457,10 @@ VAR
 BEGIN
 	splitcam(cam,a,b,c,d);
 	IF level<2 THEN
-			tessa9(a);
-			tessa9(b);
-			tessa9(c);
-			tessa9(d);
+			tessatile9(a);
+			tessatile9(b);
+			tessatile9(c);
+			tessatile9(d);
 	ELSE
 		l:=level-1;
 		ztraceu(a,l);
@@ -1258,38 +474,52 @@ PROCEDURE ztracef(cam: Camera; level: INTEGER);
 VAR
 	a,b,c,d: Camera;
 	l: INTEGER;
-	x,y: REAL;
+	x,y,D: REAL;
+	FVV:REAL;
 BEGIN
+	FVV:=3*FV;
 	splitcam(cam,a,b,c,d);
 	IF level<2 THEN
-			x:=a.imx - W/2;
+			x:=a.imx-W/2;
 			y:=a.imy-H/2;		
-			IF (~saccade)&((x*x+y*y)<FV) THEN	
-				tessax9(a); 
+			D:=(x*x+y*y);	
+			IF D<FV THEN	
+				tessaxhd9(a); 
+			ELSIF D<FVV THEN
+				tessax9(a);
 			ELSE
 				tessaix9(a); 
 			END;
-			x:=b.imx - W/2;
+ 			x:=b.imx-W/2;
 			y:=b.imy-H/2;		
-			IF  (~saccade)&((x*x+y*y)<FV) THEN	
-				tessax9(b); 
+			D:=(x*x+y*y);	
+			IF D<FV THEN	
+				tessaxhd9(b); 
+			ELSIF D<FVV THEN
+				tessax9(b);
 			ELSE
-				tessaix9(b); 			
-			END;			
-			x:=c.imx - W/2;
+				tessaix9(b); 
+			END;
+			x:=c.imx-W/2;
 			y:=c.imy-H/2;		
-			IF  (~saccade)&((x*x+y*y)<FV) THEN		
-				tessax9(c); 
+			D:=(x*x+y*y);	
+			IF D<FV THEN	
+				tessaxhd9(c); 
+			ELSIF D<FVV THEN
+				tessax9(c);
 			ELSE
 				tessaix9(c); 
 			END;
-			x:=d.imx - W/2;
-			y:=d.imy-H/2;		
-			IF  (~saccade)&((x*x+y*y)<FV) THEN	
-				tessax9(d); 
+ 			x:=b.imx-W/2;
+			y:=b.imy-H/2;		
+			D:=(x*x+y*y);	
+			IF D<FV THEN	
+				tessaxhd9(d); 
+			ELSIF D<FVV THEN
+				tessax9(d);
 			ELSE
 				tessaix9(d); 
-			END; 
+			END;		
 	ELSE
 		l:=level-1;
 		ztracef(a,l);
@@ -1307,10 +537,10 @@ VAR
 BEGIN
 	splitcam(cam,a,b,c,d);
 	IF level<2 THEN
-			tessaid9(a); 
-			tessaid9(b); 
-			tessaid9(c); 
-			tessaid9(d); 
+			tessaxhd9(a); 
+			tessaxhd9(b); 
+			tessaxhd9(c); 
+			tessaxhd9(d); 
 	ELSE
 		l:=level-1;
 		ztraced(a,l);
@@ -1473,7 +703,7 @@ PROCEDURE lessdetail*;
 BEGIN
 	foveaparameter:=(foveaparameter+5);
 	IF foveaparameter>110 THEN foveaparameter:=110 END;
-	FV:=(W*W)/foveaparameter	;
+	FV:=(W*W)/foveaparameter;
 END lessdetail;
 
 PROCEDURE decdetail*;
