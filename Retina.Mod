@@ -345,7 +345,6 @@ BEGIN
 	END;		
 END tessaxhd9;
 
-
 PROCEDURE tessaix9(cam:Camera);
 	
 VAR
@@ -477,7 +476,7 @@ VAR
 	x,y,D: REAL;
 	FVV:REAL;
 BEGIN
-	FVV:=3*FV;
+	FVV:=5.5*FV;
 	splitcam(cam,a,b,c,d);
 	IF level<2 THEN
 			x:=a.imx-W/2;
@@ -694,15 +693,15 @@ END splitcam;
 
 PROCEDURE moredetail*;
 BEGIN
-	foveaparameter:=foveaparameter-5;
-	IF foveaparameter<5 THEN foveaparameter:=5 END;
+	foveaparameter:=foveaparameter-10;
+	IF foveaparameter<1 THEN foveaparameter:=1 END;
 	FV:=(W*W)/foveaparameter;
 END moredetail;
 
 PROCEDURE lessdetail*;
 BEGIN
-	foveaparameter:=(foveaparameter+5);
-	IF foveaparameter>110 THEN foveaparameter:=110 END;
+	foveaparameter:=(foveaparameter+10);
+	IF foveaparameter>130 THEN foveaparameter:=130 END;
 	FV:=(W*W)/foveaparameter;
 END lessdetail;
 

@@ -466,13 +466,13 @@ BEGIN
 	noise[0].setvoxel(sand);			
 	NEW(noise[1]);		
 	noise[1].seed:=678;		
-	noise[1].a:=7.5;
-	noise[1].b:=7.5;
-	noise[1].c:=7.5;		
+	noise[1].a:=1.5;
+	noise[1].b:=1.5;
+	noise[1].c:=1.5;		
 	noise[1].octaves:=4;
 	noise[1].persistence:=3.91;	
 	noise[1].setcolor(0.8,0.8,0,1/2);	
-	noise[1].setvoxel(Base.VoxelFromName("Njealouscthulhu"));		
+	noise[1].setvoxel(Base.VoxelFromName("Ntensor"));		
 	NEW(noise[2]);	
 	noise[2].seed:=900909;		
 	noise[2].a:=11.5;
@@ -480,7 +480,7 @@ BEGIN
 	noise[2].c:=11.5;		
 	noise[2].octaves:=4;
 	noise[2].persistence:=3.61;	
-	noise[2].setvoxel(Base.VoxelFromName("Njealouscthulhu"));		
+	noise[2].setvoxel(bottle3);		
 	NEW(noise[3]);		
 	noise[3].seed:=11117111;		
 	noise[3].a:=11;
@@ -491,12 +491,12 @@ BEGIN
 	noise[3].setvoxel(gxy);	
 	NEW(noise[4]);		
 	noise[4].seed:=123456;		
-	noise[4].a:=11.5;
-	noise[4].b:=11.5;
-	noise[4].c:=11.5;		
+	noise[4].a:=1.5;
+	noise[4].b:=1.5;
+	noise[4].c:=1.5;		
 	noise[4].octaves:=4;
 	noise[4].persistence:=3.31;	
-	noise[4].setvoxel(wstar);		
+	noise[4].setvoxel(greensuncouple);		
 
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
@@ -507,7 +507,7 @@ BEGIN
 	
 	z3:=Base.VoxelFromName("NM3");	
 	z3a:=Base.VoxelFromName("NM3");	
-	z3.setcolor(0,0,3,4.5,1); 
+	z3.setcolor(0,13,3,14.5,1); 
 	z3.FRaster(noise[1],81);		
 	z3.FRaster(noise[4],81);					
 (*	z3.stroke(center,1,z3a); *)

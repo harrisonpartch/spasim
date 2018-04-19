@@ -3,9 +3,9 @@ IMPORT Base:=Base, TexVox;
 VAR vox: TexVox.TexVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	IF vox=NIL THEN NEW(vox,'chirkle.png')  END;
+	IF vox=NIL THEN NEW(vox,'schoolgrilfred2.png')  END;
 	vox.tscale:=0;
-	vox.passable:=FALSE;
+	vox.passable:=TRUE;
 	RETURN vox
 END thisvox;
 
