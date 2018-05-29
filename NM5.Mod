@@ -8,10 +8,9 @@ Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
 
 CONST M=5; (* defines grid size *)
 	MMO=M-1;
-	CUBERADIUS=0.9;   (*change to sqrt(3)/2 ???*)
-	NCODE="NM5";
+	CUBERADIUS=0.87;   (*change to sqrt(3)/2 ???*)
 	NL=Base.NL;
-
+	
 TYPE PT = Base.PT;
 	Color = Base.Color;
 	Ray = Base.Ray;
@@ -54,15 +53,16 @@ BEGIN
 	xyz.z := ABS(ray.lxyz.z-offset.z)* M;
 	pushxyz:=xyz;
 	IF (ray.length*ray.scale>ray.dtl) THEN
-		ray.terminate:=TRUE;
-		ray.clr.r:=1;
-		(*IF imposter#NIL THEN
+		IF imposter#NIL THEN
 			imposter.Shade(ray);
 		ELSIF nposterTF THEN
 			ray.normalTF:=TRUE;
 			ray.normal:=nposter.normal;
-			nshade(nposter,ray);
-		END;*)
+			nshade(nposter,ray)
+		ELSE
+			ray.terminate:=TRUE;
+			ray.clr.r:=1;
+		END;
 	ELSE
 		SPSME.E(xyz,ijk);
 		bounds(ijk.i,ijk.j,ijk.k,out);
@@ -142,7 +142,7 @@ BEGIN
 				END;
 				newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
 			END;
-			vdepth:=Base.distance(newxyz,xyz)/ray.scale;
+			vdepth:=dr/ray.scale;
 			ray.xyz.x:=ray.xyz.x +(newxyz.x-xyz.x)/ray.scale;
 			ray.xyz.y:=ray.xyz.y +(newxyz.y-xyz.y)/ray.scale;
 			ray.xyz.z:=ray.xyz.z +(newxyz.z-xyz.z)/ray.scale;
@@ -305,8 +305,8 @@ BEGIN
 	passable:=TRUE;
 	complex:=TRUE;
 	imposter:=Base.EMPTY;
-	code:=NCODE;
-	ncode:=NCODE
+	code:="NM5";
+	ncode:="NM5"
 END init;
 
 PROCEDURE copyclear*;
@@ -463,7 +463,7 @@ VAR
 	code: Base.Name;
 BEGIN
 	IF ~lockTF THEN
-		code:=NCODE; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
+		code:="NM5"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 		nextscale:=scale*M;
 		p.x:=p.x*M;
 		p.y:=p.y*M;
@@ -630,7 +630,7 @@ VAR
 	v: Voxel;
 	newcell: cell;
 BEGIN
-	code:=NCODE; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
+	code:="NM5"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 	MS:=M*scale;
 	TWOMS:=2*MS;
 	nextscale:=scale*M;
@@ -835,7 +835,7 @@ VAR
 	i,j,k: INTEGER;
 BEGIN
 (* copymarker code removed: this will not terminate [ie it WILL trap] if the cell is recursive *)
-	IF code=NCODE THEN
+	IF code="NM5" THEN
 		IF TRUE THEN
 			w.Bytes(code,0,NL);
 			w.RawReal(red);

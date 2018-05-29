@@ -8,8 +8,7 @@ Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
 
 CONST M=3; (* defines grid size *)
 	MMO=M-1;
-	CUBERADIUS=0.9;   (*change to sqrt(3)/2 ???*)
-	NCODE="NM3";
+	CUBERADIUS=0.867;   (*change to sqrt(3)/2 ???*)
 	NL=Base.NL;
 
 TYPE PT = Base.PT;
@@ -22,7 +21,7 @@ TYPE PT = Base.PT;
  	NCube=Base.NCube;
  	LCube=Base.LightCube;
 
-TYPE cell* = OBJECT(Voxel);
+TYPE cell = OBJECT(Voxel);
 VAR
 	nposterTF*:BOOLEAN;
 	nposter*: NCube;
@@ -56,13 +55,13 @@ BEGIN
 	IF (ray.length*ray.scale>ray.dtl) THEN
 		ray.terminate:=TRUE;
 		ray.clr.r:=1;
-		(*IF imposter#NIL THEN
+		IF imposter#NIL THEN
 			imposter.Shade(ray);
 		ELSIF nposterTF THEN
 			ray.normalTF:=TRUE;
 			ray.normal:=nposter.normal;
 			nshade(nposter,ray);
-		END;*)
+		END;
 	ELSE
 		SPSME.E(xyz,ijk);
 		bounds(ijk.i,ijk.j,ijk.k,out);
@@ -169,12 +168,12 @@ BEGIN
 					ray.lxyz.x := ABS(xyz.x - ijk.i);
 					ray.lxyz.y := ABS(xyz.y - ijk.j);
 					ray.lxyz.z := ABS(xyz.z - ijk.k);
-					ray.popdelta := Base.Origin; (* because many shaders don't set it *)
+				(*	ray.popdelta := Base.Origin; (* because many shaders don't set it *) *)
 					ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal;
 					v.Shade(ray);
-					xyz.x := xyz.x + ray.popdelta.x;
+				(*	xyz.x := xyz.x + ray.popdelta.x;
 					xyz.y := xyz.y + ray.popdelta.y;
-					xyz.z := xyz.z + ray.popdelta.z;
+					xyz.z := xyz.z + ray.popdelta.z; *)
 				ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
 				END
@@ -305,8 +304,8 @@ BEGIN
 	passable:=TRUE;
 	complex:=TRUE;
 	imposter:=Base.EMPTY;
-	code:=NCODE;
-	ncode:=NCODE
+	code:="NM3";
+	ncode:="NM3"
 END init;
 
 PROCEDURE copyclear*;
@@ -463,7 +462,7 @@ VAR
 	code: Base.Name;
 BEGIN
 	IF ~lockTF THEN
-		code:=NCODE; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
+		code:="NM3"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 		nextscale:=scale*M;
 		p.x:=p.x*M;
 		p.y:=p.y*M;
@@ -630,7 +629,7 @@ VAR
 	v: Voxel;
 	newcell: cell;
 BEGIN
-	code:=NCODE; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
+	code:="NM3"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 	MS:=M*scale;
 	TWOMS:=2*MS;
 	nextscale:=scale*M;
@@ -835,7 +834,7 @@ VAR
 	i,j,k: INTEGER;
 BEGIN
 (* copymarker code removed: this will not terminate [ie it WILL trap] if the cell is recursive *)
-	IF code=NCODE THEN
+	IF code="NM3" THEN
 		IF TRUE THEN
 			w.Bytes(code,0,NL);
 			w.RawReal(red);

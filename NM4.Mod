@@ -8,7 +8,7 @@ Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
 
 CONST M=4; (* defines grid size *)
 	MMO=M-1;
-	CUBERADIUS=0.9;   (*change to sqrt(3)/2 ???*)
+	CUBERADIUS=0.866025;   (*change to sqrt(3)/2 ???*)
 	NCODE="NM4";
 	NL=Base.NL;
 

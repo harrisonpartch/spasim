@@ -8,7 +8,7 @@ Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
 
 CONST M=10; (* defines grid size *)
 	MMO=M-1;
-	CUBERADIUS=0.9;   (*change to sqrt(3)/2 ???*)
+	CUBERADIUS=0.87;   (*change to sqrt(3)/2 ???*)
 	NCODE="NM10";
 	NL=Base.NL;
 
@@ -54,13 +54,15 @@ BEGIN
 	xyz.z := ABS(ray.lxyz.z-offset.z)* M;
 	pushxyz:=xyz;
 	IF (ray.length*ray.scale>ray.dtl) THEN
-		IF imposter#NIL THEN
+		ray.terminate:=TRUE;
+		ray.clr.r:=1;
+		(*IF imposter#NIL THEN
 			imposter.Shade(ray);
 		ELSIF nposterTF THEN
 			ray.normalTF:=TRUE;
 			ray.normal:=nposter.normal;
 			nshade(nposter,ray);
-		END;
+		END;*)
 	ELSE
 		SPSME.E(xyz,ijk);
 		bounds(ijk.i,ijk.j,ijk.k,out);
@@ -141,7 +143,6 @@ BEGIN
 				newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
 			END;
 			vdepth:=Base.distance(newxyz,xyz)/ray.scale;
-		
 			ray.xyz.x:=ray.xyz.x +(newxyz.x-xyz.x)/ray.scale;
 			ray.xyz.y:=ray.xyz.y +(newxyz.y-xyz.y)/ray.scale;
 			ray.xyz.z:=ray.xyz.z +(newxyz.z-xyz.z)/ray.scale;
@@ -271,6 +272,11 @@ BEGIN
 	blox[0,1,1]:=w;
 	blox[1,0,1]:=w;
 	blox[1,1,1]:=w;
+
+	blox[1,1,2]:=w;
+	blox[2,1,1]:=w;
+	blox[1,2,1]:=w;
+	
 END fillsierp;
 
 PROCEDURE fillcqr2*(v,w: Voxel);

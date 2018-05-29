@@ -92,8 +92,7 @@ BEGIN
 				ray.clr.ra:= ray.clr.ra-dr;
 				ray.clr.ga:= ray.clr.ga-dg;
 				ray.clr.ba:= ray.clr.ba-db;
-				ray.clr.alpha:=ray.clr.alpha-0.1;
-				IF ray.clr.alpha<0.1 THEN ray.terminate:=TRUE END;
+				IF (ray.clr.ra<0.01) OR  (ray.clr.ga<0.01) OR (ray.clr.ba<0.01) THEN ray.terminate:=TRUE END
 			END
 		ELSE
 			dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
@@ -315,21 +314,20 @@ BEGIN
 *)			color:=texcube.side[ray.face].pixel(lx,ly);	
 		END; 
 		IF color.alpha<0.99 THEN
-			IF color.alpha>0.8 THEN 
-				mirror(ray,0);			
+			IF color.alpha>0.7 THEN 
+				mirror(ray,0);	
+				IF ray.clr.alpha < 0.1 THEN ray.terminate:=TRUE END;		
 			ELSE
-				dot:=ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-				dr:=color.red*color.alpha*dot*ray.clr.ra;
-				dg:=color.green*color.alpha*dot*ray.clr.ga;
-				db:=color.blue*color.alpha*dot*ray.clr.b;	
+				dr:=color.red*color.alpha*ray.clr.ra;
+				dg:=color.green*color.alpha*ray.clr.ga;
+				db:=color.blue*color.alpha*ray.clr.b;	
 				ray.clr.r := ray.clr.r + dr;
 				ray.clr.g := ray.clr.g + dg;
 				ray.clr.b := ray.clr.b + db;	
 				ray.clr.ra:= ray.clr.ra-dr;
 				ray.clr.ga:= ray.clr.ga-dg;
 				ray.clr.ba:= ray.clr.ba-db;
-				ray.clr.alpha:=ray.clr.alpha-(dr+dg+db)/3;
-				 IF ray.clr.alpha<0.1 THEN ray.terminate:=TRUE END; 
+				IF (ray.clr.ra<0.01) OR  (ray.clr.ga<0.01) OR (ray.clr.ba<0.01) THEN ray.terminate:=TRUE END; 
 			END
 		ELSE
 			dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
@@ -343,7 +341,7 @@ BEGIN
 		END
 	ELSE
 	  (* camera is inside textured cube *)
-	END
+	END;
 END Shade;
 (*
 texture patch rays: diverge by dtheta, dphi: so distance between them at the hit is approximately
@@ -366,22 +364,24 @@ END reflect;
 
 PROCEDURE mirror(VAR ray: Ray; CONST mix: REAL);
 VAR
-	n: PT;
+	a:REAL;
 BEGIN
 	ray.hitmirrorTF := TRUE;
 	ray.hitxyz:=ray.xyz;
 	ray.changed := TRUE;
 	ray.mirrortf:=TRUE;	
-	ray.clr.ra:= ray.clr.ra + 0.2;
-	ray.clr.ga := ray.clr.ga + 0.2;
-	ray.clr.ba := ray.clr.ba + 0.2;
-	ray.clr.alpha:= ray.clr.alpha - 0.2;	
-	IF ray.clr.alpha < 0.1 THEN ray.terminate:=TRUE END;		
+	ray.clr.ra:= ray.clr.ra + 0.1;
+	ray.clr.ga := ray.clr.ga + 0.1;
+	ray.clr.ba := ray.clr.ba + 0.1;
+	ray.clr.alpha:= ray.clr.alpha - 0.1;			
 	reflect(ray.dxyz, ray.fnormal);	
 	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
-	Base.world.Shade(ray);
+	a:=1000*ray.scale;
+	ray.popdelta.x:=ray.dxyz.x/a;
+	ray.popdelta.y:=ray.dxyz.y/a;	
+	ray.popdelta.z:=ray.dxyz.z/a;
 END mirror;
 
 PROCEDURE play*();
@@ -499,21 +499,20 @@ BEGIN
 		END
 	END;
 	color:=texcube.side[ray.face].pixel(lx,ly);	
-	dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
-	dr:=color.red*dot*ray.clr.ra;
-	dg:=color.green*dot*ray.clr.ra;
-	db:=color.blue*dot*ray.clr.ra;	
-	IF color.alpha<0.9 THEN
-			ray.clr.r := ray.clr.r + dr*color.alpha;
-			ray.clr.ra:=ray.clr.ra-(dr*color.alpha)-0.1;
-			ray.clr.g := ray.clr.g + dg*color.alpha;
-			ray.clr.ga:=ray.clr.ga-(dg*color.alpha)-0.1;
-			ray.clr.b := ray.clr.b + db*color.alpha;
-			ray.clr.ba:=ray.clr.ba-(db*color.alpha)-0.1;
-			IF color.alpha>0.85 THEN 
+	IF color.alpha<0.99 THEN
+			IF color.alpha>0.75 THEN 
 				mirror(ray,dot) 
-			ELSE (* if the pixel is transparent, trace to the back side of the cube *)
-				Base.ExitF(ray,lxyz,face);
+			ELSE
+				dr:=color.red*ray.clr.ra;
+				dg:=color.green*ray.clr.ra;
+				db:=color.blue*ray.clr.ra;		
+				ray.clr.r := ray.clr.r + dr*color.alpha;
+				ray.clr.ra:=ray.clr.ra-(dr*color.alpha);
+				ray.clr.g := ray.clr.g + dg*color.alpha;
+				ray.clr.ga:=ray.clr.ga-(dg*color.alpha);
+				ray.clr.b := ray.clr.b + db*color.alpha;
+				ray.clr.ba:=ray.clr.ba-(db*color.alpha);
+				Base.ExitF(ray,lxyz,face);			 (* trace to the back side of the cube *)
 				CASE face OF
 					 0: lx := lxyz.y; ly := 1-lxyz.z; 
 					|1: lx := lxyz.x; ly := 1-lxyz.z; 
@@ -522,35 +521,38 @@ BEGIN
 					|4: lx := lxyz.x; ly := 1-lxyz.z; 
 					|5: lx := lxyz.x; ly := lxyz.y;  
 				END;
-				color:=texcube.side[ray.face].pixel(lx,ly);	
-				dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
-				dr:=color.red*dot*ray.clr.ra;
-				dg:=color.green*dot*ray.clr.ra;
-				db:=color.blue*dot*ray.clr.ra;	
-				IF color.alpha<0.9 THEN
-				ray.clr.r := ray.clr.r + dr*color.alpha;
-				ray.clr.ra:=ray.clr.ra-(dr*color.alpha)-0.1;
-				ray.clr.g := ray.clr.g + dg*color.alpha;
-				ray.clr.ga:=ray.clr.ga-(dg*color.alpha)-0.1;
-				ray.clr.b := ray.clr.b + db*color.alpha;
-				ray.clr.ba:=ray.clr.ba-(db*color.alpha)-0.1;
-					IF color.alpha>0.5 THEN 
-						mirror(ray,dot); 	
-					END	
+				color2:=texcube.side[ray.face].pixel(lx,ly);	
+				IF color2.alpha<0.99 THEN
+					IF color2.alpha>0.75 THEN 
+						mirror(ray,dot)	
+					ELSE
+						dr:=color2.red*ray.clr.ra;
+						dg:=color2.green*ray.clr.ra;
+						db:=color2.blue*ray.clr.ra;	
+						ray.clr.r := ray.clr.r + dr*color.alpha;
+						ray.clr.ra:=ray.clr.ra-(dr*color.alpha)-0.1;
+						ray.clr.g := ray.clr.g + dg*color.alpha;
+						ray.clr.ga:=ray.clr.ga-(dg*color.alpha)-0.1;
+						ray.clr.b := ray.clr.b + db*color.alpha;
+						ray.clr.ba:=ray.clr.ba-(db*color.alpha)-0.1;
+					END;
 				ELSE
-					ray.clr.r := ray.clr.r + dr;
-					ray.clr.g := ray.clr.g + dg;
-					ray.clr.b := ray.clr.b + db;	
-					ray.terminate:=TRUE
-				END			
-			END			
+					dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
+					dr:=color2.red*dot*ray.clr.ra;
+					dg:=color2.green*dot*ray.clr.ra;
+					db:=color2.blue*dot*ray.clr.ra;			
+				END	
+			END		
 	ELSE
+		dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
+		dr:=color.red*dot*ray.clr.ra;
+		dg:=color.green*dot*ray.clr.ra;
+		db:=color.blue*dot*ray.clr.ra;			
 		ray.clr.r := ray.clr.r + dr;
 		ray.clr.g := ray.clr.g + dg;
 		ray.clr.b := ray.clr.b + db;	
 		ray.terminate:=TRUE
 	END
-
 END Shade;
 
 PROCEDURE reflect(VAR p: PT; n: PT);
@@ -571,10 +573,10 @@ BEGIN
 	ray.hitxyz:=ray.xyz;
 	ray.changed := TRUE;
 	ray.mirrortf:=TRUE;	
-	ray.clr.ra:= ray.clr.ra + 0.2;
-	ray.clr.ga := ray.clr.ga + 0.2;
-	ray.clr.ba := ray.clr.ba + 0.2;
-	ray.clr.alpha:= ray.clr.alpha - 0.2;	
+	ray.clr.ra:= ray.clr.ra + 0.1;
+	ray.clr.ga := ray.clr.ga + 0.1;
+	ray.clr.ba := ray.clr.ba + 0.1;
+	ray.clr.alpha:= ray.clr.alpha - 0.1;	
 	IF ray.clr.alpha < 0.1 THEN ray.terminate:=TRUE END;		
 	n.x:=(ray.normal.x*mix+ray.fnormal.x*(1-mix));
 	n.y:=(ray.normal.y*mix+ray.fnormal.y*(1-mix));	
@@ -798,7 +800,6 @@ BEGIN
 END Shade;
 
 END NoiseVox;
-
 
 PROCEDURE nshade(CONST nc: NCube; VAR ray: Ray);
 VAR
