@@ -508,9 +508,9 @@ BEGIN
 	z3:=Base.VoxelFromName("NM3");	
 	z3a:=Base.VoxelFromName("NM3");	
 	z3.setcolor(0,0,3,5,1); 
-	z3.FRaster(noise[1],27);		
-	z3.FRaster(noise[4],27);
-	z3a.FRaster(noise[3],27);
+(*	z3.FRaster(noise[1],27);		*)
+(*	z3.FRaster(noise[4],27);
+*)	z3a.FRaster(noise[3],27);
 	NEW(plane,center,up);
 	plane.setvoxel(sfish);	
 	z3.FRaster(plane,5);						

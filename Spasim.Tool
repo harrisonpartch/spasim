@@ -71,7 +71,7 @@ NM5.Mod
 NM3.Mod
 NM2.Mod
 
-Turing.Mod
+TuringPll.Mod
 
 Nturing.Mod
 
