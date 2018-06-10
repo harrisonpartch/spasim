@@ -7,9 +7,9 @@ TYPE
 	PT=Base.PT;
 CONST
 	T=3;        
-	TS=9*8;  (*  TS MUST BE 5 MULTIPLIED BY 2**T *)
-	TW=12;
-	TH=8;
+	TS=9*8;  (*  TS MUST BE {size of unit tile} MULTIPLIED BY 2**T *)
+	TW=8;
+	TH=9;
 	W*=TS*TW;
 	H*=TS*TH;
 	CX=W DIV 2;

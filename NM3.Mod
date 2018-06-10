@@ -40,13 +40,9 @@ VAR
 	vdepth, blainv: REAL;
 	last:BOOLEAN;
 	i,j: LONGINT;
-	patchray,pray: Ray;
-	patchdx, patchdy: PT;
-	patchradiusx, patchradiusy: REAL;
 	lastlength:REAL;
 BEGIN
-	patchray:=ray;
-	ray.lastlxyz:=ray.lxyz;
+(*	ray.lastlxyz:=ray.lxyz;*)
 	ray.scale := ray.scale*M;
 	xyz.x := ABS(ray.lxyz.x-offset.x) * M;
 	xyz.y := ABS(ray.lxyz.y-offset.y) * M;
@@ -168,12 +164,12 @@ BEGIN
 					ray.lxyz.x := ABS(xyz.x - ijk.i);
 					ray.lxyz.y := ABS(xyz.y - ijk.j);
 					ray.lxyz.z := ABS(xyz.z - ijk.k);
-				(*	ray.popdelta := Base.Origin; (* because many shaders don't set it *) *)
+					ray.popdelta := Base.Origin; (* because many shaders don't set it *) 
 					ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal;
 					v.Shade(ray);
-				(*	xyz.x := xyz.x + ray.popdelta.x;
+					xyz.x := xyz.x + ray.popdelta.x;
 					xyz.y := xyz.y + ray.popdelta.y;
-					xyz.z := xyz.z + ray.popdelta.z; *)
+					xyz.z := xyz.z + ray.popdelta.z; 
 				ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
 				END

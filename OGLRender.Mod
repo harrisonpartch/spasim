@@ -353,45 +353,45 @@ VAR
 BEGIN
 	key:=CHR(ucs);
 		CASE CHR(ucs) OF		
-			"S": Retina.incdetail;
-			| "W":Retina.decdetail; 
-			|  "s" : camera.forward(-0.51*Base.speed)
-			| "w" :camera.forward(0.51*Base.speed) 
-			| "a" :camera.rightstrafe(-0.5*Base.speed)	
-			| "d" :camera.rightstrafe(0.5*Base.speed)
-			| "e": camera.upstrafe(-0.51*Base.speed)
-			| "q": camera.upstrafe(0.51*Base.speed)	
-			| "n": leftsticky:=leftsticky*1.3; upsticky:=upsticky*1.3;
-			| "m": leftsticky:=leftsticky/1.3; upsticky:=upsticky/1.3;
-			| "o": GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_NEAREST)
-			| "t": GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR)
-			| "v": ReloadShader
-			| "P": Marsh.sprout 
-			| "x": Marsh.incVN
-			| "z": Marsh.decVN		
-			| "p":  Marsh.engrain; 
-			| "1": 	CAMLOCK:=~CAMLOCK
-			| "2" : Base.gravity:= Base.gravity/1.5		
-			| "@" : Base.gravity:= 1.5*Base.gravity
+			"S": Retina.incdetail; Out.String("S Retina.incdetail");
+			| "W":Retina.decdetail; Out.String("W Retina.decdetail");
+			|  "s" : camera.forward(-0.51*Base.speed); 
+			| "w" :camera.forward(0.51*Base.speed) ; 
+			| "a" :camera.rightstrafe(-0.5*Base.speed)	; 
+			| "d" :camera.rightstrafe(0.5*Base.speed) ; 
+			| "e": camera.upstrafe(-0.51*Base.speed) ; 
+			| "q": camera.upstrafe(0.51*Base.speed) ; 
+			| "n": leftsticky:=leftsticky*1.3; upsticky:=upsticky*1.3 ; Out.String("n increase leftsticky");
+			| "m": leftsticky:=leftsticky/1.3; upsticky:=upsticky/1.3 ; Out.String("m decrease leftsticky");
+			| "o": GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_NEAREST) ; Out.String(" ");
+			| "t": GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR) ; Out.String(" ");
+			| "v": ReloadShader; Out.String("v reload toon shader");
+			| "P": Marsh.sprout ; Out.String("P Marsh.sprout");
+			| "x": Marsh.incVN ; Out.String("x Marsh.IncVN");
+			| "z": Marsh.decVN	; Out.String("z Marsh.decVN");	
+			| "p":  Marsh.engrain ; Out.String("p Marsh.engrain");
+			| "1": 	CAMLOCK:=~CAMLOCK ; Out.String(" ");
+			| "2" : Base.gravity:= Base.gravity/1.5 ; Out.String(" ");	
+			| "@" : Base.gravity:= 1.5*Base.gravity ; Out.String(" ");
 			| "3" : 
-			| "4" : Base.STOPGO
-			| "5" : Retina.Res;
-			| "6" : avaTF:=~avaTF
-			| "h" : camera.hop	
-			| " " :  Marsh.tunnelinto;
-			| "]" : mstarget:= mstarget * 102/98; 
-			| "[" : mstarget:= mstarget * 98/102; 
-			| "}": camera.aperture.width := camera.aperture.width * 101/99; camera.aperture.height := camera.aperture.height *101/99;
-			| "{":  camera.aperture.width := camera.aperture.width * 99/101;  camera.aperture.height := camera.aperture.height *99/101;
-			| "9": IF Marsh.cursorsize<999999 THEN Marsh.cursorsize:=Marsh.cursorsize * 2; Base.cursordist:=Base.cursordist/2 END
-			| "0": IF Marsh.cursorsize>1 THEN Marsh.cursorsize:=Marsh.cursorsize DIV 2; Base.cursordist:=Base.cursordist*2 END
-			| "7": Base.cursordist:=Base.cursordist*1.3
-			| "8": Base.cursordist:=Base.cursordist/1.3
-			| "l": Marsh.lines:=~Marsh.lines
-			| "g": camera.glidetoggle		
-			| "b": Marsh.showcode;		
-			| "f": curprogram := (curprogram+1 ) MOD 13; 
-			| "F": curprogram := (curprogram-1 ) MOD 13; 									
+			| "4" : Base.STOPGO ; Out.String(" ");
+			| "5" : Retina.Res ; Out.String(" ");
+			| "6" : avaTF:=~avaTF ; Out.String(" ");
+			| "h" : camera.hop ; Out.String(" ");
+			| " " :  Marsh.tunnelinto ; Out.String(" ");
+			| "]" : mstarget:= mstarget * 102/98 ; Out.String(" ");
+			| "[" : mstarget:= mstarget * 98/102 ; Out.String(" ");
+			| "}": camera.aperture.width := camera.aperture.width * 101/99; camera.aperture.height := camera.aperture.height *101/99 ; Out.String(" ");
+			| "{":  camera.aperture.width := camera.aperture.width * 99/101;  camera.aperture.height := camera.aperture.height *99/101 ; Out.String(" ");
+			| "9": IF Marsh.cursorsize<999999 THEN Marsh.cursorsize:=Marsh.cursorsize * 2; Base.cursordist:=Base.cursordist/2 END ; Out.String(" ");
+			| "0": IF Marsh.cursorsize>1 THEN Marsh.cursorsize:=Marsh.cursorsize DIV 2; Base.cursordist:=Base.cursordist*2 END ; Out.String(" ");
+			| "7": Base.cursordist:=Base.cursordist*1.3 ; Out.String(" ");
+			| "8": Base.cursordist:=Base.cursordist/1.3 ; Out.String(" ");
+			| "l": Marsh.lines:=~Marsh.lines ; Out.String(" ");
+			| "g": camera.glidetoggle ; Out.String(" ");
+			| "b": Marsh.showcode	; Out.String(" ");
+			| "f": curprogram := (curprogram+1 ) MOD 13 ; Out.String("next glsl filter");
+			| "F": curprogram := (curprogram-1 ) MOD 13 ; Out.String("previous glsl filter");							
 		ELSE (* use keysm *)
 			CASE keysym OF
 			| Inputs.KsEscape (*1BH*) : IF CAPTUREMOUSE THEN 

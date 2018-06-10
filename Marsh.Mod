@@ -475,17 +475,17 @@ BEGIN
 	noise[1].setvoxel(Base.VoxelFromName("Ntensor"));		
 	NEW(noise[2]);	
 	noise[2].seed:=900909;		
-	noise[2].a:=11.5;
-	noise[2].b:=11.5;
-	noise[2].c:=11.5;		
+	noise[2].a:=1.5;
+	noise[2].b:=3.5;
+	noise[2].c:=3.5;		
 	noise[2].octaves:=4;
 	noise[2].persistence:=3.61;	
 	noise[2].setvoxel(bottle3);		
 	NEW(noise[3]);		
 	noise[3].seed:=11117111;		
-	noise[3].a:=11;
-	noise[3].b:=11;
-	noise[3].c:=11;		
+	noise[3].a:=3;
+	noise[3].b:=2;
+	noise[3].c:=2;		
 	noise[3].octaves:=4;
 	noise[3].persistence:=3.51;	
 	noise[3].setvoxel(gxy);	
@@ -507,16 +507,19 @@ BEGIN
 	
 	z3:=Base.VoxelFromName("NM3");	
 	z3a:=Base.VoxelFromName("NM3");	
+	w3:=Base.VoxelFromName("NM3");	
 	z3.setcolor(0,0,3,5,1); 
-(*	z3.FRaster(noise[1],27);		*)
-(*	z3.FRaster(noise[4],27);
-*)	z3a.FRaster(noise[3],27);
+	z3.FRaster(noise[1],27);		
+	z3.FRaster(noise[4],27);
+	z3a.FRaster(noise[3],27);
+	noise[3].setvoxel(z3a);	
+	w3.FRaster(noise[3],27);
 	NEW(plane,center,up);
-	plane.setvoxel(sfish);	
-	z3.FRaster(plane,5);						
-	z3.stroke(center,1,z3a); 
-	
+	plane.setvoxel(sfish);			
+	z3.stroke(center,1,w3); 
+	z3.FRaster(plane,9);					
  	Base.avatar:=harrison;
+ 	
 	Base.avatarsize:=1000; 
 
 	Base.world:=z3;

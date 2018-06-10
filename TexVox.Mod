@@ -232,7 +232,7 @@ BEGIN
 			xxx:=ABS(1/2-xx);
 			yyy:=ABS(1/2-yy);
 			zzz:=ABS(1/2-zz);
-			IF FALSE OR (xxx>yyy) THEN
+			IF xxx>yyy THEN
 				IF xxx>zzz THEN
 					(* yz pyramid *)  				(*  faces come in pairs: (0,3),(2,5),(1,4) *)
 					lx:=yy; ly:=zz;
@@ -296,7 +296,7 @@ BEGIN
 			END
 		END;
 		color:=texcube.side[ray.face].pixelmip_zero(lx,ly);										
-(*		mip:=ray.length*ray.scale;
+		mip:=ray.length*ray.scale;
 		IF mip>7 THEN 	
 			color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
 		ELSIF mip>4 THEN
@@ -314,7 +314,7 @@ BEGIN
 			color:=Base.mixcolor(color1,color2,mix);			
 			color:=texcube.side[ray.face].pixel(lx,ly);	
 		END; 
-*)		IF color.alpha<0.99 THEN
+		IF color.alpha<0.99 THEN
 			IF color.alpha>0.7 THEN 
 				mirror(ray,0);	
 				IF ray.clr.alpha < 0.1 THEN ray.terminate:=TRUE END;		
@@ -513,7 +513,7 @@ BEGIN
 				ray.clr.ga:=ray.clr.ga-(dg*color.alpha);
 				ray.clr.b := ray.clr.b + db*color.alpha;
 				ray.clr.ba:=ray.clr.ba-(db*color.alpha);
-				Base.ExitF(ray,lxyz,face);			 (* trace to the back side of the cube *)
+			(*	Base.ExitF(ray,lxyz,face);			 (* trace to the back side of the cube *)
 				CASE face OF
 					 0: lx := lxyz.y; ly := 1-lxyz.z; 
 					|1: lx := lxyz.x; ly := 1-lxyz.z; 
@@ -538,11 +538,11 @@ BEGIN
 						ray.clr.ba:=ray.clr.ba-(db*color.alpha)-0.1;
 					END;
 				ELSE
-					dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
+					dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z)
 					dr:=color2.red*dot*ray.clr.ra;
 					dg:=color2.green*dot*ray.clr.ra;
 					db:=color2.blue*dot*ray.clr.ra;			
-				END	
+				END	*)
 			END		
 	ELSE
 		dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
@@ -552,7 +552,7 @@ BEGIN
 		ray.clr.r := ray.clr.r + dr;
 		ray.clr.g := ray.clr.g + dg;
 		ray.clr.b := ray.clr.b + db;	
-		ray.terminate:=TRUE
+		ray.terminate:=TRUE;
 	END
 END Shade;
 

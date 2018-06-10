@@ -1,13 +1,13 @@
 <Desktop>
-	<Window name="FileManager" loader="WMFileManager.Restore" l="36" t="110" r="536" b="510" flags="{0..2,13}"/>
 	<Window name="Backdrop" loader="WMBackdrop.Restore" l="0" t="0" r="1912" b="1078" flags="{7,9}">
 		<Configuration Image="Clouds.jp2" ChangeInterval="0" Fullscreen="false" FullscreenX="0" FullscreenY="0" FullscreenW="0" FullscreenH="0"/>
 	</Window>
-	<Window name="PET" loader="PET.Restore" l="537" t="98" r="1337" b="698" flags="{0..2,13}">
+	<Window name="FileManager" loader="WMFileManager.Restore" l="37" t="110" r="537" b="510" flags="{0..2,13}"/>
+	<Window name="PET" loader="PET.Restore" l="324" t="11" r="1124" b="611" flags="{0..2,13}">
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>
-			<Tab file="/home/harrison/spasim/Ntensor.Mod" codecFormat="AUTO" compilerOptions="-p=Linux32G -b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="152"/>
+			<Tab file="/home/harrison/spasim32/Ntensor.Mod" codecFormat="AUTO" compilerOptions="-p=Linux32G -b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="179"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
@@ -15,11 +15,11 @@
 			</Tab>
 		</PETData>
 	</Window>
-	<Window name="PET" loader="PET.Restore" l="124" t="98" r="1030" b="999" flags="{0..2,13}">
+	<Window name="PET" loader="PET.Restore" l="710" t="549" r="1616" b="1450" flags="{0..2,13}">
 		<PETData>
-			<General SelectedPageNr="6" ProjectTextFile=""/>
+			<General SelectedPageNr="0" ProjectTextFile=""/>
 			<Tab file="Spasim.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="30" cursorPos="539"/>
+				<Editor firstLine="39" cursorPos="659"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
@@ -40,16 +40,16 @@
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
 			<Tab file="TexVox.Mod" codecFormat="AUTO" compilerOptions="-p=Linux32G -b=AMD --warnings" showLabels="false" wordWrap="true">
-				<Editor firstLine="342" cursorPos="8878"/>
+				<Editor firstLine="423" cursorPos="10991"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="true" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="-ly" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="188" scratchHeight="5"/>
 			</Tab>
 			<Tab file="Marsh.Mod" codecFormat="AUTO" compilerOptions="-p=Linux32G -b=AMD --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="484" cursorPos="12033"/>
+				<Editor firstLine="449" cursorPos="11261"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<SearchPanel visible="true" wrap="true" casesensitive="true" backwards="false" highlight="false" searchString="greensuncouple" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
@@ -62,6 +62,13 @@
 			</Tab>
 			<Tab file="NM5.Mod" codecFormat="AUTO" compilerOptions="-p=Linux32G -b=AMD --warnings" showLabels="false" wordWrap="false">
 				<Editor firstLine="170" cursorPos="4858"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="NM3.Mod" codecFormat="AUTO" compilerOptions="-p=Linux32G -b=AMD --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="18" cursorPos="795"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
