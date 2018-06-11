@@ -3,8 +3,8 @@ IMPORT Base, TexVox;
 VAR vox: TexVox.TexVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	IF vox=NIL THEN NEW(vox,'heliorose.png');
-	vox.tscale:=10000;
+	IF vox=NIL THEN NEW(vox,'archaeopteryx.png');
+	vox.tscale:=0;
  	END;
 	RETURN vox
 END thisvox;

@@ -37,12 +37,11 @@ VAR
 	drx, dry, drz, dr,rr,gr,br,blr,bla: REAL;
 	out,shadenil,A,B,C: BOOLEAN;
 	v: Voxel;
-	vdepth, blainv: REAL;
+	vdepth: REAL;
 	last:BOOLEAN;
 	i,j: LONGINT;
 	lastlength:REAL;
 BEGIN
-(*	ray.lastlxyz:=ray.lxyz;*)
 	ray.scale := ray.scale*M;
 	xyz.x := ABS(ray.lxyz.x-offset.x) * M;
 	xyz.y := ABS(ray.lxyz.y-offset.y) * M;
@@ -50,14 +49,6 @@ BEGIN
 	pushxyz:=xyz;
 	IF (ray.length*ray.scale>ray.dtl) THEN
 		ray.terminate:=TRUE;
-		ray.clr.r:=1;
-		IF imposter#NIL THEN
-			imposter.Shade(ray);
-		ELSIF nposterTF THEN
-			ray.normalTF:=TRUE;
-			ray.normal:=nposter.normal;
-			nshade(nposter,ray);
-		END;
 	ELSE
 		SPSME.E(xyz,ijk);
 		bounds(ijk.i,ijk.j,ijk.k,out);
@@ -145,7 +136,6 @@ BEGIN
 			ray.hitxyz:=ray.xyz;
 			ray.length:=ray.length+vdepth;
 			blr:=black*vdepth;
-			blainv:=1-blr;	
 			rr := red*vdepth*ray.clr.ra;
 			gr := green*vdepth*ray.clr.ga;
 			br := blue*vdepth*ray.clr.ba;
@@ -156,7 +146,7 @@ BEGIN
 			ray.clr.ga := (ray.clr.ga-(gr+blr));
 			ray.clr.ba := (ray.clr.ba-(br+blr));
 			ray.clr.alpha:=ray.clr.alpha-blr;
-			IF (ray.clr.alpha<0.1) OR (ray.clr.ra<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ba<0.1)  THEN ray.terminate:=TRUE; out:=TRUE END;
+			IF (ray.clr.alpha<0.1) THEN ray.terminate:=TRUE; out:=TRUE END;
 			bounds(ijk.i,ijk.j,ijk.k, out);
 			IF ~out THEN
 				v := blox[ijk.i,ijk.j,ijk.k];

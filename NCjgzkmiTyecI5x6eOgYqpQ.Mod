@@ -13,3 +13,5 @@ BEGIN
 END thisvox;
 
 END NCjgzkmiTyecI5x6eOgYqpQ. 
+
+die.1.png

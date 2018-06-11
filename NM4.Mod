@@ -8,8 +8,7 @@ Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
 
 CONST M=4; (* defines grid size *)
 	MMO=M-1;
-	CUBERADIUS=0.866025;   (*change to sqrt(3)/2 ???*)
-	NCODE="NM4";
+	CUBERADIUS=0.867;   (*change to sqrt(3)/2 ???*)
 	NL=Base.NL;
 
 TYPE PT = Base.PT;
@@ -22,7 +21,7 @@ TYPE PT = Base.PT;
  	NCube=Base.NCube;
  	LCube=Base.LightCube;
 
-TYPE cell* = OBJECT(Voxel);
+TYPE cell = OBJECT(Voxel);
 VAR
 	nposterTF*:BOOLEAN;
 	nposter*: NCube;
@@ -38,16 +37,11 @@ VAR
 	drx, dry, drz, dr,rr,gr,br,blr,bla: REAL;
 	out,shadenil,A,B,C: BOOLEAN;
 	v: Voxel;
-	vdepth, blainv: REAL;
+	vdepth: REAL;
 	last:BOOLEAN;
 	i,j: LONGINT;
-	patchray,pray: Ray;
-	patchdx, patchdy: PT;
-	patchradiusx, patchradiusy: REAL;
 	lastlength:REAL;
 BEGIN
-	patchray:=ray;
-	ray.lastlxyz:=ray.lxyz;
 	ray.scale := ray.scale*M;
 	xyz.x := ABS(ray.lxyz.x-offset.x) * M;
 	xyz.y := ABS(ray.lxyz.y-offset.y) * M;
@@ -55,14 +49,6 @@ BEGIN
 	pushxyz:=xyz;
 	IF (ray.length*ray.scale>ray.dtl) THEN
 		ray.terminate:=TRUE;
-		ray.clr.r:=1;
-		(*IF imposter#NIL THEN
-			imposter.Shade(ray);
-		ELSIF nposterTF THEN
-			ray.normalTF:=TRUE;
-			ray.normal:=nposter.normal;
-			nshade(nposter,ray);
-		END;*)
 	ELSE
 		SPSME.E(xyz,ijk);
 		bounds(ijk.i,ijk.j,ijk.k,out);
@@ -150,7 +136,6 @@ BEGIN
 			ray.hitxyz:=ray.xyz;
 			ray.length:=ray.length+vdepth;
 			blr:=black*vdepth;
-			blainv:=1-blr;	
 			rr := red*vdepth*ray.clr.ra;
 			gr := green*vdepth*ray.clr.ga;
 			br := blue*vdepth*ray.clr.ba;
@@ -161,7 +146,7 @@ BEGIN
 			ray.clr.ga := (ray.clr.ga-(gr+blr));
 			ray.clr.ba := (ray.clr.ba-(br+blr));
 			ray.clr.alpha:=ray.clr.alpha-blr;
-			IF (ray.clr.alpha<0.1) OR (ray.clr.ra<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ba<0.1)  THEN ray.terminate:=TRUE; out:=TRUE END;
+			IF (ray.clr.alpha<0.1) THEN ray.terminate:=TRUE; out:=TRUE END;
 			bounds(ijk.i,ijk.j,ijk.k, out);
 			IF ~out THEN
 				v := blox[ijk.i,ijk.j,ijk.k];
@@ -169,12 +154,12 @@ BEGIN
 					ray.lxyz.x := ABS(xyz.x - ijk.i);
 					ray.lxyz.y := ABS(xyz.y - ijk.j);
 					ray.lxyz.z := ABS(xyz.z - ijk.k);
-					ray.popdelta := Base.Origin; (* because many shaders don't set it *)
+					ray.popdelta := Base.Origin; (* because many shaders don't set it *) 
 					ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal;
 					v.Shade(ray);
 					xyz.x := xyz.x + ray.popdelta.x;
 					xyz.y := xyz.y + ray.popdelta.y;
-					xyz.z := xyz.z + ray.popdelta.z;
+					xyz.z := xyz.z + ray.popdelta.z; 
 				ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
 				END
@@ -305,8 +290,8 @@ BEGIN
 	passable:=TRUE;
 	complex:=TRUE;
 	imposter:=Base.EMPTY;
-	code:=NCODE;
-	ncode:=NCODE
+	code:="NM4";
+	ncode:="NM4"
 END init;
 
 PROCEDURE copyclear*;
@@ -463,7 +448,7 @@ VAR
 	code: Base.Name;
 BEGIN
 	IF ~lockTF THEN
-		code:=NCODE; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
+		code:="NM4"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 		nextscale:=scale*M;
 		p.x:=p.x*M;
 		p.y:=p.y*M;
@@ -630,7 +615,7 @@ VAR
 	v: Voxel;
 	newcell: cell;
 BEGIN
-	code:=NCODE; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
+	code:="NM4"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 	MS:=M*scale;
 	TWOMS:=2*MS;
 	nextscale:=scale*M;
@@ -835,7 +820,7 @@ VAR
 	i,j,k: INTEGER;
 BEGIN
 (* copymarker code removed: this will not terminate [ie it WILL trap] if the cell is recursive *)
-	IF code=NCODE THEN
+	IF code="NM4" THEN
 		IF TRUE THEN
 			w.Bytes(code,0,NL);
 			w.RawReal(red);

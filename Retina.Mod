@@ -8,8 +8,8 @@ TYPE
 CONST
 	T=3;        
 	TS=9*8;  (*  TS MUST BE {size of unit tile} MULTIPLIED BY 2**T *)
-	TW=8;
-	TH=9;
+	TW=12;
+	TH=8;
 	W*=TS*TW;
 	H*=TS*TH;
 	CX=W DIV 2;

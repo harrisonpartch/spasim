@@ -234,18 +234,15 @@ TYPE Ray* = RECORD
 	xyz*, dxyz*, ddxyz*, lxyz*, lastlxyz*, txyz*, origin*, oxyz*, popdelta*, hitxyz*: PT;	
 	downxyz*,rightxyz*: PT;
 	theta*,phi*, dtheta*,dphi*: REAL;
-	patchdx*, patchdy*: REAL;
-(*	r*, g*, b*, ra*, ga*, ba*, bla*,alpha*: REAL; *)
 	clr*, lastclr*: ray_color;
 	mirrors*: INTEGER;
 	texcube*:TexCube;
 	texcubeTF*:BOOLEAN;
 	ncube*: NCube;
 	ncubeTF*: BOOLEAN;
-	terminate*,patchterminate*: BOOLEAN;
+	terminate*: BOOLEAN;
 	scale*,tscale*: REAL;
 	length*: REAL; 
-	len*:PT;
 	dxdi*,dydi*,dzdi*,dxdj*,dydj*,dzdj*: REAL;
 	di*,dj*,dk*: BOOLEAN;
 	changed*: BOOLEAN; 
@@ -257,11 +254,8 @@ TYPE Ray* = RECORD
 	corner*:PT;
 	dtl*: REAL;	
 	dtlTF*:BOOLEAN;
-	ispatchTF*,patchTF*: BOOLEAN;
-	patch*: ARRAY 3,3 OF ray_color; (* alpha not needed *)
 	hitmirrorTF*:BOOLEAN;
 	justhitTF*:BOOLEAN;
-	diositizeTF*:BOOLEAN;
 	texdtl*:REAL;
 END;
 
@@ -1237,7 +1231,6 @@ BEGIN
 	blankray.scale := 1; 
 	blankray.tscale:=1;
 	blankray.dtl:=0.075;	
-	blankray.ispatchTF:=FALSE;
 	blankpray.clr.ra := 1;
 	blankpray.clr.ga := 1;
 	blankpray.clr.ba := 1;
@@ -1245,7 +1238,6 @@ BEGIN
 	blankpray.scale := 1; 
 	blankpray.tscale:=1;
 	blankpray.dtl:=0.075;	
-	blankpray.ispatchTF:=TRUE;
 	m2sdelta:=25;
 	m3sdelta:=25;
 	speed:=0.00051;
