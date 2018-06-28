@@ -38,9 +38,9 @@ BEGIN
 	IF (ray.lxyz.y <0.01) OR (ray.lxyz.y > 0.99) THEN INC(ecount) END;
 	IF (ray.lxyz.z < 0.01) OR (ray.lxyz.z > 0.99) THEN INC(ecount) END;
 	IF (ecount > 1) THEN
-		ray.r := ray.r + or * ray.ra*dot;
-		ray.g := ray.g + og * ray.ga*dot;
-		ray.b := ray.b + ob * ray.ba*dot;
+		ray.clr.r := ray.clr.r + or * ray.clr.ra*dot;
+		ray.clr.g := ray.clr.g + og * ray.clr.ga*dot;
+		ray.clr.b := ray.clr.b + ob * ray.clr.ba*dot;
 		ray.terminate := TRUE;
 	END
 END Shade;

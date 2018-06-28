@@ -1,6 +1,6 @@
 MODULE RotaVox;
 
-IMPORT Base, SPSMMath, Math;
+IMPORT Base, SPSMMath, Math, NM3;
 
 TYPE Voxel=Base.Voxel;
 TYPE PT=Base.PT;
@@ -9,6 +9,7 @@ TYPE SREAL=REAL;
 
 TYPE RVox*=OBJECT(Voxel); 
 VAR
+	sabot: NM3.cell;
 	child: Voxel;
 	xphi,zphi: REAL; (* rotation angle inradians *);
 	X,Z: PT;
@@ -17,7 +18,9 @@ VAR
 
 PROCEDURE&init*(c:Voxel; x,z: PT; dx,dz: REAL);
 BEGIN
-	child:=c;
+	NEW(sabot);
+	sabot.blox[1,1,1]:=c;
+	child:=sabot;
 	dxtick:=dx;
 	dztick:=dz;
 	passable:=TRUE;

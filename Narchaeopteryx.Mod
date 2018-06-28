@@ -1,5 +1,5 @@
 MODULE Narchaeopteryx;
-IMPORT Base, TexVox, RotaVox;
+IMPORT Base, TexVox;
   
 VAR 
 	cv: TexVox.TexVox;

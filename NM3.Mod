@@ -21,7 +21,7 @@ TYPE PT = Base.PT;
  	NCube=Base.NCube;
  	LCube=Base.LightCube;
 
-TYPE cell = OBJECT(Voxel);
+TYPE cell* = OBJECT(Voxel);
 VAR
 	nposterTF*:BOOLEAN;
 	nposter*: NCube;
@@ -459,12 +459,14 @@ BEGIN
 		ELSE
 			IF blox[i,j,k]#NIL THEN
 				IF  blox[i,j,k].copyonstroke THEN
-					copyv:= blox[i,j,k].deepcopyofme;
-					IF (copyv#NIL) & (copyv.baked) THEN
+					copyv:= blox[i,j,k].deepcopy();
+					blox[i,j,k]:=copyv	;
+					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
+				(*	IF (copyv#NIL) & (copyv.baked) THEN
 						copyv.strokerec(p, resolution,nextscale,voxel);
 						copyengine.add(blox[i,j,k]);
 						blox[i,j,k]:=copyv	
-					END	
+					END	*)
 				ELSIF blox[i,j,k].complex THEN
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
 				ELSE
@@ -765,6 +767,7 @@ VAR
 	cv,child:Voxel;
 	i,j,k: INTEGER;
 BEGIN
+	code:=ncode; (* if this voxel has been rezzed from another module, make it NM3 *)
 	copymarker:=TRUE;
 	NEW(c);
 	c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; 
@@ -819,24 +822,23 @@ PROCEDURE engrain(w: Streams.Writer);
 VAR
 	i,j,k: INTEGER;
 BEGIN
-(* copymarker code removed: this will not terminate [ie it WILL trap] if the cell is recursive *)
-	IF code="NM3" THEN
-		IF TRUE THEN
-			w.Bytes(code,0,NL);
-			w.RawReal(red);
-			w.RawReal(green);
-			w.RawReal(blue);
-			w.RawReal(black);
-			FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
-					IF (blox[i,j,k]#NIL) THEN
-						w.RawBool(TRUE);
-						blox[i,j,k].engrain(w)
-					ELSE
-						w.RawBool(FALSE);
-					END
-			END END END
-		END
-	END;
+ 	IF (code=ncode) THEN	
+		w.Bytes(code,0,NL);
+		w.RawReal(red);
+		w.RawReal(green);
+		w.RawReal(blue);
+		w.RawReal(black);
+		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
+			IF (blox[i,j,k]#NIL) THEN
+				w.RawBool(TRUE);
+				blox[i,j,k].engrain(w)
+			ELSE
+				w.RawBool(FALSE);
+			END;
+		END END END;
+	ELSE
+	 	w.Bytes(code,0,NL);
+	END;	
 END engrain;
 
 (*
@@ -850,6 +852,7 @@ VAR
 	anothercell: cell;
 	len: LONGINT;
 BEGIN
+	IF (code=ncode) THEN	
 		r.RawReal(red);
 		r.RawReal(green);
 		r.RawReal(blue);
@@ -862,6 +865,8 @@ BEGIN
 				IF blox[i,j,k]#NIL THEN blox[i,j,k].sprout(r) END
 			END;
 		END END END
+	ELSE
+	END;
 END sprout;
 
 END cell;
@@ -880,14 +885,14 @@ BEGIN
 	BEGIN {EXCLUSIVE} COPYGO:=TRUE END;
 END go;
 
-BEGIN{ACTIVE, PRIORITY(Objects.Low)}
+(* BEGIN{ACTIVE, PRIORITY(Objects.Low)}
 REPEAT
 	Out.String("COPYENGINE");
 	BEGIN {EXCLUSIVE} AWAIT(COPYGO) END;
 	tobecopied.deepcopyofme:=tobecopied.deepcopy();
 	Out.String("COPYENGINE");
 	BEGIN {EXCLUSIVE} COPYGO:=FALSE END;
-UNTIL FALSE
+UNTIL FALSE *)
 END CopyEngine;
 
 VAR

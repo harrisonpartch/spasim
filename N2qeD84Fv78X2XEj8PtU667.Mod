@@ -1,6 +1,6 @@
 MODULE N2qeD84Fv78X2XEj8PtU667;(*anonymous module created by saboteur*)
   
-IMPORT Objects, Base,  FRep, RotaVox, Out:=KernelLog, Random;
+IMPORT Objects, Base,  TexVox, FRep, RotaVox, Out:=KernelLog, Random;
 
 TYPE Ray = Base.Ray;
 	Voxel = Base.Voxel;  
@@ -27,6 +27,7 @@ BEGIN
 END anim
 	
 VAR 
+	vox: TexVox.TexVox;
 	ball: FRep.sphere;
 	noise: FRep.noise;
 	cyl: FRep.hexgrid;
@@ -42,19 +43,21 @@ PROCEDURE draw;
 BEGIN	 
 	center:=Base.mkPT(1/2,1/2,1/2);
 	pole:=Base.mkPT(1/2,1/2,1);	
+	NEW(vox,"axolotl.png");
+	vox.tscale:=4050;
 	reddot:=Base.VoxelFromName("NM3");
 	bottlepossum:=Base.VoxelFromName("Nbottlepossum"); 
-	NEW(ball,center,0.47);
-	ball.setcolor(0.7,0.6,0,1);
-	reddot.FRaster(ball,27);	
+	NEW(ball,center,0.33);
+	ball.setcolor(0.7,0.6,0.6,1);
+	reddot.FRaster(ball,9);	
 	reddot.copyonstroke:=TRUE;
-	NEW(shell,center,pole,0.1,0.1);
+	NEW(shell,vox,center,pole,0.1,0.1);
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	reddot.copyonstroke:=TRUE;
-	RETURN reddot
+	RETURN vox
 END thisvox;
 
 BEGIN

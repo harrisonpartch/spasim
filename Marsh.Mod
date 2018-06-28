@@ -368,7 +368,7 @@ BEGIN
 
  	push(fuse);
 
-	gxy:=Base.VoxelFromName("NmOgKSH5ZXYP3DODELOkO7g"); 	
+	gxy:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 	
 	push(gxy);
 	sfish:=Base.VoxelFromName("NcufbYokzVEuEfN5MYiDlhA"); 	 	
 	push(sfish);
@@ -491,9 +491,9 @@ BEGIN
 	noise[3].setvoxel(gxy);	
 	NEW(noise[4]);		
 	noise[4].seed:=123456;		
-	noise[4].a:=1.5;
-	noise[4].b:=1.5;
-	noise[4].c:=1.5;		
+	noise[4].a:=7.3;
+	noise[4].b:=7.3;
+	noise[4].c:=7.5;		
 	noise[4].octaves:=4;
 	noise[4].persistence:=3.31;	
 	noise[4].setvoxel(greensuncouple);		
@@ -503,28 +503,29 @@ BEGIN
 	Base.setPT(center,1/2,1/2,9/10);
 	Base.setPT(up,0,0,1);
 	
-	Base.setPT(center,1/2,1/2,7/8);
+	Base.setPT(center,1/2,1/2,2/3);
 	
 	z3:=Base.VoxelFromName("NM3");	
-	z3a:=Base.VoxelFromName("NM3");	
+(*	z3a:=Base.VoxelFromName("NM3");	
 	w3:=Base.VoxelFromName("NM3");	
-	z3.setcolor(0,0,3,5,1); 
-	z3a.setcolor(0,0,3,5,1); 
-	w3.setcolor(0,0,3,5,1); 
-(*	z3.FRaster(noise[1],32);		
-	z3.FRaster(noise[4],32);
-*)	z3a.FRaster(noise[3],32);
-	z3a.copyonstroke:=TRUE;
+	
+	z3a.setcolor(0,0,3,25,1); 
+	w3.setcolor(10,0,3,5,1); 
+(*	z3.FRaster(noise[4],27);		*)
+     z3a.FRaster(noise[3],9);
 	noise[3].setvoxel(z3a);	
-	w3.FRaster(noise[3],32);
-	NEW(plane,center,up);
-	plane.setvoxel(sfish);			
-	z3.stroke(center,1,w3); 
-	z3.FRaster(plane,16);					
- 	Base.avatar:=harrison;
- 	
-	Base.avatarsize:=1000; 
+(*	w3.FRaster(noise[3],27); *)
+	
+	z3.stroke(center,3,z3a); 
 
+(*	NEW(plane,center,up);
+	plane.setvoxel(sfish);				
+	z3.FRaster(plane,27);					
+*) 	Base.avatar:=harrison;
+ 	
+*)	Base.avatarsize:=1000; 
+
+	z3.setcolor(0,0,3,5,1); 
 	Base.world:=z3;
 
 END dawn;

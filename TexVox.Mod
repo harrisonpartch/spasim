@@ -180,15 +180,13 @@ TYPE TexVox* = OBJECT(Voxel);
 VAR
 	txTF*: BOOLEAN;
 	texcube*: TexCube;
-	texscale*:LONGINT;
 	name*: Name; 
 
 PROCEDURE & init*(n: Name);
 BEGIN
 	NEW(texcube,n,FALSE);
 	name:=n;
-	tscale:=27;
-	texscale:=900;
+	tscale:=0;
 END init;
 
 PROCEDURE Shade (VAR ray: Ray);
@@ -294,24 +292,15 @@ BEGIN
 				|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
 				|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 			END
-		END;
-		color:=texcube.side[ray.face].pixelmip_zero(lx,ly);										
+		END;							
 		mip:=ray.length*ray.scale;
 		IF mip>7 THEN 	
 			color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
 		ELSIF mip>4 THEN
 			color:=texcube.side[ray.face].pixelmip_one(lx,ly);
 		ELSIF mip>2 THEN
-			color1:=texcube.side[ray.face].pixelmip_two(lx,ly);		
-			color2:=texcube.side[ray.face].pixelmip_one(lx*3,ly*3);	
-			mix:=1+(4-mip)/10;
-			color:=Base.mixcolor(color1,color2,mix);	
 			color:=texcube.side[ray.face].pixelmip_two(lx,ly);
-		ELSE
-			color1:=texcube.side[ray.face].pixel(lx,ly);
-			color2:=texcube.side[ray.face].pixelmip_two(lx*3,ly*3);  (* Base.Texture.pixel applies MODulo *)
-			mix:=1+mip;
-			color:=Base.mixcolor(color1,color2,mix);			
+		ELSE	
 			color:=texcube.side[ray.face].pixel(lx,ly);	
 		END; 
 		IF color.alpha<0.99 THEN
@@ -402,7 +391,6 @@ BEGIN
 	NEW(texcube,n,FALSE);
 	name:=n;
 	tscale:=1;
-	texscale:=1;
 END init;
 
 PROCEDURE Shade (VAR ray: Ray);

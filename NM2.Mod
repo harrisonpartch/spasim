@@ -6,7 +6,7 @@ Special voxel containing 27 children arranged in a 3x3x3 grid.
 Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
 *)
 
-CONST M=2; (* defines grid size *)
+CONST M=2 ;(* defines grid size *)
 	MMO=M-1;
 	CUBERADIUS=0.867;   (*change to sqrt(3)/2 ???*)
 	NL=Base.NL;
@@ -21,7 +21,7 @@ TYPE PT = Base.PT;
  	NCube=Base.NCube;
  	LCube=Base.LightCube;
 
-TYPE cell = OBJECT(Voxel);
+TYPE cell* = OBJECT(Voxel);
 VAR
 	nposterTF*:BOOLEAN;
 	nposter*: NCube;
@@ -258,7 +258,6 @@ BEGIN
 	blox[1,0,1]:=w;
 	blox[1,1,1]:=w;
 
-	
 END fillsierp;
 
 PROCEDURE fillcqr2*(v,w: Voxel);
@@ -456,12 +455,14 @@ BEGIN
 		ELSE
 			IF blox[i,j,k]#NIL THEN
 				IF  blox[i,j,k].copyonstroke THEN
-					copyv:= blox[i,j,k].deepcopyofme;
-					IF (copyv#NIL) & (copyv.baked) THEN
+					copyv:= blox[i,j,k].deepcopy();
+					blox[i,j,k]:=copyv	;
+					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
+				(*	IF (copyv#NIL) & (copyv.baked) THEN
 						copyv.strokerec(p, resolution,nextscale,voxel);
 						copyengine.add(blox[i,j,k]);
 						blox[i,j,k]:=copyv	
-					END	
+					END	*)
 				ELSIF blox[i,j,k].complex THEN
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
 				ELSE
@@ -816,24 +817,26 @@ PROCEDURE engrain(w: Streams.Writer);
 VAR
 	i,j,k: INTEGER;
 BEGIN
-(* copymarker code removed: this will not terminate [ie it WILL trap] if the cell is recursive *)
-	IF code="NM2" THEN
-		IF TRUE THEN
-			w.Bytes(code,0,NL);
-			w.RawReal(red);
-			w.RawReal(green);
-			w.RawReal(blue);
-			w.RawReal(black);
+	w.Bytes(code,0,NL);
+	w.RawReal(red);
+	w.RawReal(green);
+	w.RawReal(blue);
+	w.RawReal(black);
+	IF ~copymarker THEN
+		IF (code=ncode) THEN
+			copymarker:=TRUE;
 			FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
-					IF (blox[i,j,k]#NIL) THEN
-						w.RawBool(TRUE);
-						blox[i,j,k].engrain(w)
-					ELSE
-						w.RawBool(FALSE);
-					END
-			END END END
+				IF (blox[i,j,k]#NIL) THEN
+					w.RawBool(TRUE);
+					blox[i,j,k].engrain(w)
+				ELSE
+					w.RawBool(FALSE);
+				END;
+			END END END;
+		ELSE
+			w.Bytes(code,0,NL);
 		END
-	END;
+	END
 END engrain;
 
 (*
@@ -877,14 +880,14 @@ BEGIN
 	BEGIN {EXCLUSIVE} COPYGO:=TRUE END;
 END go;
 
-BEGIN{ACTIVE, PRIORITY(Objects.Low)}
+(* BEGIN{ACTIVE, PRIORITY(Objects.Low)}
 REPEAT
 	Out.String("COPYENGINE");
 	BEGIN {EXCLUSIVE} AWAIT(COPYGO) END;
 	tobecopied.deepcopyofme:=tobecopied.deepcopy();
 	Out.String("COPYENGINE");
 	BEGIN {EXCLUSIVE} COPYGO:=FALSE END;
-UNTIL FALSE
+UNTIL FALSE *)
 END CopyEngine;
 
 VAR

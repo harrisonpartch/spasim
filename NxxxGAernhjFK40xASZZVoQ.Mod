@@ -18,12 +18,12 @@ BEGIN
 END thisvox;
 
 BEGIN
-	v:=Base.VoxelFromName("NJOFc7qhMXMly3lot71bNUw"); 
+	v:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU666"); 
 	Base.setPT(center,1/2,1/2,1/2);
 	Base.setPT(up,0,0,1);		
 	NEW(gorgeplane,center,up,"XNXL.gorge.png","XNXL.gorge.png");
 	gorgeplane.vox:= v;
-	gorge:=Base.VoxelFromName("NRotatingM2");
-	gorge.FRaster(gorgeplane,64);
+	gorge:=Base.VoxelFromName("NM3");
+	gorge.FRaster(gorgeplane,729);
 
 END NxxxGAernhjFK40xASZZVoQ. mv 

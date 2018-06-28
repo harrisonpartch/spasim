@@ -1,5 +1,5 @@
 MODULE NH6nvNlOJNlCtpkDB56ljSx;
-IMPORT Base, TexVox,NM3; 
+IMPORT Base, TexVox, NM3; 
 TYPE Ray = Base.Ray;
 	Voxel = Base.Voxel;  
 	PT =Base.PT;

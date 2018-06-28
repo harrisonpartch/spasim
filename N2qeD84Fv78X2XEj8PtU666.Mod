@@ -24,20 +24,19 @@ BEGIN
 	yellow:=Base.VoxelFromName("NM3");
 	yellow.setcolor(0,100,0,200,4);
 	yellow.FRaster(ball,9);
-(*	NEW(ball,center,7/12);	
-	ball.setvoxel(yellow);
-	yellow.FRaster(ball,5);
-*)	NEW(ball,center,6/12);
+	NEW(ball,center,7/12);	
+	NEW(ball,center,6/12);
 	v:=Base.VoxelFromName("Nmarmory");  
 	ball.setvoxel(v);
 	yellow.FRasterSolid(ball,9);
-(*	cage:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");	
-	FOR i:=0 TO 1000 DO
+	yellow.copyonstroke:=FALSE;
+	cage:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");	
+	FOR i:=0 TO 100 DO
 		Base.randsphPT(p1,p2,center,8/12);
 		yellow.stroke(p1,9,cage)
 	END;
-*)	yellow.copyprime;	
-
+(*	yellow.copyprime;	
+*)	
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;

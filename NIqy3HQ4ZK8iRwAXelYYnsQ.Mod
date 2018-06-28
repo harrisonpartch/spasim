@@ -95,9 +95,9 @@ BEGIN
 	d := d2(a.x, a.y, a.z);
 	IF d < D2 THEN	
 		dot := ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
-		ray.clr.r := ray.color.red + dot*ray.ra; 
-		ray.g := ray.g + dot*ray.ga;
-		ray.b := ray.b +dot*ray.ba; 
+		ray.clr.r := ray.clr.r + dot*ray.clr.ra; 
+		ray.clr.g := ray.clr.g + dot*ray.clr.ga;
+		ray.clr.b := ray.clr.b +dot*ray.clr.ba; 
 		ray.terminate := TRUE;		
 	ELSE		
 		b:= Base.Exit(ray);
@@ -132,7 +132,7 @@ BEGIN
 			dot := 1-ABS(n.x*ray.dxyz.x + n.y*ray.dxyz.y+ n.z*ray.dxyz.z);
 	(*		ray.r := ray.r + (0*dot)*ray.ra; *)
 	(*		ray.g := ray.g + (0*dot)*ray.ga; *)
-			ray.b := ray.b + (1*dot)*ray.ba;
+			ray.clr.b := ray.clr.b + (1*dot)*ray.clr.ba;
 			ray.terminate := TRUE;	
 		END 
 	END

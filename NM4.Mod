@@ -1,4 +1,4 @@
-MODULE NM4; (*! This module may be either imported or used anonymously *)
+MODULE NM3; (*! This module may be either imported or used anonymously *)
 IMPORT Objects, Base, SPSME, Noise, Math, TexVox, Out := KernelLog, Debugging, Streams,Strings;
 
 (*
@@ -6,7 +6,7 @@ Special voxel containing 27 children arranged in a 3x3x3 grid.
 Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
 *)
 
-CONST M=4; (* defines grid size *)
+CONST M=3; (* defines grid size *)
 	MMO=M-1;
 	CUBERADIUS=0.867;   (*change to sqrt(3)/2 ???*)
 	NL=Base.NL;
@@ -21,7 +21,7 @@ TYPE PT = Base.PT;
  	NCube=Base.NCube;
  	LCube=Base.LightCube;
 
-TYPE cell = OBJECT(Voxel);
+TYPE cell* = OBJECT(Voxel);
 VAR
 	nposterTF*:BOOLEAN;
 	nposter*: NCube;
@@ -290,8 +290,8 @@ BEGIN
 	passable:=TRUE;
 	complex:=TRUE;
 	imposter:=Base.EMPTY;
-	code:="NM4";
-	ncode:="NM4"
+	code:="NM3";
+	ncode:="NM3"
 END init;
 
 PROCEDURE copyclear*;
@@ -448,7 +448,7 @@ VAR
 	code: Base.Name;
 BEGIN
 	IF ~lockTF THEN
-		code:="NM4"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
+		code:="NM3"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 		nextscale:=scale*M;
 		p.x:=p.x*M;
 		p.y:=p.y*M;
@@ -459,12 +459,14 @@ BEGIN
 		ELSE
 			IF blox[i,j,k]#NIL THEN
 				IF  blox[i,j,k].copyonstroke THEN
-					copyv:= blox[i,j,k].deepcopyofme;
-					IF (copyv#NIL) & (copyv.baked) THEN
+					copyv:= blox[i,j,k].deepcopy();
+					blox[i,j,k]:=copyv	;
+					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
+				(*	IF (copyv#NIL) & (copyv.baked) THEN
 						copyv.strokerec(p, resolution,nextscale,voxel);
 						copyengine.add(blox[i,j,k]);
 						blox[i,j,k]:=copyv	
-					END	
+					END	*)
 				ELSIF blox[i,j,k].complex THEN
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
 				ELSE
@@ -615,7 +617,7 @@ VAR
 	v: Voxel;
 	newcell: cell;
 BEGIN
-	code:="NM4"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
+	code:="NM3"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 	MS:=M*scale;
 	TWOMS:=2*MS;
 	nextscale:=scale*M;
@@ -765,6 +767,7 @@ VAR
 	cv,child:Voxel;
 	i,j,k: INTEGER;
 BEGIN
+	code:=ncode; (* if this voxel has been rezzed from another module, make it NM3 *)
 	copymarker:=TRUE;
 	NEW(c);
 	c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; 
@@ -806,7 +809,7 @@ END count;
 
 (*
 Engrains this voxel and it's children recursively in the following format:
-"NM4"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
+"NM3"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
 <----- Voxel data -----><------                     children data                     ------>
 Children data contains 27 boolean-child pairs, each boolean being TRUE if a child is contained in that position.
 In case of FALSE the length of child data is 0 for that child (i.e. no data is being written except for the FALSE).
@@ -819,24 +822,23 @@ PROCEDURE engrain(w: Streams.Writer);
 VAR
 	i,j,k: INTEGER;
 BEGIN
-(* copymarker code removed: this will not terminate [ie it WILL trap] if the cell is recursive *)
-	IF code="NM4" THEN
-		IF TRUE THEN
-			w.Bytes(code,0,NL);
-			w.RawReal(red);
-			w.RawReal(green);
-			w.RawReal(blue);
-			w.RawReal(black);
-			FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
-					IF (blox[i,j,k]#NIL) THEN
-						w.RawBool(TRUE);
-						blox[i,j,k].engrain(w)
-					ELSE
-						w.RawBool(FALSE);
-					END
-			END END END
-		END
-	END;
+ 	IF (code=ncode) THEN	
+		w.Bytes(code,0,NL);
+		w.RawReal(red);
+		w.RawReal(green);
+		w.RawReal(blue);
+		w.RawReal(black);
+		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
+			IF (blox[i,j,k]#NIL) THEN
+				w.RawBool(TRUE);
+				blox[i,j,k].engrain(w)
+			ELSE
+				w.RawBool(FALSE);
+			END;
+		END END END;
+	ELSE
+	 	w.Bytes(code,0,NL);
+	END;	
 END engrain;
 
 (*
@@ -850,6 +852,7 @@ VAR
 	anothercell: cell;
 	len: LONGINT;
 BEGIN
+	IF (code=ncode) THEN	
 		r.RawReal(red);
 		r.RawReal(green);
 		r.RawReal(blue);
@@ -862,6 +865,8 @@ BEGIN
 				IF blox[i,j,k]#NIL THEN blox[i,j,k].sprout(r) END
 			END;
 		END END END
+	ELSE
+	END;
 END sprout;
 
 END cell;
@@ -880,14 +885,14 @@ BEGIN
 	BEGIN {EXCLUSIVE} COPYGO:=TRUE END;
 END go;
 
-BEGIN{ACTIVE, PRIORITY(Objects.Low)}
+(* BEGIN{ACTIVE, PRIORITY(Objects.Low)}
 REPEAT
 	Out.String("COPYENGINE");
 	BEGIN {EXCLUSIVE} AWAIT(COPYGO) END;
 	tobecopied.deepcopyofme:=tobecopied.deepcopy();
 	Out.String("COPYENGINE");
 	BEGIN {EXCLUSIVE} COPYGO:=FALSE END;
-UNTIL FALSE
+UNTIL FALSE *)
 END CopyEngine;
 
 VAR
@@ -903,4 +908,4 @@ END thisvox;
 
 BEGIN
 	NEW(copyengine)
-END NM4.
+END NM3.

@@ -221,9 +221,6 @@ BEGIN
 				END;
 				newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
 			END;
-			ray.len.x:=ray.len.x+ABS(newxyz.x-xyz.x)*scaleInv;
-			ray.len.y:=ray.len.y+ABS(newxyz.y-xyz.y)*scaleInv;
-			ray.len.z:=ray.len.z+ABS(newxyz.z-xyz.z)*scaleInv;		
 			vdepth:=Base.distance(newxyz,xyz)*scaleInv; 
 			ray.xyz.x:=ray.xyz.x +((newxyz.x-xyz.x)+ray.ddxyz.x)*scaleInv;
 			ray.xyz.y:=ray.xyz.y +((newxyz.y-xyz.y)+ray.ddxyz.y)*scaleInv;			
@@ -237,7 +234,6 @@ BEGIN
 			ray.clr.ra := (ray.clr.ra-rr)-blr;
 			ray.clr.ga := (ray.clr.ga-gr)-blr;
 			ray.clr.ba := (ray.clr.ba-br)-blr; 	
-	
 			bounds(ijk.i,ijk.j,ijk.k, out);
 			IF ~out THEN
 				ray.lxyz.x := ABS(xyz.x - ijk.i);
