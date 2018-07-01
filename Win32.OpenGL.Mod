@@ -27,16 +27,16 @@ TYPE
  	PAnsiChar* = ADDRESS;
 
 	(* GL data types *)
-	Enum* = UNSIGNED32; 	(* 4 bytes *)
+	Enum* = LONGINT; 	(* 4 bytes *)
 	Boolean* = UNSIGNED8; 	(*  *)
-	Bitfield* = UNSIGNED32; 	(* SET *)
-	Byte* = SIGNED8; 		(* 1 byte signed *)
+	Bitfield* = SET32; 	(* SET *)
+	Byte* = SHORTINT; 		(* 1 byte signed *)
 	Short* = INTEGER; 	(* 2 bytes signed *)
 	Int* = LONGINT; 	(* 4 bytes signed *)
 	Sizei* = LONGINT; 	(* 4 bytes signed	 SIZE ??? *)
 	Ubyte* = UNSIGNED8; 		(* 1 byte unsigned *)
 	Ushort* = UNSIGNED16;	(* 2 bytes unsigned *)
-	Uint* = UNSIGNED32;	(* 4 bytes unsigned *)
+	Uint* = WORD;	(* 4 bytes unsigned *)
 	Float* = REAL;		(* single precision real *)
 	Clampf* = REAL;		(* single precision real in [0,1] *)
 	Double* = LONGREAL;	(* double precision real *)
@@ -11181,12 +11181,12 @@ END ReadExtensions;
 PROCEDURE GetStringFromAddr*(adr0: ADDRESS): Strings.String;
 VAR s {UNTRACED}: POINTER {UNSAFE} TO ARRAY OF CHAR;
 	str: Strings.String;
-	size, pos: SIZE; 
+	size, pos: SIZE;
 BEGIN
-	
+
 	s := adr0;
 	pos := 0;
-	IF adr0 # NIL THEN 
+	IF adr0 # NIL THEN
 		WHILE s[pos] # 0X DO
 			INC(pos);
 		END;
@@ -11197,13 +11197,13 @@ BEGIN
 			str[pos] := s[pos];
 			INC(pos);
 		END;
-		
+
 	ELSE NEW(str, 1);
 	END;
-	
+
 	str[pos] := 0X;
-	RETURN str;	
-	
+	RETURN str;
+
 END GetStringFromAddr;
 
 (*

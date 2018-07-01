@@ -27,10 +27,10 @@ CONST
 TYPE
 	Hints = RECORD
 		flags: SET;
-		functions: LONGINT;
-		decorations: LONGINT;
-		inputMode: LONGINT;
-		status: LONGINT;
+		functions: LONGWORD;
+		decorations: LONGWORD;
+		inputMode: LONGWORD;
+		status: LONGWORD;
 	END;
 
 
@@ -202,16 +202,16 @@ BEGIN
 	interval := 0;
 		IF GL.glXSwapIntervalEXT # NIL THEN
 			GL.glXSwapIntervalEXT(display, win, interval);
-			context.out.String("GL.glXSwapIntervalEXT # NIL"); context.out.Ln; 
+			context.out.String("GL.glXSwapIntervalEXT # NIL"); context.out.Ln;
 		ELSIF GL.glXSwapIntervalSGI # NIL THEN
 			bres := GL.glXSwapIntervalSGI(interval);
-			context.out.String("GL.glXSwapIntervalSGI # NIL"); context.out.Ln; 
+			context.out.String("GL.glXSwapIntervalSGI # NIL"); context.out.Ln;
 		ELSIF GL.glXSwapIntervalMESA # NIL THEN
 			bres := GL.glXSwapIntervalMESA(interval);
-			context.out.String("GL.glXSwapIntervalMESA # NIL"); context.out.Ln; 
+			context.out.String("GL.glXSwapIntervalMESA # NIL"); context.out.Ln;
 		END;
 	context.out.Ln; context.out.Update;
-	
+
 
     lightPos[0] := 5.0;	lightPos[1] := 5.0;  lightPos[2] := 10.0; lightPos[3] := 1.0;
     red[0] := 0.8; red[1] := 0.1; red[2] := 0.0; red[3] := 1.0;
@@ -343,7 +343,7 @@ END Reshape;
 PROCEDURE  InitWindow(): BOOLEAN;
 VAR
 	res: LONGINT;
-	masks: LONGINT;
+	masks: LONGWORD;
 	buf: X11.Buffer;
 
 	visinfoptr : Api.VisualInfoPtr; (* pointer to X11 VisualInfo *)
@@ -357,9 +357,9 @@ VAR
 	i: LONGINT;
 	dumysize: Api.XSizeHints;
 	defwin: X11.Window;
-	
+
 BEGIN
-	display := Api.OpenDisplay(":0.0");
+	display := Api.OpenDisplay("");
 	IF display =0 THEN
 		context.out.String(" cannot connect to X server"); context.out.Ln; context.out.Update;
 		RETURN FALSE;
@@ -410,7 +410,7 @@ BEGIN
  	END;
 
 (*	X11.Free(ADDRESSOF(modes));*)
-	
+
 	doubleBuffered := TRUE;
 
 (*  NEW(att, 13);
@@ -466,8 +466,9 @@ BEGIN
 	IF cmap = 0 THEN
 		IF debug THEN
 			context.out.String(" cannot create colormap"); context.out.Ln;
-			X11.GetErrorText(display, cmap, buf, LEN(buf));
+(*			X11.GetErrorText(display, cmap, buf, LEN(buf));
 			context.out.String("ERROR: CreateColormap = "); context.out.String(buf); context.out.Ln;
+*)
 			context.out.Update;
 		END;
 	END;
@@ -528,8 +529,8 @@ BEGIN
 		Close;
 		RETURN FALSE;
 	END;
-	
-	
+
+
 	res := GL.glXMakeCurrent(display, win, glctx);
 	IF res = 0 THEN
 		Close;
@@ -545,7 +546,7 @@ BEGIN
 		END;
 		context.out.Update;
 	END;
-	
+
  RETURN TRUE;
 END InitWindow;
 
@@ -554,10 +555,11 @@ VAR 	hints: Hints;
 	property: X11.Atom;
 BEGIN
 	IF  ~fullwindow OR  ~fullscreen THEN
-		hints.flags := {1};
- 		windecorations := ~windecorations;
- 		IF windecorations THEN hints.decorations := 0; ELSE hints.decorations := 1; END;
+	windecorations := ~windecorations;
+
 		property := Api.InternAtom(display, "_MOTIF_WM_HINTS", Api.True);
+
+		IF ~windecorations THEN hints.flags := {1};END;
 		X11.ChangeProperty(display, win, property, property, 32, Api.PropModeReplace, ADDRESSOF(hints), 5);
 	END;
 
@@ -597,7 +599,7 @@ END SaveImage;
 	END CheckAlternateKeys;
 
 	(* mouse handler *)
-	PROCEDURE SendMouseMsg( x, y, dz: LONGINT; xbuttons: SET );
+	PROCEDURE SendMouseMsg( x, y, dz: LONGINT; xbuttons: SET32 );
 	VAR mm: Inputs.AbsMouseMsg;
 	BEGIN
 		mm.keys := {};
@@ -637,7 +639,7 @@ END SaveImage;
 	VAR
 		cm: Api.XClientMessageEvent;
 		xev: Api.XEvent;
-		dl: Api.Data40l;
+		dl: Api.Data40;
 		wmstate, wmfullscreen: X11.Atom;
 		res: LONGINT;
 		defwin: X11.Window;
@@ -651,9 +653,8 @@ END SaveImage;
 	cm.messageType := wmstate;
 	cm.format := 32;
 	IF fullwindow THEN dl[0] := 1; ELSE dl[0] := 0; END;
-	dl[1] := wmfullscreen;
-	dl[2] := 0;
-	cm.data:=SYSTEM.VAL(Api.Data40, dl);
+	dl[1] := wmfullscreen;	dl[2] := 0;
+	cm.data:= dl;
 	xev := SYSTEM.VAL(Api.XEvent, cm);
 	defwin := X11.DefaultRootWindow(display);
 	res := Api.SendEvent(display, defwin, Api.False, Api.SubstructureNotifyMask, ADDRESSOF(xev));
@@ -672,7 +673,7 @@ END SaveImage;
 		INC(curcursor);
 	END ChangeCursor;
 
-	PROCEDURE WrKey(keyc: LONGINT; buf: ARRAY OF CHAR; keysym: LONGINT);
+	PROCEDURE WrKey(keyc: LONGINT; buf: ARRAY OF CHAR; keysym: X11.KeySym);
 	BEGIN
 		context.out.String("keysym: "); context.out.Int(keysym,0); context.out.String(":"); context.out.Hex(keysym, 8);
 
@@ -694,7 +695,6 @@ END SaveImage;
 		 be: Api.XButtonEvent;
 		 cn : Api.XConfigureEvent;
 		 ee : Api.XExposeEvent;
-		 datal: Api.Data40l;
 		 atomName: Api.PChar;
 	BEGIN
 	 WHILE Api.Pending(display) > 0 DO
@@ -719,7 +719,7 @@ END SaveImage;
 
 				| Api.ButtonPress: Wr("ButtonPress");
 							be := SYSTEM.VAL(Api.XButtonEvent, event);
-							context.out.String("sendEvent="); IF be.sendEvent THEN context.out.String("TRUE") ELSE context.out.String("FALSE") END; context.out.Ln;
+							context.out.String("sendEvent="); IF be.sendEvent  THEN context.out.String("TRUE") ELSE context.out.String("FALSE") END; context.out.Ln;
 							context.out.String("be.button="); context.out.Int(be.button,2); context.out.Ln;
 							context.out.Update;
 							(* IF be.button = Api.Button1 THEN
@@ -757,16 +757,16 @@ END SaveImage;
 							context.out.String("atomName="); context.out.String(atomName^); context.out.Ln;
 						END;
 
-						datal := SYSTEM.VAL(Api.Data40l, cm.data);
-						context.out.String("datal[0]="); context.out.Int(SYSTEM.VAL(X11.Atom,datal[0]), 0); context.out.Ln;
+
+						context.out.String("cm.data[0]="); context.out.Int(cm.data[0], 0); context.out.Ln;
 						context.out.String("wmDeleteWindow="); context.out.Int(wmDelete,0); context.out.Ln;
-						atomName := Api.GetAtomName(display, SYSTEM.VAL(X11.Atom,datal[0]));
+						atomName := Api.GetAtomName(display, SYSTEM.VAL(X11.Atom, cm.data[0]));
 						IF atomName # NIL THEN
-							context.out.String("datal[0] atomName="); context.out.String(atomName^); context.out.Ln;
+							context.out.String("cm.data[0] atomName="); context.out.String(atomName^); context.out.Ln;
 						END;
 						context.out.Update;
 
-						IF  SYSTEM.VAL(X11.Atom,datal[0]) = wmDelete THEN
+						IF  cm.data[0] = wmDelete THEN
 						    Wr("DeleteWindow");
 						    alive := FALSE;
 						END;
@@ -830,6 +830,6 @@ END MyXGear2.
 
 MyXGear2.Open~
 
-SystemTools.Free MyXGear2 ~ 
+System.Free MyXGear2 ~
 
-SystemTools.FreeDownTo OpenGL ~ 
+System.FreeDownTo OpenGL ~ 

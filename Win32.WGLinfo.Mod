@@ -43,7 +43,7 @@ END  WGLinfo.
 
 WGLinfo.Do ~
 
-SystemTools.Free WGLinfo GLContext ~
+System.Free WGLinfo GLContext ~
 
 
 

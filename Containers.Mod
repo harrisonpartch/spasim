@@ -1404,7 +1404,7 @@ BEGIN
 
 END Containers.
 
-SystemTools.Free Containers ~
+System.Free Containers ~
 
 Containers.StringSetTest ~
 

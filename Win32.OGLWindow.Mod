@@ -67,8 +67,8 @@ CONST
 TYPE
 	CreateStruct = POINTER TO RECORD
 		win: Window;
-		dwExStyle: SET;
-		dwStyle: SET;
+		dwExStyle: WORDSET;
+		dwStyle: WORDSET;
 		x, y, w, h: LONGINT;
 	END;
 
@@ -218,7 +218,7 @@ TYPE
 
 	(** create a new opengl context with opengl version major, minor *)
 	PROCEDURE SetProfile*(major, minor: LONGINT; flags: SET): BOOLEAN;
-	VAR 
+	VAR
 		attr: POINTER TO ARRAY OF LONGINT;
 		tempContext: WinApi.HGLRC;
 		i: LONGINT;
@@ -226,14 +226,14 @@ TYPE
 		(* create opengl compatibilitity mode context *)
 		NEW(attr, 13);
 		i := 0;
-		attr[i] := GLC.WGL_CONTEXT_MAJOR_VERSION_ARB;	INC(i); 
+		attr[i] := GLC.WGL_CONTEXT_MAJOR_VERSION_ARB;	INC(i);
 		attr[i] := major; INC(i);
 		attr[i] := GLC.WGL_CONTEXT_MINOR_VERSION_ARB; INC(i);
 		attr[i] := minor; INC(i);
-		
+
 (*		attr[i] := GLC.WGL_CONTEXT_FLAGS_ARB; INC(i);
 			attr[i] := GLC.WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB; INC(i);
-*)		
+*)
 		attr[i] := GLC.WGL_CONTEXT_PROFILE_MASK_ARB; INC(i);
 			(* attr[i] := GLC.WGL_CONTEXT_CORE_PROFILE_BIT_ARB; INC(i); *)
 			attr[i] := GLC.WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB; INC(i);
@@ -245,49 +245,49 @@ TYPE
 				(* GLC.WGL_CONTEXT_FLAGS_ARB, GLC.WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB, *)
 				GLC.WGL_CONTEXT_PROFILE_MASK_ARB, (*GLC.WGL_CONTEXT_CORE_PROFILE_BIT_ARB,*)
 				GLC.WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
-				0 
+				0
 			];
-*)	
+*)
 		GL.Read_WGL_ARB_create_context(); (* read wglCreateContextAttribsARB function *)
-			
+
 		IF GL.wglCreateContextAttribsARB = NIL THEN RETURN FALSE END;
-	
+
 		tempContext := GL.wglCreateContextAttribsARB(hDC,0, ADDRESSOF(attr[0]));
 		IF tempContext = NIL THEN
-			IF debug THEN 
+			IF debug THEN
 				(* It's not possible to make a GL 3.x context. Use the old style context (GL 2.1 and before) *)
-				KernelLog.String("Using old style context"); KernelLog.Ln; 
-			END;		 			
+				KernelLog.String("Using old style context"); KernelLog.Ln;
+			END;
 			RETURN FALSE
 		END;
-		
+
 		GL.wglMakeCurrent(0, 0);
 		GL.wglDeleteContext(hGLRC);
 		hGLRC := tempContext;
 		GL.wglMakeCurrent(hDC,  hGLRC);
 		GL.ReadExtensions();
-		IF debug THEN 
-			KernelLog.String("Using new style context"); KernelLog.Ln; 
-		END;			
-		
+		IF debug THEN
+			KernelLog.String("Using new style context"); KernelLog.Ln;
+		END;
+
   		RETURN TRUE;
 	END SetProfile;
-	
+
 	(* create GLRC context *)
 	PROCEDURE CreateGLRC(Options: SET; colorbits, depthbits, stencilbits, accumbits, auxbuffers: LONGINT; layer: LONGINT): BOOLEAN;
 	VAR
 		pfd: WinApi.PIXELFORMATDESCRIPTOR;
 		pixelformat : LONGINT;
 		res: LONGINT;
-		tmpflag: SET;
+		tmpflag: WORDSET;
 	BEGIN
 		pfd.nSize := SIZEOF(WinApi.PIXELFORMATDESCRIPTOR);
 		pfd.nVersion := 1;
 		 tmpflag := WinApi.PFD_SUPPORT_OPENGL + WinApi.PFD_DRAW_TO_WINDOW + WinApi.PFD_DOUBLEBUFFER;
 
 		IF opStereo IN Options THEN  tmpflag :=  tmpflag + WinApi.PFD_STEREO; END;
-		
-		pfd.dwFlags := Kernel32.SetToDW(tmpflag); 
+
+		pfd.dwFlags := tmpflag;
 		pfd.iPixelType := CHR(WinApi.PFD_TYPE_RGBA);
 		pfd.cColorBits := CHR(colorbits);
 		pfd.cDepthBits := CHR(depthbits);
@@ -602,7 +602,7 @@ TYPE
 	VAR pos: User32.WindowPos;
 	BEGIN
 		SYSTEM.MOVE( lParam, ADDRESSOF( pos ), SIZEOF( User32.WindowPos ) );
-		IF ~(User32.SWPNoMove IN Kernel32.DWToSet(pos.flags)) THEN
+		IF ~(User32.SWPNoMove IN pos.flags) THEN
 			IF (pos.x < -width) & (pos.y < -height) THEN Minimize()
 			ELSIF (pos.x >= 0) & (pos.y >= 0) THEN Restore()
 			END
@@ -696,12 +696,15 @@ TYPE
 	VAR str: ARRAY 32 OF CHAR;
 		ret: Kernel32.ATOM;
 		windowClass: User32.WndClassEx;
+		cur: User32.HCursor;
 	BEGIN
 		windowClass.cbSize := SIZEOF( User32.WndClassEx );
-		windowClass.style := Kernel32.SetToDW(WinApi.CS_OWNDC + WinApi.CS_VREDRAW + WinApi.CS_HREDRAW);   (* Cs_parentdc: INTEGER is 128  = 2^7 *)
+		windowClass.style := WinApi.CS_OWNDC + WinApi.CS_VREDRAW + WinApi.CS_HREDRAW;   (* Cs_parentdc: INTEGER is 128  = 2^7 *)
 		windowClass.lpfnWndProc := WindowProc;  windowClass.cbClsExtra := 0;  windowClass.cbWndExtra := 4;
 		windowClass.hInstance := Kernel32.hInstance;  str := "Console";  windowClass.hIcon := User32.LoadIcon( Kernel32.hInstance, str );
-		str := "Console.Small";  windowClass.hIconSm := User32.LoadIcon( Kernel32.hInstance, str );  windowClass.hCursor := Kernel32.NULL;
+		str := "Console.Small";  windowClass.hIconSm := User32.LoadIcon( Kernel32.hInstance, str );
+		windowClass.hCursor := Kernel32.NULL;
+
 		windowClass.hbrBackground := Kernel32.NULL;  windowClass.lpszMenuName := Kernel32.NULL;
 		windowClass.lpszClassName := SYSTEM.VAL( Kernel32.LPSTR, ADDRESSOF(className ) );
 		ret := User32.RegisterClassEx( windowClass );
@@ -751,10 +754,10 @@ TYPE
 		END;
 
 		rect.right := width; 	rect.bottom := height;
-		WinApi.AdjustWindowRectEx(rect, Kernel32.SetToDW(create.dwStyle), 0, Kernel32.SetToDW(create.dwExStyle));
+		WinApi.AdjustWindowRectEx(rect, create.dwStyle, 0, create.dwExStyle);
 
 		hWnd :=
-			User32.CreateWindowEx( SYSTEM.VAL(LONGINT, create.dwExStyle) , className, title, Kernel32.SetToDW(create.dwStyle), left, top,  (rect.right - rect.left) , (rect.bottom - rect.top),
+			User32.CreateWindowEx( SYSTEM.VAL(LONGINT, create.dwExStyle) , className, title, create.dwStyle, left, top,  (rect.right - rect.left) , (rect.bottom - rect.top),
 													   0 ,0, Kernel32.hInstance,
 													   SYSTEM.VAL( User32.LParam, create));
 		RETURN (hWnd # 0);
@@ -902,8 +905,8 @@ END GameLogic;
 		CloseWindow();
 	END MainLoop;
 
-	BEGIN {ACTIVE, PRIORITY (Objects.Normal) }
-		MainLoop;
+	BEGIN {ACTIVE, PRIORITY(Objects.Normal) }
+		MainLoop()
 	END Window;
 
 VAR
@@ -1052,10 +1055,13 @@ VAR
 		frameY := User32.GetSystemMetrics( User32.SMCYFrame );
 		captionY := User32.GetSystemMetrics( User32.SMCYCaption );
 		menuY := User32.GetSystemMetrics( User32.SMCYMenu );
+(*
+		str := "Arrow.cur"; hCurrentCursor := User32.LoadCursor( Kernel32.hInstance, str );   (* Kernel32.NULL;  *)
+		str := "Cross.cur";  hAlternativeCursor := User32.LoadCursor( Kernel32.hInstance, str );
+*)
 
-		 str := "Cross";
-		hCurrentCursor := User32.LoadCursor( Kernel32.hInstance, str );   (* Kernel32.NULL;  *)
-		str := "Cross";  hAlternativeCursor := User32.LoadCursor( Kernel32.hInstance, str );
+		str := "../PELinker/Arrow.cur"; hCurrentCursor := User32.LoadCursorFromFile( str );
+		str := "../PELinker/Cross.cur";  hAlternativeCursor := User32.LoadCursorFromFile( str );
 
 		Kernel32.InitializeCriticalSection( moduleCS );
 
@@ -1092,6 +1098,6 @@ BEGIN
 END OGLWindow.
 
 
-SystemTools.Free OGLWindow ~
+System.Free OGLWindow ~
 
-SystemTools.FreeDownTo OpenGL ~
+System.FreeDownTo OpenGL ~

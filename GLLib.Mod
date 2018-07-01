@@ -17,7 +17,7 @@ CONST
 	z = 0.850650808352039932;
 
 VAR
-	quadObj: glu.QuadricObj;
+	quadObj: glu.Quadric;
 	tData: ARRAY [4, 3] OF gl.Float;
 	tIndex: ARRAY [4, 3] OF gl.Int;
 	iData: ARRAY [12, 3] OF gl.Float;

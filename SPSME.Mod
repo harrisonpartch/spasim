@@ -3,6 +3,15 @@ IMPORT SYSTEM, Base;
 
 (* procedure for casting real array to integer array. From Patrik Reali ETHZ 2000*)
 
+
+PROCEDURE E*(VAR p: Base.PT; VAR ijk: Base.IPT);
+
+BEGIN
+	ijk.i:=SHORT(ENTIER(p.x)); ijk.j:=SHORT(ENTIER(p.y)); ijk.k:=SHORT(ENTIER(p.z));
+END E;
+
+(*
+
 PROCEDURE E*(VAR p: Base.PT; VAR ijk: Base.IPT);
 VAR
 	in: ARRAY 3 OF REAL;
@@ -80,6 +89,7 @@ CODE {SYSTEM.i386, SYSTEM.FPU}
        ADD ESP, 8
        FISTP DWORD [EAX]
 END ROUND;
+*)
 *)
 
 END SPSME.

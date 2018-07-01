@@ -354,9 +354,9 @@ BEGIN
 	Modules.InstallTermHandler(Cleanup)
 END WMGLSLBricks.
 
-SystemTools.Free  WMGLSLBricks ~
+System.Free  WMGLSLBricks ~
 
 WMGLSLBricks.Open ~
 
-SystemTools.FreeDownTo OpenGL ~
+System.FreeDownTo OpenGL ~
 

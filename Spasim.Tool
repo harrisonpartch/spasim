@@ -2,7 +2,9 @@ Compiler.Compile
 X11.Mod
 XDisplay.Mod
 WarpMouse.Mod
-WMRender.Mod ~
+WMRender.Mod
+NanonyPET.Mod
+ ~
 
 OpenGL.Tool
 
@@ -25,7 +27,7 @@ Saboteur.Mod
 FRep.Mod
 RotaVox.Mod
 NCompiler.Mod
-NanonyPET.Mod
+
 Retina.Mod
 Marsh.Mod
 OGLRender.Mod 

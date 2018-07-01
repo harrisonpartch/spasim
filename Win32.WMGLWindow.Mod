@@ -8,7 +8,7 @@ CONST
 	debug = FALSE;
 	COMPATIBILITY_PROFILE* = 0;
 	CORE_PROFILE* = 1;
-	
+
 CONST
 	WMSetup = User32.WMUser + 1;
 
@@ -68,14 +68,14 @@ TYPE
 		(* create opengl compatibilitity mode context *)
 		NEW(attr, 13);
 		i := 0;
-		attr[i] := GLC.WGL_CONTEXT_MAJOR_VERSION_ARB;	INC(i); 
+		attr[i] := GLC.WGL_CONTEXT_MAJOR_VERSION_ARB;	INC(i);
 		attr[i] := major; INC(i);
 		attr[i] := GLC.WGL_CONTEXT_MINOR_VERSION_ARB; INC(i);
 		attr[i] := minor; INC(i);
-		
+
 (*		attr[i] := GLC.WGL_CONTEXT_FLAGS_ARB; INC(i);
 			attr[i] := GLC.WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB; INC(i);
-*)		
+*)
 		attr[i] := GLC.WGL_CONTEXT_PROFILE_MASK_ARB; INC(i);
 			(* attr[i] := GLC.WGL_CONTEXT_CORE_PROFILE_BIT_ARB; INC(i); *)
 			attr[i] := GLC.WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB; INC(i);
@@ -87,34 +87,34 @@ TYPE
 				(* GLC.WGL_CONTEXT_FLAGS_ARB, GLC.WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB, *)
 				GLC.WGL_CONTEXT_PROFILE_MASK_ARB, (*GLC.WGL_CONTEXT_CORE_PROFILE_BIT_ARB,*)
 				GLC.WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
-				0 
+				0
 			];
-*)	
+*)
 		GL.Read_WGL_ARB_create_context(); (* read wglCreateContextAttribsARB function *)
-			
+
 		IF GL.wglCreateContextAttribsARB = NIL THEN RETURN FALSE END;
-	
+
 		tempContext := GL.wglCreateContextAttribsARB(glWin.hDC,0, ADDRESSOF(attr[0]));
 		IF tempContext = NIL THEN
-			IF debug THEN 
+			IF debug THEN
 				(* It's not possible to make a GL 3.x context. Use the old style context (GL 2.1 and before) *)
-				KernelLog.String("Using old style context"); KernelLog.Ln; 
-			END;		 			
+				KernelLog.String("Using old style context"); KernelLog.Ln;
+			END;
 			RETURN FALSE
 		END;
-		
+
 		GL.wglMakeCurrent(0, 0);
 		GL.wglDeleteContext(glWin.hGLRC);
 		glWin.hGLRC := tempContext;
 		GL.wglMakeCurrent(glWin.hDC,  glWin.hGLRC);
 		GL.ReadExtensions();
-		IF debug THEN 
-			KernelLog.String("Using new style context"); KernelLog.Ln; 
-		END;			
-		
+		IF debug THEN
+			KernelLog.String("Using new style context"); KernelLog.Ln;
+		END;
+
   		RETURN TRUE;
 	END SetProfile;
-	
+
 	PROCEDURE Close;
 	VAR res: LONGINT;
 	BEGIN
@@ -170,9 +170,9 @@ TYPE
 		IF (image = NIL) OR (image.adr = NIL) THEN RETURN END;
 		w := image.width; h := image.height;
 		GL.ReadPixels(0, 0, w, h, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, ADDRESSOF(buffer^[0]));
-		
+
 		(* flip vertical, y *)
-		sadr := ADDRESSOF(buffer[4*w*(h-1)]); dadr := image.adr;		
+		sadr := ADDRESSOF(buffer[4*w*(h-1)]); dadr := image.adr;
 		FOR i := 0 TO h - 1 DO
 			SYSTEM.MOVE(sadr - i*w*4, dadr + i*w*4, w*4);
 		END;
@@ -250,7 +250,7 @@ TYPE
 			res := context.SetProfile(major, minor, flags);
 			RETURN res;
 		END SetProfile;
-			
+
 		(** *)
 		PROCEDURE Close*();
 		BEGIN
@@ -314,8 +314,8 @@ VAR
 
     PROCEDURE CreateHWND(VAR glWin:WindowStruct): BOOLEAN;
 		VAR res: Kernel32.BOOL;
-			 dwStyle: SET;
-			 dwExStyle: SET;
+			 dwStyle: WORDSET;
+			 dwExStyle: WORDSET;
 			 windowClass: User32.WndClassEx;
 			 bres: BOOLEAN;
 			 scnt: ARRAY 16 OF CHAR;
@@ -330,7 +330,7 @@ VAR
 		IF debug THEN KernelLog.String("glWin.windowClassName= "); KernelLog.String(glWin.windowClassName); KernelLog.Ln; END;
 
 		windowClass.cbSize := SIZEOF( User32.WndClassEx );
-		windowClass.style :=Kernel32.SetToDW(WinApi.CS_OWNDC + WinApi.CS_VREDRAW + WinApi.CS_HREDRAW);
+		windowClass.style := WinApi.CS_OWNDC + WinApi.CS_VREDRAW + WinApi.CS_HREDRAW;
 		windowClass.lpfnWndProc := WindowProc; (* Message handler *)
 		windowClass.cbClsExtra := 0;
 		windowClass.cbWndExtra := 0;
@@ -356,7 +356,7 @@ VAR
 		dwStyle := WinApi.WS_POPUP +  WinApi.WS_CLIPSIBLINGS + WinApi.WS_CLIPCHILDREN;
 
 		 (* create the window *)
-		glWin.hWind := User32.CreateWindowEx(SYSTEM.VAL(LONGINT, dwExStyle) , glWin.windowClassName, glWin.title, Kernel32.SetToDW(dwStyle) , 10, 10, glWin.width, glWin.height, 0, 0,  glWin.Instance, SYSTEM.VAL( User32.LParam, glWin));
+		glWin.hWind := User32.CreateWindowEx(SYSTEM.VAL(LONGINT, dwExStyle) , glWin.windowClassName, glWin.title, dwStyle , 10, 10, glWin.width, glWin.height, 0, 0,  glWin.Instance, SYSTEM.VAL( User32.LParam, glWin));
 		IF glWin.hWind = 0 THEN
 			IF debug THEN
 				KernelLog.String("CreateWindowEx hWind= "); KernelLog.Int(glWin.hWind, 0); KernelLog.Ln;
@@ -437,7 +437,7 @@ VAR
   pfd: WinApi.PIXELFORMATDESCRIPTOR;
   pixelformat : LONGINT;
   res: LONGINT;
-  tmpflag: SET; 
+  tmpflag: WORDSET;
 BEGIN
 
     pfd.nSize := SIZEOF(WinApi.PIXELFORMATDESCRIPTOR);
@@ -447,8 +447,8 @@ BEGIN
     IF opStereo IN Options THEN
         tmpflag := tmpflag + WinApi.PFD_STEREO;
     END;
-   
-    pfd.dwFlags := Kernel32.SetToDW(tmpflag);
+
+    pfd.dwFlags := tmpflag;
     pfd.iPixelType := CHR(WinApi.PFD_TYPE_RGBA);
     pfd.cColorBits := CHR(colorbits);
     pfd.cDepthBits := CHR(depthbits);

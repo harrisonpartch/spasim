@@ -67,10 +67,10 @@ TYPE
 		panel.AddContent(tpanel);
 
 
-		
+
 (* --------------vertext shader -------------- *)
 
-		
+
 		(* group panel, source *)
 		NEW(grpanel); grpanel.alignment.Set(WMComponents.AlignTop); grpanel.bounds.SetHeight(200);
 		grpanel.fillColor.Set(0FFFFFFFFH); grpanel.caption.SetAOC("vertex shader source:");
@@ -87,14 +87,14 @@ TYPE
 		grpanel.AddContent(vsEditor);
 
 
-		
+
 	(* --------------fragment shader -------------- *)
 		(* resizer *)
 		NEW(vsizer); vsizer.alignment.Set(WMComponents.AlignBottom);	vsizer.bounds.SetHeight(4);
 		 vsizer.clDefault.Set(0FFFF00FFH);
 		grpanel.AddContent(vsizer);
 		(* ---------------- *)
-		
+
 		(* group panel, source *)
 		NEW(grpanel); grpanel.alignment.Set(WMComponents.AlignTop); grpanel.bounds.SetHeight(200);
 		grpanel.fillColor.Set(0FFFFFFFFH); grpanel.caption.SetAOC("fragment shader source:");
@@ -115,7 +115,7 @@ TYPE
 		 vsizer.clDefault.Set(0FFFF00FFH);
 		grpanel.AddContent(vsizer);
 		(* ---------------- *)
-		
+
 
 (*		NEW(statusbar); statusbar.alignment.Set(WMComponents.AlignTop);
 		statusbar.fillColor.Set(0FF0FFDFFH); statusbar.bounds.SetHeight(7);
@@ -146,7 +146,7 @@ TYPE
 		tpanel.AddContent(grpanel);
 
 
-		
+
 		(* build result log editor *)
 		NEW(logEditor);
 		logEditor.alignment.Set(WMComponents.AlignClient);
@@ -524,7 +524,7 @@ GLShadersBuild.Open MyDemos/mycd4.vert MyDemos/mycd4.frag ~
 
 GLShadersBuild.Open ~
 
-SystemTools.Free GLShadersBuild ~
+System.Free GLShadersBuild ~
 
-SystemTools.FreeDownTo OpenGL ~
+System.FreeDownTo OpenGL ~
 

@@ -15,7 +15,7 @@ CONST
 
 	COMPATIBILITY_PROFILE* = 0;
 	CORE_PROFILE* = 1;
-	   
+
 CONST
 	(** mouse buttons *)
 	ML* = 0;  MM* = 1;  MR* = 2;
@@ -24,18 +24,18 @@ CONST
 TYPE
 	Hints = RECORD
 		flags: SET;
-		functions: LONGINT;
-		decorations: LONGINT;
-		inputMode: LONGINT;
-		status: LONGINT;
+		functions: LONGWORD;
+		decorations: LONGWORD;
+		inputMode: LONGWORD;
+		status: LONGWORD;
 	END;
 
 	GLXFBConfig = POINTER {UNSAFE} TO RECORD END;
 	GLXFBConfigPtr =  POINTER {UNSAFE} TO ARRAY OF GLXFBConfig;
-	
+
 VAR
 	keySymbol: ARRAY 256 OF LONGINT;
-	xbuttons: SET;
+	xbuttons: SET32;
 	compstatus: Api.ComposeStatus;
 
 
@@ -139,7 +139,7 @@ VAR
 
 	(** make GL context current *)
 	PROCEDURE MakeCurrent*();
-	VAR resb: GL.Boolean;
+	VAR resb: X11.Bool;
 	BEGIN
 		resb := GL.glXMakeCurrent(display, win, glctx);
 		IF debug THEN KernelLog.String(" MakeCurrent:"); KernelLog.Boolean(resb=1); KernelLog.Ln; END;
@@ -147,7 +147,7 @@ VAR
 
 	(** deactivate the current GL context *)
 	PROCEDURE DeActivate*();
-	VAR resb: GL.Boolean;
+	VAR resb: X11.Bool;
 	 BEGIN
 		resb := GL.glXMakeCurrent(display, 0, 0);
 		IF debug THEN KernelLog.String(" DeActivate:"); KernelLog.Boolean(resb=1); KernelLog.Ln; END;
@@ -160,13 +160,13 @@ VAR
 	END SwapBuffers;
 
 	(* get current display of this window *)
-	PROCEDURE GetDisplay*(): LONGINT;
+	PROCEDURE GetDisplay*(): ADDRESS;
 	BEGIN
 		RETURN display;
 	END GetDisplay;
 
 	(* get current gl context of this window *)
-	PROCEDURE GetContext*(): LONGINT;
+	PROCEDURE GetContext*(): Api.XID;
 	BEGIN
 		RETURN glctx;
 	END GetContext;
@@ -214,7 +214,7 @@ VAR
 
 	(* close the window and its resources *)
 	 PROCEDURE CloseWindow*();
-	  VAR resb: GL.Boolean;
+	  VAR resb: X11.Bool;
 	  	    res: LONGINT;
 	 BEGIN
 		(* do we have a rendering context *)
@@ -272,7 +272,7 @@ VAR
 			FOR i:=0 TO 7 DO data[i] := 0X  END;
 			pixmap := X11.CreateBitmapFromData( display, win, ADDRESSOF( data[0] ), 8, 8 );
 			noCursor := X11.CreatePixmapCursor( display, pixmap, pixmap,  fg , fg, 0, 0 );
-		    
+
 			X11.DefineCursor( display, win, noCursor );
 			Api.FreeCursor(display, noCursor);
 			X11.FreePixmap(display, pixmap);
@@ -339,18 +339,17 @@ VAR
 		END;
 	END SetSwapInterval;
 
-	 (** set  window decorartion on/off *)
+	 (** set  window decorartion on: TRUE /off : FALSE *)
 	PROCEDURE SetDecorations*(decor: BOOLEAN);
 	VAR 	hints: Hints;
 		property: X11.Atom;
 	BEGIN
-	(*	IF (decor = decorations) OR fullwindow THEN RETURN END; (* no need to set again *)*)
-(*		decorations := decor;*)
 		IF  ~(fullscreen OR fullwindow) THEN
 			decorations := decor;
-			hints.flags := {1};
-	 		IF ~decor THEN hints.decorations := 0; ELSE hints.decorations := 1; END;
-			property := Api.InternAtom(display, "_MOTIF_WM_HINTS", Api.True);
+			property := Api.InternAtom(display, "_MOTIF_WM_HINTS", Api.False);
+			IF ~decor THEN
+				hints.flags := {1};
+			END;
 			X11.ChangeProperty(display, win, property, property, 32, Api.PropModeReplace, ADDRESSOF(hints), 5);
 		END;
 	END SetDecorations;
@@ -360,7 +359,7 @@ VAR
 	VAR
 		cm: Api.XClientMessageEvent;
 		xev: Api.XEvent;
-		dl: Api.Data40l;
+		dl: Api.Data40;
 		res: LONGINT;
 		wmstate, wmfullscreen: X11.Atom;
 		defwin: X11.Window;
@@ -376,7 +375,7 @@ VAR
 		cm.format := 32;
 		IF fullwindow THEN dl[0] := 1; ELSE dl[0] := 0; END;
 		dl[1] := wmfullscreen;  dl[2] := 0;
-		cm.data:=SYSTEM.VAL(Api.Data40, dl);  xev := SYSTEM.VAL(Api.XEvent, cm);
+		cm.data:=dl;  xev := SYSTEM.VAL(Api.XEvent, cm);
 		defwin := X11.DefaultRootWindow(display);
 		res := Api.SendEvent(display, defwin, Api.False, Api.SubstructureNotifyMask, ADDRESSOF(xev));
 	END SetFullWindow;
@@ -384,22 +383,23 @@ VAR
 	(** create a new opengl context with opengl version major, minor *)
 	PROCEDURE SetProfile*(major, minor: LONGINT; flags: SET): BOOLEAN;
 	VAR
-		elemc, res, i: LONGINT;
+		elemc, i: LONGINT;
 		fbcfg {UNTRACED}: GLXFBConfig;
 		fbcfgPtr {UNTRACED} : GLXFBConfigPtr;
 (*		str: Strings.String;*)
 		attr: POINTER TO  ARRAY OF GL.Int;
 		newctxt: GL.GLXContext;
+		res: X11.Bool;
 	BEGIN
 
 		res := GL.glXMakeCurrent(display, 0, 0);
-		
+
 		(* We need this for OpenGL3 *)
 		fbcfgPtr := GL.glXChooseFBConfig(display, 0, 0, elemc);
 		IF fbcfg = NIL THEN
 			KernelLog.String("Couldn't get FB configs"); KernelLog.Ln;
 		ELSE
-			KernelLog.String("# of Got FB configs: "); 
+			KernelLog.String("# of Got FB configs: ");
 			KernelLog.Int(elemc, 0); KernelLog.Ln;
 		END;
 
@@ -409,57 +409,58 @@ VAR
 		attr[i] := major; INC(i);
 		attr[i] := GLC.GLX_CONTEXT_MINOR_VERSION_ARB; INC(i);
 		attr[3]:=minor; INC(i);
-    
+
 (*		 attr[i] := GLC.GLX_CONTEXT_FLAGS_ARB; INC(i);
 		 attr[i] := GLC.GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB; INC(i);
-*)   
-   
+*)
+
 		attr[i] := GLC.GLX_CONTEXT_PROFILE_MASK_ARB; INC(i);
-	(*		attr[i] := GLC.GLX_CONTEXT_CORE_PROFILE_BIT_ARB; INC(i) *)		
+	(*		attr[i] := GLC.GLX_CONTEXT_CORE_PROFILE_BIT_ARB; INC(i) *)
 		attr[i] := GLC.GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB; INC(i);
-  
+
 		attr[i] := 0; (* end of attribute list *)
 		fbcfg := fbcfgPtr[0];
-		
-		newctxt := GL.glXCreateContextAttribsARB(display, fbcfg, 0, X11.True, ADDRESSOF(attr[0]));
-		IF newctxt = NIL THEN 
-			KernelLog.String("could not create OpenGL "); KernelLog.Int(major, 0); KernelLog.Char("."); KernelLog.Int(minor, 0); 
-			KernelLog.String(" context"); KernelLog.Ln; 
+
+		newctxt := GL.glXCreateContextAttribsARB(display, fbcfg, 0, GLC.GL_TRUE, ADDRESSOF(attr[0]));
+		IF newctxt = 0 THEN
+			KernelLog.String("could not create OpenGL "); KernelLog.Int(major, 0); KernelLog.Char("."); KernelLog.Int(minor, 0);
+			KernelLog.String(" context"); KernelLog.Ln;
 			RETURN FALSE;
 		END;
 
-		IF glctx # NIL THEN
+		IF glctx # 0 THEN
 (*			(* Release the context *)
 		    	res := GL.glXMakeCurrent(glWin.display, 0, 0);*)
 		    	(* Delete the context *)
 			GL.glXDestroyContext(display, glctx);
 			IF debug THEN KernelLog.String("old context deleted"); KernelLog.Ln; END;
 		END;
-				
+
 		glctx := newctxt;
-		
+
 		res := GL.glXMakeCurrent(display, win, glctx);
-		
+
 		GL.ReadOpenGLCore();
-		
-(*		str := GL.GetString(GLC.GL_VENDOR); 
+
+(*		str := GL.GetString(GLC.GL_VENDOR);
 		KernelLog.String(" Vendor: "); KernelLog.String(str^); KernelLog.Ln;
 
-		str := GL.GetString(GLC.GL_RENDERER); 
+		str := GL.GetString(GLC.GL_RENDERER);
 		KernelLog.String(" Renderer: "); KernelLog.String(str^); KernelLog.Ln;
-	
-		str := GL.GetString(GLC.GL_VERSION); 
+
+		str := GL.GetString(GLC.GL_VERSION);
 		KernelLog.String(" Version: "); KernelLog.String(str^); KernelLog.Ln;
 *)
-		X11.Free(fbcfgPtr);	
+		X11.Free(fbcfgPtr);
   		RETURN TRUE;
 	END SetProfile;
-	
+
 	(* create an X11 window, and GL context *)
 	PROCEDURE  InitWindow*(): BOOLEAN;
 	VAR
-		masks, res: LONGINT;
-		resb: GL.Boolean;
+		masks: LONGWORD;
+		res: LONGINT;
+		resb: X11.Bool;
 		attrib : POINTER TO ARRAY OF GL.Int;  (* attributes of GL window *)
 		swa : Api.XSetWindowAttributes; (* set window attributes*)
 		visinfoptr : Api.VisualInfoPtr; (* pointer to X11 VisualInfo *)
@@ -469,7 +470,7 @@ VAR
 		modeInfos {UNTRACED}: V.PModeInfo;
 		bestmodeInfo {UNTRACED} : V.ModeInfo;
 		numModes, bestmodeNum: LONGINT;
-		
+
 		i: LONGINT;
 		isbestFound: BOOLEAN;
 		rootwin: Api.Window;
@@ -492,11 +493,11 @@ VAR
 			KernelLog.Int(wmMajor,0); KernelLog.Char(".");
 			KernelLog.Int(wmMinor,0); KernelLog.Ln;
 		END;
-			
+
 (* ======================================= *)
 
 		NEW(attrib, 13);
-		
+
 		attrib[0] := GLC.GLX_RGBA;
 		attrib[1] := GLC.GLX_DOUBLEBUFFER;
 		attrib[2] := GLC.GLX_DEPTH_SIZE;	attrib[3] := 24;
@@ -543,7 +544,7 @@ VAR
 		END;
 
 		rootwin :=  Api.RootWindow(display, visinfoptr.screen);
-		
+
  		(* window attributes *)
  		swa.backgroundPixel := 0;
  		swa.borderPixel := 0;
@@ -556,7 +557,7 @@ VAR
 			RETURN FALSE;
 		END;
 
-		
+
 		IF fullscreen THEN
 
 			res := V.GetAllModeLines(display, screen, numModes, modeInfos);
@@ -567,16 +568,16 @@ VAR
  				KernelLog.String("Desktop Mode Info:");KernelLog.Int(desktopMode.hdisplay, 6);
  				KernelLog.Int(desktopMode.vdisplay, 6);
 				KernelLog.Ln;
-				KernelLog.String("Other Modes: "); KernelLog.Ln; 
+				KernelLog.String("Other Modes: "); KernelLog.Ln;
 				FOR i := 0 TO numModes-1 DO
-					 KernelLog.Int(i, 0); KernelLog.Char(":"); 
-					 KernelLog.Int(modeInfos[i].hdisplay, 6); 
-					 KernelLog.Int(modeInfos[i].vdisplay, 6); 
+					 KernelLog.Int(i, 0); KernelLog.Char(":");
+					 KernelLog.Int(modeInfos[i].hdisplay, 6);
+					 KernelLog.Int(modeInfos[i].vdisplay, 6);
 					 KernelLog.Ln;
 				 END;
 			END;
 
-			(* look for mode with the requested resolution and choose the best matched one *)		
+			(* look for mode with the requested resolution and choose the best matched one *)
 			i := 0;
 		    bestmodeNum := 0;
 		    WHILE (i < numModes) & (~isbestFound) DO
@@ -591,39 +592,39 @@ VAR
 			(* if cant find the required mode choose desktop mode *)
 			IF ~isbestFound THEN
 				bestmodeInfo := desktopMode;
-				fullscreen := FALSE;			
-				KernelLog.String("Full screen mode is not found: "); 
-				KernelLog.String("width= "); KernelLog.Int(width, 0); 
-				KernelLog.String(", height= "); KernelLog.Int(height, 0); 
-				KernelLog.Ln; 
+				fullscreen := FALSE;
+				KernelLog.String("Full screen mode is not found: ");
+				KernelLog.String("width= "); KernelLog.Int(width, 0);
+				KernelLog.String(", height= "); KernelLog.Int(height, 0);
+				KernelLog.Ln;
 			ELSE
 				bestmodeInfo := modeInfos[bestmodeNum];
 			END;
 
 			IF debug THEN
-				KernelLog.String("bestmodeNum = "); KernelLog.Int(bestmodeNum, 0); KernelLog.Ln; 
-				KernelLog.String("bestmodeInfo.hdisplay= "); KernelLog.Int(bestmodeInfo.hdisplay, 0);  KernelLog.Ln; 
-				KernelLog.String("bestmodeInfo.vdisplay= "); KernelLog.Int(bestmodeInfo.vdisplay, 5); KernelLog.Ln; 
-			END;			
+				KernelLog.String("bestmodeNum = "); KernelLog.Int(bestmodeNum, 0); KernelLog.Ln;
+				KernelLog.String("bestmodeInfo.hdisplay= "); KernelLog.Int(bestmodeInfo.hdisplay, 0);  KernelLog.Ln;
+				KernelLog.String("bestmodeInfo.vdisplay= "); KernelLog.Int(bestmodeInfo.vdisplay, 5); KernelLog.Ln;
+			END;
 		END;
 
 		IF fullscreen & isbestFound THEN
 			width := bestmodeInfo.hdisplay;
 			height := bestmodeInfo.vdisplay;
-			
+
 			left := 0; top := 0;
 			IF debug THEN
-				KernelLog.String("Full screen width: "); KernelLog.Int(width, 0); 
+				KernelLog.String("Full screen width: "); KernelLog.Int(width, 0);
 				KernelLog.String(" height= "); KernelLog.Int(height, 5);
-				KernelLog.String(" bestmodeNum= "); KernelLog.Int(bestmodeNum, 0); 
-				KernelLog.Ln; 
+				KernelLog.String(" bestmodeNum= "); KernelLog.Int(bestmodeNum, 0);
+				KernelLog.Ln;
 			END;
 			(* Use the XF86VidMode extension to control video resolution *)
 			(* Change the current video mode, switch to fullscreen *)
 			(* Unlock mode switch if necessary *)
 			res := V.LockModeSwitch(display, screen, 0);
 			(* Change the video mode to the desired mode *)
-			res := V.SwitchToMode(display, screen, bestmodeInfo);		
+			res := V.SwitchToMode(display, screen, bestmodeInfo);
 			X11.Flush(display);
 			(* Set viewport to upper left corner (where our window will be) *)
 	       	res:= V.SetViewPort(display, screen, 0, 0);
@@ -635,12 +636,12 @@ VAR
 	 		Api.ButtonMotionMask + Api.ExposureMask + Api.StructureNotifyMask + Api.FocusChangeMask ;
 
 			masks := Api.CWBorderPixel + Api.CWColormap + Api.CWEventMask + Api.CWOverrideRedirect;
-			
+
 			win := Api.CreateWindow(display,  rootwin, 0, 0, width, height,
 				        0, visinfoptr.depth, Api.InputOutput,  visinfoptr.visual, masks, swa);
-				        
-			IF win = NIL THEN RETURN FALSE END;
-			
+
+			IF win = 0 THEN RETURN FALSE END;
+
 			(* Api.WarpPointer(display, Api.None, win, 0, 0, 0, 0, 0, 0);*)
 			Api.WarpPointer(display, Api.None, win, 0, 0, 0, 0, width DIV 2, height DIV 2);
 			Api.MapWindow(display, win);
@@ -657,8 +658,8 @@ VAR
 
 	 		win := Api.CreateWindow(display, rootwin, left, top, width, height,
 			        0, visinfoptr.depth, Api.InputOutput,  visinfoptr.visual, masks, swa);
-			IF win = NIL THEN RETURN FALSE END;
-			
+			IF win = 0 THEN RETURN FALSE END;
+
 			(* set wm_delete_events if in windowed mode *)
 			wmDelete := Api.InternAtom(display, "WM_DELETE_WINDOW", Api.True);
 			res := Api.SetWMProtocols(display, win, ADDRESSOF(wmDelete), 1);
@@ -668,7 +669,7 @@ VAR
 			Api.SetStandardProperties(display, win, title, title, 0, 0, 0, sizehints);
 	 		Api.MapWindow(display, win);
 		END;
-		
+
 		IF ~fullscreen & fullwindow THEN
 			SetFullWindow(TRUE);
 		END;
@@ -685,8 +686,8 @@ VAR
 	END InitWindow;
 
 	(* Returns wether key (SHIFT, CTRL or ALT) is pressed *)
-	PROCEDURE KeyState( ): SET;
-	VAR keys: SET;
+	PROCEDURE KeyState( ): SET32;
+	VAR keys: SET32;
 	BEGIN
 		keys := {};
 		IF Api.ShiftMask IN xbuttons THEN  INCL( keys, Inputs.LeftShift )  END;
@@ -704,13 +705,12 @@ VAR
 		event: Api.XEvent;
 		kp : Api.XKeyEvent; 	be : Api.XButtonPressedEvent; em: Api.XExposeEvent;
 		cm : Api.XClientMessageEvent; cn : Api.XConfigureEvent; me: Api.XMotionEvent;
-		datal: Api.Data40l;
 	       keycount, xr, yr, x, y, i: LONGINT;
 		keysym: X11.KeySym;
-		newxbuttons, bdiff: SET;
+		newxbuttons, bdiff: SET32;
 		rw, cw: X11.Window;
 		ch: CHAR;
-		flags: SET;
+		flags: SET32;
 		buffer: ARRAY bufsize OF CHAR;
 		events: LONGINT;
 	BEGIN
@@ -734,7 +734,7 @@ VAR
 					ELSIF Api.Mod5Mask IN bdiff THEN keysym := Inputs.KsAltR
 					END;
 					flags := KeyState();
-					KeyEvent( ORD(0X), flags, keysym )
+					KeyEvent( ORD(0X), flags, LONGINT(keysym) )
 				ELSE
 					xbuttons := newxbuttons;
 					WHILE i < keycount DO
@@ -743,7 +743,7 @@ VAR
 						IF ch = 0F1X THEN  ch := 0A4X
 						ELSIF ch = 0F2X THEN ch := 0A5X
 						END;
-						KeyEvent( ORD(ch), flags, keysym);
+						KeyEvent( ORD(ch), flags, LONGINT(keysym));
 						INC( i )
 					END
 				END;
@@ -761,7 +761,7 @@ VAR
 					ELSIF Api.Mod5Mask IN bdiff THEN keysym := Inputs.KsAltR
 					END;
 					flags := KeyState( ) + {Inputs.Release};
-					KeyEvent(ORD(ch), flags, keysym);
+					KeyEvent(ORD(ch), flags, LONGINT(keysym));
 				END;
 
 			| Api.ButtonPress: be := SYSTEM.VAL(Api.XButtonPressedEvent, event); Wr("ButtonPressed");
@@ -819,8 +819,7 @@ VAR
 
 			| Api.ClientMessage:
 				cm := SYSTEM.VAL( Api.XClientMessageEvent, event );
-				datal := SYSTEM.VAL( Api.Data40l, cm.data );
-				IF  SYSTEM.VAL( X11.Atom,datal[0] ) = wmDelete THEN
+				IF  cm.data[0]  = wmDelete THEN
 					(* shutdown *)
 					Close;
 				END;
@@ -990,6 +989,6 @@ BEGIN
 	InitKeysym;
 END OGLWindow.
 
-SystemTools.Free OGLWindow ~
+System.Free OGLWindow ~
 
-SystemTools.FreeDownTo OpenGL ~
+System.FreeDownTo OpenGL ~

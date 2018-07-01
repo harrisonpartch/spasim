@@ -61,9 +61,9 @@ END OGLDemo.
 
 OGLDemo.Open ~
 
-SystemTools.Free OGLDemo OGLWindow ~
+System.Free OGLDemo OGLWindow ~
 
-SystemTools.FreeDownTo OpenGL ~
+System.FreeDownTo OpenGL ~
 
 
 

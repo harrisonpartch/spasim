@@ -533,7 +533,7 @@ BEGIN
 		ReadChunk(curChunk);
 
 		(* Check which chunk we just read *)
-		
+
 
 		IF curChunk.ID = OBJ_TRIMESH THEN					(* This lets us know that we are reading a new object*)
 
@@ -1086,7 +1086,7 @@ Decoder3DS.Open "AMBLNC1.3DS" ~
 
 Decoder3DS.Open "jelyfish.3ds" ~
 
-SystemTools.Free Decoder3DS ~
+System.Free Decoder3DS ~
 
 (*
 (*  This module handles all of the code needed to load a .3DS file.

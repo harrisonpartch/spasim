@@ -1,15 +1,15 @@
 MODULE WMGLWindow; (** AUTHOR "fnecati"; PURPOSE "an OpenGL Context enabled WM.Window using GLXPixmap for LinuxAos"; *)
 IMPORT
-	WM := WMWindowManager, KernelLog, GLContext := GLContext;
+	WM := WMWindowManager, KernelLog, GLContext := GLContext, WMMessages;
 
-CONST debug = FALSE;
+CONST debug = TRUE;
 
 TYPE Context = GLContext.Context;
 
-TYPE	
+TYPE
 	Window* =  OBJECT(WM.DoubleBufferWindow)
 	VAR
-		context : Context;
+		context {UNTRACED} : Context;
 
 		PROCEDURE &Init*(w, h: LONGINT; alpha: BOOLEAN);
 		BEGIN
@@ -48,26 +48,36 @@ TYPE
 		PROCEDURE UpdateImage*();
 		END UpdateImage;
 
-		PROCEDURE Resized(w, h: LONGINT);
-		BEGIN 			
+		PROCEDURE MyResized(w, h: LONGINT);
+		BEGIN
 			IF (backImg = NIL) OR (backImg.adr = NIL) THEN RETURN END;
-			
-			IF context.Resize(w, h) THEN 
-				ReInit(w, h);
+
+			ReInit(w, h);
+			IF context.Resize(w, h) THEN
+
 				Reshape(w, h);
 				UpdateImage;
 			(*	KernelLog.String("WMGLWindow Resized TRUE"); KernelLog.Ln; *)
 			ELSE
 (*				KernelLog.String("WMGLWindow Resized FALSE"); KernelLog.Ln; *)
-			END;		
-		END Resized;
+			END;
+		END MyResized;
 
-		PROCEDURE GetDisplay*(): LONGINT;
+		PROCEDURE Handle*(VAR m : WMMessages.Message);
+		BEGIN
+			IF m.msgType = WMMessages.MsgResized THEN
+				MyResized(m.x, m.y);
+			ELSE
+				Handle^(m);
+			END;
+		END Handle;
+
+		PROCEDURE GetDisplay*(): LONGWORD;
 		BEGIN
 			RETURN context.GetDisplay();
 		END GetDisplay;
 
-		PROCEDURE GetContext*(): LONGINT;
+		PROCEDURE GetContext*(): LONGWORD;
 		BEGIN
 			RETURN context.GetContext();
 		END GetContext;
@@ -82,6 +92,6 @@ TYPE
 BEGIN
 END WMGLWindow.
 
-SystemTools.Free WMGLWindow ~
+System.Free WMGLWindow ~
 
-SystemTools.FreeDownTo OpenGL ~ 
+System.FreeDownTo OpenGL ~ 

@@ -348,7 +348,7 @@ CONST
 	WM_MBUTTONDBLCLK* = 521 (* {0, 3, 9} *);
 	WM_MOUSEWHEEL* = 522;
 	WM_MOUSELAST* = 522 (* {1, 3, 9} *);
-	
+
 	WM_PARENTNOTIFY* = 528 (* {4, 9} *);
 	MENULOOP_WINDOW* = 0 (* {} *);
 	MENULOOP_POPUP* = 1 (* {0} *);
@@ -669,10 +669,10 @@ CONST
 	END;
 
 
-	PIXELFORMATDESCRIPTOR* = RECORD 
+	PIXELFORMATDESCRIPTOR* = RECORD
 		nSize*: INTEGER;
 		nVersion*: INTEGER;
-		dwFlags*:DWORD ;
+		dwFlags*:WORDSET ;
 		iPixelType*: CHAR;
 		cColorBits*: CHAR;
 		cRedBits*: CHAR;
@@ -693,9 +693,9 @@ CONST
 		cAuxBuffers*: CHAR;
 		iLayerType*: CHAR;
 		bReserved*: CHAR;
-		dwLayerMask*: DWORD;
-		dwVisibleMask*: DWORD;
-		dwDamageMask*: DWORD;
+		dwLayerMask*: WORDSET;
+		dwVisibleMask*: WORDSET;
+		dwDamageMask*: WORDSET;
 	END;
 
 	CREATESTRUCTA* = RECORD
@@ -710,7 +710,7 @@ CONST
 		style*: DWORD;
 		lpszName*: LONGINT;
 		lpszClass*:LONGINT;
-		dwExStyle*: DWORD;
+		dwExStyle*: WORDSET;
 	END;
 
 	CREATESTRUCTW* = RECORD
@@ -725,7 +725,7 @@ CONST
 		style*: DWORD;
 		lpszName*: LONGINT;
 		lpszClass*: LONGINT;
-		dwExStyle*: DWORD;
+		dwExStyle*: WORDSET;
 	END;
 	CREATESTRUCT* = CREATESTRUCTA;
 
@@ -741,7 +741,7 @@ CONST
 	LayerPlaneDescriptor* = RECORD
 		nSize*: INTEGER;
 		nVersion*: INTEGER;
-		dwFlags*: LONGINT;
+		dwFlags*: WORDSET;
 		iPixelType*: CHAR;
 		cColorBits*: CHAR;
 		cRedBits*: CHAR;
@@ -866,7 +866,7 @@ VAR
 
 
 	(* USER32.dll *)
-	AdjustWindowRectEx-: PROCEDURE {WINAPI} (VAR lpRect: User32.Rect (* ADDRESS *); dwStyle: DWORD; bMenu: BOOL; dwExStyle: DWORD): BOOL;
+	AdjustWindowRectEx-: PROCEDURE {WINAPI} (VAR lpRect: User32.Rect (* ADDRESS *); dwStyle: WORDSET; bMenu: BOOL; dwExStyle: WORDSET): BOOL;
 	ClientToScreen- : PROCEDURE {WINAPI} (hWnd: HWND; VAR lpPoint: User32.Point): BOOL;
 	FindWindow- : PROCEDURE {WINAPI} (CONST lpClassName: ARRAY OF CHAR; CONST lpWindowName: ARRAY OF CHAR): HWND;
 	GetDesktopWindow-: PROCEDURE {WINAPI} (): HWND;
@@ -875,7 +875,7 @@ VAR
 (*	ChangeDisplaySettingsA-: PROCEDURE {WINAPI} (lpDevMode: ADDRESS; (*DEVMODEA*) dwFlags: SET): LONGINT;
 	ChangeDisplaySettingsW- : PROCEDURE {WINAPI} (lpDevMode: ADDRESS (*DEVMODEW*); dwFlags: SET): LONGINT;
 *)
-	ChangeDisplaySettings-: PROCEDURE{WINAPI} (lpDevMode: ADDRESS (*DEVMODEA*); dwFlags: SET): LONGINT;
+	ChangeDisplaySettings-: PROCEDURE{WINAPI} (lpDevMode: ADDRESS (*DEVMODEA*); dwFlags: WORDSET): LONGINT;
 
 (*
 

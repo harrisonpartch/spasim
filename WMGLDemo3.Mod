@@ -405,8 +405,8 @@ BEGIN
 	Modules.InstallTermHandler(Cleanup)
 END WMGLDemo3.
 
-SystemTools.Free  WMGLDemo3   ~
+System.Free  WMGLDemo3   ~
 
 WMGLDemo3.Open ~
 
-SystemTools.FreeDownTo WMGLWindow ~ 
+System.FreeDownTo WMGLWindow ~

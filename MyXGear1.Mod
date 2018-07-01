@@ -44,7 +44,7 @@ CONST
 
 
 VAR
-	event: Api.XEvent;  xbuttons: SET;
+	event: Api.XEvent;  xbuttons: SET32;
 	compstatus: Api.ComposeStatus;
 
 	MMseen, MRseen: BOOLEAN;
@@ -305,7 +305,7 @@ END Reshape;
 PROCEDURE  InitWindow(w, h: LONGINT; CONST title: ARRAY OF CHAR);
 VAR
 	res: LONGINT;
-	masks: LONGINT;
+	masks: LONGWORD;
 	buf: X11.Buffer;
 	attrib : POINTER TO ARRAY OF GL.Int;  (* attributes of GL window *)
 	defwin: X11.Window;
@@ -354,8 +354,9 @@ END;
  IF cmap = 0 THEN
  	IF debug THEN
 	 	context.out.String(" cannot create colormap"); context.out.Ln;
-	 	X11.GetErrorText(display, cmap, buf, LEN(buf));
+(*	 	X11.GetErrorText(display, cmap, buf, LEN(buf));
 	 	context.out.String("ERROR: CreateColormap = "); context.out.String(buf); context.out.Ln;
+*)
 	 	context.out.Update;
  	END;
  END;
@@ -437,7 +438,7 @@ END SaveImage;
 	END CheckAlternateKeys;
 
 	(* mouse handler *)
-	PROCEDURE SendMouseMsg( x, y, dz: LONGINT; xbuttons: SET );
+	PROCEDURE SendMouseMsg( x, y, dz: LONGINT; xbuttons: SET32 );
 	VAR mm: Inputs.AbsMouseMsg;
 	BEGIN
 		mm.keys := {};
@@ -472,7 +473,7 @@ END SaveImage;
 		RETURN keys
 	END KeyState;
 
-	PROCEDURE WrKey(keysym: LONGINT);
+	PROCEDURE WrKey(keysym: LONGWORD);
 	BEGIN
 		context.out.String("keysym: "); context.out.Int(keysym,0); context.out.String(":"); context.out.Hex(keysym, 8);
 
@@ -484,7 +485,7 @@ END SaveImage;
 	PROCEDURE PollXQueue;
 	VAR eventcount, keycount, xr, yr, x, y, dz, i, res: LONGINT;
 		rw, cw: X11.Window;  buffer: X11.Buffer;  keysym: X11.KeySym;
-		newxbuttons, bdiff: SET;
+		newxbuttons, bdiff: SET32;
 		 km: Inputs.KeyboardMsg;
 		 be : Api.XButtonEvent;
 	BEGIN
@@ -637,4 +638,4 @@ END MyXGear1.
 
 MyXGear1.Open~
 
-SystemTools.Free MyXGear1 ~ 
+System.Free MyXGear1 ~ 

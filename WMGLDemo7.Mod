@@ -15,7 +15,7 @@ TYPE
 		timer: Kernel.MilliTimer;
 		alive,  animated, dead: BOOLEAN;
 		xrot : REAL;
- 		quad: GLU.QuadricObj;
+ 		quad: GLU.Quadric;
 		drawMode: LONGINT;
 		font: WMGraphics.Font;
 		frames: LONGINT;
@@ -69,7 +69,7 @@ TYPE
 
 	PROCEDURE Close;
 	BEGIN
-		BEGIN {EXCLUSIVE}   animated := FALSE; alive := FALSE; AWAIT(dead) END;		
+		BEGIN {EXCLUSIVE}   animated := FALSE; alive := FALSE; AWAIT(dead) END;
 		Close^;
 		DecCount
 	END Close;
@@ -218,7 +218,7 @@ TYPE
 
 		(* draw mirror *)
 		gl.Clear (glc.GL_DEPTH_BUFFER_BIT);
-		gl.PushAttrib (LONGINT(0FFFFFFFFH));
+		gl.PushAttrib ({0..31});
 		gl.Disable (glc.GL_LIGHTING);
 		(* Create imperfect reflector effect by blending a black
 		   mirror over the reflected scene with alpha of 0.05 *)
@@ -249,7 +249,7 @@ TYPE
 
 BEGIN  {ACTIVE}
 	Kernel.SetTimer(timer, 10);
-	WHILE alive DO		
+	WHILE alive DO
 		IF animated THEN
 	 		UpdateImage();
 	 		xrot := xrot + 1.0;
@@ -303,8 +303,8 @@ BEGIN
 	Modules.InstallTermHandler(Cleanup)
 END WMGLDemo7.
 
-SystemTools.Free  WMGLDemo7 ~
+System.Free  WMGLDemo7 ~
 
 WMGLDemo7.Open ~
 
-SystemTools.FreeDownTo OpenGL ~ 
+System.FreeDownTo OpenGL ~ 

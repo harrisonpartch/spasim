@@ -423,7 +423,7 @@ BEGIN
 	Modules.InstallTermHandler(Cleanup)
 END WMGLDemoLorenz.
 
-SystemTools.Free  WMGLDemoLorenz   ~
+System.Free  WMGLDemoLorenz   ~
 
 WMGLDemoLorenz.Open ~
 

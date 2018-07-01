@@ -74,7 +74,7 @@ TYPE
 	BEGIN
 		IF keysym = Inputs.KsLeft THEN left := TRUE; ReDisplay;
 		ELSIF keysym = Inputs.KsRight THEN left := FALSE; ReDisplay;
-		 ELSIF keysym = Inputs.KsUp THEN 
+		 ELSIF keysym = Inputs.KsUp THEN
 		 	SetIdleTime(1+ ENTIER(idletime/1.2)); (* faster *)
 			KernelLog.String("idletime= "); KernelLog.Int(idletime, 0); KernelLog.Ln;
 		ELSIF keysym = Inputs.KsDown THEN
@@ -84,6 +84,8 @@ TYPE
 		ELSIF keysym =  ORD("r") THEN MoveResizeWindow(10,10, 400, 400);
 		ELSIF keysym =  ORD("d") THEN SetDecorations(FALSE);
  		ELSIF keysym =  ORD("D") THEN SetDecorations(TRUE);
+ 		ELSIF keysym =  ORD("F") THEN SetFullWindow(TRUE);
+ 		ELSIF keysym =  ORD("f") THEN SetFullWindow(FALSE);
 		ELSIF keysym =  ORD("q") THEN Close;
 		END;
 	END KeyEvent ;
@@ -197,7 +199,7 @@ PROCEDURE Open*;
 VAR
 	mywin: MyGLControl;
 BEGIN
-	NEW(mywin, 800, 600);
+	NEW(mywin, 640, 480);
 END Open;
 
 BEGIN
@@ -205,6 +207,6 @@ END OGLDemo2.
 
 	OGLDemo2.Open~
 
-SystemTools.Free OGLDemo2 OGLWindow~
+System.Free OGLDemo2 OGLWindow~
 
-SystemTools.FreeDownTo  OpenGL ~ 
+System.FreeDownTo  OpenGL ~ 

@@ -34,23 +34,10 @@ TYPE
 	GLMatrix4d* = ADDRESS; (* ARRAY 4,4 OF Double; *)
 
 	(* GLU types *)
-	Nurbs* = LONGINT;
-	Quadric* = LONGINT;
-	Tesselator* = LONGINT;
+	Nurbs* = ADDRESS;
+	Quadric* =  ADDRESS;
+	Tesselator* =  ADDRESS;
 
-	PNurbs* = ADDRESS; (* POINTER TO ARRAY OF Nurbs; *)
-	PQuadric* = ADDRESS; (* POINTER TO ARRAY OF Quadric; *)
-	PTesselator* = ADDRESS; (* POINTER TO ARRAY OF Tesselator; *)
-
-	(* backwards compatibility *)
-	NurbsObj* = Nurbs;
-	QuadricObj* = Quadric;
-	TesselatorObj* = Tesselator;
-	TriangulatorObj* = Tesselator;
-	PNurbsObj* = PNurbs;
-	PQuadricObj* = PQuadric;
-	PTesselatorObj* = PTesselator;
-	PTriangulatorObj* = PTesselator;
 
 	(* QuadricCallback *)
 	TQuadricErrorProc* = PROCEDURE{C}(errorCode: Enum);
@@ -209,45 +196,44 @@ VAR
 	NewQuadric - : PROCEDURE{C}(): Quadric;
 	DeleteQuadric - : PROCEDURE{C}(state: Quadric);
 	QuadricNormals - : PROCEDURE{C}(quadObject: Quadric; normals: Enum);
-	QuadricTexture - : PROCEDURE{C}(quadObject: PQuadric; textureCoords: Boolean);
-	QuadricOrientation - : PROCEDURE{C}(quadObject: PQuadric; orientation: Enum);
+	QuadricTexture - : PROCEDURE{C}(quadObject: Quadric; textureCoords: Boolean);
+	QuadricOrientation - : PROCEDURE{C}(quadObject: Quadric; orientation: Enum);
 	QuadricDrawStyle - : PROCEDURE{C}(quadObject: Quadric; drawStyle: Enum);
 	Cylinder - : PROCEDURE{C}(quadObject: Quadric; baseRadius, topRadius, height: Double; slices, stacks: Int);
 	Disk - : PROCEDURE{C}(quadObject: Quadric; innerRadius, outerRadius: Double; slices, loops: Int);
 	PartialDisk - : PROCEDURE{C}(quadObject: Quadric; innerRadius, outerRadius: Double; slices, loops: Int; startAngle, sweepAngle: Double);
 	Sphere - : PROCEDURE{C}(quadObject: Quadric; radius: Double; slices, stacks: Int);
-	QuadricCallback - : PROCEDURE{C}(quadObject: Quadric; which: Enum; fn: ADDRESS (*TQuadricErrorProc*));
-	NewTess - : PROCEDURE{C}(): PTesselator;
-	DeleteTess - : PROCEDURE{C}(tess: PTesselator);
-	TessBeginPolygon - : PROCEDURE{C}(tess: PTesselator; polygon_data: Pointer);
-	TessBeginContour - : PROCEDURE{C}(tess: PTesselator);
-	TessVertex - : PROCEDURE{C}(tess: PTesselator; CONST coords: GLArray3d; data: Pointer);
-	TessEndContour - : PROCEDURE{C}(tess: PTesselator);
-	TessEndPolygon - : PROCEDURE{C}(tess: PTesselator);
-	TessProperty - : PROCEDURE{C}(tess: PTesselator; which: Enum; value: Double);
-	TessNormal - : PROCEDURE{C}(tess: PTesselator; x, y, z: Double);
-	TessCallback - : PROCEDURE{C}(tess: PTesselator; which: Enum; fn: Pointer);
-	GetTessProperty - : PROCEDURE{C}(tess: PTesselator; which: Enum; value: PDouble);
-	NewNurbsRenderer - : PROCEDURE{C}(): PNurbs;
-	DeleteNurbsRenderer - : PROCEDURE{C}(nobj: PNurbs);
-	BeginSurface - : PROCEDURE{C}(nobj: PNurbs);
-	BeginCurve - : PROCEDURE{C}(nobj: PNurbs);
-	EndCurve - : PROCEDURE{C}(nobj: PNurbs);
-	EndSurface - : PROCEDURE{C}(nobj: PNurbs);
-	BeginTrim - : PROCEDURE{C}(nobj: PNurbs);
-	EndTrim - : PROCEDURE{C}(nobj: PNurbs);
-	PwlCurve - : PROCEDURE{C}(nobj: PNurbs; count: Int; points: PFloat; stride: Int; atype: Enum);
-	NurbsCurve - : PROCEDURE{C}(nobj: PNurbs; nknots: Int; knot: PFloat; stride: Int; ctlarray: PFloat; order: Int; atype: Enum);
-	NurbsSurface - : PROCEDURE{C}(nobj: PNurbs; sknot_count: Int; sknot: PFloat; tknot_count: Int; tknot: PFloat; s_stride, t_stride: Int; ctlarray: PFloat; sorder, torder: Int; atype: Enum);
-	LoadSamplingMatrices - : PROCEDURE{C}(nobj: PNurbs; CONST modelMatrix, projMatrix: GLMatrix4f; CONST viewport: GLVector4i);
-	NurbsProperty - : PROCEDURE{C}(nobj: PNurbs; aproperty: Enum; value: Float);
-	GetNurbsProperty - : PROCEDURE{C}(nobj: PNurbs; aproperty: Enum; value: PFloat);
-	NurbsCallback - : PROCEDURE{C}(nobj: PNurbs; which: Enum; fn: TNurbsErrorProc);
-	BeginPolygon - : PROCEDURE{C}(tess: PTesselator);
-	NextContour - : PROCEDURE{C}(tess: PTesselator; atype: Enum);
-	EndPolygon - : PROCEDURE{C}(tess: PTesselator);
+	QuadricCallback - : PROCEDURE{C}(quadObject: Quadric; which: Enum; fn: TQuadricErrorProc);
+	NewTess - : PROCEDURE{C}(): Tesselator;
+	DeleteTess - : PROCEDURE{C}(tess: Tesselator);
+	TessBeginPolygon - : PROCEDURE{C}(tess: Tesselator; polygon_data: Pointer);
+	TessBeginContour - : PROCEDURE{C}(tess: Tesselator);
+	TessVertex - : PROCEDURE{C}(tess: Tesselator; CONST coords: GLArray3d; data: Pointer);
+	TessEndContour - : PROCEDURE{C}(tess: Tesselator);
+	TessEndPolygon - : PROCEDURE{C}(tess: Tesselator);
+	TessProperty - : PROCEDURE{C}(tess: Tesselator; which: Enum; value: Double);
+	TessNormal - : PROCEDURE{C}(tess: Tesselator; x, y, z: Double);
+	TessCallback - : PROCEDURE{C}(tess: Tesselator; which: Enum; fn: Pointer);
+	GetTessProperty - : PROCEDURE{C}(tess: Tesselator; which: Enum; value: PDouble);
+	NewNurbsRenderer - : PROCEDURE{C}(): Nurbs;
+	DeleteNurbsRenderer - : PROCEDURE{C}(nobj: Nurbs);
+	BeginSurface - : PROCEDURE{C}(nobj: Nurbs);
+	BeginCurve - : PROCEDURE{C}(nobj: Nurbs);
+	EndCurve - : PROCEDURE{C}(nobj: Nurbs);
+	EndSurface - : PROCEDURE{C}(nobj: Nurbs);
+	BeginTrim - : PROCEDURE{C}(nobj: Nurbs);
+	EndTrim - : PROCEDURE{C}(nobj: Nurbs);
+	PwlCurve - : PROCEDURE{C}(nobj: Nurbs; count: Int; points: PFloat; stride: Int; atype: Enum);
+	NurbsCurve - : PROCEDURE{C}(nobj: Nurbs; nknots: Int; knot: PFloat; stride: Int; ctlarray: PFloat; order: Int; atype: Enum);
+	NurbsSurface - : PROCEDURE{C}(nobj: Nurbs; sknot_count: Int; sknot: PFloat; tknot_count: Int; tknot: PFloat; s_stride, t_stride: Int; ctlarray: PFloat; sorder, torder: Int; atype: Enum);
+	LoadSamplingMatrices - : PROCEDURE{C}(nobj: Nurbs; CONST modelMatrix, projMatrix: GLMatrix4f; CONST viewport: GLVector4i);
+	NurbsProperty - : PROCEDURE{C}(nobj: Nurbs; aproperty: Enum; value: Float);
+	GetNurbsProperty - : PROCEDURE{C}(nobj: Nurbs; aproperty: Enum; value: PFloat);
+	NurbsCallback - : PROCEDURE{C}(nobj: Nurbs; which: Enum; fn: TNurbsErrorProc);
+	BeginPolygon - : PROCEDURE{C}(tess: Tesselator);
+	NextContour - : PROCEDURE{C}(tess: Tesselator; atype: Enum);
+	EndPolygon - : PROCEDURE{C}(tess: Tesselator);
 
-(* ---------------------------- *)
 (* wrapper procedures *)
 PROCEDURE ErrorString*(errCode: Enum): Strings.String;
 VAR  sadr: ADDRESS;
@@ -373,11 +359,12 @@ BEGIN
 	GetProcAddress(lib, 'gluTessVertex', ADDRESSOF( TessVertex ));
 	GetProcAddress(lib, 'gluUnProject', ADDRESSOF( UnProject ));
 	KernelLog.String(libname); KernelLog.String(" loaded."); KernelLog.Ln;
+
 END InitGLU;
 
 PROCEDURE OnClose;
 BEGIN
-	IF lib # 0 THEN
+	IF lib # NIL THEN
 		Unix.Dlclose(lib);
 		KernelLog.String(libname); KernelLog.String(" unloaded."); KernelLog.Ln;
 	END;

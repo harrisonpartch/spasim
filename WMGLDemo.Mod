@@ -2,7 +2,7 @@ MODULE WMGLDemo; (** AUTHOR "fnecati"; PURPOSE "opengl demo: uses simple primiti
 
 IMPORT
 	WMRectangles, Strings, Kernel, Modules,
-	WM := WMWindowManager,  WMMessages, 
+	WM := WMWindowManager,  WMMessages,
 	GL := OpenGL, GLC := OpenGLConst, GLU, WMGL := WMGLWindow;
 
 CONST waittime = 50;
@@ -67,7 +67,7 @@ TYPE
 
 		PROCEDURE Close;
 		BEGIN
-			BEGIN {EXCLUSIVE} alive := FALSE; animated := FALSE; END;			
+			BEGIN {EXCLUSIVE} alive := FALSE; animated := FALSE; END;
 			Close^;
 			DecCount
 		END Close;
@@ -220,7 +220,9 @@ BEGIN
 	Modules.InstallTermHandler(Cleanup)
 END WMGLDemo.
 
-SystemTools.Free  WMGLDemo ~
+System.Free  WMGLDemo ~
 
 WMGLDemo.Open ~
+
+System.FreeDownTo OpenGL ~
 

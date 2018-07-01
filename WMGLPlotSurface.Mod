@@ -2,7 +2,7 @@ MODULE WMGLPlotSurface; (** AUTHOR "fnecati"; PURPOSE "a test for 3D function pl
 
 IMPORT
 	WMRectangles, Strings, Math:=MathL, Inputs, Modules,
-	WM := WMWindowManager,  WMMessages, 
+	WM := WMWindowManager,  WMMessages,
 	GL := OpenGL, GLC := OpenGLConst, GLU, WMGL := WMGLWindow;
 
 CONST
@@ -357,6 +357,6 @@ BEGIN
 	Modules.InstallTermHandler(Cleanup)
 END WMGLPlotSurface.
 
-SystemTools.Free  WMGLPlotSurface ~
+System.Free  WMGLPlotSurface ~
 
 WMGLPlotSurface.Open ~

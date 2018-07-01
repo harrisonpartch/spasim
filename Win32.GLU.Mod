@@ -34,23 +34,10 @@ TYPE
 	GLMatrix4d* = ADDRESS; (* ARRAY 4,4 OF Double; *)
 
 	(* GLU types *)
-	Nurbs* = LONGINT;
-	Quadric* = LONGINT;
-	Tesselator* = LONGINT;
+	Nurbs* = ADDRESS;
+	Quadric* = ADDRESS;
+	Tesselator* = ADDRESS;
 
-	PNurbs* = ADDRESS; (* POINTER TO ARRAY OF Nurbs; *)
-	PQuadric* = ADDRESS; (* POINTER TO ARRAY OF Quadric; *)
-	PTesselator* = ADDRESS; (* POINTER TO ARRAY OF Tesselator; *)
-
-	(* backwards compatibility *)
-	NurbsObj* = Nurbs;
-	QuadricObj* = Quadric;
-	TesselatorObj* = Tesselator;
-	TriangulatorObj* = Tesselator;
-	PNurbsObj* = PNurbs;
-	PQuadricObj* = PQuadric;
-	PTesselatorObj* = PTesselator;
-	PTriangulatorObj* = PTesselator;
 
 	(* QuadricCallback *)
 	TQuadricErrorProc* = PROCEDURE{WINAPI}(errorCode: Enum);
@@ -209,43 +196,43 @@ VAR
 	NewQuadric - : PROCEDURE{WINAPI}(): Quadric;
 	DeleteQuadric - : PROCEDURE{WINAPI}(state: Quadric);
 	QuadricNormals - : PROCEDURE{WINAPI}(quadObject: Quadric; normals: Enum);
-	QuadricTexture - : PROCEDURE{WINAPI}(quadObject: PQuadric; textureCoords: Boolean);
-	QuadricOrientation - : PROCEDURE{WINAPI}(quadObject: PQuadric; orientation: Enum);
+	QuadricTexture - : PROCEDURE{WINAPI}(quadObject: Quadric; textureCoords: Boolean);
+	QuadricOrientation - : PROCEDURE{WINAPI}(quadObject: Quadric; orientation: Enum);
 	QuadricDrawStyle - : PROCEDURE{WINAPI}(quadObject: Quadric; drawStyle: Enum);
 	Cylinder - : PROCEDURE{WINAPI}(quadObject: Quadric; baseRadius, topRadius, height: Double; slices, stacks: Int);
 	Disk - : PROCEDURE{WINAPI}(quadObject: Quadric; innerRadius, outerRadius: Double; slices, loops: Int);
 	PartialDisk - : PROCEDURE{WINAPI}(quadObject: Quadric; innerRadius, outerRadius: Double; slices, loops: Int; startAngle, sweepAngle: Double);
 	Sphere - : PROCEDURE{WINAPI}(quadObject: Quadric; radius: Double; slices, stacks: Int);
-	QuadricCallback - : PROCEDURE{WINAPI}(quadObject: Quadric; which: Enum; fn: ADDRESS (*TQuadricErrorProc*));
-	NewTess - : PROCEDURE{WINAPI}(): PTesselator;
-	DeleteTess - : PROCEDURE{WINAPI}(tess: PTesselator);
-	TessBeginPolygon - : PROCEDURE{WINAPI}(tess: PTesselator; polygon_data: Pointer);
-	TessBeginContour - : PROCEDURE{WINAPI}(tess: PTesselator);
-	TessVertex - : PROCEDURE{WINAPI}(tess: PTesselator; CONST coords: GLArray3d; data: Pointer);
-	TessEndContour - : PROCEDURE{WINAPI}(tess: PTesselator);
-	TessEndPolygon - : PROCEDURE{WINAPI}(tess: PTesselator);
-	TessProperty - : PROCEDURE{WINAPI}(tess: PTesselator; which: Enum; value: Double);
-	TessNormal - : PROCEDURE{WINAPI}(tess: PTesselator; x, y, z: Double);
-	TessCallback - : PROCEDURE{WINAPI}(tess: PTesselator; which: Enum; fn: Pointer);
-	GetTessProperty - : PROCEDURE{WINAPI}(tess: PTesselator; which: Enum; value: PDouble);
-	NewNurbsRenderer - : PROCEDURE{WINAPI}(): PNurbs;
-	DeleteNurbsRenderer - : PROCEDURE{WINAPI}(nobj: PNurbs);
-	BeginSurface - : PROCEDURE{WINAPI}(nobj: PNurbs);
-	BeginCurve - : PROCEDURE{WINAPI}(nobj: PNurbs);
-	EndCurve - : PROCEDURE{WINAPI}(nobj: PNurbs);
-	EndSurface - : PROCEDURE{WINAPI}(nobj: PNurbs);
-	BeginTrim - : PROCEDURE{WINAPI}(nobj: PNurbs);
-	EndTrim - : PROCEDURE{WINAPI}(nobj: PNurbs);
-	PwlCurve - : PROCEDURE{WINAPI}(nobj: PNurbs; count: Int; points: PFloat; stride: Int; atype: Enum);
-	NurbsCurve - : PROCEDURE{WINAPI}(nobj: PNurbs; nknots: Int; knot: PFloat; stride: Int; ctlarray: PFloat; order: Int; atype: Enum);
-	NurbsSurface - : PROCEDURE{WINAPI}(nobj: PNurbs; sknot_count: Int; sknot: PFloat; tknot_count: Int; tknot: PFloat; s_stride, t_stride: Int; ctlarray: PFloat; sorder, torder: Int; atype: Enum);
-	LoadSamplingMatrices - : PROCEDURE{WINAPI}(nobj: PNurbs; CONST modelMatrix, projMatrix: GLMatrix4f; CONST viewport: GLVector4i);
-	NurbsProperty - : PROCEDURE{WINAPI}(nobj: PNurbs; aproperty: Enum; value: Float);
-	GetNurbsProperty - : PROCEDURE{WINAPI}(nobj: PNurbs; aproperty: Enum; value: PFloat);
-	NurbsCallback - : PROCEDURE{WINAPI}(nobj: PNurbs; which: Enum; fn: TNurbsErrorProc);
-	BeginPolygon - : PROCEDURE{WINAPI}(tess: PTesselator);
-	NextContour - : PROCEDURE{WINAPI}(tess: PTesselator; atype: Enum);
-	EndPolygon - : PROCEDURE{WINAPI}(tess: PTesselator);
+	QuadricCallback - : PROCEDURE{WINAPI}(quadObject: Quadric; which: Enum; fn: TQuadricErrorProc);
+	NewTess - : PROCEDURE{WINAPI}(): Tesselator;
+	DeleteTess - : PROCEDURE{WINAPI}(tess: Tesselator);
+	TessBeginPolygon - : PROCEDURE{WINAPI}(tess: Tesselator; polygon_data: Pointer);
+	TessBeginContour - : PROCEDURE{WINAPI}(tess: Tesselator);
+	TessVertex - : PROCEDURE{WINAPI}(tess: Tesselator; CONST coords: GLArray3d; data: Pointer);
+	TessEndContour - : PROCEDURE{WINAPI}(tess: Tesselator);
+	TessEndPolygon - : PROCEDURE{WINAPI}(tess: Tesselator);
+	TessProperty - : PROCEDURE{WINAPI}(tess: Tesselator; which: Enum; value: Double);
+	TessNormal - : PROCEDURE{WINAPI}(tess: Tesselator; x, y, z: Double);
+	TessCallback - : PROCEDURE{WINAPI}(tess: Tesselator; which: Enum; fn: Pointer);
+	GetTessProperty - : PROCEDURE{WINAPI}(tess: Tesselator; which: Enum; value: PDouble);
+	NewNurbsRenderer - : PROCEDURE{WINAPI}(): Nurbs;
+	DeleteNurbsRenderer - : PROCEDURE{WINAPI}(nobj: Nurbs);
+	BeginSurface - : PROCEDURE{WINAPI}(nobj: Nurbs);
+	BeginCurve - : PROCEDURE{WINAPI}(nobj: Nurbs);
+	EndCurve - : PROCEDURE{WINAPI}(nobj: Nurbs);
+	EndSurface - : PROCEDURE{WINAPI}(nobj: Nurbs);
+	BeginTrim - : PROCEDURE{WINAPI}(nobj: Nurbs);
+	EndTrim - : PROCEDURE{WINAPI}(nobj: Nurbs);
+	PwlCurve - : PROCEDURE{WINAPI}(nobj: Nurbs; count: Int; points: PFloat; stride: Int; atype: Enum);
+	NurbsCurve - : PROCEDURE{WINAPI}(nobj: Nurbs; nknots: Int; knot: PFloat; stride: Int; ctlarray: PFloat; order: Int; atype: Enum);
+	NurbsSurface - : PROCEDURE{WINAPI}(nobj: Nurbs; sknot_count: Int; sknot: PFloat; tknot_count: Int; tknot: PFloat; s_stride, t_stride: Int; ctlarray: PFloat; sorder, torder: Int; atype: Enum);
+	LoadSamplingMatrices - : PROCEDURE{WINAPI}(nobj: Nurbs; CONST modelMatrix, projMatrix: GLMatrix4f; CONST viewport: GLVector4i);
+	NurbsProperty - : PROCEDURE{WINAPI}(nobj: Nurbs; aproperty: Enum; value: Float);
+	GetNurbsProperty - : PROCEDURE{WINAPI}(nobj: Nurbs; aproperty: Enum; value: PFloat);
+	NurbsCallback - : PROCEDURE{WINAPI}(nobj: Nurbs; which: Enum; fn: TNurbsErrorProc);
+	BeginPolygon - : PROCEDURE{WINAPI}(tess: Tesselator);
+	NextContour - : PROCEDURE{WINAPI}(tess: Tesselator; atype: Enum);
+	EndPolygon - : PROCEDURE{WINAPI}(tess: Tesselator);
 
 (* ---------------------------- *)
 (* wrapper procedures *)

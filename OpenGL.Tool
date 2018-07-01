@@ -10,9 +10,9 @@
 # Available at:  https://github.com/fnec/opengloberon
 # =================================================
 
-SystemTools.FreeDownTo OpenGL ~
+System.FreeDownTo OpenGLConst ~
 
-SystemTools.CollectGarbage ~ 
+System.CollectGarbage ~ 
 
 # 1- Compile platform dependent bindings:
 
@@ -133,7 +133,7 @@ Compiler.Compile
 # **********************
 
 # Free OpenGL related modules from the memory:
-SystemTools.FreeDownTo OpenGL ~
+System.FreeDownTo OpenGL ~
 
 
 

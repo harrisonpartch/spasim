@@ -3,7 +3,7 @@ MODULE WMGLDemo2; (** AUTHOR "fnecati"; PURPOSE " axolotl-felix opengl implemeta
 
 IMPORT
 	Raster, WMRectangles, Strings, Modules, WMGraphics,
-	WM := WMWindowManager,  WMMessages, KernelLog, 
+	WM := WMWindowManager,  WMMessages, KernelLog,
 	GL := OpenGL, GLC := OpenGLConst, GLU, WMGL:=WMGLWindow;
 
 TYPE
@@ -13,7 +13,7 @@ TYPE
 	GLWindow =  OBJECT(WMGL.Window)
 	VAR
 		drawMode:LONGINT; (* fill, lines, points *)
-		texture: ARRAY [3] OF GL.Uint;  (* Storage For 3 Textures  *)
+		texture: ARRAY 3 OF GL.Uint;  (* Storage For 3 Textures  *)
 		LightAmbient, LightDiffuse, LightPosition: ARRAY [4] OF GL.Float;
 		xrot, yrot: REAL;  (* X, Y  rotation *)
 		z : REAL; (* depth into the screen *)
@@ -26,11 +26,12 @@ TYPE
 			Init(w, h, FALSE); (* use alpha, for 32bpp img *)
 			WM.DefaultAddWindow(SELF);
 			SetTitle(Strings.NewString("WMGLDemo2: axolotl"));
-
-			InitGL;
-		 	Reshape(GetWidth(), GetHeight());
-			UpdateImage;
 			IncCount;
+
+			IF ~InitGL() THEN Close() END;
+		 	Reshape(w, h);
+			UpdateImage;
+
 		  END New;
 
 		PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
@@ -167,7 +168,7 @@ TYPE
 			DeActivate();
 		END Reshape;
 
-		PROCEDURE InitGL;
+		PROCEDURE InitGL(): BOOLEAN;
 		BEGIN
 			light := FALSE; blend := FALSE;
 			xrot := 30.0; yrot := 30.0; z := -10.0;
@@ -224,9 +225,10 @@ TYPE
 
 			(* Blending Function For Translucency Based On Source Alpha Value  *)
 			GL.BlendFunc( GLC.GL_SRC_ALPHA, GLC.GL_ONE );
-			IF ~LoadGLTextures("opengloberon/axolotl.png") THEN Close; END;
+			IF ~LoadGLTextures("opengloberon/axolotl.png") THEN RETURN FALSE END;
 
 			DeActivate();
+			RETURN TRUE;
 		END InitGL;
 
 		PROCEDURE DrawMode(dm: LONGINT);
@@ -371,6 +373,6 @@ BEGIN
 	Modules.InstallTermHandler(Cleanup)
 END WMGLDemo2.
 
-SystemTools.Free  WMGLDemo2   ~
+System.Free  WMGLDemo2   ~
 
 WMGLDemo2.Open ~

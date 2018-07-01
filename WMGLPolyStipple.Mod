@@ -2,7 +2,7 @@ MODULE WMGLPolyStipple; (** AUTHOR "fnecati"; PURPOSE "a demo using glPolygonSti
  (* example from OpenGL redbook pdf *)
 IMPORT
 	WMRectangles, Strings, Kernel, Modules, SYSTEM, KernelLog,
-	WM := WMWindowManager,  WMMessages, 
+	WM := WMWindowManager,  WMMessages,
 	GL := OpenGL, GLC := OpenGLConst, WMGL := WMGLWindow;
 
 CONST
@@ -261,9 +261,9 @@ BEGIN
 	Modules.InstallTermHandler(Cleanup)
 END WMGLPolyStipple.
 
-SystemTools.Free  WMGLPolyStipple   ~
+System.Free  WMGLPolyStipple   ~
 
 WMGLPolyStipple.Open ~
 
-SystemTools.FreeDownTo OpenGL~
+System.FreeDownTo OpenGL~
 

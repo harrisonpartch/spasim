@@ -422,9 +422,9 @@ BEGIN
 	InitAngleTable;
 END WMGLSteamEngine.
 
-SystemTools.Free  WMGLSteamEngine ~
+System.Free  WMGLSteamEngine ~
 
 WMGLSteamEngine.Open ~
 
-SystemTools.FreeDownTo OpenGL ~
+System.FreeDownTo OpenGL ~
 

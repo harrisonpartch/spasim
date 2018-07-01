@@ -2,7 +2,7 @@ MODULE WMGLDemo6;  (** AUTHOR "fnecati"; PURPOSE "simple radar sweep example "; 
 
 IMPORT
 	WMRectangles, Strings, Kernel, Math, Modules,
-	WM := WMWindowManager,  WMMessages, 
+	WM := WMWindowManager,  WMMessages,
 	GL := OpenGL, GLC := OpenGLConst, WMGL:=WMGLWindow;
 
 CONST waittime = 50;
@@ -228,6 +228,6 @@ BEGIN
 	Modules.InstallTermHandler(Cleanup)
 END WMGLDemo6.
 
-SystemTools.Free  WMGLDemo6  ~
+System.Free  WMGLDemo6  ~
 
 WMGLDemo6.Open ~

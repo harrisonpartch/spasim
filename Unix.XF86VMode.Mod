@@ -142,29 +142,29 @@ TYPE
 
 VAR
 
-	QueryVersion- : PROCEDURE {C} (dpy: DisplayPtr; VAR majorVersion : LONGINT; VAR minorVersion : LONGINT) : Bool;
-	QueryExtension- : PROCEDURE {C} (dpy : DisplayPtr; VAR eventBaseReturn : LONGINT; VAR errorBaseReturn : LONGINT ) : Bool;
-	SetClientVersion- : PROCEDURE {C} (dpy : DisplayPtr) : Bool;
-	GetModeLine- : PROCEDURE {C} ( dpy : DisplayPtr; screen : LONGINT; VAR dotclockReturn : LONGINT; VAR modeline :  ModeLine) : Bool;
-	GetAllModeLines- : PROCEDURE {C} (dpy : DisplayPtr; screen : LONGINT;  VAR modecountReturn : LONGINT; VAR modelinesr : PModeInfo ) : Bool;
-	AddModeLine- : PROCEDURE {C} (dpy : DisplayPtr; screen : LONGINT;  new_modeline : ModeInfo;  VAR after_modeline : ModeInfo ) : Bool;
-	DeleteModeLine- : PROCEDURE {C} (dpy : DisplayPtr; screen : LONGINT; modeline : ModeInfo ) : Bool;
-	ModModeLine- : PROCEDURE {C} (dpy : DisplayPtr; screen : LONGINT; modeline : ModeLine) : Bool;
-	ValidateModeLine- : PROCEDURE {C} (dpy : DisplayPtr; screen : LONGINT; modeline : ModeInfo ) : LONGINT (* Api.Status *);
-	SwitchMode- : PROCEDURE {C} ( dpy : DisplayPtr; screen : LONGINT; zoom : LONGINT ) : Bool;
-	SwitchToMode- : PROCEDURE {C} (dpy : DisplayPtr; screen : LONGINT; modeline : ModeInfo ) : Bool;
-	LockModeSwitch- : PROCEDURE {C} (dpy : DisplayPtr; screen : LONGINT; lock : LONGINT) : Bool;
-	GetMonitor- : PROCEDURE {C} (dpy : DisplayPtr; screen : LONGINT;  monitor : Monitor) : Bool;
-	GetViewPort- : PROCEDURE {C} (dpy : DisplayPtr; screen : LONGINT; VAR xreturn : LONGINT; VAR yreturn : LONGINT ) : Bool;
-	SetViewPort- : PROCEDURE {C} (dpy : DisplayPtr; screen : LONGINT; x : LONGINT; y : LONGINT ) : Bool;
-	GetDotClocks- : PROCEDURE {C} (dpy : DisplayPtr; screen : LONGINT; VAR flagsReturn : SET; VAR numberOffClocksReturn : LONGINT;  VAR maxDotClockReturn : LONGINT;
+	QueryVersion- : PROCEDURE {PlatformCC} (dpy: DisplayPtr; VAR majorVersion : LONGINT; VAR minorVersion : LONGINT) : Bool;
+	QueryExtension- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; VAR eventBaseReturn : LONGINT; VAR errorBaseReturn : LONGINT ) : Bool;
+	SetClientVersion- : PROCEDURE {PlatformCC} (dpy : DisplayPtr) : Bool;
+	GetModeLine- : PROCEDURE {PlatformCC} ( dpy : DisplayPtr; screen : LONGINT; VAR dotclockReturn : LONGINT; VAR modeline :  ModeLine) : Bool;
+	GetAllModeLines- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT;  VAR modecountReturn : LONGINT; VAR modelinesr : PModeInfo ) : Bool;
+	AddModeLine- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT;  new_modeline : ModeInfo;  VAR after_modeline : ModeInfo ) : Bool;
+	DeleteModeLine- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; modeline : ModeInfo ) : Bool;
+	ModModeLine- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; modeline : ModeLine) : Bool;
+	ValidateModeLine- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; modeline : ModeInfo ) : LONGINT (* Api.Status *);
+	SwitchMode- : PROCEDURE {PlatformCC} ( dpy : DisplayPtr; screen : LONGINT; zoom : LONGINT ) : Bool;
+	SwitchToMode- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; modeline : ModeInfo ) : Bool;
+	LockModeSwitch- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; lock : LONGINT) : Bool;
+	GetMonitor- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT;  monitor : Monitor) : Bool;
+	GetViewPort- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; VAR xreturn : LONGINT; VAR yreturn : LONGINT ) : Bool;
+	SetViewPort- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; x : LONGINT; y : LONGINT ) : Bool;
+	GetDotClocks- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; VAR flagsReturn : SET; VAR numberOffClocksReturn : LONGINT;  VAR maxDotClockReturn : LONGINT;
 	    VAR clocksReturn : Pcushort ) : Bool;
-	GetGamma- : PROCEDURE {C} (dpy : DisplayPtr; screen : LONGINT; VAR gamma : Gamma ) : Bool;
-	SetGamma- : PROCEDURE {C} (dpy : DisplayPtr; screen : LONGINT; VAR gamma : Gamma ) : Bool;
-	SetGammaRamp-: PROCEDURE {C} ( dpy : DisplayPtr; screen : LONGINT; asize : LONGINT; redarray : Pcushort; greenarray : Pcushort; bluearray : Pcushort ) : Bool;
-	GetGammaRamp- : PROCEDURE {C} ( dpy : DisplayPtr; screen : LONGINT; asize : LONGINT; redarray : Pcushort;  greenarray : Pcushort; bluearray : Pcushort ) : Bool;
-	GetGammaRampSize- : PROCEDURE {C} (dpy : DisplayPtr; screen : LONGINT; VAR asize : LONGINT ) : Bool;
-	GetPermissions- : PROCEDURE {C} (dpy : DisplayPtr; screen : LONGINT; VAR permissions : LONGINT ) : Bool;
+	GetGamma- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; VAR gamma : Gamma ) : Bool;
+	SetGamma- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; VAR gamma : Gamma ) : Bool;
+	SetGammaRamp-: PROCEDURE {PlatformCC} ( dpy : DisplayPtr; screen : LONGINT; asize : LONGINT; redarray : Pcushort; greenarray : Pcushort; bluearray : Pcushort ) : Bool;
+	GetGammaRamp- : PROCEDURE {PlatformCC} ( dpy : DisplayPtr; screen : LONGINT; asize : LONGINT; redarray : Pcushort;  greenarray : Pcushort; bluearray : Pcushort ) : Bool;
+	GetGammaRampSize- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; VAR asize : LONGINT ) : Bool;
+	GetPermissions- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; VAR permissions : LONGINT ) : Bool;
 
 (* *********** Wrapper macros ************* *)
 

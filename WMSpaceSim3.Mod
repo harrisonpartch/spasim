@@ -1,8 +1,9 @@
 MODULE WMSpaceSim3;
 
 	IMPORT KernelLog := KernelLog, Inputs, Strings, WMRectangles,
-	WM := WMWindowManager, GLU, Modules, WMMessages,
-	GL:=OpenGL, GLC:=OpenGLConst, WMGL := WMGLWindow, ML := Decoder3DS;
+	WM := WMWindowManager,  Modules, WMMessages,
+	GL:=OpenGL, GLC:=OpenGLConst, WMGL := WMGLWindow,
+	ML := Decoder3DS;
 
 TYPE
 	KillerMsg = OBJECT
@@ -13,7 +14,7 @@ TYPE
 	SpaceWindow = OBJECT(WMGL.Window)
 	VAR
 		model: ML.Model3D;
-		textureId: LONGINT;
+		textureId: GL.Uint;
 		(* Absolute rotation values (0-359 degrees) and rotation increments for each frame *)
 		rotationX, deltaXrotation: REAL;
 		rotationY, deltaYrotation: REAL;
@@ -60,8 +61,8 @@ TYPE
 		GL.MatrixMode(GLC.GL_PROJECTION);  (* Specifies which matrix stack is the target for matrix operations  *)
 		GL.LoadIdentity;  (* We initialize the projection matrix as identity *)
 
-
-		GLU.Perspective(45.0, ratio,1.0,10000.0);  (* We define the "viewing volume" *)
+		GL.Ortho(-50, 50, -50, 50, -1000, 1000);
+	(*	GLU.Perspective(45.0, ratio,1.0,10000.0);  (* We define the "viewing volume" *)*)
 
 
 		GL.Enable(GLC.GL_DEPTH_TEST);  (* We enable the depth test (also called z buffer) *)
@@ -97,8 +98,8 @@ TYPE
 
 		GL.MatrixMode(GLC.GL_PROJECTION);  (* Projection transformation *)
 		GL.LoadIdentity;  (* We initialize the projection matrix as identity *)
-
-		GLU.Perspective(45.0, ratio,1.0,10000.0);
+		GL.Ortho(-50, 50, -50, 50, -1000, 1000);
+	(*	GLU.Perspective(45.0, ratio,1.0,10000.0);*)
 
 		DeActivate();
 	END Reshape;
@@ -304,5 +305,8 @@ END WMSpaceSim3.
 WMSpaceSim3.Open ~
 
 
-SystemTools.Free WMSpaceSim3 ~
+System.Free WMSpaceSim3 ~
+
+System.FreeDownTo OpenGLConst ~
+
 

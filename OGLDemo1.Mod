@@ -172,7 +172,7 @@ END OGLDemo1.
 
 OGLDemo1.Open~
 
-SystemTools.Free OGLDemo1 OGLWindow~
+System.Free OGLDemo1 OGLWindow~
 
-SystemTools.FreeDownTo OpenGL ~
+System.FreeDownTo OpenGL ~
 

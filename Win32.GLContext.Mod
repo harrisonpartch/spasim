@@ -19,23 +19,22 @@ TYPE
 		hWind-: WinApi.HWND;   (* handle of this window *)
 		hDC-: WinApi.HDC; (* drawing context of this window*)
 		hGLRC- : WinApi.HGLRC; (* GL render context handles for this window *)
-		width*, height*: LONGINT; (* size of window *)
-		doublebuffer*: BOOLEAN;
+		width-, height-: LONGINT; (* size of window *)
+		doublebuffer-: BOOLEAN;
 		context: Context;
 	END;
 
-	Buffer = POINTER TO ARRAY OF CHAR;
+	Buffer* = POINTER TO ARRAY OF CHAR;
 
 
 TYPE
 	Context*= OBJECT
 	VAR
-		glWin : WindowStruct;
+		glWin- : WindowStruct;
 		wincreated: BOOLEAN;
 		initialized: BOOLEAN;
 		res: BOOLEAN;
-		buffer: Buffer;	(* for speedup flip image in y*)
-		mode: Raster.Mode;
+		buffer-: Buffer;	(* for speedup flip image in y*)
 
     	PROCEDURE Init*(w, h: LONGINT);
     	BEGIN  {EXCLUSIVE}
@@ -49,7 +48,6 @@ TYPE
 		glWin.context := SELF;
 
     		NEW(buffer, w*h*4);
-		Raster.InitMode(mode, Raster.srcCopy);
     		initialized := TRUE;
 
 		AWAIT (wincreated);
@@ -96,7 +94,8 @@ TYPE
 	BEGIN
 		buffer := NIL;
 		NEW(buffer, w*h*4);
-		MoveResizeWindow(0,0, w, h);
+	(*	MoveResizeWindow(0,0, w, h);*)
+		User32.MoveWindow(glWin.hWind, 0, 0, w, h, 1); (* repaint *)
 		glWin.width := w; glWin.height := h;
 	END Resize;
 
@@ -112,27 +111,30 @@ TYPE
 		IF debug THEN KernelLog.String("ctx DeActivate res= "); KernelLog.Boolean(res); KernelLog.Ln; END;
 	END DeActivate;
 
-		(** move the window to x,y and  resize width,height *)
+(*		(** move the window to x,y and  resize width,height *)
 	PROCEDURE MoveResizeWindow(x, y, w, h: LONGINT);
 	BEGIN
 		User32.MoveWindow(glWin.hWind, x, y, w, h, 1); (* repaint *)
 	END MoveResizeWindow;
-
+*)
 	PROCEDURE RenderInto*(image: Raster.Image);
 	VAR
 		i: LONGINT;
 		w, h: LONGINT;
+		sadr, dadr: ADDRESS;
 	BEGIN
 		IF (image = NIL) OR (image.adr = NIL) THEN RETURN END;
 		w := image.width; h := image.height;
 		GL.ReadPixels(0, 0, w, h, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, ADDRESSOF(buffer^[0]));
+
 		(* flip vertical, y *)
+		sadr := ADDRESSOF(buffer[4*w*(h-1)]); dadr := image.adr;
 		FOR i := 0 TO h - 1 DO
-			Raster.PutPixels(image, 0, h-1-i, w, Raster.BGRA8888, buffer^, i * w * 4, mode)
+			SYSTEM.MOVE(sadr - i*w*4, dadr + i*w*4, w*4);
 		END;
 	END RenderInto;
 
-	PROCEDURE SwapBuffers*();
+(*	PROCEDURE SwapBuffers*();
 	VAR res: WinApi.BOOL;
 	BEGIN {EXCLUSIVE}
 		IF glWin.doublebuffer THEN
@@ -141,7 +143,7 @@ TYPE
 	 	 	GL.Flush();
 		END;
 	END SwapBuffers;
-
+*)
 	(* handler for this context's window *)
 	PROCEDURE WindowHandler( uMsg: LONGINT;  wParam: User32.WParam;
 													  lParam: User32.LParam ): User32.LResult;
@@ -196,8 +198,8 @@ VAR
 
     PROCEDURE CreateHWND(VAR glWin:WindowStruct): BOOLEAN;
 		VAR res: Kernel32.BOOL;
-			 dwStyle: SET;
-			 dwExStyle: SET;
+			 dwStyle: WORDSET;
+			 dwExStyle: WORDSET;
 			 windowClass: User32.WndClassEx;
 			 bres: BOOLEAN;
 			 scnt: ARRAY 16 OF CHAR;
@@ -212,7 +214,7 @@ VAR
 		IF debug THEN KernelLog.String("glWin.windowClassName= "); KernelLog.String(glWin.windowClassName); KernelLog.Ln; END;
 
 		windowClass.cbSize := SIZEOF( User32.WndClassEx );
-		windowClass.style := Kernel32.SetToDW( WinApi.CS_OWNDC + WinApi.CS_VREDRAW + WinApi.CS_HREDRAW);
+		windowClass.style := WinApi.CS_OWNDC + WinApi.CS_VREDRAW + WinApi.CS_HREDRAW;
 		windowClass.lpfnWndProc := WindowProc; (* Message handler *)
 		windowClass.cbClsExtra := 0;
 		windowClass.cbWndExtra := 0;
@@ -238,7 +240,7 @@ VAR
 		dwStyle := WinApi.WS_POPUP +  WinApi.WS_CLIPSIBLINGS + WinApi.WS_CLIPCHILDREN;
 
 		 (* create the window *)
-		glWin.hWind := User32.CreateWindowEx(SYSTEM.VAL(LONGINT, dwExStyle) , glWin.windowClassName, glWin.title, Kernel32.SetToDW(dwStyle) , 10, 10, glWin.width, glWin.height, 0, 0,  glWin.Instance, SYSTEM.VAL( User32.LParam, glWin));
+		glWin.hWind := User32.CreateWindowEx(SYSTEM.VAL(LONGINT, dwExStyle) , glWin.windowClassName, glWin.title, dwStyle , 10, 10, glWin.width, glWin.height, 0, 0,  glWin.Instance, SYSTEM.VAL( User32.LParam, glWin));
 		IF glWin.hWind = 0 THEN
 			IF debug THEN
 				KernelLog.String("CreateWindowEx hWind= "); KernelLog.Int(glWin.hWind, 0); KernelLog.Ln;
@@ -319,7 +321,7 @@ VAR
   pfd: WinApi.PIXELFORMATDESCRIPTOR;
   pixelformat : LONGINT;
   res: LONGINT;
-  tmpflag: SET; 
+  tmpflag: WORDSET;
 BEGIN
 
     pfd.nSize := SIZEOF(WinApi.PIXELFORMATDESCRIPTOR);
@@ -329,8 +331,8 @@ BEGIN
     IF opStereo IN Options THEN
        tmpflag := tmpflag + WinApi.PFD_STEREO;
     END;
-   
-    pfd.dwFlags := Kernel32.SetToDW(tmpflag); 
+
+    pfd.dwFlags := tmpflag;
     pfd.iPixelType := CHR(WinApi.PFD_TYPE_RGBA);
     pfd.cColorBits := CHR(colorbits);
     pfd.cDepthBits := CHR(depthbits);
@@ -413,5 +415,5 @@ BEGIN
 END GLContext.
 
 
-SystemTools.Free GLContext WinApi OpenGL OpenGLConst~
+System.Free GLContext WinApi OpenGL OpenGLConst~
 

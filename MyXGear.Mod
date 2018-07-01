@@ -286,7 +286,7 @@ END Reshape;
 PROCEDURE  InitWindow(w, h: LONGINT; CONST title: ARRAY OF CHAR);
 VAR
 	res: LONGINT;
-	masks: LONGINT;
+	masks: LONGWORD;
 	buf: X11.Buffer;
 	attrib : POINTER TO ARRAY OF GL.Int;  (* attributes of GL window *)
 	defwin: X11.Window;
@@ -336,8 +336,9 @@ END;
  IF cmap = 0 THEN
  	IF debug THEN
 	 	context.out.String(" cannot create colormap"); context.out.Ln;
-	 	X11.GetErrorText(display, cmap, buf, LEN(buf));
+(*	 	X11.GetErrorText(display, cmap, buf, LEN(buf));
 	 	context.out.String("ERROR: CreateColormap = "); context.out.String(buf); context.out.Ln;
+*)
 	 	context.out.Update;
  	END;
  END;
@@ -467,4 +468,4 @@ END MyXGear.
 
 MyXGear.Open~
 
-SystemTools.Free MyXGear ~ 
+System.Free MyXGear ~ 

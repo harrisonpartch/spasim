@@ -47,9 +47,9 @@ END GLXinfo.
 
 GLXinfo.Do ~
 
-SystemTools.Free GLXinfo GLContext ~
+System.Free GLXinfo GLContext ~
 
-SystemTools.FreeDownTo OpenGLConst ~  
+System.FreeDownTo OpenGLConst ~
 
 
 

@@ -2,7 +2,7 @@ MODULE WMGLDemo1; (** AUTHOR "fnecati"; PURPOSE "a demo for Vertex Arrays, and l
 
 IMPORT
 	WMRectangles, Strings, Kernel, KernelLog, Modules,
-	WM := WMWindowManager,  WMMessages, 
+	WM := WMWindowManager,  WMMessages,
 	GL := OpenGL, GLC := OpenGLConst, GLU, WMGL := WMGLWindow;
 
 CONST waittime=50;
@@ -326,6 +326,6 @@ BEGIN
 	Modules.InstallTermHandler(Cleanup)
 END WMGLDemo1.
 
-SystemTools.Free  WMGLDemo1~
+System.Free  WMGLDemo1~
 
 WMGLDemo1.Open ~

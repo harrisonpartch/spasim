@@ -280,6 +280,6 @@ BEGIN
 	Modules.InstallTermHandler(Cleanup)
 END WMGLDemo4.
 
-SystemTools.Free  WMGLDemo4   ~
+System.Free  WMGLDemo4   ~
 
 WMGLDemo4.Open ~

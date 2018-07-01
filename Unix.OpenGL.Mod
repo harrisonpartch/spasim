@@ -30,16 +30,16 @@ TYPE
 	PAnsiChar* = ADDRESS;
 
 	(* GL data types *)
-	Enum* = UNSIGNED32; 	(* 4 bytes *)
-	Boolean* = UNSIGNED8; 	(*  *)
-	Bitfield* = UNSIGNED32; 	(* SET *)
-	Byte* = SIGNED8; 		(* 1 byte signed *)
+	Enum* = LONGINT; 	(* 4 bytes *)
+	Boolean* = UNSIGNED8; 	(*? BOOELAN  *)
+	Bitfield* = SET32; 	(* SET *)
+	Byte* = SHORTINT; 		(* 1 byte signed *)
 	Short* = INTEGER; 	(* 2 bytes signed *)
 	Int* = LONGINT; 	(* 4 bytes signed *)
-	Sizei* = LONGINT; 	(* 4 bytes signed	 SIZE ??? *)
+	Sizei* = LONGINT; 	(* 4 bytes signed	  *)
 	Ubyte* = UNSIGNED8; 		(* 1 byte unsigned *)
 	Ushort* = UNSIGNED16;	(* 2 bytes unsigned *)
-	Uint* = UNSIGNED32;	(* 4 bytes unsigned *)
+	Uint* = WORD;	(* 4 bytes unsigned *)
 	Float* = REAL;		(* single precision real *)
 	Clampf* = REAL;		(* single precision real in [0,1] *)
 	Double* = LONGREAL;	(* double precision real *)
@@ -77,13 +77,13 @@ TYPE
 	PPCharARB* =  ADDRESS; (* POINTER TO ARRAY OF PCharARB; *)
 
 	(* GL_VERSION_1_5 *)
-	Intptr* = Int;
-	Sizeiptr* = Sizei;
+	Intptr* = ADDRESS;
+	Sizeiptr* = ADDRESS;
 	PIntptr* = ADDRESS;
 
 	(* GL_ARB_vertex_buffer_object *)
-	IntptrARB* = Int;
-	SizeiptrARB* = Sizei;
+	IntptrARB* = ADDRESS;
+	SizeiptrARB* = ADDRESS;
 
 	(* GL_VERSION_2_0 *)
 	PChar* = PAnsiChar;
@@ -123,11 +123,11 @@ TYPE
 	(*! GLX - LINUX  *)
 	DisplayPtr* = X11Api.DisplayPtr;
 	VisualInfoPtr* = X11Api.VisualInfoPtr;
-	XID* = X11Api.XID;
+	XID* = LONGWORD ;
 	GLXContext* = XID;
 	GLXContextID* = XID;
 	GLXDrawable* = XID;
-	GLXFBConfig* = XID;
+	GLXFBConfig* = ADDRESS;
 	GLXPbuffer* = XID;
 	GLXPixmap* = XID;
 	GLXWindow* = XID;
@@ -663,7 +663,7 @@ VAR
 	GLX_EXT_swap_control*,
 	GLX_ARB_context_flush_control*,
 	GLX_EXT_create_context_es2_profile*,
-	
+
 	GLX_SGI_swap_control*,
 	GLX_MESA_swap_control* : BOOLEAN;
 
@@ -3626,17 +3626,17 @@ TYPE
 
 	TglXChooseVisual* = PROCEDURE{C}(dpy: DisplayPtr; screen: Int; attribList: PInt): VisualInfoPtr;
 	TglXCopyContext* = PROCEDURE{C}(dpy: DisplayPtr; src: GLXContext; dst: GLXContext; mask: Uint);
-	TglXCreateContext* = PROCEDURE{C}(dpy: DisplayPtr; vis: VisualInfoPtr; shareList: GLXContext; direct: Boolean): GLXContext;
+	TglXCreateContext* = PROCEDURE{C}(dpy: DisplayPtr; vis: VisualInfoPtr; shareList: GLXContext; direct: X11.Bool): GLXContext;
 	TglXCreateGLXPixmap* = PROCEDURE{C}(dpy: DisplayPtr; vis: VisualInfoPtr; pixmap: Pixmap): GLXPixmap;
 	TglXDestroyContext* = PROCEDURE{C}(dpy: DisplayPtr; ctx: GLXContext);
 	TglXDestroyGLXPixmap* = PROCEDURE{C}(dpy : DisplayPtr; pix: GLXPixmap);
 	TglXGetConfig* = PROCEDURE{C}(dpy : DisplayPtr; vis: VisualInfoPtr; attrib: Int; VAR value: Int): Int;
 	TglXGetCurrentContext* = PROCEDURE{C}(): GLXContext;
 	TglXGetCurrentDrawable* = PROCEDURE{C}(): GLXDrawable ;
-	TglXIsDirect* = PROCEDURE{C}(dpy: DisplayPtr; ctx: GLXContext): Boolean;
-	TglXMakeCurrent* = PROCEDURE{C}(dpy: DisplayPtr; drawable: GLXDrawable; ctx: GLXContext): Boolean;
-	TglXQueryExtension* = PROCEDURE{C}(dpy: DisplayPtr; VAR errorBase: Int; VAR eventBase: Int): Boolean;
-	TglXQueryVersion* = PROCEDURE{C}(dpy: DisplayPtr; VAR major: Int; VAR minor: Int): Boolean;
+	TglXIsDirect* = PROCEDURE{C}(dpy: DisplayPtr; ctx: GLXContext): X11.Bool;
+	TglXMakeCurrent* = PROCEDURE{C}(dpy: DisplayPtr; drawable: GLXDrawable; ctx: GLXContext): X11.Bool;
+	TglXQueryExtension* = PROCEDURE{C}(dpy: DisplayPtr; VAR errorBase: Int; VAR eventBase: Int): X11.Bool;
+	TglXQueryVersion* = PROCEDURE{C}(dpy: DisplayPtr; VAR major: Int; VAR minor: Int): X11.Bool;
 	TglXSwapBuffers* = PROCEDURE{C}(dpy: DisplayPtr; drawable: GLXDrawable);
 	TglXUseXFont* = PROCEDURE{C}(font: Font; first: Int; count: Int; listBase: Int);
 	TglXWaitGL* = PROCEDURE{C};
@@ -3657,8 +3657,8 @@ TYPE
 	TglXCreatePbuffer* = PROCEDURE{C}(dpy: DisplayPtr; config: GLXFBConfig; attriblist: PInt): GLXPbuffer;
 	TglXDestroyPbuffer* = PROCEDURE{C}(dpy: DisplayPtr; pbuf: GLXPbuffer);
 	TglXQueryDrawable* = PROCEDURE{C}(dpy: DisplayPtr; draw: GLXDrawable; attribute: Int; value: PUint);
-	TglXCreateNewContext* = PROCEDURE{C}(dpy: DisplayPtr; config: GLXFBConfig; renderxtype:  Int; sharelist: GLXContext; direct: Boolean): GLXContext ;
-	TglXMakeContextCurrent* = PROCEDURE{C}( display: DisplayPtr; draw: GLXDrawable; readx: GLXDrawable; ctx: GLXContext): Boolean;
+	TglXCreateNewContext* = PROCEDURE{C}(dpy: DisplayPtr; config: GLXFBConfig; renderxtype:  Int; sharelist: GLXContext; direct: X11.Bool): GLXContext ;
+	TglXMakeContextCurrent* = PROCEDURE{C}( display: DisplayPtr; draw: GLXDrawable; readx: GLXDrawable; ctx: GLXContext): X11.Bool;
 	TglXGetCurrentReadDrawable* = PROCEDURE{C}(): GLXDrawable;
 	TglXGetCurrentDisplay* = PROCEDURE{C}(): DisplayPtr;
 	TglXQueryContext* = PROCEDURE{C}(dpy: DisplayPtr; ctx: GLXContext; attribute: Int; VAR value: Int): Int;
@@ -3670,7 +3670,7 @@ TYPE
 	(* GLX_ARB_get_proc_address  *)
 	TglXGetProcAddressARB* = PROCEDURE{C}(CONST name: ARRAY OF CHAR): ADDRESS;
 	(* GLX_ARB_create_context  *)
-	TglXCreateContextAttribsARB* = PROCEDURE{C}(dpy: DisplayPtr; config: GLXFBConfig; sharecontext: GLXContext; direct: Boolean; attriblist: PInt): GLXContext;
+	TglXCreateContextAttribsARB* = PROCEDURE{C}(dpy: DisplayPtr; config: GLXFBConfig; sharecontext: GLXContext; direct: X11.Bool; attriblist: PInt): GLXContext;
 	(* GLX_EXT_import_context  *)
 	TglXGetCurrentDisplayEXT* = PROCEDURE{C}(): DisplayPtr;
 	TglXQueryContextInfoEXT* = PROCEDURE{C}(dpy: DisplayPtr; context: GLXContext; attribute: Int; VAR value: Int): Int;
@@ -3687,7 +3687,7 @@ TYPE
 	TglXSwapIntervalSGI* = PROCEDURE{C}(interval: Int): Int;
 	(* GLX_MESA_swap_control *)
 	TglXSwapIntervalMESA* = PROCEDURE{C}(interval: Uint): Int;
-	
+
   VAR
 
 	(*! GL_VERSION_1_0 *)
@@ -6659,23 +6659,23 @@ TYPE
 	glXSwapIntervalSGI- : TglXSwapIntervalSGI;
 	(* GLX_MESA_swap_control *)
 	glXSwapIntervalMESA- : TglXSwapIntervalMESA;
-	
+
 (** wrapper procedure  *)
 PROCEDURE GetProcAddress*(CONST funcName: ARRAY OF CHAR; adr: ADDRESS);
 VAR address: ADDRESS;
 BEGIN
 	address := 0;
-	IF glXGetProcAddress # NIL THEN
-	  	address := glXGetProcAddress(funcName);
-	ELSIF glXGetProcAddressARB # NIL THEN
-		address := glXGetProcAddressARB(funcName);
+	IF glXGetProcAddressARB # NIL THEN
+	  	address := glXGetProcAddressARB(funcName);
+	ELSIF glXGetProcAddress# NIL THEN
+		address := glXGetProcAddress(funcName);
 	END;
 
-(*	IF debug THEN
+	IF debug THEN
 		KernelLog.String(funcName);
 		IF address = 0 THEN KernelLog.String(":  NIL"); ELSE KernelLog.String(":  # NIL"); END;
 		KernelLog.Ln;
-	END;*)
+	END;
 	SYSTEM.PUT(adr, address);
 END GetProcAddress;
 
@@ -6687,7 +6687,7 @@ VAR h: ADDRESS; i, j, k: INTEGER;
 BEGIN
 	(* first, find the library in the search parth of A2*)
 	 h := Unix.Dlopen(libName, mode );
-	 IF h = 0 THEN (* else search in libraryPaths *)
+(*	 IF h = 0 THEN (* else search in libraryPaths *)
 		i := 0; h := 0;
 		WHILE (h = 0) & (i < 4) DO
 			COPY( libraryPaths[i], p ); j := 0;
@@ -6704,6 +6704,7 @@ BEGIN
 	ELSE
 		KernelLog.String("using LinuxAos searh path: "); KernelLog.String(libName); KernelLog.Ln;
 	END;
+	*)
 	RETURN h
 END Dlopen;
 
@@ -6717,8 +6718,8 @@ BEGIN
 	Unix.Dlsym(libHandle, 'glXGetProcAddress', ADDRESSOF( glXGetProcAddress));
 
 	(* GLX_ARB_get_proc_address  (also needs to be first)  *)
-	GetProcAddress( 'glXGetProcAddressARB' , ADDRESSOF( glXGetProcAddressARB ));
-	(*   Unix.Dlsym(libHandle, 'glXGetProcAddressARB', ADDRESSOF( glXGetProcAddressARB)); *)
+	Unix.Dlsym(libHandle, 'glXGetProcAddressARB' , ADDRESSOF( glXGetProcAddressARB ));
+
 	GetProcAddress( 'glXChooseVisual' , ADDRESSOF( glXChooseVisual ));
 	GetProcAddress( 'glXCopyContext' , ADDRESSOF( glXCopyContext ));
 	GetProcAddress( 'glXCreateContext' , ADDRESSOF( glXCreateContext ));
@@ -10612,7 +10613,7 @@ BEGIN
 	Read_GLX_EXT_swap_control;
 	Read_GLX_SGI_swap_control;
 	Read_GLX_MESA_swap_control;
-	
+
 (*	KernelLog.String(" Ok. "); KernelLog.Ln;*)
 END ReadExtensions;
 
@@ -10622,12 +10623,12 @@ END ReadExtensions;
 PROCEDURE GetStringFromAddr*(adr0: ADDRESS): Strings.String;
 VAR s {UNTRACED}: POINTER {UNSAFE} TO ARRAY OF CHAR;
 	str: Strings.String;
-	size, pos: SIZE; 
+	size, pos: SIZE;
 BEGIN
-	
+
 	s := adr0;
 	pos := 0;
-	IF adr0 # NIL THEN 
+	IF adr0 # NIL THEN
 		WHILE s[pos] # 0X DO
 			INC(pos);
 		END;
@@ -10638,13 +10639,13 @@ BEGIN
 			str[pos] := s[pos];
 			INC(pos);
 		END;
-		
+
 	ELSE NEW(str, 1);
 	END;
-	
+
 	str[pos] := 0X;
-	RETURN str;	
-	
+	RETURN str;
+
 END GetStringFromAddr;
 
 (*
@@ -11411,7 +11412,7 @@ BEGIN
 	GLX_EXT_swap_control := Int_CheckExtension(Buffer, 'GLX_EXT_swap_control');
 	GLX_EXT_create_context_es2_profile := Int_CheckExtension(Buffer, 'GLX_EXT_create_context_es2_profile');
 	GLX_ARB_context_flush_control := Int_CheckExtension(Buffer, 'GLX_ARB_context_flush_control');
-	
+
 	GLX_SGI_swap_control := Int_CheckExtension(Buffer, 'GLX_SGI_swap_control');
 	GLX_MESA_swap_control := Int_CheckExtension(Buffer, 'GLX_MESA_swap_control');
 
@@ -11479,20 +11480,20 @@ END OnClose;
 BEGIN
 
 	(* add following serach paths for libGL.so.1 to mulitiarch i386 systems*)
-
+(*
 	(* amd, ati *)
-	libraryPaths[0] := "/usr/lib/i386-linux-gnu/fglrx";
+	libraryPaths[0] := "/usr/lib/x86_64-linux-gnu/fglrx";
 
 	(* mesa *)
-	libraryPaths[1] := "/usr/lib/i386-linux-gnu/mesa";
+	libraryPaths[1] := "/usr/lib/x86_64-linux-gnu/mesa";
 
 	(* local, libGL.so.1 needs to be 32bit *)
 	libraryPaths[2] := "/usr/local/lib";
-
+*)
 	InitOpenGL();
 	ReadOpenGLCore();
-	
+
 	Modules.InstallTermHandler(OnClose);
-		
+
 END OpenGL.
 

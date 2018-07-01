@@ -1,7 +1,7 @@
 MODULE  GLTest; (** AUTHOR "fnecati"; PURPOSE "Simple GL rendering with commands"; *)
 
 IMPORT  GL := OpenGL, GLC := OpenGLConst, KernelLog,
-			Math, Context:=GLContext, GLU, WMGraphics, Raster ;
+			Math, Context:=GLContext, GLU, WMGraphics, Raster;
 
 (* Note:
 	Since GL is state machine, drawing with different commands may leave
@@ -19,11 +19,11 @@ TYPE
 
 	Point = ARRAY 3 OF GL.Float;
 
+
 VAR
 	 w, h: LONGINT; (* size of window *)
 	 ctx : Context.Context;  (* GL context *)
 	 image: Raster.Image; (* for saving the rendered image *)
-
 
 PROCEDURE Error;
 BEGIN
@@ -32,9 +32,10 @@ END Error;
 
 PROCEDURE SaveToImage(fname: ARRAY OF CHAR);
 VAR imres: LONGINT;
+
 BEGIN
 	ctx.RenderInto(image);
-	 WMGraphics.StoreImage(image, fname, imres);
+	WMGraphics.StoreImage(image, fname, imres);
 	KernelLog.String(fname); KernelLog.String(" saved."); KernelLog.Ln;
 END SaveToImage;
 
@@ -404,11 +405,9 @@ ctx.MakeCurrent();
 		GL.Vertex3d (0.25, 0.75, 0.0);
 	GL.End;
 
-
-(* ctx.SwapBuffers *);
-
-SaveToImage("gldo1.bmp");
-ctx.DeActivate;
+	(* ctx.SwapBuffers *);
+	SaveToImage("gldo1.bmp");
+	ctx.DeActivate;
 END Do1;
 
 PROCEDURE  Gears*;
@@ -478,8 +477,8 @@ ctx.MakeCurrent();
 
 
 	(* ********** Draw ********** *)
-angle1 := -2.0 * angle - 9.0;
-angle2 := -2.0 * angle - 25.0;
+	angle1 := -2.0 * angle - 9.0;
+	angle2 := -2.0 * angle - 25.0;
 
 
 	GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT);
@@ -510,10 +509,9 @@ angle2 := -2.0 * angle - 25.0;
 
 	GL.PopMatrix;
 
-(* ctx.SwapBuffers *);
-SaveToImage("glgears.bmp");
-
-ctx.DeActivate;
+	(* ctx.SwapBuffers *);
+	SaveToImage("glgears.bmp");
+	ctx.DeActivate;
 END Gears;
 
 PROCEDURE  SetP (VAR a: ARRAY OF GL.Float;  a0, a1, a2: LONGREAL);
@@ -589,11 +587,10 @@ BEGIN
 	GL.PopMatrix ();
 	GL.Finish();
 
+	(* ctx.SwapBuffers *);
+	SaveToImage("glpbeziersurf.bmp");
 
-(* ctx.SwapBuffers *);
-SaveToImage("glpbeziersurf.bmp");
-
-ctx.DeActivate;
+	ctx.DeActivate;
 END BezSurf;
 
 
@@ -641,8 +638,8 @@ ctx.MakeCurrent();
 	GL.Finish();
 
 	(* ctx.SwapBuffers *);
-SaveToImage("glaccumulation.bmp");
-ctx.DeActivate;
+	SaveToImage("glaccumulation.bmp");
+	ctx.DeActivate;
 END Accum;
 
 
@@ -678,8 +675,8 @@ ctx.MakeCurrent();
 
 	GL.EndList;
 
-ctx.DeActivate();
-KernelLog.String("MakeBall. Ok"); KernelLog.Ln;
+	ctx.DeActivate();
+	KernelLog.String("MakeBall. Ok"); KernelLog.Ln;
 	RETURN list;
 
 END MakeBall;
@@ -713,7 +710,7 @@ ctx.MakeCurrent();
 	GL.End;
 
 	GL.EndList;
-ctx.DeActivate();
+	ctx.DeActivate();
 	KernelLog.String("MakeLines. Ok"); KernelLog.Ln;
 	RETURN list
 END MakeLines;
@@ -768,9 +765,9 @@ ctx.MakeCurrent();
 	GL.PopMatrix;
 
 
-(* ctx.SwapBuffers *);
-SaveToImage("glbounce.bmp");
-ctx.DeActivate;
+	(* ctx.SwapBuffers *);
+	SaveToImage("glbounce.bmp");
+	ctx.DeActivate;
 END Bounce;
 
 PROCEDURE  Cube*;
@@ -848,12 +845,21 @@ SaveToImage("glcube.bmp");
 ctx.DeActivate;
 END Cube;
 
+(*
+PROCEDURE {C} MyErrorCallback (err: GL.Enum);
+VAR s: Strings.String;
+BEGIN
+	KernelLog.String("cb err #: "); KernelLog.Int(err, 0);
+	s := GLU.ErrorString(err);
+	KernelLog.String(",  ERROR: "); KernelLog.String(s^); KernelLog.Ln;
+END MyErrorCallback;
+*)
 
 PROCEDURE  Quadric*;
 VAR
 	matAmbient, matSpecular, lightPosition, modelAmbient: ARRAY [4] OF GL.Float;
 	matShininess: GL.Float;
-	qObj: GLU.QuadricObj;
+	qObj: GLU.Quadric;
 	startList: GL.Uint;
 BEGIN
 IF ctx = NIL THEN Error; RETURN END;
@@ -863,6 +869,7 @@ IF ctx = NIL THEN Error; RETURN END;
 	lightPosition := [ 1.0, 1.0, 1.0, 0.0];
 	modelAmbient := [ 0.5, 0.5, 0.5, 1.0];
 *)
+
 matAmbient[0] := 0.5;	matAmbient[1] :=  0.5;	matAmbient[2] := 0.5; 	matAmbient[3] := 1.0;
 matSpecular[0] := 1.0;	matSpecular[1] := 1.0;	matSpecular[2] := 1.0;	matSpecular[3] := 1.0;
 matShininess := 50.0;
@@ -889,7 +896,7 @@ ctx.MakeCurrent();
  *)
 	startList := GL.GenLists(4);
 	qObj := GLU.NewQuadric();
-	GLU.QuadricCallback(qObj, GLU.GLU_ERROR, 0 (* ADDRESSOF(QuadricError)*));
+(*	GLU.QuadricCallback(qObj, GLU.GLU_ERROR, MyErrorCallback );*)
 
 	GLU.QuadricDrawStyle(qObj, GLU.GLU_FILL); (* smooth shaded *)
 	GLU.QuadricNormals(qObj, GLU.GLU_SMOOTH);
@@ -933,6 +940,7 @@ ctx.MakeCurrent();
 	GL.Enable(GLC.GL_LIGHTING);
 	GL.ShadeModel (GLC.GL_SMOOTH);
 	GL.Translated(-1.0, -1.0, 0.0);
+
 	GL.CallList(startList);
 
 	GL.ShadeModel (GLC.GL_FLAT);
@@ -954,27 +962,28 @@ ctx.MakeCurrent();
 	GL.PopMatrix;
 	GL.Finish();
 
+	GLU.DeleteQuadric(qObj);
 
 
-SaveToImage("glquadric.bmp");
-ctx.DeActivate;
+	SaveToImage("glquadric.bmp");
+	ctx.DeActivate;
 END Quadric;
 
 PROCEDURE OpenContext*;
 BEGIN
-w := 512; h := 512;
-IF ctx = NIL THEN
-	 NEW(ctx);
-	ctx.Init(w , h);
-	NEW(image);
-	Raster.Create(image, w, h, Raster.BGRA8888);
-END;
+	w := 512; h := 512;
+	IF ctx = NIL THEN
+		NEW(ctx);
+		ctx.Init(w , h);
+		NEW(image);
+		Raster.Create(image, w, h, Raster.BGRA8888);
+	END;
 END OpenContext;
 
 (** *)
 PROCEDURE CloseContext*;
 BEGIN
-IF ctx # NIL THEN ctx.Close; ctx := NIL; END;
+	IF ctx # NIL THEN ctx.Close; ctx := NIL; END;
 END CloseContext;
 
 BEGIN
@@ -991,7 +1000,7 @@ GLTest.BezSurf ~         GLTest.Accum ~    GLTest.Bounce ~ GLTest.Cube ~
 
 GLTest.Quadric ~
 
-SystemTools.Free GLTest  GLContextFB  ~
+System.Free GLTest  GLContext  ~
 
-SystemTools.FreeDownTo OpenGL ~
+System.FreeDownTo OpenGLConst ~
 

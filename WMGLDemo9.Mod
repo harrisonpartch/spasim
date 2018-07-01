@@ -2,7 +2,7 @@ MODULE WMGLDemo9; (** AUTHOR "fnecati"; PURPOSE "a demo using opengl Frame Buffe
 
 IMPORT
 	WMRectangles, WMGraphics, Strings, Kernel, Raster, Inputs, Modules, KernelLog,
-	WM := WMWindowManager,  WMMessages, 
+	WM := WMWindowManager,  WMMessages,
 	GL := OpenGL, GLC := OpenGLConst, GLU, WMGL := WMGLWindow;
 
 CONST
@@ -15,7 +15,7 @@ TYPE
 TYPE
 	KillerMsg = OBJECT
 	END KillerMsg;
-	
+
 	Vector = ARRAY [*] OF REAL;
 
 	GLWindow =  OBJECT(WMGL.Window)
@@ -421,6 +421,6 @@ BEGIN
 	Modules.InstallTermHandler(Cleanup)
 END WMGLDemo9.
 
-SystemTools.Free  WMGLDemo9  ~
+System.Free  WMGLDemo9  ~
 
 WMGLDemo9.Open ~

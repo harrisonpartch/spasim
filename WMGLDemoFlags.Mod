@@ -303,6 +303,6 @@ BEGIN
 	Modules.InstallTermHandler(Cleanup)
 END WMGLDemoFlags.
 
-SystemTools.Free  WMGLDemoFlags  ~
+System.Free  WMGLDemoFlags  ~
 
 WMGLDemoFlags.Open  ~
