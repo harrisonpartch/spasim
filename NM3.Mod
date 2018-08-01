@@ -479,6 +479,7 @@ BEGIN
 				END
 			ELSE
 				NEW(c);
+				c.red:=red; c.blue:=blue; c.green:=green; c.black:=black; 
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
 				c.strokerec(p, resolution,nextscale, voxel);
