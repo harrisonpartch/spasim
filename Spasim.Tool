@@ -25,13 +25,11 @@ RotaVox.Mod
 Engrainer.Mod
 Saboteur.Mod
 FRep.Mod
-RotaVox.Mod
 NCompiler.Mod
 Retina.Mod
 Marsh.Mod
 OGLRender.Mod 
 ~
-Render.Mod 
 
 NCompiler.ncompile  <== Middle mouse click on this
 

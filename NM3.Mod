@@ -460,6 +460,7 @@ BEGIN
 			IF blox[i,j,k]#NIL THEN
 				IF  blox[i,j,k].copyonstroke THEN
 					copyv:= blox[i,j,k].deepcopy();
+					copyv.red:=red; copyv.blue:=blue; copyv.green:=green; copyv.black:=black; 
 					blox[i,j,k]:=copyv	;
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
 				(*	IF (copyv#NIL) & (copyv.baked) THEN

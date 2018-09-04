@@ -1,5 +1,5 @@
 MODULE TexVox;
-IMPORT Base, Files,SPSMMath, Noise, FilmLoop, Raster, Graphics := WMGraphics, Random, Math,Out := KernelLog; 
+IMPORT Base, Files,SPSMMath, Noise, Raster, Graphics := WMGraphics, Random, Math,Out := KernelLog; 
 
 TYPE PT = Base.PT;
 	Color = Base.Color;
@@ -609,7 +609,7 @@ PROCEDURE tick;
 END tick;
 
 END FilmVox;
-*)
+
 TYPE FloopVox* = OBJECT(Voxel);
 VAR
 	fl: FilmLoop.floop;
@@ -744,7 +744,7 @@ END mirror;
 
 END FloopVox;
 
-
+*)
 
 TYPE NoiseVox* = OBJECT(Voxel);
 VAR

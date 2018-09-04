@@ -304,7 +304,7 @@ BEGIN
 	
 	xot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU666"); 
 	push(xot);
-	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
+(*	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	push(greenball);
 	akatrump:=Base.VoxelFromName("Nakatrump"); 
 	push(akatrump);
@@ -368,8 +368,7 @@ BEGIN
 
  	push(fuse);
 
-	gxy:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 	
-	push(gxy);
+
 	sfish:=Base.VoxelFromName("NcufbYokzVEuEfN5MYiDlhA"); 	 	
 	push(sfish);
 	dieone:=Base.VoxelFromName("NCjgzkmiTyecI5x6eOgYqpQ"); 	
@@ -401,7 +400,7 @@ BEGIN
 	push(die);
 	granite:=Base.VoxelFromName("NGNYAfkxmEzxe6ZESmcMJtw"); 	
 	push(granite);
-	sand:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw"); 		
+
 	push(sand);
 	blacksun:=Base.VoxelFromName("Nbluedot"); 	
 	push(blacksun);
@@ -445,17 +444,25 @@ BEGIN
 	push(bottle1);
 	bottle2:=Base.VoxelFromName("Nbottle2");  
 	push(bottle2);
-	bottle3:=Base.VoxelFromName("Nbottle3");  
-	push(bottle3);
+
 	bottlepossum:=Base.VoxelFromName("Njellywish");  
 	push(bottlepossum);	
 	bottlegrounds:=Base.VoxelFromName("Nbottlegrounds");  
-	greensuncouple:=Base.VoxelFromName("Ngreensuncouple");  
+
 	wstar:=Base.VoxelFromName("Nwstar");  
 	starspider:=Base.VoxelFromName("Nstarspider");  
 	arevclock:=Base.VoxelFromName("Narevclock");  
 	push(arevclock);
 	jordan:=Base.VoxelFromName("Njbp");  	
+*)
+	gxy:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 	
+	push(gxy);
+	bottle3:=Base.VoxelFromName("Nbottle3");  
+	push(bottle3);
+	sand:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw"); 	
+	push(sand);	
+	greensuncouple:=Base.VoxelFromName("Ngreensuncouple");  
+	push(greensuncouple);
 	NEW(noise[0]);		
 	noise[0].seed:=1534666690;		
 	noise[0].a:=1;
@@ -506,24 +513,24 @@ BEGIN
 	Base.setPT(center,1/2,1/2,2/3);
 	
 	z3:=Base.VoxelFromName("NM3");	
-(*	z3a:=Base.VoxelFromName("NM3");	
+	z3a:=Base.VoxelFromName("NM3");	
 	w3:=Base.VoxelFromName("NM3");	
 	
+	NEW(plane,center,up);
+	plane.setvoxel(gxy);				
+	z3.FRaster(plane,9);	
 	z3a.setcolor(0,0,3,25,1); 
-	w3.setcolor(10,0,3,5,1); 
-(*	z3.FRaster(noise[4],27);		*)
-     z3a.FRaster(noise[3],9);
-	noise[3].setvoxel(z3a);	
-(*	w3.FRaster(noise[3],27); *)
-	
-	z3.stroke(center,3,z3a); 
+	w3.setcolor(10,0,3,5,1); 	
+     z3a.FRaster(noise[4],27);
 
-(*	NEW(plane,center,up);
-	plane.setvoxel(sfish);				
-	z3.FRaster(plane,27);					
-*) 	Base.avatar:=harrison;
+	
+	z3.stroke(center,3,z3a);  
+
+
+					
+	Base.avatar:=harrison;
  	
-*)	Base.avatarsize:=1000; 
+	Base.avatarsize:=1000; 
 
 	z3.setcolor(0,0,3,5,1); 
 	Base.world:=z3;

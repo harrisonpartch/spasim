@@ -1,6 +1,6 @@
 MODULE WMRender;
 IMPORT Kernel, Objects, Random, Marsh, Rectangles := WMRectangles, WM := WMWindowManager, WMMessages,
- Out := KernelLog, Math,SPSMMath, Base, Retina,  WarpMouse,
+ Out := KernelLog, Math,SPSMMath, Base, Retina,  
 	 Inputs,  Raster, Strings, Streams, Debugging;
 
 TYPE
@@ -455,7 +455,7 @@ END detail;
 				Invalidate(Rectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 			END;
 			IF CAPTURE THEN 
-			(* 	WarpMouse.warp(500,500); *) WarpMouse.warp(500+bounds.l,500+bounds.t); 
+			
 				mousepreviousx:=500; 
 				mousepreviousy:=500;
 			END
