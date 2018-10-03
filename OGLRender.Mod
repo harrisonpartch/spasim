@@ -178,10 +178,10 @@ VAR
 	rward,dward:PT;
 	ray: Base.Ray;
 BEGIN
-	rward:=Retina.fward;
-	dward:=Base.mkPT(0,1,0);
+	rward:=Retina.rward;
+(*	dward:=Base.mkPT(0,1,0);
 	SPSMMath.orrot(rward, dward,3.14159/2);   		
-	cvx :=cvx+(x*rward.x); 
+*)	cvx :=cvx+(x*rward.x); 
 	cvy :=cvy+(x*rward.y); 	
 	cvz :=cvz+(x*rward.z); 	
 END rightstrafe;
@@ -356,12 +356,12 @@ BEGIN
 			"S": Retina.incdetail; Out.String("S Retina.incdetail");
 			| "W":Retina.decdetail; Out.String("W Retina.decdetail");
 			|  "s" : camera.forward(-0.51*Base.speed); 
-			| "w" :camera.forward(0.51*Base.speed) ; 
-			| "a" :camera.rightstrafe(-0.5*Base.speed)	; 
-			| "d" :camera.rightstrafe(0.5*Base.speed) ; 
-			| "e": camera.upstrafe(-0.51*Base.speed) ; 
-			| "q": camera.upstrafe(0.51*Base.speed) ; 
-			| "n": leftsticky:=leftsticky*1.3; upsticky:=upsticky*1.3 ; Out.String("n increase leftsticky");
+			| "w" : camera.forward(0.51*Base.speed) ; 
+			| "a" : camera.rightstrafe(-0.5*Base.speed)	; 
+			| "d" : camera.rightstrafe(0.5*Base.speed) ; 
+			| "e":  camera.upstrafe(-0.51*Base.speed) ; 
+			| "q":  camera.upstrafe(0.51*Base.speed) ; 
+			| "n":  leftsticky:=leftsticky*1.3; upsticky:=upsticky*1.3 ; Out.String("n increase leftsticky");
 			| "m": leftsticky:=leftsticky/1.3; upsticky:=upsticky/1.3 ; Out.String("m decrease leftsticky");
 			| "o": GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_NEAREST) ; Out.String(" ");
 			| "t": GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR) ; Out.String(" ");
@@ -369,18 +369,18 @@ BEGIN
 			| "P": Marsh.sprout ; Out.String("P Marsh.sprout");
 			| "x": Marsh.incVN ; Out.String("x Marsh.IncVN");
 			| "z": Marsh.decVN	; Out.String("z Marsh.decVN");	
-			| "p":  Marsh.engrain ; Out.String("p Marsh.engrain");
-			| "1": 	CAMLOCK:=~CAMLOCK ; Out.String(" ");
-			| "2" : Base.gravity:= Base.gravity/1.5 ; Out.String(" ");	
-			| "@" : Base.gravity:= 1.5*Base.gravity ; Out.String(" ");
-			| "3" : 
-			| "4" : Base.STOPGO ; Out.String(" ");
-			| "5" : Retina.Res ; Out.String(" ");
-			| "6" : avaTF:=~avaTF ; Out.String(" ");
-			| "h" : camera.hop ; Out.String(" ");
-			| " " :  Marsh.tunnelinto ; Out.String(" ");
-			| "]" : mstarget:= mstarget * 102/98 ; Out.String(" ");
-			| "[" : mstarget:= mstarget * 98/102 ; Out.String(" ");
+			| "p": Marsh.engrain ; Out.String("p Marsh.engrain");
+			| "1": CAMLOCK:=~CAMLOCK ; Out.String(" ");
+			| "2": Base.gravity:= Base.gravity/1.5 ; Out.String(" ");	
+			| "@": Base.gravity:= 1.5*Base.gravity ; Out.String(" ");
+			| "3": 
+			| "4": Base.STOPGO ; Out.String(" ");
+			| "5": Retina.Res ; Out.String(" ");
+			| "6": avaTF:=~avaTF ; Out.String(" ");
+			| "h": camera.hop ; Out.String(" ");
+			| " ":  Marsh.tunnelinto ; Out.String(" ");
+			| "]": mstarget:= mstarget * 102/98 ; Out.String(" ");
+			| "[": mstarget:= mstarget * 98/102 ; Out.String(" ");
 			| "}": camera.aperture.width := camera.aperture.width * 101/99; camera.aperture.height := camera.aperture.height *101/99 ; Out.String(" ");
 			| "{":  camera.aperture.width := camera.aperture.width * 99/101;  camera.aperture.height := camera.aperture.height *99/101 ; Out.String(" ");
 			| "9": IF Marsh.cursorsize<999999 THEN Marsh.cursorsize:=Marsh.cursorsize * 2; Base.cursordist:=Base.cursordist/2 END ; Out.String(" ");

@@ -518,14 +518,14 @@ BEGIN
 	
 	NEW(plane,center,up);
 	plane.setvoxel(gxy);				
-	z3.FRaster(plane,9);	
+	z3.FRaster(plane,27);	
 	z3a.setcolor(0,0,3,25,1); 
 	w3.setcolor(10,0,3,5,1); 	
      z3a.FRaster(noise[4],27);
-
-	
-	z3.stroke(center,3,z3a);  
-
+     Base.setPT(center,1/2,1/2,6/10);
+     NEW(plane,center,up);
+	plane.setvoxel(z3a);				
+	z3.FRaster(plane,9);	
 
 					
 	Base.avatar:=harrison;
