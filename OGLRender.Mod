@@ -280,7 +280,7 @@ BEGIN
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
-	mstarget:=40;
+	mstarget:=30;
 END openwincam;
 
 (* called when idling *)
@@ -425,11 +425,7 @@ END KeyEvent;
 		PAUSE:=FALSE;
 		MOUSEDOWN:=TRUE;	
 		MB := keys;
-(*		IF GLW.ML IN MB THEN Out.String("ML");
-		ELSIF  GLW.MM IN MB THEN Out.String("MM"); 
-		ELSIF  GLW.MR IN MB THEN Out.String("MR");
-		END;	
-*)	END PointerDown;
+	END PointerDown;
 
 		(** called when mouse button up  *)
 	PROCEDURE PointerUp(x, y: LONGINT; keys: SET);
@@ -443,8 +439,9 @@ END KeyEvent;
 		xr,yr: LONGINT;
 		temporaljust: REAL; 
 		BEGIN
-			MB := keys;
-			temporaljust := mstarget/GetCurrentFrameMs();
+			MB := keys;  (* *)
+(*			temporaljust := mstarget/GetCurrentFrameMs();*)
+			temporaljust := 1.0;
 			
 			xr := ENTIER((x-centerx)*temporaljust); yr :=ENTIER((y-centery)*temporaljust);
 			

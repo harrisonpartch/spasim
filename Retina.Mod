@@ -6,9 +6,9 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=3;        
-	TS=9*8;  (*  TS MUST BE {size of unit tile} MULTIPLIED BY 2**T *)
-	TW=16;
+	T=4;        
+	TS=9*16;  (*  TS MUST BE {size of unit tile} MULTIPLIED BY 2**T *)
+	TW=9;
 	TH=9;
 	W*=TS*TW;
 	H*=TS*TH;
@@ -701,7 +701,7 @@ END moredetail;
 PROCEDURE lessdetail*;
 BEGIN
 	foveaparameter:=(foveaparameter+10);
-	IF foveaparameter>130 THEN foveaparameter:=130 END;
+	IF foveaparameter>300 THEN foveaparameter:=300 END;
 	FV:=(W*W)/foveaparameter;
 END lessdetail;
 
