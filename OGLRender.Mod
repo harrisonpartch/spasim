@@ -177,11 +177,12 @@ PROCEDURE rightstrafe(x:REAL);
 VAR
 	rward,dward:PT;
 	ray: Base.Ray;
-BEGIN
-	rward:=Retina.rward;
-(*	dward:=Base.mkPT(0,1,0);
-	SPSMMath.orrot(rward, dward,3.14159/2);   		
-*)	cvx :=cvx+(x*rward.x); 
+BEGIN	
+	dward:=Base.mkPT(0,1,0);
+	rward:=Base.mkPT(0,1,0);
+	SPSMMath.orrot(rward, dward,cameratheta);   	
+	SPSMMath.orrot(dward, rward,cameraphi);  		
+	cvx :=cvx+(x*rward.x); 
 	cvy :=cvy+(x*rward.y); 	
 	cvz :=cvz+(x*rward.z); 	
 END rightstrafe;

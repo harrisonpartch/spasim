@@ -532,7 +532,7 @@ BEGIN
  	
 	Base.avatarsize:=1000; 
 
-	z3.setcolor(0,0,3,5,1); 
+	z3.setcolor(0,0,113,155,1); 
 	Base.world:=z3;
 
 END dawn;
