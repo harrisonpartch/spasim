@@ -59,12 +59,12 @@ PROCEDURE&init*;
 BEGIN
 	setoutline(0,0,0,1/2);
 	NEW(blue);
-	blue.setcolor(0,0,1/11,1/11,0);
+	blue.setcolor(0,0,1/101,1/101,0);
 	innard:=Base.VoxelFromName("NM3");	
-	innard.setcolor(0,0,1,1,0);
+	innard.setcolor(0,0,2/3,2/3,0);
 	passable:=TRUE;
 	copyonstroke:=TRUE;
-	complex:=FALSE;	
+	complex:=TRUE;	
 END init;	
 PROCEDURE setoutline* (red, green, blue,alpha: REAL);
 BEGIN
@@ -94,27 +94,30 @@ BEGIN
 		ray.clr.ba:=ray.clr.ba-oa;
 	END;
 	exit:= Base.Exit(ray);
-	ecount:=0;
-	IF (exit.x< 0.011) OR (exit.x > 0.989) THEN INC(ecount) END;
-	IF (exit.y <0.011) OR (exit.y > 0.989) THEN INC(ecount) END;
-	IF (exit.z < 0.011) OR (exit.z > 0.989) THEN INC(ecount) END;
-	IF (ecount > 1) THEN
-		a:=1/2;
-		ray.clr.r := ray.clr.r + or * ray.clr.ra*a;
-		ray.clr.g := ray.clr.g + og * ray.clr.ga*a;
-		ray.clr.b := ray.clr.b + ob * ray.clr.ba*a;
-		a:=1-a;
-		ray.clr.ra:= ray.clr.ra - a;
-		ray.clr.ga:=ray.clr.ga-a;
-		ray.clr.ba:=ray.clr.ba-a;
-	END;	
+	innard.Shade(ray);
+	IF ~ray.terminate THEN
+		ecount:=0;
+		IF (exit.x< 0.011) OR (exit.x > 0.989) THEN INC(ecount) END;
+		IF (exit.y <0.011) OR (exit.y > 0.989) THEN INC(ecount) END;
+		IF (exit.z < 0.011) OR (exit.z > 0.989) THEN INC(ecount) END;
+		IF (ecount > 1) THEN
+			a:=1/2;
+			ray.clr.r := ray.clr.r + or * ray.clr.ra*a;
+			ray.clr.g := ray.clr.g + og * ray.clr.ga*a;
+			ray.clr.b := ray.clr.b + ob * ray.clr.ba*a;
+			a:=1-a;
+			ray.clr.ra:= ray.clr.ra - a;
+			ray.clr.ga:=ray.clr.ga-a;
+			ray.clr.ba:=ray.clr.ba-a;
+		END
+	END;
 END Shade;
 
 PROCEDURE strokerec*(p:PT; resolution,scale: LONGINT; voxel:Voxel);
 BEGIN
 	innard.strokerec(p,resolution,scale,voxel);
 END strokerec;
-	
+
 END OutlineVox;
 
 PROCEDURE thisvox*():Base.Voxel;

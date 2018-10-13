@@ -693,14 +693,14 @@ END splitcam;
 
 PROCEDURE moredetail*;
 BEGIN
-	foveaparameter:=foveaparameter-10;
+	foveaparameter:=foveaparameter-3;
 	IF foveaparameter<1 THEN foveaparameter:=1 END;
 	FV:=(W*W)/foveaparameter;
 END moredetail;
 
 PROCEDURE lessdetail*;
 BEGIN
-	foveaparameter:=(foveaparameter+10);
+	foveaparameter:=(foveaparameter+3);
 	IF foveaparameter>300 THEN foveaparameter:=300 END;
 	FV:=(W*W)/foveaparameter;
 END lessdetail;

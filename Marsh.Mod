@@ -304,6 +304,9 @@ BEGIN
 	
 	xot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU666"); 
 	push(xot);
+	cage:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");
+	cage.copyonstroke:=TRUE;
+  	push(cage);	
 (*	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	push(greenball);
 	akatrump:=Base.VoxelFromName("Nakatrump"); 
