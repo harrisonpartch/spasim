@@ -307,7 +307,7 @@ BEGIN
 	cage:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");
 	cage.copyonstroke:=TRUE;
   	push(cage);	
-(*	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
+	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	push(greenball);
 	akatrump:=Base.VoxelFromName("Nakatrump"); 
 	push(akatrump);
@@ -457,7 +457,7 @@ BEGIN
 	arevclock:=Base.VoxelFromName("Narevclock");  
 	push(arevclock);
 	jordan:=Base.VoxelFromName("Njbp");  	
-*)
+
 	gxy:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 	
 	push(gxy);
 	bottle3:=Base.VoxelFromName("Nbottle3");  
@@ -506,7 +506,7 @@ BEGIN
 	noise[4].c:=7.5;		
 	noise[4].octaves:=4;
 	noise[4].persistence:=3.31;	
-	noise[4].setvoxel(greensuncouple);		
+	noise[4].setvoxel(sand);		
 
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
@@ -519,16 +519,21 @@ BEGIN
 	z3a:=Base.VoxelFromName("NM3");	
 	w3:=Base.VoxelFromName("NM3");	
 	
-	NEW(plane,center,up);
-	plane.setvoxel(gxy);				
+
+	w3.setcolor(10,0,3,5,1); 
+	z3a.setcolor(0,0,3,25,1);     	
+     z3a.FRaster(noise[1],9);
+ 	NEW(plane,center,up);
+	plane.setvoxel(z3a);				
 	z3.FRaster(plane,27);	
-	z3a.setcolor(0,0,3,25,1); 
-	w3.setcolor(10,0,3,5,1); 	
-     z3a.FRaster(noise[4],27);
+
+     
      Base.setPT(center,1/2,1/2,6/10);
      NEW(plane,center,up);
-	plane.setvoxel(z3a);				
-	z3.FRaster(plane,9);	
+	plane.setvoxel(gxy);				
+	z3.FRaster(plane,27);	
+	
+	z3.FRaster(noise[1],27);
 
 					
 	Base.avatar:=harrison;
