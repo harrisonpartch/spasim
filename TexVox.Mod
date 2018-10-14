@@ -293,16 +293,17 @@ BEGIN
 				|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
 			END
 		END;							
-		mip:=ray.length*ray.scale;
-		IF mip>7 THEN 	
+(*		mip:=ray.length*ray.scale;
+		IF mip>17 THEN 	
 			color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
-		ELSIF mip>4 THEN
+		ELSIF mip>11 THEN
 			color:=texcube.side[ray.face].pixelmip_one(lx,ly);
-		ELSIF mip>2 THEN
+		ELSIF mip>12 THEN
 			color:=texcube.side[ray.face].pixelmip_two(lx,ly);
 		ELSE	
 			color:=texcube.side[ray.face].pixel(lx,ly);	
 		END; 
+*)		color:=texcube.side[ray.face].pixel(lx,ly);
 		IF color.alpha<0.99 THEN
 			IF color.alpha>0.7 THEN 
 				mirror(ray,0);	

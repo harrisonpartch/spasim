@@ -48,6 +48,8 @@ N2qeD84Fv78X2XEj8PtU666.Mod  Sphere
 
 NXWCxXWLIcD2LegvoGXX666.Mod	Serp
 
+NBsHFiBKkSckXBAd46ZbEQw.Mod mandelbrot
+
 
 NM5.Mod
 NM4.Mod

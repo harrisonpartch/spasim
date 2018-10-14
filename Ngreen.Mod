@@ -11,7 +11,7 @@ END thisvox;
 
 BEGIN
 	NEW(cv,"green.png");
-	cv.tscale:=100;
+	cv.tscale:=5000;
 END Ngreen. 
  
 Marsh.Rez Ngreen ~

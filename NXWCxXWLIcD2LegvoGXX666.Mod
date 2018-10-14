@@ -54,7 +54,7 @@ BEGIN
 END thisvox;
 
 BEGIN
-	green:=Base.VoxelFromName("Ngreen");  	
+	green:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  	
 	xot:=Base.VoxelFromName("Narchillect"); 
 	NEW(s0);
 	NEW(s1);
@@ -68,7 +68,7 @@ BEGIN
 	s2.passable:=TRUE;	
 	s3.passable:=TRUE;	
 	s4.passable:=TRUE;	
-	s0.fillsierp(xot,alphablue);
+	s0.fillsierp(green,alphablue);
 	s1.fillsierp(s0,alphablue);	
 	s2.fillsierp(s1,alphablue);
 	s3.fillsierp(s2,alphablue);	

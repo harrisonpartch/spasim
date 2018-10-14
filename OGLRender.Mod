@@ -313,7 +313,7 @@ BEGIN
 	R2:=150;
 	Base.worldalive := TRUE;	
 	fogdensity:=0.11;
-	leftsticky:=100.0;
+	leftsticky:=10.0;
 	upsticky:=10.0;	
 END OnLoad;
 

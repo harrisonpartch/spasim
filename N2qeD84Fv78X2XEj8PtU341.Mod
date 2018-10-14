@@ -118,6 +118,14 @@ BEGIN
 	innard.strokerec(p,resolution,scale,voxel);
 END strokerec;
 
+PROCEDURE deepcopy*():Voxel;
+VAR v: OutlineVox;
+BEGIN
+	NEW(v);
+	v.innard:=SELF.innard.deepcopy();
+	RETURN(v)
+END deepcopy;
+
 END OutlineVox;
 
 PROCEDURE thisvox*():Base.Voxel;

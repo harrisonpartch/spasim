@@ -329,6 +329,7 @@ BEGIN
 	 volvox:=Base.VoxelFromName("Nrdvolvox");  	
       push(volvox);
 *)   serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX666"); 
+     serp.passable:=FALSE;
 	push(serp);	
 	badopossum:=Base.VoxelFromName("Nbadopossum"); 	
 	raccoon:=Base.VoxelFromName("Nraccoon"); 	
@@ -468,21 +469,21 @@ BEGIN
 	push(greensuncouple);
 	NEW(noise[0]);		
 	noise[0].seed:=1534666690;		
-	noise[0].a:=1;
-	noise[0].b:=1;
-	noise[0].c:=1;		
+	noise[0].a:=3;
+	noise[0].b:=3;
+	noise[0].c:=3;		
 	noise[0].octaves:=4;
 	noise[0].persistence:=3.61;	
-	noise[0].setvoxel(sand);			
+	noise[0].setvoxel(serp);			
 	NEW(noise[1]);		
 	noise[1].seed:=678;		
-	noise[1].a:=1.5;
-	noise[1].b:=1.5;
-	noise[1].c:=1.5;		
+	noise[1].a:=3.5;
+	noise[1].b:=3.5;
+	noise[1].c:=3.5;		
 	noise[1].octaves:=4;
 	noise[1].persistence:=3.91;	
-	noise[1].setcolor(0.8,0.8,0,1/2);	
-	noise[1].setvoxel(Base.VoxelFromName("Ntensor"));		
+	noise[1].setcolor(0.8,2.8,4,1/2);	
+	noise[1].setvoxel(serp);		
 	NEW(noise[2]);	
 	noise[2].seed:=900909;		
 	noise[2].a:=1.5;
@@ -490,7 +491,7 @@ BEGIN
 	noise[2].c:=1.5;		
 	noise[2].octaves:=4;
 	noise[2].persistence:=3.61;	
-	noise[2].setvoxel(bottle3);		
+	noise[2].setvoxel(serp);		
 	NEW(noise[3]);		
 	noise[3].seed:=11117111;		
 	noise[3].a:=1;
@@ -506,7 +507,7 @@ BEGIN
 	noise[4].c:=7.5;		
 	noise[4].octaves:=4;
 	noise[4].persistence:=3.31;	
-	noise[4].setvoxel(sand);		
+	noise[4].setvoxel(gxy);		
 
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
@@ -520,27 +521,20 @@ BEGIN
 	w3:=Base.VoxelFromName("NM3");	
 	
 
-	w3.setcolor(10,0,3,5,1); 
-	z3a.setcolor(0,0,3,25,1);     	
-     z3a.FRaster(noise[1],9);
+
+	z3a.setcolor(0,0,1,1.5,1);     	
+     z3.FRaster(noise[0],27);
  	NEW(plane,center,up);
-	plane.setvoxel(z3a);				
-	z3.FRaster(plane,27);	
-
-     
-     Base.setPT(center,1/2,1/2,6/10);
-     NEW(plane,center,up);
 	plane.setvoxel(gxy);				
-	z3.FRaster(plane,27);	
-	
-	z3.FRaster(noise[1],27);
+	z3.FRaster(plane,9);	
 
+    
 					
 	Base.avatar:=harrison;
  	
 	Base.avatarsize:=1000; 
 
-	z3.setcolor(0,0,113,155,1); 
+	z3.setcolor(0,0,3,5.5,1); 
 	Base.world:=z3;
 
 END dawn;
