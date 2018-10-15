@@ -1,5 +1,5 @@
 MODULE TexVox;
-IMPORT Base, Files,SPSMMath, Noise, Raster, Graphics := WMGraphics, Random, Math,Out := KernelLog; 
+IMPORT Base, Files,SPSMMath, Noise, Raster, Graphics := WMGraphics, Random, Math,Out := KernelLog;
 
 TYPE PT = Base.PT;
 	Color = Base.Color;
@@ -32,7 +32,7 @@ VAR
 	dot1,dot2,mix: REAL;
 	lx,ly: REAL;
 	i,j,face: INTEGER;
-	dot: REAL;	
+	dot: REAL;
 	xov,yov,zov:REAL;
 	inside: BOOLEAN;
 	color: Color;
@@ -43,29 +43,29 @@ BEGIN
 	IF ray.length>0.00001 THEN
 		xx:=ray.xyz.x;
 		yy:=ray.xyz.y;
-		zz:=ray.xyz.z;	
+		zz:=ray.xyz.z;
 		ray.lxyz.x:=xx*tscale-ENTIER(xx*tscale);
 		ray.lxyz.y:=yy*tscale-ENTIER(yy*tscale);
 		ray.lxyz.z:=zz*tscale-ENTIER(zz*tscale);
 		CASE ray.face OF
-			 0: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
-			|1: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
+			 0: lx := ray.lxyz.y; ly := 1-ray.lxyz.z;
+			|1: lx := ray.lxyz.x; ly := 1-ray.lxyz.z;
 			|2: lx := ray.lxyz.x; ly := ray.lxyz.y;
-			|3: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
-			|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
-			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
-		END;											
+			|3: lx := ray.lxyz.y; ly := 1-ray.lxyz.z;
+			|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z;
+			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;
+		END;
 		color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
-		dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
+		dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
 		dr:=color.red*color.alpha*dot;
 		dg:=color.green*color.alpha*dot;
-		db:=color.blue*color.alpha*dot;	
+		db:=color.blue*color.alpha*dot;
 		(*
 		0<alpha<1/2 is interpreted as alpha on (0,1)
 		1/2<alpha<1 is mirror+texture mixed
 		*)
 		IF color.alpha<0.99 THEN
-			IF color.alpha>0.5 THEN 
+			IF color.alpha>0.5 THEN
 				ai:=(2*color.alpha)/2;
 				ainv:=(1-ai)/2;
 				ai:=ai/2;
@@ -73,36 +73,36 @@ BEGIN
 				mirror(ray,0);
 				raycolor.r := raycolor.r + dr*raycolor.ra;
 				raycolor.g := raycolor.g + dg*raycolor.ga;
-				raycolor.b := raycolor.b + db*raycolor.ba;		
+				raycolor.b := raycolor.b + db*raycolor.ba;
 				ray.clr.r := (ray.clr.r*ai + raycolor.r*ainv);
 				ray.clr.g := (ray.clr.g*ai + raycolor.g*ainv) ;
-				ray.clr.b := (ray.clr.b*ai + raycolor.b*ainv);					
+				ray.clr.b := (ray.clr.b*ai + raycolor.b*ainv);
 			ELSE
 				dot:=ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
-(*				dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
+(*				dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
 				mix:=ray.length*ray.scale;
 				IF mix>1 THEN mix:=1 END;
-				dot:=mix*dot1+(1-mix)*dot2;	
+				dot:=mix*dot1+(1-mix)*dot2;
 *)				dr:=color.red*color.alpha*dot;
 				dg:=color.green*color.alpha*dot;
-				db:=color.blue*color.alpha*dot;	
+				db:=color.blue*color.alpha*dot;
 				ray.clr.r := ray.clr.r + dr*ray.clr.ra;
 				ray.clr.g := ray.clr.g + dg*ray.clr.ga;
-				ray.clr.b := ray.clr.b + db*ray.clr.ba;	
+				ray.clr.b := ray.clr.b + db*ray.clr.ba;
 				ray.clr.ra:= ray.clr.ra-dr;
 				ray.clr.ga:= ray.clr.ga-dg;
 				ray.clr.ba:= ray.clr.ba-db;
 				IF (ray.clr.ra<0.01) OR  (ray.clr.ga<0.01) OR (ray.clr.ba<0.01) THEN ray.terminate:=TRUE END
 			END
 		ELSE
-			dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
+			dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
 			dr:=color.red*dot;
 			dg:=color.green*dot;
-			db:=color.blue*dot;	
+			db:=color.blue*dot;
 			ray.clr.r := ray.clr.r + dr*ray.clr.ra;
 			ray.clr.g := ray.clr.g + dg*ray.clr.ga;
-			ray.clr.b := ray.clr.b + db*ray.clr.ba;	
-			ray.clr.alpha:=0;	
+			ray.clr.b := ray.clr.b + db*ray.clr.ba;
+			ray.clr.alpha:=0;
 			ray.terminate:=TRUE;
 		END
 	ELSE
@@ -111,7 +111,7 @@ BEGIN
 END Shade;
 
 PROCEDURE reflect(VAR p: PT; n: PT);
-VAR 
+VAR
 	a,b,c,dot: REAL;
 BEGIN
 	dot := p.x*n.x+p.y*n.y+p.z*n.z;
@@ -126,16 +126,16 @@ BEGIN
 	ray.hitmirrorTF := TRUE;
 	ray.hitxyz:=ray.xyz;
 	ray.changed := TRUE;
-	ray.mirrortf:=TRUE;	
+	ray.mirrortf:=TRUE;
 	ray.clr.ra:= ray.clr.ra + 0.2;
 	ray.clr.ga := ray.clr.ga + 0.2;
 	ray.clr.ba := ray.clr.ba + 0.2;
-	ray.clr.alpha:= ray.clr.alpha - 0.2;	
-	IF ray.clr.alpha < 0.1 THEN ray.terminate:=TRUE END;		
-	reflect(ray.dxyz, ray.fnormal);	
-	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
+	ray.clr.alpha:= ray.clr.alpha - 0.2;
+	IF ray.clr.alpha < 0.1 THEN ray.terminate:=TRUE END;
+	reflect(ray.dxyz, ray.fnormal);
+	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END;
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
-	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
+	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;
 END mirror;
 
 END AvaVox;
@@ -144,13 +144,13 @@ END AvaVox;
 TYPE BilbVox* = OBJECT(Voxel);
 VAR
 	texture*: Texture;
-	name*: Name; 
+	name*: Name;
 
 PROCEDURE & init*(n: Name);
 BEGIN
 	NEW(texture,n);
 	name:=n;
-END init;	
+END init;
 
 PROCEDURE Shade (VAR ray: Ray);
 VAR
@@ -164,13 +164,13 @@ BEGIN
 		cp:=Base.midPT(ray.lxyz,Base.Exit(ray));
 		(* first approx: dirty: throw out the smallest of x y z *)
 		x:= cp.x; y:= cp.y; z:=cp.z;
-		IF z>y THEN y:=z ELSIF z>x THEN  x:=z END;	
+		IF z>y THEN y:=z ELSIF z>x THEN  x:=z END;
 		color:=texture.pixel(x,-y);
 		ray.clr.r := ray.clr.r + color.red*ray.clr.ra;
 		ray.clr.g := ray.clr.g + color.green*ray.clr.ga;
-		ray.clr.b := ray.clr.b + color.blue*ray.clr.ba;	
-		ray.clr.alpha:=0;	
-		ray.terminate:=TRUE;	
+		ray.clr.b := ray.clr.b + color.blue*ray.clr.ba;
+		ray.clr.alpha:=0;
+		ray.terminate:=TRUE;
 	END
 END Shade;
 
@@ -180,7 +180,7 @@ TYPE TexVox* = OBJECT(Voxel);
 VAR
 	txTF*: BOOLEAN;
 	texcube*: TexCube;
-	name*: Name; 
+	name*: Name;
 
 PROCEDURE & init*(n: Name);
 BEGIN
@@ -198,11 +198,11 @@ VAR
 	dr,dg,db,da,blackness:REAL;
 	bb,c, lx, ly,lz, lx1,ly1,lz1,lx2,ly2,lz2,tq,xx,yy,zz,xxx,yyy,zzz,sc : REAL;
 	i,j,face: INTEGER;
-	mix,dot,dot1,dot2, nx, ny, nz: REAL;	
+	mix,dot,dot1,dot2, nx, ny, nz: REAL;
 	bpdx,bpdy,cq: REAL;
 	xov,yov,zov:REAL;
 	inside: BOOLEAN;
-	color,color1,color2: Base.Color;	
+	color,color1,color2: Base.Color;
 	raycolor: Base.ray_color;
 	txcube: TexCube;
 	rlf: REAL;
@@ -220,7 +220,7 @@ BEGIN
 		IF tscale>0 THEN
 			xx:=ray.xyz.x;
 			yy:=ray.xyz.y;
-			zz:=ray.xyz.z;	
+			zz:=ray.xyz.z;
 			lx:=xx*90-ENTIER(xx*90);
 			ly:=yy*90-ENTIER(yy*90);
 			lz:=zz*90-ENTIER(zz*90);
@@ -238,10 +238,10 @@ BEGIN
 					CASE ray.face OF
 						0:
 						|1: lx:=lx+lx1;
-						|2:  ly:=ly+lx1; 
-						|3: 
+						|2:  ly:=ly+lx1;
+						|3:
 						|4: lx:=lx+lx1-1;
-						|5: ly:=ly+lx1-1; 
+						|5: ly:=ly+lx1-1;
 					END
 				ELSE
 					(* xy pyramid *)
@@ -250,7 +250,7 @@ BEGIN
 					CASE ray.face OF
 						 0: lx:=lx+lz1;
 						|1:  ly:=ly+lz1;
-						|2: 
+						|2:
 						|3: lx:=lx+lz1-1;
 						|4: ly:=ly+lz1-1;
 						|5:
@@ -258,15 +258,15 @@ BEGIN
 				END
 			ELSE
 				IF yyy>zzz THEN
-					(* xz pyramid *)	
-					lx:=xx; ly:=zz;	
-					ly1:=tscale*ray.lxyz.y/ray.scale;	
+					(* xz pyramid *)
+					lx:=xx; ly:=zz;
+					ly1:=tscale*ray.lxyz.y/ray.scale;
 					CASE ray.face OF
 						 0: lx:= lx+ly1;
 						|1:
 						|2: ly:=ly+ly1;
 						|3: lx:= lx+ly1-1;
-						|4:  
+						|4:
 						|5:ly:=ly+ly1-1;
 					END
 				ELSE
@@ -276,58 +276,64 @@ BEGIN
 					CASE ray.face OF
 						 0: lx:=lx+lz1;
 						|1:  ly:=ly+lz1;
-						|2: 
+						|2:
 						|3: lx:=lx+lz1-1;
 						|4: ly:=ly+lz1-1;
 						|5:
 					END
 				END
-			END 
+			END
 		ELSE
 			CASE ray.face OF
-				 0: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
-				|1: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
+				 0: lx := ray.lxyz.y; ly := 1-ray.lxyz.z;
+				|1: lx := ray.lxyz.x; ly := 1-ray.lxyz.z;
 				|2: lx := ray.lxyz.x; ly := ray.lxyz.y;
-				|3: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
-				|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
-				|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
+				|3: lx := ray.lxyz.y; ly := 1-ray.lxyz.z;
+				|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z;
+				|5: lx := ray.lxyz.x; ly := ray.lxyz.y;
 			END
-		END;							
-(*		mip:=ray.length*ray.scale;
-		IF mip>17 THEN 	
+		END;
+ 		mip:=ray.length*ray.scale;
+		IF mip>100 THEN
 			color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
-		ELSIF mip>11 THEN
+		ELSIF mip>25 THEN
 			color:=texcube.side[ray.face].pixelmip_one(lx,ly);
-		ELSIF mip>12 THEN
+		ELSIF mip>15 THEN
+			color1:=texcube.side[ray.face].pixelmip_two(lx,ly);
+			color2:=texcube.side[ray.face].pixelmip_one(lx*7,ly*7);
+			mix:=1+(4-mip)/10;
+			color:=Base.mixcolor(color1,color2,mix);
 			color:=texcube.side[ray.face].pixelmip_two(lx,ly);
-		ELSE	
-			color:=texcube.side[ray.face].pixel(lx,ly);	
-		END; 
-*)		color:=texcube.side[ray.face].pixel(lx,ly);
+		ELSE
+			color1:=texcube.side[ray.face].pixel(lx,ly);
+			color2:=texcube.side[ray.face].pixelmip_two(lx*7,ly*7);  (* Base.Texture.pixel applies MODulo *)
+			mix:=1+(4-mip)/10;
+			color:=Base.mixcolor(color1,color2,mix);
+		END;
 		IF color.alpha<0.99 THEN
-			IF color.alpha>0.7 THEN 
-				mirror(ray,0);	
-				IF ray.clr.alpha < 0.1 THEN ray.terminate:=TRUE END;		
+			IF color.alpha>0.7 THEN
+				mirror(ray,0);
+				IF ray.clr.alpha < 0.1 THEN ray.terminate:=TRUE END;
 			ELSE
 				dr:=color.red*color.alpha*ray.clr.ra;
 				dg:=color.green*color.alpha*ray.clr.ga;
-				db:=color.blue*color.alpha*ray.clr.b;	
+				db:=color.blue*color.alpha*ray.clr.b;
 				ray.clr.r := ray.clr.r + dr;
 				ray.clr.g := ray.clr.g + dg;
-				ray.clr.b := ray.clr.b + db;	
+				ray.clr.b := ray.clr.b + db;
 				ray.clr.ra:= ray.clr.ra-dr;
 				ray.clr.ga:= ray.clr.ga-dg;
 				ray.clr.ba:= ray.clr.ba-db;
-				IF (ray.clr.ra<0.01) OR  (ray.clr.ga<0.01) OR (ray.clr.ba<0.01) THEN ray.terminate:=TRUE END; 
+				IF (ray.clr.ra<0.01) OR  (ray.clr.ga<0.01) OR (ray.clr.ba<0.01) THEN ray.terminate:=TRUE END;
 			END
 		ELSE
-			dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);	
+			dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
 			dr:=color.red*dot;
 			dg:=color.green*dot;
-			db:=color.blue*dot;	
+			db:=color.blue*dot;
 			ray.clr.r := ray.clr.r + dr*ray.clr.ra;
 			ray.clr.g := ray.clr.g + dg*ray.clr.ga;
-			ray.clr.b := ray.clr.b + db*ray.clr.ba;	
+			ray.clr.b := ray.clr.b + db*ray.clr.ba;
 			ray.terminate:=TRUE;
 		END
 	ELSE
@@ -340,12 +346,12 @@ sin(dtheta)*ray.length -- screw it. this should be handled in the mspace shader!
 X X X
 
 X x X
-X X X 
+X X X
 
 *)
 
 PROCEDURE reflect(VAR p: PT; n: PT);
-VAR 
+VAR
 	a,b,c,dot: REAL;
 BEGIN
 	dot := p.x*n.x+p.y*n.y+p.z*n.z;
@@ -360,25 +366,25 @@ BEGIN
 	ray.hitmirrorTF := TRUE;
 	ray.hitxyz:=ray.xyz;
 	ray.changed := TRUE;
-	ray.mirrortf:=TRUE;	
+	ray.mirrortf:=TRUE;
 	ray.clr.ra:= ray.clr.ra + 0.1;
 	ray.clr.ga := ray.clr.ga + 0.1;
 	ray.clr.ba := ray.clr.ba + 0.1;
-	ray.clr.alpha:= ray.clr.alpha - 0.1;			
-	reflect(ray.dxyz, ray.fnormal);	
-	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
+	ray.clr.alpha:= ray.clr.alpha - 0.1;
+	reflect(ray.dxyz, ray.fnormal);
+	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END;
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
-	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
+	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;
 	a:=1000*ray.scale;
 	ray.popdelta.x:=ray.dxyz.x/a;
-	ray.popdelta.y:=ray.dxyz.y/a;	
+	ray.popdelta.y:=ray.dxyz.y/a;
 	ray.popdelta.z:=ray.dxyz.z/a;
 END mirror;
 
 PROCEDURE play*();
 BEGIN
 (*	SPSMAudio.LoadWav("test.wav");
-	SPSMAudio.Play 
+	SPSMAudio.Play
 
 	ALUT.Play(Base.texsound);	*)
 END play;
@@ -403,7 +409,7 @@ VAR
 	dr,dg,db,da,blackness:REAL;
 	bb,c, lx, ly,lz, lx1,ly1,lz1,lx2,ly2,lz2,tq,xx,yy,zz,xxx,yyy,zzz,sc : REAL;
 	i,j,face: INTEGER;
-	mix,dot,dot1,dot2, nx, ny, nz: REAL;	
+	mix,dot,dot1,dot2, nx, ny, nz: REAL;
 	bpdx,bpdy,cq: REAL;
 	xov,yov,zov:REAL;
 	inside: BOOLEAN;
@@ -433,10 +439,10 @@ BEGIN
 				CASE ray.face OF
 					0:
 					|1: lx:=lx+lx1;
-					|2:  ly:=ly+lx1; 
-					|3: 
+					|2:  ly:=ly+lx1;
+					|3:
 					|4: lx:=lx+lx1-1;
-					|5: ly:=ly+lx1-1; 
+					|5: ly:=ly+lx1-1;
 				END
 			ELSE
 				(* xy pyramid *)
@@ -445,7 +451,7 @@ BEGIN
 				CASE ray.face OF
 					 0: lx:=lx+lz1;
 					|1:  ly:=ly+lz1;
-					|2: 
+					|2:
 					|3: lx:=lx+lz1-1;
 					|4: ly:=ly+lz1-1;
 					|5:
@@ -453,15 +459,15 @@ BEGIN
 			END
 		ELSE
 			IF yyy>zzz THEN
-				(* xz pyramid *)	
-				lx:=xx; ly:=zz;	
-				ly1:=tscale*ray.lxyz.y/ray.scale;	
+				(* xz pyramid *)
+				lx:=xx; ly:=zz;
+				ly1:=tscale*ray.lxyz.y/ray.scale;
 				CASE ray.face OF
 					 0: lx:= lx+ly1;
 					|1:
 					|2: ly:=ly+ly1;
 					|3: lx:= lx+ly1-1;
-					|4:  
+					|4:
 					|5:ly:=ly+ly1-1;
 				END
 			ELSE
@@ -471,31 +477,31 @@ BEGIN
 				CASE ray.face OF
 					 0: lx:=lx+lz1;
 					|1:  ly:=ly+lz1;
-					|2: 
+					|2:
 					|3: lx:=lx+lz1-1;
 					|4: ly:=ly+lz1-1;
 					|5:
 				END
 			END
-		END 
+		END
 	ELSE
 		CASE ray.face OF
-			 0: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
-			|1: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
+			 0: lx := ray.lxyz.y; ly := 1-ray.lxyz.z;
+			|1: lx := ray.lxyz.x; ly := 1-ray.lxyz.z;
 			|2: lx := ray.lxyz.x; ly := ray.lxyz.y;
-			|3: lx := ray.lxyz.y; ly := 1-ray.lxyz.z; 
-			|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z; 
-			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;  
+			|3: lx := ray.lxyz.y; ly := 1-ray.lxyz.z;
+			|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z;
+			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;
 		END
 	END;
-	color:=texcube.side[ray.face].pixel(lx,ly);	
+	color:=texcube.side[ray.face].pixel(lx,ly);
 	IF color.alpha<0.99 THEN
-			IF color.alpha>0.75 THEN 
-				mirror(ray,dot) 
+			IF color.alpha>0.75 THEN
+				mirror(ray,dot)
 			ELSE
 				dr:=color.red*ray.clr.ra;
 				dg:=color.green*ray.clr.ra;
-				db:=color.blue*ray.clr.ra;		
+				db:=color.blue*ray.clr.ra;
 				ray.clr.r := ray.clr.r + dr*color.alpha;
 				ray.clr.ra:=ray.clr.ra-(dr*color.alpha);
 				ray.clr.g := ray.clr.g + dg*color.alpha;
@@ -504,21 +510,21 @@ BEGIN
 				ray.clr.ba:=ray.clr.ba-(db*color.alpha);
 			(*	Base.ExitF(ray,lxyz,face);			 (* trace to the back side of the cube *)
 				CASE face OF
-					 0: lx := lxyz.y; ly := 1-lxyz.z; 
-					|1: lx := lxyz.x; ly := 1-lxyz.z; 
+					 0: lx := lxyz.y; ly := 1-lxyz.z;
+					|1: lx := lxyz.x; ly := 1-lxyz.z;
 					|2: lx := lxyz.x; ly := lxyz.y;
-					|3: lx := lxyz.y; ly := 1-lxyz.z; 
-					|4: lx := lxyz.x; ly := 1-lxyz.z; 
-					|5: lx := lxyz.x; ly := lxyz.y;  
+					|3: lx := lxyz.y; ly := 1-lxyz.z;
+					|4: lx := lxyz.x; ly := 1-lxyz.z;
+					|5: lx := lxyz.x; ly := lxyz.y;
 				END;
-				color2:=texcube.side[ray.face].pixel(lx,ly);	
+				color2:=texcube.side[ray.face].pixel(lx,ly);
 				IF color2.alpha<0.99 THEN
-					IF color2.alpha>0.75 THEN 
-						mirror(ray,dot)	
+					IF color2.alpha>0.75 THEN
+						mirror(ray,dot)
 					ELSE
 						dr:=color2.red*ray.clr.ra;
 						dg:=color2.green*ray.clr.ra;
-						db:=color2.blue*ray.clr.ra;	
+						db:=color2.blue*ray.clr.ra;
 						ray.clr.r := ray.clr.r + dr*color.alpha;
 						ray.clr.ra:=ray.clr.ra-(dr*color.alpha)-0.1;
 						ray.clr.g := ray.clr.g + dg*color.alpha;
@@ -530,23 +536,23 @@ BEGIN
 					dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z)
 					dr:=color2.red*dot*ray.clr.ra;
 					dg:=color2.green*dot*ray.clr.ra;
-					db:=color2.blue*dot*ray.clr.ra;			
+					db:=color2.blue*dot*ray.clr.ra;
 				END	*)
-			END		
+			END
 	ELSE
-		dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 
+		dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
 		dr:=color.red*dot*ray.clr.ra;
 		dg:=color.green*dot*ray.clr.ra;
-		db:=color.blue*dot*ray.clr.ra;			
+		db:=color.blue*dot*ray.clr.ra;
 		ray.clr.r := ray.clr.r + dr;
 		ray.clr.g := ray.clr.g + dg;
-		ray.clr.b := ray.clr.b + db;	
+		ray.clr.b := ray.clr.b + db;
 		ray.terminate:=TRUE;
 	END
 END Shade;
 
 PROCEDURE reflect(VAR p: PT; n: PT);
-VAR 
+VAR
 	a,b,c,dot: REAL;
 BEGIN
 	dot := p.x*n.x+p.y*n.y+p.z*n.z;
@@ -562,28 +568,28 @@ BEGIN
 	ray.hitmirrorTF := TRUE;
 	ray.hitxyz:=ray.xyz;
 	ray.changed := TRUE;
-	ray.mirrortf:=TRUE;	
+	ray.mirrortf:=TRUE;
 	ray.clr.ra:= ray.clr.ra + 0.1;
 	ray.clr.ga := ray.clr.ga + 0.1;
 	ray.clr.ba := ray.clr.ba + 0.1;
-	ray.clr.alpha:= ray.clr.alpha - 0.1;	
-	IF ray.clr.alpha < 0.1 THEN ray.terminate:=TRUE END;		
+	ray.clr.alpha:= ray.clr.alpha - 0.1;
+	IF ray.clr.alpha < 0.1 THEN ray.terminate:=TRUE END;
 	n.x:=(ray.normal.x*mix+ray.fnormal.x*(1-mix));
-	n.y:=(ray.normal.y*mix+ray.fnormal.y*(1-mix));	
-	n.z:=(ray.normal.z*mix+ray.fnormal.z*(1-mix));	
-	reflect(ray.dxyz, n);	
-	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
+	n.y:=(ray.normal.y*mix+ray.fnormal.y*(1-mix));
+	n.z:=(ray.normal.z*mix+ray.fnormal.z*(1-mix));
+	reflect(ray.dxyz, n);
+	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END;
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
-	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
+	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;
 END mirror;
 
 END TexCubeVox;
 
 (*
 TYPE FilmVox=OBJECT(Voxel);
-VAR 
+VAR
 	e: Files.Enumerator;
-	name: ARRAY 256 OF CHAR; 
+	name: ARRAY 256 OF CHAR;
 	flags: SET;
 	time,date,size: LONGINT;
 	go:BOOLEAN;
@@ -605,8 +611,8 @@ PROCEDURE tick;
 	ELSE
 		Out.Char("Y");
 		NEW(e);
-     	e.Open("ngs/*.png",{});		
-	END;  	
+     	e.Open("ngs/*.png",{});
+	END;
 END tick;
 
 END FilmVox;
@@ -645,7 +651,7 @@ BEGIN
 	zz:=zz*tscale-ENTIER(zz*tscale);
 	xxx:=ABS(1/2-xx);
 	yyy:=ABS(1/2-yy);
-	zzz:=ABS(1/2-zz);	
+	zzz:=ABS(1/2-zz);
 	IF xxx>yyy THEN
 		IF xxx>zzz THEN
 			(* yz pyramid *)  				(*  faces come in pairs: (0,3),(2,5),(1,4) *)
@@ -654,10 +660,10 @@ BEGIN
 			CASE ray.face OF
 				0:
 				|1: lx:=lx+lx1;
-				|2:  ly:=ly+lx1; 
-				|3: 
+				|2:  ly:=ly+lx1;
+				|3:
 				|4: lx:=lx+lx1;
-				|5: ly:=ly+lx1; 
+				|5: ly:=ly+lx1;
 			END
 		ELSE
 			(* xy pyramid *)
@@ -666,7 +672,7 @@ BEGIN
 			CASE ray.face OF
 				 0: lx:=lx+lz1;
 				|1:  ly:=ly+lz1;
-				|2: 
+				|2:
 				|3: lx:=lx+lz1;
 				|4: ly:=ly+lz1;
 				|5:
@@ -674,15 +680,15 @@ BEGIN
 		END
 	ELSE
 		IF yyy>zzz THEN
-			(* xz pyramid *)	
-			lx:=xx; ly:=zz;	
-			ly1:=tscale*ray.lxyz.y/ray.scale;	
+			(* xz pyramid *)
+			lx:=xx; ly:=zz;
+			ly1:=tscale*ray.lxyz.y/ray.scale;
 			CASE ray.face OF
 				 0: lx:= lx+ly1;
 				|1:
 				|2: ly:=ly+ly1;
 				|3: lx:= lx+ly1;
-				|4:  
+				|4:
 				|5:ly:=ly+ly1;
 			END
 
@@ -693,7 +699,7 @@ BEGIN
 			CASE ray.face OF
 				 0: lx:=lx+lz1;
 				|1:  ly:=ly+lz1;
-				|2: 
+				|2:
 				|3: lx:=lx+lz1;
 				|4: ly:=ly+lz1;
 				|5:
@@ -704,10 +710,10 @@ BEGIN
 	IF ((color.green>0.20) & ((color.red+color.blue)<0.2)) THEN
 		mirror(ray)
 	ELSE
-		dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z); 	
+		dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
 		dr:=color.red*dot*ray.clr.ra;
 		dg:=color.green*dot*ray.clr.ga;
-		db:=color.blue*dot*ray.clr.ba;	
+		db:=color.blue*dot*ray.clr.ba;
 		ray.clr.r := ray.clr.r + dr;
 		ray.clr.g := ray.clr.g+dg;
 		ray.clr.b := ray.clr.b + db;
@@ -716,7 +722,7 @@ BEGIN
 END Shade;
 
 PROCEDURE reflect(VAR p: PT; n: PT);
-VAR 
+VAR
 	a,b,c,dot: REAL;
 BEGIN
 	dot := p.x*n.x+p.y*n.y+p.z*n.z;
@@ -731,16 +737,16 @@ BEGIN
 	ray.hitmirrorTF := TRUE;
 	ray.hitxyz:=ray.xyz;
 	ray.changed := TRUE;
-	ray.mirrortf:=TRUE;	
+	ray.mirrortf:=TRUE;
 	ray.clr.ra:= ray.clr.ra + 0.2;
 	ray.clr.ga := ray.clr.ga + 0.2;
 	ray.clr.ba := ray.clr.ba + 0.2;
-	ray.clr.alpha:= ray.clr.alpha - 0.2;	
-	IF ray.clr.alpha < 0.1 THEN ray.terminate:=TRUE END;		
-	reflect(ray.dxyz, ray.normal);	
-	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
+	ray.clr.alpha:= ray.clr.alpha - 0.2;
+	IF ray.clr.alpha < 0.1 THEN ray.terminate:=TRUE END;
+	reflect(ray.dxyz, ray.normal);
+	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END;
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
-	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
+	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;
 END mirror;
 
 END FloopVox;
@@ -753,7 +759,7 @@ VAR
 	octaves:INTEGER;
 	aa,bb,cc,persistence: REAL;
 	tscale: REAL;
-	
+
 PROCEDURE&init*(s:LONGINT;o:INTEGER; a,b,c,p:REAL);
 BEGIN
 	seed:=s; octaves:=SHORT(o); persistence:=p;
@@ -776,10 +782,10 @@ BEGIN
 	x:= x; y:=y; z:=z;
 	c:=Noise.noise3dperlinabs(x,y,z, 6985, 4,3.5);
 	color.red:=c;
-	color.green:=c;	
+	color.green:=c;
 	color.blue:=c;
 	Base.clampColor(color);
-	dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z)*0.7+0.4; 
+	dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z)*0.7+0.4;
 	dr:=color.red*dot*ray.clr.ra;
 	dg:=color.green*dot*ray.clr.ga;
 	db:=color.blue*dot*ray.clr.ba;
@@ -793,9 +799,9 @@ END NoiseVox;
 
 PROCEDURE nshade(CONST nc: NCube; VAR ray: Ray);
 VAR
-	mix,dot,dot1,dot2: REAL;	
+	mix,dot,dot1,dot2: REAL;
 BEGIN
-	dot1 := ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z); 
+	dot1 := ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
 	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
 	dot1:=dot1*0.7+0.3;
 	dot2:=dot2*0.7+0.3;
@@ -803,7 +809,7 @@ BEGIN
 	dot:=mix*dot2+(1-mix)*dot1;
 	ray.clr.r := ray.clr.r + nc.color.red * ray.clr.ra*dot;
 	ray.clr.g := ray.clr.g + nc.color.green * ray.clr.ga*dot;
-	ray.clr.b := ray.clr.b + nc.color.blue * ray.clr.ba*dot; 		
+	ray.clr.b := ray.clr.b + nc.color.blue * ray.clr.ba*dot;
 	ray.terminate:=TRUE
 END nshade;
 

@@ -30,9 +30,12 @@ END setFuzz;
 PROCEDURE Shade*(VAR ray: Ray);
 BEGIN
 	ray.changed := TRUE;
-	ray.dxyz.x := ray.dxyz.x + rand.Uniform()/100 - 0.005;
+	ray.dxyz.x := ray.lxyz.x + 0.05;
+	ray.dxyz.y := ray.lxyz.y + 0.05;
+	ray.dxyz.z := ray.lxyz.z + 0.05; 	
+(*	ray.dxyz.x := ray.dxyz.x + rand.Uniform()/100 - 0.005;
 	ray.dxyz.y := ray.dxyz.y + rand.Uniform()/100 - 0.005;
-	ray.dxyz.z := ray.dxyz.z + rand.Uniform()/100 - 0.005; 
+	ray.dxyz.z := ray.dxyz.z + rand.Uniform()/100 - 0.005; *)
 END Shade;
 
 END FuzzVox;

@@ -452,7 +452,7 @@ END KeyEvent;
 				camera.up(-up/(15000*leftsticky)); 
 				camera.left(left/(6000*leftsticky));
 				WarpPointer(1000,1000, centerx,centery);
-				IF (ABS(xr)+ABS(yr)>100) THEN
+				IF (ABS(xr)+ABS(yr)>300) THEN
 					Retina.saccade:=TRUE
 				ELSE
 					Retina.saccade:=FALSE

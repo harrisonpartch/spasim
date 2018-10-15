@@ -6,7 +6,7 @@ VAR vox: HalfSpace.halfvox; v: TexVox.TexVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	 NEW(v, "mandel.png"); 
-	 v.tscale:=30000;
+	 v.tscale:=3000;
 	 NEW(vox,v,Base.randPT(),Base.randPT());
 	RETURN v
 END thisvox;

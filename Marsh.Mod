@@ -1,5 +1,5 @@
 MODULE Marsh;
-IMPORT  Base , Retina, Engrainer, Random, CellAuto,
+IMPORT  Base , Retina, Engrainer, Random, CellAuto, Voxel4,
  FRep, Files, Streams, Commands, Out:=KernelLog;
 
 CONST sfile="marshstrokes.text"
@@ -295,6 +295,7 @@ VAR
 	jordan, bottle1,bottle2,bottle3,bottlepossum,bottlegrounds,greensuncouple,wstar,starspider,arevclock: Voxel;
 	ball: FRep.sphere;
 	medley: Voxel;
+	fuzz: Voxel4.FuzzVox;
 	noise: ARRAY 5 OF FRep.noise;	 
 BEGIN
 	NEW(ms);
@@ -307,6 +308,8 @@ BEGIN
 	cage:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");
 	cage.copyonstroke:=TRUE;
   	push(cage);	
+  	NEW(fuzz);
+  	push(fuzz);
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	push(greenball);
 	akatrump:=Base.VoxelFromName("Nakatrump"); 
@@ -329,7 +332,7 @@ BEGIN
 	 volvox:=Base.VoxelFromName("Nrdvolvox");  	
       push(volvox);
 *)   serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX666"); 
-     serp.passable:=FALSE;
+     serp.passable:=TRUE;
 	push(serp);	
 	badopossum:=Base.VoxelFromName("Nbadopossum"); 	
 	raccoon:=Base.VoxelFromName("Nraccoon"); 	
@@ -469,7 +472,7 @@ BEGIN
 	push(greensuncouple);
 	NEW(noise[0]);		
 	noise[0].seed:=1534666690;		
-	noise[0].a:=3;
+	noise[0].a:=7;
 	noise[0].b:=3;
 	noise[0].c:=3;		
 	noise[0].octaves:=4;
@@ -523,12 +526,10 @@ BEGIN
 
 
 	z3a.setcolor(0,0,1,1.5,1);     	
-     z3.FRaster(noise[0],27);
+     z3.FRaster(noise[0],81);
  	NEW(plane,center,up);
 	plane.setvoxel(gxy);				
 	z3.FRaster(plane,9);	
-
-    
 					
 	Base.avatar:=harrison;
  	

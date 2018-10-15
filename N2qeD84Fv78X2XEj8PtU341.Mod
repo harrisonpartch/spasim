@@ -113,10 +113,10 @@ BEGIN
 	END;
 END Shade;
 
-PROCEDURE strokerec*(p:PT; resolution,scale: LONGINT; voxel:Voxel);
+PROCEDURE stroke*(p:PT; resolution: LONGINT; voxel:Voxel);
 BEGIN
-	innard.strokerec(p,resolution,scale,voxel);
-END strokerec;
+	innard.stroke(p,resolution,voxel);
+END stroke;
 
 PROCEDURE deepcopy*():Voxel;
 VAR v: OutlineVox;
