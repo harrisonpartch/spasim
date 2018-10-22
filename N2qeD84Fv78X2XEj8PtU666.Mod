@@ -12,27 +12,42 @@ VAR
 	center, p1, p2,n:  PT;
 	i:LONGINT;
 	rand: Random.Generator;
+	c:Base.Color;
 	vu: Voxel;
 	
 PROCEDURE draw;
 VAR
 	i: LONGINT;
 BEGIN
+	NEW(rand);
 	Base.setPT(center,1/2,1/2,1/2);
-	NEW(ball,center,7.5/12);
-	ball.setcolor(0.8,0.8,0,1/2);	
+	cage:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");
+	FOR i:=0 TO 10000 DO 
+		NEW(ball,Base.randPT(), rand.Uniform()/5);
+		c:=Base.randColor();
+		ball.setcolor(c.red,c.green,c.blue,1);
+		p1:=Base.randPT();
+		cage.FRaster(ball,27)
+	END;	
+	NEW(ball,center,0.4);
+	ball.setcolor(1,0,0,1/2);	
 	yellow:=Base.VoxelFromName("NM3");
-	yellow.setcolor(0,1,0,20,4);
 	yellow.FRaster(ball,9);
-	NEW(ball,center,7/12);	
-	yellow.copyonstroke:=FALSE;
-	cage:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");	
-	FOR i:=0 TO 100 DO
-		Base.randsphPT(p1,p2,center,8/12);
-		cage.stroke(p1,9,yellow)
-	END;
-(*	yellow.copyprime;	
-*)	
+	yellow.copyonstroke:=TRUE;
+
+	FOR i:=0 TO 10000  DO 
+		p1:=Base.randPT();
+		cage.stroke(p1,27,yellow)
+	END;	
+(*	NEW(ball,center,0.1);
+	NEW(ball,center,0.6);
+	ball.setcolor(1,1,0,1/2);	
+	ball.setvoxel(Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw"));		
+	yellow:=Base.VoxelFromName("NM3");
+	yellow.FRaster(ball,9);
+	yellow.copyonstroke:=TRUE;	
+*)
+	
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;

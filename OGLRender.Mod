@@ -252,7 +252,7 @@ BEGIN
 	END;
 	trace; 
 	Base.tick;	
-	GLIDE:=0.995;	
+	GLIDE:=0.96;	
 	cvz := cvz*GLIDE+gravityvector.z; 
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y; 
 	cvl :=cvl*0; cvu := cvu*0;
@@ -281,7 +281,7 @@ BEGIN
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
-	mstarget:=40;
+	mstarget:=33;
 END openwincam;
 
 (* called when idling *)
@@ -305,8 +305,8 @@ BEGIN
 	camrotinertia:=100;
 	Base.DTL:=25000;
 	Base.DTL2:=2500;
-	Base.gravity:=0.000001;
-	Base.speed:=0.001;
+	Base.gravity:=0;
+	Base.speed:=0.00001;
 	Base.maxspeed:=0.0001;
 	Base.cursordist:=0.01;
 	R1:=100;
@@ -550,7 +550,7 @@ END KeyEvent;
 		GL.GenTextures(1, ADDRESSOF(image));
 		GL.BindTexture(GLC.GL_TEXTURE_2D, image); 
 		(* These determine how interpolation is made when image scaled down on up *)
-		GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER,  GLC.GL_LINEAR);
+		GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER,  GLC.GL_NEAREST);
 		GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_NEAREST);
 		GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height, 0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr);
 		

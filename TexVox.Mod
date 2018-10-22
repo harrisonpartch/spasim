@@ -56,7 +56,7 @@ BEGIN
 			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;
 		END;
 		color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
-		dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
+		dot:= ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
 		dr:=color.red*color.alpha*dot;
 		dg:=color.green*color.alpha*dot;
 		db:=color.blue*color.alpha*dot;
@@ -79,7 +79,7 @@ BEGIN
 				ray.clr.b := (ray.clr.b*ai + raycolor.b*ainv);
 			ELSE
 				dot:=ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
-(*				dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
+(*				dot2:= ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
 				mix:=ray.length*ray.scale;
 				IF mix>1 THEN mix:=1 END;
 				dot:=mix*dot1+(1-mix)*dot2;
@@ -95,7 +95,7 @@ BEGIN
 				IF (ray.clr.ra<0.01) OR  (ray.clr.ga<0.01) OR (ray.clr.ba<0.01) THEN ray.terminate:=TRUE END
 			END
 		ELSE
-			dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
+			dot:= ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
 			dr:=color.red*dot;
 			dg:=color.green*dot;
 			db:=color.blue*dot;
@@ -132,7 +132,7 @@ BEGIN
 	ray.clr.ba := ray.clr.ba + 0.2;
 	ray.clr.alpha:= ray.clr.alpha - 0.2;
 	IF ray.clr.alpha < 0.1 THEN ray.terminate:=TRUE END;
-	reflect(ray.dxyz, ray.fnormal);
+	reflect(ray.dxyz, ray.normal);
 	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END;
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;
@@ -202,7 +202,7 @@ VAR
 	bpdx,bpdy,cq: REAL;
 	xov,yov,zov:REAL;
 	inside: BOOLEAN;
-	color,color1,color2: Base.Color;
+	color,color1,color2,color3: Base.Color;
 	raycolor: Base.ray_color;
 	txcube: TexCube;
 	rlf: REAL;
@@ -298,17 +298,18 @@ BEGIN
 			color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
 		ELSIF mip>25 THEN
 			color:=texcube.side[ray.face].pixelmip_one(lx,ly);
-		ELSIF mip>15 THEN
-			color1:=texcube.side[ray.face].pixelmip_two(lx,ly);
-			color2:=texcube.side[ray.face].pixelmip_one(lx*7,ly*7);
-			mix:=1+(4-mip)/10;
-			color:=Base.mixcolor(color1,color2,mix);
+		ELSIF mip>10 THEN
 			color:=texcube.side[ray.face].pixelmip_two(lx,ly);
 		ELSE
-			color1:=texcube.side[ray.face].pixel(lx,ly);
-			color2:=texcube.side[ray.face].pixelmip_two(lx*7,ly*7);  (* Base.Texture.pixel applies MODulo *)
+(*			color1:=texcube.side[ray.face].pixel(lx,ly);
+			color2:=texcube.side[ray.face].pixel(lx*3,ly*4);  (* Base.Texture.pixel applies MODulo *)
 			mix:=1+(4-mip)/10;
 			color:=Base.mixcolor(color1,color2,mix);
+			color3:=texcube.side[ray.face].pixel(lx*4,ly*3); 
+			mix:=1-mix;
+			color:=Base.mixcolor(color,color3,mix);			
+*)
+			color:=texcube.side[ray.face].pixel(lx,ly);
 		END;
 		IF color.alpha<0.99 THEN
 			IF color.alpha>0.7 THEN
@@ -327,7 +328,7 @@ BEGIN
 				IF (ray.clr.ra<0.01) OR  (ray.clr.ga<0.01) OR (ray.clr.ba<0.01) THEN ray.terminate:=TRUE END;
 			END
 		ELSE
-			dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
+			dot:= ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
 			dr:=color.red*dot;
 			dg:=color.green*dot;
 			db:=color.blue*dot;
@@ -371,7 +372,7 @@ BEGIN
 	ray.clr.ga := ray.clr.ga + 0.1;
 	ray.clr.ba := ray.clr.ba + 0.1;
 	ray.clr.alpha:= ray.clr.alpha - 0.1;
-	reflect(ray.dxyz, ray.fnormal);
+	reflect(ray.dxyz, ray.normal);
 	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END;
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;
@@ -533,14 +534,14 @@ BEGIN
 						ray.clr.ba:=ray.clr.ba-(db*color.alpha)-0.1;
 					END;
 				ELSE
-					dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z)
+					dot := ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z)
 					dr:=color2.red*dot*ray.clr.ra;
 					dg:=color2.green*dot*ray.clr.ra;
 					db:=color2.blue*dot*ray.clr.ra;
 				END	*)
 			END
 	ELSE
-		dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
+		dot := ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
 		dr:=color.red*dot*ray.clr.ra;
 		dg:=color.green*dot*ray.clr.ra;
 		db:=color.blue*dot*ray.clr.ra;
@@ -574,9 +575,9 @@ BEGIN
 	ray.clr.ba := ray.clr.ba + 0.1;
 	ray.clr.alpha:= ray.clr.alpha - 0.1;
 	IF ray.clr.alpha < 0.1 THEN ray.terminate:=TRUE END;
-	n.x:=(ray.normal.x*mix+ray.fnormal.x*(1-mix));
-	n.y:=(ray.normal.y*mix+ray.fnormal.y*(1-mix));
-	n.z:=(ray.normal.z*mix+ray.fnormal.z*(1-mix));
+	n.x:=(ray.normal.x*mix+ray.normal.x*(1-mix));
+	n.y:=(ray.normal.y*mix+ray.normal.y*(1-mix));
+	n.z:=(ray.normal.z*mix+ray.normal.z*(1-mix));
 	reflect(ray.dxyz, n);
 	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END;
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
@@ -710,7 +711,7 @@ BEGIN
 	IF ((color.green>0.20) & ((color.red+color.blue)<0.2)) THEN
 		mirror(ray)
 	ELSE
-		dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
+		dot := ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
 		dr:=color.red*dot*ray.clr.ra;
 		dg:=color.green*dot*ray.clr.ga;
 		db:=color.blue*dot*ray.clr.ba;
@@ -785,7 +786,7 @@ BEGIN
 	color.green:=c;
 	color.blue:=c;
 	Base.clampColor(color);
-	dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z)*0.7+0.4;
+	dot := ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z)*0.7+0.4;
 	dr:=color.red*dot*ray.clr.ra;
 	dg:=color.green*dot*ray.clr.ga;
 	db:=color.blue*dot*ray.clr.ba;
@@ -802,7 +803,7 @@ VAR
 	mix,dot,dot1,dot2: REAL;
 BEGIN
 	dot1 := ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
-	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
+	dot2:= ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
 	dot1:=dot1*0.7+0.3;
 	dot2:=dot2*0.7+0.3;
 	IF ray.length*ray.scale<75 THEN mix:=1-(ray.length*ray.scale/75) ELSE mix:=0 END;

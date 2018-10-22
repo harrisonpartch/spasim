@@ -43,7 +43,7 @@ END TransparaVox;
 
 VAR 
 	subserp: Voxel;
-	green: Voxel;
+	sky: Voxel;
 	nark, xot: Voxel;
 	darkblue, alphablue: TransparaVox;
 	s0,s1,s2,s3,s4: NM3.cell;
@@ -54,8 +54,8 @@ BEGIN
 END thisvox;
 
 BEGIN
-	green:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  	
-	nark:=Base.VoxelFromName("Narchillect"); 
+	nark:=Base.VoxelFromName("N5a2g4M6HYjPJxYSNQvYy7");  	
+	sky:=Base.VoxelFromName("Narchillect"); 
 	xot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU666"); 
 	NEW(s0);
 	NEW(s1);
@@ -66,17 +66,21 @@ BEGIN
 	darkblue.setcolor(0,0,1.3,1.5,1);	
 	NEW(alphablue);
 	alphablue.setcolor(0,0,0.6,0.6,1);
-	s0.passable:=FALSE;
+	s0.passable:=TRUE;
 	s1.passable:=TRUE;	
 	s2.passable:=TRUE;	
 	s3.passable:=TRUE;	
 	s4.passable:=TRUE;	
-	s0.fillsierp(green,xot);
+	s0.fillsierp(sky,xot);
 	s1.fillsierp(s0,alphablue);	
 	s2.fillsierp(s1,alphablue);
 	s3.fillsierp(s2,alphablue);	
-	s4.fillsierp(s3,alphablue);
-	s0.imposter:=green;	
+	s4.fillsierp(s3,nark);
+	s0.imposter:=sky;
+	s1.imposter:=sky;	
+	s2.imposter:=sky;
+	s3.imposter:=sky;		
+	s4.imposter:=sky;	
 	s0.copyonstroke:=TRUE;
 	s1.copyonstroke:=TRUE;	
 	s2.copyonstroke:=TRUE;	

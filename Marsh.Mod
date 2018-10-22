@@ -472,9 +472,9 @@ BEGIN
 	push(greensuncouple);
 	NEW(noise[0]);		
 	noise[0].seed:=1534666690;		
-	noise[0].a:=7;
-	noise[0].b:=3;
-	noise[0].c:=3;		
+	noise[0].a:=1;
+	noise[0].b:=1;
+	noise[0].c:=1;		
 	noise[0].octaves:=4;
 	noise[0].persistence:=3.61;	
 	noise[0].setvoxel(serp);			
@@ -525,7 +525,7 @@ BEGIN
 	
 
 
-	z3a.setcolor(0,0,1,1.5,1);     	
+	z3a.setcolor(3,0,1,5.5,1);     	
      z3.FRaster(noise[0],81);
  	NEW(plane,center,up);
 	plane.setvoxel(gxy);				
@@ -535,7 +535,7 @@ BEGIN
  	
 	Base.avatarsize:=1000; 
 
-	z3.setcolor(0,0,3,5.5,1); 
+	z3.setcolor(0,3,1,9,9); 
 	Base.world:=z3;
 
 END dawn;
