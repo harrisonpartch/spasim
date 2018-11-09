@@ -282,6 +282,14 @@ BEGIN
 						|5:
 					END
 				END
+			END;
+			CASE ray.face OF
+				 0: lx2 := ray.lxyz.y; ly2 := 1-ray.lxyz.z;
+				|1: lx2 := ray.lxyz.x; ly2 := 1-ray.lxyz.z;
+				|2: lx2 := ray.lxyz.x; ly2 := ray.lxyz.y;
+				|3: lx2 := ray.lxyz.y; ly2 := 1-ray.lxyz.z;
+				|4: lx2 := ray.lxyz.x; ly2 := 1-ray.lxyz.z;
+				|5: lx2 := ray.lxyz.x; ly2 := ray.lxyz.y;
 			END
 		ELSE
 			CASE ray.face OF
@@ -291,25 +299,25 @@ BEGIN
 				|3: lx := ray.lxyz.y; ly := 1-ray.lxyz.z;
 				|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z;
 				|5: lx := ray.lxyz.x; ly := ray.lxyz.y;
-			END
+			END;
+			lx2:=lx;
+			ly2:=ly;
 		END;
  		mip:=ray.length*ray.scale;
-		IF mip>100 THEN
+		IF mip>20 THEN
 			color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
-		ELSIF mip>25 THEN
-			color:=texcube.side[ray.face].pixelmip_one(lx,ly);
 		ELSIF mip>10 THEN
-			color:=texcube.side[ray.face].pixelmip_two(lx,ly);
+			color:=texcube.side[ray.face].pixelmip_one(lx,ly);
+		ELSIF mip>5 THEN
+			color1:=texcube.side[ray.face].pixelmip_two(lx,ly);
+			color2:=texcube.side[ray.face].pixelmip_two(lx2,ly2);  
+			mix:=mip/10;
+			color:=Base.mixcolor(color2,color2,mix)		
 		ELSE
-(*			color1:=texcube.side[ray.face].pixel(lx,ly);
-			color2:=texcube.side[ray.face].pixel(lx*3,ly*4);  (* Base.Texture.pixel applies MODulo *)
-			mix:=1+(4-mip)/10;
-			color:=Base.mixcolor(color1,color2,mix);
-			color3:=texcube.side[ray.face].pixel(lx*4,ly*3); 
-			mix:=1-mix;
-			color:=Base.mixcolor(color,color3,mix);			
-*)
-			color:=texcube.side[ray.face].pixel(lx,ly);
+			color1:=texcube.side[ray.face].pixel(lx,ly);
+			color2:=texcube.side[ray.face].pixel(lx2,ly2);  
+			mix:=mip/5;
+			color:=Base.mixcolor(color2,color2,mix)	
 		END;
 		IF color.alpha<0.99 THEN
 			IF color.alpha>0.7 THEN

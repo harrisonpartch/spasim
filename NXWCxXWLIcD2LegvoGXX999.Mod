@@ -1,4 +1,4 @@
-MODULE NXWCxXWLIcD2LegvoGXX666;
+MODULE NXWCxXWLIcD2LegvoGXX999;
 
 IMPORT Base, NM3;
 TYPE PT = Base.PT;
@@ -50,7 +50,7 @@ VAR
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	RETURN s1
+	RETURN s3
 END thisvox;
 
 BEGIN
@@ -59,16 +59,30 @@ BEGIN
 	xot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU666"); 
 	NEW(s0);
 	NEW(s1);
+	NEW(s2);
+	NEW(s3);
+	NEW(darkblue);
+	darkblue.setcolor(0,0,1.3,1.5,1);	
 	NEW(alphablue);
-	alphablue.setcolor(0,0,0.46,0.56,1);
+	alphablue.setcolor(0,0,0.06,0.08,1);
 	s0.passable:=TRUE;
-	s1.passable:=TRUE;		
-	s0.fillsierp(nark,xot);
-	s1.fillsierp(s0,xot);
+	s1.passable:=TRUE;	
+	s2.passable:=TRUE;	
+	s3.passable:=TRUE;	
+	s0.fillsierp(xot,sky);
+	s1.fillsierp(alphablue,s0);	
+	s2.fillsierp(alphablue,s1);
+	s3.fillsierp(alphablue,s2);	
+	s0.imposter:=sky;
+	s1.imposter:=sky;	
+	s2.imposter:=sky;
+	s3.imposter:=sky;		
 	s0.copyonstroke:=TRUE;
 	s1.copyonstroke:=TRUE;	
-END NXWCxXWLIcD2LegvoGXX666. 
+	s2.copyonstroke:=TRUE;	
+	s3.copyonstroke:=TRUE;
+END NXWCxXWLIcD2LegvoGXX999. 
  
- Marsh.Rez NXWCxXWLIcD2LegvoGXX666
+ Marsh.Rez NXWCxXWLIcD2LegvoGXX999
  
 N5a2g4M6HYjPJxYSNQvYy7.Mod

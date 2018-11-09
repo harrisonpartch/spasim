@@ -281,7 +281,7 @@ BEGIN
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
-	mstarget:=33;
+	mstarget:=30;
 END openwincam;
 
 (* called when idling *)
@@ -303,9 +303,9 @@ BEGIN
 	foveasize := 100;
 	multicore:=TRUE;
 	camrotinertia:=100;
-	Base.DTL:=25000;
-	Base.DTL2:=2500;
-	Base.gravity:=0;
+	Base.DTL:=250000;
+	Base.DTL2:=25000;
+	Base.gravity:=0.00001;
 	Base.speed:=0.00001;
 	Base.maxspeed:=0.0001;
 	Base.cursordist:=0.01;
@@ -596,7 +596,7 @@ END KeyEvent;
 	(* change detail according to frame speed, called in GLWindow.MainLoop *)
 	PROCEDURE GameLogic();
 	BEGIN
-		IF GetCurrentFrameMs() < (mstarget-5) THEN 
+		IF GetCurrentFrameMs() < (mstarget-2) THEN 
 			Retina.moredetail;
 		ELSIF GetCurrentFrameMs() > mstarget THEN 
 			Retina.lessdetail;

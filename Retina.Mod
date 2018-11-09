@@ -115,12 +115,12 @@ BEGIN
 	angletoray(rays[11,0],cam.theta,cam.phi+cam.dphi);
 	angletoray(rays[11,11],cam.theta+cam.dtheta,cam.phi+cam.dphi);	
 	FOR i := 1 TO 10 DO
-		rays[i,0]:= interpray(rays[0,0],rays[11,0],i/12);
-		rays[i,11]:= interpray(rays[0,11],rays[11,11],i/12);
+		rays[i,0]:= interpray(rays[0,0],rays[11,0],i/11);
+		rays[i,11]:= interpray(rays[0,11],rays[11,11],i/11);
 	END;	
 	FOR i := 0 TO 11 DO
 		FOR j:= 1 TO 10 DO
-			rays[i,j]:= interpray(rays[i,0],rays[i,11],j/12);
+			rays[i,j]:= interpray(rays[i,0],rays[i,11],j/11);
 		END
 	END;		
 	FOR i:= 0 TO 11 DO
@@ -131,9 +131,9 @@ BEGIN
 				g:=rays[i,j].clr.g;
 				b:=rays[i,j].clr.b; 
 			ELSE
-				r:= rays[i,j].clr.b + rays[i,j].clr.ba;
-				g:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
-				b:= rays[i,j].clr.g + rays[i,j].clr.ga/3 
+				r:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
+				g:= rays[i,j].clr.g + rays[i,j].clr.ga/2;
+				b:= rays[i,j].clr.b + rays[i,j].clr.ba 
 			END;
 			Base.clamp3(r,g,b); 
 			Raster.SetRGB(pixel,ENTIER(r*GAMMA),ENTIER(g*GAMMA),ENTIER(b*GAMMA)); 
@@ -166,15 +166,16 @@ BEGIN
 	END;		
 	FOR i:= 0 TO 11 BY 2 DO
 		FOR j := 0 TO 11 BY 2 DO 
+		  	rays[i,j].dtl:=Base.DTL2;
 			Base.world.Shade(rays[i,j]);	
 			IF rays[i,j].terminate THEN
 				r:=rays[i,j].clr.r;
 				g:=rays[i,j].clr.g;
 				b:=rays[i,j].clr.b; 
 			ELSE
-				r:= rays[i,j].clr.b + rays[i,j].clr.ba;
-				g:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
-				b:= rays[i,j].clr.g + rays[i,j].clr.ga/3 
+				r:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
+				g:= rays[i,j].clr.g + rays[i,j].clr.ga/2.5;
+				b:= rays[i,j].clr.b + rays[i,j].clr.ba 
 			END;
 			Base.clamp3(r,g,b); 
 			Raster.SetRGB(pixel,ENTIER(r*GAMMA),ENTIER(g*GAMMA),ENTIER(b*GAMMA)); 
@@ -210,15 +211,16 @@ BEGIN
 	END;		
 	FOR i:= 0 TO 11 BY 3 DO
 		FOR j := 0 TO 11 BY 3 DO 
+			rays[i,j].dtl:=Base.DTL2;
 			Base.world.Shade(rays[i,j]);	
 			IF rays[i,j].terminate THEN
 				r:=rays[i,j].clr.r;
 				g:=rays[i,j].clr.g;
 				b:=rays[i,j].clr.b; 
 			ELSE
-				r:= rays[i,j].clr.b + rays[i,j].clr.ba;
-				g:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
-				b:= rays[i,j].clr.g + rays[i,j].clr.ga/3 
+				r:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
+				g:= rays[i,j].clr.g + rays[i,j].clr.ga/3;
+				b:= rays[i,j].clr.b + rays[i,j].clr.ba 
 			END;
 			Base.clamp3(r,g,b); 
 			Raster.SetRGB(pixel,ENTIER(r*GAMMA),ENTIER(g*GAMMA),ENTIER(b*GAMMA)); 
@@ -253,9 +255,9 @@ BEGIN
 		g:=ray.clr.g;
 		b:=ray.clr.b; 
 	ELSE
-		b:= ray.clr.b + ray.clr.ba;
-		r:= ray.clr.r + ray.clr.ra/3;
-		g:= ray.clr.g + ray.clr.ga/3
+		r:= ray.clr.r + ray.clr.ra;
+		g:= ray.clr.g + ray.clr.ga/3;
+		b:= ray.clr.b + ray.clr.ba/3;
 	END;
 	Base.clamp3(r,g,b);
 	Raster.SetRGB(pixel,ENTIER(r*GAMMA),ENTIER(g*GAMMA),ENTIER(b*GAMMA)); 	
@@ -302,59 +304,47 @@ VAR
 	x,y,D: REAL;
 	FVV:REAL;
 BEGIN
-	FVV:=12.5*FV;
+	FVV:=10*FV*FV;
 	splitcam(cam,a,b,c,d);
 	IF level<2 THEN
 			x:=a.imx-W/2;
 			y:=a.imy-H/2;		
 			D:=(x*x+y*y);	
-			IF D<FV THEN	
+			IF D<FVV THEN	
 				dtl:=Base.DTL;
 				tessa12(a); 
-			ELSIF D<FVV THEN
-				dtl:=Base.DTL2;
-				tessa6(a);
 			ELSE
-				dtl:=Base.DTL/10;
+				dtl:=Base.DTL2;
 				tessa4(a); 
 			END;
  			x:=b.imx-W/2;
 			y:=b.imy-H/2;		
 			D:=(x*x+y*y);	
-			IF D<FV THEN
-				dtl:=Base.DTL2;
+			IF D<FVV THEN
+				dtl:=Base.DTL;
 				tessa12(b); 
-			ELSIF D<FVV THEN
-				dtl:=Base.DTL/5;
-				tessa6(b);
-			ELSE
-				dtl:=Base.DTL/10;
-				tessa4(b); 
+			ELSE 
+				dtl:=Base.DTL2;
+				tessa4(b);
 			END;
 			x:=c.imx-W/2;
 			y:=c.imy-H/2;		
 			D:=(x*x+y*y);	
-			IF D<FV THEN	
+			IF D<FVV THEN	
 				dtl:=Base.DTL;
 				tessa12(c); 
-			ELSIF D<FVV THEN
-				dtl:=Base.DTL2;
-				tessa6(c);
 			ELSE
-				dtl:=Base.DTL/10;
-				tessa4(c); 
+				dtl:=Base.DTL2;
+				tessa4(c)
 			END;
  			x:=b.imx-W/2;
 			y:=b.imy-H/2;		
 			D:=(x*x+y*y);	
-			IF D<FV THEN	
+			IF D<FVV THEN	
 				dtl:=Base.DTL;
 				tessa12(d); 
-			ELSIF D<FVV THEN
-				dtl:=Base.DTL2;
-				tessa6(d);
 			ELSE
-				dtl:=Base.DTL/10;
+				dtl:=Base.DTL2;
 				tessa4(d); 
 			END;		
 	ELSE
@@ -532,26 +522,30 @@ END splitcam;
 
 PROCEDURE moredetail*;
 BEGIN
-	foveaparameter:=foveaparameter-1;
+	foveaparameter:=foveaparameter-3;
 	IF foveaparameter<1 THEN foveaparameter:=1 END;
 	FV:=W/foveaparameter;
 END moredetail;
 
 PROCEDURE lessdetail*;
 BEGIN
-	foveaparameter:=(foveaparameter+1);
-	IF foveaparameter>20 THEN foveaparameter:=20 END;
+	foveaparameter:=(foveaparameter+3);
+	IF foveaparameter>100 THEN foveaparameter:=100 END;
 	FV:=W/foveaparameter;
 END lessdetail;
 
 PROCEDURE decdetail*;
 BEGIN
 	DETAIL:=DETAIL*2/3;
+	Base.DTL:=Base.DTL*2/3;
+	Base.DTL2:=Base.DTL2*2/3;	
 END decdetail;
 
 PROCEDURE incdetail*;
 BEGIN
 	DETAIL:=DETAIL*3/2;
+	Base.DTL:=Base.DTL*3/2;
+	Base.DTL2:=Base.DTL2*3/2;		
 END incdetail;
 
 PROCEDURE incTD;
@@ -662,6 +656,6 @@ BEGIN
  	lsense:=0.2;
  	aperture.width:=1;
  	aperture.height:=1;
- 	foveaparameter:=50;
+ 	foveaparameter:=150;
  	Out.String("loaded...");	
 END Retina.

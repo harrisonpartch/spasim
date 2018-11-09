@@ -9,5 +9,5 @@ END thisvox;
 
 BEGIN
 NEW(vox,'rahowacat.png');
-vox.tscale:=256; 
+vox.tscale:=9; 
 END NnKyXYNiHwdxuM6wHrbxwuQ. 

@@ -61,7 +61,7 @@ BEGIN
 	NEW(blue);
 	blue.setcolor(1/3,0,0,1/3,0);
 	innard:=Base.VoxelFromName("NM3");	
-	innard.setcolor(10000,0,2/3,100000,0);
+	innard.setcolor(0,0,2/3,10000,0);
 	passable:=TRUE;
 	copyonstroke:=TRUE;
 	complex:=TRUE;	

@@ -331,7 +331,7 @@ BEGIN
      push(medley);
 	 volvox:=Base.VoxelFromName("Nrdvolvox");  	
       push(volvox);
-*)   serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX666"); 
+*)   serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999"); 
      serp.passable:=TRUE;
 	push(serp);	
 	badopossum:=Base.VoxelFromName("Nbadopossum"); 	
@@ -472,12 +472,13 @@ BEGIN
 	push(greensuncouple);
 	NEW(noise[0]);		
 	noise[0].seed:=1534666690;		
-	noise[0].a:=1;
-	noise[0].b:=1;
-	noise[0].c:=1;		
+	noise[0].a:=7;
+	noise[0].b:=7;
+	noise[0].c:=7;		
 	noise[0].octaves:=4;
 	noise[0].persistence:=3.61;	
-	noise[0].setvoxel(serp);			
+	noise[0].setvoxel(granite);	
+	granite.tscale:=100;		
 	NEW(noise[1]);		
 	noise[1].seed:=678;		
 	noise[1].a:=3.5;
@@ -486,7 +487,8 @@ BEGIN
 	noise[1].octaves:=4;
 	noise[1].persistence:=3.91;	
 	noise[1].setcolor(0.8,2.8,4,1/2);	
-	noise[1].setvoxel(serp);		
+	noise[1].setvoxel(xot);	
+	xot.tscale:=100;		
 	NEW(noise[2]);	
 	noise[2].seed:=900909;		
 	noise[2].a:=1.5;
@@ -494,7 +496,7 @@ BEGIN
 	noise[2].c:=1.5;		
 	noise[2].octaves:=4;
 	noise[2].persistence:=3.61;	
-	noise[2].setvoxel(serp);		
+	noise[2].setvoxel(xot);	
 	NEW(noise[3]);		
 	noise[3].seed:=11117111;		
 	noise[3].a:=1;
@@ -520,22 +522,22 @@ BEGIN
 	Base.setPT(center,1/2,1/2,2/3);
 	
 	z3:=Base.VoxelFromName("NM3");	
-	z3a:=Base.VoxelFromName("NM3");	
-	w3:=Base.VoxelFromName("NM3");	
+
 	
 
-
-	z3a.setcolor(3,0,1,5.5,1);     	
-     z3.FRaster(noise[0],81);
+	z3.setcolor(0,0,3,5,0); 
+	
+     z3.FRaster(noise[0],128);
+    z3.FRaster(noise[1],128);     
  	NEW(plane,center,up);
-	plane.setvoxel(gxy);				
-	z3.FRaster(plane,9);	
+	plane.setvoxel(axolotl);			
+	z3.FRaster(plane,32);	
 					
 	Base.avatar:=harrison;
  	
 	Base.avatarsize:=1000; 
 
-	z3.setcolor(0,3,1,9,9); 
+	
 	Base.world:=z3;
 
 END dawn;

@@ -707,8 +707,8 @@ VAR
 	c:Color;
 	tmm:REAL;
 BEGIN
-	tmm:=2-m;
-	c.red:=(a.red*m+b.red*tmm)/2; c.green:=(a.green*m+b.green*tmm)/2; c.blue:=(a.blue*m+b.blue*tmm)/2; c.alpha:=(a.alpha*m+b.alpha*tmm)/2;
+	tmm:=1-m;
+	c.red:=(a.red*m+b.red*tmm); c.green:=(a.green*m+b.green*tmm); c.blue:=(a.blue*m+b.blue*tmm); c.alpha:=(a.alpha*m+b.alpha*tmm);
 	RETURN(c);
 END mixcolor;
 
