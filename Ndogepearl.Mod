@@ -1,22 +1,16 @@
 MODULE Ndogepearl;
-IMPORT Base, TexVox, RotaVox;
+
+IMPORT Base, TexVox;
   
-VAR 
-	cv: TexVox.TexVox;
-	rv: RotaVox.RVox;
-	up,right: Base.PT;
-	sabot, vox,v,sphere: Base.Voxel;
-	center: Base.PT;
+VAR vox: TexVox.TexVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	IF vox=NIL THEN
-		NEW(cv,"swastika2.jpg");
-		vox:=cv;
-		vox.passable:=FALSE
-	END;
+	IF vox=NIL THEN NEW(vox,"dogepearl.png")  END;
+	vox.passable:=TRUE;
+	vox.tscale:=27;
 	RETURN vox
 END thisvox;
 
  END Ndogepearl. 
  
- XNXLMarsh.Rez Ndogepearl~
+ Marsh.Rez Ndogepearl ~

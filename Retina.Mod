@@ -125,6 +125,7 @@ BEGIN
 	END;		
 	FOR i:= 0 TO 11 DO
 		FOR j := 0 TO 11 DO 
+			rays[i,j].dtl:=Base.DTL;
 			Base.world.Shade(rays[i,j]);	
 			IF rays[i,j].terminate THEN
 				r:=rays[i,j].clr.r;
@@ -166,7 +167,7 @@ BEGIN
 	END;		
 	FOR i:= 0 TO 11 BY 2 DO
 		FOR j := 0 TO 11 BY 2 DO 
-		  	rays[i,j].dtl:=Base.DTL2;
+		  	rays[i,j].dtl:=Base.DTL;
 			Base.world.Shade(rays[i,j]);	
 			IF rays[i,j].terminate THEN
 				r:=rays[i,j].clr.r;

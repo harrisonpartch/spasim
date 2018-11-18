@@ -64,9 +64,9 @@ BEGIN
 	s0.passable:=TRUE;
 	s1.passable:=TRUE;		
 	s0.fillsierp(nark,xot);
-	s1.fillsierp(s0,xot);
-	s0.copyonstroke:=TRUE;
-	s1.copyonstroke:=TRUE;	
+	s1.fillsierp(nark,s0);
+	s0.lock();
+	s1.lock();	
 END NXWCxXWLIcD2LegvoGXX666. 
  
  Marsh.Rez NXWCxXWLIcD2LegvoGXX666

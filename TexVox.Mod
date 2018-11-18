@@ -308,21 +308,15 @@ BEGIN
 			color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
 		ELSIF mip>10 THEN
 			color:=texcube.side[ray.face].pixelmip_one(lx,ly);
-		ELSIF mip>5 THEN
-			color1:=texcube.side[ray.face].pixelmip_two(lx,ly);
-			color2:=texcube.side[ray.face].pixelmip_two(lx2,ly2);  
-			mix:=mip/10;
-			color:=Base.mixcolor(color2,color2,mix)		
+		ELSIF mip>1 THEN
+			color:=texcube.side[ray.face].pixelmip_two(lx,ly);
 		ELSE
-			color1:=texcube.side[ray.face].pixel(lx,ly);
-			color2:=texcube.side[ray.face].pixel(lx2,ly2);  
-			mix:=mip/5;
-			color:=Base.mixcolor(color2,color2,mix)	
+			color:=texcube.side[ray.face].pixel(lx,ly);
 		END;
 		IF color.alpha<0.99 THEN
 			IF color.alpha>0.7 THEN
 				mirror(ray,0);
-				IF ray.clr.alpha < 0.1 THEN ray.terminate:=TRUE END;
+				IF (ray.clr.ra<0.01) OR  (ray.clr.ga<0.01) OR (ray.clr.ba<0.01) THEN ray.terminate:=TRUE END;
 			ELSE
 				dr:=color.red*color.alpha*ray.clr.ra;
 				dg:=color.green*color.alpha*ray.clr.ga;

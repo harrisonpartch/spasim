@@ -291,7 +291,7 @@ VAR
 	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison,fuse:Voxel;
 	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,
 	w3,z3,z3a,z2,z4,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp,acidcats, badopossum, raccoon,
-	akatrump, archillect,arkilekt,kat,muratpak,
+	akatrump, archillect,arkilekt,kat,muratpak,dogepearl,
 	jordan, bottle1,bottle2,bottle3,bottlepossum,bottlegrounds,greensuncouple,wstar,starspider,arevclock: Voxel;
 	ball: FRep.sphere;
 	medley: Voxel;
@@ -322,7 +322,8 @@ BEGIN
 	push(kat);
 	muratpak:=Base.VoxelFromName("Nmuratpak"); 
 	push(muratpak);
-
+	dogepearl:=Base.VoxelFromName("Ndogepearl"); 
+	push(dogepearl);
 	harrison:=Base.VoxelFromName("Nharrisonavatar"); 
 	push(harrison);
 	doge:=Base.VoxelFromName("Ndogepearl"); 
@@ -472,13 +473,12 @@ BEGIN
 	push(greensuncouple);
 	NEW(noise[0]);		
 	noise[0].seed:=1534666690;		
-	noise[0].a:=7;
-	noise[0].b:=7;
-	noise[0].c:=7;		
+	noise[0].a:=1;
+	noise[0].b:=1;
+	noise[0].c:=1;		
 	noise[0].octaves:=4;
 	noise[0].persistence:=3.61;	
-	noise[0].setvoxel(granite);	
-	granite.tscale:=100;		
+	noise[0].setvoxel(wstar);		
 	NEW(noise[1]);		
 	noise[1].seed:=678;		
 	noise[1].a:=3.5;
@@ -487,7 +487,7 @@ BEGIN
 	noise[1].octaves:=4;
 	noise[1].persistence:=3.91;	
 	noise[1].setcolor(0.8,2.8,4,1/2);	
-	noise[1].setvoxel(xot);	
+	noise[1].setvoxel(dogepearl);	
 	xot.tscale:=100;		
 	NEW(noise[2]);	
 	noise[2].seed:=900909;		
@@ -522,13 +522,20 @@ BEGIN
 	Base.setPT(center,1/2,1/2,2/3);
 	
 	z3:=Base.VoxelFromName("NM3");	
-
+	z3a:=Base.VoxelFromName("NM3");
 	
-
-	z3.setcolor(0,0,3,5,0); 
+	z3.setcolor(0,8,5,15,0); 
+	z3a.setcolor(0,80,50,150,0); 
 	
-     z3.FRaster(noise[0],128);
-    z3.FRaster(noise[1],128);     
+    z3a.FRaster(noise[0],27);
+    z3a.copyonstroke:=TRUE;
+    noise[0].setvoxel(z3a);	
+    noise[0].a:=7;
+    noise[0].b:=7;
+    noise[0].c:=7;    
+    z3.FRaster(noise[0],81);
+ 	    
+    	z3.FRaster(noise[1],81);     
  	NEW(plane,center,up);
 	plane.setvoxel(axolotl);			
 	z3.FRaster(plane,32);	
