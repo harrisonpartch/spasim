@@ -197,6 +197,6 @@ BEGIN
 	Modules.InstallTermHandler(Cleanup);
 END Turing.
 
-SystemTools.Free Turing ~
+System.Free Turing ~
 
 Turing.Open ~
