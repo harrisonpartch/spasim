@@ -3,7 +3,7 @@ MODULE Nrdvolvox;
 IMPORT Base, SPSME, FRep,Objects;
 
 CONST	
-	M=50;
+	M=20;
 	A = 80;
 	B = 20;
 	C = 0.03;
@@ -292,7 +292,7 @@ END P;
 
 BEGIN
 	r:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODh"); 	
-	b:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU666");
+	b:=Base.VoxelFromName("Nbluedot");
 (*	b:=Base.EMPTY;*)
 	NEW(vox,r,b,b);
 	vox.passable:=TRUE
