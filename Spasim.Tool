@@ -5,8 +5,6 @@ SPSMMath.Mod
 SPSMHex.Mod
 Noise.Mod
 FRep.Mod
-MPEG.Mod
-FilmLoop.Mod
 TexVox.Mod
 CellAuto.Mod
 Voxel4.Mod
