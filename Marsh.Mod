@@ -328,9 +328,8 @@ BEGIN
 	push(harrison);
 	doge:=Base.VoxelFromName("Ndogepearl"); 
 	push(doge);		
- (*    medley:=Base.VoxelFromName("NFLOOP");  
-     push(medley);
-	 volvox:=Base.VoxelFromName("Nrdvolvox");  	
+
+      volvox:=Base.VoxelFromName("Nrdvolvox");  	
       push(volvox);
 *)   serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999"); 
      serp.passable:=TRUE;
@@ -527,18 +526,18 @@ BEGIN
 	z3.setcolor(0,8,5,15,0); 
 	z3a.setcolor(0,80,50,150,0); 
 	
-    z3a.FRaster(noise[0],9);
+    z3a.FRaster(noise[0],27);
     z3a.copyonstroke:=TRUE;
     noise[0].setvoxel(z3a);	
     noise[0].a:=7;
     noise[0].b:=7;
     noise[0].c:=7;    
-    z3.FRaster(noise[0],9);
+    z3.FRaster(noise[0],81);
  	    
-    	z3.FRaster(noise[1],27);     
+    	z3.FRaster(noise[1],81);     
  	NEW(plane,center,up);
 	plane.setvoxel(axolotl);			
-	z3.FRaster(plane,27);	
+	z3.FRaster(plane,32);	
 					
 	Base.avatar:=harrison;
  	

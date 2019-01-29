@@ -124,7 +124,8 @@ BEGIN
 					END;
 					newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
 				END;
-				vdepth:=Base.distance(newxyz,xyz)/ray.scale;
+				vdepth:=Base.distance(newxyz,xyz)/ray.scale; 
+			(*	vdepth := 1/ray.scale; *)
 				ray.xyz.x:=ray.xyz.x +(newxyz.x-xyz.x)/ray.scale;
 				ray.xyz.y:=ray.xyz.y +(newxyz.y-xyz.y)/ray.scale;
 				ray.xyz.z:=ray.xyz.z +(newxyz.z-xyz.z)/ray.scale;
