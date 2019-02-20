@@ -48,5 +48,5 @@ END thisvox;
 
 BEGIN
 NEW(vox); 
-vox.setcolor(0, 1/3, 1/2, 1/7,1);
+vox.setcolor(0, 1/3, 1/2, 1/7,1/2);
 END NIXARXB2vH6ieKZmsc6mODh. 

@@ -292,9 +292,9 @@ END P;
 
 BEGIN
 	r:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODh"); 	
-	b:=Base.VoxelFromName("Nbluedot");
-(*	b:=Base.EMPTY;*)
-	NEW(vox,r,b,b);
+	y:=Base.VoxelFromName("Nbluedot");
+	b:=Base.EMPTY;
+	NEW(vox,b,r,y);
 	vox.passable:=TRUE
 END Nrdvolvox.
 

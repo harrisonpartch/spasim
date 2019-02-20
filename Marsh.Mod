@@ -308,7 +308,11 @@ BEGIN
 	cage:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");
 	cage.copyonstroke:=TRUE;
   	push(cage);	
-  	NEW(fuzz);
+	archillect:=Base.VoxelFromName("Narchillect"); 
+	push(archillect);
+	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
+	push(greenball);	
+(*  	NEW(fuzz);
   	push(fuzz);
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	push(greenball);
@@ -331,7 +335,7 @@ BEGIN
 
       volvox:=Base.VoxelFromName("Nrdvolvox");  	
       push(volvox);
-*)   serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999"); 
+      serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999"); 
      serp.passable:=TRUE;
 	push(serp);	
 	badopossum:=Base.VoxelFromName("Nbadopossum"); 	
@@ -512,12 +516,21 @@ BEGIN
 	noise[4].octaves:=4;
 	noise[4].persistence:=3.31;	
 	noise[4].setvoxel(gxy);		
-
+*)
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,9/10);
 	Base.setPT(up,0,0,1);
-	
+
+	NEW(noise[0]);
+	noise[0].seed:=1534666690;		
+	noise[0].a:=1;
+	noise[0].b:=1;
+	noise[0].c:=1;		
+	noise[0].octaves:=4;
+	noise[0].persistence:=3.61;	
+	noise[0].setvoxel(archillect);			
+
 	Base.setPT(center,1/2,1/2,2/3);
 	
 	z3:=Base.VoxelFromName("NM3");	
@@ -526,18 +539,18 @@ BEGIN
 	z3.setcolor(0,8,5,15,0); 
 	z3a.setcolor(0,80,50,150,0); 
 	
-    z3a.FRaster(noise[0],27);
+    z3a.FRaster(noise[0],9);
     z3a.copyonstroke:=TRUE;
+
     noise[0].setvoxel(z3a);	
     noise[0].a:=7;
     noise[0].b:=7;
     noise[0].c:=7;    
-    z3.FRaster(noise[0],81);
- 	    
-    	z3.FRaster(noise[1],81);     
+    z3.FRaster(noise[0],27);
+ 	     
  	NEW(plane,center,up);
-	plane.setvoxel(axolotl);			
-	z3.FRaster(plane,32);	
+	plane.setvoxel(greenball);			
+	z3.FRaster(plane,9);	
 					
 	Base.avatar:=harrison;
  	
