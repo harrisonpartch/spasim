@@ -644,13 +644,13 @@ BEGIN
 				 	v:=blox[i,j,k];
 				 	IF v IS cell THEN
 				 		WITH v:cell DO
-				 			v.imposter:=f.voxel(p);
+				 			v.imposter:=f.getimposter(p);
 							v.nposterTF:=TRUE;
 							v.nposter.normal:=f.normal(p);
 							v.nposter.color:=f.color(p);
 							v.FRasterrec(f,resolution,o,nextscale)
 				 		END
-				 	END
+				 	END	
 				 END
 			END
 		END END END
@@ -659,10 +659,15 @@ BEGIN
 			p.x:=origin.x+(i+1/2)/MS; p.y:=origin.y+(j+1/2)/MS; p.z:=origin.z+(k+1/2)/MS;
 			d2s:=f.d2s(p);
 			IF ABS(d2s) < CRDNS THEN
-				nbloxTF[i,j,k]:=TRUE;
-				nblox[i,j,k].color:=f.color(p);
-				nblox[i,j,k].normal:=f.normal(p);
-				blox[i,j,k]:=f.voxel(p);
+				imposter:=f.getimposter(p);
+				v:=f.voxel(p);
+				IF v=NIL THEN 
+					nbloxTF[i,j,k]:=TRUE;
+					nblox[i,j,k].color:=f.color(p);
+					nblox[i,j,k].normal:=f.normal(p);
+				ELSE 
+					blox[i,j,k]:=v
+				END
 			END
 		END END END
 	END

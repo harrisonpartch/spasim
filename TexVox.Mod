@@ -181,7 +181,6 @@ VAR
 	txTF*: BOOLEAN;
 	texcube*: TexCube;
 	name*: Name;
-
 PROCEDURE & init*(n: Name);
 BEGIN
 	NEW(texcube,n,FALSE);
@@ -300,34 +299,34 @@ BEGIN
 				|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z;
 				|5: lx := ray.lxyz.x; ly := ray.lxyz.y;
 			END;
-			lx2:=lx;
-			ly2:=ly;
+			ly:=1-ly;
 		END;
  		mip:=ray.length*ray.scale;
 		IF mip>20 THEN
 			color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
 		ELSIF mip>10 THEN
 			color:=texcube.side[ray.face].pixelmip_one(lx,ly);
-		ELSIF mip>1 THEN
+(*		ELSIF mip>1 THEN
 			color:=texcube.side[ray.face].pixelmip_two(lx,ly);
-		ELSE
+*)		ELSE
 			color:=texcube.side[ray.face].pixel(lx,ly);
-		END;
+		END;	
 		IF color.alpha<0.99 THEN
-			IF color.alpha>0.7 THEN
+			IF color.alpha>0.8 THEN
 				mirror(ray,0);
 				IF (ray.clr.ra<0.01) OR  (ray.clr.ga<0.01) OR (ray.clr.ba<0.01) THEN ray.terminate:=TRUE END;
 			ELSE
+				color.alpha:=color.alpha+0.2;
 				dr:=color.red*color.alpha*ray.clr.ra;
 				dg:=color.green*color.alpha*ray.clr.ga;
 				db:=color.blue*color.alpha*ray.clr.b;
 				ray.clr.r := ray.clr.r + dr;
 				ray.clr.g := ray.clr.g + dg;
 				ray.clr.b := ray.clr.b + db;
-				ray.clr.ra:= ray.clr.ra-dr;
-				ray.clr.ga:= ray.clr.ga-dg;
-				ray.clr.ba:= ray.clr.ba-db;
-				IF (ray.clr.ra<0.01) OR  (ray.clr.ga<0.01) OR (ray.clr.ba<0.01) THEN ray.terminate:=TRUE END;
+				ray.clr.ra:= (ray.clr.ra-dr)-0.1;
+				ray.clr.ga:= (ray.clr.ga-dg)-0.1;
+				ray.clr.ba:= (ray.clr.ba-db)-0.1;
+				IF (ray.clr.ra<0.1) OR  (ray.clr.ga<0.1) OR (ray.clr.ba<0.1) THEN ray.terminate:=TRUE END;
 			END
 		ELSE
 			dot:= ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);

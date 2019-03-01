@@ -63,8 +63,8 @@ BEGIN
 	alphablue.setcolor(0,0,0.46,0.56,1);
 	s0.passable:=TRUE;
 	s1.passable:=TRUE;		
-	s0.fillsierp(nark,xot);
-	s1.fillsierp(nark,s0);
+	s0.fillsierp(nark,NIL);
+	s1.fillsierp(s0,NIL);
 	s0.lock();
 	s1.lock();	
 END NXWCxXWLIcD2LegvoGXX666. 

@@ -120,8 +120,8 @@ VAR
 	p: Raster.Pixel;
 	c: Color;
 BEGIN
-	i:= ENTIER(x*MIP0);
-	j:=MIP0-ENTIER(y*MIP0);
+	i:= ENTIER(x*MIP0) MOD MIP0;
+	j:=ENTIER(y*MIP0) MOD MIP0;
 	i:=i MOD MIP0; j:=j MOD MIP0;	
 	Raster.Get(mip_zero,i,j,p,copy);
 	c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
@@ -135,8 +135,8 @@ VAR
 	p: Raster.Pixel;
 	c: Color;
 BEGIN
-	i:= ENTIER(x*mip_one.width)MOD mip_one.width;
-	j:=(mip_one.height-ENTIER(y*mip_one.height)) MOD mip_one.height;
+	i:= ENTIER(x*MIP1) MOD MIP1;
+	j:=ENTIER(y*MIP1) MOD MIP1;
 	Raster.Get(mip_one,i,j,p,copy); 
 	c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
 	RETURN c
@@ -149,7 +149,7 @@ VAR
 	c: Color;
 BEGIN
 	i:= ENTIER(x*MIP2) MOD MIP2;
-	j:=(MIP2-ENTIER(y*MIP2)) MOD MIP2;
+	j:=ENTIER(y*MIP2) MOD MIP2;
 	Raster.Get(mip_two,i,j,p,copy); 
 	c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
 	RETURN c
@@ -162,7 +162,7 @@ VAR
 	c: Color;
 BEGIN
 	i:= ENTIER(x*W) MOD W;
-	j:=(H-ENTIER(y*H)) MOD H;
+	j:=ENTIER(y*H) MOD H;
 	Raster.Get(img,i,j,p,copy); 
 	c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
 	RETURN c

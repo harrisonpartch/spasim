@@ -1,10 +1,12 @@
 MODULE Narchillect;
 IMPORT Base:=Base, TexVox;
 VAR vox: TexVox.TexVox;
+
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	IF vox=NIL THEN NEW(vox,"archillect.png") END;
-	vox.tscale:=9;
+	IF vox=NIL THEN NEW(vox,"earthebolachan.png") END;
+	vox.passable:=FALSE;
+	vox.tscale:=0;
 	RETURN vox
 END thisvox;
 

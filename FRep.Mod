@@ -54,16 +54,16 @@ BEGIN
 	bbc2.y:=c.y+r;
 	bbc2.z:=c.z+r;	
 	center:=c;	
-	mir:=0.8;
+	mir:=0.0;
 END init;
 
 PROCEDURE color*(p:PT):Color;
 VAR
 	c: Color;
 BEGIN
-	c.red:=cxolor.red+(0.10-rand.Uniform()/5);
-	c.green:=cxolor.green+(0.10-rand.Uniform()/5);
-	c.blue:=cxolor.blue+(0.10-rand.Uniform()/5);
+	c.red:=cxolor.red+(0.010-rand.Uniform()/50);
+	c.green:=cxolor.green+(0.010-rand.Uniform()/50);
+	c.blue:=cxolor.blue+(0.010-rand.Uniform()/50);
 	Base.clamp3(c.red,c.green,c.blue);
 	RETURN c
 END color;
@@ -97,7 +97,7 @@ BEGIN
 	norml.x:= center.x-p.x; 
 	norml.y:= center.y-p.y; 	
 	norml.z:= center.z-p.z; 
-	RETURN((norml.x*norml.x+norml.y*norml.y+norml.z*norml.z)-rsquared)
+	RETURN(rsquared-(norml.x*norml.x+norml.y*norml.y+norml.z*norml.z))
 END d2s;
 
 PROCEDURE normal*(p:PT):PT;

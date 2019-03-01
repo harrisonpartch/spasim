@@ -45,7 +45,7 @@ VAR
 	subserp: Voxel;
 	sky: Voxel;
 	nark, xot: Voxel;
-	darkblue, alphablue: TransparaVox;
+	darkblue:TransparaVox;
 	s0,s1,s2,s3,s4: NM3.cell;
 
 PROCEDURE thisvox*():Base.Voxel;
@@ -61,18 +61,17 @@ BEGIN
 	NEW(s1);
 	NEW(s2);
 	NEW(s3);
-	NEW(darkblue);
-	darkblue.setcolor(0,0,1.3,1.5,1);	
-	NEW(alphablue);
-	alphablue.setcolor(0,0,0.06,0.08,1);
+	NEW(darkblue); 
+	darkblue.setcolor(0,0,1/3,1/2,1);
+	darkblue.passable:=TRUE;	
 	s0.passable:=TRUE;
 	s1.passable:=TRUE;	
 	s2.passable:=TRUE;	
 	s3.passable:=TRUE;	
-	s0.fillsierp(xot,sky);
-	s1.fillsierp(alphablue,s0);	
-	s2.fillsierp(alphablue,s1);
-	s3.fillsierp(alphablue,s2);	
+	s0.fillsierp(nark,darkblue);
+	s1.fillsierp(s0,darkblue);	
+	s2.fillsierp(s1,darkblue);
+	s3.fillsierp(s2,darkblue);	
 	s0.imposter:=sky;
 	s1.imposter:=sky;	
 	s2.imposter:=sky;

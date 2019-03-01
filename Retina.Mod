@@ -386,7 +386,7 @@ BEGIN{ACTIVE, PRIORITY(Objects.Normal)}
 		END;
 		CASE TESSA OF
 			  0: ztraceu(cam,T); 
-			| 1: IF ~saccade THEN ztraced(cam,T) ELSE ztraceu(cam,T) END;
+			| 1: IF ~saccade THEN ztraced(cam,T) ELSE ztracef(cam,T) END;
 			| 2: IF ~saccade THEN ztracef(cam,T) ELSE ztraceu(cam,T) END;
 		ELSE
 		END;

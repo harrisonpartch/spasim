@@ -252,7 +252,7 @@ BEGIN
 	END;
 	trace; 
 	Base.tick;	
-	GLIDE:=0.96;	
+	GLIDE:=0.985;	
 	cvz := cvz*GLIDE+gravityvector.z; 
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y; 
 	cvl :=cvl*0; cvu := cvu*0;
@@ -281,7 +281,7 @@ BEGIN
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
-	mstarget:=30;
+	mstarget:=35;
 END openwincam;
 
 (* called when idling *)
@@ -305,7 +305,7 @@ BEGIN
 	camrotinertia:=100;
 	Base.DTL:=250000;
 	Base.DTL2:=25000;
-	Base.gravity:=0.00001;
+	Base.gravity:=0;
 	Base.speed:=0.00001;
 	Base.maxspeed:=0.0001;
 	Base.cursordist:=0.01;

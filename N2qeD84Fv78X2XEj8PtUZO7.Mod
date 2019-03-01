@@ -7,8 +7,7 @@ TYPE Ray = Base.Ray;
 	PT =Base.PT;
 	Path= Base.Path;
 VAR 
-	core,cloud,reddot: Voxel;
-	conglo: NM3.cell;
+	core,cloud,reddot,conglo: Voxel;
 	ball: FRep.sphere;
 	plane: FRep.plane;
 	center,p,n:  PT;
@@ -17,47 +16,24 @@ VAR
 	path: Path;
 PROCEDURE draw;
 BEGIN	
-	NEW(conglo); 
-	core:=Base.VoxelFromName("NM3"); 
+	conglo:=Base.VoxelFromName("NM3"); 
 	reddot:=Base.VoxelFromName("Nreddot"); 
-	conglo.setcolor(10,100,10,100,1);	
+	conglo.setcolor(0,0,0,190,190);	
 	NEW(ball,center,6/12);	
 		Base.setPT(center,1/2,1/2,1/2);
 		radius:=1/2;
 		ball.reset(center, radius);
 		ball.setcolor(1,1,0,1/2);	
-		core.FRasterSolid(ball,27);	
-		cloud:=Base.VoxelFromName("NM2"); 	
 		ball.setcolor(1,0,1,1/2);	
-		cloud.FRasterSolid(ball,16);		
-		FOR i:=0 TO 2 BY 2 DO
-			FOR j:=0 TO 2 BY 2 DO
-				FOR k:=0 TO 2 BY 2  DO
-					conglo.blox[i,j,k]:=cloud
-				END
-			END
-		END;
-		FOR i:= 0 TO 100 DO
+		FOR i:= 0 TO 30 DO
 			center:=Base.randPT();
-			radius:=Base.rand.Uniform()/28;
+			radius:=Base.rand.Uniform()/3;
 			ball.reset(center,radius);
 			ball.setcolor(i/10, Base.rand.Uniform(),1-i/10,0);
 			conglo.FRaster(ball,27)
-		END;
-		conglo.blox[0,1,1]:=conglo;
-		conglo.blox[1,0,1]:=conglo;		
-		conglo.blox[1,1,0]:=conglo;
-		conglo.blox[2,1,1]:=conglo;
-		conglo.blox[1,2,1]:=core;		
-		conglo.blox[1,1,2]:=conglo;
-		conglo.blox[1,1,1]:=core;
-		conglo.imposter:=cloud;		
-		cloud.copyonstroke:= TRUE;		
+		END;	
 		conglo.copyonstroke:= TRUE;		
-		core.copyonstroke:= TRUE;		
-		cloud.passable:= TRUE;		
-		conglo.passable:= TRUE;		
-		core.passable:= TRUE;						
+		conglo.passable:= TRUE;						
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;
