@@ -29,7 +29,7 @@ void main(void)
 	}
 
 	float len = length(vec2(accumHor, accumVert));
-	if (len > 0.95)
+	if (len > 0.55)
 		gl_FragColor = vec4(vec3(0),1.0);
 	else
 	{

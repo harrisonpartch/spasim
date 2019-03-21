@@ -312,40 +312,32 @@ BEGIN
 			y:=a.imy-H/2;		
 			D:=(x*x+y*y);	
 			IF D<FVV THEN	
-				dtl:=Base.DTL;
 				tessa12(a); 
 			ELSE
-				dtl:=Base.DTL2;
 				tessa4(a); 
 			END;
  			x:=b.imx-W/2;
 			y:=b.imy-H/2;		
 			D:=(x*x+y*y);	
 			IF D<FVV THEN
-				dtl:=Base.DTL;
 				tessa12(b); 
 			ELSE 
-				dtl:=Base.DTL2;
 				tessa4(b);
 			END;
 			x:=c.imx-W/2;
 			y:=c.imy-H/2;		
 			D:=(x*x+y*y);	
 			IF D<FVV THEN	
-				dtl:=Base.DTL;
 				tessa12(c); 
 			ELSE
-				dtl:=Base.DTL2;
 				tessa4(c)
 			END;
  			x:=b.imx-W/2;
 			y:=b.imy-H/2;		
 			D:=(x*x+y*y);	
 			IF D<FVV THEN	
-				dtl:=Base.DTL;
 				tessa12(d); 
 			ELSE
-				dtl:=Base.DTL2;
 				tessa4(d); 
 			END;		
 	ELSE
@@ -523,14 +515,15 @@ END splitcam;
 
 PROCEDURE moredetail*;
 BEGIN
-	foveaparameter:=foveaparameter-3;
+	foveaparameter:=foveaparameter-1;
 	IF foveaparameter<1 THEN foveaparameter:=1 END;
+	Out.Int(foveaparameter,4); 
 	FV:=W/foveaparameter;
 END moredetail;
 
 PROCEDURE lessdetail*;
 BEGIN
-	foveaparameter:=(foveaparameter+3);
+	foveaparameter:=(foveaparameter+1);
 	IF foveaparameter>100 THEN foveaparameter:=100 END;
 	FV:=W/foveaparameter;
 END lessdetail;
@@ -657,6 +650,6 @@ BEGIN
  	lsense:=0.2;
  	aperture.width:=1;
  	aperture.height:=1;
- 	foveaparameter:=150;
+ 	foveaparameter:=13;
  	Out.String("loaded...");	
 END Retina.

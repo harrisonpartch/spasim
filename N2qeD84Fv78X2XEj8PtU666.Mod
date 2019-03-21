@@ -22,7 +22,7 @@ BEGIN
 	NEW(rand);
 	Base.setPT(center,1/2,1/2,1/2);
 	cage:=Base.VoxelFromName("NM2");
-	cage.setcolor(0,52,0,77,0);
+	cage.setcolor(0,1/2,0,1/3,1/3,1/3);
 (*	FOR i:=0 TO 1000 DO 
 		NEW(ball,Base.randPT(), rand.Uniform()/15);
 		c:=Base.randColor();
@@ -32,7 +32,7 @@ BEGIN
 *)	NEW(ball,center,0.5);
 	ball.setcolor(1,0,0,1/2);	
 	yellow:=Base.VoxelFromName("NM2");
-	yellow.setcolor(0,10000,0,15000,150);
+	yellow.setcolor(0,1,0,1,1,1);
 	yellow.FRaster(ball,16);
 	yellow.copyonstroke:=TRUE;
 	FOR i:=0 TO 25000  DO 

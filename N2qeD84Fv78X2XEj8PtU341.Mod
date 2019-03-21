@@ -9,16 +9,6 @@ VAR
 	cage: OutlineVox;
 
 TYPE TransparaVox*=OBJECT(Base.Voxel);
-VAR
-	r, g, b, black: REAL;	
-PROCEDURE setcolor* (red, green, blue,bl , a : REAL); 
-BEGIN
-	r := red;
-	g := green;
-	b := blue;
-	black:=bl;
-	passable := TRUE;
-END setcolor;
 
 PROCEDURE Shade (VAR ray: Ray);
 VAR 
@@ -28,16 +18,15 @@ VAR
 BEGIN
 	exit:=Base.Exit(ray);
 	depth:=Base.dist(ray.lxyz,exit);
-	dr := r*depth;
-	dg := g*depth;
-	db := b*depth;
-	dbl:=black*depth;
+	dr := red*depth;
+	dg := green*depth;
+	db := blue*depth;
 	ray.clr.r := ray.clr.r + dr;
 	ray.clr.g := ray.clr.g + dg;
 	ray.clr.b := ray.clr.b + db; 
-	ray.clr.ra := (ray.clr.ra - dr)-dbl;
-	ray.clr.ga := (ray.clr.ga - dg)-dbl;
-	ray.clr.ba := (ray.clr.ba - db)-dbl; 
+	ray.clr.ra := (ray.clr.ra - dr)-redblack;
+	ray.clr.ga := (ray.clr.ga - dg)-greenblack;
+	ray.clr.ba := (ray.clr.ba - db)-blueblack; 
 	IF (ray.clr.ra<0.1)&(ray.clr.ga<0.1)&(ray.clr.ba<0.1) THEN ray.terminate:=TRUE 
 	ELSE ray.lxyz:=exit;
 	END
@@ -59,9 +48,9 @@ PROCEDURE&init*;
 BEGIN
 	setoutline(0,0,0,1/2);
 	NEW(blue);
-	blue.setcolor(1/3,0,0,1/3,0);
+	blue.setcolor(1/3,0,0,0,1/3,1/3);
 	innard:=Base.VoxelFromName("NM3");	
-	innard.setcolor(0,0,2/3,1000,0);
+	innard.setcolor(0,0,2/3,1,1,1);
 	passable:=TRUE;
 	copyonstroke:=TRUE;
 	complex:=TRUE;	

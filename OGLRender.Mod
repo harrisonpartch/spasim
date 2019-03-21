@@ -245,14 +245,14 @@ BEGIN
 		IF avaTF THEN Marsh.drawavatar END
 	END;
 	IF MOUSEDOWN THEN	
-		IF GLW.ML IN MB THEN Marsh.draw;
+		IF GLW.ML IN MB THEN (* Marsh.draw; *)
 		ELSIF  GLW.MM IN MB THEN Marsh.snipeinto; 
 		ELSIF  GLW.MR IN MB THEN Marsh.snipeonto;
 		END;	
 	END;
 	trace; 
 	Base.tick;	
-	GLIDE:=0.985;	
+	GLIDE:=0.975;	
 	cvz := cvz*GLIDE+gravityvector.z; 
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y; 
 	cvl :=cvl*0; cvu := cvu*0;
@@ -276,12 +276,15 @@ PROCEDURE &openwincam(w,h: INTEGER);
 BEGIN
 	Init(w,h, 0,0, FALSE);
 	NEW(camera,Retina.W, Retina.H); 
+	Retina.Res;
+	Retina.Res;
 	camera.aperjust(w, h);
 	SetTitle("SPASIM");
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
 	mstarget:=35;
+	Base.STOPGO; 
 END openwincam;
 
 (* called when idling *)
@@ -356,7 +359,9 @@ BEGIN
 		CASE CHR(ucs) OF		
 			"S": Retina.incdetail; Out.String("S Retina.incdetail");
 			| "W":Retina.decdetail; Out.String("W Retina.decdetail");
-			|  "s" : camera.forward(-0.51*Base.speed); 
+			| "A": Retina.moredetail; Out.String("S Retina.moredetail");
+			| "D":Retina.lessdetail; Out.String("W Retina.lessdetail");					
+			| "s" : camera.forward(-0.51*Base.speed); 
 			| "w" : camera.forward(0.51*Base.speed) ; 
 			| "a" : camera.rightstrafe(-0.5*Base.speed)	; 
 			| "d" : camera.rightstrafe(0.5*Base.speed) ; 
@@ -375,8 +380,8 @@ BEGIN
 			| "2": Base.gravity:= Base.gravity/1.5 ; Out.String(" ");	
 			| "@": Base.gravity:= 1.5*Base.gravity ; Out.String(" ");
 			| "3": 
-			| "4": Base.STOPGO ; Out.String(" ");
-			| "5": Retina.Res ; Out.String(" ");
+			| "4": Base.STOPGO; Out.String(" ");
+			| "5": Retina.Res; Out.String(" ");
 			| "6": avaTF:=~avaTF ; Out.String(" ");
 			| "h": camera.hop ; Out.String(" ");
 			| " ":  Marsh.tunnelinto ; Out.String(" ");
@@ -570,7 +575,7 @@ END KeyEvent;
 			programs[11] := InitShader("passthroughVS.glsl", "nightVisionFS.glsl");
 (*			programs[12]:=InitShader("passthroughVS.glsl", "passthroughFS.glsl");*)
 			programs[12] := InitShader("passthroughVS.glsl", "kuwahara.glsl"); 
-		curprogram := 6;	  
+		curprogram := 0;	  
 		Out.String("InitGL");
 		Out.Ln;
 		RETURN TRUE;
@@ -596,12 +601,12 @@ END KeyEvent;
 	(* change detail according to frame speed, called in GLWindow.MainLoop *)
 	PROCEDURE GameLogic();
 	BEGIN
-		IF GetCurrentFrameMs() < (mstarget-2) THEN 
+(*		IF GetCurrentFrameMs() < (mstarget-5) THEN 
 			Retina.moredetail;
 		ELSIF GetCurrentFrameMs() > mstarget THEN 
 			Retina.lessdetail;
 		END; 
-	END GameLogic;
+*)	END GameLogic;
 	
 	END GLWindow;
 

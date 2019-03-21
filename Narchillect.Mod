@@ -4,10 +4,16 @@ VAR vox: TexVox.TexVox;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	IF vox=NIL THEN NEW(vox,"earthebolachan.png") END;
-	vox.passable:=FALSE;
-	vox.tscale:=0;
 	RETURN vox
 END thisvox;
 
+PROCEDURE tick;
+BEGIN
+	vox.tscale:= 26 + Base.rand.Uniform()*5;
+END tick;
+
+BEGIN
+	NEW(vox,"earthchan.png");
+	vox.tscale:=27;  
+	vox.register;
 END Narchillect. 

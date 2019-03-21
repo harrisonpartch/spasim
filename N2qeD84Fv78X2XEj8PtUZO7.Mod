@@ -18,7 +18,7 @@ PROCEDURE draw;
 BEGIN	
 	conglo:=Base.VoxelFromName("NM3"); 
 	reddot:=Base.VoxelFromName("Nreddot"); 
-	conglo.setcolor(0,0,0,190,190);	
+	conglo.setcolor(0,0,0,1,1,1);	
 	NEW(ball,center,6/12);	
 		Base.setPT(center,1/2,1/2,1/2);
 		radius:=1/2;

@@ -5,9 +5,9 @@ Strings, Streams, CryptoMD5, WMFontManager, Raster, WMRasterScale, WMRectangles,
 
 CONST
 	NL*=24;
-	MIP0=32;
-	MIP1=128;
-	MIP2=512;
+	MIP0=8;
+	MIP1=32;
+	MIP2=128;
 
 TYPE Name*=ARRAY 32 OF CHAR;
 
@@ -63,10 +63,12 @@ END;
 TYPE V*= OBJECT  (*abstract base type for voxel and texture and anything else that may animate *)
 PROCEDURE tick*;
 END tick;
+
 PROCEDURE register*;
 VAR i: INTEGER;
 BEGIN
 	i := 0;
+	Out.Char('*');
 	WHILE voxelist[i] # NIL DO INC(i) END;
 	IF i < 99 THEN voxelist[i] := SELF END;
 END register;
@@ -122,7 +124,6 @@ VAR
 BEGIN
 	i:= ENTIER(x*MIP0) MOD MIP0;
 	j:=ENTIER(y*MIP0) MOD MIP0;
-	i:=i MOD MIP0; j:=j MOD MIP0;	
 	Raster.Get(mip_zero,i,j,p,copy);
 	c.red := ORD(p[2])/255; c.green := ORD(p[1])/255; c.blue := ORD(p[0])/255; c.alpha:= ORD(p[3])/255;	
 	RETURN c
@@ -231,7 +232,7 @@ END reload;
 END TexCube;
 
 TYPE Ray* = RECORD
-	xyz*, dxyz*, ddxyz*, lxyz*, lastlxyz*, txyz*, origin*, oxyz*, popdelta*, hitxyz*: PT;	
+	xyz*, dxyz*, ddxyz*, lxyz*, lastlxyz*, txyz*, origin*, oxyz*, hitxyz*: PT;	
 	downxyz*,rightxyz*: PT;
 	theta*,phi*, dtheta*,dphi*: REAL;
 	clr*, lastclr*: ray_color;
@@ -256,6 +257,7 @@ TYPE Ray* = RECORD
 	dtlTF*:BOOLEAN;
 	hitmirrorTF*:BOOLEAN;
 	justhitTF*:BOOLEAN;
+	thisvoxelisempty*:BOOLEAN;
 	texdtl*:REAL;
 END;
 
@@ -268,8 +270,8 @@ VAR
 	lockTF*,copymarker*,emptysplit*: BOOLEAN;
 	DTL*: REAL;
 	code*,ncode*:Name;  
-	tscale*: LONGINT;
-	red*,green*,blue*,black*,alpha*: REAL;
+	tscale*: REAL;
+	red*,green*,blue*,black*,alpha*,redblack*,greenblack*, blueblack*: REAL;
 	colored*,frozen*,probelock*,copyonstroke*,copyonstrokerecursion, baked*:BOOLEAN;
 	offset*:PT;
 	
@@ -309,7 +311,14 @@ BEGIN
 	END;
 	RETURN out
  END chat;
-PROCEDURE setcolor* (r,g,b,bl,a: REAL); 
+PROCEDURE setcolor* (r,g,b,rb,gb,bb: REAL); 
+BEGIN
+	red :=r;
+	green:=g;
+	blue:=b;
+	redblack:=rb;
+	greenblack:=gb;
+	blueblack:= bb;
 END setcolor;
 PROCEDURE erase*(p:PT; resolution:LONGINT);
 END erase;
@@ -765,8 +774,8 @@ END fzz3;
 PROCEDURE tick*;
 VAR i: INTEGER;
 BEGIN
-(*	Out.String("t"); *)
-	IF  TRUE THEN
+	IF  ~STOP THEN
+		Out.String("t"); 
 		i := 0;
 		WHILE i < 90 DO
 			IF voxelist[i] # NIL THEN voxelist[i].tick END;

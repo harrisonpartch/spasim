@@ -18,7 +18,7 @@ END thisvox;
 BEGIN
 	n3ball:=Base.VoxelFromName("NM3"); 
 	v:=Base.VoxelFromName("Nreddot"); 
-	v.setcolor(0.7,0,0.3,0,0);
+	v.setcolor(0.7,0,0.3,1,1,1);
 	Base.setPT(center,1/2,1/2,1/2);
 	NEW(ball,center,6/12);
 	ball.vox:=v;

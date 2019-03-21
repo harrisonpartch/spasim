@@ -8,8 +8,7 @@ Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
 
 CONST M=10; (* defines grid size *)
 	MMO=M-1;
-	CUBERADIUS=0.87;   (*change to sqrt(3)/2 ???*)
-	NCODE="NM10";
+	CUBERADIUS=0.866025;   (*change to sqrt(3)/2 ???*)
 	NL=Base.NL;
 
 TYPE PT = Base.PT;
@@ -35,35 +34,20 @@ PROCEDURE Shade(VAR ray: Ray);
 VAR
 	pushxyz, newxyz, xyz: Base.PT;
 	ijk: Base.IPT;
-	drx, dry, drz, dr,rr,gr,br,blr,bla: REAL;
-	out,shadenil,A,B,C: BOOLEAN;
+	drx, dry, drz, dr,rr,gr,br,blr,bla,a: REAL;
+	out,shadenil,A,B,C,bloxupied: BOOLEAN;
 	v: Voxel;
-	vdepth, blainv: REAL;
+	vdepth: REAL;
 	last:BOOLEAN;
 	i,j: LONGINT;
-	patchray,pray: Ray;
-	patchdx, patchdy: PT;
-	patchradiusx, patchradiusy: REAL;
 	lastlength:REAL;
 BEGIN
-	patchray:=ray;
-	ray.lastlxyz:=ray.lxyz;
 	ray.scale := ray.scale*M;
 	xyz.x := ABS(ray.lxyz.x-offset.x) * M;
 	xyz.y := ABS(ray.lxyz.y-offset.y) * M;
 	xyz.z := ABS(ray.lxyz.z-offset.z)* M;
 	pushxyz:=xyz;
-	IF (ray.length*ray.scale>ray.dtl) THEN
-		ray.terminate:=TRUE;
-		ray.clr.r:=1;
-		(*IF imposter#NIL THEN
-			imposter.Shade(ray);
-		ELSIF nposterTF THEN
-			ray.normalTF:=TRUE;
-			ray.normal:=nposter.normal;
-			nshade(nposter,ray);
-		END;*)
-	ELSE
+	IF (ray.length*ray.scale<ray.dtl) THEN
 		SPSME.E(xyz,ijk);
 		bounds(ijk.i,ijk.j,ijk.k,out);
 		IF ~out THEN
@@ -72,118 +56,109 @@ BEGIN
 				ray.lxyz.x := ABS(xyz.x - ijk.i);
 				ray.lxyz.y := ABS(xyz.y - ijk.j);
 				ray.lxyz.z := ABS(xyz.z - ijk.k);
-				ray.popdelta := Base.Origin;
-				ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal;
 				v.Shade(ray);
-				xyz.x := xyz.x + ray.popdelta.x;
-				xyz.y := xyz.y + ray.popdelta.y;
-				xyz.z := xyz.z + ray.popdelta.z;
 			ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
-				nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
-			END;
+				bloxupied:=TRUE;
+				nshade(nblox[ijk.i,ijk.j,ijk.k],ray)
+			END
+		END;
+		IF ~ray.terminate THEN
+			REPEAT
+				IF ray.di  THEN
+					drx := ( (ijk.i + 1) - xyz.x) / ray.dxyz.x
+				ELSE
+					drx :=  (ijk.i -  xyz.x) / ray.dxyz.x
+				END;
+				IF ray.dj THEN
+					dry := ( (ijk.j + 1) - xyz.y) / ray.dxyz.y
+				ELSE
+					dry :=  (ijk.j - xyz.y) / ray.dxyz.y
+				END;
+				IF ray.dk  THEN
+					drz := ( (ijk.k + 1) - xyz.z) / ray.dxyz.z
+				ELSE
+					drz :=  (ijk.k - xyz.z) / ray.dxyz.z
+				END;
+				A:=drx<dry; B:=drx<drz; C:=dry<drz;
+				IF A&B THEN
+					dr := drx;
+					IF ray.di THEN
+						INC(ijk.i, 1);
+						ray.face := 0; ray.fnormal:= Base.Face[0]
+					ELSE
+						INC(ijk.i, -1);
+						ray.face := 3; ray.fnormal:= Base.Face[3]
+					END;
+					newxyz.x := xyz.x + drx * ray.dxyz.x; newxyz.y := xyz.y + drx * ray.dxyz.y; newxyz.z  := xyz.z + drx * ray.dxyz.z
+				ELSIF A&~B THEN
+					dr := drz;
+					IF ray.dk THEN
+						INC(ijk.k, 1);
+						ray.face := 2; ray.fnormal:= Base.Face[2]
+					ELSE
+						INC(ijk.k, -1);
+						ray.face := 5; ray.fnormal:= Base.Face[5]
+					END;
+					newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
+				ELSIF C THEN
+					dr := dry;
+					IF ray.dj THEN
+						INC(ijk.j, 1);
+						ray.face := 1; ray.fnormal:= Base.Face[1]
+					ELSE
+						INC(ijk.j, -1);
+						ray.face := 4; ray.fnormal:= Base.Face[4]
+					END;
+					newxyz.x := xyz.x + dry * ray.dxyz.x; newxyz.y := xyz.y + dry * ray.dxyz.y; newxyz.z  := xyz.z+ dry * ray.dxyz.z
+				ELSE
+					dr := drz;
+					IF ray.dk  THEN
+						INC(ijk.k, 1);
+						ray.face := 2; ray.fnormal:= Base.Face[2]
+					ELSE
+						INC(ijk.k, -1);
+						ray.face := 5; ray.fnormal:= Base.Face[5]
+					END;
+					newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
+				END;
+				vdepth:=Base.distance(newxyz,xyz); 
+				
+				ray.xyz.x:=ray.xyz.x +(newxyz.x-xyz.x)/ray.scale;
+				ray.xyz.y:=ray.xyz.y +(newxyz.y-xyz.y)/ray.scale;
+				ray.xyz.z:=ray.xyz.z +(newxyz.z-xyz.z)/ray.scale;
+				ray.length:=ray.length+vdepth/ray.scale;
+				ray.hitxyz:=ray.xyz;
+				xyz:=newxyz;		 
+				blr:=black*vdepth;
+				rr := red*vdepth*ray.clr.ra;
+				gr := green*vdepth*ray.clr.ga;
+				br := blue*vdepth*ray.clr.ba;
+				ray.clr.r := ray.clr.r+rr;
+				ray.clr.g:= ray.clr.g+gr;
+				ray.clr.b := ray.clr.b+br;
+				ray.clr.ra := (ray.clr.ra-(rr+blr));
+				ray.clr.ga := (ray.clr.ga-(gr+blr));
+				ray.clr.ba := (ray.clr.ba-(br+blr));	
+				IF (ray.clr.ra+ray.clr.ga+ray.clr.ba)<0.2 THEN ray.terminate:=TRUE END;  
+				
+				bounds(ijk.i,ijk.j,ijk.k, out);		
+				IF ~(out OR ray.terminate) THEN
+					v := blox[ijk.i,ijk.j,ijk.k];
+					IF (v#NIL) THEN
+						ray.lxyz.x := ABS(xyz.x - ijk.i);
+						ray.lxyz.y := ABS(xyz.y - ijk.j);
+						ray.lxyz.z := ABS(xyz.z - ijk.k);
+						ray.normal := ray.fnormal;
+						v.Shade(ray);
+					ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
+						ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal; 
+						nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
+					ELSE
+					END
+				END;
+				UNTIL out OR ray.terminate;
 		END
 	END;
-	IF ~ray.terminate THEN
-		REPEAT
-			IF ray.di  THEN
-				drx := ( (ijk.i + 1) - xyz.x) / ray.dxyz.x
-			ELSE
-				drx :=  (ijk.i -  xyz.x) / ray.dxyz.x
-			END;
-			IF ray.dj THEN
-				dry := ( (ijk.j + 1) - xyz.y) / ray.dxyz.y
-			ELSE
-				dry :=  (ijk.j - xyz.y) / ray.dxyz.y
-			END;
-			IF ray.dk  THEN
-				drz := ( (ijk.k + 1) - xyz.z) / ray.dxyz.z
-			ELSE
-				drz :=  (ijk.k - xyz.z) / ray.dxyz.z
-			END;
-			A:=drx<dry; B:=drx<drz; C:=dry<drz;
-			IF A&B THEN
-				dr := drx;
-				IF ray.di THEN
-					INC(ijk.i, 1);
-					ray.face := 0; ray.fnormal:= Base.Face[0]
-				ELSE
-					INC(ijk.i, -1);
-					ray.face := 3; ray.fnormal:= Base.Face[3]
-				END;
-				newxyz.x := xyz.x + drx * ray.dxyz.x; newxyz.y := xyz.y + drx * ray.dxyz.y; newxyz.z  := xyz.z + drx * ray.dxyz.z
-			ELSIF A&~B THEN
-				dr := drz;
-				IF ray.dk THEN
-					INC(ijk.k, 1);
-					ray.face := 2; ray.fnormal:= Base.Face[2]
-				ELSE
-					INC(ijk.k, -1);
-					ray.face := 5; ray.fnormal:= Base.Face[5]
-				END;
-				newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
-			ELSIF C THEN
-				dr := dry;
-				IF ray.dj THEN
-					INC(ijk.j, 1);
-					ray.face := 1; ray.fnormal:= Base.Face[1]
-				ELSE
-					INC(ijk.j, -1);
-					ray.face := 4; ray.fnormal:= Base.Face[4]
-				END;
-				newxyz.x := xyz.x + dry * ray.dxyz.x; newxyz.y := xyz.y + dry * ray.dxyz.y; newxyz.z  := xyz.z+ dry * ray.dxyz.z
-			ELSE
-				dr := drz;
-				IF ray.dk  THEN
-					INC(ijk.k, 1);
-					ray.face := 2; ray.fnormal:= Base.Face[2]
-				ELSE
-					INC(ijk.k, -1);
-					ray.face := 5; ray.fnormal:= Base.Face[5]
-				END;
-				newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
-			END;
-			vdepth:=Base.distance(newxyz,xyz)/ray.scale;
-			ray.xyz.x:=ray.xyz.x +(newxyz.x-xyz.x)/ray.scale;
-			ray.xyz.y:=ray.xyz.y +(newxyz.y-xyz.y)/ray.scale;
-			ray.xyz.z:=ray.xyz.z +(newxyz.z-xyz.z)/ray.scale;
-			xyz:=newxyz;
-			ray.hitxyz:=ray.xyz;
-			ray.length:=ray.length+vdepth;
-			blr:=black*vdepth;
-			blainv:=1-blr;	
-			rr := red*vdepth*ray.clr.ra;
-			gr := green*vdepth*ray.clr.ga;
-			br := blue*vdepth*ray.clr.ba;
-			ray.clr.r := ray.clr.r+rr;
-			ray.clr.g:= ray.clr.g+gr;
-			ray.clr.b := ray.clr.b+br;
-			ray.clr.ra := (ray.clr.ra-(rr+blr));
-			ray.clr.ga := (ray.clr.ga-(gr+blr));
-			ray.clr.ba := (ray.clr.ba-(br+blr));
-			ray.clr.alpha:=ray.clr.alpha-blr;
-			IF (ray.clr.alpha<0.1) OR (ray.clr.ra<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ba<0.1)  THEN ray.terminate:=TRUE; out:=TRUE END;
-			bounds(ijk.i,ijk.j,ijk.k, out);
-			IF ~out THEN
-				v := blox[ijk.i,ijk.j,ijk.k];
-				IF (v#NIL) THEN
-					ray.lxyz.x := ABS(xyz.x - ijk.i);
-					ray.lxyz.y := ABS(xyz.y - ijk.j);
-					ray.lxyz.z := ABS(xyz.z - ijk.k);
-					ray.popdelta := Base.Origin; (* because many shaders don't set it *)
-					ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal;
-					v.Shade(ray);
-					xyz.x := xyz.x + ray.popdelta.x;
-					xyz.y := xyz.y + ray.popdelta.y;
-					xyz.z := xyz.z + ray.popdelta.z;
-				ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
-					nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
-				END
-			END;
-		UNTIL out OR ray.terminate;
-	END;
-	ray.popdelta.x := (xyz.x-pushxyz.x)/M;
-	ray.popdelta.y := (xyz.y-pushxyz.y)/M;
-	ray.popdelta.z := (xyz.z-pushxyz.z)/M;
 	ray.scale := ray.scale/M;
 END Shade;
 
@@ -227,9 +202,6 @@ BEGIN
 	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END;
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;
-	ray.popdelta.x:=ray.dxyz.x*3.0;
-	ray.popdelta.y:=ray.dxyz.z*3.0;
-	ray.popdelta.z:=ray.dxyz.z*3.0;
 END mirror;
 
 PROCEDURE tick*;
@@ -272,7 +244,6 @@ BEGIN
 	blox[0,1,1]:=w;
 	blox[1,0,1]:=w;
 	blox[1,1,1]:=w;
-
 	blox[1,1,2]:=w;
 	blox[2,1,1]:=w;
 	blox[1,2,1]:=w;
@@ -305,8 +276,8 @@ BEGIN
 	passable:=TRUE;
 	complex:=TRUE;
 	imposter:=Base.EMPTY;
-	code:=NCODE;
-	ncode:=NCODE
+	code:="NM10";
+	ncode:="NM10"
 END init;
 
 PROCEDURE copyclear*;
@@ -463,7 +434,7 @@ VAR
 	code: Base.Name;
 BEGIN
 	IF ~lockTF THEN
-		code:=NCODE; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
+		code:="NM10"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 		nextscale:=scale*M;
 		p.x:=p.x*M;
 		p.y:=p.y*M;
@@ -474,17 +445,14 @@ BEGIN
 		ELSE
 			IF blox[i,j,k]#NIL THEN
 				IF  blox[i,j,k].copyonstroke THEN
-					copyv:= blox[i,j,k].deepcopyofme;
-					IF (copyv#NIL) & (copyv.baked) THEN
-						copyv.strokerec(p, resolution,nextscale,voxel);
-						copyengine.add(blox[i,j,k]);
-						blox[i,j,k]:=copyv	
-					END	
-				ELSIF blox[i,j,k].complex THEN
+					copyv:= blox[i,j,k].deepcopy();
+					blox[i,j,k]:=copyv;	
+					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
+				ELSIF blox[i,j,k] IS cell THEN
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
 				ELSE
 					NEW(c);
-					c.red:=red; c.blue:=blue; c.green:=green; c.black:=black; 
+					c.setcolor(red/M, blue/M, green/M, black/M, 1); 
 					c.fill(blox[i,j,k]);
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
@@ -492,6 +460,7 @@ BEGIN
 				END
 			ELSE
 				NEW(c);
+				c.setcolor(red/M, green/M, blue/M, black/M, 1); 
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
 				c.strokerec(p, resolution,nextscale, voxel);
@@ -630,7 +599,7 @@ VAR
 	v: Voxel;
 	newcell: cell;
 BEGIN
-	code:=NCODE; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
+	code:="NM10"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 	MS:=M*scale;
 	TWOMS:=2*MS;
 	nextscale:=scale*M;
@@ -644,7 +613,7 @@ BEGIN
 				o.x:=p.x-1/TWOMS; o.y:=p.y-1/TWOMS; o.z:=p.z-1/TWOMS; (* p is center, o is corner *)
 				IF blox[i,j,k]=NIL THEN
 					NEW(newcell);
-					newcell.setcolor(red,green,blue,black,alpha);
+					newcell.setcolor(red/M,green/M,blue/M,black/M,alpha/M);
 					blox[i,j,k]:=newcell;
 					IF f.normaltf(p) THEN
 						newcell.nposterTF:=TRUE;
@@ -657,13 +626,13 @@ BEGIN
 				 	v:=blox[i,j,k];
 				 	IF v IS cell THEN
 				 		WITH v:cell DO
-				 			v.imposter:=f.voxel(p);
+				 			v.imposter:=f.getimposter(p);
 							v.nposterTF:=TRUE;
 							v.nposter.normal:=f.normal(p);
 							v.nposter.color:=f.color(p);
 							v.FRasterrec(f,resolution,o,nextscale)
 				 		END
-				 	END
+				 	END	
 				 END
 			END
 		END END END
@@ -672,10 +641,15 @@ BEGIN
 			p.x:=origin.x+(i+1/2)/MS; p.y:=origin.y+(j+1/2)/MS; p.z:=origin.z+(k+1/2)/MS;
 			d2s:=f.d2s(p);
 			IF ABS(d2s) < CRDNS THEN
-				nbloxTF[i,j,k]:=TRUE;
-				nblox[i,j,k].color:=f.color(p);
-				nblox[i,j,k].normal:=f.normal(p);
-				blox[i,j,k]:=f.voxel(p);
+				imposter:=f.getimposter(p);
+				v:=f.voxel(p);
+				IF v=NIL THEN 
+					nbloxTF[i,j,k]:=TRUE;
+					nblox[i,j,k].color:=f.color(p);
+					nblox[i,j,k].normal:=f.normal(p);
+				ELSE 
+					blox[i,j,k]:=v
+				END
 			END
 		END END END
 	END
@@ -780,6 +754,7 @@ VAR
 	cv,child:Voxel;
 	i,j,k: INTEGER;
 BEGIN
+	code:=ncode; (* if this voxel has been rezzed from another module, make it NM10 *)
 	copymarker:=TRUE;
 	NEW(c);
 	c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; 
@@ -834,24 +809,23 @@ PROCEDURE engrain(w: Streams.Writer);
 VAR
 	i,j,k: INTEGER;
 BEGIN
-(* copymarker code removed: this will not terminate [ie it WILL trap] if the cell is recursive *)
-	IF code=NCODE THEN
-		IF TRUE THEN
-			w.Bytes(code,0,NL);
-			w.RawReal(red);
-			w.RawReal(green);
-			w.RawReal(blue);
-			w.RawReal(black);
-			FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
-					IF (blox[i,j,k]#NIL) THEN
-						w.RawBool(TRUE);
-						blox[i,j,k].engrain(w)
-					ELSE
-						w.RawBool(FALSE);
-					END
-			END END END
-		END
-	END;
+ 	IF (code=ncode) THEN	
+		w.Bytes(code,0,NL);
+		w.RawReal(red);
+		w.RawReal(green);
+		w.RawReal(blue);
+		w.RawReal(black);
+		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
+			IF (blox[i,j,k]#NIL) THEN
+				w.RawBool(TRUE);
+				blox[i,j,k].engrain(w)
+			ELSE
+				w.RawBool(FALSE);
+			END;
+		END END END;
+	ELSE
+	 	w.Bytes(code,0,NL);
+	END;	
 END engrain;
 
 (*
@@ -865,6 +839,7 @@ VAR
 	anothercell: cell;
 	len: LONGINT;
 BEGIN
+	IF (code=ncode) THEN	
 		r.RawReal(red);
 		r.RawReal(green);
 		r.RawReal(blue);
@@ -877,6 +852,8 @@ BEGIN
 				IF blox[i,j,k]#NIL THEN blox[i,j,k].sprout(r) END
 			END;
 		END END END
+	ELSE
+	END;
 END sprout;
 
 END cell;
@@ -895,14 +872,14 @@ BEGIN
 	BEGIN {EXCLUSIVE} COPYGO:=TRUE END;
 END go;
 
-BEGIN{ACTIVE, PRIORITY(Objects.Low)}
+(* BEGIN{ACTIVE, PRIORITY(Objects.Low)}
 REPEAT
 	Out.String("COPYENGINE");
 	BEGIN {EXCLUSIVE} AWAIT(COPYGO) END;
 	tobecopied.deepcopyofme:=tobecopied.deepcopy();
 	Out.String("COPYENGINE");
 	BEGIN {EXCLUSIVE} COPYGO:=FALSE END;
-UNTIL FALSE
+UNTIL FALSE *)
 END CopyEngine;
 
 VAR

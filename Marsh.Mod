@@ -311,14 +311,17 @@ BEGIN
 	push(archillect);
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	push(greenball);	
-	conglomerate:=Base.VoxelFromName("N2qeD84Fv798X2XEj8PtUZO7"); 	
+	conglomerate:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7"); 	
 	conglomerate.copyonstroke:=TRUE;
 	push(conglomerate);	
      serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999"); 
      serp.passable:=TRUE;
 	push(serp);	
-	reddot:=Base.VoxelFromName("Nrecursivesphere"); 	
+	reddot:=Base.VoxelFromName("Nbrownianspheres"); 	
 	push(reddot);		
+	rd:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODg"); 	
+	push(rd);
+		
 (*  	NEW(fuzz);
   	push(fuzz);
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
@@ -536,48 +539,49 @@ BEGIN
 	noise[0].c:=1;		
 	noise[0].octaves:=4;
 	noise[0].persistence:=3.61;	
-	noise[0].setvoxel(conglomerate);			
+	noise[0].setvoxel(archillect);			
 
 	Base.setPT(center,1/2,1/2,2/3);
 	
-	z3:=Base.VoxelFromName("NM3");	
+(*	z3:=Base.VoxelFromName("NM2");	
 	z3a:=Base.VoxelFromName("NM3");
 	
-	z3.setcolor(3,3,3,10,0); 
+	z3.setcolor(0,0,2,1,1); 
 	z3a.setcolor(0,80,50,150,0); 
 	
-(*    z3a.FRaster(noise[0],9);
+    z3a.FRaster(noise[0],9);
     z3a.copyonstroke:=TRUE;
 
     noise[0].setvoxel(z3a);	
     noise[0].a:=7;
     noise[0].b:=7;
-    noise[0].c:=7;    *)
-    z3.FRaster(noise[0],27);
+    noise[0].c:=7;   
+    z3.FRaster(noise[0],128);
  	     
  	NEW(plane,center,up);
+ 	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999");
 	plane.setvoxel(serp);			
-	z3.FRaster(plane,27);	
+	z3.FRaster(plane,16);	 *)
 					
 	Base.avatar:=harrison;
  	
 	Base.avatarsize:=1000; 
 
 	
-	Base.world:=z3;
+	Base.world:=serp;
 
 END dawn;
 
 PROCEDURE darken*;
 BEGIN
 	atmdark:= atmdark*1.5;
-	Base.world.setcolor(0,0,0,atmdark,0);	
+	Base.world.setcolor(0,0,0,atmdark,atmdark,atmdark);	
 END darken;
 
 PROCEDURE lighten*;
 BEGIN
 	IF atmdark>0.11 THEN atmdark:= atmdark/1.5 END;
-	Base.world.setcolor(0,0,0,atmdark,0);	
+	Base.world.setcolor(0,0,0,atmdark,atmdark,atmdark);	
 END lighten
 
 BEGIN
