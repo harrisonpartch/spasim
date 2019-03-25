@@ -139,7 +139,8 @@ BEGIN
 				ray.clr.ba := ray.clr.ba-blueblack*vdepth;
 				IF ray.clr.ra<0 THEN ray.clr.ra:=0 END;
 				IF ray.clr.ga<0 THEN ray.clr.ga:=0 END;
-				IF ray.clr.ba<0 THEN ray.clr.ba:=0 END;			
+				IF ray.clr.ba<0 THEN ray.clr.ba:=0 END;	
+				IF (ray.clr.ra+ray.clr.ga+ray.clr.ba)<0.01 THEN ray.terminate:=TRUE END;  		
 				bounds(ijk.i,ijk.j,ijk.k, out);		
 				IF ~(out OR ray.terminate) THEN
 					v := blox[ijk.i,ijk.j,ijk.k];
@@ -156,7 +157,7 @@ BEGIN
 					ELSE
 					END
 				END;
-				IF (ray.clr.ra+ray.clr.ga+ray.clr.ba)<0.12 THEN ray.terminate:=TRUE END;  
+				
 				UNTIL out OR ray.terminate;
 		END
 	END;

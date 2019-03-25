@@ -252,7 +252,7 @@ BEGIN
 	END;
 	trace; 
 	Base.tick;	
-	GLIDE:=0.975;	
+	GLIDE:=0.991;	
 	cvz := cvz*GLIDE+gravityvector.z; 
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y; 
 	cvl :=cvl*0; cvu := cvu*0;
@@ -601,12 +601,12 @@ END KeyEvent;
 	(* change detail according to frame speed, called in GLWindow.MainLoop *)
 	PROCEDURE GameLogic();
 	BEGIN
-(*		IF GetCurrentFrameMs() < (mstarget-5) THEN 
+		IF GetCurrentFrameMs() < (mstarget-5) THEN 
 			Retina.moredetail;
 		ELSIF GetCurrentFrameMs() > mstarget THEN 
 			Retina.lessdetail;
 		END; 
-*)	END GameLogic;
+	END GameLogic;
 	
 	END GLWindow;
 

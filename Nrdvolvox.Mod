@@ -141,7 +141,6 @@ BEGIN
 		ray.lxyz.x := ABS(xyz.x - ijk.i);
 		ray.lxyz.y := ABS(xyz.y - ijk.j);
 		ray.lxyz.z := ABS(xyz.z - ijk.k);
-		ray.popdelta := Base.Origin; 
 		color := ENTIER(10*m1[ijk.i,ijk.j,ijk.k]);
 		CASE color OF
 			0: RED.Shade(ray)
@@ -157,9 +156,6 @@ BEGIN
 		ELSE
 			RED.Shade(ray)
 		END;
-		xyz.x := xyz.x + ray.popdelta.x;    
-		xyz.y := xyz.y + ray.popdelta.y;
-		xyz.z := xyz.z + ray.popdelta.z;
 	END;	 
 	IF (ray.clr.ra<0.1)&(ray.clr.ga<0.1)&(ray.clr.ba<0.1) THEN ray.terminate:=TRUE END;	
 	IF ~ray.terminate THEN
@@ -239,7 +235,6 @@ BEGIN
 				ray.lxyz.x := ABS(xyz.x - ijk.i);
 				ray.lxyz.y := ABS(xyz.y - ijk.j);
 				ray.lxyz.z := ABS(xyz.z - ijk.k);
-				ray.popdelta := Base.Origin; 
 				color := ENTIER(10*m1[ijk.i,ijk.j,ijk.k]);
 				CASE color OF
 					0: RED.Shade(ray)
@@ -255,25 +250,19 @@ BEGIN
 				ELSE
 					RED.Shade(ray)
 				END;
-				xyz.x := xyz.x + ray.popdelta.x;    
-				xyz.y := xyz.y + ray.popdelta.y;
-				xyz.z := xyz.z + ray.popdelta.z;
 			END;		
 		IF (ray.clr.ra<0.01)OR(ray.clr.ga<0.01)OR(ray.clr.ba<0.01) THEN ray.terminate:=TRUE END;
 		UNTIL  out OR ray.terminate;
 	END 	
 	END;
-			ray.popdelta.x := (xyz.x-pushxyz.x)/M;
-			ray.popdelta.y := (xyz.y-pushxyz.y)/M;
-			ray.popdelta.z := (xyz.z-pushxyz.z)/M; 
-			ray.scale := ray.scale/M;
+	ray.scale := ray.scale/M;
 END Shade;
 
-BEGIN{ACTIVE, PRIORITY(Objects.Low)}
+(* BEGIN{ACTIVE, PRIORITY(Objects.Low)}
 	REPEAT
 		tick;
 		Objects.Sleep(40)
-	UNTIL FALSE
+	UNTIL FALSE *)
 END RDVolVox;
 
 VAR

@@ -516,15 +516,15 @@ END splitcam;
 PROCEDURE moredetail*;
 BEGIN
 	foveaparameter:=foveaparameter-1;
-	IF foveaparameter<1 THEN foveaparameter:=1 END;
-	Out.Int(foveaparameter,4); 
+	IF foveaparameter<11 THEN foveaparameter:=11 END;
+(*	Out.Int(foveaparameter,4); *)
 	FV:=W/foveaparameter;
 END moredetail;
 
 PROCEDURE lessdetail*;
 BEGIN
 	foveaparameter:=(foveaparameter+1);
-	IF foveaparameter>100 THEN foveaparameter:=100 END;
+	IF foveaparameter>50 THEN foveaparameter:=50 END;
 	FV:=W/foveaparameter;
 END lessdetail;
 

@@ -1,19 +1,7 @@
 <Desktop>
+	<Window name="FileManager" loader="WMFileManager.Restore" l="445" t="78" r="945" b="478" flags="{0..2,13}"/>
 	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="826" t="99" r="1466" b="385" flags="{0..2,13}"/>
-	<Window name="FileManager" loader="WMFileManager.Restore" l="250" t="108" r="750" b="508" flags="{0..2,13}"/>
-	<Window name="PET" loader="PET.Restore" l="444" t="311" r="1244" b="911" flags="{0..2,13}">
-		<PETData>
-			<General SelectedPageNr="0" ProjectTextFile=""/>
-			<Tab file="NXWCxXWLIcD2LegvoGXX999.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="0"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-		</PETData>
-	</Window>
-	<Window name="PET" loader="PET.Restore" l="908" t="303" r="1790" b="1181" flags="{0..2,13}">
+	<Window name="PET" loader="PET.Restore" l="1219" t="138" r="2101" b="1016" flags="{0..2,13}">
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>
 			<Tab file="Nbrownianspheres.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
@@ -25,20 +13,44 @@
 			</Tab>
 		</PETData>
 	</Window>
-	<Window name="PET" loader="PET.Restore" l="917" t="673" r="1776" b="1623" flags="{0..2,13}">
+	<Window name="PET" loader="PET.Restore" l="898" t="200" r="1698" b="800" flags="{0..2,13}">
 		<PETData>
-			<General SelectedPageNr="1" ProjectTextFile=""/>
+			<General SelectedPageNr="0" ProjectTextFile=""/>
+			<Tab file="NXWCxXWLIcD2LegvoGXX999.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="54" cursorPos="1531"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+		</PETData>
+	</Window>
+	<Window name="PET" loader="PET.Restore" l="29" t="191" r="829" b="791" flags="{0..2,13}">
+		<PETData>
+			<General SelectedPageNr="0" ProjectTextFile=""/>
+			<Tab file="/home/valentine/spasim32/Nrdvolvox.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="0"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+		</PETData>
+	</Window>
+	<Window name="PET" loader="PET.Restore" l="1146" t="129" r="2005" b="1079" flags="{0..2,13}">
+		<PETData>
+			<General SelectedPageNr="0" ProjectTextFile=""/>
 			<Tab file="/home/valentine/spasim32/Spasim.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="12" cursorPos="458"/>
+				<Editor firstLine="12" cursorPos="395"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
 			<Tab file="Marsh.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="300" cursorPos="6274"/>
+				<Editor firstLine="300" cursorPos="6437"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<SearchPanel visible="true" wrap="true" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
@@ -85,7 +97,7 @@
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
 			<Tab file="NM3.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="178" cursorPos="5913"/>
+				<Editor firstLine="247" cursorPos="6902"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="true" wrap="true" casesensitive="true" backwards="false" highlight="false" searchString="offset" replaceString=""/>
 				<LogPanel height="130"/>

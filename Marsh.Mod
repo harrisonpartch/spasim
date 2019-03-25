@@ -546,8 +546,8 @@ BEGIN
 (*	z3:=Base.VoxelFromName("NM2");	
 	z3a:=Base.VoxelFromName("NM3");
 	
-	z3.setcolor(0,0,2,1,1); 
-	z3a.setcolor(0,80,50,150,0); 
+	z3.setcolor(30,0,0,150,150,150); 
+	z3a.setcolor(0,80,50,150,150,150); 
 	
     z3a.FRaster(noise[0],9);
     z3a.copyonstroke:=TRUE;
@@ -561,8 +561,8 @@ BEGIN
  	NEW(plane,center,up);
  	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999");
 	plane.setvoxel(serp);			
-	z3.FRaster(plane,16);	 *)
-					
+	z3.FRaster(plane,16);	 
+*)					
 	Base.avatar:=harrison;
  	
 	Base.avatarsize:=1000; 

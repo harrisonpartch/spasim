@@ -18,25 +18,28 @@ VAR
 BEGIN
 	nark:=Base.VoxelFromName("Narchillect"); 
 	Base.setPT(center,1/2,1/2,1/2);
-	wiggleball1:=Base.VoxelFromName("NM2");
+	wiggleball1:=Base.VoxelFromName("NM3");
 	NEW(ball,center,0.5);
 	ball.setcolor(1,1,0,1/2);
 	
 	wiggleball1.FRaster(ball,32);
 	wiggleball1.lock;
-	wiggleball2:=Base.VoxelFromName("NM2");
+	wiggleball2:=Base.VoxelFromName("NM3");
 	ball.setcolor(1,1,0,1/2);	
 	wiggleball2.FRaster(ball,9);
 	wiggleball2.lock;
-	wiggleball3:=Base.VoxelFromName("NM2");	
-	v:=Base.VoxelFromName("NM2");
+	wiggleball3:=Base.VoxelFromName("NM3");	
+	v:=Base.VoxelFromName("NM3");
 	v.register;
 	v.tick;
 	Out.Char('v');
 	v.setcolor(0,0,0,1000,1000,1000);
 	FOR i:=0 TO 3000 DO
-		v.stroke(Base.randPT(),32, wiggleball1);
+		v.stroke(Base.randPT(),16, wiggleball1);
 	END;
+	FOR i:=0 TO 100 DO
+		v.stroke(Base.randPT(),8, v);
+	END;	
 END draw;
 
 PROCEDURE tick;
@@ -48,7 +51,7 @@ END tick;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN	
-	RETURN v;
+	RETURN wiggleball1;
 END thisvox;
 
 BEGIN
