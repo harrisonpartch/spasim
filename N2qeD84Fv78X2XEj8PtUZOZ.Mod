@@ -24,15 +24,15 @@ END thisvox;
 BEGIN
 	v:=Base.VoxelFromName("NXOT"); 	
 	NEW(red);
-	red.setcolor(1,0.9,2/3,0,0);
+	red.setcolor(1,0.9,2/3,1,1,1);
 	NEW(blue);
-	blue.setcolor(0.9,2/3,1,0,0);
+	blue.setcolor(0.9,2/3,1,1,1,1);
 	NEW(sgtp,"sgtpepper.png");
 	s1:=Base.VoxelFromName("NM2"); 	
 	s2:=Base.VoxelFromName("NM2"); 	
 	sc:=Base.VoxelFromName("NM2"); 	
 	s1.imposter:=red;
-	s1.setcolor(0,0,0,0,0);
+	s1.setcolor(0,0,0,1,1,1);
 	Base.setPT(center,1/2,1/2,1/2);
 	Base.setPT(q,1/2,1/2,0);
 	Base.setPT(qq,1/2,1/2,1);

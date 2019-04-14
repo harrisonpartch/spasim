@@ -447,17 +447,20 @@ BEGIN
 		n.x := cx-x; n.y := cy - y; n.z := cz - z;
 		Base.normalizePT(n);
 		reflect(ray.dxyz.x,ray.dxyz.y,ray.dxyz.z, n.x,n.y,n.z);
-		ray.lxyz.x :=  x; ray.lxyz.y :=  y; ray.xyz.z := z; 
-		ray.changed := TRUE;
+		ray.xyz.x:=ray.xyz.x+x/ray.scale;
+		ray.xyz.y:=ray.xyz.y+y/ray.scale;		
+		ray.xyz.z:=ray.xyz.z+z/ray.scale;			
 		ray.clr.ra := ray.clr.ra - 0.1;
 		ray.clr.ga := ray.clr.ga - 0.1;
 		ray.clr.ba := ray.clr.ba - 0.1;
-		ray.clr.alpha := ray.clr.alpha - 0.1;
+		IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END;
+		IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
+		IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;
+		ray.xyz.x:=ray.xyz.x+ray.dxyz.x/10000000 ;
+		ray.xyz.y:=ray.xyz.y+ray.dxyz.y/10000000 ;	
+		ray.xyz.z:=ray.xyz.z+ray.dxyz.z/10000000 ;	
+		Base.world.Shade(ray);		
 	END;
-	IF ray.changed & (enclosingvoxel#NIL) THEN
-		ray.changed:=FALSE;
-		enclosingvoxel.Shade(ray);
-	END; 
 END Shade;
 
 PROCEDURE tick;

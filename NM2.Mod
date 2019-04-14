@@ -124,11 +124,11 @@ BEGIN
 					END;
 					newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
 				END;
-				vdepth:=Base.distance(newxyz,xyz)/ray.scale; 		
+				vdepth:=Base.distance(newxyz,xyz); 		
 				ray.xyz.x:=ray.xyz.x + (newxyz.x-xyz.x)/ray.scale;
 				ray.xyz.y:=ray.xyz.y + (newxyz.y-xyz.y)/ray.scale;
 				ray.xyz.z:=ray.xyz.z + (newxyz.z-xyz.z)/ray.scale;				
-				ray.length:=ray.length+vdepth;
+				ray.length:=ray.length+vdepth/ray.scale;
 				ray.hitxyz:=ray.xyz;
 				xyz:=newxyz;		 			
 				ray.clr.r := ray.clr.r+red*vdepth;
@@ -139,7 +139,8 @@ BEGIN
 				ray.clr.ba := ray.clr.ba-blueblack*vdepth;
 				IF ray.clr.ra<0 THEN ray.clr.ra:=0 END;
 				IF ray.clr.ga<0 THEN ray.clr.ga:=0 END;
-				IF ray.clr.ba<0 THEN ray.clr.ba:=0 END;			
+				IF ray.clr.ba<0 THEN ray.clr.ba:=0 END;	
+				IF (ray.clr.ra+ray.clr.ga+ray.clr.ba)<0.01 THEN ray.terminate:=TRUE END;  		
 				bounds(ijk.i,ijk.j,ijk.k, out);		
 				IF ~(out OR ray.terminate) THEN
 					v := blox[ijk.i,ijk.j,ijk.k];
@@ -156,7 +157,7 @@ BEGIN
 					ELSE
 					END
 				END;
-				IF (ray.clr.ra+ray.clr.ga+ray.clr.ba)<0.12 THEN ray.terminate:=TRUE END;  
+				
 				UNTIL out OR ray.terminate;
 		END
 	END;
@@ -242,6 +243,7 @@ BEGIN
 	blox[0,1,1]:=w;
 	blox[1,0,1]:=w;
 	blox[1,1,1]:=w;
+
 END fillsierp;
 
 PROCEDURE fillcqr2*(v,w: Voxel);
@@ -447,7 +449,7 @@ BEGIN
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
 				ELSE
 					NEW(c);
-					c.setcolor(red, green, blue, redblack, greenblack, blueblack); 
+					c.setcolor(red/M, green/M, blue/M, redblack/M, greenblack/M, blueblack/M); 
 					c.fill(blox[i,j,k]);
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
@@ -455,7 +457,7 @@ BEGIN
 				END
 			ELSE
 				NEW(c);
-				c.setcolor(red,green,blue,redblack,greenblack,blueblack);
+				c.setcolor(red/M,green/M,blue/M,redblack/M,greenblack/M,blueblack/M);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
 				c.strokerec(p, resolution,nextscale, voxel);
@@ -608,7 +610,7 @@ BEGIN
 				o.x:=p.x-1/TWOMS; o.y:=p.y-1/TWOMS; o.z:=p.z-1/TWOMS; (* p is center, o is corner *)
 				IF blox[i,j,k]=NIL THEN
 					NEW(newcell);
-					newcell.setcolor(red,green,blue, redblack,greenblack,blueblack);
+					newcell.setcolor(red/M,green/M,blue/M, redblack/M,greenblack/M,blueblack/M);
 					blox[i,j,k]:=newcell;
 					IF f.normaltf(p) THEN
 						newcell.nposterTF:=TRUE;
@@ -791,7 +793,7 @@ END count;
 
 (*
 Engrains this voxel and it's children recursively in the following format:
-"NM2"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
+"2"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
 <----- Voxel data -----><------                     children data                     ------>
 Children data contains 27 boolean-child pairs, each boolean being TRUE if a child is contained in that position.
 In case of FALSE the length of child data is 0 for that child (i.e. no data is being written except for the FALSE).

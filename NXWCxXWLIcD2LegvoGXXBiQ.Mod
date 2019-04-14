@@ -8,12 +8,12 @@ TYPE PT = Base.PT;
 TYPE TransparaVox*=OBJECT(Base.Voxel);
 VAR
 	r, g, b, black: REAL;	
-PROCEDURE setcolor* (red, green, blue,bl , a : REAL); 
+PROCEDURE setcolor* (red, green, blue,rbl, gbl, bbl: REAL); 
 BEGIN
 	r := red;
 	g := green;
 	b := blue;
-	black:=bl;
+	black:=bbl;
 	passable := TRUE;
 END setcolor;
 
@@ -65,7 +65,7 @@ BEGIN
 	NEW(s3);
 	NEW(s4);	
 	NEW(alphablue);
-	alphablue.setcolor(0,0,1/2,2/3,1);
+	alphablue.setcolor(0,0,1/2,2/3,1,2/3);
 
 	s0.fillsierp(s1,alphablue);	
 	s0.imposter:=badopossum;

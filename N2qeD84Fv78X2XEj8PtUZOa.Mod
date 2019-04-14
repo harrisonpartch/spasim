@@ -25,7 +25,7 @@ BEGIN
 	sc:=Base.VoxelFromName("NM3"); 	
 	star:=Base.VoxelFromName("NM3"); 	
 	conglomerate.imposter:=sc;
-	conglomerate.setcolor(0,0,0,100,0);
+	conglomerate.setcolor(0,0,0,100,100,100);
 	Base.setPT(center,1/2,1/2,1/2);
 	Base.setPT(q,1/2,1/2,0);
 	Base.setPT(qq,1/2,1/2,1);
@@ -36,7 +36,7 @@ BEGIN
 	conglomerate.FRaster(ball,32);
 	sc.FRaster(cyl,9);	
 	
-	star.setcolor(0,0,0,100,0);
+	star.setcolor(0,0,0,100,100,100);
 	ball.setcolor(1,0,1,1);
 	star.FRaster(ball,32);	
 	NEW(ball,center,1/2);	

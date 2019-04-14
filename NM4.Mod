@@ -1,4 +1,4 @@
-MODULE NM4; (*! This module may be either imported or used anonymously *)
+MODULE NM5; (*! This module may be either imported or used anonymously *)
 IMPORT Objects, Base, SPSME, Noise, Math, TexVox, Out := KernelLog, Debugging, Streams,Strings;
 
 (*
@@ -35,7 +35,7 @@ VAR
 	pushxyz, newxyz, xyz: Base.PT;
 	ijk: Base.IPT;
 	drx, dry, drz, dr,rr,gr,br,blr,bla,a: REAL;
-	out,shadenil,A,B,C,bloxupied: BOOLEAN;
+	out,shadenil,A,B,C: BOOLEAN;
 	v: Voxel;
 	vdepth: REAL;
 	last:BOOLEAN;
@@ -62,7 +62,6 @@ BEGIN
 				ray.lxyz.z := ABS(xyz.z - ijk.k);
 				v.Shade(ray);
 			ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
-				bloxupied:=TRUE;
 				nshade(nblox[ijk.i,ijk.j,ijk.k],ray)
 			END
 		END;
@@ -132,15 +131,16 @@ BEGIN
 				ray.length:=ray.length+vdepth/ray.scale;
 				ray.hitxyz:=ray.xyz;
 				xyz:=newxyz;		 			
-				rr := red*vdepth*ray.clr.ra;
-				gr := green*vdepth*ray.clr.ga;
-				br := blue*vdepth*ray.clr.ba;
-				ray.clr.r := ray.clr.r+rr;
-				ray.clr.g:= ray.clr.g+gr;
-				ray.clr.b := ray.clr.b+br;
-				ray.clr.ra := (ray.clr.ra-(rr+redblack));
-				ray.clr.ga := (ray.clr.ga-(gr+greenblack));
-				ray.clr.ba := (ray.clr.ba-(br+blueblack));			
+				ray.clr.r := ray.clr.r+red*vdepth;
+				ray.clr.g:= ray.clr.g+green*vdepth;
+				ray.clr.b := ray.clr.b+blue*vdepth;
+				ray.clr.ra := ray.clr.ra-redblack*vdepth;
+				ray.clr.ga := ray.clr.ga-greenblack*vdepth;
+				ray.clr.ba := ray.clr.ba-blueblack*vdepth;
+				IF ray.clr.ra<0 THEN ray.clr.ra:=0 END;
+				IF ray.clr.ga<0 THEN ray.clr.ga:=0 END;
+				IF ray.clr.ba<0 THEN ray.clr.ba:=0 END;	
+				IF (ray.clr.ra+ray.clr.ga+ray.clr.ba)<0.01 THEN ray.terminate:=TRUE END;  		
 				bounds(ijk.i,ijk.j,ijk.k, out);		
 				IF ~(out OR ray.terminate) THEN
 					v := blox[ijk.i,ijk.j,ijk.k];
@@ -149,6 +149,7 @@ BEGIN
 						ray.lxyz.y := ABS(xyz.y - ijk.j);
 						ray.lxyz.z := ABS(xyz.z - ijk.k);
 						ray.normal := ray.fnormal;
+						ray.ncube:=nblox[ijk.i,ijk.j,ijk.k];
 						v.Shade(ray);
 					ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 						ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal; 
@@ -156,7 +157,7 @@ BEGIN
 					ELSE
 					END
 				END;
-				IF (ray.clr.ra+ray.clr.ga+ray.clr.ba)<0.02 THEN ray.terminate:=TRUE END;  
+				
 				UNTIL out OR ray.terminate;
 		END
 	END;
@@ -245,7 +246,6 @@ BEGIN
 	blox[1,1,2]:=w;
 	blox[2,1,1]:=w;
 	blox[1,2,1]:=w;
-	
 END fillsierp;
 
 PROCEDURE fillcqr2*(v,w: Voxel);
@@ -274,8 +274,8 @@ BEGIN
 	passable:=TRUE;
 	complex:=TRUE;
 	imposter:=Base.EMPTY;
-	code:="NM4";
-	ncode:="NM4"
+	code:="NM5";
+	ncode:="NM5"
 END init;
 
 PROCEDURE copyclear*;
@@ -296,7 +296,7 @@ VAR
 	i,j,k: INTEGER;
 BEGIN
 	copyclear;
-	setcolorrec(r,g,b,rb,gb,bb)
+	setcolorrec(r/M,g/M,b/M,rb/M,gb/M,bb/M)
 END setcolor;
 
 PROCEDURE setcolorrec(r,g,b,rb,gb,bb: REAL);
@@ -433,7 +433,7 @@ VAR
 	code: Base.Name;
 BEGIN
 	IF ~lockTF THEN
-		code:="NM4"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
+		code:="NM5"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 		nextscale:=scale*M;
 		p.x:=p.x*M;
 		p.y:=p.y*M;
@@ -459,7 +459,7 @@ BEGIN
 				END
 			ELSE
 				NEW(c);
-				setcolor(red,green,blue,redblack,greenblack,blueblack);
+				c.setcolor(red/M,green/M,blue/M,redblack/M,greenblack/M,blueblack/M);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
 				c.strokerec(p, resolution,nextscale, voxel);
@@ -598,7 +598,7 @@ VAR
 	v: Voxel;
 	newcell: cell;
 BEGIN
-	code:="NM4"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
+	code:="NM5"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 	MS:=M*scale;
 	TWOMS:=2*MS;
 	nextscale:=scale*M;
@@ -640,15 +640,11 @@ BEGIN
 			p.x:=origin.x+(i+1/2)/MS; p.y:=origin.y+(j+1/2)/MS; p.z:=origin.z+(k+1/2)/MS;
 			d2s:=f.d2s(p);
 			IF ABS(d2s) < CRDNS THEN
-				imposter:=f.getimposter(p);
 				v:=f.voxel(p);
-				IF v=NIL THEN 
-					nbloxTF[i,j,k]:=TRUE;
-					nblox[i,j,k].color:=f.color(p);
-					nblox[i,j,k].normal:=f.normal(p);
-				ELSE 
-					blox[i,j,k]:=v
-				END
+				IF v#NIL THEN blox[i,j,k]:=v END;
+				nbloxTF[i,j,k]:=TRUE;
+				nblox[i,j,k].color:=f.color(p);
+				nblox[i,j,k].normal:=f.normal(p);
 			END
 		END END END
 	END
@@ -757,7 +753,7 @@ VAR
 	cv,child:Voxel;
 	i,j,k: INTEGER;
 BEGIN
-	code:=ncode; (* if this voxel has been rezzed from another module, make it NM4 *)
+	code:=ncode; (* if this voxel has been rezzed from another module, make it NM5 *)
 	copymarker:=TRUE;
 	NEW(c);
 	c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; 
@@ -799,7 +795,7 @@ END count;
 
 (*
 Engrains this voxel and it's children recursively in the following format:
-"NM4"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
+"2"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
 <----- Voxel data -----><------                     children data                     ------>
 Children data contains 27 boolean-child pairs, each boolean being TRUE if a child is contained in that position.
 In case of FALSE the length of child data is 0 for that child (i.e. no data is being written except for the FALSE).
@@ -898,4 +894,4 @@ END thisvox;
 
 BEGIN
 	NEW(copyengine)
-END NM4.
+END NM5.

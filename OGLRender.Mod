@@ -300,14 +300,13 @@ BEGIN
 	IF ~InitGL() THEN Close; RETURN END;	
 	Display; (* display splash screen *)
 	NEW(Retina.image);
-	Raster.Create(Retina.image,Retina.W,Retina.H,Raster.BGRA8888);
-		
+	Raster.Create(Retina.image,Retina.W,Retina.H,Raster.BGRA8888);	
 	NEW(rand);
 	foveasize := 100;
 	multicore:=TRUE;
 	camrotinertia:=100;
 	Base.DTL:=250000;
-	Base.DTL2:=25000;
+	Base.DTL2:=2500000;
 	Base.gravity:=0;
 	Base.speed:=0.00001;
 	Base.maxspeed:=0.0001;
@@ -316,8 +315,8 @@ BEGIN
 	R2:=150;
 	Base.worldalive := TRUE;	
 	fogdensity:=0.11;
-	leftsticky:=10.0;
-	upsticky:=10.0;	
+	leftsticky:=500.0;
+	upsticky:=100.0;	
 END OnLoad;
 
 PROCEDURE Reshape(w, h: LONGINT);
@@ -454,7 +453,7 @@ END KeyEvent;
 			IF CAPTUREMOUSE & (ABS(xr)+ABS(yr)>5) THEN
 				left:=ABS(xr)*xr;
 				up:=-ABS(yr)*yr;  
-				camera.up(-up/(15000*leftsticky)); 
+				camera.up(-up/(1500*leftsticky)); 
 				camera.left(left/(6000*leftsticky));
 				WarpPointer(1000,1000, centerx,centery);
 				IF (ABS(xr)+ABS(yr)>300) THEN

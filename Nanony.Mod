@@ -33,7 +33,7 @@ BEGIN
 	starr:=Base.VoxelFromName("NM3"); 
 	starr.code:="N2qeD84Fv78X2XEj8PtUZOQ";		
 	starr.copyonstroke:=TRUE;
-	starr.setcolor(0,0,10,10,0);		
+	starr.setcolor(0,0,10,10,10,10);		
 	reddot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO6"); 	
 	bludot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7"); 	
 	yellodot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO8"); 	

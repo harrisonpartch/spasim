@@ -124,23 +124,23 @@ BEGIN
 					END;
 					newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
 				END;
-				vdepth:=Base.distance(newxyz,xyz)/ray.scale; 		
+				vdepth:=Base.distance(newxyz,xyz); 		
 				ray.xyz.x:=ray.xyz.x + (newxyz.x-xyz.x)/ray.scale;
 				ray.xyz.y:=ray.xyz.y + (newxyz.y-xyz.y)/ray.scale;
 				ray.xyz.z:=ray.xyz.z + (newxyz.z-xyz.z)/ray.scale;				
-				ray.length:=ray.length+vdepth;
+				ray.length:=ray.length+vdepth/ray.scale;
 				ray.hitxyz:=ray.xyz;
-				xyz:=newxyz;		 			
-				ray.clr.r := ray.clr.r+red*vdepth;
-				ray.clr.g:= ray.clr.g+green*vdepth;
-				ray.clr.b := ray.clr.b+blue*vdepth;
+				xyz:=newxyz;	
 				ray.clr.ra := ray.clr.ra-redblack*vdepth;
 				ray.clr.ga := ray.clr.ga-greenblack*vdepth;
-				ray.clr.ba := ray.clr.ba-blueblack*vdepth;
-				IF ray.clr.ra<0 THEN ray.clr.ra:=0 END;
-				IF ray.clr.ga<0 THEN ray.clr.ga:=0 END;
-				IF ray.clr.ba<0 THEN ray.clr.ba:=0 END;	
-				IF (ray.clr.ra+ray.clr.ga+ray.clr.ba)<0.01 THEN ray.terminate:=TRUE END;  		
+				ray.clr.ba := ray.clr.ba-blueblack*vdepth;	
+				IF (ray.clr.ra<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ba<0.1) THEN 
+					ray.terminate:=TRUE 
+				ELSE						 			
+					ray.clr.r := ray.clr.r+red*vdepth*ray.clr.ra;
+					ray.clr.g:= ray.clr.g+green*vdepth*ray.clr.ga;
+					ray.clr.b := ray.clr.b+blue*vdepth*ray.clr.ba;
+				END;
 				bounds(ijk.i,ijk.j,ijk.k, out);		
 				IF ~(out OR ray.terminate) THEN
 					v := blox[ijk.i,ijk.j,ijk.k];
@@ -156,8 +156,7 @@ BEGIN
 						nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
 					ELSE
 					END
-				END;
-				
+				END;		
 				UNTIL out OR ray.terminate;
 		END
 	END;
@@ -296,7 +295,7 @@ VAR
 	i,j,k: INTEGER;
 BEGIN
 	copyclear;
-	setcolorrec(r/M,g/M,b/M,rb/M,gb/M,bb/M)
+	setcolorrec(r,g,b,rb,gb,bb)
 END setcolor;
 
 PROCEDURE setcolorrec(r,g,b,rb,gb,bb: REAL);
@@ -309,9 +308,9 @@ BEGIN
 		red:= r;
 		green := g;
 		blue := b;
-		redblack := r+rb;
-		greenblack:= g+gb;
-		blueblack := b+bb;
+		redblack := rb;
+		greenblack:= gb;
+		blueblack := bb;
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 			v:=blox[i,j,k];
 			IF v#NIL THEN
@@ -451,7 +450,7 @@ BEGIN
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
 				ELSE
 					NEW(c);
-					c.setcolor(red, green, blue, redblack, greenblack, blueblack); 
+					c.setcolor(red/M, green/M, blue/M, redblack/M, greenblack/M, blueblack/M); 
 					c.fill(blox[i,j,k]);
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
@@ -459,7 +458,7 @@ BEGIN
 				END
 			ELSE
 				NEW(c);
-				c.setcolor(red,green,blue,redblack,greenblack,blueblack);
+				c.setcolor(red/M,green/M,blue/M,redblack/M,greenblack/M,blueblack/M);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
 				c.strokerec(p, resolution,nextscale, voxel);
@@ -612,7 +611,7 @@ BEGIN
 				o.x:=p.x-1/TWOMS; o.y:=p.y-1/TWOMS; o.z:=p.z-1/TWOMS; (* p is center, o is corner *)
 				IF blox[i,j,k]=NIL THEN
 					NEW(newcell);
-					newcell.setcolor(red,green,blue, redblack,greenblack,blueblack);
+					newcell.setcolor(red/M,green/M,blue/M, redblack/M,greenblack/M,blueblack/M);
 					blox[i,j,k]:=newcell;
 					IF f.normaltf(p) THEN
 						newcell.nposterTF:=TRUE;

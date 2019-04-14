@@ -32,6 +32,7 @@ BEGIN
 	clere;
 	seed;
 	tock := 1;
+	lock;
 END init;
 			
 PROCEDURE clere*;

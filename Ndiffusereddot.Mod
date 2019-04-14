@@ -7,7 +7,7 @@ TYPE
 TYPE ColoredVox* = OBJECT(Voxel);
 VAR
 	r, g, b: REAL;
-PROCEDURE setcolor* (red, green, blue, black, alpha: REAL);
+PROCEDURE setcolor* (red, green, blue, rbl, gbl, bbl: REAL);
 BEGIN
 	r :=red ;
 	g := green;
@@ -15,9 +15,9 @@ BEGIN
 END setcolor;
 PROCEDURE Shade (VAR ray: Ray);
 BEGIN
-	ray.r := ray.r + r*ray.ra;
-	ray.g := ray.g + g*ray.ga;
-	ray.b := ray.b + b*ray.ba;
+	ray.clr.r := ray.clr.r + r*ray.clr.ra;
+	ray.clr.g := ray.clr.g + g*ray.clr.ga;
+	ray.clr.b := ray.clr.b + b*ray.clr.ba;
 	ray.terminate := TRUE;
 END Shade;
 END ColoredVox;
@@ -34,9 +34,9 @@ BEGIN
 	lz := ray.lxyz.z;
 	dot := ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
 	rr:=	Noise.noise3dperlinabs(lx,lz,ly, 666,4,2);
-	ray.r := ray.r + (rr*dot)*ray.ra;
-	ray.g := ray.g + (rr*dot)*ray.ga;
-	ray.b := ray.b + (rr*dot)*ray.ba;
+	ray.clr.r := ray.clr.r + (rr*dot)*ray.clr.ra;
+	ray.clr.g := ray.clr.g + (rr*dot)*ray.clr.ga;
+	ray.clr.b := ray.clr.b + (rr*dot)*ray.clr.ba;
 	ray.terminate := TRUE;	
 END Shade;
 END NoiseVox;

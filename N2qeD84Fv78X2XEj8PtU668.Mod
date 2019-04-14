@@ -17,7 +17,7 @@ VAR
 PROCEDURE draw;
 BEGIN
 	dot:=Base.VoxelFromName("NM3");
-	dot.setcolor(120,100,0,150,0);
+	dot.setcolor(120,100,0,150,150,150);
 	bludot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7");	 	
 	Base.setPT(center,1/2,1/2,1/2);
 	tigerlily:=Base.VoxelFromName("NUzl1lqmBmaKyswkc70kO1w");  

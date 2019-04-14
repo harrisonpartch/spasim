@@ -302,7 +302,7 @@ BEGIN
 	NEW(EMPTY);
 	EMPTY.passable:=TRUE;
      rand:=Base.rand;	
-	xot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU666"); 
+	xot:=Base.VoxelFromName("Nbrownianspheres"); 
 	push(xot);
 	cage:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");
 	cage.copyonstroke:=TRUE;
@@ -533,42 +533,39 @@ BEGIN
 	Base.setPT(up,0,0,1);
 
 	NEW(noise[0]);
-	noise[0].seed:=1534666690;		
-	noise[0].a:=1;
-	noise[0].b:=1;
+	noise[0].seed:=1534777690;		
+	noise[0].a:=5;
+	noise[0].b:=5;
 	noise[0].c:=1;		
 	noise[0].octaves:=4;
-	noise[0].persistence:=3.61;	
+	noise[0].persistence:=3.71;	
 	noise[0].setvoxel(archillect);			
 
 	Base.setPT(center,1/2,1/2,2/3);
 	
-(*	z3:=Base.VoxelFromName("NM2");	
+	z3:=Base.VoxelFromName("NM3");	
 	z3a:=Base.VoxelFromName("NM3");
 	
-	z3.setcolor(30,0,0,150,150,150); 
-	z3a.setcolor(0,80,50,150,150,150); 
+	z3.setcolor(0,0,0,3,3,3); 
+	z3a.setcolor(0,0,0,1,1,1); 
 	
     z3a.FRaster(noise[0],9);
     z3a.copyonstroke:=TRUE;
 
-    noise[0].setvoxel(z3a);	
-    noise[0].a:=7;
-    noise[0].b:=7;
-    noise[0].c:=7;   
-    z3.FRaster(noise[0],128);
+	noise[0].setvoxel(z3a);	
+	z3.FRaster(noise[0],81);
  	     
  	NEW(plane,center,up);
  	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999");
 	plane.setvoxel(serp);			
 	z3.FRaster(plane,16);	 
-*)					
+			
 	Base.avatar:=harrison;
  	
 	Base.avatarsize:=1000; 
 
 	
-	Base.world:=serp;
+	Base.world:=z3;
 
 END dawn;
 

@@ -161,7 +161,7 @@ END reflect;
 PROCEDURE  thisvox*():Base.Voxel;
 BEGIN
 	NEW(sphere); 
-	sphere.setcolor(0.3,0.9,0.3,0,0);
+	sphere.setcolor(0.3,0.9,0.3,1,1,1);
 	RETURN sphere
 END thisvox;
 

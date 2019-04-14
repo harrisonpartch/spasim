@@ -8,7 +8,7 @@ TYPE
 VAR 
 	ball: FRep.sphere;
 	cyl: FRep.hexgrid;
-	wiggleball1, wiggleball2, wiggleball3, nark,  v: Voxel;
+	wiggleball1, wiggleball2, wiggleball3, v: Voxel;
 	center, p1, p2,n:  PT;
 	i:LONGINT;
 	
@@ -16,30 +16,33 @@ PROCEDURE draw;
 VAR
 	i: LONGINT;
 BEGIN
-	nark:=Base.VoxelFromName("Narchillect"); 
 	Base.setPT(center,1/2,1/2,1/2);
 	wiggleball1:=Base.VoxelFromName("NM3");
 	NEW(ball,center,0.5);
-	ball.setcolor(1,1,0,1/2);
-	
-	wiggleball1.FRaster(ball,32);
+	ball.setcolor(1,0,1,1/2);	
+	wiggleball1.FRaster(ball,16);
 	wiggleball1.lock;
 	wiggleball2:=Base.VoxelFromName("NM3");
-	ball.setcolor(1,1,0,1/2);	
-	wiggleball2.FRaster(ball,9);
+	ball.setcolor(1,1,1,1/2);	
+	wiggleball2.FRaster(ball,8);
 	wiggleball2.lock;
 	wiggleball3:=Base.VoxelFromName("NM3");	
+	ball.setvoxel(wiggleball1);	
+	wiggleball3.FRaster(ball,8);	
 	v:=Base.VoxelFromName("NM3");
 	v.register;
 	v.tick;
 	Out.Char('v');
-	v.setcolor(0,0,0,1000,1000,1000);
-	FOR i:=0 TO 3000 DO
-		v.stroke(Base.randPT(),16, wiggleball1);
-	END;
-	FOR i:=0 TO 100 DO
-		v.stroke(Base.randPT(),8, v);
+	v.setcolor(0,0,0,10,10,10);
+	FOR i:=0 TO 300 DO
+		v.stroke(Base.randPT(),8, wiggleball1);
+		v.stroke(Base.randPT(),8, wiggleball2);
+		v.stroke(Base.randPT(),8, wiggleball3);
 	END;	
+	v.copyonstroke:=TRUE;
+	wiggleball1.copyonstroke:=TRUE;
+	wiggleball2.copyonstroke:=TRUE;
+	wiggleball3.copyonstroke:=TRUE;
 END draw;
 
 PROCEDURE tick;
@@ -51,7 +54,7 @@ END tick;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN	
-	RETURN wiggleball1;
+	RETURN v;
 END thisvox;
 
 BEGIN

@@ -8,12 +8,12 @@ TYPE PT = Base.PT;
 TYPE TransparaVox*=OBJECT(Base.Voxel);
 VAR
 	r, g, b, black: REAL;	
-PROCEDURE setcolor* (red, green, blue,bl , a : REAL); 
+PROCEDURE setcolor* (red, green, blue, rbl, gbl, bbl : REAL); 
 BEGIN
 	r := red;
 	g := green;
 	b := blue;
-	black:=bl;
+	black:=bbl;
 	passable := TRUE;
 END setcolor;
 
@@ -48,5 +48,5 @@ END thisvox;
 
 BEGIN
 NEW(vox); 
-vox.setcolor(0, 1/3, 1/2, 1/7,1/2);
+vox.setcolor(1/3, 1/2, 1/7,1/2, 1/2, 1/2);
 END NIXARXB2vH6ieKZmsc6mODh. 

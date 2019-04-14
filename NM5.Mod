@@ -35,19 +35,23 @@ VAR
 	pushxyz, newxyz, xyz: Base.PT;
 	ijk: Base.IPT;
 	drx, dry, drz, dr,rr,gr,br,blr,bla,a: REAL;
-	out,shadenil,A,B,C,bloxupied: BOOLEAN;
+	out,shadenil,A,B,C: BOOLEAN;
 	v: Voxel;
 	vdepth: REAL;
 	last:BOOLEAN;
 	i,j: LONGINT;
 	lastlength:REAL;
 BEGIN
+	pushxyz:=ray.xyz;
 	ray.scale := ray.scale*M;
-	xyz.x := ABS(ray.lxyz.x-offset.x) * M;
-	xyz.y := ABS(ray.lxyz.y-offset.y) * M;
-	xyz.z := ABS(ray.lxyz.z-offset.z)* M;
-	pushxyz:=xyz;
-	IF (ray.length*ray.scale<ray.dtl) THEN
+	xyz.x := (ray.lxyz.x) * M;
+	xyz.y := (ray.lxyz.y) * M;
+	xyz.z := (ray.lxyz.z)* M;
+	IF (ray.length*ray.scale>ray.dtl) THEN
+		IF imposter#NIL THEN
+			imposter.Shade(ray)
+		END
+	ELSE
 		SPSME.E(xyz,ijk);
 		bounds(ijk.i,ijk.j,ijk.k,out);
 		IF ~out THEN
@@ -58,7 +62,6 @@ BEGIN
 				ray.lxyz.z := ABS(xyz.z - ijk.k);
 				v.Shade(ray);
 			ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
-				bloxupied:=TRUE;
 				nshade(nblox[ijk.i,ijk.j,ijk.k],ray)
 			END
 		END;
@@ -121,26 +124,23 @@ BEGIN
 					END;
 					newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
 				END;
-				vdepth:=Base.distance(newxyz,xyz); 
-				
-				ray.xyz.x:=ray.xyz.x +(newxyz.x-xyz.x)/ray.scale;
-				ray.xyz.y:=ray.xyz.y +(newxyz.y-xyz.y)/ray.scale;
-				ray.xyz.z:=ray.xyz.z +(newxyz.z-xyz.z)/ray.scale;
+				vdepth:=Base.distance(newxyz,xyz); 		
+				ray.xyz.x:=ray.xyz.x + (newxyz.x-xyz.x)/ray.scale;
+				ray.xyz.y:=ray.xyz.y + (newxyz.y-xyz.y)/ray.scale;
+				ray.xyz.z:=ray.xyz.z + (newxyz.z-xyz.z)/ray.scale;				
 				ray.length:=ray.length+vdepth/ray.scale;
 				ray.hitxyz:=ray.xyz;
-				xyz:=newxyz;		 
-				blr:=black*vdepth;
-				rr := red*vdepth*ray.clr.ra;
-				gr := green*vdepth*ray.clr.ga;
-				br := blue*vdepth*ray.clr.ba;
-				ray.clr.r := ray.clr.r+rr;
-				ray.clr.g:= ray.clr.g+gr;
-				ray.clr.b := ray.clr.b+br;
-				ray.clr.ra := (ray.clr.ra-(rr+blr));
-				ray.clr.ga := (ray.clr.ga-(gr+blr));
-				ray.clr.ba := (ray.clr.ba-(br+blr));	
-				IF (ray.clr.ra+ray.clr.ga+ray.clr.ba)<0.2 THEN ray.terminate:=TRUE END;  
-				
+				xyz:=newxyz;		 			
+				ray.clr.r := ray.clr.r+red*vdepth;
+				ray.clr.g:= ray.clr.g+green*vdepth;
+				ray.clr.b := ray.clr.b+blue*vdepth;
+				ray.clr.ra := ray.clr.ra-redblack*vdepth;
+				ray.clr.ga := ray.clr.ga-greenblack*vdepth;
+				ray.clr.ba := ray.clr.ba-blueblack*vdepth;
+				IF ray.clr.ra<0 THEN ray.clr.ra:=0 END;
+				IF ray.clr.ga<0 THEN ray.clr.ga:=0 END;
+				IF ray.clr.ba<0 THEN ray.clr.ba:=0 END;	
+				IF (ray.clr.ra+ray.clr.ga+ray.clr.ba)<0.01 THEN ray.terminate:=TRUE END;  		
 				bounds(ijk.i,ijk.j,ijk.k, out);		
 				IF ~(out OR ray.terminate) THEN
 					v := blox[ijk.i,ijk.j,ijk.k];
@@ -149,6 +149,7 @@ BEGIN
 						ray.lxyz.y := ABS(xyz.y - ijk.j);
 						ray.lxyz.z := ABS(xyz.z - ijk.k);
 						ray.normal := ray.fnormal;
+						ray.ncube:=nblox[ijk.i,ijk.j,ijk.k];
 						v.Shade(ray);
 					ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 						ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal; 
@@ -156,10 +157,12 @@ BEGIN
 					ELSE
 					END
 				END;
+				
 				UNTIL out OR ray.terminate;
 		END
 	END;
-	ray.scale := ray.scale/M;
+	ray.scale := ray.scale/M;	
+	ray.xyz:=pushxyz;	
 END Shade;
 
 PROCEDURE nshade(nc: NCube; VAR ray: Ray);
@@ -204,10 +207,6 @@ BEGIN
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;
 END mirror;
 
-PROCEDURE tick*;
-BEGIN
-END tick;
-
 PROCEDURE erase*(p:PT; resolution:LONGINT);
 VAR
 	i,j,k: INTEGER;
@@ -247,7 +246,6 @@ BEGIN
 	blox[1,1,2]:=w;
 	blox[2,1,1]:=w;
 	blox[1,2,1]:=w;
-	
 END fillsierp;
 
 PROCEDURE fillcqr2*(v,w: Voxel);
@@ -293,15 +291,15 @@ BEGIN
 	END END END;
 END copyclear;
 
-PROCEDURE setcolor* (r,g,b,bl,a: REAL);
+PROCEDURE setcolor* (r,g,b,rb,gb,bb: REAL);
 VAR
 	i,j,k: INTEGER;
 BEGIN
 	copyclear;
-	setcolorrec(r,g,b,bl,a)
+	setcolorrec(r/M,g/M,b/M,rb/M,gb/M,bb/M)
 END setcolor;
 
-PROCEDURE setcolorrec(r,g,b,bl,a: REAL);
+PROCEDURE setcolorrec(r,g,b,rb,gb,bb: REAL);
 VAR
 	v: Voxel;
 	i,j,k: INTEGER;
@@ -311,15 +309,16 @@ BEGIN
 		red:= r;
 		green := g;
 		blue := b;
-		black:= bl;
-		alpha:=a;
-		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
+		redblack := r+rb;
+		greenblack:= g+gb;
+		blueblack := b+bb;
+	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 			v:=blox[i,j,k];
 			IF v#NIL THEN
 				IF v IS cell THEN
 					IF v.code=code THEN
 						WITH v: cell DO
-							v.setcolorrec(r,g,b,bl,a);
+							v.setcolorrec(r/M,g/M,b/M,rb/M,gb/M,bb/M);
 						END
 					END
 				END
@@ -452,7 +451,7 @@ BEGIN
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
 				ELSE
 					NEW(c);
-					c.setcolor(red/M, blue/M, green/M, black/M, 1); 
+					c.setcolor(red/M, green/M, blue/M, redblack/M, greenblack/M, blueblack/M); 
 					c.fill(blox[i,j,k]);
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
@@ -460,7 +459,7 @@ BEGIN
 				END
 			ELSE
 				NEW(c);
-				c.setcolor(red/M, green/M, blue/M, black/M, 1); 
+				c.setcolor(red/M,green/M,blue/M,redblack/M,greenblack/M,blueblack/M);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
 				c.strokerec(p, resolution,nextscale, voxel);
@@ -535,7 +534,7 @@ BEGIN
 					blox[i,j,k].nstroke(p, resolution DIV nextscale,normal,color)
 				ELSE
 					NEW(c);
-					c.setcolor(red,green,blue,black,alpha);
+					c.setcolor(red,green,blue,redblack,greenblack,blueblack);
 					c.imposter:=blox[i,j,k];
 					IF blox[i,j,k].emptysplit THEN
 						FOR ii := 0 TO MMO DO FOR jj := 0 TO MMO DO FOR kk:= 0 TO MMO DO
@@ -551,7 +550,7 @@ BEGIN
 				END
 			ELSE
 				NEW(c);
-				c.setcolor(red,green,blue,black,alpha);
+				c.setcolor(red,green,blue,redblack,greenblack,blueblack);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
 				c.nstrokerec(p, resolution,nextscale,normal,color);
@@ -613,7 +612,7 @@ BEGIN
 				o.x:=p.x-1/TWOMS; o.y:=p.y-1/TWOMS; o.z:=p.z-1/TWOMS; (* p is center, o is corner *)
 				IF blox[i,j,k]=NIL THEN
 					NEW(newcell);
-					newcell.setcolor(red/M,green/M,blue/M,black/M,alpha/M);
+					newcell.setcolor(red/M,green/M,blue/M, redblack/M,greenblack/M,blueblack/M);
 					blox[i,j,k]:=newcell;
 					IF f.normaltf(p) THEN
 						newcell.nposterTF:=TRUE;
@@ -641,15 +640,11 @@ BEGIN
 			p.x:=origin.x+(i+1/2)/MS; p.y:=origin.y+(j+1/2)/MS; p.z:=origin.z+(k+1/2)/MS;
 			d2s:=f.d2s(p);
 			IF ABS(d2s) < CRDNS THEN
-				imposter:=f.getimposter(p);
 				v:=f.voxel(p);
-				IF v=NIL THEN 
-					nbloxTF[i,j,k]:=TRUE;
-					nblox[i,j,k].color:=f.color(p);
-					nblox[i,j,k].normal:=f.normal(p);
-				ELSE 
-					blox[i,j,k]:=v
-				END
+				IF v#NIL THEN blox[i,j,k]:=v END;
+				nbloxTF[i,j,k]:=TRUE;
+				nblox[i,j,k].color:=f.color(p);
+				nblox[i,j,k].normal:=f.normal(p);
 			END
 		END END END
 	END
@@ -687,7 +682,7 @@ BEGIN
 				o.x:=p.x-1/TWOMS; o.y:=p.y-1/TWOMS; o.z:=p.z-1/TWOMS; (* p is center, o is corner *)
 				IF blox[i,j,k]=NIL THEN
 					NEW(newcell);
-					newcell.setcolor(red,green,blue,black,alpha);
+					newcell.setcolor(red,green,blue,redblack,greenblack,blueblack);
 					newcell.imposter:=f.voxel(p);
 					newcell.nposterTF:=TRUE;
 					newcell.nposter.normal:=f.normal(p);
@@ -732,7 +727,7 @@ VAR c: cell;
 	i,j,k: INTEGER;
 BEGIN
 	NEW(c);
-	c.setcolor(red,green,blue,black,alpha);
+	c.setcolor(red,green,blue,redblack,greenblack,blueblack);
 	c.nbloxTF:=nbloxTF;
 	c.nblox:=nblox;
 	c.passable:=passable;
@@ -740,7 +735,11 @@ BEGIN
 		FOR j := 0 TO MMO DO
 			FOR k := 0 TO MMO DO
 				IF blox[i,j,k] # NIL THEN
-					c.blox[i,j,k] := blox[i,j,k].copy();
+					IF c.blox[i,j,k].lockTF THEN
+						c.blox[i,j,k] := blox[i,j,k];
+					ELSE
+						c.blox[i,j,k] := blox[i,j,k].copy();
+					END
 				END
 			END
 		END
@@ -796,7 +795,7 @@ END count;
 
 (*
 Engrains this voxel and it's children recursively in the following format:
-"NM5"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
+"2"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
 <----- Voxel data -----><------                     children data                     ------>
 Children data contains 27 boolean-child pairs, each boolean being TRUE if a child is contained in that position.
 In case of FALSE the length of child data is 0 for that child (i.e. no data is being written except for the FALSE).

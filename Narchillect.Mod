@@ -14,6 +14,6 @@ END tick;
 
 BEGIN
 	NEW(vox,"earthchan.png");
-	vox.tscale:=27;  
+	vox.tscale:=729;  
 	vox.register;
 END Narchillect. 

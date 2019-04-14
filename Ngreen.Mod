@@ -2,7 +2,7 @@ MODULE Ngreen;
 IMPORT Base, TexVox;
   
 VAR 
-	cv: TexVox.TexVox;
+	cv: TexVox.TexCubeVox;
 	
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
@@ -10,8 +10,8 @@ BEGIN
 END thisvox;
 
 BEGIN
-	NEW(cv,"green.png");
-	cv.tscale:=5000;
+	NEW(cv,"earth");
+	cv.tscale:=26
 END Ngreen. 
  
 Marsh.Rez Ngreen ~

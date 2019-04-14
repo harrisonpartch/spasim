@@ -1,6 +1,6 @@
 MODULE NXWCxXWLIcD2LegvoGXX999;
 
-IMPORT Base, NM3, Nrdvolvox, Voxel4;
+IMPORT Base, NM3, Nrdvolvox, Voxel4, RotaVox;
 TYPE PT = Base.PT;
 	Ray = Base.Ray;
 	Voxel = Base.Voxel;  
@@ -27,7 +27,6 @@ BEGIN
 	ray.clr.ra := ray.clr.ra-redblack*depth;
 	ray.clr.ga := ray.clr.ga-greenblack*depth;
 	ray.clr.ba := ray.clr.ba-blueblack*depth;
-	IF ray.clr.alpha<0.3 THEN ray.terminate:=TRUE END;	
 END Shade;
 
 END TransparaVox;  
@@ -40,6 +39,9 @@ VAR
 	s0,s1,s2,s3,s4: NM3.cell;
 	rd: Nrdvolvox.RDVolVox; 
 	fuzz: Voxel4.FuzzVox;
+	mirrorball: Voxel4.MirrorSphereInVox;
+	p,q: Base.PT;
+	sball: RotaVox.RVox;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
@@ -48,7 +50,7 @@ END thisvox;
 
 BEGIN
 	sky:=Base.VoxelFromName("NM3");  	
-	nark:=Base.VoxelFromName("Narchillect"); 
+	nark:=Base.VoxelFromName("Ngreen"); 
 	xot:=Base.VoxelFromName("Nbrownianspheres"); 
 	NEW(s0);
 	NEW(s1);
@@ -56,30 +58,33 @@ BEGIN
 	NEW(s3);
 	NEW(darkblue);
 	NEW(fuzz);
+	NEW(mirrorball);
 	NEW(empty);
-	darkblue.setcolor(0.6,0,0,1,1,1);
+	darkblue.setcolor(1,1,1,1,1,1);
 	dblue := Base.VoxelFromName("NM3");  
 	dblue.setcolor(13,13,13,13,13,13);
-	s0.passable:=TRUE;
+	s0.passable:=TRUE;	
 	s1.passable:=TRUE;	
 	s2.passable:=TRUE;	
 	s3.passable:=TRUE;	
-	s0.setcolor(100,100,0,130,130,130);
-	s1.setcolor(0,30,0,40,40,40);
-	s2.setcolor(0,0,100,130,130,130);
-	s3.setcolor(0,0,0,10,10,10);
-	NEW(rd,darkblue,empty,empty);	
+	NEW(sball, s0, Base.randPT(),Base.randPT(),1,1);
+	s0.setcolor(11,10,400,30,30,530);
+	s1.setcolor(10,10,120,140,140,140);
+	s2.setcolor(1,1,10,30,30,30);
+	s3.setcolor(1,1,3,10,10,10);
+	NEW(rd,empty,nark,empty);	
 	rd.register;
 	rd.passable:=TRUE;
-	s0.fillsierp(nark,rd);
+	s0.fillsierp(xot,nark);
 	s1.fillsierp(s0,NIL);	
-	s2.fillsierp(s1,NIL);
+	s2.fillsierp(NIL,s1);
 	s3.fillsierp(s2,NIL);	
+	
 	s0.imposter:=nark;
 	s1.imposter:=nark;	
 	s2.imposter:=nark;
 	s3.imposter:=nark;		
-	s0.copyonstroke:=TRUE;
+	s0.copyonstroke:=TRUE;	
 	s1.copyonstroke:=TRUE;	
 	s2.copyonstroke:=TRUE;	
 	s3.copyonstroke:=TRUE;

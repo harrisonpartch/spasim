@@ -23,14 +23,14 @@ END thisvox;
 BEGIN
 	v:=Base.VoxelFromName("NnTJ6nDktAth4WTAUdr8HYQ"); 	
 	NEW(red);
-	red.setcolor(1,0.5,0.5,0,0);
+	red.setcolor(1,0.5,0.5,1,1,1);
 	NEW(blue);
-	blue.setcolor(0.5,0.5,1,0,0);
+	blue.setcolor(0.5,0.5,1,1,1,1);
 	conglomerate:=Base.VoxelFromName("NM3"); 
 	sc:=Base.VoxelFromName("NM3"); 
 	star:=Base.VoxelFromName("NM3"); 
 	conglomerate.imposter:=sc;
-	conglomerate.setcolor(0,0,0,100,0);
+	conglomerate.setcolor(0,0,0,100,100,100);
 	Base.setPT(center,1/2,1/2,1/2);
 	Base.setPT(q,1/2,1/2,0);
 	Base.setPT(qq,1/2,1/2,1);
@@ -47,7 +47,7 @@ BEGIN
 		q:=Base.randPT();
 		star.stroke(q,3,sc);	
 	END;
-	star.setcolor(0,0,0,10,0);
+	star.setcolor(0,0,0,10,10,10);
 	star.copyonstroke:=TRUE;
 	conglomerate.copyonstroke:=TRUE;	
 	

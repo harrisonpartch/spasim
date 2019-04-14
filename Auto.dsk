@@ -1,110 +1,32 @@
 <Desktop>
-	<Window name="FileManager" loader="WMFileManager.Restore" l="445" t="78" r="945" b="478" flags="{0..2,13}"/>
-	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="826" t="99" r="1466" b="385" flags="{0..2,13}"/>
-	<Window name="PET" loader="PET.Restore" l="1219" t="138" r="2101" b="1016" flags="{0..2,13}">
+	<Window name="FileManager" loader="WMFileManager.Restore" l="130" t="403" r="771" b="713" flags="{0..2,13}"/>
+	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="4" t="87" r="644" b="378" flags="{0..2,13}"/>
+	<Window name="PET" loader="PET.Restore" l="288" t="47" r="1328" b="939" flags="{0..2,13}">
 		<PETData>
-			<General SelectedPageNr="0" ProjectTextFile=""/>
-			<Tab file="Nbrownianspheres.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="47"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="true" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="u" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-		</PETData>
-	</Window>
-	<Window name="PET" loader="PET.Restore" l="898" t="200" r="1698" b="800" flags="{0..2,13}">
-		<PETData>
-			<General SelectedPageNr="0" ProjectTextFile=""/>
-			<Tab file="NXWCxXWLIcD2LegvoGXX999.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="54" cursorPos="1531"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-		</PETData>
-	</Window>
-	<Window name="PET" loader="PET.Restore" l="29" t="191" r="829" b="791" flags="{0..2,13}">
-		<PETData>
-			<General SelectedPageNr="0" ProjectTextFile=""/>
-			<Tab file="/home/valentine/spasim32/Nrdvolvox.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="0"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-		</PETData>
-	</Window>
-	<Window name="PET" loader="PET.Restore" l="1146" t="129" r="2005" b="1079" flags="{0..2,13}">
-		<PETData>
-			<General SelectedPageNr="0" ProjectTextFile=""/>
+			<General SelectedPageNr="3" ProjectTextFile=""/>
 			<Tab file="/home/valentine/spasim32/Spasim.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="12" cursorPos="395"/>
+				<Editor firstLine="12" cursorPos="210"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-			<Tab file="Marsh.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="300" cursorPos="6437"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="true" wrap="true" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-			<Tab file="Nrdvolvox.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="0"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-			<Tab file="TexVox.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="771" cursorPos="19472"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="true" wrap="true" casesensitive="true" backwards="false" highlight="false" searchString="exit" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-			<Tab file="Retina.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="315" cursorPos="8242"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
+				<SidePanel visible="true" width="5" scratchHeight="5"/>
 			</Tab>
 			<Tab file="OGLRender.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="251" cursorPos="5546"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="true" wrap="true" casesensitive="true" backwards="false" highlight="false" searchString="GLIDE" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-			<Tab file="FRep.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
 				<Editor firstLine="0" cursorPos="0"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
-			<Tab file="Base.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="335" cursorPos="7900"/>
+			<Tab file="NXWCxXWLIcD2LegvoGXX999.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="0"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
+				<SidePanel visible="true" width="139" scratchHeight="5"/>
 			</Tab>
-			<Tab file="NM3.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="247" cursorPos="6902"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="true" wrap="true" casesensitive="true" backwards="false" highlight="false" searchString="offset" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-			<Tab file="N2qeD84Fv78X2XEj8PtU666.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="18" cursorPos="1416"/>
+			<Tab file="Marsh.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="0"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>

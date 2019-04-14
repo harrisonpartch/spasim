@@ -4,16 +4,12 @@ TYPE Ray = Base.Ray;
 	Voxel = Base.Voxel;  
 	PT =Base.PT;
 TYPE TransparaVox*=OBJECT(Voxel);
-VAR
-	r, g, b, black: REAL;	
-PROCEDURE setcolor* (red, green, blue,bl, alpha  : REAL); 
+
+PROCEDURE&new;
 BEGIN
-	r := red;
-	g := green;
-	b := blue;
-	black:=bl;
-	passable := TRUE;
-END setcolor;
+	setcolor(1/13,1/13,1/4,1/3,1/3,1/4);
+	passable:=TRUE;
+END new;
 
 PROCEDURE Shade (VAR ray: Ray);
 VAR 
@@ -22,18 +18,13 @@ VAR
 	dr,dg,db,dbl: REAL;
 BEGIN
 	exit:=Base.Exit(ray);
-	depth:=Base.distsquared(ray.lxyz,exit);
-	dr := r*depth;
-	dg := g*depth;
-	db := b*depth;
-	dbl:=black*depth;
-	ray.clr.r := ray.clr.r + dr;
-	ray.clr.g := ray.clr.g + dg;
-	ray.clr.b := ray.clr.b + db; 
-	ray.clr.ra := ray.clr.ra -dbl;
-	ray.clr.ga := ray.clr.ga -dbl;
-	ray.clr.ba := ray.clr.ba -dbl; 
-	IF (ray.clr.ra<0.1)&(ray.clr.ga<0.1)&(ray.clr.ba<0.1) THEN ray.terminate:=TRUE END;
+	depth:=Base.dist(ray.lxyz,exit);
+	ray.clr.r := ray.clr.r+red*depth;
+	ray.clr.g:= ray.clr.g+green*depth;
+	ray.clr.b := ray.clr.b+blue*depth;
+	ray.clr.ra := ray.clr.ra-redblack*depth;
+	ray.clr.ga := ray.clr.ga-greenblack*depth;
+	ray.clr.ba := ray.clr.ba-blueblack*depth;
 END Shade;
 
 END TransparaVox;
@@ -57,10 +48,10 @@ BEGIN
 	s1.copyonstroke:=TRUE;
 	s1.copyonstroke:=TRUE;	
 	red.copyonstroke:=TRUE;
-	red.setcolor(1/3,0,0,1/2,0);
-	blue.setcolor(1/3,0,0,1/2,0);
-	green.setcolor(0,1/3,0,1/2,0);	
-	purple.setcolor(1/3,0,1/3,12,0);	
+	red.setcolor(1/3,0,0,1/2,1/2,1/2);
+	blue.setcolor(1/3,0,0,1/2,1/2,1/2);
+	green.setcolor(0,1/3,0,1/2,1/2,1/2);	
+	purple.setcolor(1/3,0,1/3,12,1/2,1/2);	
 	s3.fillsierp(kitty,red);
 	s2.fillsierp(s3,blue);
 	s1.fillsierp(s2,green);

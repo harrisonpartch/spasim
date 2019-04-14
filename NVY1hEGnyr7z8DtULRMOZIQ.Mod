@@ -3,7 +3,7 @@ IMPORT Base, TexVox;VAR
 	vox: TexVox.TexVox; 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN	
-	IF vox=NIL THEN NEW(vox,'XNXL.gorge.png'); vox.texscale:=1  END;
+	IF vox=NIL THEN NEW(vox,'XNXL.gorge.png'); vox.tscale:=1  END;
 	RETURN vox
 END thisvox;
 	

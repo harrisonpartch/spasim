@@ -300,17 +300,17 @@ BEGIN
 			ly:=1-ly;
 		END;
  		mip:=ray.length*ray.scale;
-(*		IF mip>20 THEN
+		IF mip>120 THEN
 			color:=texcube.side[ray.face].pixelmip_two(lx,ly);
 		ELSE
 			color:=texcube.side[ray.face].pixel(lx,ly);
 		END;
-*)		color:=texcube.side[ray.face].pixel(lx,ly);
+(*		color:=texcube.side[ray.face].pixel(lx,ly); *)
 		IF color.alpha<0.99 THEN
 			IF color.alpha>0.8 THEN
 				mirror(ray,0);
 			ELSE
-(*				color.alpha:=color.alpha+0.2;
+				color.alpha:=color.alpha+0.2;
 				dr:=color.red*color.alpha*ray.clr.ra;
 				dg:=color.green*color.alpha*ray.clr.ga;
 				db:=color.blue*color.alpha*ray.clr.b;
@@ -320,8 +320,7 @@ BEGIN
 				ray.clr.ra:= (ray.clr.ra-dr)-0.1;
 				ray.clr.ga:= (ray.clr.ga-dg)-0.1;
 				ray.clr.ba:= (ray.clr.ba-db)-0.1;
-				IF (ray.clr.ra<0.1) OR  (ray.clr.ga<0.1) OR (ray.clr.ba<0.1) THEN ray.terminate:=TRUE END;
-*)			END
+			END
 		ELSE
 			dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
 			dr:=color.red*dot;
@@ -369,7 +368,8 @@ BEGIN
 		ray.mirrortf:=TRUE;
 		ray.clr.ra:= ray.clr.ra + 0.1;
 		ray.clr.ga := ray.clr.ga + 0.1;
-		ray.clr.ba := ray.clr.ba + 0.1;	reflect(ray.dxyz, ray.normal);
+		ray.clr.ba := ray.clr.ba + 0.1;	
+		reflect(ray.dxyz, ray.normal);
 		IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END;
 		IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 		IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;
@@ -394,193 +394,9 @@ TYPE TexCubeVox* = OBJECT(TexVox);
 
 PROCEDURE & init*(n: Name);
 BEGIN
-	NEW(texcube,n,FALSE);
+	NEW(texcube,n,TRUE);
 	name:=n;
-	tscale:=1;
 END init;
-
-PROCEDURE Shade (VAR ray: Ray);
-VAR
-	p: Raster.Pixel;
-	x,y,xi,yj: LONGINT;
-	X,Y, xblend, yblend,blendx,blendy: REAL;
-	r,g,b,a: REAL;
-	dr,dg,db,da,blackness:REAL;
-	bb,c, lx, ly,lz, lx1,ly1,lz1,lx2,ly2,lz2,tq,xx,yy,zz,xxx,yyy,zzz,sc : REAL;
-	i,j,face: INTEGER;
-	mix,dot,dot1,dot2, nx, ny, nz: REAL;
-	bpdx,bpdy,cq: REAL;
-	xov,yov,zov:REAL;
-	inside: BOOLEAN;
-	color,color1,color2: Base.Color;
-	txcube: TexCube;
-	rlf: REAL;
-	lxyz: Base.PT;
-	lsp: Base.SPT;
-	dtl: LONGINT;
-	mip,mipverse: REAL;
-BEGIN
-	IF tscale>0 THEN
-		xx:=ray.lxyz.x;
-		yy:=ray.lxyz.y;
-		zz:=ray.lxyz.z;
-		xx:=xx*tscale-ENTIER(xx*tscale);
-		yy:=yy*tscale-ENTIER(yy*tscale);
-		zz:=zz*tscale-ENTIER(zz*tscale);
-		xxx:=ABS(1/2-xx);
-		yyy:=ABS(1/2-yy);
-		zzz:=ABS(1/2-zz);
-		IF xxx>yyy THEN
-			IF xxx>zzz THEN
-				(* yz pyramid *)  				(*  faces come in pairs: (0,3),(2,5),(1,4) *)
-				lx:=yy; ly:=zz;
-				lx1:=tscale*ray.lxyz.x/ray.scale;
-				CASE ray.face OF
-					0:
-					|1: lx:=lx+lx1;
-					|2:  ly:=ly+lx1;
-					|3:
-					|4: lx:=lx+lx1-1;
-					|5: ly:=ly+lx1-1;
-				END
-			ELSE
-				(* xy pyramid *)
-				lx:=xx; ly:=yy;
-				lz1:=tscale*ray.lxyz.z/ray.scale;
-				CASE ray.face OF
-					 0: lx:=lx+lz1;
-					|1:  ly:=ly+lz1;
-					|2:
-					|3: lx:=lx+lz1-1;
-					|4: ly:=ly+lz1-1;
-					|5:
-				END
-			END
-		ELSE
-			IF yyy>zzz THEN
-				(* xz pyramid *)
-				lx:=xx; ly:=zz;
-				ly1:=tscale*ray.lxyz.y/ray.scale;
-				CASE ray.face OF
-					 0: lx:= lx+ly1;
-					|1:
-					|2: ly:=ly+ly1;
-					|3: lx:= lx+ly1-1;
-					|4:
-					|5:ly:=ly+ly1-1;
-				END
-			ELSE
-				(* xy pyramid *)
-				lx:=xx; ly:=yy;
-				lz1:=tscale*ray.lxyz.z/ray.scale;
-				CASE ray.face OF
-					 0: lx:=lx+lz1;
-					|1:  ly:=ly+lz1;
-					|2:
-					|3: lx:=lx+lz1-1;
-					|4: ly:=ly+lz1-1;
-					|5:
-				END
-			END
-		END
-	ELSE
-		CASE ray.face OF
-			 0: lx := ray.lxyz.y; ly := 1-ray.lxyz.z;
-			|1: lx := ray.lxyz.x; ly := 1-ray.lxyz.z;
-			|2: lx := ray.lxyz.x; ly := ray.lxyz.y;
-			|3: lx := ray.lxyz.y; ly := 1-ray.lxyz.z;
-			|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z;
-			|5: lx := ray.lxyz.x; ly := ray.lxyz.y;
-		END
-	END;
-	color:=texcube.side[ray.face].pixel(lx,ly);
-	IF color.alpha<0.99 THEN
-			IF color.alpha>0.75 THEN
-				mirror(ray,dot)
-			ELSE
-				dr:=color.red*ray.clr.ra;
-				dg:=color.green*ray.clr.ra;
-				db:=color.blue*ray.clr.ra;
-				ray.clr.r := ray.clr.r + dr*color.alpha;
-				ray.clr.ra:=ray.clr.ra-(dr*color.alpha);
-				ray.clr.g := ray.clr.g + dg*color.alpha;
-				ray.clr.ga:=ray.clr.ga-(dg*color.alpha);
-				ray.clr.b := ray.clr.b + db*color.alpha;
-				ray.clr.ba:=ray.clr.ba-(db*color.alpha);
-			(*	Base.ExitF(ray,lxyz,face);			 (* trace to the back side of the cube *)
-				CASE face OF
-					 0: lx := lxyz.y; ly := 1-lxyz.z;
-					|1: lx := lxyz.x; ly := 1-lxyz.z;
-					|2: lx := lxyz.x; ly := lxyz.y;
-					|3: lx := lxyz.y; ly := 1-lxyz.z;
-					|4: lx := lxyz.x; ly := 1-lxyz.z;
-					|5: lx := lxyz.x; ly := lxyz.y;
-				END;
-				color2:=texcube.side[ray.face].pixel(lx,ly);
-				IF color2.alpha<0.99 THEN
-					IF color2.alpha>0.75 THEN
-						mirror(ray,dot)
-					ELSE
-						dr:=color2.red*ray.clr.ra;
-						dg:=color2.green*ray.clr.ra;
-						db:=color2.blue*ray.clr.ra;
-						ray.clr.r := ray.clr.r + dr*color.alpha;
-						ray.clr.ra:=ray.clr.ra-(dr*color.alpha)-0.1;
-						ray.clr.g := ray.clr.g + dg*color.alpha;
-						ray.clr.ga:=ray.clr.ga-(dg*color.alpha)-0.1;
-						ray.clr.b := ray.clr.b + db*color.alpha;
-						ray.clr.ba:=ray.clr.ba-(db*color.alpha)-0.1;
-					END;
-				ELSE
-					dot := ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z)
-					dr:=color2.red*dot*ray.clr.ra;
-					dg:=color2.green*dot*ray.clr.ra;
-					db:=color2.blue*dot*ray.clr.ra;
-				END	*)
-			END
-	ELSE
-		dot := ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
-		dr:=color.red*dot*ray.clr.ra;
-		dg:=color.green*dot*ray.clr.ra;
-		db:=color.blue*dot*ray.clr.ra;
-		ray.clr.r := ray.clr.r + dr;
-		ray.clr.g := ray.clr.g + dg;
-		ray.clr.b := ray.clr.b + db;
-		ray.terminate:=TRUE;
-	END
-END Shade;
-
-PROCEDURE reflect(VAR p: PT; n: PT);
-VAR
-	a,b,c,dot: REAL;
-BEGIN
-	dot := p.x*n.x+p.y*n.y+p.z*n.z;
-	a := 2*n.x*dot; b := 2*n.y*dot; c := 2*n.z*dot;
-	p.x := p.x-a; p.y := p.y-b; p.z := p.z-c;
-END reflect;
-
-
-PROCEDURE mirror(VAR ray: Ray; CONST mix: REAL);
-VAR
-	n: PT;
-BEGIN
-	ray.hitmirrorTF := TRUE;
-	ray.hitxyz:=ray.xyz;
-	ray.changed := TRUE;
-	ray.mirrortf:=TRUE;
-	ray.clr.ra:= ray.clr.ra + 0.1;
-	ray.clr.ga := ray.clr.ga + 0.1;
-	ray.clr.ba := ray.clr.ba + 0.1;
-	ray.clr.alpha:= ray.clr.alpha - 0.1;
-	IF ray.clr.alpha < 0.1 THEN ray.terminate:=TRUE END;
-	n.x:=(ray.normal.x*mix+ray.normal.x*(1-mix));
-	n.y:=(ray.normal.y*mix+ray.normal.y*(1-mix));
-	n.z:=(ray.normal.z*mix+ray.normal.z*(1-mix));
-	reflect(ray.dxyz, n);
-	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END;
-	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
-	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;
-END mirror;
 
 END TexCubeVox;
 

@@ -35,7 +35,7 @@ BEGIN
 	bludot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7");	 
 	NEW(av);
 	dot:=Base.VoxelFromName("NM3");
-	dot.setcolor(0.8,0,0.4,3,0);	
+	dot.setcolor(0.8,0,0.4,3,3,3);	
 	Base.setPT(center,1/2,1/2,1/2);
 	tigerlily:=Base.VoxelFromName("NmOgKSH5ZXYP3DODELOkO7g");  
 	NEW(ball,center,5/12);	
