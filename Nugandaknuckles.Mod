@@ -1,4 +1,4 @@
-MODULE Narchillect;
+MODULE Nugandaknuckles;
 IMPORT Base:=Base, TexVox;
 VAR vox: TexVox.TexVox;
 
@@ -17,4 +17,4 @@ BEGIN
 	vox.tscale:=0;  
 	vox.passable:=TRUE;
 	vox.register;
-END Narchillect. 
+END Nugandaknuckles. 

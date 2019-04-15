@@ -306,7 +306,7 @@ BEGIN
 	multicore:=TRUE;
 	camrotinertia:=100;
 	Base.DTL:=250000;
-	Base.DTL2:=2500000;
+	Base.DTL2:=25000;
 	Base.gravity:=0;
 	Base.speed:=0.00001;
 	Base.maxspeed:=0.0001;

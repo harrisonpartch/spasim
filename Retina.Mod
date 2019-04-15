@@ -463,11 +463,7 @@ BEGIN
 	ray.clr.ra := 1;
 	ray.clr.ga := 1;
 	ray.clr.ba := 1;
-	ray.clr.alpha:=1;
 	ray.scale := 1; 
-	ray.tscale:=1;
-	ray.dtl:=Base.DTL;
-	ray.texdtl:=1;	
 END angletoray;
 
 PROCEDURE splitcam(cam: Camera; VAR a,b,c,d: Camera);

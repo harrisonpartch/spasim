@@ -162,7 +162,7 @@ BEGIN
 	p.y:=p.y+ray.dxyz.y/10000000;
 	p.z:=p.z+ray.dxyz.z/10000000;
 	Base.cursorPT:=p; 	
-	stroke(p,cursorsize,Base.EMPTY)
+	Base.world.tunnel(p,cursorsize)
 END tunnelinto;
 
 PROCEDURE snipeinto*;
@@ -539,20 +539,21 @@ BEGIN
 	noise[0].c:=1;		
 	noise[0].octaves:=4;
 	noise[0].persistence:=3.71;	
-	noise[0].setvoxel(archillect);			
+	noise[0].setvoxel(serp);			
 
 	Base.setPT(center,1/2,1/2,2/3);
 	
 	z3:=Base.VoxelFromName("NM3");	
 	z3a:=Base.VoxelFromName("NM3");
+	Base.EMPTY:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODh");	
 	
-	z3.setcolor(0,0,0,3,3,3); 
-	z3a.setcolor(0,0,0,1,1,1); 
+	z3.setcolor(0,0,1,3,3,3); 
+	z3a.setcolor(0,1,0,100,100,100); 
 	
     z3a.FRaster(noise[0],9);
     z3a.copyonstroke:=TRUE;
 
-	noise[0].setvoxel(z3a);	
+	noise[0].setvoxel(serp);	
 	z3.FRaster(noise[0],81);
  	     
  	NEW(plane,center,up);

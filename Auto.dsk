@@ -1,11 +1,11 @@
 <Desktop>
 	<Window name="FileManager" loader="WMFileManager.Restore" l="130" t="403" r="771" b="713" flags="{0..2,13}"/>
 	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="4" t="87" r="644" b="378" flags="{0..2,13}"/>
-	<Window name="PET" loader="PET.Restore" l="288" t="47" r="1328" b="939" flags="{0..2,13}">
+	<Window name="PET" loader="PET.Restore" l="314" t="106" r="1354" b="998" flags="{0..2,13}">
 		<PETData>
-			<General SelectedPageNr="3" ProjectTextFile=""/>
+			<General SelectedPageNr="4" ProjectTextFile=""/>
 			<Tab file="/home/valentine/spasim32/Spasim.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="12" cursorPos="210"/>
+				<Editor firstLine="12" cursorPos="772"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
@@ -28,6 +28,13 @@
 			<Tab file="Marsh.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
 				<Editor firstLine="0" cursorPos="0"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="NM3.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="768" cursorPos="19395"/>
+				<SplitEditor visible="false" firstLine="435" cursorPos="10800" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>

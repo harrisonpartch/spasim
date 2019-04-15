@@ -347,6 +347,10 @@ END FRasterrecSolid;
 
 PROCEDURE stroke*(p:PT; resolution: LONGINT; voxel:Voxel);
 END stroke;
+PROCEDURE tunnel*(p:PT; resolution: LONGINT);
+END tunnel;
+PROCEDURE tunnelrec*(p:PT; resolution,scale: LONGINT);
+END tunnelrec;
 PROCEDURE strokerec*(p:PT; resolution,scale: LONGINT;  voxel: Voxel);
 END strokerec;
 PROCEDURE strokephemeral*(p:PT; resolution: LONGINT; voxel,voxundo:Voxel);
@@ -1216,6 +1220,7 @@ BEGIN
 	NEW(EMPTY);
 	NEW(OPAQUE);
 	EMPTY.passable:=TRUE;
+	EMPTY.setcolor(0,0,0,1,1,1);
 	NEW(world);
 	worldalive := TRUE;
 	frame:=0;

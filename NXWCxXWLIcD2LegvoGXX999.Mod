@@ -50,7 +50,7 @@ END thisvox;
 
 BEGIN
 	sky:=Base.VoxelFromName("NM3");  	
-	nark:=Base.VoxelFromName("Ngreen"); 
+	nark:=Base.VoxelFromName("Narchillect"); 
 	xot:=Base.VoxelFromName("Nbrownianspheres"); 
 	NEW(s0);
 	NEW(s1);
@@ -63,23 +63,22 @@ BEGIN
 	darkblue.setcolor(1,1,1,1,1,1);
 	dblue := Base.VoxelFromName("NM3");  
 	dblue.setcolor(13,13,13,13,13,13);
-	s0.passable:=TRUE;	
+(*	s0.passable:=TRUE;	
 	s1.passable:=TRUE;	
 	s2.passable:=TRUE;	
 	s3.passable:=TRUE;	
 	NEW(sball, s0, Base.randPT(),Base.randPT(),1,1);
-	s0.setcolor(11,10,400,30,30,530);
-	s1.setcolor(10,10,120,140,140,140);
-	s2.setcolor(1,1,10,30,30,30);
-	s3.setcolor(1,1,3,10,10,10);
 	NEW(rd,empty,nark,empty);	
 	rd.register;
 	rd.passable:=TRUE;
-	s0.fillsierp(xot,nark);
+*)	s0.fillsierp(nark,NIL);
 	s1.fillsierp(s0,NIL);	
-	s2.fillsierp(NIL,s1);
+	s2.fillsierp(s1,NIL);
 	s3.fillsierp(s2,NIL);	
-	
+	s0.setcolor(11,10,400,30,30,530);
+	s1.setcolor(10,10,120,140,140,140);
+	s2.setcolor(1,1,10,30,30,30);
+	s3.setcolor(0.1,0,0.8,0.2,0,1);	
 	s0.imposter:=nark;
 	s1.imposter:=nark;	
 	s2.imposter:=nark;

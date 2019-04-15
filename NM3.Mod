@@ -137,9 +137,9 @@ BEGIN
 				IF (ray.clr.ra<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ba<0.1) THEN 
 					ray.terminate:=TRUE 
 				ELSE						 			
-					ray.clr.r := ray.clr.r+red*vdepth*ray.clr.ra;
-					ray.clr.g:= ray.clr.g+green*vdepth*ray.clr.ga;
-					ray.clr.b := ray.clr.b+blue*vdepth*ray.clr.ba;
+					ray.clr.r := ray.clr.r+red*vdepth;
+					ray.clr.g:= ray.clr.g+green*vdepth;
+					ray.clr.b := ray.clr.b+blue*vdepth;
 				END;
 				bounds(ijk.i,ijk.j,ijk.k, out);		
 				IF ~(out OR ray.terminate) THEN
@@ -284,7 +284,7 @@ VAR
 BEGIN
 	copymarker:=FALSE;
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
-		IF (blox[i,j,k]#NIL) & blox[i,j,k].copymarker THEN
+		IF (blox[i,j,k]#NIL) THEN
 			blox[i,j,k].copyclear
 		END
 	END END END;
@@ -467,44 +467,57 @@ BEGIN
 	END
 END strokerec;
 
-PROCEDURE strokephemeralrec(p:PT; resolution,scale:LONGINT; voxel,voxundo:Voxel);
+PROCEDURE tunnel*(p:PT; resolution: LONGINT);
+VAR
+	i,j,k: LONGINT;
+BEGIN
+	Base.clamPT(p);
+	tunnelrec(p,resolution,M);
+END tunnel;
+
+PROCEDURE tunnelrec*(p:PT; resolution,scale: LONGINT);
 VAR
 	i,j,k,ii,jj,kk,nextscale: LONGINT;
 	v,vv:Voxel;
 	c,c2: cell;
-	copy,vu: Voxel;
+	copyv,vu: Voxel;
 	code: Base.Name;
-	path: Path;
 BEGIN
 	IF ~lockTF THEN
+		code:="NM3"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 		nextscale:=scale*M;
 		p.x:=p.x*M;
 		p.y:=p.y*M;
 		p.z:=p.z*M;
 		i := ENTIER(p.x)MOD M; j := ENTIER(p.y)MOD M; k := ENTIER(p.z)MOD M;
 		IF nextscale>resolution THEN
-			blox[i,j,k]:=voxel
+			blox[i,j,k]:=NIL
 		ELSE
 			IF blox[i,j,k]#NIL THEN
-				IF blox[i,j,k].complex THEN
-					blox[i,j,k].strokephemeralrec(p, resolution,nextscale,voxel,vu)
+				IF  blox[i,j,k].copyonstroke THEN
+					copyv:= blox[i,j,k].deepcopy();
+					blox[i,j,k]:=copyv;	
+					blox[i,j,k].tunnelrec(p, resolution,nextscale)
+				ELSIF blox[i,j,k] IS cell THEN
+					blox[i,j,k].tunnelrec(p, resolution,nextscale)
 				ELSE
 					NEW(c);
+					c.setcolor(red/M, green/M, blue/M, redblack/M, greenblack/M, blueblack/M); 
 					c.fill(blox[i,j,k]);
-					c.passable:=blox[i,j,k].passable;
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-					c.strokerec(p, resolution,nextscale, voxel);
+					c.tunnelrec(p, resolution,nextscale);
 				END
 			ELSE
 				NEW(c);
+				c.setcolor(red/M,green/M,blue/M,redblack/M,greenblack/M,blueblack/M);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-				c.strokerec(p, resolution,nextscale, voxel);
+				c.tunnelrec(p, resolution,nextscale);
 			END
 		END
 	END
-END strokephemeralrec;
+END tunnelrec;
 
 PROCEDURE nstrokerec(p:PT; resolution,scale:LONGINT; normal:PT; color: Color);
 VAR
@@ -755,7 +768,7 @@ BEGIN
 	code:=ncode; (* if this voxel has been rezzed from another module, make it NM3 *)
 	copymarker:=TRUE;
 	NEW(c);
-	c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; 
+	c.setcolor(red/M, green/M, blue/M, redblack/M, greenblack/M, blueblack/M); 
 	c.nbloxTF:=nbloxTF;
 	c.nblox:=nblox;
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO

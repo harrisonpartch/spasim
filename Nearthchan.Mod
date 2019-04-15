@@ -1,4 +1,4 @@
-MODULE Narchillect;
+MODULE Nearthchan;
 IMPORT Base:=Base, TexVox;
 VAR vox: TexVox.TexVox;
 
@@ -13,8 +13,8 @@ BEGIN
 END tick;
 
 BEGIN
-	NEW(vox,"ugandaknucklesmosaic.png");
+	NEW(vox,"earthchan.png");
 	vox.tscale:=0;  
 	vox.passable:=TRUE;
 	vox.register;
-END Narchillect. 
+END Nearthchan. 
