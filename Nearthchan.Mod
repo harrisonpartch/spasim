@@ -14,7 +14,6 @@ END tick;
 
 BEGIN
 	NEW(vox,"earthchan.png");
-	vox.tscale:=0;  
-	vox.passable:=TRUE;
+	vox.tscale:=110;  
 	vox.register;
 END Nearthchan. 

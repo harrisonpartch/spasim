@@ -83,3 +83,7 @@ NIXARXB2vH6ieKZmsc6mODh.Mod
 Nrdvolvox.Mod
 
 NXWCxXWLIcD2LegvoGXX999.Mod
+
+Nearthchan.Mod
+
+Nugandaknuckles.Mod

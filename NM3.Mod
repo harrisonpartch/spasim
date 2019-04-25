@@ -134,13 +134,13 @@ BEGIN
 				ray.clr.ra := ray.clr.ra-redblack*vdepth;
 				ray.clr.ga := ray.clr.ga-greenblack*vdepth;
 				ray.clr.ba := ray.clr.ba-blueblack*vdepth;	
+					 			
+				ray.clr.r := ray.clr.r+red*ray.clr.ra*vdepth;
+				ray.clr.g:= ray.clr.g+green*ray.clr.ga*vdepth;
+				ray.clr.b := ray.clr.b+blue*ray.clr.ba*vdepth;
 				IF (ray.clr.ra<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ba<0.1) THEN 
 					ray.terminate:=TRUE 
-				ELSE						 			
-					ray.clr.r := ray.clr.r+red*vdepth;
-					ray.clr.g:= ray.clr.g+green*vdepth;
-					ray.clr.b := ray.clr.b+blue*vdepth;
-				END;
+				END;	
 				bounds(ijk.i,ijk.j,ijk.k, out);		
 				IF ~(out OR ray.terminate) THEN
 					v := blox[ijk.i,ijk.j,ijk.k];
@@ -295,6 +295,7 @@ VAR
 	i,j,k: INTEGER;
 BEGIN
 	copyclear;
+	colorlock:=TRUE;
 	setcolorrec(r,g,b,rb,gb,bb)
 END setcolor;
 
@@ -313,14 +314,8 @@ BEGIN
 		blueblack := bb;
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 			v:=blox[i,j,k];
-			IF v#NIL THEN
-				IF v IS cell THEN
-					IF v.code=code THEN
-						WITH v: cell DO
-							v.setcolorrec(r/M,g/M,b/M,rb/M,gb/M,bb/M);
-						END
-					END
-				END
+			IF (v#NIL) & ~v.colorlock THEN
+				v.setcolorrec(r/M,g/M,b/M,rb/M,gb/M,bb/M);
 			END
 		END END END;
 		copymarker:=FALSE

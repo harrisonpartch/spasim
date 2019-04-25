@@ -13,7 +13,7 @@ BEGIN
 END tick;
 
 BEGIN
-	NEW(vox,"ugandaknucklesmosaic.png");
+	NEW(vox,"ugandaknuckles.png");
 	vox.tscale:=0;  
 	vox.passable:=TRUE;
 	vox.register;

@@ -272,7 +272,7 @@ VAR
 	code*,ncode*:Name;  
 	tscale*: REAL;
 	red*,green*,blue*,black*,alpha*,redblack*,greenblack*, blueblack*: REAL;
-	colored*,frozen*,probelock*,copyonstroke*,copyonstrokerecursion, baked*:BOOLEAN;
+	colored*, colorlock*, frozen*, probelock*, copyonstroke*, baked*:BOOLEAN;
 	offset*:PT;
 	
 PROCEDURE r90z*;
@@ -320,6 +320,8 @@ BEGIN
 	greenblack:=gb;
 	blueblack:= bb;
 END setcolor;
+PROCEDURE setcolorrec* (r,g,b,rb,gb,bb: REAL); 
+END setcolorrec;
 PROCEDURE erase*(p:PT; resolution:LONGINT);
 END erase;
 PROCEDURE copyprime*;

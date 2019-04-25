@@ -290,7 +290,7 @@ VAR
 	undo,rd, rdpseudosolid, blu, die,gren,granite,sand,whiteblock,lazy,pdestroyer,axolotl,xen,sky1,sky2,tigerlily,cloud: Voxel;
 	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison,fuse:Voxel;
 	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,
-	w3,z3,z3a,z2,z4,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp,acidcats, badopossum, raccoon,
+	w3,z3,z3a,z3b,z2,z4,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp,acidcats, badopossum, raccoon,
 	akatrump, archillect,arkilekt,kat,muratpak,dogepearl,
 	jordan, bottle1,bottle2,bottle3,bottlepossum,bottlegrounds,greensuncouple,wstar,starspider,arevclock: Voxel;
 	ball: FRep.sphere;
@@ -545,22 +545,25 @@ BEGIN
 	
 	z3:=Base.VoxelFromName("NM3");	
 	z3a:=Base.VoxelFromName("NM3");
-	Base.EMPTY:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODh");	
+	z3b:=Base.VoxelFromName("NM3");		
+	z3a.copyonstroke:=TRUE;
+	z3b.copyonstroke:=TRUE;	
 	
-	z3.setcolor(0,0,1,3,3,3); 
-	z3a.setcolor(0,1,0,100,100,100); 
+	z3b.setcolor(0,0,1/2,1,1,1);
+	z3a.setcolor(0,1/2,0,0,1,0);
+	z3.setcolor(1/2,0,0,1,1,1); 		
 	
-    z3a.FRaster(noise[0],9);
-    z3a.copyonstroke:=TRUE;
-
-	noise[0].setvoxel(serp);	
-	z3.FRaster(noise[0],81);
+	z3b.FRaster(noise[0],9);
+	noise[0].setvoxel(z3b);	
+	z3a.FRaster(noise[0],9);
+	noise[0].setvoxel(z3a);	
+	z3.FRaster(noise[0],27);
  	     
  	NEW(plane,center,up);
  	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999");
 	plane.setvoxel(serp);			
 	z3.FRaster(plane,16);	 
-			
+		
 	Base.avatar:=harrison;
  	
 	Base.avatarsize:=1000; 

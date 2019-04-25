@@ -303,7 +303,9 @@ BEGIN
 		IF mip>120 THEN
 			color:=texcube.side[ray.face].pixelmip_two(lx,ly);
 		ELSE
-			color:=texcube.side[ray.face].pixel(lx,ly);
+			color1:=texcube.side[ray.face].pixel(lx,ly);
+			color2:=texcube.side[ray.face].pixel(lx*7,ly*7);
+			color:=Base.mixcolor(color1,color2,mip/120);
 		END;
 (*		color:=texcube.side[ray.face].pixel(lx,ly); *)
 		IF color.alpha<0.99 THEN
