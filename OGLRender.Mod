@@ -283,7 +283,7 @@ BEGIN
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
-	mstarget:=33;
+	mstarget:=30;
 	Base.STOPGO; 
 END openwincam;
 
@@ -356,10 +356,10 @@ VAR
 BEGIN
 	key:=CHR(ucs);
 		CASE CHR(ucs) OF		
-			"S": Retina.incdetail; Out.String("S Retina.incdetail");
-			| "W":Retina.decdetail; Out.String("W Retina.decdetail");
-			| "A": Retina.incthresh; Out.String("S Retina.incthresh");
-			| "D": Retina.decthresh; Out.String("W Retina.decthresh");						
+			"S": Retina.incthresh1; Out.String("S Retina.incthresh1");
+			| "W":Retina.decthresh1; Out.String("W Retina.decthresh1");
+			| "A": Retina.incthresh2; Out.String("S Retina.incthresh2");
+			| "D": Retina.decthresh2; Out.String("W Retina.decthresh2");						
 			| "s" : camera.forward(-0.51*Base.speed); 
 			| "w" : camera.forward(0.51*Base.speed) ; 
 			| "a" : camera.rightstrafe(-0.5*Base.speed)	; 

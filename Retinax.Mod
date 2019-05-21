@@ -1,5 +1,5 @@
 MODULE Retinax; (* EXPERIMENTAL RETINA WITH EDGEFINDING TILE *)
-IMPORT  Base, Objects, Kernel, Out:=KernelLog, Noise,
+IMPORT  Base, Objects, Out:=KernelLog, Noise,
 Math, SPSMMath, Raster, Graphics:=WMGraphics, WMRasterScale,  Rect := WMRectangles;
 
 TYPE
@@ -160,7 +160,7 @@ PROCEDURE t4x4fill(CONST x,y: INTEGER);
 VAR
 	i,j: INTEGER;
 BEGIN
-	IF clrd4(rays[x,y].clr, rays[x+3,y].clr, rays[x+3,y+3].clr, rays[x,y+3].clr) >THRESH THEN
+	IF clrd4(rays[x,y].clr, rays[x+3,y].clr, rays[x+3,y+3].clr, rays[x,y+3].clr) > thresh1c THEN
 		t2x2a(x,y);
 		t2x2b(x+2,y);
 		t2x2c(x+2,y+2);
@@ -210,7 +210,7 @@ PROCEDURE t8x8fill(CONST x,y: INTEGER);
 VAR
 	i,j: INTEGER;
 BEGIN
-	IF clrd4(rays[x,y].clr, rays[x+7,y].clr, rays[x+7,y+7].clr, rays[x,y+7].clr) > THRESH THEN
+	IF clrd4(rays[x,y].clr, rays[x+7,y].clr, rays[x+7,y+7].clr, rays[x,y+7].clr) > thresh1b THEN
 		t4x4a(x,y);
 		t4x4b(x+4,y);
 		t4x4c(x+4,y+4);
@@ -260,7 +260,7 @@ PROCEDURE t16x16fill();
 VAR
 	i,j: INTEGER;
 BEGIN
-	IF clrd4(rays[0,0].clr, rays[15,0].clr, rays[15,15].clr, rays[0,15].clr) > THRESH THEN
+	IF clrd4(rays[0,0].clr, rays[15,0].clr, rays[15,15].clr, rays[0,15].clr) > thresh1a THEN
 		t8x8a(0,0);
 		t8x8b(8,0);
 		t8x8c(8,8);
@@ -309,15 +309,66 @@ BEGIN
 	END;		
 END tessa16;
 
-PROCEDURE tessa16d4(cam:Camera);	
+PROCEDURE tessa16b(cam:Camera);	
+
+PROCEDURE t2x2a(CONST x,y: INTEGER);
+BEGIN
+	Base.world.Shade(rays[x,y+1]);	
+	Base.world.Shade(rays[x+1,y]);	
+	Base.world.Shade(rays[x+1,y+1]);		
+	tileimage[x,y]:=rays[x,y].clr;
+	tileimage[x+1,y]:=rays[x+1,y].clr;
+	tileimage[x+1,y+1]:=rays[x+1,y+1].clr;
+	tileimage[x,y+1]:=rays[x,y+1].clr;
+END t2x2a;
+
+PROCEDURE t2x2b(CONST x,y: INTEGER);
+BEGIN
+	Base.world.Shade(rays[x,y]);	
+	Base.world.Shade(rays[x,y+1]);	
+	Base.world.Shade(rays[x+1,y+1]);		
+	tileimage[x,y]:=rays[x,y].clr;
+	tileimage[x+1,y]:=rays[x+1,y].clr;
+	tileimage[x+1,y+1]:=rays[x+1,y+1].clr;
+	tileimage[x,y+1]:=rays[x,y+1].clr;
+END t2x2b;
+
+PROCEDURE t2x2c(CONST x,y: INTEGER);
+BEGIN
+	Base.world.Shade(rays[x,y]);	
+	Base.world.Shade(rays[x+1,y]);	
+	Base.world.Shade(rays[x,y+1]);		
+	tileimage[x,y]:=rays[x,y].clr;
+	tileimage[x+1,y]:=rays[x+1,y].clr;
+	tileimage[x+1,y+1]:=rays[x+1,y+1].clr;
+	tileimage[x,y+1]:=rays[x,y+1].clr;	
+END t2x2c;
+
+PROCEDURE t2x2d(CONST x,y: INTEGER);
+BEGIN
+	Base.world.Shade(rays[x,y]);	
+	Base.world.Shade(rays[x+1,y]);	
+	Base.world.Shade(rays[x+1,y+1]);		
+	tileimage[x,y]:=rays[x,y].clr;
+	tileimage[x+1,y]:=rays[x+1,y].clr;
+	tileimage[x+1,y+1]:=rays[x+1,y+1].clr;
+	tileimage[x,y+1]:=rays[x,y+1].clr;
+END t2x2d;
 
 PROCEDURE t4x4fill(CONST x,y: INTEGER);
 VAR
 	i,j: INTEGER;
-BEGIN	
-	FOR i:=x TO x+3 DO
-		FOR j:=y TO y+3 DO
-			tileimage[i,j]:=rays[x,y].clr;
+BEGIN
+	IF clrd4(rays[x,y].clr, rays[x+3,y].clr, rays[x+3,y+3].clr, rays[x,y+3].clr) > thresh2c THEN
+		t2x2a(x,y);
+		t2x2b(x+2,y);
+		t2x2c(x+2,y+2);
+		t2x2d(x,y+2); 
+	ELSE
+		FOR i:=x TO x+3 DO
+			FOR j:=y TO y+3 DO
+				tileimage[i,j]:=rays[x,y].clr;
+			END
 		END
 	END
 END t4x4fill;
@@ -358,7 +409,7 @@ PROCEDURE t8x8fill(CONST x,y: INTEGER);
 VAR
 	i,j: INTEGER;
 BEGIN
-	IF clrd4(rays[x,y].clr, rays[x+7,y].clr, rays[x+7,y+7].clr, rays[x,y+7].clr) > THRESH THEN
+	IF clrd4(rays[x,y].clr, rays[x+7,y].clr, rays[x+7,y+7].clr, rays[x,y+7].clr) > thresh2b THEN
 		t4x4a(x,y);
 		t4x4b(x+4,y);
 		t4x4c(x+4,y+4);
@@ -408,7 +459,7 @@ PROCEDURE t16x16fill();
 VAR
 	i,j: INTEGER;
 BEGIN
-	IF clrd4(rays[0,0].clr, rays[15,0].clr, rays[15,15].clr, rays[0,15].clr) > THRESH THEN
+	IF clrd4(rays[0,0].clr, rays[15,0].clr, rays[15,15].clr, rays[0,15].clr) > thresh2a THEN
 		t8x8a(0,0);
 		t8x8b(8,0);
 		t8x8c(8,8);
@@ -455,7 +506,7 @@ BEGIN
 			Raster.Put(image,cam.imx+j,cam.imy+i,pixel,copy);
 		END
 	END;		
-END tessa16d4;
+END tessa16b;
 
 PROCEDURE ztrace(cam: Camera; level: INTEGER);
 VAR
@@ -463,42 +514,24 @@ VAR
 	l: INTEGER;
 	x,y,D: REAL;
 	FVV:REAL;
-BEGIN
-	FVV:=10*FV*FV;
+BEGIN	
 	splitcam(cam,a,b,c,d);
 	IF level<2 THEN
-			x:=a.imx-W/2;
-			y:=a.imy-H/2;		
-			D:=(x*x+y*y);	
-			IF D<FVV THEN	
+		FVV:=10*FV*FV;
+		x:=a.imx-W/2;
+		y:=a.imy-H/2;		
+		D:=(x*x+y*y);			
+		IF D<FVV THEN	
 				tessa16(a); 
-			ELSE
-				tessa16d4(a); 
-			END;
- 			x:=b.imx-W/2;
-			y:=b.imy-H/2;		
-			D:=(x*x+y*y);	
-			IF D<FVV THEN
 				tessa16(b); 
-			ELSE 
-				tessa16d4(b);
-			END;
-			x:=c.imx-W/2;
-			y:=c.imy-H/2;		
-			D:=(x*x+y*y);	
-			IF D<FVV THEN	
 				tessa16(c); 
-			ELSE
-				tessa16d4(c)
-			END;
- 			x:=b.imx-W/2;
-			y:=b.imy-H/2;		
-			D:=(x*x+y*y);	
-			IF D<FVV THEN	
 				tessa16(d); 
 			ELSE
-				tessa16d4(d); 
-			END;		
+				tessa16b(a); 
+				tessa16b(b); 
+				tessa16b(c); 
+				tessa16b(d); 	
+			END;
 	ELSE
 		l:=level-1;
 		ztrace(a,l);
@@ -541,7 +574,7 @@ VAR
 	foveaparameter:INTEGER;
 	FV: REAL;
 	copy: Raster.Mode;
-	THRESH: REAL;
+	thresh1a, thresh1b,thresh1c,thresh2a,thresh2b,thresh2c: REAL;
 	
 PROCEDURE Res*;
 BEGIN
@@ -643,15 +676,18 @@ PROCEDURE moredetail*;
 BEGIN
 	foveaparameter:=foveaparameter-1;
 	IF foveaparameter<11 THEN foveaparameter:=11 END;
-(*	Out.Int(foveaparameter,4); *)
-	FV:=W/foveaparameter;
+	FV:=W/foveaparameter; 
+	decthresh1;
+	decthresh2;
 END moredetail;
 
 PROCEDURE lessdetail*;
 BEGIN
 	foveaparameter:=(foveaparameter+1);
 	IF foveaparameter>50 THEN foveaparameter:=50 END;
-	FV:=W/foveaparameter;
+	FV:=W/foveaparameter; 
+	incthresh1;
+	incthresh2;
 END lessdetail;
 
 PROCEDURE decdetail*;
@@ -664,15 +700,36 @@ BEGIN
 	Base.DTL:=Base.DTL*3/2;
 END incdetail;
 
-PROCEDURE decthresh*;
+PROCEDURE decthresh1*;
 BEGIN
-	THRESH:=THRESH*2/3;
-END decthresh;
+	thresh1a:=thresh1a*2/3;
+	thresh1b:=thresh1a*1.5;
+	thresh1c:=thresh1b*1.5;	
+	Out.Ln;
+END decthresh1;
 
-PROCEDURE incthresh*;
+PROCEDURE incthresh1*;
 BEGIN
-	THRESH:=THRESH*3/2;
-END incthresh;
+	thresh1a:=thresh1a*3/2;
+	thresh1b:=thresh1a*1.5;
+	thresh1c:=thresh1b*1.5;		
+	Out.Ln;
+END incthresh1;
+
+PROCEDURE decthresh2*;
+BEGIN
+	thresh2a:=thresh2a*2/3;
+	thresh2b:=thresh2a*2;
+	thresh2c:=thresh2b*2;	
+	Out.Ln;
+END decthresh2;
+
+PROCEDURE incthresh2*;
+BEGIN
+	thresh2a:=thresh2a*3/2;
+	thresh2b:=thresh2a*2;
+	thresh2c:=thresh2b*2;		
+END incthresh2;
 
 PROCEDURE incTD;
 BEGIN{EXCLUSIVE}
@@ -768,10 +825,16 @@ BEGIN
 	END;	
 	AFTER:=2;
  	FAST:=3;
- 	THRESH:=0.1;
+ 	thresh1a:=0.05;
+  	thresh1b:=0.05;	
+ 	thresh1c:=0.05; 	
+ 	thresh2a:=0.5; 
+ 	thresh2b:=0.5; 	
+ 	thresh2c:=0.5; 
  	lsense:=0.2;
  	aperture.width:=1;
  	aperture.height:=1;
  	foveaparameter:=13;
+ 	FV:=W/foveaparameter; 
  	Out.String("loaded...");	
 END Retinax.
