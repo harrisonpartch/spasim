@@ -290,7 +290,7 @@ VAR
 	undo,rd, rdpseudosolid, blu, die,gren,granite,sand,whiteblock,lazy,pdestroyer,axolotl,xen,sky1,sky2,tigerlily,cloud: Voxel;
 	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison,fuse:Voxel;
 	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,
-	w3,z3,z3a,z3b,z2,z4,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp,acidcats, badopossum, raccoon,
+	w3,z3,z3a,z2,z4,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp,acidcats, badopossum, raccoon,
 	akatrump, archillect,arkilekt,kat,muratpak,dogepearl,
 	jordan, bottle1,bottle2,bottle3,bottlepossum,bottlegrounds,greensuncouple,wstar,starspider,arevclock: Voxel;
 	ball: FRep.sphere;
@@ -314,15 +314,12 @@ BEGIN
 	conglomerate:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7"); 	
 	conglomerate.copyonstroke:=TRUE;
 	push(conglomerate);	
-     serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999"); 
-     serp.passable:=TRUE;
-	push(serp);	
 	reddot:=Base.VoxelFromName("Nbrownianspheres"); 	
 	push(reddot);		
 	rd:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODg"); 	
 	push(rd);
 		
-(*  	NEW(fuzz);
+ 	NEW(fuzz);
   	push(fuzz);
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	push(greenball);
@@ -343,10 +340,9 @@ BEGIN
 	doge:=Base.VoxelFromName("Ndogepearl"); 
 	push(doge);		
 
-      volvox:=Base.VoxelFromName("Nrdvolvox");  	
-      push(volvox);
-      serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999"); 
-     serp.passable:=TRUE;
+     volvox:=Base.VoxelFromName("Nrdvolvox");  	
+     push(volvox);
+     serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999"); 
 	push(serp);	
 	badopossum:=Base.VoxelFromName("Nbadopossum"); 	
 	raccoon:=Base.VoxelFromName("Nraccoon"); 	
@@ -526,7 +522,7 @@ BEGIN
 	noise[4].octaves:=4;
 	noise[4].persistence:=3.31;	
 	noise[4].setvoxel(gxy);		
-*)
+
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,9/10);
@@ -534,8 +530,8 @@ BEGIN
 
 	NEW(noise[0]);
 	noise[0].seed:=1534777690;		
-	noise[0].a:=5;
-	noise[0].b:=5;
+	noise[0].a:=1;
+	noise[0].b:=1;
 	noise[0].c:=1;		
 	noise[0].octaves:=4;
 	noise[0].persistence:=3.71;	
@@ -544,25 +540,20 @@ BEGIN
 	Base.setPT(center,1/2,1/2,2/3);
 	
 	z3:=Base.VoxelFromName("NM3");	
-	z3a:=Base.VoxelFromName("NM3");
-	z3b:=Base.VoxelFromName("NM3");		
+	z3a:=Base.VoxelFromName("NM3");	
 	z3a.copyonstroke:=TRUE;
-	z3b.copyonstroke:=TRUE;	
-	
-	z3b.setcolor(0,0,1/2,1,1,1);
-	z3a.setcolor(0,1/2,0,0,1,0);
+	z3a.passable:=TRUE;
+	z3a.setcolor(0,1/2,0,1,1,1);
 	z3.setcolor(1/2,0,0,1,1,1); 		
 	
-	z3b.FRaster(noise[0],9);
-	noise[0].setvoxel(z3b);	
 	z3a.FRaster(noise[0],9);
 	noise[0].setvoxel(z3a);	
 	z3.FRaster(noise[0],27);
- 	     
+	
  	NEW(plane,center,up);
  	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999");
-	plane.setvoxel(serp);			
-	z3.FRaster(plane,16);	 
+	plane.setvoxel(axolotl);			
+	z3.FRaster(plane,27);	 
 		
 	Base.avatar:=harrison;
  	

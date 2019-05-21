@@ -12,7 +12,6 @@ HalfSpace.Mod
 RotaVox.Mod
 Engrainer.Mod
 Saboteur.Mod
-FRep.Mod
 NCompiler.Mod
 Retina.Mod
 Marsh.Mod
@@ -35,7 +34,7 @@ OpenGL.Tool
 
 OGLRetina.Mod
 
-Compiler.SetDefaultPlatform Linux32G ~
+Compiler.SetDefaultPlatform Linux64G ~
 
 Marsh.Rez Nrdvolvox
 
@@ -87,3 +86,5 @@ NXWCxXWLIcD2LegvoGXX999.Mod
 Nearthchan.Mod
 
 Nugandaknuckles.Mod
+
+srVoxel.Mod	<== Not ever imported but useful for coding

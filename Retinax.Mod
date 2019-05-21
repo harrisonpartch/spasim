@@ -1,4 +1,4 @@
-MODULE Retina;
+MODULE Retinax; (* EXPERIMENTAL RETINA WITH EDGEFINDING TILE *)
 IMPORT  Base, Objects, Kernel, Out:=KernelLog, Noise,
 Math, SPSMMath, Raster, Graphics:=WMGraphics, WMRasterScale,  Rect := WMRectangles;
 
@@ -7,7 +7,7 @@ TYPE
 	PT=Base.PT;
 CONST
 	T=2;        
-	TS=12*4;  (*  TS MUST BE {size of unit tile} MULTIPLIED BY 2**T *)
+	TS=16*4;  (*  TS MUST BE {size of unit tile} MULTIPLIED BY 2**T *)
 	TW=16;
 	TH=9;
 	W*=TS*TW;
@@ -61,7 +61,7 @@ BEGIN
 	ray.clr.alpha:=1;
 	ray.scale := 1; 
 	ray.tscale:=1;
-	ray.dtl:=dtl;
+	ray.dtl:=Base.DTL;
 	ray.texdtl:=1;	
 END angletoray;
 
@@ -79,8 +79,7 @@ BEGIN
 	r.clr.alpha:=1;
 	r.scale := 1; 
 	r.tscale:=1;
-	r.dtl:=Base.DTL;
-	r.texdtl:=1;	
+	r.dtl:=Base.DTL;	
 	mixi:=1-mix;
 	r.dxyz.x:= ra.dxyz.x*mixi + rb.dxyz.x*mix;
 	r.dxyz.y:= ra.dxyz.y*mixi + rb.dxyz.y*mix;
@@ -91,214 +90,374 @@ BEGIN
 	RETURN r;
 END interpray;
 
-PROCEDURE interpclr(CONST ra,rb: Base.Color): Base.Color;
+PROCEDURE interpclr(CONST ra,rb: Base.ray_color): Base.ray_color;
 VAR
-	r: Base.Color;
+	r: Base.ray_color;
 BEGIN
-	r.red:= (ra.red+rb.red)/2;
-	r.green:= (ra.green+rb.green)/2;
-	r.blue:= (ra.blue+rb.blue)/2;				
+	r.r:= (ra.r+rb.r)/2;
+	r.g:= (ra.g+rb.g)/2;
+	r.b:= (ra.b+rb.b)/2;				
 	RETURN r;
 END interpclr;
 
-PROCEDURE tessa12(cam:Camera);	
-VAR
-	i,j,k: LONGINT;
-	theta,phi,dtheta,dphi: REAL;
-	ray: Base.Ray;
-	rays: ARRAY 12,12 OF Base.Ray;
-	pixel: Raster.Pixel;
-	r,b,g: REAL;
-BEGIN
-	angletoray(rays[0,0],cam.theta,cam.phi);
-	angletoray(rays[0,11],cam.theta+cam.dtheta,cam.phi);
-	angletoray(rays[11,0],cam.theta,cam.phi+cam.dphi);
-	angletoray(rays[11,11],cam.theta+cam.dtheta,cam.phi+cam.dphi);	
-	FOR i := 1 TO 10 DO
-		rays[i,0]:= interpray(rays[0,0],rays[11,0],i/11);
-		rays[i,11]:= interpray(rays[0,11],rays[11,11],i/11);
-	END;	
-	FOR i := 0 TO 11 DO
-		FOR j:= 1 TO 10 DO
-			rays[i,j]:= interpray(rays[i,0],rays[i,11],j/11);
-		END
-	END;		
-	FOR i:= 0 TO 11 DO
-		FOR j := 0 TO 11 DO 
-			rays[i,j].dtl:=Base.DTL;
-			Base.world.Shade(rays[i,j]);	
-			IF rays[i,j].terminate THEN
-				r:=rays[i,j].clr.r;
-				g:=rays[i,j].clr.g;
-				b:=rays[i,j].clr.b; 
-			ELSE
-				r:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
-				g:= rays[i,j].clr.g + rays[i,j].clr.ga/2;
-				b:= rays[i,j].clr.b + rays[i,j].clr.ba 
-			END;
-			Base.clamp3(r,g,b); 
-			Raster.SetRGB(pixel,ENTIER(r*GAMMA),ENTIER(g*GAMMA),ENTIER(b*GAMMA)); 
-			Raster.Put(image,cam.imx+j,cam.imy+i,pixel,copy);
-		END
-	END;		
-END tessa12;
+PROCEDURE clrd(CONST ra,rb: Base.ray_color): REAL;
+BEGIN			
+	RETURN ABS(ra.r-rb.r)+ABS(ra.g-rb.g)+ABS(ra.b-rb.b);
+END clrd;
 
-PROCEDURE tessa6(cam:Camera);	
-VAR
-	i,j,k: LONGINT;
-	theta,phi,dtheta,dphi: REAL;
-	ray: Base.Ray;
-	rays: ARRAY 12,12 OF Base.Ray;
-	pixel: Raster.Pixel;
-	r,b,g: REAL;
-BEGIN
-	angletoray(rays[0,0],cam.theta,cam.phi);
-	angletoray(rays[0,11],cam.theta+cam.dtheta,cam.phi);
-	angletoray(rays[11,0],cam.theta,cam.phi+cam.dphi);
-	angletoray(rays[11,11],cam.theta+cam.dtheta,cam.phi+cam.dphi);	
-	FOR i := 1 TO 10 DO
-		rays[i,0]:= interpray(rays[0,0],rays[11,0],i/12);
-		rays[i,11]:= interpray(rays[0,11],rays[11,11],i/12);
-	END;	
-	FOR i := 0 TO 11 DO
-		FOR j:= 1 TO 10 DO
-			rays[i,j]:= interpray(rays[i,0],rays[i,11],j/12);
-		END
-	END;		
-	FOR i:= 0 TO 11 BY 2 DO
-		FOR j := 0 TO 11 BY 2 DO 
-		  	rays[i,j].dtl:=Base.DTL;
-			Base.world.Shade(rays[i,j]);	
-			IF rays[i,j].terminate THEN
-				r:=rays[i,j].clr.r;
-				g:=rays[i,j].clr.g;
-				b:=rays[i,j].clr.b; 
-			ELSE
-				r:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
-				g:= rays[i,j].clr.g + rays[i,j].clr.ga/2.5;
-				b:= rays[i,j].clr.b + rays[i,j].clr.ba 
-			END;
-			Base.clamp3(r,g,b); 
-			Raster.SetRGB(pixel,ENTIER(r*GAMMA),ENTIER(g*GAMMA),ENTIER(b*GAMMA)); 
-			Raster.Put(image,cam.imx+j,cam.imy+i,pixel,copy);
-			Raster.Put(image,cam.imx+j+1,cam.imy+i,pixel,copy);
-			Raster.Put(image,cam.imx+j,cam.imy+i+1,pixel,copy);
-			Raster.Put(image,cam.imx+j+1,cam.imy+i+1,pixel,copy);
-		END
-	END;		
-END tessa6;
+PROCEDURE clrd4(CONST ra,rb,rc,rd: Base.ray_color): REAL;
+BEGIN			
+	RETURN clrd(ra,rb)+clrd(rb,rc)+clrd(rc,rd)+clrd(rd,ra);
+END clrd4;
 
-PROCEDURE tessa4(cam:Camera);	
-VAR
-	i,j,ia,ja: LONGINT;
-	theta,phi,dtheta,dphi: REAL;
-	ray: Base.Ray;
-	rays: ARRAY 12,12 OF Base.Ray;
-	pixel: Raster.Pixel;
-	r,b,g: REAL;
+PROCEDURE tessa16(cam:Camera);	
+
+PROCEDURE t2x2a(CONST x,y: INTEGER);
 BEGIN
-	angletoray(rays[0,0],cam.theta,cam.phi);
-	angletoray(rays[0,11],cam.theta+cam.dtheta,cam.phi);
-	angletoray(rays[11,0],cam.theta,cam.phi+cam.dphi);
-	angletoray(rays[11,11],cam.theta+cam.dtheta,cam.phi+cam.dphi);	
-	FOR i := 0 TO 11 BY 3 DO 
-		rays[i,0]:= interpray(rays[0,0],rays[11,0],i/11);
-		rays[i,11]:= interpray(rays[0,11],rays[11,11],i/11);
-	END;	
-	FOR i := 0 TO 11 BY 3 DO
-		FOR j:= 0 TO 11 BY 3 DO 
-			rays[i,j]:= interpray(rays[i,0],rays[i,11],j/11);
-		END
-	END;		
-	FOR i:= 0 TO 11 BY 3 DO
-		FOR j := 0 TO 11 BY 3 DO 
-			rays[i,j].dtl:=Base.DTL2;
-			Base.world.Shade(rays[i,j]);	
-			IF rays[i,j].terminate THEN
-				r:=rays[i,j].clr.r;
-				g:=rays[i,j].clr.g;
-				b:=rays[i,j].clr.b; 
-			ELSE
-				r:= rays[i,j].clr.r + rays[i,j].clr.ra/3;
-				g:= rays[i,j].clr.g + rays[i,j].clr.ga/3;
-				b:= rays[i,j].clr.b + rays[i,j].clr.ba 
-			END;
-			Base.clamp3(r,g,b); 
-			Raster.SetRGB(pixel,ENTIER(r*GAMMA),ENTIER(g*GAMMA),ENTIER(b*GAMMA)); 
-			FOR ia:=0 TO 2 DO
-				FOR ja:=0 TO 2 DO
-					Raster.Put(image,cam.imx+j+ja,cam.imy+i+ia,pixel,copy);
-				END
+	Base.world.Shade(rays[x,y+1]);	
+	Base.world.Shade(rays[x+1,y]);	
+	Base.world.Shade(rays[x+1,y+1]);		
+	tileimage[x,y]:=rays[x,y].clr;
+	tileimage[x+1,y]:=rays[x+1,y].clr;
+	tileimage[x+1,y+1]:=rays[x+1,y+1].clr;
+	tileimage[x,y+1]:=rays[x,y+1].clr;
+END t2x2a;
+
+PROCEDURE t2x2b(CONST x,y: INTEGER);
+BEGIN
+	Base.world.Shade(rays[x,y]);	
+	Base.world.Shade(rays[x,y+1]);	
+	Base.world.Shade(rays[x+1,y+1]);		
+	tileimage[x,y]:=rays[x,y].clr;
+	tileimage[x+1,y]:=rays[x+1,y].clr;
+	tileimage[x+1,y+1]:=rays[x+1,y+1].clr;
+	tileimage[x,y+1]:=rays[x,y+1].clr;
+END t2x2b;
+
+PROCEDURE t2x2c(CONST x,y: INTEGER);
+BEGIN
+	Base.world.Shade(rays[x,y]);	
+	Base.world.Shade(rays[x+1,y]);	
+	Base.world.Shade(rays[x,y+1]);		
+	tileimage[x,y]:=rays[x,y].clr;
+	tileimage[x+1,y]:=rays[x+1,y].clr;
+	tileimage[x+1,y+1]:=rays[x+1,y+1].clr;
+	tileimage[x,y+1]:=rays[x,y+1].clr;	
+END t2x2c;
+
+PROCEDURE t2x2d(CONST x,y: INTEGER);
+BEGIN
+	Base.world.Shade(rays[x,y]);	
+	Base.world.Shade(rays[x+1,y]);	
+	Base.world.Shade(rays[x+1,y+1]);		
+	tileimage[x,y]:=rays[x,y].clr;
+	tileimage[x+1,y]:=rays[x+1,y].clr;
+	tileimage[x+1,y+1]:=rays[x+1,y+1].clr;
+	tileimage[x,y+1]:=rays[x,y+1].clr;
+END t2x2d;
+
+PROCEDURE t4x4fill(CONST x,y: INTEGER);
+VAR
+	i,j: INTEGER;
+BEGIN
+	IF clrd4(rays[x,y].clr, rays[x+3,y].clr, rays[x+3,y+3].clr, rays[x,y+3].clr) >THRESH THEN
+		t2x2a(x,y);
+		t2x2b(x+2,y);
+		t2x2c(x+2,y+2);
+		t2x2d(x,y+2); 
+	ELSE
+		FOR i:=x TO x+3 DO
+			FOR j:=y TO y+3 DO
+				tileimage[i,j]:=rays[x,y].clr;
 			END
 		END
-	END;		
-END tessa4;
+	END
+END t4x4fill;
 
-PROCEDURE tessa(cam: Camera);
+PROCEDURE t4x4a(CONST x,y: INTEGER);
+BEGIN
+	Base.world.Shade(rays[x+3,y]);	
+	Base.world.Shade(rays[x,y+3]);	
+	Base.world.Shade(rays[x+3,y+3]);	
+	t4x4fill(x,y)
+END t4x4a;
+
+PROCEDURE t4x4b(x,y: INTEGER);
+BEGIN
+	Base.world.Shade(rays[x,y]);	
+	Base.world.Shade(rays[x,y+3]);	
+	Base.world.Shade(rays[x+3,y+3]);		
+	t4x4fill(x,y)	
+END t4x4b;
+
+PROCEDURE t4x4c(x,y: INTEGER);
+BEGIN
+	Base.world.Shade(rays[x,y]);	
+	Base.world.Shade(rays[x+3,y]);	
+	Base.world.Shade(rays[x,y+3]);		
+	t4x4fill(x,y)
+END t4x4c;
+
+PROCEDURE t4x4d(x,y: INTEGER);
+BEGIN
+	Base.world.Shade(rays[x,y]);	
+	Base.world.Shade(rays[x+3,y]);	
+	Base.world.Shade(rays[x+3,y+3]);		
+	t4x4fill(x,y)	
+END t4x4d;
+
+PROCEDURE t8x8fill(CONST x,y: INTEGER);
 VAR
-	i,j: LONGINT;
+	i,j: INTEGER;
+BEGIN
+	IF clrd4(rays[x,y].clr, rays[x+7,y].clr, rays[x+7,y+7].clr, rays[x,y+7].clr) > THRESH THEN
+		t4x4a(x,y);
+		t4x4b(x+4,y);
+		t4x4c(x+4,y+4);
+		t4x4d(x,y+4); 
+	ELSE
+		FOR i:=x TO x+7 DO
+			FOR j:=y TO y+7 DO
+				tileimage[i,j]:=rays[x,y].clr;
+			END
+		END
+	END
+END t8x8fill;
+
+PROCEDURE t8x8a(CONST x,y: INTEGER);
+BEGIN
+	Base.world.Shade(rays[x+7,y]);	
+	Base.world.Shade(rays[x,y+7]);	
+	Base.world.Shade(rays[x+7,y+7]);	
+	t8x8fill(x,y)
+END t8x8a;
+
+PROCEDURE t8x8b(x,y: INTEGER);
+BEGIN
+	Base.world.Shade(rays[x,y]);	
+	Base.world.Shade(rays[x,y+7]);	
+	Base.world.Shade(rays[x+7,y+7]);		
+	t8x8fill(x,y)	
+END t8x8b;
+
+PROCEDURE t8x8c(x,y: INTEGER);
+BEGIN
+	Base.world.Shade(rays[x,y]);	
+	Base.world.Shade(rays[x+7,y]);	
+	Base.world.Shade(rays[x,y+7]);		
+	t8x8fill(x,y)
+END t8x8c;
+
+PROCEDURE t8x8d(x,y: INTEGER);
+BEGIN
+	Base.world.Shade(rays[x,y]);	
+	Base.world.Shade(rays[x+7,y]);	
+	Base.world.Shade(rays[x+7,y+7]);		
+	t8x8fill(x,y)	
+END t8x8d;
+
+PROCEDURE t16x16fill();
+VAR
+	i,j: INTEGER;
+BEGIN
+	IF clrd4(rays[0,0].clr, rays[15,0].clr, rays[15,15].clr, rays[0,15].clr) > THRESH THEN
+		t8x8a(0,0);
+		t8x8b(8,0);
+		t8x8c(8,8);
+		t8x8d(0,8); 
+	ELSE
+		FOR i:= 0 TO 15 DO
+			FOR j:= 0 TO 15 DO
+				tileimage[i,j]:=rays[0,0].clr;
+			END
+		END
+	END
+END t16x16fill;
+
+VAR
+	i,j,k: LONGINT;
 	theta,phi,dtheta,dphi: REAL;
 	ray: Base.Ray;
+	rays: ARRAY 16,16 OF Base.Ray;
+	tileimage: ARRAY 16,16 OF Base.ray_color;
 	pixel: Raster.Pixel;
 	r,b,g: REAL;
 BEGIN
-	angletoray(ray,cam.theta+cam.dtheta/2, cam.phi+cam.dphi/2);
-	ray.clr.ra := 1;
-	ray.clr.ga := 1;
-	ray.clr.ba := 1;
-	ray.clr.alpha:=1;
-	ray.scale := 1; 
-	ray.tscale:=1;
-	ray.dtl:=Base.DTL;	
-	Base.world.Shade(ray);
-	IF ray.terminate THEN
-		r:=ray.clr.r;
-		g:=ray.clr.g;
-		b:=ray.clr.b; 
-	ELSE
-		r:= ray.clr.r + ray.clr.ra;
-		g:= ray.clr.g + ray.clr.ga/3;
-		b:= ray.clr.b + ray.clr.ba/3;
-	END;
-	Base.clamp3(r,g,b);
-	Raster.SetRGB(pixel,ENTIER(r*GAMMA),ENTIER(g*GAMMA),ENTIER(b*GAMMA)); 	
-	FOR i:=0 TO 11 DO 
-		FOR j:= 0 TO 11 DO
-			Raster.Put(image,cam.imx+i,cam.imy+j,pixel,copy);
+	angletoray(rays[0,0],cam.theta,cam.phi);
+	angletoray(rays[0,15],cam.theta+cam.dtheta,cam.phi);
+	angletoray(rays[15,0],cam.theta,cam.phi+cam.dphi);
+	angletoray(rays[15,15],cam.theta+cam.dtheta,cam.phi+cam.dphi);	
+	FOR i := 1 TO 15 DO
+		rays[i,0]:= interpray(rays[0,0],rays[15,0],i/16);
+		rays[i,15]:= interpray(rays[0,15],rays[15,15],i/16);
+	END;	
+	FOR i := 0 TO 15 DO
+		FOR j:= 1 TO 14 DO
+			rays[i,j]:= interpray(rays[i,0],rays[i,15],j/16);
 		END
-	END 
-END tessa;
+	END;		
+	Base.world.Shade(rays[0,0]);	
+	Base.world.Shade(rays[15,0]);		
+	Base.world.Shade(rays[15,15]);		
+	Base.world.Shade(rays[0,15]);		
+	t16x16fill;	
+	FOR i:= 0 TO 15 DO
+		FOR j := 0 TO 15 DO 
+			Raster.SetRGB(pixel,ENTIER(tileimage[i,j].r*GAMMA),ENTIER(tileimage[i,j].g*GAMMA),ENTIER(tileimage[i,j].b*GAMMA)); 
+			Raster.Put(image,cam.imx+j,cam.imy+i,pixel,copy);
+		END
+	END;		
+END tessa16;
 
-PROCEDURE atrace(cam: Camera);
+PROCEDURE tessa16d4(cam:Camera);	
+
+PROCEDURE t4x4fill(CONST x,y: INTEGER);
 VAR
+	i,j: INTEGER;
+BEGIN	
+	FOR i:=x TO x+3 DO
+		FOR j:=y TO y+3 DO
+			tileimage[i,j]:=rays[x,y].clr;
+		END
+	END
+END t4x4fill;
 
+PROCEDURE t4x4a(CONST x,y: INTEGER);
 BEGIN
+	Base.world.Shade(rays[x+3,y]);	
+	Base.world.Shade(rays[x,y+3]);	
+	Base.world.Shade(rays[x+3,y+3]);	
+	t4x4fill(x,y)
+END t4x4a;
 
-END atrace;
+PROCEDURE t4x4b(x,y: INTEGER);
+BEGIN
+	Base.world.Shade(rays[x,y]);	
+	Base.world.Shade(rays[x,y+3]);	
+	Base.world.Shade(rays[x+3,y+3]);		
+	t4x4fill(x,y)	
+END t4x4b;
 
-PROCEDURE ztraceu(cam: Camera; level: INTEGER);
+PROCEDURE t4x4c(x,y: INTEGER);
+BEGIN
+	Base.world.Shade(rays[x,y]);	
+	Base.world.Shade(rays[x+3,y]);	
+	Base.world.Shade(rays[x,y+3]);		
+	t4x4fill(x,y)
+END t4x4c;
+
+PROCEDURE t4x4d(x,y: INTEGER);
+BEGIN
+	Base.world.Shade(rays[x,y]);	
+	Base.world.Shade(rays[x+3,y]);	
+	Base.world.Shade(rays[x+3,y+3]);		
+	t4x4fill(x,y)	
+END t4x4d;
+
+PROCEDURE t8x8fill(CONST x,y: INTEGER);
 VAR
-	a,b,c,d: Camera;
-	l: INTEGER;
-	x,y: REAL;
+	i,j: INTEGER;
 BEGIN
-	splitcam(cam,a,b,c,d);
-	IF level<2 THEN
-			dtl:=Base.DTL/10;
-			tessa(a);
-			tessa(b);
-			tessa(c);
-			tessa(d);
+	IF clrd4(rays[x,y].clr, rays[x+7,y].clr, rays[x+7,y+7].clr, rays[x,y+7].clr) > THRESH THEN
+		t4x4a(x,y);
+		t4x4b(x+4,y);
+		t4x4c(x+4,y+4);
+		t4x4d(x,y+4); 
 	ELSE
-		l:=level-1;
-		ztraceu(a,l);
-		ztraceu(b,l);
-		ztraceu(c,l);
-		ztraceu(d,l) 	
-	END;
-END ztraceu;
+		FOR i:=x TO x+7 DO
+			FOR j:=y TO y+7 DO
+				tileimage[i,j]:=rays[x,y].clr;
+			END
+		END
+	END
+END t8x8fill;
 
-PROCEDURE ztracef(cam: Camera; level: INTEGER);
+PROCEDURE t8x8a(CONST x,y: INTEGER);
+BEGIN
+	Base.world.Shade(rays[x+7,y]);	
+	Base.world.Shade(rays[x,y+7]);	
+	Base.world.Shade(rays[x+7,y+7]);	
+	t8x8fill(x,y)
+END t8x8a;
+
+PROCEDURE t8x8b(x,y: INTEGER);
+BEGIN
+	Base.world.Shade(rays[x,y]);	
+	Base.world.Shade(rays[x,y+7]);	
+	Base.world.Shade(rays[x+7,y+7]);		
+	t8x8fill(x,y)	
+END t8x8b;
+
+PROCEDURE t8x8c(x,y: INTEGER);
+BEGIN
+	Base.world.Shade(rays[x,y]);	
+	Base.world.Shade(rays[x+7,y]);	
+	Base.world.Shade(rays[x,y+7]);		
+	t8x8fill(x,y)
+END t8x8c;
+
+PROCEDURE t8x8d(x,y: INTEGER);
+BEGIN
+	Base.world.Shade(rays[x,y]);	
+	Base.world.Shade(rays[x+7,y]);	
+	Base.world.Shade(rays[x+7,y+7]);		
+	t8x8fill(x,y)	
+END t8x8d;
+
+PROCEDURE t16x16fill();
+VAR
+	i,j: INTEGER;
+BEGIN
+	IF clrd4(rays[0,0].clr, rays[15,0].clr, rays[15,15].clr, rays[0,15].clr) > THRESH THEN
+		t8x8a(0,0);
+		t8x8b(8,0);
+		t8x8c(8,8);
+		t8x8d(0,8); 
+	ELSE
+		FOR i:= 0 TO 15 DO
+			FOR j:= 0 TO 15 DO
+				tileimage[i,j]:=rays[0,0].clr;
+			END
+		END
+	END
+END t16x16fill;
+
+VAR
+	i,j,k: LONGINT;
+	theta,phi,dtheta,dphi: REAL;
+	ray: Base.Ray;
+	rays: ARRAY 16,16 OF Base.Ray;
+	tileimage: ARRAY 16,16 OF Base.ray_color;
+	pixel: Raster.Pixel;
+	r,b,g: REAL;
+BEGIN
+	angletoray(rays[0,0],cam.theta,cam.phi);
+	angletoray(rays[0,15],cam.theta+cam.dtheta,cam.phi);
+	angletoray(rays[15,0],cam.theta,cam.phi+cam.dphi);
+	angletoray(rays[15,15],cam.theta+cam.dtheta,cam.phi+cam.dphi);	
+	FOR i := 1 TO 15 DO
+		rays[i,0]:= interpray(rays[0,0],rays[15,0],i/16);
+		rays[i,15]:= interpray(rays[0,15],rays[15,15],i/16);
+	END;	
+	FOR i := 0 TO 15 DO
+		FOR j:= 1 TO 14 DO
+			rays[i,j]:= interpray(rays[i,0],rays[i,15],j/16);
+		END
+	END;		
+	Base.world.Shade(rays[0,0]);	
+	Base.world.Shade(rays[15,0]);		
+	Base.world.Shade(rays[15,15]);		
+	Base.world.Shade(rays[0,15]);		
+	t16x16fill;	
+	FOR i:= 0 TO 15 DO
+		FOR j := 0 TO 15 DO 
+			Raster.SetRGB(pixel,ENTIER(tileimage[i,j].r*GAMMA),ENTIER(tileimage[i,j].g*GAMMA),ENTIER(tileimage[i,j].b*GAMMA)); 
+			Raster.Put(image,cam.imx+j,cam.imy+i,pixel,copy);
+		END
+	END;		
+END tessa16d4;
+
+PROCEDURE ztrace(cam: Camera; level: INTEGER);
 VAR
 	a,b,c,d: Camera;
 	l: INTEGER;
@@ -312,76 +471,49 @@ BEGIN
 			y:=a.imy-H/2;		
 			D:=(x*x+y*y);	
 			IF D<FVV THEN	
-				tessa12(a); 
+				tessa16(a); 
 			ELSE
-				tessa6(a); 
+				tessa16d4(a); 
 			END;
  			x:=b.imx-W/2;
 			y:=b.imy-H/2;		
 			D:=(x*x+y*y);	
 			IF D<FVV THEN
-				tessa12(b); 
+				tessa16(b); 
 			ELSE 
-				tessa6(b);
+				tessa16d4(b);
 			END;
 			x:=c.imx-W/2;
 			y:=c.imy-H/2;		
 			D:=(x*x+y*y);	
 			IF D<FVV THEN	
-				tessa12(c); 
+				tessa16(c); 
 			ELSE
-				tessa6(c)
+				tessa16d4(c)
 			END;
  			x:=b.imx-W/2;
 			y:=b.imy-H/2;		
 			D:=(x*x+y*y);	
 			IF D<FVV THEN	
-				tessa12(d); 
+				tessa16(d); 
 			ELSE
-				tessa6(d); 
+				tessa16d4(d); 
 			END;		
 	ELSE
 		l:=level-1;
-		ztracef(a,l);
-		ztracef(b,l);
-		ztracef(c,l);
-		ztracef(d,l) 	
+		ztrace(a,l);
+		ztrace(b,l);
+		ztrace(c,l);
+		ztrace(d,l) 	
 	END;
-END ztracef;
-
-PROCEDURE ztraced(cam: Camera; level: INTEGER);
-VAR
-	a,b,c,d: Camera;
-	l: INTEGER;
-	x,y: REAL;
-BEGIN
-	splitcam(cam,a,b,c,d);
-	IF level<2 THEN
-			dtl:=Base.DTL;
-			tessa12(a); 
-			tessa12(b); 
-			tessa12(c); 
-			tessa12(d); 
-	ELSE
-		l:=level-1;
-		ztraced(a,l);
-		ztraced(b,l);
-		ztraced(c,l);
-		ztraced(d,l) 	
-	END;
-END ztraced;
+END ztrace;
 
 BEGIN{ACTIVE, PRIORITY(Objects.Normal)}
 	REPEAT
 		BEGIN{EXCLUSIVE}
 			AWAIT(GO);
 		END;
-		CASE TESSA OF
-			  0: ztraceu(cam,T); 
-			| 1: IF ~saccade THEN ztraced(cam,T) ELSE ztracef(cam,T) END;
-			| 2: IF ~saccade THEN ztracef(cam,T) ELSE ztraceu(cam,T) END;
-		ELSE
-		END;
+		ztrace(cam,T); 
 		BEGIN{EXCLUSIVE}
 			GO:=FALSE;
 		incTD; 
@@ -395,7 +527,7 @@ VAR
 	frameasteps*,framebsteps*:LONGINT;
 	a,b: LONGINT;
 	tilesdone:INTEGER;
-	EDGE*: REAL;
+
 	AFTER*: INTEGER;
 	FAST*:INTEGER;
 	lsense,ls2:REAL;
@@ -409,8 +541,7 @@ VAR
 	foveaparameter:INTEGER;
 	FV: REAL;
 	copy: Raster.Mode;
-	PATCH*:BOOLEAN;
-	DETAIL: REAL;
+	THRESH: REAL;
 	
 PROCEDURE Res*;
 BEGIN
@@ -446,9 +577,7 @@ BEGIN
 	ray.dxyz.x := ray.dxyz.x/d;
 	ray.dxyz.y := ray.dxyz.y/d;
 	ray.dxyz.z := ray.dxyz.z/d;	
-(*	ray.dtheta:=dtheta;
-	ray.dphi:=dphi;
-*)	ray.downxyz:=Base.dward;
+	ray.downxyz:=Base.dward;
 	ray.rightxyz:=Base.rward;
 	SPSMMath.orrot(ray.dxyz, Base.dward, rtheta);  
 	SPSMMath.orrot(ray.dxyz, Base.rward, rphi);  
@@ -464,6 +593,7 @@ BEGIN
 	ray.clr.ga := 1;
 	ray.clr.ba := 1;
 	ray.scale := 1; 
+	ray.dtl:=Base.DTL;
 END angletoray;
 
 PROCEDURE splitcam(cam: Camera; VAR a,b,c,d: Camera);
@@ -526,17 +656,23 @@ END lessdetail;
 
 PROCEDURE decdetail*;
 BEGIN
-	DETAIL:=DETAIL*2/3;
 	Base.DTL:=Base.DTL*2/3;
-	Base.DTL2:=Base.DTL2*2/3;	
 END decdetail;
 
 PROCEDURE incdetail*;
 BEGIN
-	DETAIL:=DETAIL*3/2;
 	Base.DTL:=Base.DTL*3/2;
-	Base.DTL2:=Base.DTL2*3/2;		
 END incdetail;
+
+PROCEDURE decthresh*;
+BEGIN
+	THRESH:=THRESH*2/3;
+END decthresh;
+
+PROCEDURE incthresh*;
+BEGIN
+	THRESH:=THRESH*3/2;
+END incthresh;
 
 PROCEDURE incTD;
 BEGIN{EXCLUSIVE}
@@ -602,6 +738,7 @@ BEGIN
 	sr.clr.ba := 1;
 	sr.clr.alpha:=1;
 	sr.scale := 1; 
+	sr.dtl:=Base.DTL;
 	angletoray(sr,0,0);	
 	Base.sniperay:=sr;
 	BEGIN{EXCLUSIVE}
@@ -620,16 +757,6 @@ BEGIN
 	Raster.Put(image,CX+1,CY-1,pixel,copy);	
 END go;
 
-PROCEDURE lsu*;
-BEGIN
-	EDGE:=0
-END lsu;
-
-PROCEDURE lsd*;
-BEGIN
-	EDGE:=0.01
-END lsd;
-
 BEGIN
 	Out.String("Retina loading...");
 	Raster.InitMode(copy,Raster.srcCopy);	
@@ -639,13 +766,12 @@ BEGIN
 			NEW(tile[a,b]);
 		END
 	END;	
-	EDGE:=0.001;
 	AFTER:=2;
  	FAST:=3;
- 	DETAIL:=2000;
+ 	THRESH:=0.1;
  	lsense:=0.2;
  	aperture.width:=1;
  	aperture.height:=1;
  	foveaparameter:=13;
  	Out.String("loaded...");	
-END Retina.
+END Retinax.

@@ -525,7 +525,7 @@ END setimposter;
 
 PROCEDURE getimposter*(p:PT):Voxel;
 BEGIN
-	RETURN imposter
+	RETURN vox
 END getimposter;
 
 PROCEDURE mirror*(p:PT):REAL;

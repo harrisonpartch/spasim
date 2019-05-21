@@ -1,4 +1,4 @@
-MODULE Nearthchan;
+MODULE Ndimetrodon;
 IMPORT Base:=Base, TexVox;
 VAR vox: TexVox.TexVox;
 
@@ -13,7 +13,7 @@ BEGIN
 END tick;
 
 BEGIN
-	NEW(vox,"earthchan.png");
+	NEW(vox,"dimetrodon.png");
 	vox.tscale:=1100;  
 	vox.register;
-END Nearthchan. 
+END Ndimetrodon. 

@@ -1,6 +1,6 @@
 MODULE Render;
 IMPORT Kernel, Objects, Random, Marsh,
- Out := KernelLog, Math,SPSMMath, Base,  Retina, GLW := OGLWindow, 
+ Out := KernelLog, Math,SPSMMath, Base,  Retina:=Retinax, GLW := OGLWindow, 
 	 GL:=OpenGL, GLC := OpenGLConst,  GLSL:= GLShaderUtils,
 	 Inputs,  Raster, Strings, Streams, Debugging;
 
@@ -245,14 +245,14 @@ BEGIN
 		IF avaTF THEN Marsh.drawavatar END
 	END;
 	IF MOUSEDOWN THEN	
-		IF GLW.ML IN MB THEN (* Marsh.draw; *)
+		IF GLW.ML IN MB THEN  Marsh.draw; 
 		ELSIF  GLW.MM IN MB THEN Marsh.snipeinto; 
 		ELSIF  GLW.MR IN MB THEN Marsh.snipeonto;
 		END;	
 	END;
 	trace; 
 	Base.tick;	
-	GLIDE:=0.991;	
+	GLIDE:=0.971;	
 	cvz := cvz*GLIDE+gravityvector.z; 
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y; 
 	cvl :=cvl*0; cvu := cvu*0;
@@ -283,7 +283,7 @@ BEGIN
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
-	mstarget:=50;
+	mstarget:=33;
 	Base.STOPGO; 
 END openwincam;
 
@@ -307,7 +307,7 @@ BEGIN
 	camrotinertia:=100;
 	Base.DTL:=250000;
 	Base.DTL2:=25000;
-	Base.gravity:=0;
+	Base.gravity:=0.00000001;
 	Base.speed:=0.00001;
 	Base.maxspeed:=0.0001;
 	Base.cursordist:=0.01;
@@ -358,8 +358,8 @@ BEGIN
 		CASE CHR(ucs) OF		
 			"S": Retina.incdetail; Out.String("S Retina.incdetail");
 			| "W":Retina.decdetail; Out.String("W Retina.decdetail");
-			| "A": Retina.moredetail; Out.String("S Retina.moredetail");
-			| "D":Retina.lessdetail; Out.String("W Retina.lessdetail");					
+			| "A": Retina.incthresh; Out.String("S Retina.incthresh");
+			| "D": Retina.decthresh; Out.String("W Retina.decthresh");						
 			| "s" : camera.forward(-0.51*Base.speed); 
 			| "w" : camera.forward(0.51*Base.speed) ; 
 			| "a" : camera.rightstrafe(-0.5*Base.speed)	; 
@@ -594,15 +594,15 @@ END KeyEvent;
 			GL.UseProgram(programs[curprogram]); 		
 			GL.DrawElements(GLC.GL_TRIANGLES, 6, GLC.GL_UNSIGNED_SHORT, 0);	
 		GL.UseProgram(0); 
-     SwapBuffers();	
+	     SwapBuffers();	
 	END Display;
 
 	(* change detail according to frame speed, called in GLWindow.MainLoop *)
 	PROCEDURE GameLogic();
 	BEGIN
-		IF GetCurrentFrameMs() < (mstarget-5) THEN 
+		IF GetCurrentFrameMs() < (mstarget-1) THEN 
 			Retina.moredetail;
-		ELSIF GetCurrentFrameMs() > mstarget THEN 
+		ELSIF GetCurrentFrameMs() > (mstarget+1) THEN 
 			Retina.lessdetail;
 		END; 
 	END GameLogic;
