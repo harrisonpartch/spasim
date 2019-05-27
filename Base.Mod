@@ -419,6 +419,13 @@ END hash;
 
 END Voxel; 
 
+TYPE Cell*=OBJECT(Voxel);
+VAR
+	nposterTF*:BOOLEAN;
+	nposter*: NCube;
+	deepcopyofme*:Cell;
+END Cell;
+
 TYPE VoxelStack*=OBJECT
 
 TYPE Transform=RECORD

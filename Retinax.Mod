@@ -62,7 +62,6 @@ BEGIN
 	ray.scale := 1; 
 	ray.tscale:=1;
 	ray.dtl:=Base.DTL;
-	ray.texdtl:=1;	
 END angletoray;
 
 PROCEDURE interpray(CONST ra,rb: Ray; mix: REAL): Ray;
@@ -107,7 +106,7 @@ END clrd;
 
 PROCEDURE clrd4(CONST ra,rb,rc,rd: Base.ray_color): REAL;
 BEGIN			
-	RETURN clrd(ra,rb)+clrd(rb,rc)+clrd(rc,rd)+clrd(rd,ra);
+	RETURN clrd(ra,rb)+clrd(rb,rc)+clrd(rc,rd)+clrd(rd,ra)+clrd(rb,rd)+clrd(ra,rc);
 END clrd4;
 
 PROCEDURE tessa16(cam:Camera);	
@@ -705,7 +704,6 @@ BEGIN
 	thresh1a:=thresh1a*2/3;
 	thresh1b:=thresh1a*1.5;
 	thresh1c:=thresh1b*1.5;	
-	Out.Ln;
 END decthresh1;
 
 PROCEDURE incthresh1*;
@@ -713,7 +711,6 @@ BEGIN
 	thresh1a:=thresh1a*3/2;
 	thresh1b:=thresh1a*1.5;
 	thresh1c:=thresh1b*1.5;		
-	Out.Ln;
 END incthresh1;
 
 PROCEDURE decthresh2*;
@@ -721,7 +718,6 @@ BEGIN
 	thresh2a:=thresh2a*2/3;
 	thresh2b:=thresh2a*2;
 	thresh2c:=thresh2b*2;	
-	Out.Ln;
 END decthresh2;
 
 PROCEDURE incthresh2*;

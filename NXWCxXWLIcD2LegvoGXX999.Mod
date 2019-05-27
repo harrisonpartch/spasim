@@ -72,16 +72,16 @@ VAR
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	RETURN xot
+	RETURN s1
 END thisvox;
 
 BEGIN
 	sky:=Base.VoxelFromName("NM3");  	
 	nark:=Base.VoxelFromName("Narchillect"); 
 	xot:=Base.VoxelFromName("Nearthchan"); 
-	xot.tscale:=27;
+	xot.tscale:=127;
 	echan:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");  	
-	uk:=Base.VoxelFromName("Nugandaknuckles");  	
+	uk:=Base.VoxelFromName("Ndimetrodon");  	
 	NEW(s0);
 	NEW(s1);
 	NEW(s2);
@@ -95,19 +95,25 @@ BEGIN
 	darkblue.setcolor(1/3, 1/2, 0, 1, 1, 1);
 	darkblue.passable:=TRUE;
 	dblue:=Base.VoxelFromName("NM3");  
+	nark.tscale:=100;
 
 (*	NEW(sball, s0, Base.randPT(),Base.randPT(),1,1);
 	NEW(rd,empty,nark,empty);	
 	rd.register;
 	rd.passable:=TRUE;
-*)	s0.fillsierp(echan,uk);
-	s1.fillsierp(s0,gray);	
-	s2.fillsierp(s1,darkblue);
-	s3.fillsierp(s2,darkblue);		
-	s3.setcolor(0,0,0,1/4,1/2,1/4);	
-	s2.setcolor(0,0,0,1/14,1/14,1/2);	
-	s1.setcolor(0,1/2,0,1/4,1/4,1/14);	
-	s0.setcolor(0,1/2,0,1/4,1/14,1/4);		
+*)	s0.fillsierp(nark,NIL);
+	s1.fillsierp(s0,NIL);	
+	s2.fillsierp(s1,NIL);
+	s3.fillsierp(s2,NIL);		
+	s3.setcolor(0, 1/28, 0, 1/14,1/14,1/14);	
+	s2.setcolor(0, 1/28, 0, 1/14,1/14,1/14);	
+	s1.setcolor(0, 1/28, 0, 1/14,1/14,1/14);	
+	s0.setcolor(0, 1/28, 0, 1/14, 1/14, 1/14);		
+	s0.imposter:=xot;
+	s1.imposter:=xot;
+	s2.imposter:=xot;
+	s3.imposter:=xot;
+	s0.passable:=FALSE;	
 	s0.copyonstroke:=TRUE;	
 	s1.copyonstroke:=TRUE;	
 	s2.copyonstroke:=TRUE;	

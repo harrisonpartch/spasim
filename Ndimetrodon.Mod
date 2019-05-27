@@ -13,7 +13,7 @@ BEGIN
 END tick;
 
 BEGIN
-	NEW(vox,"dimetrodon.png");
+	NEW(vox,"opossumetrodon.png");
 	vox.tscale:=1100;  
 	vox.register;
 END Ndimetrodon. 

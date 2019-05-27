@@ -207,14 +207,14 @@ VAR
 	txcube: TexCube;
 	rlf: REAL;
 	rlm: BOOLEAN;
-	lxyz,exit: Base.PT;
+	lxyz,exit,mid: Base.PT;
 	lsp: Base.SPT;
 	faace:INTEGER;
 	dtl: LONGINT;
 	mip,mipverse,gray,grayinv: REAL;
 	patchradius: REAL;
 	pclr: Base.ray_color;
-	ai,ainv:REAL;
+	ai,ainv, middy:REAL;
 BEGIN
 	IF ray.length>0 THEN
 		IF tscale>1 THEN
@@ -299,39 +299,59 @@ BEGIN
 			END;
 			ly:=1-ly;
 		END;
- 		mip:=ray.length*ray.scale;
+ 		mip:=ray.length*100;
 		IF mip>120 THEN
-			color:=texcube.side[ray.face].pixelmip_two(lx,ly);
-		ELSE
+			color:=texcube.side[ray.face].pixelmip_zero(lx,ly); 
+		ELSIF mip>40 THEN
+			color1:=texcube.side[ray.face].pixelmip_zero(lx,ly);
+			color2:=texcube.side[ray.face].pixelmip_one(lx,ly);
+			color:=Base.mixcolor(color1,color2, (mip-40)/120);
+		ELSIF mip>12 THEN
+			color1:=texcube.side[ray.face].pixelmip_one(lx,ly);
+			color2:=texcube.side[ray.face].pixelmip_two(lx,ly);
+			color:=Base.mixcolor(color1,color2,(mip-12)/40);		
+		ELSIF mip>4 THEN
+			color1:=texcube.side[ray.face].pixelmip_two(lx,ly);
+			color2:=texcube.side[ray.face].pixel(lx,ly);
+			color:=Base.mixcolor(color1,color2,(mip-4)/12);
+		ELSIF mip>1 THEN
 			color1:=texcube.side[ray.face].pixel(lx,ly);
-			color2:=texcube.side[ray.face].pixel(lx*7,ly*7);
-			color:=Base.mixcolor(color1,color2,mip/120);
+			color2:=texcube.side[ray.face].pixel(lx*1.1,ly*1.1);
+			color:=Base.mixcolor(color1,color2,(mip-1)/4);			
+		ELSE
+			color:=texcube.side[ray.face].pixel(lx*1.1,ly*1.1); 
 		END;
-(*		color:=texcube.side[ray.face].pixel(lx,ly); *)
-		IF color.alpha<0.99 THEN
-			IF color.alpha>0.8 THEN
+(*		exit:=Base.Exit(ray);
+		mid:=Base.midPT(ray.lxyz,exit);
+		middy:=1-Base.dist(mid,Base.mkPT(1/2,1/2,1/2)); *)
+		middy:=ABS(1-Math.sqrt((lx-1/2)*(lx-1/2) + (ly-1/2)*(ly-1/2)));
+		IF   color.alpha<0.99 THEN
+		 	IF color.alpha>0.9 THEN
 				mirror(ray,0);
 			ELSE
-				color.alpha:=color.alpha+0.2;
-				dr:=color.red*color.alpha*ray.clr.ra;
-				dg:=color.green*color.alpha*ray.clr.ga;
-				db:=color.blue*color.alpha*ray.clr.b;
-				ray.clr.r := ray.clr.r + dr;
-				ray.clr.g := ray.clr.g + dg;
-				ray.clr.b := ray.clr.b + db;
-				ray.clr.ra:= (ray.clr.ra-dr)-0.1;
-				ray.clr.ga:= (ray.clr.ga-dg)-0.1;
-				ray.clr.ba:= (ray.clr.ba-db)-0.1;
+				dot:= color.alpha*ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
+				dr:=color.red*dot*middy;
+				dg:=color.green*dot*middy;
+				db:=color.blue*dot*middy;
+				ray.clr.r := ray.clr.r + dr*ray.clr.ra;
+				ray.clr.g := ray.clr.g + dg*ray.clr.ga;
+				ray.clr.b := ray.clr.b + db*ray.clr.ba;
+				ray.clr.ra:=ray.clr.ra*color.alpha;
+				ray.clr.ga:=ray.clr.ga*color.alpha;			
+				ray.clr.ba:=ray.clr.ba*color.alpha;			
+				IF (color.alpha=1) OR (ray.clr.ra<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ba<0.1) THEN 
+					ray.terminate:=TRUE 
+				END;	
 			END
 		ELSE
 			dot:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-			dr:=color.red*dot;
-			dg:=color.green*dot;
-			db:=color.blue*dot;
+			dr:=color.red*dot*middy;
+			dg:=color.green*dot*middy;
+			db:=color.blue*dot*middy;
 			ray.clr.r := ray.clr.r + dr*ray.clr.ra;
 			ray.clr.g := ray.clr.g + dg*ray.clr.ga;
 			ray.clr.b := ray.clr.b + db*ray.clr.ba;
-			ray.terminate:=TRUE;
+			ray.terminate:=TRUE
 		END
 	ELSE
 	  (* camera is inside textured cube *)

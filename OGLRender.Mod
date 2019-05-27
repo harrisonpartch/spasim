@@ -252,7 +252,7 @@ BEGIN
 	END;
 	trace; 
 	Base.tick;	
-	GLIDE:=0.971;	
+	GLIDE:=0.995;	
 	cvz := cvz*GLIDE+gravityvector.z; 
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y; 
 	cvl :=cvl*0; cvu := cvu*0;
@@ -359,7 +359,9 @@ BEGIN
 			"S": Retina.incthresh1; Out.String("S Retina.incthresh1");
 			| "W":Retina.decthresh1; Out.String("W Retina.decthresh1");
 			| "A": Retina.incthresh2; Out.String("S Retina.incthresh2");
-			| "D": Retina.decthresh2; Out.String("W Retina.decthresh2");						
+			| "D": Retina.decthresh2; Out.String("W Retina.decthresh2");		
+			| "X": Retina.incdetail; Out.String("S Retina.incdetail");
+			| "C": Retina.decdetail; Out.String("W Retina.decdetail");								
 			| "s" : camera.forward(-0.51*Base.speed); 
 			| "w" : camera.forward(0.51*Base.speed) ; 
 			| "a" : camera.rightstrafe(-0.5*Base.speed)	; 

@@ -204,6 +204,19 @@ BEGIN
 END normal;
 END noise;
 
+TYPE twonoise*= OBJECT(FR)
+VAR
+	noise1*, noise2*: noise;
+
+PROCEDURE d2s*(p:PT):REAL;  (* distance to surface *)
+VAR 
+	n,d:REAL;
+BEGIN
+	RETURN((noise1.d2s(p) +noise2.d2s(p))/2)	
+END d2s;
+
+END twonoise;
+
 TYPE ellipsoid*= OBJECT(FR)
 VAR 
 	radius: REAL;

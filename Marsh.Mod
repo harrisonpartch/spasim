@@ -290,13 +290,14 @@ VAR
 	undo,rd, rdpseudosolid, blu, die,gren,granite,sand,whiteblock,lazy,pdestroyer,axolotl,xen,sky1,sky2,tigerlily,cloud: Voxel;
 	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison,fuse:Voxel;
 	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,
-	w3,z3,z3a,z2,z4,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp,acidcats, badopossum, raccoon,
+	w3,z3,z3a,z3b,z2,z4,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp,acidcats, badopossum, raccoon,
 	akatrump, archillect,arkilekt,kat,muratpak,dogepearl,
 	jordan, bottle1,bottle2,bottle3,bottlepossum,bottlegrounds,greensuncouple,wstar,starspider,arevclock: Voxel;
 	ball: FRep.sphere;
 	medley: Voxel;
 	fuzz: Voxel4.FuzzVox;
 	noise: ARRAY 5 OF FRep.noise;	 
+	twonoise: FRep.twonoise;
 BEGIN
 	NEW(ms);
 	NEW(EMPTY);
@@ -490,9 +491,9 @@ BEGIN
 	noise[0].setvoxel(wstar);		
 	NEW(noise[1]);		
 	noise[1].seed:=678;		
-	noise[1].a:=3.5;
-	noise[1].b:=3.5;
-	noise[1].c:=3.5;		
+	noise[1].a:=1;
+	noise[1].b:=1;
+	noise[1].c:=1;		
 	noise[1].octaves:=4;
 	noise[1].persistence:=3.91;	
 	noise[1].setcolor(0.8,2.8,4,1/2);	
@@ -535,25 +536,43 @@ BEGIN
 	noise[0].c:=1;		
 	noise[0].octaves:=4;
 	noise[0].persistence:=3.71;	
-	noise[0].setvoxel(serp);			
+ 	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999");
+ 	noise[0].setvoxel(serp);			
 
 	Base.setPT(center,1/2,1/2,2/3);
 	
-	z3:=Base.VoxelFromName("NM3");	
+	z3:=Base.VoxelFromName("NM2");	
 	z3a:=Base.VoxelFromName("NM3");	
+	z3b:=Base.VoxelFromName("NM3");	
 	z3a.copyonstroke:=TRUE;
-	z3a.passable:=TRUE;
-	z3a.setcolor(0,1/2,0,1,1,1);
-	z3.setcolor(1/2,0,0,1,1,1); 		
+	z3b.copyonstroke:=TRUE;	
+	z3a.setcolor(0,0,0,1,1,1);
+	z3b.setcolor(0,0,0,1,1,1);	
+	z3.setcolor(0,0,1,1,1,1); 		
 	
-	z3a.FRaster(noise[0],9);
-	noise[0].setvoxel(z3a);	
-	z3.FRaster(noise[0],27);
+	serp.tscale:=20;
+	NEW(twonoise);
+	twonoise.noise1:=noise[0];
+	twonoise.noise2:=noise[1];	
+	twonoise.setvoxel(serp);
+
+	z3a.FRaster(twonoise,16);
+	twonoise.setvoxel(z3a);	
+	z3b.FRaster(twonoise,16);	
+	twonoise.setvoxel(z3a);		
+
+	noise[0].a:=3;
+	noise[0].b:=1;
+	noise[0].c:=1;	
+	noise[1].a:=10;
+	noise[1].b:=3;
+	noise[1].c:=3;	
+	z3.FRaster(twonoise,128);
 	
  	NEW(plane,center,up);
- 	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999");
-	plane.setvoxel(axolotl);			
-	z3.FRaster(plane,27);	 
+
+	plane.setvoxel(serp);			
+	z3.FRaster(plane,32);	 
 		
 	Base.avatar:=harrison;
  	

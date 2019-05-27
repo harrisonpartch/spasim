@@ -16,12 +16,13 @@ TYPE PT = Base.PT;
 	Ray = Base.Ray;
 	Path = Base.Path;
 	Voxel = Base.Voxel;
+	Cell = Base.Cell;
 	FR = Base.FR;
 	Name = Base.Name;
  	NCube=Base.NCube;
  	LCube=Base.LightCube;
 
-TYPE cell* = OBJECT(Voxel);
+TYPE cell* = OBJECT(Cell);
 VAR
 	nposterTF*:BOOLEAN;
 	nposter*: NCube;
@@ -367,8 +368,8 @@ BEGIN
 	IF scale>=resolution THEN
 		(* v.touch; *)
 		RETURN(v)
-	ELSIF  (v#NIL) & (v IS cell) THEN
-		WITH v:cell  DO
+	ELSIF  (v#NIL) & (v IS Cell) THEN
+		WITH v:Cell  DO
 			RETURN(v.proberec(p,resolution,newscale))
 		END
 	ELSE RETURN(v)
@@ -441,7 +442,7 @@ BEGIN
 					copyv:= blox[i,j,k].deepcopy();
 					blox[i,j,k]:=copyv;	
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
-				ELSIF blox[i,j,k] IS cell THEN
+				ELSIF blox[i,j,k] IS Cell THEN
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
 				ELSE
 					NEW(c);
@@ -493,7 +494,7 @@ BEGIN
 					copyv:= blox[i,j,k].deepcopy();
 					blox[i,j,k]:=copyv;	
 					blox[i,j,k].tunnelrec(p, resolution,nextscale)
-				ELSIF blox[i,j,k] IS cell THEN
+				ELSIF blox[i,j,k] IS Cell THEN
 					blox[i,j,k].tunnelrec(p, resolution,nextscale)
 				ELSE
 					NEW(c);
@@ -534,9 +535,9 @@ BEGIN
 			END
 		ELSE
 			IF blox[i,j,k]#NIL THEN
-				IF (blox[i,j,k] IS cell) THEN
+				IF (blox[i,j,k] IS Cell) THEN
 					v:=blox[i,j,k];
-					WITH v: cell DO v.nstrokerec(p, resolution,nextscale,normal,color) END
+					WITH v: Cell DO v.nstrokerec(p, resolution,nextscale,normal,color) END
 				ELSIF (blox[i,j,k] IS Voxel) THEN
 					blox[i,j,k].nstroke(p, resolution DIV nextscale,normal,color)
 				ELSE
@@ -630,8 +631,8 @@ BEGIN
 					newcell.FRasterrec(f,resolution,o,nextscale);
 				ELSE
 				 	v:=blox[i,j,k];
-				 	IF v IS cell THEN
-				 		WITH v:cell DO
+				 	IF v IS Cell THEN
+				 		WITH v:Cell DO
 				 			v.imposter:=f.getimposter(p);
 							v.nposterTF:=TRUE;
 							v.nposter.normal:=f.normal(p);
@@ -662,10 +663,10 @@ VAR
 	origin: PT;
 BEGIN
 	origin.x:=0; origin.y:=0; origin.z:=0;
-	SFRasterrec(f,resolution,origin,1);   (* origin is (0,0,0) *)
+	FRasterrecSolid(f,resolution,origin,1);   (* origin is (0,0,0) *)
 END FRasterSolid;
 
-PROCEDURE SFRasterrec(f: FR; resolution: LONGINT; origin: PT; scale: LONGINT);
+PROCEDURE FRasterrecSolid(f: FR; resolution: LONGINT; origin: PT; scale: LONGINT);
 VAR
 	i,j,k,ii,jj,kk: INTEGER;
 	o,p:PT;
@@ -694,17 +695,17 @@ BEGIN
 					newcell.nposterTF:=TRUE;
 					newcell.nposter.normal:=f.normal(p);
 					newcell.nposter.color:=f.color(p);
-					newcell.SFRasterrec(f,resolution,o,nextscale);
+					newcell.FRasterrecSolid(f,resolution,o,nextscale);
 					blox[i,j,k]:=newcell				
 				ELSE
 				 	v:=blox[i,j,k];
-				 	IF v IS cell THEN
-				 		WITH v:cell DO
+				 	IF v IS Cell THEN
+				 		WITH v:Cell DO
 				 			v.imposter:=f.voxel(p);
 							v.nposterTF:=TRUE;
 							v.nposter.normal:=f.normal(p);
 							v.nposter.color:=f.color(p);
-							v.SFRasterrec(f,resolution,o,nextscale)
+							v.FRasterrecSolid(f,resolution,o,nextscale)
 				 		END
 				 	END
 				 END
@@ -727,7 +728,7 @@ BEGIN
 			END
 		END END END
 	END;
-END SFRasterrec;
+END FRasterrecSolid;
 
 PROCEDURE copy():Voxel;
 VAR c: cell;
