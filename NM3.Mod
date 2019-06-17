@@ -175,7 +175,7 @@ BEGIN
 	ELSE
 		dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z);
 		dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-		mix:=ray.length*ray.scale/10;
+		mix:=ray.length*ray.scale/100;
 		IF mix>1 THEN mix:=1 END;
 		dot:=mix*dot1+(1-mix)*dot2;
 		ray.clr.r := ray.clr.r + nc.color.red * ray.clr.ra*dot;
@@ -406,7 +406,7 @@ VAR
 BEGIN
 	Base.clamPT(p);
 	IF voxel#NIL THEN
-		strokerec(p,resolution,1, voxel);
+		strokerec(p,resolution,M, voxel);
 	END
 END stroke;
 

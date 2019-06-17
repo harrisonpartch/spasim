@@ -303,7 +303,7 @@ BEGIN
 	NEW(EMPTY);
 	EMPTY.passable:=TRUE;
      rand:=Base.rand;	
-	xot:=Base.VoxelFromName("Nbrownianspheres"); 
+	xot:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoR"); 
 	push(xot);
 	cage:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");
 	cage.copyonstroke:=TRUE;
@@ -488,7 +488,7 @@ BEGIN
 	noise[0].c:=1;		
 	noise[0].octaves:=4;
 	noise[0].persistence:=3.61;	
-	noise[0].setvoxel(wstar);		
+	noise[0].setvoxel(xot);		
 	NEW(noise[1]);		
 	noise[1].seed:=678;		
 	noise[1].a:=1;
@@ -497,7 +497,7 @@ BEGIN
 	noise[1].octaves:=4;
 	noise[1].persistence:=3.91;	
 	noise[1].setcolor(0.8,2.8,4,1/2);	
-	noise[1].setvoxel(dogepearl);	
+	noise[1].setvoxel(xot);	
 	xot.tscale:=100;		
 	NEW(noise[2]);	
 	noise[2].seed:=900909;		
@@ -539,40 +539,49 @@ BEGIN
  	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999");
  	noise[0].setvoxel(serp);			
 
-	Base.setPT(center,1/2,1/2,2/3);
+
 	
-	z3:=Base.VoxelFromName("NM2");	
-	z3a:=Base.VoxelFromName("NM3");	
-	z3b:=Base.VoxelFromName("NM3");	
+	z3:=Base.VoxelFromName("NM3");	
+	z3a:=Base.VoxelFromName("NM2");	
+	z3b:=Base.VoxelFromName("NM2");	
 	z3a.copyonstroke:=TRUE;
 	z3b.copyonstroke:=TRUE;	
-	z3a.setcolor(0,0,0,1,1,1);
-	z3b.setcolor(0,0,0,1,1,1);	
-	z3.setcolor(0,0,1,1,1,1); 		
-	
-	serp.tscale:=20;
+	z3a.passable:=FALSE;
+	z3a.setcolor(1/4,0,0,1/2,1/2,1/2);
+
 	NEW(twonoise);
 	twonoise.noise1:=noise[0];
 	twonoise.noise2:=noise[1];	
-	twonoise.setvoxel(serp);
-
-	z3a.FRaster(twonoise,16);
-	twonoise.setvoxel(z3a);	
-	z3b.FRaster(twonoise,16);	
-	twonoise.setvoxel(z3a);		
-
-	noise[0].a:=3;
-	noise[0].b:=1;
-	noise[0].c:=1;	
-	noise[1].a:=10;
-	noise[1].b:=3;
-	noise[1].c:=3;	
-	z3.FRaster(twonoise,128);
+     dieone.tscale:=1000;
+	twonoise.setvoxel(wstar);
 	
+	z3a.FRaster(twonoise,8);
+	twonoise.setvoxel(z3a);	
+	z3b.FRaster(twonoise,8);	
+	
+	noise[0].a:=3;
+	noise[0].b:=5;
+	noise[0].c:=7;	
+	noise[1].a:=5;
+	noise[1].b:=7;
+	noise[1].c:=3;	
+	
+	Base.setPT(center,1/2,1/2,1/2);
+	xot.stroke(center,1,serp);
+
+	z3.FRaster(twonoise,27); 
+	FOR i := 0 TO 1000 DO
+		z3.stroke(Base.randPT(),81,xot)
+	END;
+	
+	
+
+	
+	Base.setPT(center,1/2,1/2,2/3);	
  	NEW(plane,center,up);
 
 	plane.setvoxel(serp);			
-	z3.FRaster(plane,32);	 
+	z3.FRaster(plane,16);	 
 		
 	Base.avatar:=harrison;
  	

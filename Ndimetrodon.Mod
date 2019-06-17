@@ -1,5 +1,5 @@
 MODULE Ndimetrodon;
-IMPORT Base:=Base, TexVox;
+IMPORT Base, TexVox;
 VAR vox: TexVox.TexVox;
 
 PROCEDURE thisvox*():Base.Voxel;
@@ -14,6 +14,6 @@ END tick;
 
 BEGIN
 	NEW(vox,"opossumetrodon.png");
-	vox.tscale:=1100;  
+	vox.tscale:=100;  
 	vox.register;
 END Ndimetrodon. 

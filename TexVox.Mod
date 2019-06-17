@@ -339,7 +339,7 @@ BEGIN
 				ray.clr.ra:=ray.clr.ra*color.alpha;
 				ray.clr.ga:=ray.clr.ga*color.alpha;			
 				ray.clr.ba:=ray.clr.ba*color.alpha;			
-				IF (color.alpha=1) OR (ray.clr.ra<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ba<0.1) THEN 
+				IF (ray.clr.ra<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ba<0.1) THEN 
 					ray.terminate:=TRUE 
 				END;	
 			END

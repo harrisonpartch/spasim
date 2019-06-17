@@ -114,7 +114,7 @@ BEGIN
 		q:=Base.mkPT(x,y,z);
 		pass := Base.world.passprobe(q);
 		IF pass THEN 
-			cvz:=0 (* -cvz/2 *)
+			cvz:=-cvz/2 
 		ELSE
 			x := cx + cvx; y := cy; z := cz+cvz;	
 			q:=Base.mkPT(x,y,z);
@@ -255,7 +255,7 @@ BEGIN
 	GLIDE:=0.995;	
 	cvz := cvz*GLIDE+gravityvector.z; 
 	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y; 
-	cvl :=cvl*0; cvu := cvu*0;
+	cvl :=cvl*0.7; cvu := cvu*0.7
 END tick;
  
 END Camera;
@@ -575,7 +575,7 @@ END KeyEvent;
 			programs[10] := InitShader("passthroughVS.glsl", "sharpenFS.glsl");
 			programs[11] := InitShader("passthroughVS.glsl", "nightVisionFS.glsl");
 (*			programs[12]:=InitShader("passthroughVS.glsl", "passthroughFS.glsl");*)
-			programs[12] := InitShader("passthroughVS.glsl", "kuwahara.glsl"); 
+			programs[12] := InitShader("passthroughVS.glsl", "toonShading2.glsl"); 
 		curprogram := 0;	  
 		Out.String("InitGL");
 		Out.Ln;
@@ -602,12 +602,12 @@ END KeyEvent;
 	(* change detail according to frame speed, called in GLWindow.MainLoop *)
 	PROCEDURE GameLogic();
 	BEGIN
-		IF GetCurrentFrameMs() < (mstarget-1) THEN 
+	(*	IF GetCurrentFrameMs() < (mstarget-1) THEN 
 			Retina.moredetail;
 		ELSIF GetCurrentFrameMs() > (mstarget+1) THEN 
 			Retina.lessdetail;
 		END; 
-	END GameLogic;
+*)	END GameLogic;
 	
 	END GLWindow;
 

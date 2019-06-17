@@ -540,12 +540,35 @@ BEGIN
 	END;
 END ztrace;
 
+PROCEDURE zftrace(cam: Camera; level: INTEGER);
+VAR
+	a,b,c,d: Camera;
+	l: INTEGER;
+	x,y,D: REAL;
+	FVV:REAL;
+BEGIN	
+	splitcam(cam,a,b,c,d);
+	IF level<2 THEN
+		tessa16(a); 
+		tessa16(b); 
+		tessa16(c); 
+		tessa16(d); 
+	ELSE
+		l:=level-1;
+		zftrace(a,l);
+		zftrace(b,l);
+		zftrace(c,l);
+		zftrace(d,l) 	
+	END;
+END zftrace;
+
+
 BEGIN{ACTIVE, PRIORITY(Objects.Normal)}
 	REPEAT
 		BEGIN{EXCLUSIVE}
 			AWAIT(GO);
 		END;
-		ztrace(cam,T); 
+		zftrace(cam,T); 
 		BEGIN{EXCLUSIVE}
 			GO:=FALSE;
 		incTD; 

@@ -33,6 +33,47 @@ END in;
 		
 END rprism;
 
+TYPE randpoints*= OBJECT(FR)
+VAR 
+	radius*, rsquared*: REAL;
+	center*:PT;
+	cxf*:BOOLEAN;
+	rand*:Random.Sequence;
+		
+PROCEDURE &init*;
+
+BEGIN
+	NEW(rand);
+END init;
+
+PROCEDURE color*(p:PT):Color;
+VAR
+	c: Color;
+BEGIN
+	c.red:=cxolor.red+(rand.Uniform()*0.06);
+	c.green:=cxolor.green+(rand.Uniform()*0.06);
+	c.blue:=cxolor.blue+(rand.Uniform()*0.06);
+	Base.clamp3(c.red,c.green,c.blue);
+	RETURN c
+END color;
+
+PROCEDURE in*(p:PT):BOOLEAN;
+BEGIN
+	RETURN TRUE
+END in;
+
+PROCEDURE d2s*(p:PT):REAL;  (* distance to surface *)
+BEGIN
+	IF rand.Uniform()<0.3 THEN 
+		RETURN(0.001)
+	ELSE
+		RETURN(0.5)
+	END
+END d2s;
+	
+END randpoints;
+
+
 TYPE sphere*= OBJECT(FR)
 VAR 
 	radius*, rsquared*: REAL;
@@ -61,9 +102,9 @@ PROCEDURE color*(p:PT):Color;
 VAR
 	c: Color;
 BEGIN
-	c.red:=cxolor.red+(0.010-rand.Uniform()/50);
-	c.green:=cxolor.green+(0.010-rand.Uniform()/50);
-	c.blue:=cxolor.blue+(0.010-rand.Uniform()/50);
+	c.red:=cxolor.red+(rand.Uniform()*0.06);
+	c.green:=cxolor.green+(rand.Uniform()*0.06);
+	c.blue:=cxolor.blue+(rand.Uniform()*0.06);
 	Base.clamp3(c.red,c.green,c.blue);
 	RETURN c
 END color;
@@ -117,6 +158,52 @@ BEGIN
 END mirror;
 	
 END sphere;
+
+TYPE twosphere*= OBJECT(sphere);
+VAR
+	vox2: Voxel;
+	cxolor2: Color;
+	
+PROCEDURE setcolor2*(r,g,b,a: REAL);  
+BEGIN
+	cxolor2.red:=r; cxolor2.green:=g; cxolor2.blue:=b; cxolor2.alpha:=a;
+END setcolor2;
+
+PROCEDURE setvoxel2*(CONST a:Voxel);
+BEGIN
+	vox2:=a;
+END setvoxel2;
+
+PROCEDURE color*(p:PT):Color;
+VAR
+	c: Color;
+BEGIN
+	IF rand.Uniform()>1/2 THEN
+		c.red:=cxolor.red+(rand.Uniform()*0.06);
+		c.green:=cxolor.green+(rand.Uniform()*0.06);
+		c.blue:=cxolor.blue+(rand.Uniform()*0.06);
+		Base.clamp3(c.red,c.green,c.blue);
+	ELSE
+		c.red:=cxolor2.red+(rand.Uniform()*0.06);
+		c.green:=cxolor2.green+(rand.Uniform()*0.06);
+		c.blue:=cxolor2.blue+(rand.Uniform()*0.06);
+		Base.clamp3(c.red,c.green,c.blue);
+	END;
+	RETURN c
+END color;
+
+
+PROCEDURE voxel*(p:PT):Voxel;
+BEGIN
+	IF rand.Uniform() > 1/2 THEN 
+		RETURN vox 
+	ELSE 
+		RETURN vox2
+	END
+END voxel;
+
+END twosphere;
+
 
 TYPE benice*= OBJECT(FR);
 VAR 
@@ -212,7 +299,7 @@ PROCEDURE d2s*(p:PT):REAL;  (* distance to surface *)
 VAR 
 	n,d:REAL;
 BEGIN
-	RETURN((noise1.d2s(p) +noise2.d2s(p))/2)	
+	RETURN((noise1.d2s(p)+noise2.d2s(p))/2)	
 END d2s;
 
 END twonoise;

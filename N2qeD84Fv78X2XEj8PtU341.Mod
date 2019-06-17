@@ -48,7 +48,7 @@ PROCEDURE&init*;
 BEGIN
 	setoutline(0,0,0,1/2);
 	NEW(blue);
-	blue.setcolor(1/3,0,0,0,1/3,1/3);
+	blue.setcolor(1/7,0,0,1/3,1/3,1/3);
 	innard:=Base.VoxelFromName("NM3");	
 	innard.setcolor(0,0,2/3,1,1,1);
 	passable:=TRUE;

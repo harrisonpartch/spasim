@@ -72,7 +72,7 @@ VAR
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	RETURN s1
+	RETURN s3
 END thisvox;
 
 BEGIN
@@ -101,10 +101,10 @@ BEGIN
 	NEW(rd,empty,nark,empty);	
 	rd.register;
 	rd.passable:=TRUE;
-*)	s0.fillsierp(nark,NIL);
-	s1.fillsierp(s0,NIL);	
-	s2.fillsierp(s1,NIL);
-	s3.fillsierp(s2,NIL);		
+*)	s0.fillsierp(NIL,xot);
+	s1.fillsierp(NIL,s0);	
+	s2.fillsierp(NIL,s1);
+	s3.fillsierp(NIL,s2);		
 	s3.setcolor(0, 1/28, 0, 1/14,1/14,1/14);	
 	s2.setcolor(0, 1/28, 0, 1/14,1/14,1/14);	
 	s1.setcolor(0, 1/28, 0, 1/14,1/14,1/14);	
