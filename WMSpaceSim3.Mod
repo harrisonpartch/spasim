@@ -3,7 +3,7 @@ MODULE WMSpaceSim3;
 	IMPORT KernelLog := KernelLog, Inputs, Strings, WMRectangles,
 	WM := WMWindowManager,  Modules, WMMessages,
 	GL:=OpenGL, GLC:=OpenGLConst, WMGL := WMGLWindow,
-	ML := Decoder3DS;
+	ML := Decoder3DS, GLU;
 
 TYPE
 	KillerMsg = OBJECT
@@ -61,8 +61,8 @@ TYPE
 		GL.MatrixMode(GLC.GL_PROJECTION);  (* Specifies which matrix stack is the target for matrix operations  *)
 		GL.LoadIdentity;  (* We initialize the projection matrix as identity *)
 
-		GL.Ortho(-50, 50, -50, 50, -1000, 1000);
-	(*	GLU.Perspective(45.0, ratio,1.0,10000.0);  (* We define the "viewing volume" *)*)
+	(*	GL.Ortho(-50, 50, -50, 50, -1000, 1000); *)
+		GLU.Perspective(45.0, ratio,1.0,10000.0);  (* We define the "viewing volume" *)
 
 
 		GL.Enable(GLC.GL_DEPTH_TEST);  (* We enable the depth test (also called z buffer) *)
@@ -98,8 +98,8 @@ TYPE
 
 		GL.MatrixMode(GLC.GL_PROJECTION);  (* Projection transformation *)
 		GL.LoadIdentity;  (* We initialize the projection matrix as identity *)
-		GL.Ortho(-50, 50, -50, 50, -1000, 1000);
-	(*	GLU.Perspective(45.0, ratio,1.0,10000.0);*)
+	(*	GL.Ortho(-50, 50, -50, 50, -1000, 1000); *)
+		GLU.Perspective(45.0, ratio,1.0,10000.0);
 
 		DeActivate();
 	END Reshape;

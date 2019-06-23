@@ -91,11 +91,13 @@ TYPE
 	END GetScreen;
 
 	PROCEDURE Resize*(w, h: LONGINT);
+	VAR
+		res: Kernel32.BOOL;
 	BEGIN
 		buffer := NIL;
 		NEW(buffer, w*h*4);
 	(*	MoveResizeWindow(0,0, w, h);*)
-		User32.MoveWindow(glWin.hWind, 0, 0, w, h, 1); (* repaint *)
+		res := User32.MoveWindow(glWin.hWind, 0, 0, w, h, 1); (* repaint *)
 		glWin.width := w; glWin.height := h;
 	END Resize;
 
@@ -275,7 +277,7 @@ VAR
 	   (* do we have a rendering context *)
     IF  glWin.hGLRC # 0 THEN
         (* Release the DC and RC contexts *)
-        GL.wglMakeCurrent(0, 0 );
+			bres := GL.wglMakeCurrent(0, 0 );
 
         (* Delete the rendering context *)
 

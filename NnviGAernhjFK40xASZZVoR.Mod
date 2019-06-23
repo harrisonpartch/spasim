@@ -25,7 +25,7 @@ BEGIN
 	ball.setcolor(0.9,0.1,0.1,1);
 	redball.FRaster(ball,4);
 	ball.setcolor(0.2,0.1,0.9,1);
-	blueball.FRaster(ball,8);
+	blueball.FRaster(ball,4);
 	NEW(ball2,center,7.15/12);
 	ball2.setvoxel(redball);
 	ball2.setvoxel2(blueball);	

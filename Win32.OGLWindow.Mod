@@ -222,6 +222,7 @@ TYPE
 		attr: POINTER TO ARRAY OF LONGINT;
 		tempContext: WinApi.HGLRC;
 		i: LONGINT;
+		bres: BOOLEAN;
 	BEGIN
 		(* create opengl compatibilitity mode context *)
 		NEW(attr, 13);
@@ -261,10 +262,10 @@ TYPE
 			RETURN FALSE
 		END;
 
-		GL.wglMakeCurrent(0, 0);
-		GL.wglDeleteContext(hGLRC);
+		bres := GL.wglMakeCurrent(0, 0);
+		bres := GL.wglDeleteContext(hGLRC);
 		hGLRC := tempContext;
-		GL.wglMakeCurrent(hDC,  hGLRC);
+		bres := GL.wglMakeCurrent(hDC,  hGLRC);
 		GL.ReadExtensions();
 		IF debug THEN
 			KernelLog.String("Using new style context"); KernelLog.Ln;
@@ -349,8 +350,10 @@ TYPE
 
 	(** Redisplay proc for GL,  sends update message to the Window to call Display proc. *)
 	PROCEDURE ReDisplay*();
+	VAR
+		res: Kernel32.BOOL;
 	BEGIN
-		User32.SendMessage(hWnd, User32.WMPaint, 0, 0);
+		res := User32.SendMessage(hWnd, User32.WMPaint, 0, 0);
 	END ReDisplay;
 
 	(** abstract: when iddle time expired, redisplay GL content.
@@ -392,19 +395,22 @@ TYPE
 
 	(** move the window to x,y and  resize width,height *)
 	PROCEDURE MoveResizeWindow*(x, y, w, h: LONGINT);
+	VAR
+		res: Kernel32.BOOL;
 	BEGIN
-		User32.MoveWindow(hWnd, x, y, w, h, 1); (* repaint *)
+		res := User32.MoveWindow(hWnd, x, y, w, h, 1); (* repaint *)
 	END MoveResizeWindow;
 
 	(** Set mouse position to x,y *)
 	PROCEDURE SetMousePosition*(x, y: LONGINT);
 	VAR pt: User32.Point;
+		res: Kernel32.BOOL;
 	BEGIN
 		(* convert client coords. to screen coords. *)
 		pt.x := x; pt.y := height-1 - y;
-		WinApi.ClientToScreen(hWnd, pt);
+		res := WinApi.ClientToScreen(hWnd, pt);
 		(* chage cursor position *)
-		User32.SetCursorPos(pt.x, pt.y);
+		res := User32.SetCursorPos(pt.x, pt.y);
 	END SetMousePosition;
 
 	(** warp pointer to x,y *)
@@ -415,17 +421,19 @@ TYPE
 
 	(** make null cursor for mouse pointer *)
 	PROCEDURE HideMousePointer*(hide: BOOLEAN);
+	VAR
+		hres: User32.HWND;
+		cur: User32.HCursor;
 	BEGIN
 		hidecursor := hide;
 		IF hide THEN
 			(* hide cursor *)
-			User32.SetCapture(hWnd); (*  capture mouse to user window *)
-			User32.ShowCursor(0); (* FALSE *)
-
+			hres := User32.SetCapture(hWnd); (*  capture mouse to user window *)
+			cur := User32.ShowCursor(0); (* FALSE *)
 		ELSE
 			(* show cursor *)
-			User32.ReleaseCapture(); (*  un-capture mouse from user window *)
-			User32.ShowCursor(1); (* TRUE *)
+			hres := User32.ReleaseCapture(); (*  un-capture mouse from user window *)
+			cur := User32.ShowCursor(1); (* TRUE *)
 		END;
 	END HideMousePointer;
 
@@ -463,8 +471,9 @@ TYPE
 	VAR m: Inputs.AbsMouseMsg;
 		ret: Kernel32.HANDLE;
 		keys: SET;
+		cur: User32.HCursor;
 	BEGIN
-		User32.SetCursor(hCurrentCursor);
+		cur := User32.SetCursor(hCurrentCursor);
 		m.x := LONGINT(lParam MOD ASH( 1, 16 ));
 		m.y := LONGINT(height-1-ASH( lParam, -16 )); (* opengl coordinates origin is lower-left  *)
 	(*	m.y := ASH( lParam, -16 ) -1;*)
@@ -612,6 +621,7 @@ TYPE
 	PROCEDURE UpdateDisplay(id: LONGINT;  lParam: User32.LParam; wParam: User32.WParam );
 	VAR
 		ps: User32.PaintStruct;
+		dcres: User32.HDC;
 	BEGIN
 		IF ~(minimized IN state) THEN
 			IF id = resize THEN
@@ -620,9 +630,9 @@ TYPE
 				Reshape(width, height);
 
 			ELSIF id = redraw THEN
-				User32.BeginPaint(hWnd, ps);
+				dcres := User32.BeginPaint(hWnd, ps);
 				Display();
-				User32.EndPaint(hWnd, ps);
+				dcres := User32.EndPaint(hWnd, ps);
 			END;
 		END;
 	END UpdateDisplay;
@@ -696,7 +706,6 @@ TYPE
 	VAR str: ARRAY 32 OF CHAR;
 		ret: Kernel32.ATOM;
 		windowClass: User32.WndClassEx;
-		cur: User32.HCursor;
 	BEGIN
 		windowClass.cbSize := SIZEOF( User32.WndClassEx );
 		windowClass.style := WinApi.CS_OWNDC + WinApi.CS_VREDRAW + WinApi.CS_HREDRAW;   (* Cs_parentdc: INTEGER is 128  = 2^7 *)
@@ -720,6 +729,8 @@ TYPE
 	PROCEDURE CreateWindow(): BOOLEAN;
 	VAR
 		rect: User32.Rect;
+		cur: User32.HCursor;
+		res: Kernel32.BOOL;
 	BEGIN
 		IF fullscreen THEN
 			screenSettings.dmSize:=SIZEOF(WinApi.DEVMODE);
@@ -739,7 +750,7 @@ TYPE
 		IF fullscreen THEN
 			create.dwExStyle := WinApi.WS_EX_APPWINDOW;
 			create.dwStyle := WinApi.WS_POPUP + WinApi.WS_CLIPSIBLINGS + WinApi.WS_CLIPCHILDREN;
-			User32.ShowCursor(0);
+			cur := User32.ShowCursor(0);
 		ELSE
 			create.dwExStyle := WinApi.WS_EX_APPWINDOW + WinApi.WS_EX_WINDOWEDGE;
 			create.dwStyle := WinApi.WS_OVERLAPPEDWINDOW + WinApi.WS_CLIPSIBLINGS + WinApi.WS_CLIPCHILDREN;
@@ -754,7 +765,7 @@ TYPE
 		END;
 
 		rect.right := width; 	rect.bottom := height;
-		WinApi.AdjustWindowRectEx(rect, create.dwStyle, 0, create.dwExStyle);
+		res := WinApi.AdjustWindowRectEx(rect, create.dwStyle, 0, create.dwExStyle);
 
 		hWnd :=
 			User32.CreateWindowEx( SYSTEM.VAL(LONGINT, create.dwExStyle) , className, title, create.dwStyle, left, top,  (rect.right - rect.left) , (rect.bottom - rect.top),
@@ -767,17 +778,18 @@ TYPE
 	PROCEDURE CloseWindow*();
 	VAR res: Kernel32.BOOL;
 		bres : BOOLEAN;
+		cur: User32.HCursor;
 	BEGIN
 		active := FALSE;
 		IF fullscreen THEN
-			WinApi.ChangeDisplaySettings(0, {});
-			User32.SetCursor(1);
+			res := WinApi.ChangeDisplaySettings(0, {});
+			cur := User32.SetCursor(1);
 		END;
 
 		(* do we have a rendering context *)
 		IF  hGLRC # 0 THEN
 			(* Release the DC and RC contexts *)
-			GL.wglMakeCurrent(0, 0 );
+			bres := GL.wglMakeCurrent(0, 0 );
 			(* Delete the rendering context *)
 			bres := GL.wglDeleteContext( hGLRC );
 			hGLRC := 0;
@@ -809,13 +821,14 @@ TYPE
 
 	PROCEDURE LoopForEvents*();
 	VAR msg: User32.Msg;
+		res: Kernel32.BOOL;
 	BEGIN
 		IF WinApi.PeekMessage(msg, 0, 0,0, WinApi.PM_REMOVE) # 0 THEN
 			IF msg.message = User32.WMQuit THEN
 				active := FALSE
 			ELSE;
-				User32.TranslateMessage(msg);
-				User32.DispatchMessage(msg);
+				res := User32.TranslateMessage(msg);
+				res := User32.DispatchMessage(msg);
 			END
 		END;
 	END LoopForEvents;
@@ -835,13 +848,14 @@ END GameLogic;
 	VAR fms,fmsum: LONGINT;
 		ft: ARRAY 10 OF LONGINT;
 		i,ii: LONGINT;
+		res: Kernel32.BOOL;
 	BEGIN
 
 		RegisterClasses();
 		IF ~CreateWindow() THEN Close(); RETURN END;
 
-		User32.ShowWindow( hWnd, User32.SWShow);
-		User32.SetForegroundWindow(hWnd);
+		res := User32.ShowWindow( hWnd, User32.SWShow);
+		res := User32.SetForegroundWindow(hWnd);
 
 		(*User32.UpdateWindow(hWnd);*)
 		(*User32.SetWindowText(hWnd, title);*)

@@ -117,6 +117,7 @@ VAR
 	SNIPE*,SNIPEINTO*:BOOLEAN;
 	atmdark: REAL;
 	pth: Path; 
+	alternateworld: Voxel;
 
 PROCEDURE draw*;
 BEGIN
@@ -283,6 +284,14 @@ BEGIN
 	RETURN p
 END randPT;
 
+PROCEDURE swapworld*;
+VAR v:Voxel;
+BEGIN
+	v:=Base.world;
+	Base.world:=alternateworld;
+	alternateworld:=v;
+END swapworld;
+
 PROCEDURE dawn*;
 VAR
 	z10: Voxel;
@@ -290,7 +299,7 @@ VAR
 	undo,rd, rdpseudosolid, blu, die,gren,granite,sand,whiteblock,lazy,pdestroyer,axolotl,xen,sky1,sky2,tigerlily,cloud: Voxel;
 	die0,die1,die2,die3,die4,die5,etile0,etile1,etile2,etile3,etile4,grass,sparx,msphere,harrison,fuse:Voxel;
 	sky,dieone, serp,cthulhu,greenball,rat,beatrix,blacksun,conglomerate,conglo2,caption,gorge,xot,xot2,
-	w3,z3,z3a,z3b,z2,z4,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp,acidcats, badopossum, raccoon,
+	w3,z3,z3a,z3b,z2,z2a,z4,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp,acidcats, badopossum, raccoon,
 	akatrump, archillect,arkilekt,kat,muratpak,dogepearl,
 	jordan, bottle1,bottle2,bottle3,bottlepossum,bottlegrounds,greensuncouple,wstar,starspider,arevclock: Voxel;
 	ball: FRep.sphere;
@@ -488,16 +497,16 @@ BEGIN
 	noise[0].c:=1;		
 	noise[0].octaves:=4;
 	noise[0].persistence:=3.61;	
-	noise[0].setvoxel(xot);		
+	noise[0].setvoxel(sky1);		
 	NEW(noise[1]);		
 	noise[1].seed:=678;		
-	noise[1].a:=1;
-	noise[1].b:=1;
-	noise[1].c:=1;		
+	noise[1].a:=3;
+	noise[1].b:=3;
+	noise[1].c:=3;		
 	noise[1].octaves:=4;
 	noise[1].persistence:=3.91;	
 	noise[1].setcolor(0.8,2.8,4,1/2);	
-	noise[1].setvoxel(xot);	
+	noise[1].setvoxel(wstar);	
 	xot.tscale:=100;		
 	NEW(noise[2]);	
 	noise[2].seed:=900909;		
@@ -528,68 +537,50 @@ BEGIN
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,9/10);
 	Base.setPT(up,0,0,1);
-
-	NEW(noise[0]);
-	noise[0].seed:=1534777690;		
-	noise[0].a:=1;
-	noise[0].b:=1;
-	noise[0].c:=1;		
-	noise[0].octaves:=4;
-	noise[0].persistence:=3.71;	
- 	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999");
- 	noise[0].setvoxel(serp);			
-
-
 	
+	z2:=Base.VoxelFromName("NM2");	
+	z2a:=Base.VoxelFromName("NM2");	
 	z3:=Base.VoxelFromName("NM3");	
-	z3a:=Base.VoxelFromName("NM2");	
-	z3b:=Base.VoxelFromName("NM2");	
+	z3a:=Base.VoxelFromName("NM3");
+	z3b:=Base.VoxelFromName("NM3");	
 	z3a.copyonstroke:=TRUE;
 	z3b.copyonstroke:=TRUE;	
-	z3a.passable:=FALSE;
-	z3a.setcolor(1/4,0,0,1/2,1/2,1/2);
-
+	z3a.passable:=TRUE;
+	z3a.setcolor(0,1/4,0,1/2,1/2,1/2);
+	z2a.setcolor(0,1/4,0,1/2,1/2,1/2);
+	
 	NEW(twonoise);
 	twonoise.noise1:=noise[0];
 	twonoise.noise2:=noise[1];	
      dieone.tscale:=1000;
 	twonoise.setvoxel(wstar);
 	
-	z3a.FRaster(twonoise,8);
-	twonoise.setvoxel(z3a);	
-	z3b.FRaster(twonoise,8);	
-	
-	noise[0].a:=3;
-	noise[0].b:=5;
-	noise[0].c:=7;	
-	noise[1].a:=5;
-	noise[1].b:=7;
-	noise[1].c:=3;	
-	
+(*	z3a.FRaster(noise[0],16);
+	noise[0].setvoxel(z3a);	
+*)	z2.FRaster(noise[0],64);	
+	z3.FRaster(noise[0],81);	
 	Base.setPT(center,1/2,1/2,1/2);
 	xot.stroke(center,1,serp);
 
-	z3.FRaster(twonoise,27); 
 	FOR i := 0 TO 1000 DO
-		z3.stroke(Base.randPT(),81,xot)
+		z2a.stroke(Base.randPT(),16,serp);
+		z3a.stroke(Base.randPT(),27,serp);
 	END;
-	
-	
-
 	
 	Base.setPT(center,1/2,1/2,2/3);	
  	NEW(plane,center,up);
 
 	plane.setvoxel(serp);			
-	z3.FRaster(plane,16);	 
-		
+	z2.FRaster(plane,8);	 
+	plane.setvoxel(serp);			
+	z3.FRaster(plane,9);	 		
 	Base.avatar:=harrison;
  	
 	Base.avatarsize:=1000; 
 
 	
 	Base.world:=z3;
-
+	alternateworld:=z3;	
 END dawn;
 
 PROCEDURE darken*;

@@ -17,8 +17,6 @@ VAR
 	(* handle to library  *)
 	libHandle: ADDRESS;
 
-	libraryPaths: ARRAY 3 OF ARRAY 64 OF CHAR;
-
 CONST
 	debug = FALSE; (* used in ReadImplementationProperties, when extension is not available  *)
 	(* libName = '/usr/lib/i386-linux-gnu/mesa/libGL.so.1';*)
@@ -30,16 +28,16 @@ TYPE
 	PAnsiChar* = ADDRESS;
 
 	(* GL data types *)
-	Enum* = LONGINT; 	(* 4 bytes *)
-	Boolean* = UNSIGNED8; 	(*? BOOELAN  *)
-	Bitfield* = SET32; 	(* SET *)
-	Byte* = SHORTINT; 		(* 1 byte signed *)
-	Short* = INTEGER; 	(* 2 bytes signed *)
-	Int* = LONGINT; 	(* 4 bytes signed *)
-	Sizei* = LONGINT; 	(* 4 bytes signed	  *)
-	Ubyte* = UNSIGNED8; 		(* 1 byte unsigned *)
+	Enum* = LONGINT;	(* 4 bytes *)
+	Boolean* = UNSIGNED8;	(*? BOOELAN  *)
+	Bitfield* = SET32;	(* SET *)
+	Byte* = SHORTINT;	(* 1 byte signed *)
+	Short* = INTEGER;	(* 2 bytes signed *)
+	Int* = LONGINT;		(* 4 bytes signed *)
+	Sizei* = LONGINT;	(* 4 bytes signed	  *)
+	Ubyte* = UNSIGNED8;	(* 1 byte unsigned *)
 	Ushort* = UNSIGNED16;	(* 2 bytes unsigned *)
-	Uint* = WORD;	(* 4 bytes unsigned *)
+	Uint* = WORD;		(* 4 bytes unsigned *)
 	Float* = REAL;		(* single precision real *)
 	Clampf* = REAL;		(* single precision real in [0,1] *)
 	Double* = LONGREAL;	(* double precision real *)
@@ -48,23 +46,23 @@ TYPE
 	Int64* = HUGEINT;
 	Uint64* = UNSIGNED64;
 
-	PBoolean* = ADDRESS; 	(* POINTER TO ARRAY OF Boolean; *)
-	PByte* = ADDRESS; 	(* POINTER TO ARRAY OF Byte; *)
-	PShort* = ADDRESS; 	(* POINTER TO ARRAY OF Short; *)
-	PInt* =  ADDRESS; 	(* POINTER TO ARRAY OF Int; *)
-	PSizei* = ADDRESS; 	(* POINTER TO ARRAY OF Sizei; *)
-	PUbyte* = ADDRESS; 	(* POINTER TO ARRAY OF Ubyte; *)
-	PUshort* = ADDRESS; 	(* POINTER TO ARRAY OF Ushort; *)
-	PUint* = ADDRESS; 	(* POINTER TO ARRAY OF Uint; *)
-	PClampf* = ADDRESS; 	(* POINTER TO ARRAY OF Clampf; *)
-	PFloat* =  ADDRESS; 	(* POINTER TO ARRAY OF Float; *)
-	PDouble* = ADDRESS; 	(* POINTER TO ARRAY OF Double; *)
-	PClampd* = ADDRESS; 	(* POINTER TO ARRAY OF Clampd; *)
-	PEnum* =  ADDRESS; 	(* POINTER TO ARRAY OF Enum *);
-	PVoid* = Void; 			(* POINTER TO ARRAY OF Void; *)
-	PPVoid* = ADDRESS; 	(* POINTER TO ARRAY OF PVoid; *)
-	PInt64* =  ADDRESS; 	(* POINTER TO ARRAY OF Int64; *)
-	PUint64* = ADDRESS; 	(* POINTER TO ARRAY OF Uint64; *)
+	PBoolean* = ADDRESS;	(* POINTER TO ARRAY OF Boolean; *)
+	PByte* = ADDRESS;	(* POINTER TO ARRAY OF Byte; *)
+	PShort* = ADDRESS;	(* POINTER TO ARRAY OF Short; *)
+	PInt* =  ADDRESS;	(* POINTER TO ARRAY OF Int; *)
+	PSizei* = ADDRESS;	(* POINTER TO ARRAY OF Sizei; *)
+	PUbyte* = ADDRESS;	(* POINTER TO ARRAY OF Ubyte; *)
+	PUshort* = ADDRESS;	(* POINTER TO ARRAY OF Ushort; *)
+	PUint* = ADDRESS;	(* POINTER TO ARRAY OF Uint; *)
+	PClampf* = ADDRESS;	(* POINTER TO ARRAY OF Clampf; *)
+	PFloat* =  ADDRESS;	(* POINTER TO ARRAY OF Float; *)
+	PDouble* = ADDRESS;	(* POINTER TO ARRAY OF Double; *)
+	PClampd* = ADDRESS;	(* POINTER TO ARRAY OF Clampd; *)
+	PEnum* =  ADDRESS;	(* POINTER TO ARRAY OF Enum *);
+	PVoid* = Void;		(* POINTER TO ARRAY OF Void; *)
+	PPVoid* = ADDRESS;	(* POINTER TO ARRAY OF PVoid; *)
+	PInt64* =  ADDRESS;	(* POINTER TO ARRAY OF Int64; *)
+	PUint64* = ADDRESS;	(* POINTER TO ARRAY OF Uint64; *)
 
 	(* GL_NV_half_float *)
 	HalfNV* = Ushort;
@@ -6679,38 +6677,9 @@ BEGIN
 	SYSTEM.PUT(adr, address);
 END GetProcAddress;
 
-(*! --------------------------   *)
-(* from Linux.Unix.Mod *)
-PROCEDURE Dlopen*( CONST libName: ARRAY OF CHAR; mode: LONGINT ): ADDRESS;
-VAR h: ADDRESS; i, j, k: INTEGER;
-	p: ARRAY 256 OF CHAR;
-BEGIN
-	(* first, find the library in the search parth of A2*)
-	 h := Unix.Dlopen(libName, mode );
-(*	 IF h = 0 THEN (* else search in libraryPaths *)
-		i := 0; h := 0;
-		WHILE (h = 0) & (i < 4) DO
-			COPY( libraryPaths[i], p ); j := 0;
-			WHILE p[j] # 0X DO  INC( j )  END;
-			p[j] := '/'; k := 0;
-			REPEAT  INC( j ); p[j] := libName[k]; INC( k )  UNTIL p[j] = 0X;
-			h := Unix.Dlopen( p , mode ); INC( i )
-		END;
-		IF h # 0 THEN
-			KernelLog.String("using OpenGL search path: "); KernelLog.String(p); KernelLog.Ln;
-		ELSE
-			KernelLog.String("ERROR: could not find a suitable file for libGL.so.1 - "); KernelLog.String(libName); KernelLog.Ln;
-		END;
-	ELSE
-		KernelLog.String("using LinuxAos searh path: "); KernelLog.String(libName); KernelLog.Ln;
-	END;
-	*)
-	RETURN h
-END Dlopen;
-
 PROCEDURE InitOpenGL*;
 BEGIN
-	libHandle := Dlopen(libName, 2);
+	libHandle := Unix.Dlopen(libName, 2);
   	ASSERT(libHandle # 0,101);
 
 	(* load GL functions *)
@@ -10736,9 +10705,8 @@ VAR
 	END isNumber;
 
 	PROCEDURE TrimAndSplitVersionString(CONST buffer: ARRAY OF CHAR; VAR Max, Min: LONGINT);
-	VAR separator,i : LONGINT;
+	VAR separator: SIZE;
 	BEGIN
-		i := 0;
 		separator := Strings.Pos('.', buffer);
 		(* At least one number must be before and one after the dot.  *)
 		IF (separator > 0) & (separator < Strings.Length(buffer)) & ((isNumber(buffer[separator - 1])) &
@@ -10837,7 +10805,7 @@ BEGIN
 END Int_GetExtensionString;
 
 PROCEDURE Int_CheckExtension( allextensions: Strings.String; CONST thisextension: ARRAY OF CHAR): BOOLEAN;
-VAR pos: LONGINT;
+VAR pos: SIZE;
 BEGIN
 	pos := Strings.Pos(thisextension, allextensions^);
 	IF debug & (pos = -1) THEN
@@ -11478,22 +11446,8 @@ BEGIN
 END OnClose;
 
 BEGIN
-
-	(* add following serach paths for libGL.so.1 to mulitiarch i386 systems*)
-(*
-	(* amd, ati *)
-	libraryPaths[0] := "/usr/lib/x86_64-linux-gnu/fglrx";
-
-	(* mesa *)
-	libraryPaths[1] := "/usr/lib/x86_64-linux-gnu/mesa";
-
-	(* local, libGL.so.1 needs to be 32bit *)
-	libraryPaths[2] := "/usr/local/lib";
-*)
 	InitOpenGL();
 	ReadOpenGLCore();
-
 	Modules.InstallTermHandler(OnClose);
-
 END OpenGL.
 

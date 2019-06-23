@@ -30,7 +30,7 @@ TYPE
 		NEW(object);
 
 		Init(640, 480, 200,100, FALSE);
-		fname := "opengloberon_X64/spaceship.3ds";
+		fname := "opengloberon/spaceship.3ds";
 		SetTitle(fname);
 		(* cmdlinerun := TRUE; *) (* if you run this module from command line, set TRUE *)
 	END New;
@@ -66,7 +66,7 @@ TYPE
 			Close;
 		END;
 
-		textureId:=ML.LoadImage('opengloberon_x64/spaceshiptexture.bmp');  (* The Function LoadImage() return the current texture ID *)
+		textureId:=ML.LoadImage('opengloberon/spaceshiptexture.bmp');  (* The Function LoadImage() return the current texture ID *)
 
 		(* If the last function returns -1 it means the file was not found so we exit from the program *)
 		IF (textureId = -1) THEN

@@ -6,10 +6,10 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=2;        
-	TS=16*4;  (*  TS MUST BE {size of unit tile} MULTIPLIED BY 2**T *)
-	TW=16;
-	TH=9;
+	T=3;        
+	TS=16*8;  (*  TS MUST BE {size of unit tile} MULTIPLIED BY 2**T *)
+	TW=8;
+	TH=5;
 	W*=TS*TW;
 	H*=TS*TH;
 	CX=W DIV 2;
@@ -562,13 +562,12 @@ BEGIN
 	END;
 END zftrace;
 
-
 BEGIN{ACTIVE, PRIORITY(Objects.Normal)}
 	REPEAT
 		BEGIN{EXCLUSIVE}
 			AWAIT(GO);
 		END;
-		zftrace(cam,T); 
+		ztrace(cam,T); 
 		BEGIN{EXCLUSIVE}
 			GO:=FALSE;
 		incTD; 
@@ -697,7 +696,7 @@ END splitcam;
 PROCEDURE moredetail*;
 BEGIN
 	foveaparameter:=foveaparameter-1;
-	IF foveaparameter<11 THEN foveaparameter:=11 END;
+	IF foveaparameter<25 THEN foveaparameter:=25 END;
 	FV:=W/foveaparameter; 
 	decthresh1;
 	decthresh2;
@@ -706,7 +705,7 @@ END moredetail;
 PROCEDURE lessdetail*;
 BEGIN
 	foveaparameter:=(foveaparameter+1);
-	IF foveaparameter>50 THEN foveaparameter:=50 END;
+	IF foveaparameter>100 THEN foveaparameter:=100 END;
 	FV:=W/foveaparameter; 
 	incthresh1;
 	incthresh2;
@@ -714,40 +713,40 @@ END lessdetail;
 
 PROCEDURE decdetail*;
 BEGIN
-	Base.DTL:=Base.DTL*2/3;
+	Base.DTL:=Base.DTL*2/5;
 END decdetail;
 
 PROCEDURE incdetail*;
 BEGIN
-	Base.DTL:=Base.DTL*3/2;
+	Base.DTL:=Base.DTL*5/2;
 END incdetail;
 
 PROCEDURE decthresh1*;
 BEGIN
-	thresh1a:=thresh1a*2/3;
-	thresh1b:=thresh1a*1.5;
-	thresh1c:=thresh1b*1.5;	
+	thresh1a:=thresh1a*2/5;
+	thresh1b:=thresh1a;
+	thresh1c:=thresh1b;	
 END decthresh1;
 
 PROCEDURE incthresh1*;
 BEGIN
-	thresh1a:=thresh1a*3/2;
-	thresh1b:=thresh1a*1.5;
-	thresh1c:=thresh1b*1.5;		
+	thresh1a:=thresh1a*5/2;
+	thresh1b:=thresh1a;
+	thresh1c:=thresh1b;		
 END incthresh1;
 
 PROCEDURE decthresh2*;
 BEGIN
-	thresh2a:=thresh2a*2/3;
-	thresh2b:=thresh2a*2;
-	thresh2c:=thresh2b*2;	
+	thresh2a:=thresh2a*2/5;
+	thresh2b:=thresh2a;
+	thresh2c:=thresh2b;	
 END decthresh2;
 
 PROCEDURE incthresh2*;
 BEGIN
 	thresh2a:=thresh2a*3/2;
-	thresh2b:=thresh2a*2;
-	thresh2c:=thresh2b*2;		
+	thresh2b:=thresh2a;
+	thresh2c:=thresh2b;		
 END incthresh2;
 
 PROCEDURE incTD;

@@ -11287,9 +11287,8 @@ VAR
 
 
 	PROCEDURE TrimAndSplitVersionString(CONST buffer: ARRAY OF CHAR; VAR Max, Min: LONGINT);
-	VAR separator,i : LONGINT;
+	VAR separator: SIZE;
 	BEGIN
-		i := 0;
 		separator := Strings.Pos('.', buffer);
 		(* At least one number must be before and one after the dot.  *)
 		IF (separator > 0) & (separator < Strings.Length(buffer)) & ((isNumber(buffer[separator - 1])) &
@@ -11400,7 +11399,7 @@ BEGIN
 END Int_GetExtensionString;
 
 PROCEDURE Int_CheckExtension( allextensions: Strings.String; CONST thisextension: ARRAY OF CHAR): BOOLEAN;
-VAR pos: LONGINT;
+VAR pos: SIZE;
 BEGIN
 	pos := Strings.Pos(thisextension, allextensions^);
 	IF debug & (pos = -1) THEN

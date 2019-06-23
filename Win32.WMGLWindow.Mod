@@ -60,7 +60,8 @@ TYPE
 
 	(* create a new opengl context with opengl version major, minor *)
 	PROCEDURE SetProfile(major, minor: LONGINT; flags: SET): BOOLEAN;
-	VAR res: LONGINT;
+	VAR
+		bres: BOOLEAN;
 		attr: POINTER TO ARRAY OF LONGINT;
 		tempContext: WinApi.HGLRC;
 		i: LONGINT;
@@ -103,10 +104,10 @@ TYPE
 			RETURN FALSE
 		END;
 
-		GL.wglMakeCurrent(0, 0);
-		GL.wglDeleteContext(glWin.hGLRC);
+		bres := GL.wglMakeCurrent(0, 0);
+		bres := GL.wglDeleteContext(glWin.hGLRC);
 		glWin.hGLRC := tempContext;
-		GL.wglMakeCurrent(glWin.hDC,  glWin.hGLRC);
+		bres := GL.wglMakeCurrent(glWin.hDC,  glWin.hGLRC);
 		GL.ReadExtensions();
 		IF debug THEN
 			KernelLog.String("Using new style context"); KernelLog.Ln;
@@ -149,8 +150,10 @@ TYPE
 
 		(** move the window to x,y and  resize width,height *)
 	PROCEDURE MoveResizeWindow(x, y, w, h: LONGINT);
+	VAR
+		res: Kernel32.BOOL;
 	BEGIN
-		User32.MoveWindow(glWin.hWind, x, y, w, h, 1); (* repaint *)
+		res := User32.MoveWindow(glWin.hWind, x, y, w, h, 1); (* repaint *)
 	END MoveResizeWindow;
 
 	PROCEDURE Resize(w, h: LONGINT);
@@ -391,7 +394,7 @@ VAR
 	   (* do we have a rendering context *)
     IF  glWin.hGLRC # 0 THEN
         (* Release the DC and RC contexts *)
-        GL.wglMakeCurrent(0, 0 );
+        bres := GL.wglMakeCurrent(0, 0 );
 
         (* Delete the rendering context *)
 

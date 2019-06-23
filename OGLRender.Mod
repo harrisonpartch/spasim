@@ -386,8 +386,8 @@ BEGIN
 			| "6": avaTF:=~avaTF ; Out.String(" ");
 			| "h": camera.hop ; Out.String(" ");
 			| " ":  Marsh.tunnelinto ; Out.String(" ");
-			| "]": mstarget:= mstarget * 102/98 ; Out.String(" ");
-			| "[": mstarget:= mstarget * 98/102 ; Out.String(" ");
+			| "]": mstarget:= mstarget * 102/98 ; Out.String("slower");
+			| "[": mstarget:= mstarget * 98/102 ; Out.String("faster");
 			| "}": camera.aperture.width := camera.aperture.width * 101/99; camera.aperture.height := camera.aperture.height *101/99 ; Out.String(" ");
 			| "{":  camera.aperture.width := camera.aperture.width * 99/101;  camera.aperture.height := camera.aperture.height *99/101 ; Out.String(" ");
 			| "9": IF Marsh.cursorsize<999999 THEN Marsh.cursorsize:=Marsh.cursorsize * 2; Base.cursordist:=Base.cursordist/2 END ; Out.String(" ");
@@ -398,7 +398,8 @@ BEGIN
 			| "g": camera.glidetoggle ; Out.String(" ");
 			| "b": Marsh.showcode	; Out.String(" ");
 			| "f": curprogram := (curprogram+1 ) MOD 13 ; Out.String("next glsl filter");
-			| "F": curprogram := (curprogram-1 ) MOD 13 ; Out.String("previous glsl filter");							
+			| "F": curprogram := (curprogram-1 ) MOD 13 ; Out.String("previous glsl filter");		
+			| "+": Marsh.swapworld; Out.String("Swap")					
 		ELSE (* use keysm *)
 			CASE keysym OF
 			| Inputs.KsEscape (*1BH*) : IF CAPTUREMOUSE THEN 
@@ -602,12 +603,12 @@ END KeyEvent;
 	(* change detail according to frame speed, called in GLWindow.MainLoop *)
 	PROCEDURE GameLogic();
 	BEGIN
-	(*	IF GetCurrentFrameMs() < (mstarget-1) THEN 
-			Retina.moredetail;
-		ELSIF GetCurrentFrameMs() > (mstarget+1) THEN 
-			Retina.lessdetail;
+		IF GetCurrentFrameMs() > (mstarget+5) THEN 
+			Retina.lessdetail
+		ELSIF GetCurrentFrameMs() < (mstarget-5) THEN 
+			Retina.moredetail
 		END; 
-*)	END GameLogic;
+	END GameLogic;
 	
 	END GLWindow;
 
