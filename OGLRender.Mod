@@ -739,7 +739,7 @@ END shaders;
 PROCEDURE Open* ;
 BEGIN
 	NEW(glw,Retina.W,Retina.H);
-(*	Debugging.DisableGC *)
+	Debugging.DisableGC 
 END Open;
 
 
