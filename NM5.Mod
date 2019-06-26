@@ -136,9 +136,9 @@ BEGIN
 				ray.clr.ga := ray.clr.ga-greenblack*vdepth;
 				ray.clr.ba := ray.clr.ba-blueblack*vdepth;	
 					 			
-				ray.clr.r := ray.clr.r+red*ray.clr.ra*vdepth;
-				ray.clr.g:= ray.clr.g+green*ray.clr.ga*vdepth;
-				ray.clr.b := ray.clr.b+blue*ray.clr.ba*vdepth;
+				ray.clr.r := ray.clr.r+red*vdepth;
+				ray.clr.g:= ray.clr.g+green*vdepth;
+				ray.clr.b := ray.clr.b+blue*vdepth;
 				IF (ray.clr.ra<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ba<0.1) THEN 
 					ray.terminate:=TRUE 
 				END;	
@@ -175,7 +175,7 @@ BEGIN
 	ELSE
 		dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z);
 		dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-		mix:=ray.length*ray.scale/10;
+		mix:=ray.length*ray.scale/100;
 		IF mix>1 THEN mix:=1 END;
 		dot:=mix*dot1+(1-mix)*dot2;
 		ray.clr.r := ray.clr.r + nc.color.red * ray.clr.ra*dot;

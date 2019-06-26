@@ -62,7 +62,7 @@ END draw;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN	
-	RETURN cage
+	RETURN yellow
 END thisvox;
 
 BEGIN 

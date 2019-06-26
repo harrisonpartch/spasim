@@ -356,12 +356,10 @@ VAR
 BEGIN
 	key:=CHR(ucs);
 		CASE CHR(ucs) OF		
-			"S": Retina.incthresh1; Out.String("S Retina.incthresh1");
-			| "W":Retina.decthresh1; Out.String("W Retina.decthresh1");
-			| "A": Retina.incthresh2; Out.String("S Retina.incthresh2");
-			| "D": Retina.decthresh2; Out.String("W Retina.decthresh2");		
-			| "X": Retina.incdetail; Out.String("S Retina.incdetail");
-			| "C": Retina.decdetail; Out.String("W Retina.decdetail");								
+			"S": Retina.incthresh1(4); Out.String("  Retina.incthresh1"); 
+			| "W":Retina.decthresh1(4); Out.String("  Retina.decthresh1");
+			| "X": Retina.incdetail; Out.String("  Retina.incdetail");
+			| "C": Retina.decdetail; Out.String("  Retina.decdetail");								
 			| "s" : camera.forward(-0.51*Base.speed); 
 			| "w" : camera.forward(0.51*Base.speed) ; 
 			| "a" : camera.rightstrafe(-0.5*Base.speed)	; 
@@ -386,8 +384,8 @@ BEGIN
 			| "6": avaTF:=~avaTF ; Out.String(" ");
 			| "h": camera.hop ; Out.String(" ");
 			| " ":  Marsh.tunnelinto ; Out.String(" ");
-			| "]": mstarget:= mstarget * 102/98 ; Out.String("slower");
-			| "[": mstarget:= mstarget * 98/102 ; Out.String("faster");
+			| "]": mstarget:= mstarget * 102/98 ; Out.String("mstarget = "); Out.Int(ENTIER(mstarget),4);
+			| "[": mstarget:= mstarget * 98/102 ; Out.String("mstarget = "); Out.Int(ENTIER(mstarget),4);
 			| "}": camera.aperture.width := camera.aperture.width * 101/99; camera.aperture.height := camera.aperture.height *101/99 ; Out.String(" ");
 			| "{":  camera.aperture.width := camera.aperture.width * 99/101;  camera.aperture.height := camera.aperture.height *99/101 ; Out.String(" ");
 			| "9": IF Marsh.cursorsize<999999 THEN Marsh.cursorsize:=Marsh.cursorsize * 2; Base.cursordist:=Base.cursordist/2 END ; Out.String(" ");
@@ -602,12 +600,17 @@ END KeyEvent;
 
 	(* change detail according to frame speed, called in GLWindow.MainLoop *)
 	PROCEDURE GameLogic();
+	VAR ms,msd: LONGINT;
 	BEGIN
-		IF GetCurrentFrameMs() > (mstarget+5) THEN 
-			Retina.lessdetail
-		ELSIF GetCurrentFrameMs() < (mstarget-5) THEN 
-			Retina.moredetail
-		END; 
+		ms:= GetCurrentFrameMs();
+		msd:= ENTIER(ms-mstarget);
+		IF ABS(msd)>3 THEN
+			IF msd > 0 THEN 
+				Retina.lessdetail(msd)
+			ELSE 
+				Retina.moredetail(5)
+			END
+		END
 	END GameLogic;
 	
 	END GLWindow;
