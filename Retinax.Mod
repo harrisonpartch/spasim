@@ -6,10 +6,10 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=2;        
-	TS=16*4;  (*  TS MUST BE {size of unit tile} MULTIPLIED BY 2**T *)
-	TW=16;
-	TH=9;
+	T=3;        
+	TS=16*8;  (*  TS MUST BE {size of unit tile} MULTIPLIED BY 2**T *)
+	TW=15;
+	TH=8;
 	W*=TS*TW;
 	H*=TS*TH;
 	CX=W DIV 2;
@@ -669,11 +669,13 @@ END incdetail;
 PROCEDURE decthresh1*(d: LONGINT);
 BEGIN
 	thresh1a:=thresh1a*3/d;
+	IF thresh1a<0.01 THEN thresh1a:=0.01 END
 END decthresh1;
 
 PROCEDURE incthresh1*(d: LONGINT);
 BEGIN
 	thresh1a:=thresh1a*d/3;
+	IF thresh1a>10 THEN thresh1a:=10 END
 END incthresh1;
 
 PROCEDURE incTD;
@@ -770,7 +772,7 @@ BEGIN
 	END;	
 	AFTER:=2;
  	FAST:=3;
- 	thresh1a:=0.5;
+ 	thresh1a:=2.5;
  	lsense:=0.2;
  	aperture.width:=1;
  	aperture.height:=1;

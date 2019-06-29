@@ -496,7 +496,7 @@ BEGIN
 	noise[0].b:=1;
 	noise[0].c:=1;		
 	noise[0].octaves:=4;
-	noise[0].persistence:=3.31;	
+	noise[0].persistence:=3.61;	
 	noise[0].setvoxel(sky1);		
 	NEW(noise[1]);		
 	noise[1].seed:=678;		
@@ -542,25 +542,24 @@ BEGIN
 	z3a:=Base.VoxelFromName("NM3");
 	z3a.copyonstroke:=TRUE; 
 	z3a.passable:=TRUE;
-	z3.setcolor(1/4,2/3,0,1,1,1);
+	z3.setcolor(0,0,0.1,0.2,0.2,0.2);	
+	z3a.setcolor(1/2,1/2,2/3,1,1,1);
 
 	
 	NEW(twonoise);
 	twonoise.noise1:=noise[0];
 	twonoise.noise2:=noise[1];	
      dieone.tscale:=1000;
-	twonoise.setvoxel(wstar);
+     twonoise.setvoxel(sky1);
 	z3a.FRaster(noise[0],27);
-	noise[1].setvoxel(z3a);	
-	z3.FRaster(noise[1],27);	
+	noise[1].setvoxel(z3a);
+	z3.FRasterSolid(noise[1],27);	
+
 	Base.setPT(center,1/2,1/2,1/2);
 	xot.stroke(center,1,serp);
 
 	FOR i := 0 TO 10000 DO
-		z3a.stroke(Base.randPT(),27,dotz);		
-	END;
-	FOR i := 0 TO 1000 DO
-		z3a.stroke(Base.randPT(),27,xot);		
+		z3.stroke(Base.randPT(),27,dotz);		
 	END;
 	Base.setPT(center,1/2,1/2,2/3);	
  	NEW(plane,center,up);
@@ -573,7 +572,7 @@ BEGIN
 
 	
 	Base.world:=z3;
-	alternateworld:=z2;	
+	alternateworld:=z3;	
 END dawn;
 
 PROCEDURE darken*;

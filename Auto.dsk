@@ -15,9 +15,9 @@
 	</Window>
 	<Window name="PET" loader="PET.Restore" l="504" t="17" r="1544" b="1026" flags="{0..2,13}">
 		<PETData>
-			<General SelectedPageNr="4" ProjectTextFile=""/>
+			<General SelectedPageNr="5" ProjectTextFile=""/>
 			<Tab file="/home/valentine/spasim32/Spasim.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="209"/>
+				<Editor firstLine="0" cursorPos="192"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
@@ -31,7 +31,7 @@
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
 			<Tab file="NM3.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
-				<Editor firstLine="164" cursorPos="4895"/>
+				<Editor firstLine="0" cursorPos="1"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="true" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="M" replaceString=""/>
 				<LogPanel height="130"/>
@@ -45,6 +45,13 @@
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
 			<Tab file="OGLRender.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="0"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="Retinax.Mod" codecFormat="AUTO" compilerOptions="-p=Unix32 --warnings" showLabels="false" wordWrap="false">
 				<Editor firstLine="0" cursorPos="0"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>

@@ -283,7 +283,7 @@ BEGIN
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
-	mstarget:=30;
+	mstarget:=40;
 	Base.STOPGO; 
 END openwincam;
 
@@ -600,16 +600,11 @@ END KeyEvent;
 
 	(* change detail according to frame speed, called in GLWindow.MainLoop *)
 	PROCEDURE GameLogic();
-	VAR ms,msd: LONGINT;
 	BEGIN
-		ms:= GetCurrentFrameMs();
-		msd:= ENTIER(ms-mstarget);
-		IF ABS(msd)>3 THEN
-			IF msd > 0 THEN 
-				Retina.lessdetail(msd)
-			ELSE 
-				Retina.moredetail(5)
-			END
+		IF  GetCurrentFrameMs()>mstarget THEN 
+			Retina.lessdetail(5)
+		ELSE 
+			Retina.moredetail(5)
 		END
 	END GameLogic;
 	

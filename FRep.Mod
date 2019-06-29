@@ -299,7 +299,7 @@ PROCEDURE d2s*(p:PT):REAL;  (* distance to surface *)
 VAR 
 	n,d:REAL;
 BEGIN
-	RETURN((noise1.d2s(p)+noise2.d2s(p))/3)	
+	RETURN((noise1.d2s(p)+noise2.d2s(p)))	
 END d2s;
 
 END twonoise;
