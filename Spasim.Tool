@@ -1,4 +1,5 @@
 Compiler.Compile 
+Heaps.Mod
 Base.Mod
 SPSME.Mod 
 SPSMMath.Mod

@@ -500,9 +500,9 @@ BEGIN
 	noise[0].setvoxel(sky1);		
 	NEW(noise[1]);		
 	noise[1].seed:=678;		
-	noise[1].a:=3;
-	noise[1].b:=3;
-	noise[1].c:=1;		
+	noise[1].a:=7;
+	noise[1].b:=7;
+	noise[1].c:=7;		
 	noise[1].octaves:=4;
 	noise[1].persistence:=3.91;	
 	noise[1].setcolor(0.8,2.8,4,1/2);	
@@ -540,10 +540,12 @@ BEGIN
 	
 	z3:=Base.VoxelFromName("NM3");	
 	z3a:=Base.VoxelFromName("NM3");
+	medley:=Base.VoxelFromName("NM3");	
 	z3a.copyonstroke:=TRUE; 
 	z3a.passable:=TRUE;
-	z3.setcolor(0,0,0.1,0.2,0.2,0.2);	
-	z3a.setcolor(1/2,1/2,2/3,1,1,1);
+	medley.copyonstroke:=TRUE; 
+	z3.setcolor(0,0,0.01,0.02,0.02,0.02);	
+	z3a.setcolor(1/12,1/12,2/13,1,1,1);
 
 	
 	NEW(twonoise);
@@ -552,14 +554,21 @@ BEGIN
      dieone.tscale:=1000;
      twonoise.setvoxel(sky1);
 	z3a.FRaster(noise[0],27);
-	noise[1].setvoxel(z3a);
+	z3.FRasterSolid(twonoise,27);	
+	noise[1].setvoxel(wstar);
 	z3.FRasterSolid(noise[1],27);	
-
 	Base.setPT(center,1/2,1/2,1/2);
 	xot.stroke(center,1,serp);
 
-	FOR i := 0 TO 10000 DO
-		z3.stroke(Base.randPT(),27,dotz);		
+
+	NEW(ball,center,0.6);
+	ball.setcolor(0.9,0.1,0.1,1);
+	medley.FRaster(ball,9);
+(*	FOR i := 0 TO 10 DO
+		medley.stroke(Base.randPT(),27,wstar);
+	END;		
+*)	FOR i := 0 TO 100000 DO
+		z3.stroke(Base.randPT(),81,medley);
 	END;
 	Base.setPT(center,1/2,1/2,2/3);	
  	NEW(plane,center,up);
