@@ -305,6 +305,7 @@ VAR
 	ball: FRep.sphere;
 	medley: Voxel;
 	fuzz: Voxel4.FuzzVox;
+	siv: Voxel4.MirrorSphereInVox;
 	noise: ARRAY 5 OF FRep.noise;	 
 	twonoise: FRep.twonoise;
 BEGIN
@@ -491,20 +492,20 @@ BEGIN
 	greensuncouple:=Base.VoxelFromName("Ngreensuncouple");  
 	push(greensuncouple);
 	NEW(noise[0]);		
-	noise[0].seed:=1534666690;		
+	noise[0].seed:=153466690;		
 	noise[0].a:=1;
 	noise[0].b:=1;
 	noise[0].c:=1;		
 	noise[0].octaves:=4;
-	noise[0].persistence:=3.61;	
+	noise[0].persistence:=3.71;	
 	noise[0].setvoxel(sky1);		
 	NEW(noise[1]);		
 	noise[1].seed:=678;		
-	noise[1].a:=7;
-	noise[1].b:=7;
-	noise[1].c:=7;		
+	noise[1].a:=2;
+	noise[1].b:=3;
+	noise[1].c:=1;		
 	noise[1].octaves:=4;
-	noise[1].persistence:=3.91;	
+	noise[1].persistence:=3.31;	
 	noise[1].setcolor(0.8,2.8,4,1/2);	
 	noise[1].setvoxel(wstar);	
 	xot.tscale:=100;		
@@ -540,48 +541,57 @@ BEGIN
 	
 	z3:=Base.VoxelFromName("NM3");	
 	z3a:=Base.VoxelFromName("NM3");
+	z3b:=Base.VoxelFromName("NM3");
 	medley:=Base.VoxelFromName("NM3");	
 	z3a.copyonstroke:=TRUE; 
+	z3b.copyonstroke:=TRUE; 	
 	z3a.passable:=TRUE;
 	medley.copyonstroke:=TRUE; 
-	z3.setcolor(0,0,0.01,0.02,0.02,0.02);	
-	z3a.setcolor(1/12,1/12,2/13,1,1,1);
-
-	
-	NEW(twonoise);
-	twonoise.noise1:=noise[0];
-	twonoise.noise2:=noise[1];	
+(*	z3.setcolor(0,0,0.13,0.17,0.17,0.17);	
+	z3a.setcolor(1/12,1/12,1/13,1/13,1/13,1/13);
+*)
      dieone.tscale:=1000;
-     twonoise.setvoxel(sky1);
+     noise[0].setvoxel(sky1);
+(*	z3b.FRaster(noise[0],27);
+	noise[0].setvoxel(z3b);	
 	z3a.FRaster(noise[0],27);
-	z3.FRasterSolid(twonoise,27);	
-	noise[1].setvoxel(wstar);
-	z3.FRasterSolid(noise[1],27);	
-	Base.setPT(center,1/2,1/2,1/2);
-	xot.stroke(center,1,serp);
-
+	noise[0].setvoxel(z3a);		
+	z3.FRaster(noise[0],27);	*)
+(*	noise[1].setvoxel(wstar);
+	z3.FRaster(noise[1],27);	
+*)	Base.setPT(center,1/2,1/2,1/2);
 
 	NEW(ball,center,0.6);
-	ball.setcolor(0.9,0.1,0.1,1);
-	medley.FRaster(ball,9);
-(*	FOR i := 0 TO 10 DO
+	ball.setcolor(0.21,0.21,0.81,1);
+	medley.FRaster(ball,27);
+	FOR i := 0 TO 10000 DO
 		medley.stroke(Base.randPT(),27,wstar);
 	END;		
-*)	FOR i := 0 TO 100000 DO
-		z3.stroke(Base.randPT(),81,medley);
+	FOR i := 0 TO 10000 DO
+		medley.stroke(Base.randPT(),27,gxy);
+	END;			
+	FOR i := 0 TO 10000 DO
+		z3.stroke(Base.randPT(),27,medley);
 	END;
+		FOR i := 0 TO 10000 DO
+		z3.stroke(Base.randPT(),27,gxy);
+	END;	
 	Base.setPT(center,1/2,1/2,2/3);	
  	NEW(plane,center,up);
 
-	plane.setvoxel(serp);			
-	z3.FRaster(plane,27);	 		
+	plane.setvoxel(wstar);			
+	z3.FRaster(plane,9);	 		
+
+	NEW(siv); 
+	
 	Base.avatar:=harrison;
- 	
+	
 	Base.avatarsize:=1000; 
 
 	
 	Base.world:=z3;
 	alternateworld:=z3;	
+	Out.String('end of Marsh.dawn')
 END dawn;
 
 PROCEDURE darken*;

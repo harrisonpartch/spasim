@@ -569,7 +569,7 @@ VAR
 (*	clock*: Clock;*)
 	TICK*: BOOLEAN;
 	TOCK*: BOOLEAN;
-	fog*:REAL;
+	fog*,horizon*:REAL;
 	rlimit*: INTEGER;
 	iterlimit*: LONGINT;
 	speed*,maxspeed*:REAL;
@@ -1233,7 +1233,8 @@ BEGIN
 	NEW(world);
 	worldalive := TRUE;
 	frame:=0;
-	fog := 0.02;
+	fog := 3.1;
+	horizon:=1;
 	rlimit := 4;
 	iterlimit := 500;
 	DTL:=3;	

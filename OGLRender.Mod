@@ -1,6 +1,6 @@
 MODULE Render;
 IMPORT Kernel, Objects, Random, Marsh,
- Out := KernelLog, Math,SPSMMath, Base,  Retina:=Retinax, GLW := OGLWindow, 
+ Out := KernelLog, Math,SPSMMath, Base,  Retina, GLW := OGLWindow, 
 	 GL:=OpenGL, GLC := OpenGLConst,  GLSL:= GLShaderUtils,
 	 Inputs,  Raster, Strings, Streams, Debugging;
 
@@ -356,10 +356,10 @@ VAR
 BEGIN
 	key:=CHR(ucs);
 		CASE CHR(ucs) OF		
-			"S": Retina.incthresh1(4); Out.String("  Retina.incthresh1"); 
-			| "W":Retina.decthresh1(4); Out.String("  Retina.decthresh1");
-			| "X": Retina.incdetail; Out.String("  Retina.incdetail");
-			| "C": Retina.decdetail; Out.String("  Retina.decdetail");								
+			"S": Base.fog:=Base.fog*7/6; Out.String("more fog"); 
+			| "W":Base.fog:=Base.fog*6/7; ; Out.String("less fog");
+			| "X": Base.horizon:=Base.horizon*7/6; Out.String("++horizon");
+			| "C": Base.horizon:=Base.horizon*6/7;  Out.String("--horizon");								
 			| "s" : camera.forward(-0.51*Base.speed); 
 			| "w" : camera.forward(0.51*Base.speed) ; 
 			| "a" : camera.rightstrafe(-0.5*Base.speed)	; 
@@ -734,7 +734,7 @@ END shaders;
 PROCEDURE Open* ;
 BEGIN
 	NEW(glw,Retina.W,Retina.H);
-	Debugging.DisableGC 
+(*	Debugging.DisableGC *)
 END Open;
 
 

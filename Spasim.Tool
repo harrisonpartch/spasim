@@ -36,7 +36,7 @@ OpenGL.Tool
 
 OGLRetina.Mod
 
-Compiler.SetDefaultPlatform Linux64G ~
+Compiler.SetDefaultPlatform Linux32G ~
 
 Marsh.Rez Nrdvolvox
 

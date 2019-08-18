@@ -459,7 +459,9 @@ BEGIN
 		ray.xyz.x:=ray.xyz.x+ray.dxyz.x/10000000 ;
 		ray.xyz.y:=ray.xyz.y+ray.dxyz.y/10000000 ;	
 		ray.xyz.z:=ray.xyz.z+ray.dxyz.z/10000000 ;	
-		Base.world.Shade(ray);		
+		Base.world.Shade(ray);	
+		ray.clr.b:=1;	
+		ray.changed := TRUE;
 	END;
 END Shade;
 

@@ -1,5 +1,5 @@
-MODULE NM5; (*! This module may be either imported or used anonymously *)
-IMPORT Objects, Base, SPSME, Noise, Math, TexVox, Out := KernelLog, Debugging, Streams,Strings;
+MODULE NM4; (*! This module may be either imported or used anonymously *)
+IMPORT Objects, Base, SPSME, Noise, Math, TexVox, Out := KernelLog, Debugging, Heaps, Streams,Strings;
 
 (*
 Special voxel containing 27 children arranged in a 3x3x3 grid.
@@ -16,12 +16,13 @@ TYPE PT = Base.PT;
 	Ray = Base.Ray;
 	Path = Base.Path;
 	Voxel = Base.Voxel;
+	Cell = Base.Cell;
 	FR = Base.FR;
 	Name = Base.Name;
  	NCube=Base.NCube;
  	LCube=Base.LightCube;
 
-TYPE cell* = OBJECT(Voxel);
+TYPE cell* = OBJECT(Cell);
 VAR
 	nposterTF*:BOOLEAN;
 	nposter*: NCube;
@@ -37,7 +38,7 @@ VAR
 	drx, dry, drz, dr,rr,gr,br,blr,bla,a: REAL;
 	out,shadenil,A,B,C: BOOLEAN;
 	v: Voxel;
-	vdepth: REAL;
+	vdepth, v2, fog: REAL;
 	last:BOOLEAN;
 	i,j: LONGINT;
 	lastlength:REAL;
@@ -124,23 +125,29 @@ BEGIN
 					END;
 					newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
 				END;
-				vdepth:=Base.distance(newxyz,xyz); 		
+				vdepth:=Base.distance(newxyz,xyz); 	
+				v2:=vdepth/ray.scale;
+				fog:=Base.fog*ray.length*v2;	
 				ray.xyz.x:=ray.xyz.x + (newxyz.x-xyz.x)/ray.scale;
 				ray.xyz.y:=ray.xyz.y + (newxyz.y-xyz.y)/ray.scale;
 				ray.xyz.z:=ray.xyz.z + (newxyz.z-xyz.z)/ray.scale;				
-				ray.length:=ray.length+vdepth/ray.scale;
+				ray.length:=ray.length+v2;
 				ray.hitxyz:=ray.xyz;
-				xyz:=newxyz;		 			
-				ray.clr.r := ray.clr.r+red*vdepth;
-				ray.clr.g:= ray.clr.g+green*vdepth;
-				ray.clr.b := ray.clr.b+blue*vdepth;
+				xyz:=newxyz;	
 				ray.clr.ra := ray.clr.ra-redblack*vdepth;
 				ray.clr.ga := ray.clr.ga-greenblack*vdepth;
-				ray.clr.ba := ray.clr.ba-blueblack*vdepth;
-				IF ray.clr.ra<0 THEN ray.clr.ra:=0 END;
-				IF ray.clr.ga<0 THEN ray.clr.ga:=0 END;
-				IF ray.clr.ba<0 THEN ray.clr.ba:=0 END;	
-				IF (ray.clr.ra+ray.clr.ga+ray.clr.ba)<0.01 THEN ray.terminate:=TRUE END;  		
+				ray.clr.ba := ray.clr.ba-blueblack*vdepth;	
+				ray.clr.ra := ray.clr.ra-fog;
+				ray.clr.ga := ray.clr.ga-fog;
+				ray.clr.ba := ray.clr.ba-fog;		
+				fog:=fog/2;		 			
+				ray.clr.r := ray.clr.r+red*ray.clr.ra*v2;
+				ray.clr.g:= ray.clr.g+green*ray.clr.ga*v2;
+				ray.clr.b := ray.clr.b+blue*ray.clr.ba*v2;		
+				IF (ray.length>Base.horizon) OR (ray.clr.ra<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ba<0.1) THEN 
+					ray.clr.b:= ray.clr.b + ray.clr.ba;
+					ray.terminate:=TRUE 
+				END;	
 				bounds(ijk.i,ijk.j,ijk.k, out);		
 				IF ~(out OR ray.terminate) THEN
 					v := blox[ijk.i,ijk.j,ijk.k];
@@ -156,8 +163,7 @@ BEGIN
 						nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
 					ELSE
 					END
-				END;
-				
+				END;		
 				UNTIL out OR ray.terminate;
 		END
 	END;
@@ -175,7 +181,7 @@ BEGIN
 	ELSE
 		dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z);
 		dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-		mix:=ray.length*ray.scale/10;
+		mix:=ray.length*ray.scale/100;
 		IF mix>1 THEN mix:=1 END;
 		dot:=mix*dot1+(1-mix)*dot2;
 		ray.clr.r := ray.clr.r + nc.color.red * ray.clr.ra*dot;
@@ -274,8 +280,8 @@ BEGIN
 	passable:=TRUE;
 	complex:=TRUE;
 	imposter:=Base.EMPTY;
-	code:="NM5";
-	ncode:="NM5"
+	code:="NM4";
+	ncode:="NM4"
 END init;
 
 PROCEDURE copyclear*;
@@ -285,7 +291,7 @@ VAR
 BEGIN
 	copymarker:=FALSE;
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
-		IF (blox[i,j,k]#NIL) & blox[i,j,k].copymarker THEN
+		IF (blox[i,j,k]#NIL) THEN
 			blox[i,j,k].copyclear
 		END
 	END END END;
@@ -296,7 +302,8 @@ VAR
 	i,j,k: INTEGER;
 BEGIN
 	copyclear;
-	setcolorrec(r/M,g/M,b/M,rb/M,gb/M,bb/M)
+	colorlock:=TRUE;
+	setcolorrec(r,g,b,rb,gb,bb)
 END setcolor;
 
 PROCEDURE setcolorrec(r,g,b,rb,gb,bb: REAL);
@@ -309,19 +316,13 @@ BEGIN
 		red:= r;
 		green := g;
 		blue := b;
-		redblack := r+rb;
-		greenblack:= g+gb;
-		blueblack := b+bb;
+		redblack := rb;
+		greenblack:= gb;
+		blueblack := bb;
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 			v:=blox[i,j,k];
-			IF v#NIL THEN
-				IF v IS cell THEN
-					IF v.code=code THEN
-						WITH v: cell DO
-							v.setcolorrec(r/M,g/M,b/M,rb/M,gb/M,bb/M);
-						END
-					END
-				END
+			IF (v#NIL) & ~v.colorlock THEN
+				v.setcolorrec(r/M,g/M,b/M,rb/M,gb/M,bb/M);
 			END
 		END END END;
 		copymarker:=FALSE
@@ -373,8 +374,8 @@ BEGIN
 	IF scale>=resolution THEN
 		(* v.touch; *)
 		RETURN(v)
-	ELSIF  (v#NIL) & (v IS cell) THEN
-		WITH v:cell  DO
+	ELSIF  (v#NIL) & (v IS Cell) THEN
+		WITH v:Cell  DO
 			RETURN(v.proberec(p,resolution,newscale))
 		END
 	ELSE RETURN(v)
@@ -405,13 +406,14 @@ BEGIN
 	copyengine.add(SELF);	
 END copyprime;
 
-PROCEDURE stroke*(p:PT; resolution: LONGINT; voxel :Voxel);
+PROCEDURE stroke*(p:PT; res: LONGINT; voxel :Voxel);
 VAR
 	i,j,k: LONGINT;
 BEGIN
 	Base.clamPT(p);
+(*	voxel.setcolorrec(red*res,green*res,blue*res,redblack*res,greenblack*res,blueblack*res); *)
 	IF voxel#NIL THEN
-		strokerec(p,resolution,1, voxel);
+		strokerec(p,res,M, voxel);
 	END
 END stroke;
 
@@ -433,7 +435,7 @@ VAR
 	code: Base.Name;
 BEGIN
 	IF ~lockTF THEN
-		code:="NM5"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
+		code:="NM4"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 		nextscale:=scale*M;
 		p.x:=p.x*M;
 		p.y:=p.y*M;
@@ -444,10 +446,12 @@ BEGIN
 		ELSE
 			IF blox[i,j,k]#NIL THEN
 				IF  blox[i,j,k].copyonstroke THEN
+				(*	Debugging.DisableGC; *)
 					copyv:= blox[i,j,k].deepcopy();
+				(*	Debugging.EnableGC; *)
 					blox[i,j,k]:=copyv;	
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
-				ELSIF blox[i,j,k] IS cell THEN
+				ELSIF blox[i,j,k] IS Cell THEN
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
 				ELSE
 					NEW(c);
@@ -468,44 +472,57 @@ BEGIN
 	END
 END strokerec;
 
-PROCEDURE strokephemeralrec(p:PT; resolution,scale:LONGINT; voxel,voxundo:Voxel);
+PROCEDURE tunnel*(p:PT; resolution: LONGINT);
+VAR
+	i,j,k: LONGINT;
+BEGIN
+	Base.clamPT(p);
+	tunnelrec(p,resolution,M);
+END tunnel;
+
+PROCEDURE tunnelrec*(p:PT; resolution,scale: LONGINT);
 VAR
 	i,j,k,ii,jj,kk,nextscale: LONGINT;
 	v,vv:Voxel;
 	c,c2: cell;
-	copy,vu: Voxel;
+	copyv,vu: Voxel;
 	code: Base.Name;
-	path: Path;
 BEGIN
 	IF ~lockTF THEN
+		code:="NM4"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 		nextscale:=scale*M;
 		p.x:=p.x*M;
 		p.y:=p.y*M;
 		p.z:=p.z*M;
 		i := ENTIER(p.x)MOD M; j := ENTIER(p.y)MOD M; k := ENTIER(p.z)MOD M;
 		IF nextscale>resolution THEN
-			blox[i,j,k]:=voxel
+			blox[i,j,k]:=NIL
 		ELSE
 			IF blox[i,j,k]#NIL THEN
-				IF blox[i,j,k].complex THEN
-					blox[i,j,k].strokephemeralrec(p, resolution,nextscale,voxel,vu)
+				IF  blox[i,j,k].copyonstroke THEN
+					copyv:= blox[i,j,k].deepcopy();
+					blox[i,j,k]:=copyv;	
+					blox[i,j,k].tunnelrec(p, resolution,nextscale)
+				ELSIF blox[i,j,k] IS Cell THEN
+					blox[i,j,k].tunnelrec(p, resolution,nextscale)
 				ELSE
 					NEW(c);
+					c.setcolor(red/M, green/M, blue/M, redblack/M, greenblack/M, blueblack/M); 
 					c.fill(blox[i,j,k]);
-					c.passable:=blox[i,j,k].passable;
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-					c.strokerec(p, resolution,nextscale, voxel);
+					c.tunnelrec(p, resolution,nextscale);
 				END
 			ELSE
 				NEW(c);
+				c.setcolor(red/M,green/M,blue/M,redblack/M,greenblack/M,blueblack/M);
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-				c.strokerec(p, resolution,nextscale, voxel);
+				c.tunnelrec(p, resolution,nextscale);
 			END
 		END
 	END
-END strokephemeralrec;
+END tunnelrec;
 
 PROCEDURE nstrokerec(p:PT; resolution,scale:LONGINT; normal:PT; color: Color);
 VAR
@@ -527,9 +544,9 @@ BEGIN
 			END
 		ELSE
 			IF blox[i,j,k]#NIL THEN
-				IF (blox[i,j,k] IS cell) THEN
+				IF (blox[i,j,k] IS Cell) THEN
 					v:=blox[i,j,k];
-					WITH v: cell DO v.nstrokerec(p, resolution,nextscale,normal,color) END
+					WITH v: Cell DO v.nstrokerec(p, resolution,nextscale,normal,color) END
 				ELSIF (blox[i,j,k] IS Voxel) THEN
 					blox[i,j,k].nstroke(p, resolution DIV nextscale,normal,color)
 				ELSE
@@ -598,7 +615,7 @@ VAR
 	v: Voxel;
 	newcell: cell;
 BEGIN
-	code:="NM5"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
+	code:="NM4"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 	MS:=M*scale;
 	TWOMS:=2*MS;
 	nextscale:=scale*M;
@@ -623,8 +640,8 @@ BEGIN
 					newcell.FRasterrec(f,resolution,o,nextscale);
 				ELSE
 				 	v:=blox[i,j,k];
-				 	IF v IS cell THEN
-				 		WITH v:cell DO
+				 	IF v IS Cell THEN
+				 		WITH v:Cell DO
 				 			v.imposter:=f.getimposter(p);
 							v.nposterTF:=TRUE;
 							v.nposter.normal:=f.normal(p);
@@ -655,10 +672,10 @@ VAR
 	origin: PT;
 BEGIN
 	origin.x:=0; origin.y:=0; origin.z:=0;
-	SFRasterrec(f,resolution,origin,1);   (* origin is (0,0,0) *)
+	FRasterrecSolid(f,resolution,origin,1);   (* origin is (0,0,0) *)
 END FRasterSolid;
 
-PROCEDURE SFRasterrec(f: FR; resolution: LONGINT; origin: PT; scale: LONGINT);
+PROCEDURE FRasterrecSolid(f: FR; resolution: LONGINT; origin: PT; scale: LONGINT);
 VAR
 	i,j,k,ii,jj,kk: INTEGER;
 	o,p:PT;
@@ -687,17 +704,17 @@ BEGIN
 					newcell.nposterTF:=TRUE;
 					newcell.nposter.normal:=f.normal(p);
 					newcell.nposter.color:=f.color(p);
-					newcell.SFRasterrec(f,resolution,o,nextscale);
+					newcell.FRasterrecSolid(f,resolution,o,nextscale);
 					blox[i,j,k]:=newcell				
 				ELSE
 				 	v:=blox[i,j,k];
-				 	IF v IS cell THEN
-				 		WITH v:cell DO
+				 	IF v IS Cell THEN
+				 		WITH v:Cell DO
 				 			v.imposter:=f.voxel(p);
 							v.nposterTF:=TRUE;
 							v.nposter.normal:=f.normal(p);
 							v.nposter.color:=f.color(p);
-							v.SFRasterrec(f,resolution,o,nextscale)
+							v.FRasterrecSolid(f,resolution,o,nextscale)
 				 		END
 				 	END
 				 END
@@ -720,7 +737,7 @@ BEGIN
 			END
 		END END END
 	END;
-END SFRasterrec;
+END FRasterrecSolid;
 
 PROCEDURE copy():Voxel;
 VAR c: cell;
@@ -753,10 +770,10 @@ VAR
 	cv,child:Voxel;
 	i,j,k: INTEGER;
 BEGIN
-	code:=ncode; (* if this voxel has been rezzed from another module, make it NM5 *)
+	code:=ncode; (* if this voxel has been rezzed from another module, make it NM4 *)
 	copymarker:=TRUE;
 	NEW(c);
-	c.red:=red; c.green:=green; c.blue:=blue; c.black:=black; 
+	c.setcolor(red/M, green/M, blue/M, redblack/M, greenblack/M, blueblack/M); 
 	c.nbloxTF:=nbloxTF;
 	c.nblox:=nblox;
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
@@ -795,7 +812,7 @@ END count;
 
 (*
 Engrains this voxel and it's children recursively in the following format:
-"2"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
+"NM4"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
 <----- Voxel data -----><------                     children data                     ------>
 Children data contains 27 boolean-child pairs, each boolean being TRUE if a child is contained in that position.
 In case of FALSE the length of child data is 0 for that child (i.e. no data is being written except for the FALSE).
@@ -894,4 +911,4 @@ END thisvox;
 
 BEGIN
 	NEW(copyengine)
-END NM5.
+END NM4.

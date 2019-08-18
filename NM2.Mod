@@ -1,5 +1,5 @@
 MODULE NM2; (*! This module may be either imported or used anonymously *)
-IMPORT Objects, Base, SPSME, Noise, Math, TexVox, Out := KernelLog, Debugging, Streams,Strings;
+IMPORT Objects, Base, SPSME, Noise, Math, TexVox, Out := KernelLog, Debugging, Heaps, Streams,Strings;
 
 (*
 Special voxel containing 27 children arranged in a 3x3x3 grid.
@@ -38,7 +38,7 @@ VAR
 	drx, dry, drz, dr,rr,gr,br,blr,bla,a: REAL;
 	out,shadenil,A,B,C: BOOLEAN;
 	v: Voxel;
-	vdepth: REAL;
+	vdepth, v2, fog: REAL;
 	last:BOOLEAN;
 	i,j: LONGINT;
 	lastlength:REAL;
@@ -125,21 +125,27 @@ BEGIN
 					END;
 					newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
 				END;
-				vdepth:=Base.distance(newxyz,xyz); 		
+				vdepth:=Base.distance(newxyz,xyz); 	
+				v2:=vdepth/ray.scale;
+				fog:=Base.fog*ray.length*v2;	
 				ray.xyz.x:=ray.xyz.x + (newxyz.x-xyz.x)/ray.scale;
 				ray.xyz.y:=ray.xyz.y + (newxyz.y-xyz.y)/ray.scale;
 				ray.xyz.z:=ray.xyz.z + (newxyz.z-xyz.z)/ray.scale;				
-				ray.length:=ray.length+vdepth/ray.scale;
+				ray.length:=ray.length+v2;
 				ray.hitxyz:=ray.xyz;
 				xyz:=newxyz;	
 				ray.clr.ra := ray.clr.ra-redblack*vdepth;
 				ray.clr.ga := ray.clr.ga-greenblack*vdepth;
 				ray.clr.ba := ray.clr.ba-blueblack*vdepth;	
-					 			
-				ray.clr.r := ray.clr.r+red*vdepth;
-				ray.clr.g:= ray.clr.g+green*vdepth;
-				ray.clr.b := ray.clr.b+blue*vdepth;
-				IF (ray.clr.ra<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ba<0.1) THEN 
+				ray.clr.ra := ray.clr.ra-fog;
+				ray.clr.ga := ray.clr.ga-fog;
+				ray.clr.ba := ray.clr.ba-fog;		
+				fog:=fog/2;		 			
+				ray.clr.r := ray.clr.r+red*ray.clr.ra*v2;
+				ray.clr.g:= ray.clr.g+green*ray.clr.ga*v2;
+				ray.clr.b := ray.clr.b+blue*ray.clr.ba*v2;		
+				IF (ray.length>Base.horizon) OR (ray.clr.ra<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ba<0.1) THEN 
+					ray.clr.b:= ray.clr.b + ray.clr.ba;
 					ray.terminate:=TRUE 
 				END;	
 				bounds(ijk.i,ijk.j,ijk.k, out);		
@@ -175,7 +181,7 @@ BEGIN
 	ELSE
 		dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z);
 		dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-		mix:=ray.length*ray.scale/10;
+		mix:=ray.length*ray.scale/100;
 		IF mix>1 THEN mix:=1 END;
 		dot:=mix*dot1+(1-mix)*dot2;
 		ray.clr.r := ray.clr.r + nc.color.red * ray.clr.ra*dot;
@@ -397,13 +403,14 @@ BEGIN
 	copyengine.add(SELF);	
 END copyprime;
 
-PROCEDURE stroke*(p:PT; resolution: LONGINT; voxel :Voxel);
+PROCEDURE stroke*(p:PT; res: LONGINT; voxel :Voxel);
 VAR
 	i,j,k: LONGINT;
 BEGIN
 	Base.clamPT(p);
+(*	voxel.setcolorrec(red*res,green*res,blue*res,redblack*res,greenblack*res,blueblack*res); *)
 	IF voxel#NIL THEN
-		strokerec(p,resolution,1, voxel);
+		strokerec(p,res,M, voxel);
 	END
 END stroke;
 
@@ -436,7 +443,9 @@ BEGIN
 		ELSE
 			IF blox[i,j,k]#NIL THEN
 				IF  blox[i,j,k].copyonstroke THEN
+				(*	Debugging.DisableGC; *)
 					copyv:= blox[i,j,k].deepcopy();
+				(*	Debugging.EnableGC; *)
 					blox[i,j,k]:=copyv;	
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
 				ELSIF blox[i,j,k] IS Cell THEN

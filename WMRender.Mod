@@ -1,6 +1,6 @@
 MODULE WMRender;
 IMPORT Kernel, Objects, Random, Marsh, Rectangles := WMRectangles, WM := WMWindowManager, WMMessages,
- Out := KernelLog, Math,SPSMMath, Base, Retina,  
+ Out := KernelLog, Math,SPSMMath, Base, Retina:= Retinax,  
 	 Inputs,  Raster, Strings, Streams, Debugging;
 
 TYPE
@@ -413,9 +413,9 @@ BEGIN
 	ELSE	
 		Retina.saccade:=FALSE;
 		IF framedt < mstarget THEN
-			Retina.moredetail; 
+			Retina.moredetail(5); 
 		ELSIF framedt > (mstarget+5) THEN
-			Retina.lessdetail; 
+			Retina.lessdetail(5); 
 		END
 	END;
 END detail;
@@ -551,6 +551,6 @@ BEGIN
 
 END WMRender.
 
-Render.Open ~
+WMRender.Open ~
 
 SystemTools.Free WMRender ~

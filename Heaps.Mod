@@ -15,13 +15,10 @@ IMPORT Builtins (* enforce import order *), SYSTEM, Trace, Machine;
 CONST
 	EnableRefCount =TRUE;
 
-(*	Paranoid = TRUE; (* if paranoid =true, then during mark phase the GC can accept spurious pointers but reports them
+	Paranoid = FALSE; (* if paranoid =true, then during mark phase the GC can accept spurious pointers but reports them
 									paranoid = false expects correct metadata and correct settings of untraced variables
 									moreover, it should improve GC mark speed *)
-*)
 
-	Paranoid = FALSE; (* THIS ONE CHANGE IS NEEDED TO PREVENT GC DELAYS IN THE TRACER *)
-	
 	DebugValue = LONGINT(0DEADDEADH);	(* set non-0 to clear free storage to this value *)
 
 	Stats* = TRUE;					(* maintain statistical counters *)

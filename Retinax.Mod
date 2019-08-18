@@ -1,4 +1,4 @@
-MODULE Retinax; (* EXPERIMENTAL RETINA WITH EDGEFINDING TILE *)
+MODULE Retina; (* EXPERIMENTAL RETINA WITH EDGEFINDING TILE *)
 IMPORT  Base, Objects, Out:=KernelLog, Noise,
 Math, SPSMMath, Raster, Graphics:=WMGraphics, WMRasterScale,  Rect := WMRectangles;
 
@@ -156,6 +156,14 @@ BEGIN
 	tileimage[x,y+1]:=rays[x,y+1].clr;
 END t2x2d;
 
+PROCEDURE t2x2(CONST x,y: INTEGER; c: Base.ray_color);
+BEGIN
+	tileimage[x,y]:=c;
+	tileimage[x+1,y]:=c;
+	tileimage[x+1,y+1]:=c;
+	tileimage[x,y+1]:=c;
+END t2x2;
+
 PROCEDURE t4x4fill(CONST x,y: INTEGER);
 VAR
 	i,j: INTEGER;
@@ -166,11 +174,10 @@ BEGIN
 		t2x2c(x+2,y+2);
 		t2x2d(x,y+2); 
 	ELSE
-		FOR i:=x TO x+3 DO
-			FOR j:=y TO y+3 DO
-				tileimage[i,j]:=rays[x,y].clr;
-			END
-		END
+		t2x2(x,y,rays[x,y].clr);
+		t2x2(x+2,y,rays[x+3,y].clr);
+		t2x2(x+2,y+2,rays[x+3,y+3].clr);
+		t2x2(x,y+2,rays[x,y+3].clr); 
 	END
 END t4x4fill;
 
@@ -206,6 +213,17 @@ BEGIN
 	t4x4fill(x,y)	
 END t4x4d;
 
+PROCEDURE t4x4(CONST x,y: INTEGER; c: Base.ray_color);
+VAR
+	i,j: INTEGER;
+BEGIN
+	FOR i:= 0 TO 3 DO
+		FOR j:= 0 TO 3 DO
+			tileimage[x+i,y+j]:=c;
+		END
+	END
+END t4x4;
+
 PROCEDURE t8x8fill(CONST x,y: INTEGER);
 VAR
 	i,j: INTEGER;
@@ -216,11 +234,10 @@ BEGIN
 		t4x4c(x+4,y+4);
 		t4x4d(x,y+4); 
 	ELSE
-		FOR i:=x TO x+7 DO
-			FOR j:=y TO y+7 DO
-				tileimage[i,j]:=rays[x,y].clr;
-			END
-		END
+		t4x4(x,y,rays[x,y].clr);
+		t4x4(x+4,y,rays[x+7,y].clr);
+		t4x4(x+4,y+4,rays[x+7,y+7].clr);
+		t4x4(x,y+4,rays[x,y+7].clr); 	
 	END
 END t8x8fill;
 
@@ -312,15 +329,22 @@ END tessa16;
 
 PROCEDURE tessa16b(cam:Camera);	
 
+PROCEDURE t2x2(CONST x,y: INTEGER; c: Base.ray_color);
+BEGIN
+	tileimage[x,y]:=c;
+	tileimage[x+1,y]:=c;
+	tileimage[x+1,y+1]:=c;
+	tileimage[x,y+1]:=c;
+END t2x2;
+
 PROCEDURE t4x4fill(CONST x,y: INTEGER);
 VAR
 	i,j: INTEGER;
 BEGIN
-	FOR i:=x TO x+3 DO
-		FOR j:=y TO y+3 DO
-			tileimage[i,j]:=rays[x,y].clr;
-		END
-	END
+	t2x2(x,y,rays[x,y].clr);
+	t2x2(x+2,y,rays[x+3,y].clr);
+	t2x2(x+2,y+2,rays[x+3,y+3].clr);
+	t2x2(x,y+2,rays[x,y+3].clr); 
 END t4x4fill;
 
 PROCEDURE t4x4a(CONST x,y: INTEGER);
@@ -646,12 +670,14 @@ END splitcam;
 
 PROCEDURE moredetail*(d: LONGINT);
 BEGIN
-	decthresh1(d)
+	decthresh1(d); 
+	Base.horizon:=Base.horizon*7/6 
 END moredetail;
 
 PROCEDURE lessdetail*(d: LONGINT);
 BEGIN
-	incthresh1(d)
+	incthresh1(d); 
+	Base.horizon:=Base.horizon*6/7; 
 END lessdetail;
 
 PROCEDURE decdetail*;
@@ -747,7 +773,7 @@ BEGIN
 	Base.sniperay:=sr;
 	BEGIN{EXCLUSIVE}
 		gotiles;
-		AWAIT((tilesdone=TW*TH) OR FRAMEBOORT)
+		AWAIT((tilesdone=TW*TH))
 	END;
 	Raster.SetRGB(pixel,255,255,255);
 	Raster.Put(image,CX+2,CY+2,pixel,copy);	
@@ -779,4 +805,4 @@ BEGIN
  	foveaparameter:=13;
  	FV:=W/foveaparameter; 
  	Out.String("loaded...");	
-END Retinax.
+END Retina.
