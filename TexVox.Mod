@@ -299,7 +299,7 @@ BEGIN
 			END;
 			ly:=1-ly;
 		END;
- 		mip:=ray.length*100;
+ 		mip:=ray.length*Base.texdetail;
 		IF mip>120 THEN
 			color:=texcube.side[ray.face].pixelmip_zero(lx,ly); 
 		ELSIF mip>40 THEN

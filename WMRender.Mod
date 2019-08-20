@@ -1,6 +1,6 @@
 MODULE WMRender;
 IMPORT Kernel, Objects, Random, Marsh, Rectangles := WMRectangles, WM := WMWindowManager, WMMessages,
- Out := KernelLog, Math,SPSMMath, Base, Retina:= Retinax,  
+ Out := KernelLog, Math,SPSMMath, Base, Retina,  
 	 Inputs,  Raster, Strings, Streams, Debugging;
 
 TYPE
@@ -279,6 +279,8 @@ PROCEDURE &openwincam(W,H: INTEGER);
 BEGIN
 	Init(W, H, TRUE);
 	NEW(camera, Retina.W, Retina.H);
+	Retina.Res;
+	Retina.Res;
 	camera.aperjust(W,H);
 	manager := WM.GetDefaultManager();
 	manager.Add(100,100, SELF, { WM.FlagFrame, WM.FlagClose, WM.FlagStayOnTop});

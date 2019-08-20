@@ -671,13 +671,15 @@ END splitcam;
 PROCEDURE moredetail*(d: LONGINT);
 BEGIN
 	decthresh1(d); 
-	Base.horizon:=Base.horizon*7/6 
+(*	Base.horizon:=Base.horizon*7/6;*)
+	Base.DTL:= Base.DTL*3/2; 
 END moredetail;
 
 PROCEDURE lessdetail*(d: LONGINT);
 BEGIN
 	incthresh1(d); 
-	Base.horizon:=Base.horizon*6/7; 
+(*	Base.horizon:=Base.horizon*6/7; *)
+	Base.DTL:= Base.DTL*2/3; 
 END lessdetail;
 
 PROCEDURE decdetail*;

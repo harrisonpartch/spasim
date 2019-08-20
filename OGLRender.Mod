@@ -356,8 +356,8 @@ VAR
 BEGIN
 	key:=CHR(ucs);
 		CASE CHR(ucs) OF		
-			"S": Base.fog:=Base.fog*7/6; Out.String("more fog"); 
-			| "W":Base.fog:=Base.fog*6/7; ; Out.String("less fog");
+			"S": Base.fog:=Base.texdetail*7/6; Out.String("more texdetail"); 
+			| "W":Base.fog:=Base.texdetail*6/7; ; Out.String("less texdetail");
 			| "X": Base.horizon:=Base.horizon*7/6; Out.String("++horizon");
 			| "C": Base.horizon:=Base.horizon*6/7;  Out.String("--horizon");								
 			| "s" : camera.forward(-0.51*Base.speed); 

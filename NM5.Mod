@@ -134,9 +134,9 @@ BEGIN
 				ray.length:=ray.length+v2;
 				ray.hitxyz:=ray.xyz;
 				xyz:=newxyz;	
-				ray.clr.ra := ray.clr.ra-redblack*vdepth;
-				ray.clr.ga := ray.clr.ga-greenblack*vdepth;
-				ray.clr.ba := ray.clr.ba-blueblack*vdepth;	
+				ray.clr.ra := ray.clr.ra-redblack*v2;
+				ray.clr.ga := ray.clr.ga-greenblack*v2;
+				ray.clr.ba := ray.clr.ba-blueblack*v2;	
 				ray.clr.ra := ray.clr.ra-fog;
 				ray.clr.ga := ray.clr.ga-fog;
 				ray.clr.ba := ray.clr.ba-fog;		

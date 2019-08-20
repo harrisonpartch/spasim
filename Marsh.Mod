@@ -493,19 +493,19 @@ BEGIN
 	push(greensuncouple);
 	NEW(noise[0]);		
 	noise[0].seed:=153466690;		
-	noise[0].a:=1;
-	noise[0].b:=1;
+	noise[0].a:=3;
+	noise[0].b:=3;
 	noise[0].c:=1;		
 	noise[0].octaves:=4;
 	noise[0].persistence:=3.71;	
 	noise[0].setvoxel(sky1);		
 	NEW(noise[1]);		
 	noise[1].seed:=678;		
-	noise[1].a:=2;
-	noise[1].b:=3;
+	noise[1].a:=1;
+	noise[1].b:=1;
 	noise[1].c:=1;		
 	noise[1].octaves:=4;
-	noise[1].persistence:=3.31;	
+	noise[1].persistence:=3.81;	
 	noise[1].setcolor(0.8,2.8,4,1/2);	
 	noise[1].setvoxel(wstar);	
 	xot.tscale:=100;		
@@ -547,9 +547,8 @@ BEGIN
 	z3b.copyonstroke:=TRUE; 	
 	z3a.passable:=TRUE;
 	medley.copyonstroke:=TRUE; 
-(*	z3.setcolor(0,0,0.13,0.17,0.17,0.17);	
+	z3.setcolor(0,0,1,3,3,3);
 	z3a.setcolor(1/12,1/12,1/13,1/13,1/13,1/13);
-*)
      dieone.tscale:=1000;
      noise[0].setvoxel(sky1);
 (*	z3b.FRaster(noise[0],27);
@@ -557,14 +556,14 @@ BEGIN
 	z3a.FRaster(noise[0],27);
 	noise[0].setvoxel(z3a);		
 	z3.FRaster(noise[0],27);	*)
-(*	noise[1].setvoxel(wstar);
-	z3.FRaster(noise[1],27);	
-*)	Base.setPT(center,1/2,1/2,1/2);
+	noise[1].setvoxel(wstar);
+(*	z3.FRaster(noise[1],81);	*)
+	Base.setPT(center,1/2,1/2,1/2);
 
 	NEW(ball,center,0.6);
 	ball.setcolor(0.21,0.21,0.81,1);
 	medley.FRaster(ball,27);
-	FOR i := 0 TO 10000 DO
+(*		FOR i := 0 TO 10000 DO
 		medley.stroke(Base.randPT(),27,wstar);
 	END;		
 	FOR i := 0 TO 10000 DO
@@ -576,7 +575,7 @@ BEGIN
 		FOR i := 0 TO 10000 DO
 		z3.stroke(Base.randPT(),27,gxy);
 	END;	
-	Base.setPT(center,1/2,1/2,2/3);	
+*)	Base.setPT(center,1/2,1/2,2/3);	
  	NEW(plane,center,up);
 
 	plane.setvoxel(wstar);			
