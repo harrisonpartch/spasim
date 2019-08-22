@@ -38,7 +38,7 @@ VAR
 	drx, dry, drz, dr,rr,gr,br,blr,bla,a: REAL;
 	out,shadenil,A,B,C: BOOLEAN;
 	v: Voxel;
-	vdepth, v2, fog: REAL;
+	vdepth, v2, fog,f2: REAL;
 	last:BOOLEAN;
 	i,j: LONGINT;
 	lastlength:REAL;
@@ -48,7 +48,7 @@ BEGIN
 	xyz.x := (ray.lxyz.x) * M;
 	xyz.y := (ray.lxyz.y) * M;
 	xyz.z := (ray.lxyz.z)* M;
-	IF (ray.length*ray.scale>ray.dtl) THEN
+	IF (ray.length*ray.scale*M>ray.dtl) THEN (* size of the child voxels at camera *)
 		IF imposter#NIL THEN
 			imposter.Shade(ray)
 		END
@@ -127,25 +127,19 @@ BEGIN
 				END;
 				vdepth:=Base.distance(newxyz,xyz); 	
 				v2:=vdepth/ray.scale;
-				fog:=Base.fog*ray.length*v2;	
 				ray.xyz.x:=ray.xyz.x + (newxyz.x-xyz.x)/ray.scale;
 				ray.xyz.y:=ray.xyz.y + (newxyz.y-xyz.y)/ray.scale;
 				ray.xyz.z:=ray.xyz.z + (newxyz.z-xyz.z)/ray.scale;				
 				ray.length:=ray.length+v2;
 				ray.hitxyz:=ray.xyz;
 				xyz:=newxyz;	
-				ray.clr.ra := ray.clr.ra-redblack*vdepth;
-				ray.clr.ga := ray.clr.ga-greenblack*vdepth;
-				ray.clr.ba := ray.clr.ba-blueblack*vdepth;	
-				ray.clr.ra := ray.clr.ra-fog;
-				ray.clr.ga := ray.clr.ga-fog;
-				ray.clr.ba := ray.clr.ba-fog;		
-				fog:=fog/2;		 			
+				ray.clr.ra := ray.clr.ra-redblack*v2;
+				ray.clr.ga := ray.clr.ga-greenblack*v2;
+				ray.clr.ba := ray.clr.ba-blueblack*v2;	
 				ray.clr.r := ray.clr.r+red*ray.clr.ra*v2;
 				ray.clr.g:= ray.clr.g+green*ray.clr.ga*v2;
 				ray.clr.b := ray.clr.b+blue*ray.clr.ba*v2;		
-				IF (ray.length>Base.horizon) OR (ray.clr.ra<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ba<0.1) THEN 
-					ray.clr.b:= ray.clr.b + ray.clr.ba;
+				IF (ray.clr.ba<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ra<0.1) THEN 			
 					ray.terminate:=TRUE 
 				END;	
 				bounds(ijk.i,ijk.j,ijk.k, out);		
@@ -249,6 +243,9 @@ BEGIN
 	blox[0,1,1]:=w;
 	blox[1,0,1]:=w;
 	blox[1,1,1]:=w;
+	blox[1,1,2]:=w;
+	blox[2,1,1]:=w;
+	blox[1,2,1]:=w;
 END fillsierp;
 
 PROCEDURE fillcqr2*(v,w: Voxel);

@@ -232,7 +232,7 @@ END reload;
 END TexCube;
 
 TYPE Ray* = RECORD
-	xyz*, dxyz*, ddxyz*, lxyz*, lastlxyz*, txyz*, origin*, oxyz*, hitxyz*: PT;	
+	xyz*, dxyz*, ddxyz*, lxyz*, lastlxyz*, txyz*, origin*, oxyz*, hitxyz*,firsthitxyz*: PT;	
 	downxyz*,rightxyz*: PT;
 	theta*,phi*, dtheta*,dphi*: REAL;
 	clr*, lastclr*: ray_color;
@@ -256,7 +256,7 @@ TYPE Ray* = RECORD
 	dtl*: REAL;	
 	dtlTF*:BOOLEAN;
 	hitmirrorTF*:BOOLEAN;
-	justhitTF*:BOOLEAN;
+	justhitTF*,firsthitTF*:BOOLEAN;
 	thisvoxelisempty*:BOOLEAN;
 	texdtl*:REAL;
 END;
@@ -569,7 +569,7 @@ VAR
 (*	clock*: Clock;*)
 	TICK*: BOOLEAN;
 	TOCK*: BOOLEAN;
-	fog*,horizon*,texdetail*:REAL;
+	fog*,horizon*,horizon2*,texdetail*:REAL;
 	rlimit*: INTEGER;
 	iterlimit*: LONGINT;
 	speed*,maxspeed*:REAL;
@@ -1235,7 +1235,8 @@ BEGIN
 	frame:=0;
 	fog := 1.1;
 	texdetail:=30;
-	horizon:=0.1;
+	horizon:=0.01;
+	horizon2:=1;
 	rlimit := 4;
 	iterlimit := 500;
 	DTL:=3;	

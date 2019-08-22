@@ -48,7 +48,7 @@ BEGIN
 	xyz.x := (ray.lxyz.x) * M;
 	xyz.y := (ray.lxyz.y) * M;
 	xyz.z := (ray.lxyz.z)* M;
-	IF (ray.length*ray.scale>ray.dtl) THEN
+	IF (ray.length*ray.scale*M>ray.dtl) THEN (* size of the child voxels at camera *)
 		IF imposter#NIL THEN
 			imposter.Shade(ray)
 		END
@@ -139,9 +139,12 @@ BEGIN
 				ray.clr.r := ray.clr.r+red*ray.clr.ra*v2;
 				ray.clr.g:= ray.clr.g+green*ray.clr.ga*v2;
 				ray.clr.b := ray.clr.b+blue*ray.clr.ba*v2;		
-				IF (ray.clr.ba<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ra<0.1) THEN 			
+				IF ray.length>Base.horizon THEN
+					ray.clr.b := ray.clr.b+ray.clr.ba;	
 					ray.terminate:=TRUE 
-				END;	
+				ELSIF (ray.clr.ba<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ra<0.1) THEN 			
+					ray.terminate:=TRUE 
+				END;
 				bounds(ijk.i,ijk.j,ijk.k, out);		
 				IF ~(out OR ray.terminate) THEN
 					v := blox[ijk.i,ijk.j,ijk.k];

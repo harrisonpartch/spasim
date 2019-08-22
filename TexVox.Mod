@@ -124,7 +124,6 @@ VAR
 	n: PT;
 BEGIN
 	ray.hitmirrorTF := TRUE;
-	ray.hitxyz:=ray.xyz;
 	ray.changed := TRUE;
 	ray.mirrortf:=TRUE;
 	ray.clr.ra:= ray.clr.ra + 0.2;
@@ -299,28 +298,29 @@ BEGIN
 			END;
 			ly:=1-ly;
 		END;
- 		mip:=ray.length*Base.texdetail;
+ 	(*	mip:=ray.length*Base.texdetail;
 		IF mip>120 THEN
 			color:=texcube.side[ray.face].pixelmip_zero(lx,ly); 
 		ELSIF mip>40 THEN
-			color1:=texcube.side[ray.face].pixelmip_zero(lx,ly);
-			color2:=texcube.side[ray.face].pixelmip_one(lx,ly);
-			color:=Base.mixcolor(color1,color2, (mip-40)/120);
+			color:=texcube.side[ray.face].pixelmip_zero(lx,ly);
+	(*		color2:=texcube.side[ray.face].pixelmip_one(lx,ly);
+			color:=Base.mixcolor(color1,color2, (mip-40)/120); *)
 		ELSIF mip>12 THEN
-			color1:=texcube.side[ray.face].pixelmip_one(lx,ly);
-			color2:=texcube.side[ray.face].pixelmip_two(lx,ly);
-			color:=Base.mixcolor(color1,color2,(mip-12)/40);		
+			color:=texcube.side[ray.face].pixelmip_one(lx,ly);
+	(*		color2:=texcube.side[ray.face].pixelmip_two(lx,ly);
+			color:=Base.mixcolor(color1,color2,(mip-12)/40);		*)
 		ELSIF mip>4 THEN
-			color1:=texcube.side[ray.face].pixelmip_two(lx,ly);
-			color2:=texcube.side[ray.face].pixel(lx,ly);
-			color:=Base.mixcolor(color1,color2,(mip-4)/12);
+			color:=texcube.side[ray.face].pixelmip_two(lx,ly);
+	(*		color2:=texcube.side[ray.face].pixel(lx,ly);
+			color:=Base.mixcolor(color1,color2,(mip-4)/12); *)
 		ELSIF mip>1 THEN
-			color1:=texcube.side[ray.face].pixel(lx,ly);
-			color2:=texcube.side[ray.face].pixel(lx*1.1,ly*1.1);
-			color:=Base.mixcolor(color1,color2,(mip-1)/4);			
+			color:=texcube.side[ray.face].pixel(lx,ly);
+	(*		color2:=texcube.side[ray.face].pixel(lx*1.1,ly*1.1);
+			color:=Base.mixcolor(color1,color2,(mip-1)/4);		*)	
 		ELSE
 			color:=texcube.side[ray.face].pixel(lx*1.1,ly*1.1); 
-		END;
+		END; *)
+		color:=texcube.side[ray.face].pixel(lx,ly); 
 (*		exit:=Base.Exit(ray);
 		mid:=Base.midPT(ray.lxyz,exit);
 		middy:=1-Base.dist(mid,Base.mkPT(1/2,1/2,1/2)); *)
@@ -383,14 +383,17 @@ BEGIN
 	ray.clr.alpha:= ray.clr.alpha - 0.1;
 	IF ray.clr.alpha<0.1 THEN
 		ray.terminate:=TRUE
-	ELSE
+	ELSE	
+		IF ~ray.firsthitTF THEN 
+			ray.firsthitxyz:=ray.xyz;
+			ray.firsthitTF:=TRUE
+		END;
 		ray.hitmirrorTF := TRUE;
-		ray.hitxyz:=ray.xyz;
 		ray.changed := TRUE;
 		ray.mirrortf:=TRUE;
-		ray.clr.ra:= ray.clr.ra + 0.1;
-		ray.clr.ga := ray.clr.ga + 0.1;
-		ray.clr.ba := ray.clr.ba + 0.1;	
+		ray.clr.ra:= ray.clr.ra + 0.21;
+		ray.clr.ga := ray.clr.ga + 0.21;
+		ray.clr.ba := ray.clr.ba + 0.21;	
 		reflect(ray.dxyz, ray.normal);
 		IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END;
 		IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;

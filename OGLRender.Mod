@@ -114,7 +114,7 @@ BEGIN
 		q:=Base.mkPT(x,y,z);
 		pass := Base.world.passprobe(q);
 		IF pass THEN 
-			cvz:=-cvz/2 
+			cvz:=-cvz/5 
 		ELSE
 			x := cx + cvx; y := cy; z := cz+cvz;	
 			q:=Base.mkPT(x,y,z);
@@ -122,7 +122,7 @@ BEGIN
 			IF pass THEN 
 				cvy:=0
 			ELSE			
-				x := cx; y := cy + cvy; z := cz+cvz-0.0001;	
+				x := cx; y := cy + cvy; z := cz+cvz-0.01;	
 				q:=Base.mkPT(x,y,z);
 				pass := Base.world.passprobe(q);
 				IF pass THEN 
@@ -163,14 +163,14 @@ BEGIN
 	IF GLIDE<1/2 THEN GLIDE:=0.995 ELSE GLIDE:=0.3 END;
 END glidetoggle;
 
-PROCEDURE forward(x:REAL);
+PROCEDURE forward(a:REAL);
 VAR
 	fward,dward,rward:PT;
 BEGIN
 	fward:=Retina.fward;
-	cvx :=cvx+(x*fward.x); 
-	cvy :=cvy+(x*fward.y); 	
-	cvz :=cvz+(x*fward.z);
+	cvx :=cvx+(a*fward.x); 
+	cvy :=cvy+(a*fward.y); 	
+	cvz :=cvz+(a*fward.z); 	
 END forward;
 
 PROCEDURE rightstrafe(x:REAL);
@@ -200,6 +200,15 @@ BEGIN
 	cvy :=cvy+(x*dward.y); 	
 	cvz :=cvz+(x*dward.z); 	
 END upstrafe;
+
+PROCEDURE jump; 
+VAR
+	rward,dward,fward:PT;
+	ray: Base.Ray;
+BEGIN	
+	cvz :=-Base.speed 	
+END jump;
+
 
 PROCEDURE trace;
 VAR
@@ -235,7 +244,7 @@ VAR
 BEGIN
 	IF ~CAMLOCK THEN
 		move;	
-		cam.x := cx; cam.y := cy; cam.z := cz;
+		cam.x := cx; cam.y := cy; cam.z := cz+0.001;
 		gravityvector:=Base.mkPT(0,0,1);		
 		gravity:=Base.gravity;
 		gravityvector:=Base.mulPT(gravityvector,Base.gravity);
@@ -245,17 +254,17 @@ BEGIN
 		IF avaTF THEN Marsh.drawavatar END
 	END;
 	IF MOUSEDOWN THEN	
-		IF GLW.ML IN MB THEN  Marsh.draw; 
+		IF GLW.ML IN MB THEN  Marsh.tunnelinto; 
 		ELSIF  GLW.MM IN MB THEN Marsh.snipeinto; 
 		ELSIF  GLW.MR IN MB THEN Marsh.snipeonto;
 		END;	
 	END;
 	trace; 
 	Base.tick;	
-	GLIDE:=0.995;	
-	cvz := cvz*GLIDE+gravityvector.z; 
-	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y; 
-	cvl :=cvl*0.7; cvu := cvu*0.7
+	GLIDE:=0.99;	
+	cvz := cvz+gravityvector.z; 
+	cvx := cvx*GLIDE; cvy := cvy*GLIDE; 
+	cvl :=0; cvu := 0;
 END tick;
  
 END Camera;
@@ -307,9 +316,9 @@ BEGIN
 	camrotinertia:=100;
 	Base.DTL:=250000;
 	Base.DTL2:=25000;
-	Base.gravity:=0.00000001;
+	Base.gravity:=0.000001;
 	Base.speed:=0.00001;
-	Base.maxspeed:=0.0001;
+	Base.maxspeed:=0.001;
 	Base.cursordist:=0.01;
 	R1:=100;
 	R2:=150;
@@ -358,13 +367,13 @@ BEGIN
 		CASE CHR(ucs) OF		
 			"S": Base.fog:=Base.texdetail*7/6; Out.String("more texdetail"); 
 			| "W":Base.fog:=Base.texdetail*6/7; ; Out.String("less texdetail");
-			| "X": Base.horizon:=Base.horizon*7/6; Out.String("++horizon");
-			| "C": Base.horizon:=Base.horizon*6/7;  Out.String("--horizon");								
+			| "X": Base.horizon2:=Base.horizon2*7/6; Out.String("++horizon");
+			| "C": Base.horizon2:=Base.horizon2*6/7;  Out.String("--horizon");								
 			| "s" : camera.forward(-0.51*Base.speed); 
 			| "w" : camera.forward(0.51*Base.speed) ; 
 			| "a" : camera.rightstrafe(-0.5*Base.speed)	; 
 			| "d" : camera.rightstrafe(0.5*Base.speed) ; 
-			| "e":  camera.upstrafe(-0.51*Base.speed) ; 
+			| " ":  camera.jump; 
 			| "q":  camera.upstrafe(0.51*Base.speed) ; 
 			| "n":  leftsticky:=leftsticky*1.3; upsticky:=upsticky*1.3 ; Out.String("n increase leftsticky");
 			| "m": leftsticky:=leftsticky/1.3; upsticky:=upsticky/1.3 ; Out.String("m decrease leftsticky");
@@ -383,7 +392,7 @@ BEGIN
 			| "5": Retina.Res; Out.String(" ");
 			| "6": avaTF:=~avaTF ; Out.String(" ");
 			| "h": camera.hop ; Out.String(" ");
-			| " ":  Marsh.tunnelinto ; Out.String(" ");
+			| "e":  Marsh.tunnelinto ; Out.String(" ");
 			| "]": mstarget:= mstarget * 102/98 ; Out.String("mstarget = "); Out.Int(ENTIER(mstarget),4);
 			| "[": mstarget:= mstarget * 98/102 ; Out.String("mstarget = "); Out.Int(ENTIER(mstarget),4);
 			| "}": camera.aperture.width := camera.aperture.width * 101/99; camera.aperture.height := camera.aperture.height *101/99 ; Out.String(" ");
@@ -602,7 +611,7 @@ END KeyEvent;
 	PROCEDURE GameLogic();
 	BEGIN
 		IF  GetCurrentFrameMs()>mstarget THEN 
-			Retina.lessdetail(5)
+			Retina.lessdetail(1)
 		ELSE 
 			Retina.moredetail(5)
 		END
@@ -687,7 +696,9 @@ END gray;
 
 PROCEDURE speedup;
 BEGIN
-	IF Base.speed < 	Base.maxspeed THEN Base.speed := Base.speed * 1.5 END
+	IF Base.speed < 	Base.maxspeed THEN 
+		Base.speed := Base.speed * 1.5;
+	END
 END speedup;
 
 PROCEDURE slowdown;

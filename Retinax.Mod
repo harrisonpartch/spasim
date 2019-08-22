@@ -570,7 +570,7 @@ VAR
 	foveaparameter:INTEGER;
 	FV: REAL;
 	copy: Raster.Mode;
-	thresh1a: REAL;
+	thresh1a, horizon: REAL;
 	
 PROCEDURE Res*;
 BEGIN
@@ -671,15 +671,17 @@ END splitcam;
 PROCEDURE moredetail*(d: LONGINT);
 BEGIN
 	decthresh1(d); 
-(*	Base.horizon:=Base.horizon*7/6;*)
-	Base.DTL:= Base.DTL*3/2; 
+	horizon:=horizon*3/2;
+	Base.horizon:=Base.horizon2*horizon;
+	Base.DTL:= Base.DTL*7/6; 
 END moredetail;
 
 PROCEDURE lessdetail*(d: LONGINT);
 BEGIN
 	incthresh1(d); 
-(*	Base.horizon:=Base.horizon*6/7; *)
-	Base.DTL:= Base.DTL*2/3; 
+	horizon:=horizon*2/3;
+	Base.horizon:=Base.horizon*horizon;
+	Base.DTL:= Base.DTL*6/7; 
 END lessdetail;
 
 PROCEDURE decdetail*;
@@ -703,7 +705,7 @@ END decthresh1;
 PROCEDURE incthresh1*(d: LONGINT);
 BEGIN
 	thresh1a:=thresh1a*d/3;
-	IF thresh1a>10 THEN thresh1a:=10 END
+	IF thresh1a>1 THEN thresh1a:=1 END
 END incthresh1;
 
 PROCEDURE incTD;
@@ -800,7 +802,8 @@ BEGIN
 	END;	
 	AFTER:=2;
  	FAST:=3;
- 	thresh1a:=2.5;
+ 	thresh1a:=0.5;
+ 	horizon:=1.0;
  	lsense:=0.2;
  	aperture.width:=1;
  	aperture.height:=1;

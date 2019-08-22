@@ -154,14 +154,21 @@ VAR
 	p,dp:PT;
 	ray:Base.Ray;
 	v: Voxel;
-	d:REAL;
+	dx,dy,dz,d:REAL;
 BEGIN
 	ray:=Base.sniperay;
+	dx:=ray.dxyz.x/10000000;
+	dy:=ray.dxyz.y/10000000;
+	dz:=ray.dxyz.z/10000000;	
 	Base.world.Shade(ray);
-	p:=ray.hitxyz;
-	p.x:=p.x+ray.dxyz.x/10000000;
-	p.y:=p.y+ray.dxyz.y/10000000;
-	p.z:=p.z+ray.dxyz.z/10000000;
+	IF ray.firsthitTF THEN 
+		p:=ray.firsthitxyz
+	ELSE
+		p:=ray.hitxyz
+	END;
+	p.x:=p.x+dx;
+	p.y:=p.y+dy;
+	p.z:=p.z+dz;
 	Base.cursorPT:=p; 	
 	Base.world.tunnel(p,cursorsize)
 END tunnelinto;
@@ -501,9 +508,9 @@ BEGIN
 	noise[0].setvoxel(sky1);		
 	NEW(noise[1]);		
 	noise[1].seed:=678;		
-	noise[1].a:=1;
-	noise[1].b:=1;
-	noise[1].c:=1;		
+	noise[1].a:=10;
+	noise[1].b:=10;
+	noise[1].c:=10;		
 	noise[1].octaves:=4;
 	noise[1].persistence:=3.81;	
 	noise[1].setcolor(0.8,2.8,4,1/2);	
@@ -557,7 +564,7 @@ BEGIN
 	noise[0].setvoxel(z3a);		
 	z3.FRaster(noise[0],27);	*)
 	noise[1].setvoxel(wstar);
-(*	z3.FRaster(noise[1],81);	*)
+	z3.FRaster(noise[1],81);	
 	Base.setPT(center,1/2,1/2,1/2);
 
 	NEW(ball,center,0.6);
