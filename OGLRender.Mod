@@ -312,11 +312,10 @@ BEGIN
 	Raster.Create(Retina.image,Retina.W,Retina.H,Raster.BGRA8888);	
 	NEW(rand);
 	foveasize := 100;
-	multicore:=TRUE;
 	camrotinertia:=100;
-	Base.DTL:=250000;
-	Base.DTL2:=25000;
-	Base.gravity:=0.000001;
+	Base.DTL:=25000;
+	Base.DTL2:=2500;
+	Base.gravity:=0.00000001;
 	Base.speed:=0.00001;
 	Base.maxspeed:=0.001;
 	Base.cursordist:=0.01;
@@ -324,7 +323,7 @@ BEGIN
 	R2:=150;
 	Base.worldalive := TRUE;	
 	fogdensity:=0.11;
-	leftsticky:=500.0;
+	leftsticky:=300.0;
 	upsticky:=100.0;	
 END OnLoad;
 
@@ -365,8 +364,8 @@ VAR
 BEGIN
 	key:=CHR(ucs);
 		CASE CHR(ucs) OF		
-			"S": Base.fog:=Base.texdetail*7/6; Out.String("more texdetail"); 
-			| "W":Base.fog:=Base.texdetail*6/7; ; Out.String("less texdetail");
+			"S": Base.DTL:=Base.DTL*7/6; Out.String("Base.DTL ++"); 
+			| "W":Base.DTL:=Base.DTL*6/7; ; Out.String("Base.DTL --");
 			| "X": Base.horizon2:=Base.horizon2*7/6; Out.String("++horizon");
 			| "C": Base.horizon2:=Base.horizon2*6/7;  Out.String("--horizon");								
 			| "s" : camera.forward(-0.51*Base.speed); 
@@ -610,10 +609,10 @@ END KeyEvent;
 	(* change detail according to frame speed, called in GLWindow.MainLoop *)
 	PROCEDURE GameLogic();
 	BEGIN
-		IF  GetCurrentFrameMs()>mstarget THEN 
+		IF  GetCurrentFrameMs()>mstarget+5 THEN 
 			Retina.lessdetail(1)
-		ELSE 
-			Retina.moredetail(5)
+		ELSIF GetCurrentFrameMs()<mstarget THEN
+			Retina.moredetail(1)
 		END
 	END GameLogic;
 	

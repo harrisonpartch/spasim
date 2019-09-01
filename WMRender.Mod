@@ -319,8 +319,8 @@ BEGIN
 		| 196: Base.DTL:= Base.DTL*3/2;
 	ELSE
 		CASE CHR(ucs) OF
-			"S": Retina.incdetail; Out.String("inc detail"); 
-			| "W":Retina.decdetail; Out.String("dec detail"); 
+			"S": Base.fog:=Base.fog*7/6; Out.String("more fog"); 
+			| "W": Base.fog:=Base.fog*6/7; ; Out.String("less fog");
 			|   "s" : camera.forward(-0.51*Base.speed)
 			| "w" :camera.forward(0.51*Base.speed)
 			| "a" :camera.rightstrafe(-0.5*Base.speed)

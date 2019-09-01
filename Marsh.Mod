@@ -1,5 +1,5 @@
 MODULE Marsh;
-IMPORT  Base , Retina, Engrainer, Random, CellAuto, Voxel4,
+IMPORT  Base , Retina, Engrainer, Random, CellAuto, srVoxel, Voxel4,
  FRep, Files, Streams, Commands, Out:=KernelLog;
 
 CONST sfile="marshstrokes.text"
@@ -170,7 +170,7 @@ BEGIN
 	p.y:=p.y+dy;
 	p.z:=p.z+dz;
 	Base.cursorPT:=p; 	
-	Base.world.tunnel(p,cursorsize)
+	Base.world.stroke(p,cursorsize, Base.EMPTY)
 END tunnelinto;
 
 PROCEDURE snipeinto*;
@@ -311,8 +311,11 @@ VAR
 	jordan, bottle1,bottle2,bottle3,bottlepossum,bottlegrounds,greensuncouple,wstar,starspider,arevclock: Voxel;
 	ball: FRep.sphere;
 	medley: Voxel;
+	med1,med2,med3: Voxel;
+	mcube: srVoxel.DiffuseMVox;
 	fuzz: Voxel4.FuzzVox;
-	siv: Voxel4.MirrorSphereInVox;
+	Red,Green: srVoxel.DiffuseVox;
+	siv: Voxel4.SphereInVox;
 	noise: ARRAY 5 OF FRep.noise;	 
 	twonoise: FRep.twonoise;
 BEGIN
@@ -320,6 +323,7 @@ BEGIN
 	NEW(EMPTY);
 	EMPTY.passable:=TRUE;
      rand:=Base.rand;	
+     NEW(mcube);
 	xot:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoR"); 
 	push(xot);
 	cage:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");
@@ -508,12 +512,12 @@ BEGIN
 	noise[0].setvoxel(sky1);		
 	NEW(noise[1]);		
 	noise[1].seed:=678;		
-	noise[1].a:=10;
-	noise[1].b:=10;
-	noise[1].c:=10;		
+	noise[1].a:=1;
+	noise[1].b:=1;
+	noise[1].c:=1;		
 	noise[1].octaves:=4;
 	noise[1].persistence:=3.81;	
-	noise[1].setcolor(0.8,2.8,4,1/2);	
+	noise[1].setcolor(0.8,2.8,4,1/2,0);	
 	noise[1].setvoxel(wstar);	
 	xot.tscale:=100;		
 	NEW(noise[2]);	
@@ -547,48 +551,72 @@ BEGIN
 	Base.setPT(up,0,0,1);
 	
 	z3:=Base.VoxelFromName("NM3");	
-	z3a:=Base.VoxelFromName("NM3");
-	z3b:=Base.VoxelFromName("NM3");
-	medley:=Base.VoxelFromName("NM3");	
-	z3a.copyonstroke:=TRUE; 
+	z3a:=Base.VoxelFromName("NM2");
+	z3b:=Base.VoxelFromName("NM2");
+	medley:=Base.VoxelFromName("NM2");	
+	med1:=Base.VoxelFromName("NM2");		
+	med2:=Base.VoxelFromName("NM2");		
+	med3:=Base.VoxelFromName("NM2");	
+(*	z3a.copyonstroke:=TRUE; 
 	z3b.copyonstroke:=TRUE; 	
 	z3a.passable:=TRUE;
 	medley.copyonstroke:=TRUE; 
-	z3.setcolor(0,0,1,3,3,3);
-	z3a.setcolor(1/12,1/12,1/13,1/13,1/13,1/13);
-     dieone.tscale:=1000;
-     noise[0].setvoxel(sky1);
-(*	z3b.FRaster(noise[0],27);
-	noise[0].setvoxel(z3b);	
-	z3a.FRaster(noise[0],27);
-	noise[0].setvoxel(z3a);		
-	z3.FRaster(noise[0],27);	*)
+*)	z3.setcolor(0.5,0.5,0.5,3,3,3);
+	z3a.setcolor(0,6,0,10,10,10);
+ 	z3b.setcolor(28,28,28,30,30,30);    
+ 	dieone.tscale:=1000;
+     noise[0].setvoxel(dieone);
+	z3b.FRaster(noise[0],16);
 	noise[1].setvoxel(wstar);
-	z3.FRaster(noise[1],81);	
+	z3b.FRaster(noise[1],16);
+	
+	noise[0].setvoxel(z3b);	
+	z3a.FRaster(noise[0],16);
+	noise[1].setvoxel(z3b);		
+	z3.FRaster(noise[1],16);	
 	Base.setPT(center,1/2,1/2,1/2);
 
-	NEW(ball,center,0.6);
-	ball.setcolor(0.21,0.21,0.81,1);
-	medley.FRaster(ball,27);
-(*		FOR i := 0 TO 10000 DO
-		medley.stroke(Base.randPT(),27,wstar);
-	END;		
-	FOR i := 0 TO 10000 DO
-		medley.stroke(Base.randPT(),27,gxy);
-	END;			
-	FOR i := 0 TO 10000 DO
-		z3.stroke(Base.randPT(),27,medley);
+
+	NEW(Red);
+	Red.SetColor(0.8,0.3,0.05);
+	NEW(Green);
+	Green.SetColor(0,1,0);
+	NEW(siv,Green,NIL,0.6); 
+	NEW(fuzz);
+	NEW(ball,center,0.5);
+	ball.setcolor(0.61,0.61,0.61,1,0);	
+	med1.FRaster(ball,3);
+	med2.FRaster(ball,9);	
+	med3.FRaster(ball,27);	
+	medley.FRaster(ball,32);	
+
+	NEW(ball,center,0.6);	
+	ball.setcolor(0.41,0.21,0.21,1,0);	
+	ball.setvoxel(med2);
+	medley.FRaster(ball,8);	
+		
+	med2.imposter:=med1;
+	med3.imposter:=med2;
+
+	medley.imposter:=med2;
+	
+	FOR i := 0 TO 1000 DO
+		z3b.stroke(Base.randPT(),10,medley);
 	END;
-		FOR i := 0 TO 10000 DO
-		z3.stroke(Base.randPT(),27,gxy);
+		FOR i := 0 TO 100 DO
+		z3.stroke(Base.randPT(),90,wstar);
 	END;	
-*)	Base.setPT(center,1/2,1/2,2/3);	
+	Base.setPT(center,1/2,1/2,2/3);	
  	NEW(plane,center,up);
 
-	plane.setvoxel(wstar);			
+	plane.setvoxel(z3b);			
 	z3.FRaster(plane,9);	 		
 
-	NEW(siv); 
+
+	med1.lock;
+	med2.lock;
+	med3.lock;	
+	medley.lock;
 	
 	Base.avatar:=harrison;
 	
@@ -616,7 +644,7 @@ BEGIN
 	NEW(marshv);
 	push(Base.EMPTY);
 	dawn; 
-	cursorsize:=81;
+	cursorsize:=243;
 	cursorTF:=TRUE;
 	atmdark:=0;
 	SNIPEINTO:=TRUE;

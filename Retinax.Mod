@@ -542,7 +542,7 @@ BEGIN{ACTIVE, PRIORITY(Objects.Normal)}
 		BEGIN{EXCLUSIVE}
 			AWAIT(GO);
 		END;
-		ztrace(cam,T); 
+		zftrace(cam,T); 
 		BEGIN{EXCLUSIVE}
 			GO:=FALSE;
 		incTD; 
@@ -671,41 +671,33 @@ END splitcam;
 PROCEDURE moredetail*(d: LONGINT);
 BEGIN
 	decthresh1(d); 
-	horizon:=horizon*3/2;
-	Base.horizon:=Base.horizon2*horizon;
-	Base.DTL:= Base.DTL*7/6; 
+	Base.horizon:=Base.horizon+0.001;
+	IF Base.horizon>1 THEN Base.horizon:=1 END
 END moredetail;
 
 PROCEDURE lessdetail*(d: LONGINT);
 BEGIN
 	incthresh1(d); 
-	horizon:=horizon*2/3;
-	Base.horizon:=Base.horizon*horizon;
-	Base.DTL:= Base.DTL*6/7; 
+	Base.horizon:=Base.horizon-0.001; 
+	IF Base.horizon<0.01 THEN Base.horizon:=0.01 END
 END lessdetail;
 
-PROCEDURE decdetail*;
+PROCEDURE decthresh1(d: LONGINT);
 BEGIN
-	Base.DTL:=Base.DTL*3/5;
-	Out.Int(ENTIER(Base.DTL),6);	
-END decdetail;
-
-PROCEDURE incdetail*;
-BEGIN
-	Base.DTL:=Base.DTL*5/3;
-	Out.Int(ENTIER(Base.DTL),6);		
-END incdetail;
-
-PROCEDURE decthresh1*(d: LONGINT);
-BEGIN
-	thresh1a:=thresh1a*3/d;
-	IF thresh1a<0.01 THEN thresh1a:=0.01 END
+	thresh1a:=thresh1a-d/10;
+	IF thresh1a<0.02 THEN 
+		thresh1a:=0.02;
+		DEC(foveaparameter) 
+	END
 END decthresh1;
 
-PROCEDURE incthresh1*(d: LONGINT);
+PROCEDURE incthresh1(d: LONGINT);
 BEGIN
-	thresh1a:=thresh1a*d/3;
-	IF thresh1a>1 THEN thresh1a:=1 END
+	thresh1a:=thresh1a+d/10;
+	IF thresh1a>2/12 THEN 
+		thresh1a:=2/12;
+		INC(foveaparameter)
+	END
 END incthresh1;
 
 PROCEDURE incTD;

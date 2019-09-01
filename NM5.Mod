@@ -1,4 +1,4 @@
-MODULE NM5; (*! This module may be either imported or used anonymously *)
+MODULE NM5; (*! This module may be either imported or used anonymously *)
 IMPORT Objects, Base, SPSME, Noise, Math, TexVox, Out := KernelLog, Debugging, Heaps, Streams,Strings;
 
 (*
@@ -38,7 +38,7 @@ VAR
 	drx, dry, drz, dr,rr,gr,br,blr,bla,a: REAL;
 	out,shadenil,A,B,C: BOOLEAN;
 	v: Voxel;
-	vdepth, v2, fog: REAL;
+	vdepth, v2, fog,f2: REAL;
 	last:BOOLEAN;
 	i,j: LONGINT;
 	lastlength:REAL;
@@ -48,7 +48,7 @@ BEGIN
 	xyz.x := (ray.lxyz.x) * M;
 	xyz.y := (ray.lxyz.y) * M;
 	xyz.z := (ray.lxyz.z)* M;
-	IF (ray.length*ray.scale>ray.dtl) THEN
+	IF (ray.length*ray.scale*M>ray.dtl) THEN (* size of the child voxels at camera *)
 		IF imposter#NIL THEN
 			imposter.Shade(ray)
 		END
@@ -126,8 +126,7 @@ BEGIN
 					newxyz.x := xyz.x + drz * ray.dxyz.x; newxyz.y := xyz.y + drz * ray.dxyz.y; newxyz.z  := xyz.z + drz * ray.dxyz.z
 				END;
 				vdepth:=Base.distance(newxyz,xyz); 	
-				v2:=vdepth/ray.scale;
-				fog:=Base.fog*ray.length*v2;	
+				v2:=vdepth/ray.scale*(1/Base.horizon);
 				ray.xyz.x:=ray.xyz.x + (newxyz.x-xyz.x)/ray.scale;
 				ray.xyz.y:=ray.xyz.y + (newxyz.y-xyz.y)/ray.scale;
 				ray.xyz.z:=ray.xyz.z + (newxyz.z-xyz.z)/ray.scale;				
@@ -137,17 +136,15 @@ BEGIN
 				ray.clr.ra := ray.clr.ra-redblack*v2;
 				ray.clr.ga := ray.clr.ga-greenblack*v2;
 				ray.clr.ba := ray.clr.ba-blueblack*v2;	
-				ray.clr.ra := ray.clr.ra-fog;
-				ray.clr.ga := ray.clr.ga-fog;
-				ray.clr.ba := ray.clr.ba-fog;		
-				fog:=fog/2;		 			
 				ray.clr.r := ray.clr.r+red*ray.clr.ra*v2;
 				ray.clr.g:= ray.clr.g+green*ray.clr.ga*v2;
 				ray.clr.b := ray.clr.b+blue*ray.clr.ba*v2;		
-				IF (ray.length>Base.horizon) OR (ray.clr.ra<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ba<0.1) THEN 
-					ray.clr.b:= ray.clr.b + ray.clr.ba;
+				IF ray.length>Base.horizon THEN
+					ray.clr.b := ray.clr.b+ray.clr.ba;	
 					ray.terminate:=TRUE 
-				END;	
+				ELSIF (ray.clr.ba<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ra<0.1) THEN 			
+					ray.terminate:=TRUE 
+				END;
 				bounds(ijk.i,ijk.j,ijk.k, out);		
 				IF ~(out OR ray.terminate) THEN
 					v := blox[ijk.i,ijk.j,ijk.k];
@@ -164,7 +161,7 @@ BEGIN
 					ELSE
 					END
 				END;		
-				UNTIL out OR ray.terminate;
+			UNTIL out OR ray.terminate;
 		END
 	END;
 	ray.scale := ray.scale/M;	
@@ -172,24 +169,6 @@ BEGIN
 END Shade;
 
 PROCEDURE nshade(nc: NCube; VAR ray: Ray);
-VAR
-	dr,dg,db,mix,dot,dot1,dot2: REAL;
-	light: Base.Light;
-BEGIN
-	IF texture#NIL THEN
-		texture.Shade(ray)
-	ELSE
-		dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z);
-		dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-		mix:=ray.length*ray.scale/100;
-		IF mix>1 THEN mix:=1 END;
-		dot:=mix*dot1+(1-mix)*dot2;
-		ray.clr.r := ray.clr.r + nc.color.red * ray.clr.ra*dot;
-		ray.clr.g := ray.clr.g + nc.color.green * ray.clr.ga*dot;
-		ray.clr.b := ray.clr.b + nc.color.blue * ray.clr.ba*dot;
-		ray.terminate:=TRUE
-	END
-END nshade;
 
 PROCEDURE reflect(VAR p: PT; n: PT);
 VAR
@@ -202,16 +181,58 @@ END reflect;
 
 PROCEDURE mirror(VAR ray: Ray);
 BEGIN
-	ray.hitmirrorTF := TRUE;
-	ray.hitxyz:=ray.xyz;
-	ray.changed := TRUE;
-	ray.mirrortf:=TRUE;
 	INC(ray.mirrors);
-	IF ray.mirrors<4 THEN reflect(ray.dxyz, ray.normal) END;
-	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END;
-	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
-	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;
+	IF ray.mirrors>4 THEN 
+		ray.terminate:=TRUE
+	ELSE
+		ray.hitmirrorTF := TRUE;
+		ray.changed := TRUE;
+		ray.mirrortf:=TRUE;
+		ray.clr.ra:= ray.clr.ra + mi;
+		ray.clr.ga := ray.clr.ga + mi;
+		ray.clr.ba := ray.clr.ba + mi;	
+		reflect(ray.dxyz, nc.normal);
+		IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END;
+		IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
+		IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;
+		ray.xyz.x:=ray.xyz.x+ray.dxyz.x/10000000 ;
+		ray.xyz.y:=ray.xyz.y+ray.dxyz.y/10000000 ;	
+		ray.xyz.z:=ray.xyz.z+ray.dxyz.z/10000000 ;	
+		Base.world.Shade(ray);		
+	END
 END mirror;
+
+VAR
+	dr,dg,db,mix,dot,dot1,dot2,mi: REAL;
+	light: Base.Light;
+BEGIN
+(*	dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z);
+	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
+	mix:=ray.length*ray.scale/100;
+	IF mix>1 THEN mix:=1 END;
+	dot:=mix*dot1+(1-mix)*dot2*nc.color.alpha;
+*)
+	dot:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z);
+	IF nc.color.mirror>0 THEN
+		mi:=1-nc.color.mirror;
+		ray.clr.r := ray.clr.r + nc.color.red*ray.clr.ra*dot*mi;
+		ray.clr.g := ray.clr.g + nc.color.green*ray.clr.ga*dot*mi;
+		ray.clr.b := ray.clr.b + nc.color.blue*ray.clr.ba*dot*mi;
+		ray.clr.ra := ray.clr.ra-nc.color.alpha*mi;
+		ray.clr.ga := ray.clr.ra-nc.color.alpha*mi;
+		ray.clr.ba := ray.clr.ra-nc.color.alpha*mi;
+		ray.normal:=nc.normal;
+		mirror(ray);
+	ELSE		
+		ray.clr.r := ray.clr.r + nc.color.red * ray.clr.ra*dot;
+		ray.clr.g := ray.clr.g + nc.color.green * ray.clr.ga*dot;
+		ray.clr.b := ray.clr.b + nc.color.blue * ray.clr.ba*dot;
+		ray.clr.ra := ray.clr.ra-nc.color.alpha;
+		ray.clr.ga := ray.clr.ra-nc.color.alpha;
+		ray.clr.ba := ray.clr.ra-nc.color.alpha;		
+		ray.terminate:=TRUE
+	END	
+END nshade;
 
 PROCEDURE erase*(p:PT; resolution:LONGINT);
 VAR
@@ -280,8 +301,8 @@ BEGIN
 	passable:=TRUE;
 	complex:=TRUE;
 	imposter:=Base.EMPTY;
-	code:="NM5";
-	ncode:="NM5"
+	code:="NM5";
+	ncode:="NM5"
 END init;
 
 PROCEDURE copyclear*;
@@ -435,7 +456,7 @@ VAR
 	code: Base.Name;
 BEGIN
 	IF ~lockTF THEN
-		code:="NM5"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
+		code:="NM5"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 		nextscale:=scale*M;
 		p.x:=p.x*M;
 		p.y:=p.y*M;
@@ -471,58 +492,6 @@ BEGIN
 		END
 	END
 END strokerec;
-
-PROCEDURE tunnel*(p:PT; resolution: LONGINT);
-VAR
-	i,j,k: LONGINT;
-BEGIN
-	Base.clamPT(p);
-	tunnelrec(p,resolution,M);
-END tunnel;
-
-PROCEDURE tunnelrec*(p:PT; resolution,scale: LONGINT);
-VAR
-	i,j,k,ii,jj,kk,nextscale: LONGINT;
-	v,vv:Voxel;
-	c,c2: cell;
-	copyv,vu: Voxel;
-	code: Base.Name;
-BEGIN
-	IF ~lockTF THEN
-		code:="NM5"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
-		nextscale:=scale*M;
-		p.x:=p.x*M;
-		p.y:=p.y*M;
-		p.z:=p.z*M;
-		i := ENTIER(p.x)MOD M; j := ENTIER(p.y)MOD M; k := ENTIER(p.z)MOD M;
-		IF nextscale>resolution THEN
-			blox[i,j,k]:=NIL
-		ELSE
-			IF blox[i,j,k]#NIL THEN
-				IF  blox[i,j,k].copyonstroke THEN
-					copyv:= blox[i,j,k].deepcopy();
-					blox[i,j,k]:=copyv;	
-					blox[i,j,k].tunnelrec(p, resolution,nextscale)
-				ELSIF blox[i,j,k] IS Cell THEN
-					blox[i,j,k].tunnelrec(p, resolution,nextscale)
-				ELSE
-					NEW(c);
-					c.setcolor(red/M, green/M, blue/M, redblack/M, greenblack/M, blueblack/M); 
-					c.fill(blox[i,j,k]);
-					blox[i,j,k]:=c;
-					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-					c.tunnelrec(p, resolution,nextscale);
-				END
-			ELSE
-				NEW(c);
-				c.setcolor(red/M,green/M,blue/M,redblack/M,greenblack/M,blueblack/M);
-				blox[i,j,k]:=c;
-				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-				c.tunnelrec(p, resolution,nextscale);
-			END
-		END
-	END
-END tunnelrec;
 
 PROCEDURE nstrokerec(p:PT; resolution,scale:LONGINT; normal:PT; color: Color);
 VAR
@@ -615,7 +584,7 @@ VAR
 	v: Voxel;
 	newcell: cell;
 BEGIN
-	code:="NM5"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
+	code:="NM5"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 	MS:=M*scale;
 	TWOMS:=2*MS;
 	nextscale:=scale*M;
@@ -770,7 +739,7 @@ VAR
 	cv,child:Voxel;
 	i,j,k: INTEGER;
 BEGIN
-	code:=ncode; (* if this voxel has been rezzed from another module, make it NM5 *)
+	code:=ncode; (* if this voxel has been rezzed from another module, make it NM5 *)
 	copymarker:=TRUE;
 	NEW(c);
 	c.setcolor(red/M, green/M, blue/M, redblack/M, greenblack/M, blueblack/M); 
@@ -812,7 +781,7 @@ END count;
 
 (*
 Engrains this voxel and it's children recursively in the following format:
-"NM5"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
+"NM5"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
 <----- Voxel data -----><------                     children data                     ------>
 Children data contains 27 boolean-child pairs, each boolean being TRUE if a child is contained in that position.
 In case of FALSE the length of child data is 0 for that child (i.e. no data is being written except for the FALSE).
@@ -911,4 +880,4 @@ END thisvox;
 
 BEGIN
 	NEW(copyengine)
-END NM5.
+END NM5.

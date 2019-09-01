@@ -43,16 +43,17 @@ VAR
 	i,j: LONGINT;
 	lastlength:REAL;
 BEGIN
-	pushxyz:=ray.xyz;
-	ray.scale := ray.scale*M;
-	xyz.x := (ray.lxyz.x) * M;
-	xyz.y := (ray.lxyz.y) * M;
-	xyz.z := (ray.lxyz.z)* M;
-	IF (ray.length*ray.scale*M>ray.dtl) THEN (* size of the child voxels at camera *)
+	ray.dtl:=Base.DTL*(1-ray.length/Base.horizon);
+	IF (ray.length*ray.scale>ray.dtl) THEN (* size of the child voxels at camera *)
 		IF imposter#NIL THEN
 			imposter.Shade(ray)
 		END
 	ELSE
+		pushxyz:=ray.xyz;
+		ray.scale := ray.scale*M;
+		xyz.x := (ray.lxyz.x) * M;
+		xyz.y := (ray.lxyz.y) * M;
+		xyz.z := (ray.lxyz.z)* M;
 		SPSME.E(xyz,ijk);
 		bounds(ijk.i,ijk.j,ijk.k,out);
 		IF ~out THEN
@@ -131,6 +132,7 @@ BEGIN
 				ray.xyz.y:=ray.xyz.y + (newxyz.y-xyz.y)/ray.scale;
 				ray.xyz.z:=ray.xyz.z + (newxyz.z-xyz.z)/ray.scale;				
 				ray.length:=ray.length+v2;
+				v2:=v2*Base.horizon*10;
 				ray.hitxyz:=ray.xyz;
 				xyz:=newxyz;	
 				ray.clr.ra := ray.clr.ra-redblack*v2;
@@ -139,9 +141,13 @@ BEGIN
 				ray.clr.r := ray.clr.r+red*ray.clr.ra*v2;
 				ray.clr.g:= ray.clr.g+green*ray.clr.ga*v2;
 				ray.clr.b := ray.clr.b+blue*ray.clr.ba*v2;		
-				IF (ray.clr.ba<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ra<0.1) THEN 			
+				IF ray.length>Base.horizon THEN
+					ray.clr.b:= ray.clr.b + ray.clr.ba;
+					ray.terminate:=TRUE;
+				ELSIF (ray.clr.ba<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ra<0.1) THEN 	
+					Base.clampclr(ray.clr);		
 					ray.terminate:=TRUE 
-				END;	
+				END;
 				bounds(ijk.i,ijk.j,ijk.k, out);		
 				IF ~(out OR ray.terminate) THEN
 					v := blox[ijk.i,ijk.j,ijk.k];
@@ -158,7 +164,7 @@ BEGIN
 					ELSE
 					END
 				END;		
-				UNTIL out OR ray.terminate;
+			UNTIL out OR ray.terminate;
 		END
 	END;
 	ray.scale := ray.scale/M;	
@@ -166,24 +172,6 @@ BEGIN
 END Shade;
 
 PROCEDURE nshade(nc: NCube; VAR ray: Ray);
-VAR
-	dr,dg,db,mix,dot,dot1,dot2: REAL;
-	light: Base.Light;
-BEGIN
-	IF texture#NIL THEN
-		texture.Shade(ray)
-	ELSE
-		dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z);
-		dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-		mix:=ray.length*ray.scale/100;
-		IF mix>1 THEN mix:=1 END;
-		dot:=mix*dot1+(1-mix)*dot2;
-		ray.clr.r := ray.clr.r + nc.color.red * ray.clr.ra*dot;
-		ray.clr.g := ray.clr.g + nc.color.green * ray.clr.ga*dot;
-		ray.clr.b := ray.clr.b + nc.color.blue * ray.clr.ba*dot;
-		ray.terminate:=TRUE
-	END
-END nshade;
 
 PROCEDURE reflect(VAR p: PT; n: PT);
 VAR
@@ -196,16 +184,56 @@ END reflect;
 
 PROCEDURE mirror(VAR ray: Ray);
 BEGIN
-	ray.hitmirrorTF := TRUE;
-	ray.hitxyz:=ray.xyz;
-	ray.changed := TRUE;
-	ray.mirrortf:=TRUE;
 	INC(ray.mirrors);
-	IF ray.mirrors<4 THEN reflect(ray.dxyz, ray.normal) END;
-	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END;
-	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
-	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;
+	IF ray.mirrors>4 THEN 
+		ray.terminate:=TRUE
+	ELSE
+		ray.hitmirrorTF := TRUE;
+		ray.changed := TRUE;
+		ray.mirrortf:=TRUE;
+		ray.clr.ra:= ray.clr.ra + mi;
+		ray.clr.ga := ray.clr.ga + mi;
+		ray.clr.ba := ray.clr.ba + mi;	
+		reflect(ray.dxyz, ray.normal);
+		IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END;
+		IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
+		IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;
+		ray.xyz.x:=ray.xyz.x+ray.dxyz.x/100000000 ;
+		ray.xyz.y:=ray.xyz.y+ray.dxyz.y/100000000 ;	
+		ray.xyz.z:=ray.xyz.z+ray.dxyz.z/100000000;	
+		Base.world.Shade(ray);		
+	END
 END mirror;
+
+VAR
+	dr,dg,db,mix,dot,dot1,dot2,mi: REAL;
+	light: Base.Light;
+BEGIN
+	dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z);
+	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
+	mix:=ray.length*ray.scale/100;
+	IF mix>1 THEN mix:=1 END;
+	dot:=mix*dot1+(1-mix)*dot2*nc.color.alpha;
+	IF nc.color.mirror>0 THEN
+		mi:=1-nc.color.mirror;
+		ray.clr.r := ray.clr.r + nc.color.red*ray.clr.ra*dot*mi;
+		ray.clr.g := ray.clr.g + nc.color.green*ray.clr.ga*dot*mi;
+		ray.clr.b := ray.clr.b + nc.color.blue*ray.clr.ba*dot*mi;
+		ray.clr.ra := ray.clr.ra-nc.color.alpha*mi;
+		ray.clr.ga := ray.clr.ra-nc.color.alpha*mi;
+		ray.clr.ba := ray.clr.ra-nc.color.alpha*mi;
+		ray.normal:=nc.normal;
+		mirror(ray);
+	ELSE		
+		ray.clr.r := ray.clr.r + nc.color.red * ray.clr.ra*dot;
+		ray.clr.g := ray.clr.g + nc.color.green * ray.clr.ga*dot;
+		ray.clr.b := ray.clr.b + nc.color.blue * ray.clr.ba*dot;
+		ray.clr.ra := ray.clr.ra-nc.color.alpha;
+		ray.clr.ga := ray.clr.ra-nc.color.alpha;
+		ray.clr.ba := ray.clr.ra-nc.color.alpha;		
+		ray.terminate:=TRUE
+	END	
+END nshade;
 
 PROCEDURE erase*(p:PT; resolution:LONGINT);
 VAR
@@ -243,9 +271,6 @@ BEGIN
 	blox[0,1,1]:=w;
 	blox[1,0,1]:=w;
 	blox[1,1,1]:=w;
-	blox[1,1,2]:=w;
-	blox[2,1,1]:=w;
-	blox[1,2,1]:=w;
 END fillsierp;
 
 PROCEDURE fillcqr2*(v,w: Voxel);
@@ -404,10 +429,12 @@ PROCEDURE stroke*(p:PT; res: LONGINT; voxel :Voxel);
 VAR
 	i,j,k: LONGINT;
 BEGIN
-	Base.clamPT(p);
-(*	voxel.setcolorrec(red*res,green*res,blue*res,redblack*res,greenblack*res,blueblack*res); *)
-	IF voxel#NIL THEN
-		strokerec(p,res,M, voxel);
+	IF ~lockTF THEN
+		Base.clamPT(p);
+		voxel.setcolor(red*res,green*res,blue*res,redblack*res,greenblack*res,blueblack*res); 
+		IF voxel#NIL THEN
+			strokerec(p,res,M, voxel);
+		END
 	END
 END stroke;
 
@@ -465,58 +492,6 @@ BEGIN
 		END
 	END
 END strokerec;
-
-PROCEDURE tunnel*(p:PT; resolution: LONGINT);
-VAR
-	i,j,k: LONGINT;
-BEGIN
-	Base.clamPT(p);
-	tunnelrec(p,resolution,M);
-END tunnel;
-
-PROCEDURE tunnelrec*(p:PT; resolution,scale: LONGINT);
-VAR
-	i,j,k,ii,jj,kk,nextscale: LONGINT;
-	v,vv:Voxel;
-	c,c2: cell;
-	copyv,vu: Voxel;
-	code: Base.Name;
-BEGIN
-	IF ~lockTF THEN
-		code:="NM2"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
-		nextscale:=scale*M;
-		p.x:=p.x*M;
-		p.y:=p.y*M;
-		p.z:=p.z*M;
-		i := ENTIER(p.x)MOD M; j := ENTIER(p.y)MOD M; k := ENTIER(p.z)MOD M;
-		IF nextscale>resolution THEN
-			blox[i,j,k]:=NIL
-		ELSE
-			IF blox[i,j,k]#NIL THEN
-				IF  blox[i,j,k].copyonstroke THEN
-					copyv:= blox[i,j,k].deepcopy();
-					blox[i,j,k]:=copyv;	
-					blox[i,j,k].tunnelrec(p, resolution,nextscale)
-				ELSIF blox[i,j,k] IS Cell THEN
-					blox[i,j,k].tunnelrec(p, resolution,nextscale)
-				ELSE
-					NEW(c);
-					c.setcolor(red/M, green/M, blue/M, redblack/M, greenblack/M, blueblack/M); 
-					c.fill(blox[i,j,k]);
-					blox[i,j,k]:=c;
-					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-					c.tunnelrec(p, resolution,nextscale);
-				END
-			ELSE
-				NEW(c);
-				c.setcolor(red/M,green/M,blue/M,redblack/M,greenblack/M,blueblack/M);
-				blox[i,j,k]:=c;
-				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-				c.tunnelrec(p, resolution,nextscale);
-			END
-		END
-	END
-END tunnelrec;
 
 PROCEDURE nstrokerec(p:PT; resolution,scale:LONGINT; normal:PT; color: Color);
 VAR

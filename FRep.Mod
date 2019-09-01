@@ -102,10 +102,13 @@ PROCEDURE color*(p:PT):Color;
 VAR
 	c: Color;
 BEGIN
-	c.red:=cxolor.red+(rand.Uniform()*0.06);
-	c.green:=cxolor.green+(rand.Uniform()*0.06);
-	c.blue:=cxolor.blue+(rand.Uniform()*0.06);
+	c.red:=cxolor.red;
+	c.green:=cxolor.green;
+	c.blue:=cxolor.blue;
+	c.alpha:=cxolor.alpha;
+	c.mirror:=cxolor.mirror;
 	Base.clamp3(c.red,c.green,c.blue);
+	Base.clamp(c.mirror);
 	RETURN c
 END color;
 

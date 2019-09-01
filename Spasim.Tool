@@ -8,6 +8,7 @@ FRep.Mod
 TexVox.Mod
 CellAuto.Mod
 Voxel4.Mod
+srVoxel.Mod
 HalfSpace.Mod
 RotaVox.Mod
 Engrainer.Mod
@@ -17,13 +18,20 @@ Retinax.Mod
 Marsh.Mod
 OGLRender.Mod 
 ~
-
+Compiler.Compile 
+WMRetina.Mod
+WMRender.Mod
+~
 
 NCompiler.ncompile  <== Middle mouse click on this
 
 **********************************************************************************************************
 
 Render.Open    <== Middle mouse click on this
+
+
+WMRender.Open 
+
 
 ======
 
@@ -48,10 +56,12 @@ NXWCxXWLIcD2LegvoGXX666.Mod	Serp
 NBsHFiBKkSckXBAd46ZbEQw.Mod mandelbrot
 
 
+NM10.Mod
 NM5.Mod
 NM4.Mod
 NM3.Mod
 NM2.Mod
+
 
 TuringPll.Mod
 

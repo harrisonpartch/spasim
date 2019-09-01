@@ -295,6 +295,7 @@ BEGIN
 				|3: lx := ray.lxyz.y; ly := 1-ray.lxyz.z;
 				|4: lx := ray.lxyz.x; ly := 1-ray.lxyz.z;
 				|5: lx := ray.lxyz.x; ly := ray.lxyz.y;
+				|6: lx := ray.lxyz.x; ly := ray.lxyz.y; lz:=ray.lxyz.z; (* 6 means inside *)
 			END;
 			ly:=1-ly;
 		END;
@@ -355,6 +356,7 @@ BEGIN
 		END
 	ELSE
 	  (* camera is inside textured cube *)
+	  
 	END;
 END Shade;
 (*

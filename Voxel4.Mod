@@ -1,5 +1,5 @@
 MODULE Voxel4;
-IMPORT Random, Base,  SPSMMath, Math, Raster;
+IMPORT Random, Random2, Base,  SPSMMath, Math, Raster;
 
 VAR
 	rand: Random.Generator;
@@ -14,11 +14,14 @@ TYPE PT=Base.PT;
 TYPE FuzzVox*=OBJECT(Voxel);
 VAR
 	fuzzdivisor, fuzzsubtract: REAL;
+	rand: Random2.Generator;
+	
 PROCEDURE & init*;
 BEGIN
 	passable := TRUE;
 	fuzzdivisor := 100;
-	fuzzsubtract := 1/(2*fuzzdivisor)
+	fuzzsubtract := 1/(2*fuzzdivisor);
+	NEW(rand);
 END init;
 
 PROCEDURE setFuzz*(f: REAL);
@@ -30,12 +33,9 @@ END setFuzz;
 PROCEDURE Shade*(VAR ray: Ray);
 BEGIN
 	ray.changed := TRUE;
-	ray.dxyz.x := ray.lxyz.x + 0.05;
-	ray.dxyz.y := ray.lxyz.y + 0.05;
-	ray.dxyz.z := ray.lxyz.z + 0.05; 	
-(*	ray.dxyz.x := ray.dxyz.x + rand.Uniform()/100 - 0.005;
+	ray.dxyz.x := ray.dxyz.x + rand.Uniform()/100 - 0.005;
 	ray.dxyz.y := ray.dxyz.y + rand.Uniform()/100 - 0.005;
-	ray.dxyz.z := ray.dxyz.z + rand.Uniform()/100 - 0.005; *)
+	ray.dxyz.z := ray.dxyz.z + rand.Uniform()/100 - 0.005; 
 END Shade;
 
 END FuzzVox;
@@ -343,7 +343,7 @@ BEGIN
 	ELSE		
 		b:= Base.Exit(ray);
 		x := (a.x+b.x)/2; y := (a.y+b.y)/2; z := (a.z + b.z)/2;
-		d := d2(a.x, a.y, a.z);
+		d := d2(x,y,z);
 		IF d > D2 THEN
 			FOR i := 0 TO 24 DO
 				d := d2(x,y,z);
@@ -365,35 +365,33 @@ BEGIN
 				x := (a.x+b.x)/2; y := (a.y+b.y)/2; z := (a.z + b.z)/2;
 			END;
 		END;
-		IF (ABS(d-D2) < 0.0001) THEN 
-			ray.lxyz.x := x; ray.lxyz.y := y; ray.lxyz.z :=  z;
-			IF ray.di THEN
-				ray.xyz.x := ray.xyz.x+x/ray.scale
-			ELSE
-				ray.xyz.x := ray.xyz.x-x/ray.scale
-			END;
-			IF ray.dj THEN
-				ray.xyz.y := ray.xyz.y+y/ray.scale
-			ELSE
-				ray.xyz.y := ray.xyz.y-y/ray.scale
-			END;
-			IF ray.dk THEN
-				ray.xyz.z := ray.xyz.z+z/ray.scale
-			ELSE
-				ray.xyz.z := ray.xyz.z-z/ray.scale
-			END;
-			n.x:= cx-x; n.y:=cy-y; n.z:=cz-z;
-			normalize(n.x,n.y,n.z);
-			ray.normal.x:=n.x;
-			ray.normal.y:=n.y;
-			ray.normal.z:=n.z;
-			dott := ABS(n.x*ray.dxyz.x + n.y*ray.dxyz.y+ n.z*ray.dxyz.z);
-			IF V2 # NIL THEN 
-				V2.Shade(ray) 
-			ELSIF V # NIL THEN 
-				V.Shade(ray) 
-			END
-		END 
+		ray.lxyz.x := x; ray.lxyz.y := y; ray.lxyz.z :=  z;
+		IF ray.di THEN
+			ray.xyz.x := ray.xyz.x+x/ray.scale
+		ELSE
+			ray.xyz.x := ray.xyz.x-x/ray.scale
+		END;
+		IF ray.dj THEN
+			ray.xyz.y := ray.xyz.y+y/ray.scale
+		ELSE
+			ray.xyz.y := ray.xyz.y-y/ray.scale
+		END;
+		IF ray.dk THEN
+			ray.xyz.z := ray.xyz.z+z/ray.scale
+		ELSE
+			ray.xyz.z := ray.xyz.z-z/ray.scale
+		END;
+		n.x:= cx-x; n.y:=cy-y; n.z:=cz-z;
+		normalize(n.x,n.y,n.z);
+		ray.normal.x:=-n.x;
+		ray.normal.y:=-n.y;
+		ray.normal.z:=-n.z;
+		ray.fnormal:=ray.normal;
+		IF V2 # NIL THEN 
+			V2.Shade(ray) 
+		ELSIF V # NIL THEN 
+			V.Shade(ray) 
+		END
 	END
 END Shade;
 END SphereInVox;
@@ -494,7 +492,7 @@ BEGIN
 	ax := ray.lxyz.x; ay := ray.lxyz.y; az := ray.lxyz.z;
 	bx := ray.lxyz.x + ray.dxyz.x; by := ray.lxyz.y+ ray.dxyz.y; bz := ray.lxyz.z+ ray.dxyz.z; 
 	x := (ax+bx)/2; y := (ay+by)/2; z := (az + bz)/2;
-	IF d2(x,y,cz) < D2 THEN
+	IF d2(x,y,z) < D2 THEN
 		FOR i := 0 TO 8 DO
 			IF d2(x,y,1/2) < D2 THEN 
 				bx := x; by := y; bz := z

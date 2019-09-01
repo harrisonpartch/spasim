@@ -36,7 +36,7 @@ TYPE Aperture* = RECORD
 END;
 
 TYPE Color*=RECORD
-	red*,green*,blue*,alpha*: REAL
+	red*,green*,blue*,alpha*,mirror*: REAL
 END;
 
 TYPE ray_color*=RECORD
@@ -51,7 +51,6 @@ TYPE NCube*=RECORD
 	TF*:BOOLEAN;
 	normal*: PT; 
 	color*: Color;
-	mirrorTF*: BOOLEAN;
 END;
 
 TYPE Time*=RECORD
@@ -349,10 +348,6 @@ END FRasterrecSolid;
 
 PROCEDURE stroke*(p:PT; resolution: LONGINT; voxel:Voxel);
 END stroke;
-PROCEDURE tunnel*(p:PT; resolution: LONGINT);
-END tunnel;
-PROCEDURE tunnelrec*(p:PT; resolution,scale: LONGINT);
-END tunnelrec;
 PROCEDURE strokerec*(p:PT; resolution,scale: LONGINT;  voxel: Voxel);
 END strokerec;
 PROCEDURE strokephemeral*(p:PT; resolution: LONGINT; voxel,voxundo:Voxel);
@@ -515,9 +510,9 @@ BEGIN
 	imposter:=v
 END setvoxel;
 
-PROCEDURE setcolor*(r,g,b,a: REAL);  
+PROCEDURE setcolor*(r,g,b,a,m: REAL);  
 BEGIN
-	cxolor.red:=r; cxolor.green:=g; cxolor.blue:=b; cxolor.alpha:=a;
+	cxolor.red:=r; cxolor.green:=g; cxolor.blue:=b; cxolor.alpha:=a; cxolor.mirror:=m;
 END setcolor;
 
 PROCEDURE getcolor*(p:PT):Color;
@@ -715,6 +710,13 @@ BEGIN
 	IF a.green < 0 THEN a.green := 0 ELSIF a.green >=1 THEN a.green := 0.9999999 END;
 	IF a.blue < 0 THEN a.blue := 0 ELSIF a.blue>=1 THEN a.blue := 0.9999999 END;
 END clampColor;
+
+PROCEDURE clampclr*(VAR a: ray_color);
+BEGIN
+	IF a.r < 0 THEN a.r := 0 ELSIF a.r>=1 THEN a.r := 0.9999999 END;
+	IF a.g < 0 THEN a.g := 0 ELSIF a.g >=1 THEN a.g := 0.9999999 END;
+	IF a.b < 0 THEN a.b := 0 ELSIF a.b>=1 THEN a.b := 0.9999999 END;
+END clampclr;
 
 PROCEDURE mkcolor*(r,g,b: REAL): Color;
 VAR
@@ -928,6 +930,7 @@ BEGIN
 	c.red:= rand.Uniform();	
 	c.green:= rand.Uniform();	
 	c.blue := rand.Uniform();	
+	c.alpha:=1;
 	RETURN c
 END randColor;
 
@@ -1235,7 +1238,7 @@ BEGIN
 	frame:=0;
 	fog := 1.1;
 	texdetail:=30;
-	horizon:=0.01;
+	horizon:=0.11;
 	horizon2:=1;
 	rlimit := 4;
 	iterlimit := 500;
