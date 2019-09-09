@@ -23,13 +23,13 @@ BEGIN
 		Base.setPT(center,1/2,1/2,1/2);
 		radius:=1/2;
 		ball.reset(center, radius);
-		ball.setcolor(1,1,0,1/2);	
-		ball.setcolor(1,0,1,1/2);	
+		ball.setcolor(1,1,0,1/2,0);	
+		ball.setcolor(1,0,1,1/2,0);	
 		FOR i:= 0 TO 30 DO
 			center:=Base.randPT();
 			radius:=Base.rand.Uniform()/3;
 			ball.reset(center,radius);
-			ball.setcolor(i/10, Base.rand.Uniform(),1-i/10,0);
+			ball.setcolor(i/10, Base.rand.Uniform(),1-i/10,1,0);
 			conglo.FRaster(ball,27)
 		END;	
 		conglo.copyonstroke:= TRUE;		

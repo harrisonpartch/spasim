@@ -13,7 +13,7 @@ BEGIN
 		NEW(w2);
 		Base.setPT(center,1/2,1/2,1/2);
 		NEW(ball,center,1/2);
-		ball.setcolor(0,1,0,1);
+		ball.setcolor(0,1,0,1,1);
 		w2.FRaster(ball,17); 
 		w2.lock;
 		w2.frozen:= TRUE; (*engrain and sprout must not recurse inside w2*)

@@ -30,7 +30,7 @@ BEGIN
 		cage.FRaster(ball,27)
 	END;	
 *)	NEW(ball,center,0.5);
-	ball.setcolor(1,0,0,1/2);	
+	ball.setcolor(1,0,0,1/2,0);	
 	yellow:=Base.VoxelFromName("NM2");
 	yellow.setcolor(0,1,0,1,1,1);
 	yellow.FRaster(ball,16);
@@ -40,7 +40,7 @@ BEGIN
 		cage.stroke(p1,8,yellow)
 	END;	
 	NEW(ball,center,0.5);
-	ball.setcolor(0,1,0,1/2);	
+	ball.setcolor(0,1,0,1/2,0);	
 	yellow:=Base.VoxelFromName("NM2");
 	yellow.FRaster(ball,16);
 	yellow.copyonstroke:=TRUE;
@@ -49,7 +49,7 @@ BEGIN
 		cage.stroke(p1,8,yellow)
 	END;	
 	NEW(ball,center,0.5);
-	ball.setcolor(0,0,1,1/2);	
+	ball.setcolor(0,0,1,1/2,0);	
 	yellow:=Base.VoxelFromName("NM2");
 	yellow.FRaster(ball,16);
 	yellow.copyonstroke:=TRUE;

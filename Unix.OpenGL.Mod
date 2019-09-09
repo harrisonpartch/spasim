@@ -11439,10 +11439,12 @@ END Color3dv;
 (* ---------------------- *)
 PROCEDURE OnClose;
 BEGIN
+	KernelLog.String('eep');
 	IF libHandle # 0 THEN
 		Unix.Dlclose(libHandle);
 		KernelLog.String(libName); KernelLog.String(" unloaded."); KernelLog.Ln;
 	END;
+	KernelLog.String('awk');
 END OnClose;
 
 BEGIN

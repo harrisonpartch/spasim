@@ -20,7 +20,7 @@ BEGIN
 	u:=Base.VoxelFromName("NM3");
 	u.setcolor(0,150,150,150,150,150);
 	NEW(ball,center,0.5);
-	ball.setcolor(1,0,0,1/2);	
+	ball.setcolor(1,0,0,1/2,1);	
 	u.FRaster(ball,9);
 	u.copyonstroke:=TRUE;	
 	w:=Base.VoxelFromName("NM3");

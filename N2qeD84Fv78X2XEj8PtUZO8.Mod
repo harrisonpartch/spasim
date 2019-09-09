@@ -18,7 +18,7 @@ BEGIN
 	Base.setPT(center1,1/2,4/12,1/2);
 	Base.setPT(center2,1/2,7/12,1/2);
 	NEW(ball,center1,center2,2/3);	
-	ball.setcolor(0,0,1,1);		
+	ball.setcolor(0,0,1,1,0);		
 	dot.FRaster(ball,9);
 END draw;
 

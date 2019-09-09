@@ -22,9 +22,9 @@ BEGIN
 	blueball:=Base.VoxelFromName("NM2"); 		
 	Base.setPT(center,1/2,1/2,1/2);
 	NEW(ball,center,3.25/12);
-	ball.setcolor(0.9,0.1,0.1,1);
+	ball.setcolor(0.9,0.1,0.1,1,0);
 	redball.FRaster(ball,4);
-	ball.setcolor(0.2,0.1,0.9,1);
+	ball.setcolor(0.2,0.1,0.9,1,0);
 	blueball.FRaster(ball,4);
 	NEW(ball2,center,7.15/12);
 	ball2.setvoxel(redball);

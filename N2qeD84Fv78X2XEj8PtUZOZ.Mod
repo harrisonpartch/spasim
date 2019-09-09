@@ -38,7 +38,7 @@ BEGIN
 	Base.setPT(qq,1/2,1/2,1);
 	NEW(ball,center,23/50);
 (*	ball.setvoxel(v); *)
-	ball.setcolor(1,1,1,1);
+	ball.setcolor(1,1,1,1,0);
 	ball.cxf:=TRUE;
 	NEW(cyl,q,qq,1/6);
 	s1.FRasterSolid(ball,28);

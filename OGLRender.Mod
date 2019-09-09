@@ -281,11 +281,11 @@ VAR
 	splashscreen: BOOLEAN;
 	mstarget: REAL;
 	
-PROCEDURE &openwincam(w,h: INTEGER);
+PROCEDURE &openwincam;
 BEGIN
-	Init(w,h, 0,0, FALSE);
+	Init(Retina.W, Retina.H, 0,0, FALSE);
 	NEW(camera,Retina.W, Retina.H); 
-	Retina.Res;
+(*	Retina.Res;
 	Retina.Res;
 	camera.aperjust(w, h);
 	SetTitle("SPASIM");
@@ -293,7 +293,7 @@ BEGIN
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
 	mstarget:=40;
-	Base.STOPGO; 
+	Base.STOPGO; *)
 END openwincam;
 
 (* called when idling *)
@@ -305,7 +305,7 @@ END IdleDisplay;
 (* is called by OGLWindow before MainLoop started *)
 PROCEDURE OnLoad ;
 BEGIN
-
+(*
 	IF ~InitGL() THEN Close; RETURN END;	
 	Display; (* display splash screen *)
 	NEW(Retina.image);
@@ -325,6 +325,7 @@ BEGIN
 	fogdensity:=0.11;
 	leftsticky:=300.0;
 	upsticky:=100.0;	
+*)
 END OnLoad;
 
 PROCEDURE Reshape(w, h: LONGINT);
@@ -545,7 +546,7 @@ END KeyEvent;
 
 	PROCEDURE  InitGL(): BOOLEAN;
 	BEGIN
-	GL.ReadCoreVersion(); (* read default version of opengl *)
+(*	GL.ReadCoreVersion(); (* read default version of opengl *)
 
 	IF ~GL.GL_VERSION_2_0 THEN
 		Out.String("Error: your graphic card does not support OpenGL 2.0"); 
@@ -586,7 +587,7 @@ END KeyEvent;
 		curprogram := 0;	  
 		Out.String("InitGL");
 		Out.Ln;
-		RETURN TRUE;
+*)		RETURN TRUE;
 	END InitGL;
 		
 	PROCEDURE  ReloadShader;
@@ -597,24 +598,24 @@ END KeyEvent;
 
 	PROCEDURE Display();
 	BEGIN
-		camera.tick;  
-		GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT) ;			
-		GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height,  0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr);	
+(*		camera.tick;  *)
+(*		GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT) ;			
+		GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.W, Retina.H,  0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr);	
 			GL.UseProgram(programs[curprogram]); 		
 			GL.DrawElements(GLC.GL_TRIANGLES, 6, GLC.GL_UNSIGNED_SHORT, 0);	
 		GL.UseProgram(0); 
-	     SwapBuffers();	
+	     SwapBuffers();	*)
 	END Display;
 
 	(* change detail according to frame speed, called in GLWindow.MainLoop *)
 	PROCEDURE GameLogic();
 	BEGIN
-		IF  GetCurrentFrameMs()>mstarget+5 THEN 
+(*		IF  GetCurrentFrameMs()>mstarget+5 THEN 
 			Retina.lessdetail(1)
 		ELSIF GetCurrentFrameMs()<mstarget THEN
 			Retina.moredetail(1)
 		END
-	END GameLogic;
+*)	END GameLogic;
 	
 	END GLWindow;
 
@@ -743,7 +744,7 @@ END shaders;
 
 PROCEDURE Open* ;
 BEGIN
-	NEW(glw,Retina.W,Retina.H);
+	NEW(glw);
 (*	Debugging.DisableGC *)
 END Open;
 

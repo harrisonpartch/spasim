@@ -564,7 +564,7 @@ VAR
 	saccade*,SACCADE1*,DTLRAYS*:BOOLEAN;
 	cameratheta*,cameraphi*:REAL;
 	aperture*: Base.Aperture;
-	image*,fimage*: Raster.Image;
+	image*: Raster.Image;
 	rtheta,rphi: REAL; (* camera pitch,roll. global variables because they are the same for all rays in a frame *)
 	fward*, dward*, rward*,camrward*: PT;  
 	foveaparameter:INTEGER;

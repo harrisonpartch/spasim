@@ -269,11 +269,13 @@ VAR
 	alive: BOOLEAN;
 	i, t1: LONGINT;
 	mousepreviousx, mousepreviousy: LONGINT;
+	px, pdx, py, pdy: LONGINT;
 	pi: WM.PointerInfo;
 	warpvent,rlock: BOOLEAN;
 	saccade: BOOLEAN;
 	mstarget: INTEGER;
 	mainloopgo: BOOLEAN;
+	movemode: CHAR;
 
 PROCEDURE &openwincam(W,H: INTEGER);
 BEGIN
@@ -292,15 +294,6 @@ BEGIN
 	mainloopgo:= TRUE;
 END openwincam;
 
-PROCEDURE uncapture;
-VAR 
-	wmanager: WM.WindowManager;
-BEGIN
-	CAPTURE:= FALSE;
-	wmanager:=WM.GetDefaultManager();
-	wmanager.RemoveMessagePreview(P);
-END uncapture;
-
 PROCEDURE KeyEvent (ucs : LONGINT; flags : SET; keysym : LONGINT);
 VAR
 	v: Voxel;
@@ -309,8 +302,7 @@ VAR
 BEGIN
 	key:=CHR(ucs);
 	CASE ucs OF
-		   27: uncapture
-		| 164: uncapture; Close; Base.worldalive:=FALSE
+		| 164: Close;
 		| 193: INC(Base.PRO); Out.Int(Base.PRO,4); Out.Ln
 		| 194: DEC(Base.PRO); Out.Int(Base.PRO,4); Out.Ln
 (*		| 195: camera.left(0.03)
@@ -353,7 +345,6 @@ BEGIN
 			| "l": Marsh.lines:=~Marsh.lines
 			| "b": Marsh.showcode;
 			| "=": Out.Int(framedt,5); Out.Ln;;
-			| "+": uncapture; Close;	
 			| " ": rlock:= ~rlock
 			| "-": Out.Int(framedt,4); Out.Ln
 
@@ -368,14 +359,8 @@ PROCEDURE PointerDown(x, y: LONGINT; keys: SET);
 VAR 
 	wmanager: WM.WindowManager;
 BEGIN
-	IF ~CAPTURE THEN
-		CAPTURE:= TRUE;
-		wmanager:=WM.GetDefaultManager();
-		wmanager.InstallMessagePreview(P)
-	ELSE
-		Out.Char("!");
-		MB:=keys;		
-	END; 
+	Out.Char("!");
+	MB:=keys;		
 END PointerDown;
 
 PROCEDURE PointerUp(x, y: LONGINT; keys: SET);
@@ -385,18 +370,8 @@ END PointerUp;
 	
 PROCEDURE PointerMove(x,y: LONGINT; keys: SET);
 BEGIN
-	IF CAPTURE THEN
-			mousedx:=x-mousepreviousx;
-			mousedy:=y-mousepreviousy;
-			IF (mousedx+mousedy)>30 THEN saccade:=TRUE ELSE saccade:=FALSE END;
-			IF ~rlock THEN
-				camera.up(-mousedy*ABS(mousedy)/(10000*upsticky)); 
-				camera.left(mousedx*ABS(mousedx)/(10000*leftsticky))
-			END;
-			mousepreviousx:=x;
-			mousepreviousy:=y;
-			MB:=keys
-	END
+	pdx := px - x; pdy := py - y;
+	px := ABS(x); py := ABS(y); pkeys := keys;
 END PointerMove;
 
 PROCEDURE WheelMove(dz: LONGINT);
@@ -408,26 +383,42 @@ BEGIN
 	END;
 END WheelMove;
 
+PROCEDURE move;
+BEGIN
+	IF movemode = "f" THEN fly ELSE pan END;
+	camera.tick;
+END move;
+
+PROCEDURE fly;
+BEGIN
+	IF 0 IN pkeys THEN camera.forward(px) END ;
+(*	IF 1 IN pkeys THEN cvl := cvl+pdx/44; cvu := cvu+pdy/44 END;*)
+	IF 2 IN pkeys THEN camera.forward(-px) END;
+END fly;
+
+PROCEDURE pan;
+(*
+BEGIN
+	IF 0 IN pkeys THEN camera.forward(px,py);
+	ELSIF 1 IN pkeys THEN cvl := cvl+pdx/4; camera.up(pdy)
+	ELSIF 2 IN pkeys THEN camera.backward(px,py);
+	END *)
+END pan;
+
 PROCEDURE detail();
 BEGIN
-	IF saccade THEN 
-		Retina.saccade:=TRUE
-	ELSE	
-		Retina.saccade:=FALSE;
-		IF framedt < mstarget THEN
-			Retina.moredetail(5); 
-		ELSIF framedt > (mstarget+5) THEN
-			Retina.lessdetail(5); 
-		END
-	END;
+	IF framedt < mstarget THEN
+		Retina.moredetail(5); 
+	ELSIF framedt > (mstarget+5) THEN
+		Retina.lessdetail(5); 
+	END
 END detail;
 
 	BEGIN {ACTIVE, PRIORITY(Objects.Normal)}
 		NEW(rand);
 		foveasize := 100;
-		multicore:=TRUE;
 		camrotinertia:=100;
-		Base.DTL:=2500;
+		Base.DTL:=250;
 		Base.DTL2:=2500;
 		Base.gravity:=0.000001;
 		Base.speed:=0.001;
@@ -443,24 +434,13 @@ END detail;
 		msd:=30;		
 		NEW(ftimer);
 		REPEAT
-			Retina.image := backImg; 
-	(*		Retina.fimage:=img;*)
 			t1:=Kernel.GetTicks();
-			IF mainloopgo THEN 
-				camera.tick;
-				framedt:=Kernel.GetTicks()-t1;	
-				IF framedt < mstarget THEN 
-					ftimer.Sleep(3); 
-					framedt:=Kernel.GetTicks()-t1;
-				END;			
-				Swap; 
-				Invalidate(Rectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
-			END;
-			IF CAPTURE THEN 
-			
-				mousepreviousx:=500; 
-				mousepreviousy:=500;
-			END
+			camera.tick;
+			framedt:=Kernel.GetTicks()-t1;	
+			detail;
+			Swap; 
+			Invalidate(Rectangles.MakeRect(0, 0, GetWidth(), GetHeight()));	
+			Retina.image := backImg; 
 		UNTIL FALSE
 	END RayWindow;
 
@@ -546,7 +526,7 @@ END Open;
 
 PROCEDURE Close*;
 BEGIN
-	 IF RW# NIL THEN RW.uncapture; RW.Close; RW := NIL END;
+	 IF RW# NIL THEN RW.Close; RW := NIL END;
 END Close;
 
 BEGIN

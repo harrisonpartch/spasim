@@ -53,7 +53,7 @@ BEGIN
 	FOR i := 0  TO 100 DO
 		Base.setPT(center,Base.rand.Uniform(),Base.rand.Uniform(),Base.rand.Uniform());
 		NEW(ball,center,1/25);	
-		ball.setcolor(Base.rand.Uniform(),Base.rand.Uniform(),Base.rand.Uniform(),1/2);		
+		ball.setcolor(Base.rand.Uniform(),Base.rand.Uniform(),Base.rand.Uniform(),1/2,0);		
 		star.FRaster(ball,128);			
 	END;
 

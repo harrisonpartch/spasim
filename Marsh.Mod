@@ -509,7 +509,7 @@ BEGIN
 	noise[0].c:=1;		
 	noise[0].octaves:=4;
 	noise[0].persistence:=3.71;	
-	noise[0].setvoxel(sky1);		
+	noise[0].setvoxel(starspider);		
 	NEW(noise[1]);		
 	noise[1].seed:=678;		
 	noise[1].a:=1;
@@ -527,7 +527,7 @@ BEGIN
 	noise[2].c:=1.5;		
 	noise[2].octaves:=4;
 	noise[2].persistence:=3.61;	
-	noise[2].setvoxel(xot);	
+	noise[2].setvoxel(wstar);	
 	NEW(noise[3]);		
 	noise[3].seed:=11117111;		
 	noise[3].a:=1;
@@ -557,11 +557,10 @@ BEGIN
 	med1:=Base.VoxelFromName("NM2");		
 	med2:=Base.VoxelFromName("NM2");		
 	med3:=Base.VoxelFromName("NM2");	
-(*	z3a.copyonstroke:=TRUE; 
+	z3a.copyonstroke:=TRUE; 
 	z3b.copyonstroke:=TRUE; 	
 	z3a.passable:=TRUE;
-	medley.copyonstroke:=TRUE; 
-*)	z3.setcolor(0.5,0.5,0.5,3,3,3);
+    z3.setcolor(0.5,0.5,0.5,3,3,3);
 	z3a.setcolor(0,6,0,10,10,10);
  	z3b.setcolor(28,28,28,30,30,30);    
  	dieone.tscale:=1000;
@@ -625,6 +624,7 @@ BEGIN
 	
 	Base.world:=z3;
 	alternateworld:=z3;	
+
 	Out.String('end of Marsh.dawn')
 END dawn;
 
