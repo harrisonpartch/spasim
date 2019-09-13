@@ -40,7 +40,7 @@ VAR
 	v: Voxel;
 	vdepth, v2, fog,f2: REAL;
 	last:BOOLEAN;
-	i,j: LONGINT;
+	i,j: INTEGER;
 	lastlength:REAL;
 BEGIN
 	ray.dtl:=Base.DTL*(1-ray.length/Base.horizon);
@@ -235,7 +235,7 @@ BEGIN
 	END	
 END nshade;
 
-PROCEDURE erase*(p:PT; resolution:LONGINT);
+PROCEDURE erase*(p:PT; resolution:INTEGER);
 VAR
 	i,j,k: INTEGER;
 BEGIN
@@ -351,7 +351,7 @@ BEGIN
 	END
 END setcolorrec;
 
-PROCEDURE bounds*(i, j, k: LONGINT; VAR out: BOOLEAN);
+PROCEDURE bounds*(i, j, k: INTEGER; VAR out: BOOLEAN);
 BEGIN
 	IF (i < 0) OR (i > MMO) OR (j < 0) OR (j > MMO) OR (k < 0) OR (k > MMO) THEN
 		out := TRUE
@@ -369,21 +369,21 @@ BEGIN
 	END END END
 END fill;
 
-PROCEDURE probe(p:PT; resolution:LONGINT):Voxel;
+PROCEDURE probe(p:PT; resolution:INTEGER):Voxel;
 VAR
 	X,Y,Z: REAL;
-	i,j,k: LONGINT;
+	i,j,k: INTEGER;
 BEGIN
 	IF probelock THEN RETURN SELF END;
 	RETURN proberec(p,resolution,1);
 END probe;
 
-PROCEDURE proberec(p:PT; resolution,scale:LONGINT):Voxel;
+PROCEDURE proberec(p:PT; resolution,scale:INTEGER):Voxel;
 VAR
 	X,Y,Z: REAL;
 	v: Voxel;
-	i,j,k: LONGINT;
-	newscale: LONGINT;
+	i,j,k: INTEGER;
+	newscale: INTEGER;
 BEGIN
 	Base.clamPT(p);
 	newscale:=scale*M;
@@ -407,7 +407,7 @@ END proberec;
 PROCEDURE passprobe(p:PT):BOOLEAN;
 VAR
 	X,Y,Z: REAL;
-	i,j,k: LONGINT;
+	i,j,k: INTEGER;
 BEGIN
 	IF ~passable THEN RETURN FALSE END;
 	Base.clamPT(p);
@@ -428,9 +428,9 @@ BEGIN
 	copyengine.add(SELF);	
 END copyprime;
 
-PROCEDURE stroke*(p:PT; res: LONGINT; voxel :Voxel);
+PROCEDURE stroke*(p:PT; res: INTEGER; voxel :Voxel);
 VAR
-	i,j,k: LONGINT;
+	i,j,k: INTEGER;
 BEGIN
 	IF ~lockTF THEN
 		Base.clamPT(p);
@@ -441,18 +441,18 @@ BEGIN
 	END
 END stroke;
 
-PROCEDURE nstroke(p:PT; resolution:LONGINT; normal:PT; color: Color);
+PROCEDURE nstroke(p:PT; resolution:INTEGER; normal:PT; color: Color);
 VAR
-	i,j,k: LONGINT;
+	i,j,k: INTEGER;
 BEGIN
 	Base.clamPT(p);
 	color.alpha:=1;
 	nstrokerec(p,resolution,1,normal,color);
 END nstroke;
 
-PROCEDURE strokerec*(p:PT; resolution,scale: LONGINT; voxel :Voxel);
+PROCEDURE strokerec*(p:PT; resolution,scale: INTEGER; voxel :Voxel);
 VAR
-	i,j,k,ii,jj,kk,nextscale: LONGINT;
+	i,j,k,ii,jj,kk,nextscale: INTEGER;
 	v,vv:Voxel;
 	c,c2: cell;
 	copyv,vu: Voxel;
@@ -496,9 +496,9 @@ BEGIN
 	END
 END strokerec;
 
-PROCEDURE nstrokerec(p:PT; resolution,scale:LONGINT; normal:PT; color: Color);
+PROCEDURE nstrokerec(p:PT; resolution,scale:INTEGER; normal:PT; color: Color);
 VAR
-	i,j,k,ii,jj,kk,nextscale: LONGINT;
+	i,j,k,ii,jj,kk,nextscale: INTEGER;
 	v:Voxel;
 	c,c2: cell;
 	smallcopy: Voxel;
@@ -548,12 +548,12 @@ BEGIN
 	END
 END nstrokerec;
 
-PROCEDURE line*(a,b: PT; resolution: LONGINT; v: Voxel);
+PROCEDURE line*(a,b: PT; resolution: INTEGER; v: Voxel);
 VAR
 	tx,ty,tz, dxdt, dydt, dzdt: REAL;
-	t: LONGINT;
+	t: INTEGER;
 	delta: REAL;
-	n: LONGINT;
+	n: INTEGER;
 	p: PT;
 	path: Path;
 	vu: Voxel
@@ -570,7 +570,7 @@ BEGIN
 	END
 END line;
 
-PROCEDURE FRaster*( f: FR; resolution: LONGINT);
+PROCEDURE FRaster*( f: FR; resolution: INTEGER);
 VAR
 	origin: PT;
 BEGIN
@@ -578,12 +578,12 @@ BEGIN
 	FRasterrec(f,resolution,origin,1);   (* origin is (0,0,0) *)
 END FRaster;
 
-PROCEDURE FRasterrec(f: FR; resolution: LONGINT; origin: PT; scale: LONGINT); (*origin is always in world space*)
+PROCEDURE FRasterrec(f: FR; resolution: INTEGER; origin: PT; scale: INTEGER); (*origin is always in world space*)
 VAR
 	i,j,k: INTEGER;
 	o,p:PT;
 	d2s,MS,TWOMS,CRDS,CRDNS:REAL;
-	nextscale: LONGINT;
+	nextscale: INTEGER;
 	v: Voxel;
 	newcell: cell;
 BEGIN
@@ -639,7 +639,7 @@ BEGIN
 	END
 END FRasterrec;
 
-PROCEDURE FRasterSolid*( f: FR; resolution: LONGINT);
+PROCEDURE FRasterSolid*( f: FR; resolution: INTEGER);
 VAR
 	origin: PT;
 BEGIN
@@ -647,12 +647,12 @@ BEGIN
 	FRasterrecSolid(f,resolution,origin,1);   (* origin is (0,0,0) *)
 END FRasterSolid;
 
-PROCEDURE FRasterrecSolid(f: FR; resolution: LONGINT; origin: PT; scale: LONGINT);
+PROCEDURE FRasterrecSolid(f: FR; resolution: INTEGER; origin: PT; scale: INTEGER);
 VAR
 	i,j,k,ii,jj,kk: INTEGER;
 	o,p:PT;
 	d2s,MS,TWOMS,CRDS,CRDNS:REAL;
-	nextscale: LONGINT;
+	nextscale: INTEGER;
 	v: Voxel;
 	newcell: cell;
 	solidmarker: BOOLEAN;
@@ -763,9 +763,9 @@ BEGIN
 	RETURN c
 END deepcopy;
 
-PROCEDURE count*(level: INTEGER):LONGINT;
+PROCEDURE count*(level: INTEGER):INTEGER;
 VAR
-	c: LONGINT;
+	c: INTEGER;
 	i,j,k:INTEGER;
 BEGIN
 	c:=1;
@@ -799,10 +799,10 @@ VAR
 BEGIN
  	IF (code=ncode) THEN	
 		w.Bytes(code,0,NL);
-		w.RawReal(red);
-		w.RawReal(green);
-		w.RawReal(blue);
-		w.RawReal(black);
+		w.RawLReal(red);
+		w.RawLReal(green);
+		w.RawLReal(blue);
+		w.RawLReal(black);
 		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 			IF (blox[i,j,k]#NIL) THEN
 				w.RawBool(TRUE);
@@ -825,13 +825,13 @@ VAR
 	b: BOOLEAN;
 	name: Name;
 	anothercell: cell;
-	len: LONGINT;
+	len: SIZE;
 BEGIN
 	IF (code=ncode) THEN	
-		r.RawReal(red);
-		r.RawReal(green);
-		r.RawReal(blue);
-		r.RawReal(black);
+		r.RawLReal(red);
+		r.RawLReal(green);
+		r.RawLReal(blue);
+		r.RawLReal(black);
 		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 			r.RawBool(b);
 			IF b THEN

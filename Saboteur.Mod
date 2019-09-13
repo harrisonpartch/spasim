@@ -30,7 +30,8 @@ VAR
 	hash: ARRAY 16 OF CHAR;
 	md5string, anonymod: Strings.String;
 	hashtext,anonymodtext: Strings.String;
-	len,format,res: LONGINT;
+	len: SIZE;
+	format,res: INTEGER;
 	error:BOOLEAN;
 	f: Files.File; w: Files.Writer;
 	compiler: CompilerInterface.Compiler;

@@ -8,7 +8,6 @@ FRep.Mod
 TexVox.Mod
 CellAuto.Mod
 Voxel4.Mod
-srVoxel.Mod
 HalfSpace.Mod
 RotaVox.Mod
 Engrainer.Mod
@@ -29,7 +28,7 @@ NCompiler.ncompile  <== Middle mouse click on this
 
 Render.Open    <== Middle mouse click on this
 
-
+srVoxel.Mod
 WMRender.Open 
 
 

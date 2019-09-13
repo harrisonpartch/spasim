@@ -1,5 +1,5 @@
 MODULE Voxel4;
-IMPORT Random, Random2, Base,  SPSMMath, Math, Raster;
+IMPORT Random, Base,  SPSMMath, Math:=MathL, Raster;
 
 VAR
 	rand: Random.Generator;
@@ -14,7 +14,7 @@ TYPE PT=Base.PT;
 TYPE FuzzVox*=OBJECT(Voxel);
 VAR
 	fuzzdivisor, fuzzsubtract: REAL;
-	rand: Random2.Generator;
+	rand: Random.Generator;
 	
 PROCEDURE & init*;
 BEGIN
@@ -484,7 +484,7 @@ PROCEDURE Shade*(VAR ray: Ray);
 VAR
 	x,y,z, th,ph,d,r,g,b,a: REAL;
 	ax, ay, az, bx, by, bz : REAL;
-	iter, i,j: LONGINT;
+	iter, i,j: INTEGER;
 	hit: BOOLEAN;
 	nx,ny,nz, lat, long: REAL;
 	p: Raster.Pixel;

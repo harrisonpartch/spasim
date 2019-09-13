@@ -1,6 +1,6 @@
 MODULE Retina; (* EXPERIMENTAL RETINA WITH EDGEFINDING TILE *)
-IMPORT  Base, Objects, Out:=KernelLog, Noise,
-Math, SPSMMath, Raster, Graphics:=WMGraphics, WMRasterScale,  Rect := WMRectangles;
+IMPORT  Base, Objects, Out:=KernelLog, 
+Math:=MathL, SPSMMath, Raster, Graphics:=WMGraphics, WMRasterScale,  Rect := WMRectangles;
 
 TYPE
 	Ray=Base.Ray;
@@ -293,7 +293,7 @@ BEGIN
 END t16x16fill;
 
 VAR
-	i,j,k: LONGINT;
+	i,j,k: INTEGER;
 	theta,phi,dtheta,dphi: REAL;
 	ray: Base.Ray;
 	rays: ARRAY 16,16 OF Base.Ray;
@@ -448,7 +448,7 @@ BEGIN
 END t16x16fill;
 
 VAR
-	i,j,k: LONGINT;
+	i,j,k: INTEGER;
 	theta,phi,dtheta,dphi: REAL;
 	ray: Base.Ray;
 	rays: ARRAY 16,16 OF Base.Ray;
@@ -553,8 +553,8 @@ END Tile;
 VAR
 	tile: ARRAY TW,TH OF Tile;
 	TESSA: INTEGER;
-	frameasteps*,framebsteps*:LONGINT;
-	a,b: LONGINT;
+	frameasteps*,framebsteps*:INTEGER;
+	a,b: INTEGER;
 	tilesdone:INTEGER;
 
 	AFTER*: INTEGER;
@@ -668,21 +668,21 @@ BEGIN
 	
 END splitcam;
 
-PROCEDURE moredetail*(d: LONGINT);
+PROCEDURE moredetail*(d: INTEGER);
 BEGIN
 	decthresh1(d); 
 	Base.horizon:=Base.horizon+0.001;
 	IF Base.horizon>1 THEN Base.horizon:=1 END
 END moredetail;
 
-PROCEDURE lessdetail*(d: LONGINT);
+PROCEDURE lessdetail*(d: INTEGER);
 BEGIN
 	incthresh1(d); 
 	Base.horizon:=Base.horizon-0.001; 
 	IF Base.horizon<0.01 THEN Base.horizon:=0.01 END
 END lessdetail;
 
-PROCEDURE decthresh1(d: LONGINT);
+PROCEDURE decthresh1(d: INTEGER);
 BEGIN
 	thresh1a:=thresh1a-d/10;
 	IF thresh1a<0.02 THEN 
@@ -691,7 +691,7 @@ BEGIN
 	END
 END decthresh1;
 
-PROCEDURE incthresh1(d: LONGINT);
+PROCEDURE incthresh1(d: INTEGER);
 BEGIN
 	thresh1a:=thresh1a+d/10;
 	IF thresh1a>2/12 THEN 

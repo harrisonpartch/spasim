@@ -1,5 +1,5 @@
 MODULE SPSMMath;
-IMPORT Math, Base;
+IMPORT Math:=MathL, Base;
 
 CONST
 	R = 100000;
@@ -19,7 +19,7 @@ TYPE Quaternion*=RECORD
 VAR
 	Sin,Cos: ARRAY R OF REAL;
 	Norm: ARRAY N,N OF Base.PT;
-	i, j: LONGINT;
+	i, j: INTEGER;
 	x,d, theta, phi: REAL;
 	
 PROCEDURE qlength(q: Quaternion):REAL;
@@ -54,14 +54,14 @@ BEGIN
 END qmul;
 
 PROCEDURE sin*(x: REAL): REAL;
-VAR i: LONGINT;
+VAR i: SIZE;
 BEGIN
 	i := ENTIER(x/dx) MOD R;
 	RETURN Sin[i];	
 END sin;
 
 PROCEDURE cos*(x: REAL): REAL;
-VAR i: LONGINT;
+VAR i: SIZE;
 BEGIN
 	i := ENTIER(x/dx) MOD R;
 	RETURN Cos[i];	

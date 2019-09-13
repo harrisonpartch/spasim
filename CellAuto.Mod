@@ -1,7 +1,7 @@
 MODULE CellAuto;
 IMPORT Base, Objects,Out:=KernelLog;
 
-TYPE 	PT=Base.PT;
+TYPE PT=Base.PT;
 		Ray = Base.Ray;
 		Path=Base.Path;
 		Voxel = Base.Voxel;
@@ -27,7 +27,7 @@ VAR
 	greenf,burning1*, burning2*, burnt*: BOOLEAN;
 	color:CHAR;
 
-PROCEDURE set(p:PT; size: LONGINT); 
+PROCEDURE set(p:PT; size: INTEGER); 
 BEGIN
 	color:=GREEN;
 	greenf:=TRUE;	
@@ -46,7 +46,7 @@ BEGIN
 	END;
 END fire;
 
-PROCEDURE probe*(p:PT; resolution: LONGINT):Voxel;
+PROCEDURE probe*(p:PT; resolution: INTEGER):Voxel;
 BEGIN
 	fire;
 	Out.String("fire!");
@@ -59,7 +59,7 @@ BEGIN
 	RETURN(FALSE);
 END passprobe;
 
-PROCEDURE stroke*(p:PT; resolution: LONGINT; voxel:Voxel);
+PROCEDURE stroke*(p:PT; resolution: INTEGER; voxel:Voxel);
 BEGIN
 	fire
 END stroke;
@@ -158,7 +158,7 @@ END GateFuseVox;
 TYPE CAEngine=OBJECT
 VAR
 	Front, F2: ARRAY N OF CAVox;
-	fn,i: LONGINT;
+	fn,i: INTEGER;
 	
 PROCEDURE push(v: CAVox);
 BEGIN
@@ -166,7 +166,7 @@ BEGIN
 END push;
 
 PROCEDURE tick*;
-VAR i,n: LONGINT;
+VAR i,n: INTEGER;
 BEGIN
 	FOR i:=0 TO fn-1 DO
 		Front[i]:=F2[i]

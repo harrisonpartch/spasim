@@ -10,24 +10,24 @@ CONST
 	coslookup = [1.0,0.9238,0.7071,0.3826,0,-0.3826,-0.7071,-0.9238,
 	1.0,-0.9238,-0.7071,-0.3826,0,0.3826,0.7071,0.9238]
 
-PROCEDURE dot(vx,vy,wx,wy:LONGREAL):LONGREAL;
+PROCEDURE dot(vx,vy,wx,wy:FLOAT64):FLOAT64;
 BEGIN
 	RETURN(vx*wx+vy*wy)
 END dot;
 
-PROCEDURE easecurve*(t:LONGREAL):LONGREAL;
+PROCEDURE easecurve*(t:FLOAT64):FLOAT64;
 BEGIN
 	RETURN ((6*t*t*t*t*t)-(15*t*t*t*t)+(10*t*t*t))
 END easecurve;
 
-PROCEDURE linearinterpolation(x,y,t:LONGREAL):LONGREAL;
+PROCEDURE linearinterpolation(x,y,t:FLOAT64):FLOAT64;
 BEGIN
 	RETURN(x+(y-x)*t)
 END linearinterpolation;
 
-PROCEDURE bilinearinterpolation(x0y0,x1y0,x0y1,x1y1,x,y:LONGREAL):LONGREAL;
+PROCEDURE bilinearinterpolation(x0y0,x1y0,x0y1,x1y1,x,y:FLOAT64):FLOAT64;
 VAR
-	tx,ty,u,v: LONGREAL;
+	tx,ty,u,v: FLOAT64;
 BEGIN
 	tx:=easecurve(x);
 	ty:=easecurve(y);
@@ -36,9 +36,9 @@ BEGIN
 	RETURN linearinterpolation(u,v,ty);
 END bilinearinterpolation;
 
-PROCEDURE trilinearinterpolation(v000,v100,v010,v110,v001,v101,v011,v111,x,y,z:LONGREAL):LONGREAL;
+PROCEDURE trilinearinterpolation(v000,v100,v010,v110,v001,v101,v011,v111,x,y,z:FLOAT64):FLOAT64;
 VAR
-	tx,ty,tz:LONGREAL;
+	tx,ty,tz:FLOAT64;
 BEGIN
 	tx:=x; ty:=y; tz:=z;
 	RETURN(v000*(1-tx)*(1-ty)*(1-tz) +
@@ -51,44 +51,44 @@ BEGIN
 		v111*tx*ty*tz)
 END trilinearinterpolation;
 
-PROCEDURE noise2d(x,y,seed:LONGINT):LONGREAL;
+PROCEDURE noise2d(x,y,seed:SIZE):FLOAT64;
 VAR	
-	n:LONGINT;
+	n:INTEGER;
 	s,m:SET;
 BEGIN
 	s:=SYSTEM.VAL(SET,NOISE_MAGIC_X * x + NOISE_MAGIC_Y * y
 			+ NOISE_MAGIC_SEED * seed);
 	m:=SYSTEM.VAL(SET,7FFFFFFFH);
 	s:= s*m; 
-	n:=SYSTEM.VAL(LONGINT,s);
+	n:=SYSTEM.VAL(INTEGER,s);
 	n:=BIT.LXOR(n DIV 8192,n);
 	s:=SYSTEM.VAL(SET,(n * (n*n*60493+19990303) + 1376312589) );
 	s:= s*m; 
-	n:=SYSTEM.VAL(LONGINT,s);
+	n:=SYSTEM.VAL(INTEGER,s);
 	RETURN 1.0 - n/1073741824;
 END noise2d;
 
-PROCEDURE noise3d*(x,y,z,seed:LONGINT):LONGREAL;
+PROCEDURE noise3d*(x,y,z,seed:SIZE):FLOAT64;
 VAR	
-	n:LONGINT;
+	n:INTEGER;
 	s,m:SET;
 BEGIN
 	s:=SYSTEM.VAL(SET,NOISE_MAGIC_X * x + NOISE_MAGIC_Y * y + NOISE_MAGIC_Z * z
 			+ NOISE_MAGIC_SEED * seed);
 	m:=SYSTEM.VAL(SET,7FFFFFFFH);
 	s:= s*m; 
-	n:=SYSTEM.VAL(LONGINT,s);
+	n:=SYSTEM.VAL(INTEGER,s);
 	n:=BIT.LXOR(n DIV 8192,n);	
 	s:=SYSTEM.VAL(SET,(n * (n*n*60493+19990303) + 1376312589) );
 	s:= s*m; 
-	n:=SYSTEM.VAL(LONGINT,s);
+	n:=SYSTEM.VAL(INTEGER,s);
 	RETURN 1.0 - n/1073741824;
 END noise3d;
 
-PROCEDURE noise2dgradient*(x, y:LONGREAL; seed:LONGINT):LONGREAL;
+PROCEDURE noise2dgradient*(x, y:FLOAT64; seed:SIZE):FLOAT64;
 VAR
-	x0,y0:LONGINT;
-	xl,yl,v00,v10,v01,v11:LONGREAL;
+	x0,y0:SIZE;
+	xl,yl,v00,v10,v01,v11:FLOAT64;
 BEGIN
 	
 	IF x>0 THEN x0:=ENTIER(x) ELSE x0:=ENTIER(x)-1 END;
@@ -102,10 +102,10 @@ BEGIN
 	RETURN SHORT(bilinearinterpolation(v00,v10,v01,v11,xl,yl));
 END noise2dgradient;
 
-PROCEDURE noise3dgradient*(x, y, z:LONGREAL; seed:LONGINT):LONGREAL;
+PROCEDURE noise3dgradient*(x, y, z:FLOAT64; seed:SIZE):FLOAT64;
 VAR
-	x0,y0,z0:LONGINT;
-	xl,yl,zl,v000,v001,v010,v011,v100,v101,v110,v111:LONGREAL;
+	x0,y0,z0:SIZE;
+	xl,yl,zl,v000,v001,v010,v011,v100,v101,v110,v111:FLOAT64;
 BEGIN
 	IF x>0 THEN x0:=ENTIER(x) ELSE x0:=ENTIER(x)-1 END;
 	IF y>0 THEN y0:=ENTIER(y) ELSE y0:=ENTIER(y)-1 END;	
@@ -124,9 +124,9 @@ BEGIN
 	RETURN SHORT(trilinearinterpolation(v000,v100,v010,v110,v001,v101,v011,v111,xl,yl,zl));
 END noise3dgradient;
 
-PROCEDURE noise2dperlin*(x,y:LONGREAL; seed: LONGINT; octaves: INTEGER; persistence:LONGREAL):REAL;
+PROCEDURE noise2dperlin*(x,y:FLOAT64; seed: SIZE; octaves: INTEGER; persistence:FLOAT64):REAL;
 VAR
-	a,f,g:LONGREAL;
+	a,f,g:FLOAT64;
 	i: INTEGER;
 BEGIN
 	a:=0;
@@ -140,9 +140,9 @@ BEGIN
 	RETURN SHORT(a);
 END noise2dperlin;
 
-PROCEDURE noise2dperlinabs*(x,y:LONGREAL; seed: LONGINT; octaves: INTEGER; persistence:LONGREAL):REAL;
+PROCEDURE noise2dperlinabs*(x,y:FLOAT64; seed: SIZE; octaves: INTEGER; persistence:FLOAT64):REAL;
 VAR
-	a,f,g:LONGREAL;
+	a,f,g:FLOAT64;
 	i: INTEGER;
 BEGIN
 	a:=0;
@@ -156,9 +156,9 @@ BEGIN
 	RETURN SHORT(a);
 END noise2dperlinabs;
 
-PROCEDURE noise3dperlin*(x,y,z:LONGREAL; seed: LONGINT; octaves: INTEGER; persistence:LONGREAL):REAL;
+PROCEDURE noise3dperlin*(x,y,z:FLOAT64; seed: SIZE; octaves: INTEGER; persistence:FLOAT64):REAL;
 VAR
-	a,f,g:LONGREAL;
+	a,f,g:FLOAT64;
 	i: INTEGER;
 BEGIN
 	a:=0;
@@ -172,9 +172,9 @@ BEGIN
 	RETURN SHORT(a);
 END noise3dperlin;
 
-PROCEDURE noise3dperlinabs*(x,y,z:LONGREAL; seed: LONGINT; octaves: INTEGER; persistence:LONGREAL):REAL;
+PROCEDURE noise3dperlinabs*(x,y,z:FLOAT64; seed: SIZE; octaves: INTEGER; persistence:FLOAT64):REAL;
 VAR
-	a,f,g:LONGREAL;
+	a,f,g:FLOAT64;
 	i: INTEGER;
 BEGIN
 	a:=0;

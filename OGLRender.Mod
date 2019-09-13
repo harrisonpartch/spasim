@@ -1,6 +1,6 @@
 MODULE Render;
 IMPORT Kernel, Objects, Random, Marsh,
- Out := KernelLog, Math,SPSMMath, Base,  Retina, GLW := OGLWindow, 
+ Out := KernelLog, Math:=MathL,SPSMMath, Base,  Retina, GLW := OGLWindow, 
 	 GL:=OpenGL, GLC := OpenGLConst,  GLSL:= GLShaderUtils,
 	 Inputs,  Raster, Strings, Streams, Debugging;
 
@@ -24,11 +24,11 @@ TYPE Camera = OBJECT
 VAR
 	random: Random.Generator;
 	rayschanged, ang1,filter: BOOLEAN;
-	fovealeft, fovearight, foveabottom, foveatop: LONGINT;
+	fovealeft, fovearight, foveabottom, foveatop: INTEGER;
 	fovea: BOOLEAN;
 	cam,worldcenter: PT; 
 	d2c:REAL;
-	W,H,pointerx,pointery:LONGINT;
+	W,H,pointerx,pointery:INTEGER;
 	aperture: Aperture;
 	iamalargecamera: BOOLEAN;
 	lookdxyz:PT;
@@ -285,15 +285,15 @@ PROCEDURE &openwincam;
 BEGIN
 	Init(Retina.W, Retina.H, 0,0, FALSE);
 	NEW(camera,Retina.W, Retina.H); 
-(*	Retina.Res;
 	Retina.Res;
-	camera.aperjust(w, h);
+	Retina.Res;
+	camera.aperjust(Retina.W, Retina.H);
 	SetTitle("SPASIM");
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
 	mstarget:=40;
-	Base.STOPGO; *)
+	Base.STOPGO; 
 END openwincam;
 
 (* called when idling *)
@@ -305,7 +305,7 @@ END IdleDisplay;
 (* is called by OGLWindow before MainLoop started *)
 PROCEDURE OnLoad ;
 BEGIN
-(*
+
 	IF ~InitGL() THEN Close; RETURN END;	
 	Display; (* display splash screen *)
 	NEW(Retina.image);
@@ -325,17 +325,17 @@ BEGIN
 	fogdensity:=0.11;
 	leftsticky:=300.0;
 	upsticky:=100.0;	
-*)
+
 END OnLoad;
 
-PROCEDURE Reshape(w, h: LONGINT);
+PROCEDURE Reshape(w, h: INTEGER);
 BEGIN	
 	GL.Viewport(0, 0, w, h);
 	centerx:= w DIV 2; centery:= h DIV 2;	
 END Reshape;
 
 PROCEDURE Close;
-VAR i: LONGINT;
+VAR i: INTEGER;
 BEGIN
 	Base.worldalive:=FALSE;
 	Out.String("Spasim Closing.."); Out.Ln;
@@ -356,7 +356,7 @@ BEGIN
 	Close^;
 END Close;
   
-PROCEDURE KeyEvent (ucs : LONGINT; flags : SET; keysym : LONGINT);
+PROCEDURE KeyEvent (ucs : INTEGER; flags : SET; keysym : INTEGER);
 
 VAR
 	v: Voxel;   
@@ -434,7 +434,7 @@ BEGIN
 		END
 END KeyEvent;
 
-	PROCEDURE PointerDown(x, y: LONGINT; keys: SET);
+	PROCEDURE PointerDown(x, y: INTEGER; keys: SET);
 	BEGIN
 		IF ~CAPTUREMOUSE THEN SetIdleTime(0); HideMousePointer(TRUE); CAPTUREMOUSE:=TRUE;	 END;
 		PAUSE:=FALSE;
@@ -443,15 +443,15 @@ END KeyEvent;
 	END PointerDown;
 
 		(** called when mouse button up  *)
-	PROCEDURE PointerUp(x, y: LONGINT; keys: SET);
+	PROCEDURE PointerUp(x, y: INTEGER; keys: SET);
 	BEGIN
 		MOUSEDOWN:=FALSE
 	END PointerUp;
 		
-	PROCEDURE PointerMove (x, y : LONGINT; keys : SET);
+	PROCEDURE PointerMove (x, y : INTEGER; keys : SET);
 	VAR
 		up,left: REAL;
-		xr,yr: LONGINT;
+		xr,yr: INTEGER;
 		temporaljust: REAL; 
 		BEGIN
 			MB := keys;  (* *)
@@ -474,7 +474,7 @@ END KeyEvent;
 			END
 	END PointerMove;
 	 
-	PROCEDURE WheelMove(dz: LONGINT);
+	PROCEDURE WheelMove(dz: INTEGER);
 	BEGIN
 	IF TRUE  THEN
 		IF dz > 0 THEN slowdown; (* Out.String("slowdown dz="); Out.Int(dz, 0); *) Out.Ln;
@@ -486,7 +486,7 @@ END KeyEvent;
 	PROCEDURE InitShader(CONST vertexShaderPath, fragmentShaderPath: ARRAY OF CHAR): Uint;
 	VAR program: Uint;
 		location: Int;
-		w, h: REAL;
+		w, h: FLOAT32;
 	BEGIN
 		Out.String("Loading Shaders: "); Out.String(vertexShaderPath);
 		Out.String(" and "); Out.String(fragmentShaderPath); Out.Ln;
@@ -546,7 +546,7 @@ END KeyEvent;
 
 	PROCEDURE  InitGL(): BOOLEAN;
 	BEGIN
-(*	GL.ReadCoreVersion(); (* read default version of opengl *)
+	GL.ReadCoreVersion(); (* read default version of opengl *)
 
 	IF ~GL.GL_VERSION_2_0 THEN
 		Out.String("Error: your graphic card does not support OpenGL 2.0"); 
@@ -554,7 +554,7 @@ END KeyEvent;
 
 	 	RETURN FALSE;
 	 END;
-          GL.ReadExtensions(); (* read all opengl extension functions *)	
+     GL.ReadExtensions(); (* read all opengl extension functions *)	
 		GL.ReadImplementationProperties;
 
 
@@ -566,7 +566,7 @@ END KeyEvent;
 		(* These determine how interpolation is made when image scaled down on up *)
 		GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER,  GLC.GL_NEAREST);
 		GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_NEAREST);
-		GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.image.width, Retina.image.height, 0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr);
+		GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.W, Retina.H, 0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr);
 		
 		InitVAO();
 			(* load shader programs *) (* ONE OF THESE STATEMENTS CRASHES. maybe they all crash. *)
@@ -583,11 +583,11 @@ END KeyEvent;
 			programs[10] := InitShader("passthroughVS.glsl", "sharpenFS.glsl");
 			programs[11] := InitShader("passthroughVS.glsl", "nightVisionFS.glsl");
 (*			programs[12]:=InitShader("passthroughVS.glsl", "passthroughFS.glsl");*)
-			programs[12] := InitShader("passthroughVS.glsl", "toonShading2.glsl"); 
-		curprogram := 0;	  
+			programs[12] := InitShader("passthroughVS.glsl", "toonShadingFS.glsl"); 
+		curprogram := 6;	  
 		Out.String("InitGL");
 		Out.Ln;
-*)		RETURN TRUE;
+		RETURN TRUE;
 	END InitGL;
 		
 	PROCEDURE  ReloadShader;
@@ -598,24 +598,29 @@ END KeyEvent;
 
 	PROCEDURE Display();
 	BEGIN
-(*		camera.tick;  *)
-(*		GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT) ;			
+		camera.tick;  
+		GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT) ;			
 		GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, Retina.W, Retina.H,  0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, Retina.image.adr);	
-			GL.UseProgram(programs[curprogram]); 		
-			GL.DrawElements(GLC.GL_TRIANGLES, 6, GLC.GL_UNSIGNED_SHORT, 0);	
+		GL.UseProgram(programs[curprogram]); 		
+		GL.DrawElements(GLC.GL_TRIANGLES, 6, GLC.GL_UNSIGNED_SHORT, 0);	
 		GL.UseProgram(0); 
-	     SwapBuffers();	*)
+	  SwapBuffers();	
 	END Display;
 
 	(* change detail according to frame speed, called in GLWindow.MainLoop *)
 	PROCEDURE GameLogic();
+	VAR
+		ms: INTEGER;
 	BEGIN
-(*		IF  GetCurrentFrameMs()>mstarget+5 THEN 
+		ms:= GetCurrentFrameMs();
+		Out.Int(ms,5);
+		Out.Ln;
+		IF ms > mstarget+5 THEN 
 			Retina.lessdetail(1)
 		ELSIF GetCurrentFrameMs()<mstarget THEN
 			Retina.moredetail(1)
 		END
-*)	END GameLogic;
+	END GameLogic;
 	
 	END GLWindow;
 
@@ -624,20 +629,20 @@ VAR
 	FRAMERATE: REAL;
 	rand: Random.Generator;
 	wcount: INTEGER;
-	frame, tickframe: LONGINT;
+	frame, tickframe: INTEGER;
 	movierecording, movieplaying: BOOLEAN; 
 	frtrace, foveate: BOOLEAN;
-	foveasize, fovealeft, fovearight, foveadown, foveaup: LONGINT;
+	foveasize, fovealeft, fovearight, foveadown, foveaup: INTEGER;
 	DEATH, wLOOK, PAUSE: BOOLEAN;
 	tracetiled,avaTF, capturethemouse: BOOLEAN;
-	framecount: LONGINT;
+	framecount: INTEGER;
 	multicore,filtor,uplock,rollcam,suppressz: BOOLEAN;
 	camrotinertia:REAL;
 	framedt: REAL;
 	pkeys: SET;	
-	pointerx, pointerdx, pointery, pointerdy: LONGINT;
+	pointerx, pointerdx, pointery, pointerdy: INTEGER;
 	R1,R2: REAL;
-	update: LONGINT;
+	update: INTEGER;
 	MLseen, MMseen, MRseen: BOOLEAN;	
 	chatting: BOOLEAN;
 	chatvoxel: Voxel;
@@ -647,7 +652,7 @@ VAR
 	camera:Camera;
 	fogdensity:REAL;
 	leftsticky,upsticky: REAL;
-	centerx,centery: LONGINT;
+	centerx,centery: INTEGER;
 	GLIDE:REAL;
 
 PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);

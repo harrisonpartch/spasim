@@ -1,5 +1,5 @@
 MODULE TexVox;
-IMPORT Base, Files,SPSMMath, Noise, Raster, Graphics := WMGraphics, Random, Math,Out := KernelLog;
+IMPORT Base, Files,SPSMMath, Noise, Raster, Graphics := WMGraphics, Random, Math:=MathL,Out := KernelLog;
 
 TYPE PT = Base.PT;
 	Color = Base.Color;
@@ -27,7 +27,7 @@ END init;
 PROCEDURE Shade (VAR ray: Ray);
 VAR
 	p: Raster.Pixel;
-	x,y,xi,yj: LONGINT;
+	x,y,xi,yj: SIZE;
 	dr,dg,db,a: REAL;
 	dot1,dot2,mix: REAL;
 	lx,ly: REAL;
@@ -191,7 +191,7 @@ END init;
 PROCEDURE Shade (VAR ray: Ray);
 VAR
 	p: Raster.Pixel;
-	x,y,xi,yj: LONGINT;
+	x,y,xi,yj: SIZE;
 	X,Y, xblend, yblend,blendx,blendy: REAL;
 	r,g,b,a: REAL;
 	dr,dg,db,da,blackness:REAL;
@@ -209,7 +209,7 @@ VAR
 	lxyz,exit,mid: Base.PT;
 	lsp: Base.SPT;
 	faace:INTEGER;
-	dtl: LONGINT;
+	dtl: SIZE;
 	mip,mipverse,gray,grayinv: REAL;
 	patchradius: REAL;
 	pclr: Base.ray_color;
@@ -433,7 +433,7 @@ VAR
 	e: Files.Enumerator;
 	name: ARRAY 256 OF CHAR;
 	flags: SET;
-	time,date,size: LONGINT;
+	time,date,size: SIZE;
 	go:BOOLEAN;
 
 PROCEDURE  & new(n: Name);
@@ -464,7 +464,7 @@ VAR
 	fl: FilmLoop.floop;
 	tscale*: REAL;
 
-PROCEDURE&init*(fname: Name; fnumber: LONGINT);
+PROCEDURE&init*(fname: Name; fnumber: SIZE);
 BEGIN
 	NEW(fl,fname,fnumber);
 	fl.register;
@@ -475,7 +475,7 @@ END init;
 PROCEDURE Shade (VAR ray: Ray);
 VAR
 	p: Raster.Pixel;
-	x,y,xi,yj: LONGINT;
+	x,y,xi,yj: SIZE;
 	r,g,b,a: REAL;
 	dr,dg,db,da,blackness:REAL;
 	bb,c, lx, ly,lx1,ly1, lz1,lx2,ly2,xx,yy,zz,xxx,yyy,zzz,dtl,tq :REAL;
@@ -597,12 +597,12 @@ END FloopVox;
 
 TYPE NoiseVox* = OBJECT(Voxel);
 VAR
-	seed:LONGINT;
+	seed:SIZE;
 	octaves:INTEGER;
 	aa,bb,cc,persistence: REAL;
 	tscale: REAL;
 
-PROCEDURE&init*(s:LONGINT;o:INTEGER; a,b,c,p:REAL);
+PROCEDURE&init*(s:SIZE;o:INTEGER; a,b,c,p:REAL);
 BEGIN
 	seed:=s; octaves:=SHORT(o); persistence:=p;
 	aa:=a; bb:=b; cc:=c;
@@ -622,7 +622,7 @@ VAR
 BEGIN
 	x:= ray.xyz.x; y:=ray.xyz.y; z:=ray.xyz.z;
 	x:= x; y:=y; z:=z;
-	c:=Noise.noise3dperlinabs(x,y,z, 6985, 4,3.5);
+	c:=SHORT(Noise.noise3dperlinabs(x,y,z, 6985, 4,3.5));
 	color.red:=c;
 	color.green:=c;
 	color.blue:=c;

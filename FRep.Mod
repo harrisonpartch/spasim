@@ -1,6 +1,6 @@
 MODULE FRep;
 
-IMPORT Math, Random, SPSMMath, Base, Raster, Graphics:=WMGraphics, Noise;
+IMPORT Math:=MathL, Random, SPSMMath, Base, Raster, Graphics:=WMGraphics, Noise;
 	
 CONST
 	twopi = 2*Math.pi;
@@ -251,15 +251,15 @@ END benice;
 
 TYPE tilednoise*= OBJECT(FR)
 VAR
-	seed*:LONGINT;
+	seed*:SIZE;
 	octaves*:INTEGER;
-	persistence*:LONGREAL;
+	persistence*:REAL;
 	a*,b*,c*: REAL;
 	va*: ARRAY 6 OF Voxel;
 	
 PROCEDURE d2s*(p:PT):REAL;  (* distance to surface *)
 BEGIN
-	RETURN(Noise.noise3dperlin(a*p.x,b*p.y,c*p.z, seed,octaves,persistence)/500 - 1/1000)	
+	RETURN(SHORT(Noise.noise3dperlin(a*p.x,b*p.y,c*p.z, seed,octaves,persistence)/500 - 1/1000))	
 END d2s;
 
 PROCEDURE voxel*(p:PT):Voxel;
@@ -271,16 +271,16 @@ END tilednoise;
 
 TYPE noise*= OBJECT(FR)
 VAR
-	seed*:LONGINT;
+	seed*:SIZE;
 	octaves*:INTEGER;
-	persistence*:LONGREAL;
+	persistence*:REAL;
 	a*,b*,c*: REAL;
 
 PROCEDURE d2s*(p:PT):REAL;  (* distance to surface *)
 VAR 
 	n,d:REAL;
 BEGIN
-	RETURN(Noise.noise3dperlin(a*p.x,b*p.y,c*p.z, seed,octaves,persistence)/1000 - 1/2000)	
+	RETURN(	SHORT(Noise.noise3dperlin(a*p.x,b*p.y,c*p.z, seed,octaves,persistence)/1000 - 1/2000))	
 END d2s;
 
 PROCEDURE color*(p:PT):Color;
@@ -384,7 +384,7 @@ VAR
 	img: Raster.Image;
 	fmt: Raster.Format;
 	copy : Raster.Mode;
-	W,H, bpr,adr: LONGINT;	
+	W,H, bpr,adr: SIZE;	
 
 PROCEDURE &init*(a,b:PT; r,r2: REAL; n: Name);
 BEGIN
@@ -405,7 +405,7 @@ PROCEDURE getcolor*(p:PT):Color;
 VAR
 	a:Color;
 	r,b,g: REAL;
-	tx,ty: LONGINT;
+	tx,ty: SIZE;
 	pixel:Raster.Pixel;
 BEGIN
 	IF img#NIL THEN
@@ -539,7 +539,7 @@ VAR
 	heightimage, colorimage: Raster.Image;
 	fmt: Raster.Format;
 	copy : Raster.Mode;
-	heightW, heightH, colorW, colorH, bpr,adr: LONGINT;
+	heightW, heightH, colorW, colorH, bpr,adr: SIZE;
 	rarevox*:Voxel;
 	z: REAL;
 		
@@ -560,7 +560,7 @@ PROCEDURE getcolor*(p:PT):Color;
 VAR
 	a:Color;
 	r,b,g: REAL;
-	tx,ty: LONGINT;
+	tx,ty: SIZE;
 	pixel:Raster.Pixel;
 BEGIN
 	IF  FALSE (* colorimage#NIL *) THEN
@@ -580,7 +580,7 @@ END getcolor;
 PROCEDURE d2s*(p:PT):REAL;  (* distance to surface *)
 VAR
 	r,b,g: REAL;
-	tx,ty: LONGINT;
+	tx,ty: SIZE;
 	pixel:Raster.Pixel;
 BEGIN
 	IF  heightimage#NIL THEN

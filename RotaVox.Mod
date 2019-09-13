@@ -1,6 +1,6 @@
 MODULE RotaVox;
 
-IMPORT Base, SPSMMath, Math, NM3;
+IMPORT Base, SPSMMath, Math:=MathL, NM3;
 
 TYPE Voxel=Base.Voxel;
 TYPE PT=Base.PT;

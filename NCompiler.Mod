@@ -1,5 +1,5 @@
 MODULE NCompiler;
-IMPORT Files, Texts, TextUtilities, Diagnostics, CompilerInterface, Commands;
+IMPORT Base, Files, Streams, Texts, TextUtilities, Diagnostics, CompilerInterface, Commands;
 
 PROCEDURE ncompile*(context : Commands.Context);
 VAR
@@ -9,8 +9,11 @@ VAR
        text: Texts.Text;
        diagnostics: Diagnostics.Diagnostics;
        error:BOOLEAN;
-       format,res: LONGINT;
-       name : ARRAY 256 OF CHAR; flags : SET; time, date, size : LONGINT;
+       format,res: INTEGER;
+       name : ARRAY 256 OF CHAR; 
+       flags : SET; 
+       time, date : SIGNED32;
+       size: Streams.Position;
 BEGIN
         NEW(e);
       e.Open("./N*Mod", {}); 

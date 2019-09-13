@@ -1,6 +1,6 @@
 MODULE Base;
 
-IMPORT  Math, Random, Kernel, Out:=KernelLog, Objects, (*AL:=OpenAL, ALUT := OpenALUtil,  *)
+IMPORT  Math:=MathL, Random,  Out:=KernelLog, (*AL:=OpenAL, ALUT := OpenALUtil,  *)
 Strings, Streams, CryptoMD5, WMFontManager, Raster, WMRasterScale, WMRectangles, Graphics := WMGraphics, Commands(*, XNXLAudio*);
 
 CONST
@@ -54,9 +54,9 @@ TYPE NCube*=RECORD
 END;
 
 TYPE Time*=RECORD
-	seconds*:LONGINT; (*global from server*)
-	s2cs*:LONGINT;
-	centisecs*:LONGINT
+	seconds*:SIZE; (*global from server*)
+	s2cs*:SIZE;
+	centisecs*:SIZE
 END;
 
 TYPE V*= OBJECT  (*abstract base type for voxel and texture and anything else that may animate *)
@@ -77,13 +77,13 @@ END V;
 TYPE Texture*=OBJECT(V)
 VAR
 	img*,mip_zero,mip_one,mip_two: Raster.Image;
-	W*,H*, bpr,adr: LONGINT;
+	W*,H*: SIZE;
 	transparent*: BOOLEAN;
 	copy: Raster.Mode;
 
 PROCEDURE & init*(CONST n: ARRAY OF CHAR);
 VAR
-	i,j,ix,jy: LONGINT;
+	i,j,ix,jy: INTEGER;
 BEGIN
 	Raster.InitMode(copy,Raster.srcCopy);
 	img :=Graphics.LoadImage(n, FALSE); (* img format is BGRA8888 *)
@@ -117,7 +117,7 @@ END init;
 
 PROCEDURE pixelmip_zero*(x,y:REAL):Color;
 VAR
-	i,j: LONGINT;
+	i,j: INTEGER;
 	p: Raster.Pixel;
 	c: Color;
 BEGIN
@@ -131,7 +131,7 @@ END pixelmip_zero;
 
 PROCEDURE pixelmip_one*(x,y:REAL):Color;
 VAR
-	i,j: LONGINT;
+	i,j: INTEGER;
 	p: Raster.Pixel;
 	c: Color;
 BEGIN
@@ -144,7 +144,7 @@ END pixelmip_one;
 
 PROCEDURE pixelmip_two*(x,y:REAL):Color;
 VAR
-	i,j: LONGINT;
+	i,j: INTEGER;
 	p: Raster.Pixel;
 	c: Color;
 BEGIN
@@ -157,7 +157,7 @@ END pixelmip_two;
 
 PROCEDURE pixel*(x,y:REAL):Color;
 VAR
-	i,j: LONGINT;
+	i,j: SIZE;
 	p: Raster.Pixel;
 	c: Color;
 BEGIN
@@ -168,9 +168,9 @@ BEGIN
 	RETURN c
 END pixel;
 
-PROCEDURE pixelT*(x,y:REAL; T: LONGINT):Color;
+PROCEDURE pixelT*(x,y:REAL; T: INTEGER):Color;
 VAR
-	i,j: LONGINT;
+	i,j: SIZE;
 	p: Raster.Pixel;
 	c: Color;
 BEGIN
@@ -277,7 +277,7 @@ VAR
 PROCEDURE r90z*;
 END r90z;
 
-PROCEDURE count*(level: INTEGER):LONGINT;
+PROCEDURE count*(level: INTEGER):INTEGER;
 BEGIN
 	RETURN 1;
 END count;
@@ -290,7 +290,7 @@ BEGIN
 	NEW(v);
 	RETURN(v)
 END proberay;
-PROCEDURE probe*(p:PT; resolution: LONGINT):Voxel;
+PROCEDURE probe*(p:PT; resolution: INTEGER):Voxel;
 BEGIN
 	RETURN(SELF);
 END probe;
@@ -321,7 +321,7 @@ BEGIN
 END setcolor;
 PROCEDURE setcolorrec* (r,g,b,rb,gb,bb: REAL); 
 END setcolorrec;
-PROCEDURE erase*(p:PT; resolution:LONGINT);
+PROCEDURE erase*(p:PT; resolution:INTEGER);
 END erase;
 PROCEDURE copyprime*;
 END copyprime;
@@ -333,32 +333,32 @@ PROCEDURE copyclear*;
 END copyclear;
 PROCEDURE fill*(v: Voxel);
 END fill;
-PROCEDURE line*(a,b: PT; level: LONGINT; v: Voxel);
+PROCEDURE line*(a,b: PT; level: INTEGER; v: Voxel);
 END line;
-PROCEDURE proberec*(p:PT; resolution,scale:LONGINT):Voxel;
+PROCEDURE proberec*(p:PT; resolution,scale:INTEGER):Voxel;
 END proberec;
-PROCEDURE FRaster*( f: FR; resolution: LONGINT); 
+PROCEDURE FRaster*( f: FR; resolution: INTEGER); 
 END FRaster;
-PROCEDURE FRasterrec*(f: FR; resolution: LONGINT; origin: PT; scale: LONGINT); 
+PROCEDURE FRasterrec*(f: FR; resolution: INTEGER; origin: PT; scale: INTEGER); 
 END FRasterrec;
-PROCEDURE FRasterSolid*( f: FR; resolution: LONGINT); 
+PROCEDURE FRasterSolid*( f: FR; resolution: INTEGER); 
 END FRasterSolid;
-PROCEDURE FRasterrecSolid*(f: FR; resolution: LONGINT; origin: PT; scale: LONGINT); 
+PROCEDURE FRasterrecSolid*(f: FR; resolution: INTEGER; origin: PT; scale: INTEGER); 
 END FRasterrecSolid;
 
-PROCEDURE stroke*(p:PT; resolution: LONGINT; voxel:Voxel);
+PROCEDURE stroke*(p:PT; resolution: INTEGER; voxel:Voxel);
 END stroke;
-PROCEDURE strokerec*(p:PT; resolution,scale: LONGINT;  voxel: Voxel);
+PROCEDURE strokerec*(p:PT; resolution,scale: INTEGER;  voxel: Voxel);
 END strokerec;
-PROCEDURE strokephemeral*(p:PT; resolution: LONGINT; voxel,voxundo:Voxel);
+PROCEDURE strokephemeral*(p:PT; resolution: INTEGER; voxel,voxundo:Voxel);
 END strokephemeral;
-PROCEDURE strokephemeralrec*(p:PT; resolution,scale: LONGINT; voxel,voxundo:Voxel);
+PROCEDURE strokephemeralrec*(p:PT; resolution,scale: INTEGER; voxel,voxundo:Voxel);
 END strokephemeralrec;
-PROCEDURE nstroke*(p:PT; resolution: LONGINT; normal: PT; color: Color);
+PROCEDURE nstroke*(p:PT; resolution: INTEGER; normal: PT; color: Color);
 END nstroke;
-PROCEDURE nstrokerec*(p:PT; resolution,scale: LONGINT; normal: PT; color: Color);
+PROCEDURE nstrokerec*(p:PT; resolution,scale: INTEGER; normal: PT; color: Color);
 END nstrokerec;
-PROCEDURE mstroke*(a,b,c: LONGINT; resolution: LONGINT; vname: Name);
+PROCEDURE mstroke*(a,b,c: INTEGER; resolution: INTEGER; vname: Name);
 BEGIN
 END mstroke;
 
@@ -386,7 +386,7 @@ END sprout;
 
 PROCEDURE showcode*;
 VAR
-	VAR res : LONGINT; 
+	VAR res : INTEGER; 
 	command: Strings.String;
 	msg : ARRAY 128 OF CHAR;
 BEGIN
@@ -566,9 +566,9 @@ VAR
 	TOCK*: BOOLEAN;
 	fog*,horizon*,horizon2*,texdetail*:REAL;
 	rlimit*: INTEGER;
-	iterlimit*: LONGINT;
+	iterlimit*: INTEGER;
 	speed*,maxspeed*:REAL;
-	frame*: LONGINT;
+	frame*: SIZE;
 	rand*:Random.Sequence;
 	worldalive*: BOOLEAN;
 	gravity*:REAL;
@@ -588,7 +588,7 @@ VAR
 	DTL*,DTL2*: REAL;
 	frameblack*:REAL;
 	avatar*:Voxel;
-	avatarsize*: LONGINT;
+	avatarsize*: INTEGER;
 	cursordist*:REAL;
 	RVR*:BOOLEAN;
 	vlist*: ARRAY 100 OF Voxel;
@@ -599,8 +599,8 @@ VAR
 	blackspeed*:REAL;
 	defaultimg: Raster.Image;
 	hasher*:CryptoMD5.Hash;
-	PRO*: LONGINT;
-	patchx*, patchy*: LONGINT;
+	PRO*: INTEGER;
+	patchx*, patchy*: INTEGER;
 (*	basesource*, texsound*, grainsound*: AL.ALuint;
 	listenerPos*: ARRAY [3] OF AL.ALfloat; (* global position *)
 	sourcePos: ARRAY 3 OF AL.ALfloat;
@@ -804,7 +804,7 @@ END tick;
 VAR
 	v:Voxel;
 	ray: Ray;
-	x,y: LONGINT;
+	x,y: INTEGER;
 BEGIN
 	x:=W DIV 2;
 	y:=H DIV 2;

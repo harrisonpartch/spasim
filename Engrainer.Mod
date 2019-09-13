@@ -35,7 +35,7 @@ VAR
 	r: Files.Reader; 
 	name: Name;
 	cell: Voxel;
-	len: LONGINT;
+	len: SIZE;
 BEGIN
 	NEW(cell);
 	fgz:= Files.Old("sprout");
