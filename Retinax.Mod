@@ -99,14 +99,14 @@ BEGIN
 	RETURN r;
 END interpclr;
 
-PROCEDURE clrd(CONST ra,rb: Base.ray_color): REAL;
+PROCEDURE clrd(CONST ra,rb: Base.Ray): REAL;
 BEGIN			
-	RETURN ABS(ra.r-rb.r)+ABS(ra.g-rb.g)+ABS(ra.b-rb.b);
+	RETURN ABS(ra.clr.r-rb.clr.r)+ABS(ra.clr.g-rb.clr.g)+ABS(ra.clr.b-rb.clr.b);
 END clrd;
 
-PROCEDURE clrd4(CONST ra,rb,rc,rd: Base.ray_color): REAL;
-BEGIN			
-	RETURN (*clrd(ra,rb)+clrd(rb,rc)+clrd(rc,rd)+clrd(rd,ra)+*) (clrd(rb,rd)+clrd(ra,rc))/2;
+PROCEDURE clrd4(CONST ra,rb,rc,rd: Base.Ray): REAL;
+BEGIN		
+	RETURN (clrd(rb,rd)+clrd(ra,rc))/2;
 END clrd4;
 
 PROCEDURE tessa16(cam:Camera);	
@@ -168,7 +168,7 @@ PROCEDURE t4x4fill(CONST x,y: INTEGER);
 VAR
 	i,j: INTEGER;
 BEGIN
-	IF clrd4(rays[x,y].clr, rays[x+3,y].clr, rays[x+3,y+3].clr, rays[x,y+3].clr) > thresh1a THEN
+	IF clrd4(rays[x,y], rays[x+3,y], rays[x+3,y+3], rays[x,y+3]) > thresh1a THEN
 		t2x2a(x,y);
 		t2x2b(x+2,y);
 		t2x2c(x+2,y+2);
@@ -228,7 +228,7 @@ PROCEDURE t8x8fill(CONST x,y: INTEGER);
 VAR
 	i,j: INTEGER;
 BEGIN
-	IF clrd4(rays[x,y].clr, rays[x+7,y].clr, rays[x+7,y+7].clr, rays[x,y+7].clr) > thresh1a THEN
+	IF clrd4(rays[x,y], rays[x+7,y], rays[x+7,y+7], rays[x,y+7]) > thresh1a THEN
 		t4x4a(x,y);
 		t4x4b(x+4,y);
 		t4x4c(x+4,y+4);
@@ -277,7 +277,7 @@ PROCEDURE t16x16fill();
 VAR
 	i,j: INTEGER;
 BEGIN
-(*	IF clrd4(rays[0,0].clr, rays[15,0].clr, rays[15,15].clr, rays[0,15].clr) > thresh1a THEN *)
+(*	IF clrd4(rays[0,0], rays[15,0], rays[15,15], rays[0,15]) > thresh1a THEN *)
 		t8x8a(0,0);
 		t8x8b(8,0);
 		t8x8c(8,8);
@@ -285,7 +285,7 @@ BEGIN
 (*	ELSE
 		FOR i:= 0 TO 15 DO
 			FOR j:= 0 TO 15 DO
-				tileimage[i,j]:=rays[0,0].clr;
+				tileimage[i,j]:=rays[0,0];
 			END
 		END
 	END
@@ -383,7 +383,7 @@ PROCEDURE t8x8fill(CONST x,y: INTEGER);
 VAR
 	i,j: INTEGER;
 BEGIN
-	IF clrd4(rays[x,y].clr, rays[x+7,y].clr, rays[x+7,y+7].clr, rays[x,y+7].clr) > thresh1a THEN
+	IF clrd4(rays[x,y], rays[x+7,y], rays[x+7,y+7], rays[x,y+7]) > thresh1a THEN
 		t4x4a(x,y);
 		t4x4b(x+4,y);
 		t4x4c(x+4,y+4);
@@ -433,7 +433,7 @@ PROCEDURE t16x16fill();
 VAR
 	i,j: INTEGER;
 BEGIN
-	IF clrd4(rays[0,0].clr, rays[15,0].clr, rays[15,15].clr, rays[0,15].clr) > thresh1a THEN
+	IF clrd4(rays[0,0], rays[15,0], rays[15,15], rays[0,15]) > thresh1a THEN
 		t8x8a(0,0);
 		t8x8b(8,0);
 		t8x8c(8,8);
@@ -684,18 +684,18 @@ END lessdetail;
 
 PROCEDURE decthresh1(d: INTEGER);
 BEGIN
-	thresh1a:=thresh1a-d/10;
-	IF thresh1a<0.02 THEN 
-		thresh1a:=0.02;
+	thresh1a:=thresh1a*10/11;
+	IF thresh1a<0.002 THEN 
+		thresh1a:=0.002;
 		DEC(foveaparameter) 
 	END
 END decthresh1;
 
 PROCEDURE incthresh1(d: INTEGER);
 BEGIN
-	thresh1a:=thresh1a+d/10;
-	IF thresh1a>2/12 THEN 
-		thresh1a:=2/12;
+	thresh1a:=thresh1a*11/10;
+	IF thresh1a>1/12 THEN 
+		thresh1a:=1/12;
 		INC(foveaparameter)
 	END
 END incthresh1;

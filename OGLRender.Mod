@@ -750,7 +750,7 @@ END shaders;
 PROCEDURE Open* ;
 BEGIN
 	NEW(glw);
-(*	Debugging.DisableGC *)
+	Debugging.DisableGC 
 END Open;
 
 

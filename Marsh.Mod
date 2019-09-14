@@ -323,7 +323,7 @@ BEGIN
 	EMPTY.passable:=TRUE;
   rand:=Base.rand;	
    NEW(mcube);
-	xot:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoR"); 
+(*	xot:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoR"); 
 	push(xot);
 	cage:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");
 	cage.copyonstroke:=TRUE;
@@ -332,7 +332,7 @@ BEGIN
 	push(archillect);
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	push(greenball);	
-(*	conglomerate:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7"); 	
+	conglomerate:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7"); 	
 	conglomerate.copyonstroke:=TRUE;
 	push(conglomerate);	
 	reddot:=Base.VoxelFromName("Nbrownianspheres"); 	
@@ -520,6 +520,7 @@ BEGIN
 	noise[1].persistence:=3.81;	
 	noise[1].setcolor(0.8,2.8,4,1/2,0);	
 	wstar:=Base.VoxelFromName("Nwstar"); 
+	push(wstar);
 	noise[1].setvoxel(wstar);	
 	NEW(noise[2]);	
 	noise[2].seed:=900909;		
@@ -556,10 +557,6 @@ BEGIN
 	z3:=Base.VoxelFromName("NM3");	
 	z3a:=Base.VoxelFromName("NM3");
 	z3b:=Base.VoxelFromName("NM3");
-	medley:=Base.VoxelFromName("NM3");	
-	med1:=Base.VoxelFromName("NM3");		
-	med2:=Base.VoxelFromName("NM3");		
-	med3:=Base.VoxelFromName("NM3");	
 
   	z3.setcolor(0.5,0.5,0.5,3,3,3);
 	z3a.setcolor(0,6,0,10,10,10);
@@ -568,59 +565,54 @@ BEGIN
   	push(dieone);
   	dieone.tscale:=1000;
    noise[0].setvoxel(dieone);
-	z3b.FRaster(noise[0],27);
+	z3b.FRaster(noise[0],16);
 	noise[1].setvoxel(wstar);
-	z3b.FRaster(noise[1],9);
+	z3b.FRaster(noise[1],16);
 	
 	noise[0].setvoxel(z3b);	
-	z3a.FRaster(noise[0],9);
+	z3a.FRaster(noise[0],16);
 	noise[1].setvoxel(z3b);		
-	z3.FRaster(noise[1],81);	
+	z3.FRaster(noise[1],32);	
 	Base.setPT(center,1/2,1/2,1/2);
 
 	GREEN:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODg");	
 	NEW(siv,GREEN,NIL,0.6); 
 	NEW(ball,center,0.5);
 	ball.setcolor(0.61,0.61,0.61,1,0);	
-	med1.FRaster(ball,3);
-	med2.FRaster(ball,9);	
-	med3.FRaster(ball,27);	
-	medley.FRaster(ball,32);	
+	medley:=Base.VoxelFromName("NM3");	
+	med1:=Base.VoxelFromName("NM3");		
+	med2:=Base.VoxelFromName("NM3");		
+	med1.FRaster(ball,4);
+	med2.FRaster(ball,8);		
+	medley.FRaster(ball,16);	
 
 	NEW(ball,center,0.6);	
 	ball.setcolor(0.41,0.21,0.21,1,0);	
-	ball.setvoxel(med2);
-	medley.FRaster(ball,8);	
-		
-	med2.imposter:=med1;
-	med3.imposter:=med2;
-	medley.imposter:=med2;
+	ball.setvoxel(med1);
+	medley.FRaster(ball,32);	
+	
 	
 	FOR i := 0 TO 1000 DO
 		z3b.stroke(Base.randPT(),10,medley);
 	END;
-		FOR i := 0 TO 100 DO
+(*	FOR i := 0 TO 100 DO
 		z3.stroke(Base.randPT(),90,wstar);
 	END;	
-	Base.setPT(center,1/2,1/2,2/3);	
+*)	Base.setPT(center,1/2,1/2,2/3);	
  	NEW(plane,center,up);
 
-	plane.setvoxel(z3b);			
-	z3.FRaster(plane,9);	 		
-
-	z3a.copyonstroke:=TRUE; 
-	z3b.copyonstroke:=TRUE; 	
+	plane.setvoxel(wstar);			
+	z3.FRaster(plane,8);	 		
+	z3b.copyonstroke:=TRUE; 
+(*	z3a.copyonstroke:=TRUE; 
+		
 	z3a.passable:=TRUE;
-	med1.lock;
-	med2.lock;
-	med3.lock;	
-	medley.lock;
-	
+	*)
 	harrison:=Base.VoxelFromName("Nharrisonavatar"); 
 	push(harrison);	
 	Base.avatar:=harrison;
 	
-	Base.avatarsize:=243; 
+	Base.avatarsize:=81; 
 
 	
 	Base.world:=z3;
@@ -643,6 +635,7 @@ END lighten
 
 BEGIN
 	NEW(marshv);
+	marshv.vox:= Base.EMPTY;
 	push(Base.EMPTY);
 	dawn; 
 	cursorsize:=243;
