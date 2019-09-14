@@ -256,7 +256,7 @@ BEGIN
 	IF MOUSEDOWN THEN	
 		IF GLW.ML IN MB THEN  Marsh.tunnelinto; 
 		ELSIF  GLW.MM IN MB THEN Marsh.snipeinto; 
-		ELSIF  GLW.MR IN MB THEN Marsh.snipeonto;
+(*		ELSIF  GLW.MR IN MB THEN Marsh.snipeonto;*)
 		END;	
 	END;
 	trace; 
@@ -750,7 +750,7 @@ END shaders;
 PROCEDURE Open* ;
 BEGIN
 	NEW(glw);
-	Debugging.DisableGC 
+(*	Debugging.DisableGC *)
 END Open;
 
 

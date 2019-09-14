@@ -748,16 +748,18 @@ BEGIN
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 		child:=blox[i,j,k];
 		IF (child#NIL) THEN
-			IF ~child.copymarker  & ~child.copyonstroke THEN
-				 c.blox[i,j,k]:=child.deepcopy();
-			ELSE
+			IF child.copyonstroke THEN
 				c.blox[i,j,k]:=child
+			ELSIF child.copymarker THEN
+				c.blox[i,j,k]:=child
+			ELSE
+				c.blox[i,j,k]:=child.deepcopy() 
 			END
 		END
 	END END END;
 	copymarker:=FALSE;
 	c.baked:=TRUE; (* baked means done copying *)
-	RETURN c
+	RETURN c;
 END deepcopy;
 
 PROCEDURE count*(level: INTEGER):INTEGER;

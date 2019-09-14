@@ -554,9 +554,9 @@ BEGIN
 	Base.setPT(center,1/2,1/2,9/10);
 	Base.setPT(up,0,0,1);
 	
-	z3:=Base.VoxelFromName("NM3");	
-	z3a:=Base.VoxelFromName("NM3");
-	z3b:=Base.VoxelFromName("NM3");
+	z3:=Base.VoxelFromName("NM2");	
+	z3a:=Base.VoxelFromName("NM2");
+	z3b:=Base.VoxelFromName("NM2");
 
   	z3.setcolor(0.5,0.5,0.5,3,3,3);
 	z3a.setcolor(0,6,0,10,10,10);
@@ -579,41 +579,42 @@ BEGIN
 	NEW(siv,GREEN,NIL,0.6); 
 	NEW(ball,center,0.5);
 	ball.setcolor(0.61,0.61,0.61,1,0);	
-	medley:=Base.VoxelFromName("NM3");	
-	med1:=Base.VoxelFromName("NM3");		
-	med2:=Base.VoxelFromName("NM3");		
-	med1.FRaster(ball,4);
-	med2.FRaster(ball,8);		
-	medley.FRaster(ball,16);	
+	medley:=Base.VoxelFromName("NM2");	
+	med1:=Base.VoxelFromName("NM2");		
+	med1.FRaster(ball,8);
+
+	medley.FRaster(ball,8);	
+	
 
 	NEW(ball,center,0.6);	
 	ball.setcolor(0.41,0.21,0.21,1,0);	
 	ball.setvoxel(med1);
-	medley.FRaster(ball,32);	
-	
-	
+	medley.FRaster(ball,8);	
+		
 	FOR i := 0 TO 1000 DO
 		z3b.stroke(Base.randPT(),10,medley);
 	END;
-(*	FOR i := 0 TO 100 DO
-		z3.stroke(Base.randPT(),90,wstar);
+	FOR i := 0 TO 100 DO
+		z3.stroke(Base.randPT(),64,wstar);
 	END;	
-*)	Base.setPT(center,1/2,1/2,2/3);	
+	Base.setPT(center,1/2,1/2,2/3);	
  	NEW(plane,center,up);
 
 	plane.setvoxel(wstar);			
 	z3.FRaster(plane,8);	 		
-	z3b.copyonstroke:=TRUE; 
-(*	z3a.copyonstroke:=TRUE; 
-		
-	z3a.passable:=TRUE;
-	*)
+
+
 	harrison:=Base.VoxelFromName("Nharrisonavatar"); 
 	push(harrison);	
 	Base.avatar:=harrison;
 	
+		
 	Base.avatarsize:=81; 
-
+	
+	med1.copyonstroke:=TRUE;		
+	medley.copyonstroke:=TRUE;
+	z3b.copyonstroke:=TRUE; 
+	z3a.copyonstroke:=TRUE; 
 	
 	Base.world:=z3;
 	alternateworld:=z3;	
