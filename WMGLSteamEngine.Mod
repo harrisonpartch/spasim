@@ -63,7 +63,7 @@ TYPE
 				UpdateImage;
 		END ChangeAngle;
 
-		PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
+		PROCEDURE KeyEvent (ucs: SIZE; flags: SET; keysym: SIZE);
 		BEGIN
 			CASE CHR(ucs) OF
 				"a", "A": BEGIN {EXCLUSIVE} animated := ~ animated; END;
@@ -79,7 +79,7 @@ TYPE
 
 		END KeyEvent;
 
-		PROCEDURE WheelMove(dz : LONGINT);
+		PROCEDURE WheelMove(dz : SIZE);
 		BEGIN
 			eyeposz := eyeposz + dz;
 			IF eyeposz < -100 THEN eyeposz:= -100.0; END;
@@ -343,10 +343,10 @@ TYPE
 
 	END Display;
 
-	PROCEDURE  Reshape (w, h: LONGINT);
+	PROCEDURE  Reshape (w, h: SIZE);
 	BEGIN
 		 MakeCurrent;
-		GL.Viewport(0, 0, w, h);
+		GL.Viewport(0, 0, w(GL.Sizei), h(GL.Sizei));
 
 		GL.MatrixMode (GLC.GL_PROJECTION);
 		GL.LoadIdentity;

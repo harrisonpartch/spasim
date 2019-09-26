@@ -34,7 +34,7 @@ TYPE
 
 		  END New;
 
-		PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
+		PROCEDURE KeyEvent (ucs: SIZE; flags: SET; keysym: SIZE);
 		BEGIN
 			CASE CHR(ucs) OF
 				 "t" : Testspeed;
@@ -69,7 +69,7 @@ TYPE
 			END;
 		END KeyEvent;
 
-		PROCEDURE WheelMove(dz : LONGINT);
+		PROCEDURE WheelMove(dz : SIZE);
 		BEGIN
 			z := z + dz;
 			UpdateImage;
@@ -121,7 +121,7 @@ TYPE
 		 	GL.BindTexture( GLC.GL_TEXTURE_2D, texture[0] );
 
 		 	(* Generate The Texture *)
-		 	GL.TexImage2D( GLC.GL_TEXTURE_2D, 0, 4, teximg.width, teximg.height, 0,GLC. GL_RGBA,
+		 	GL.TexImage2D( GLC.GL_TEXTURE_2D, 0, 4, teximg.width(GL.Sizei), teximg.height(GL.Sizei), 0,GLC. GL_RGBA,
 		 	GLC.GL_UNSIGNED_BYTE, teximg.adr );
 
 		 	(* Linear Filtering *)
@@ -135,8 +135,8 @@ TYPE
 		 	GL.TexParameteri( GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR );
 
 		 	(* Generate The Texture *)
-		 	GL.TexImage2D( GLC.GL_TEXTURE_2D, 0, 4, teximg.width,
-		 					teximg.height, 0, GLC.GL_RGBA, GLC.GL_UNSIGNED_BYTE, teximg.adr );
+		 	GL.TexImage2D( GLC.GL_TEXTURE_2D, 0, 4, teximg.width(GL.Sizei),
+		 					teximg.height(GL.Sizei), 0, GLC.GL_RGBA, GLC.GL_UNSIGNED_BYTE, teximg.adr );
 
 		 	GL.BindTexture( GLC.GL_TEXTURE_2D, texture[2] );
 
@@ -145,7 +145,7 @@ TYPE
 		 	GL.TexParameteri( GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR_MIPMAP_NEAREST );
 
 		 	(* Generate The MipMapped Texture  *)
-		 	res := GLU.Build2DMipmaps(GLC.GL_TEXTURE_2D, 4, teximg.width, teximg.height,
+		 	res := GLU.Build2DMipmaps(GLC.GL_TEXTURE_2D, 4, teximg.width(GL.Sizei), teximg.height(GL.Sizei),
 		 									GLC.GL_RGBA, GLC.GL_UNSIGNED_BYTE, teximg.adr);
 
 		 	(* Free up any memory we may have used *)
@@ -153,10 +153,10 @@ TYPE
 		 	RETURN TRUE;
 		END LoadGLTextures;
 
-		PROCEDURE Reshape(w, h: LONGINT);
+		PROCEDURE Reshape(w, h: SIZE);
 		BEGIN
 			MakeCurrent();
-			GL.Viewport(0, 0, w, h);
+			GL.Viewport(0, 0, w(GL.Sizei), h(GL.Sizei));
 
 			GL.MatrixMode(GLC.GL_PROJECTION);
 			GL.LoadIdentity();

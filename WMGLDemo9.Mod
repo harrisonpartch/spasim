@@ -114,7 +114,7 @@ TYPE
 *)
 		END InitVertex;
 
-		PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
+		PROCEDURE KeyEvent (ucs: SIZE; flags: SET; keysym: SIZE);
 		BEGIN
 			IF  keysym = Inputs.KsLeft  THEN  spinXL := spinXL - 5.0;    UpdateImage; (* Cursor Left *)
 			ELSIF keysym = Inputs.KsRight  THEN  spinXR := spinXR + 5.0;   UpdateImage; (* Cursor Right *)
@@ -126,7 +126,7 @@ TYPE
 			END;
 		END KeyEvent;
 
-		PROCEDURE WheelMove(dz : LONGINT);
+		PROCEDURE WheelMove(dz : SIZE);
 		BEGIN
 			eyeposz := eyeposz + dz;
 			Reshape(GetWidth(), GetHeight());
@@ -160,10 +160,10 @@ TYPE
 			Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 		END UpdateImage;
 
-		PROCEDURE Reshape(w, h: LONGINT);
+		PROCEDURE Reshape(w, h: SIZE);
 		BEGIN
 			MakeCurrent();
-			GL.Viewport(0, 0, w, h);
+			GL.Viewport(0, 0, w(GL.Sizei), h(GL.Sizei));
 			GL.MatrixMode(GLC.GL_MODELVIEW);
 			GL.LoadIdentity();
 				GLU.LookAt(5, 5, eyeposz,   0, 0, 0,   0, 1, 0); (* eye(x,y,z), focal(x,y,z), up(x,y,z) *)
@@ -261,7 +261,7 @@ IF teximg # NIL THEN
 	GL.TexParameteri(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR);
 	GL.TexParameteri(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_LINEAR);
 
-	GL.TexImage2D( GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA8, teximg.width, teximg.height, 0,
+	GL.TexImage2D( GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA8, teximg.width(GL.Sizei), teximg.height(GL.Sizei), 0,
 	GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, teximg.adr );
 ELSE
  	KernelLog.String("teximg= NIL"); KernelLog.Ln;
@@ -333,7 +333,7 @@ BEGIN
 	 Now, set up the regular window for rendering...
 	-------------------------------------------------- *)
 
-	GL.Viewport( 0, 0, GetWidth(), GetHeight() );
+	GL.Viewport( 0, 0, GetWidth()(GL.Sizei), GetHeight()(GL.Sizei) );
 	GL.ClearColor( 0.0, 0.0, 0.0, 1.0 );
 	GL.Clear( GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT );
 

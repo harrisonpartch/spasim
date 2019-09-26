@@ -45,7 +45,7 @@ TYPE
 		IncCount
 	END New;
 
-	PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
+	PROCEDURE KeyEvent (ucs: SIZE; flags: SET; keysym: SIZE);
 	BEGIN
 		CASE CHR(ucs) OF
 			 "a", "A":  BEGIN{EXCLUSIVE} animated := ~ animated; END;
@@ -63,7 +63,7 @@ TYPE
 		END;
 	END KeyEvent;
 
-	PROCEDURE WheelMove(dz : LONGINT);
+	PROCEDURE WheelMove(dz : SIZE);
 	BEGIN
 		eyeposz := eyeposz + dz;
 		Reshape(GetWidth(), GetHeight());
@@ -95,10 +95,10 @@ TYPE
 		 Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 	END UpdateImage;
 
-	PROCEDURE Reshape(w,h: LONGINT);
+	PROCEDURE Reshape(w,h: SIZE);
 	BEGIN
 		MakeCurrent();
-		GL.Viewport(0,0, w, h);
+		GL.Viewport(0,0, w(GL.Sizei), h(GL.Sizei));
 
 		GL.MatrixMode(GLC.GL_PROJECTION);
 		GL.LoadIdentity();
@@ -186,15 +186,15 @@ TYPE
 		GL.GenBuffersARB(1, ADDRESSOF(normalId));
 
 		GL.BindBufferARB(GLC.GL_ARRAY_BUFFER, vboId);
-		GL.BufferDataARB(GLC.GL_ARRAY_BUFFER, LEN(vertices,0)*4, ADDRESSOF(vertices[0]), GLC.GL_STATIC_DRAW);
+		GL.BufferDataARB(GLC.GL_ARRAY_BUFFER, (LEN(vertices,0)*4)(GL.Sizei), ADDRESSOF(vertices[0]), GLC.GL_STATIC_DRAW);
 		GL.VertexPointer(3, GLC.GL_FLOAT, 0, 0);
 
 		GL.BindBufferARB(GLC.GL_ARRAY_BUFFER, colorId);
-		GL.BufferDataARB(GLC.GL_ARRAY_BUFFER, LEN(colors,0)*4, ADDRESSOF(colors[0]), GLC.GL_STATIC_DRAW);
+		GL.BufferDataARB(GLC.GL_ARRAY_BUFFER, (LEN(colors,0)*4)(GL.Sizei), ADDRESSOF(colors[0]), GLC.GL_STATIC_DRAW);
 		GL.ColorPointer(3, GLC.GL_FLOAT, 0, 0);
 
 		GL.BindBufferARB(GLC.GL_ARRAY_BUFFER, normalId);
-		GL.BufferDataARB(GLC.GL_ARRAY_BUFFER, LEN(normals,0)*4, ADDRESSOF(normals[0]), GLC.GL_STATIC_DRAW);
+		GL.BufferDataARB(GLC.GL_ARRAY_BUFFER, (LEN(normals,0)*4)(GL.Sizei), ADDRESSOF(normals[0]), GLC.GL_STATIC_DRAW);
 		GL.NormalPointer(GLC.GL_FLOAT, 0, 0);
 
 		GL.ClearColor(0.2, 0.1, 0.4, 1.0);                   (*  background color *)

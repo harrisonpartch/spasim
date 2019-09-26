@@ -256,6 +256,7 @@ TYPE Ray* = RECORD
 	dtlTF*:BOOLEAN;
 	hitmirrorTF*:BOOLEAN;
 	justhitTF*,firsthitTF*:BOOLEAN;
+	justhit*:Voxel;
 	thisvoxelisempty*:BOOLEAN;
 	texdtl*:REAL;
 END;

@@ -17,7 +17,7 @@ BEGIN
 	fgz := Files.New("sprout");
 	IF (f # NIL) THEN
 		Files.OpenWriter(w, f, 0);
-		voxel.copyclear;
+		(* voxel.copyclear; *)
 		voxel.engrain(w);
 		IF (w.res = Streams.Ok) THEN
 			w.Update;

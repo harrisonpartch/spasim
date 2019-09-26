@@ -1,6 +1,6 @@
 MODULE SpaceSim3;
 
-	IMPORT KernelLog := KernelLog, Inputs,
+	IMPORT KernelLog, Inputs,
 	GL:=OpenGL, GLC:=OpenGLConst, OGW := OGLWindow, GLU, ML := Decoder3DS;
 
 TYPE
@@ -13,7 +13,8 @@ TYPE
 		rotationX, deltaXrotation: REAL;
 		rotationY, deltaYrotation: REAL;
 		rotationZ, deltaZrotation: REAL;
-
+		transZ: REAL;
+		
 		(* Flag for rendering as lines or filled polygons *)
 		filling: INTEGER;
 
@@ -26,6 +27,8 @@ TYPE
 		rotationX := 0.0; deltaXrotation := 0.1;
 		rotationY := 0.0;  deltaYrotation := 0.05;
 		rotationZ := 0.0;  deltaZrotation := 0.03;
+		transZ := -300.0;
+		
 		filling := 1; (*0=OFF 1=ON *)
 		NEW(object);
 
@@ -43,17 +46,6 @@ TYPE
 		ratio := width / height;
 		GL.ClearColor(0.0, 0.0, 0.0, 0.0);  (* This clear the background color to black *)
 		GL.ShadeModel(GLC.GL_SMOOTH);  (* Type of shading for the polygons *)
-
-		(* Viewport transformation *)
-		GL.Viewport(0,0,width, height);
-
-		(* Projection transformation *)
-		GL.MatrixMode(GLC.GL_PROJECTION);  (* Specifies which matrix stack is the target for matrix operations  *)
-		GL.LoadIdentity;  (* We initialize the projection matrix as identity *)
-
-
-		GLU.Perspective(45.0, ratio,1.0,10000.0);  (* We define the "viewing volume" *)
-
 
 		GL.Enable(GLC.GL_DEPTH_TEST);  (* We enable the depth test (also called z buffer) *)
 		GL.PolygonMode (GLC.GL_FRONT_AND_BACK, GLC.GL_FILL);  (* Polygon rasterization mode (polygon filled) *)
@@ -81,16 +73,10 @@ TYPE
 	VAR ratio: LONGREAL;
 	BEGIN
 		ratio := w /h;
-		GL.Clear (GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT);  (* We clear both the color and the depth buffer so to draw the next frame *)
 		GL.Viewport(0,0,width, height);  (* Viewport transformation *)
-
 		GL.MatrixMode(GLC.GL_PROJECTION);  (* Projection transformation *)
 		GL.LoadIdentity;  (* We initialize the projection matrix as identity *)
-
 		GLU.Perspective(45.0, ratio,1.0,10000.0);
-
-
-		(*glutPostRedisplay;*)  (* This command redraw the scene (it calls the same routine of glutDisplayFunc) *)
 	END Reshape;
 
 	(* Used to handle the keyboard input *)
@@ -113,7 +99,8 @@ TYPE
 				| Inputs.KsRight:   deltaYrotation := deltaYrotation - 0.05;   ReDisplay;
 				| Inputs.KsUp:      deltaXrotation := deltaXrotation + 0.05;   ReDisplay;
 				| Inputs.KsDown:  deltaXrotation := deltaXrotation - 0.05; 	  ReDisplay;
-
+				| Inputs.KsPageUp: transZ := transZ + 5.0; ReDisplay;
+				| Inputs.KsPageDown: transZ := transZ - 5.0; ReDisplay;
 		ELSE
 		END;
 		END;
@@ -179,7 +166,7 @@ TYPE
 
 	(* This is our main rendering subroutine, called each frame *)
 	PROCEDURE Display;
-	VAR i, j: LONGINT;
+	VAR i, j: SIZE;
 
 	BEGIN
 		GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT);  (* This clear the background color to dark blue *)
@@ -192,7 +179,7 @@ TYPE
 		GL.LoadIdentity;  (* Initialize the model matrix as identity *)
 
 
-		GL.Translatef(0.0,0.0,-300);  (* We move the object forward (the model matrix is multiplied by the translation matrix) *)
+		GL.Translatef(0.0,0.0,transZ);  (* We move the object forward (the model matrix is multiplied by the translation matrix) *)
 
 		rotationX := rotationX + deltaXrotation;
 		rotationY := rotationY + deltaYrotation;
@@ -212,8 +199,6 @@ TYPE
 		GL.Rotatef(rotationY, 0.0,1.0, 0.0);
 		GL.Rotatef(rotationZ, 0.0, 0.0,1.0);
 
-
-
 		FOR j := 0 TO model.objects.GetCount()-1 DO
 			object := model.objects.GetItem(j)(ML.Object3D);
 			IF object.numTexVerts = 0  THEN
@@ -222,8 +207,6 @@ TYPE
 				DrawObjectTextured(object);
 			END;
 		END;
-
-		GL.Flush;  (* This force the execution of OpenGL commands *)
 		SwapBuffers(); (* In double buffered mode we invert the positions of the visible buffer and the writing buffer *)
 	END Display;
 

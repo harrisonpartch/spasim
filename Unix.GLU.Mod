@@ -253,10 +253,10 @@ END GetString;
 PROCEDURE ReadVersion*();
 VAR
 	Buffer: Strings.String;
-	MajorVersion, MinorVersion: LONGINT;
+	MajorVersion, MinorVersion: SIGNED32;
 
 	PROCEDURE isNumber(ch: CHAR): BOOLEAN;
-	VAR val: LONGINT; res: BOOLEAN;
+	VAR val: SIGNED32; res: BOOLEAN;
 	BEGIN
 		res := FALSE;
 		val := ORD(ch);
@@ -264,7 +264,7 @@ VAR
 		RETURN res;
 	END isNumber;
 
-	PROCEDURE TrimAndSplitVersionString(CONST buffer: ARRAY OF CHAR; VAR Max, Min: LONGINT);
+	PROCEDURE TrimAndSplitVersionString(CONST buffer: ARRAY OF CHAR; VAR Max, Min: SIGNED32);
 	VAR
 		separator: SIZE;;
 	BEGIN

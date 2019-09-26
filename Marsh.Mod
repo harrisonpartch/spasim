@@ -270,7 +270,6 @@ END showcode;
 PROCEDURE engrain*;
 BEGIN
 	Out.String("engraining...");
-	Base.world.copyclear;
 	Engrainer.engrain(Base.world); 
 END engrain;
 
@@ -340,8 +339,6 @@ BEGIN
 	rd:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODg"); 	
 	push(rd);
 		
- 	NEW(fuzz);
-  	push(fuzz);
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	push(greenball);
 	akatrump:=Base.VoxelFromName("Nakatrump"); 
@@ -361,9 +358,9 @@ BEGIN
 	doge:=Base.VoxelFromName("Ndogepearl"); 
 	push(doge);		
 
-     volvox:=Base.VoxelFromName("Nrdvolvox");  	
-     push(volvox);
-     serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999"); 
+  volvox:=Base.VoxelFromName("Nrdvolvox");  	
+  push(volvox);
+  serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999"); 
 	push(serp);	
 	badopossum:=Base.VoxelFromName("Nbadopossum"); 	
 	raccoon:=Base.VoxelFromName("Nraccoon"); 	
@@ -524,9 +521,9 @@ BEGIN
 	noise[1].setvoxel(wstar);	
 	NEW(noise[2]);	
 	noise[2].seed:=900909;		
-	noise[2].a:=1.5;
-	noise[2].b:=1.5;
-	noise[2].c:=1.5;		
+	noise[2].a:=7.5;
+	noise[2].b:=7.5;
+	noise[2].c:=3.5;		
 	noise[2].octaves:=4;
 	noise[2].persistence:=3.61;	
 	noise[2].setvoxel(wstar);	
@@ -555,24 +552,15 @@ BEGIN
 	Base.setPT(up,0,0,1);
 	
 	z3:=Base.VoxelFromName("NM2");	
-	z3a:=Base.VoxelFromName("NM2");
+	z3a:=Base.VoxelFromName("NM3");
 	z3b:=Base.VoxelFromName("NM2");
 
-  	z3.setcolor(0.5,0.5,0.5,3,3,3);
-	z3a.setcolor(0,6,0,10,10,10);
- 	z3b.setcolor(28,28,28,30,30,30);    
+	z3a.setcolor(0,1,0,2,2,2);
+ 	z3b.setcolor(0,1,1,1,1,1);    
 	dieone:=Base.VoxelFromName("NCjgzkmiTyecI5x6eOgYqpQ"); 	
   	push(dieone);
   	dieone.tscale:=1000;
-   noise[0].setvoxel(dieone);
-	z3b.FRaster(noise[0],16);
-	noise[1].setvoxel(wstar);
-	z3b.FRaster(noise[1],16);
-	
-	noise[0].setvoxel(z3b);	
-	z3a.FRaster(noise[0],16);
-	noise[1].setvoxel(z3b);		
-	z3.FRaster(noise[1],32);	
+  			
 	Base.setPT(center,1/2,1/2,1/2);
 
 	GREEN:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODg");	
@@ -583,25 +571,30 @@ BEGIN
 	med1:=Base.VoxelFromName("NM2");		
 	med1.FRaster(ball,8);
 
-	medley.FRaster(ball,8);	
+	medley.FRaster(ball,4);	
 	
 
 	NEW(ball,center,0.6);	
 	ball.setcolor(0.41,0.21,0.21,1,0);	
 	ball.setvoxel(med1);
-	medley.FRaster(ball,8);	
-		
-	FOR i := 0 TO 1000 DO
-		z3b.stroke(Base.randPT(),10,medley);
-	END;
-	FOR i := 0 TO 100 DO
-		z3.stroke(Base.randPT(),64,wstar);
-	END;	
-	Base.setPT(center,1/2,1/2,2/3);	
+	medley.FRaster(ball,16);	
+	push(medley);
+			
+  	noise[0].setvoxel(dieone);
+	z3b.FRaster(noise[0],16);
+	noise[1].setvoxel(medley);
+	z3b.FRaster(noise[1],8);
+
+	noise[0].setvoxel(z3b);	
+	z3a.FRaster(noise[0],16);
+	noise[1].setvoxel(z3a);		
+	z3.FRaster(noise[1],16);	
+	
+	Base.setPT(center,1/2,1/2,1/3);	
  	NEW(plane,center,up);
 
-	plane.setvoxel(wstar);			
-	z3.FRaster(plane,8);	 		
+	plane.setvoxel(Base.EMPTY);			
+	z3.FRaster(plane,16);	 		
 
 
 	harrison:=Base.VoxelFromName("Nharrisonavatar"); 

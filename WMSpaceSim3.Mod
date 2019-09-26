@@ -1,6 +1,6 @@
 MODULE WMSpaceSim3;
 
-	IMPORT KernelLog := KernelLog, Inputs, Strings, WMRectangles,
+	IMPORT KernelLog, Inputs, Strings, WMRectangles,
 	WM := WMWindowManager,  Modules, WMMessages,
 	GL:=OpenGL, GLC:=OpenGLConst, WMGL := WMGLWindow,
 	ML := Decoder3DS, GLU;
@@ -55,7 +55,7 @@ TYPE
 		GL.ShadeModel(GLC.GL_SMOOTH);  (* Type of shading for the polygons *)
 
 		(* Viewport transformation *)
-		GL.Viewport(0,0, GetWidth(), GetHeight());
+		GL.Viewport(0,0, GetWidth()(GL.Sizei), GetHeight()(GL.Sizei));
 
 		(* Projection transformation *)
 		GL.MatrixMode(GLC.GL_PROJECTION);  (* Specifies which matrix stack is the target for matrix operations  *)
@@ -88,13 +88,13 @@ TYPE
 	END OnLoad;
 
 	(* This routine must be called everytime we resize our window.*)
-	PROCEDURE Reshape (w, h: LONGINT);
+	PROCEDURE Reshape (w, h: SIZE);
 	VAR ratio: LONGREAL;
 	BEGIN
 		ratio := w /h;
 		MakeCurrent();
 		GL.Clear (GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT);  (* We clear both the color and the depth buffer so to draw the next frame *)
-		GL.Viewport(0,0,w, h);  (* Viewport transformation *)
+		GL.Viewport(0,0,w(GL.Sizei), h(GL.Sizei));  (* Viewport transformation *)
 
 		GL.MatrixMode(GLC.GL_PROJECTION);  (* Projection transformation *)
 		GL.LoadIdentity;  (* We initialize the projection matrix as identity *)
@@ -105,7 +105,7 @@ TYPE
 	END Reshape;
 
 	(* Used to handle the keyboard input *)
-	PROCEDURE KeyEvent (ucs : LONGINT; flags : SET; keysym : LONGINT);
+	PROCEDURE KeyEvent (ucs : SIZE; flags : SET; keysym : SIZE);
 	BEGIN
 		CASE CHR(ucs) OF
 			"q": Close;
@@ -204,7 +204,7 @@ TYPE
 
 	(* This is our main rendering subroutine, called each frame *)
 	PROCEDURE Display;
-	VAR j: LONGINT;
+	VAR j: SIZE;
 	BEGIN
 		IF filling = 1 THEN
 			GL.PolygonMode (GLC.GL_FRONT_AND_BACK, GLC.GL_FILL);  (* Polygon rasterization mode (polygon filled) *)
@@ -308,5 +308,4 @@ WMSpaceSim3.Open ~
 System.Free WMSpaceSim3 ~
 
 System.FreeDownTo OpenGLConst ~
-
 

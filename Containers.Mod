@@ -26,7 +26,7 @@ CONST
 
 TYPE
 
-	LongintArray = POINTER TO ARRAY OF LONGINT;
+	SizeArray = POINTER TO ARRAY OF SIZE;
 
 	SetArray = POINTER TO ARRAY OF SET;
 
@@ -55,7 +55,7 @@ TYPE
 	(** HashMethod defines a Method that returns hash code for Object.
 		The Methods then returns:
 			hash code. *)
-	HashMethod* = PROCEDURE {DELEGATE} (item: ANY): LONGINT;
+	HashMethod* = PROCEDURE {DELEGATE} (item: ANY): SIZE;
 
 	(** Base Vector container *)
 	Vector* = OBJECT
@@ -63,7 +63,7 @@ TYPE
 		VAR
 			array: AnyArray;
 
-			nCount, nReadLock: LONGINT;
+			nCount, nReadLock: SIZE;
 
 			compare: CompareMethod;
 
@@ -96,7 +96,7 @@ TYPE
 		PROCEDURE Grow;
 		VAR
 			old: AnyArray;
-			nLen, i: LONGINT;
+			nLen, i: SIZE;
 		BEGIN
 			old := array;
 			nLen := LEN(old);
@@ -171,9 +171,9 @@ TYPE
 		END FindPosition;
 		*)
 
-		PROCEDURE FindPosition(x: ANY; VAR bFound: BOOLEAN): LONGINT;
+		PROCEDURE FindPosition(x: ANY; VAR bFound: BOOLEAN): SIZE;
 		VAR
-			lower, middle, upper: LONGINT;
+			lower, middle, upper: SIZE;
 			value: LONGINT;
 		BEGIN
 			bFound := FALSE;
@@ -202,9 +202,9 @@ TYPE
 		(** return the index of an object. In a multi-process situation, the process calling the IndexOf method should
 			call Lock before IndexOf and Unlock after the last use of an index based on IndexOf.
 			If the object is not found, -1 is returned *)
-		PROCEDURE IndexOf*(x: ANY): LONGINT;
+		PROCEDURE IndexOf*(x: ANY): SIZE;
 		VAR
-			pos: LONGINT;
+			pos: SIZE;
 			bFound: BOOLEAN;
 		BEGIN {EXCLUSIVE}
 			IF bSorted THEN
@@ -222,13 +222,13 @@ TYPE
 		(** return the number of objects in the list. If count is used for indexing elements (e.g. FOR - Loop) in a multi-process
 			situation, the process calling the GetCount method should call Lock before GetCount and Unlock after the
 			last use of an index based on GetCount *)
-		PROCEDURE GetCount*():LONGINT;
+		PROCEDURE GetCount*():SIZE;
 		BEGIN
 			RETURN nCount
 		END GetCount;
 
 		(** return an object based on an index. In a multi-process situation, GetItem is only safe in a locked region Lock / Unlock *)
-		PROCEDURE GetItem*(pos: LONGINT): ANY;
+		PROCEDURE GetItem*(pos: SIZE): ANY;
 		BEGIN
 			ASSERT((pos >= 0) & (pos < nCount), 101);
 			RETURN array[pos]
@@ -242,7 +242,7 @@ TYPE
 			IF bSorted THEN AddUnlocked(x) ELSE AppendUnlocked(x) END
 		END Add;
 
-		PROCEDURE Insert*(pos: LONGINT; x: ANY);
+		PROCEDURE Insert*(pos: SIZE; x: ANY);
 		BEGIN {EXCLUSIVE}
 			AWAIT(nReadLock = 0);
 			ASSERT((pos >= 0) & (pos < nCount), 101);
@@ -253,7 +253,7 @@ TYPE
 			have been done by the caller) *)
 		PROCEDURE AddUnlocked(x: ANY);
 		VAR
-			i, pos: LONGINT;
+			i, pos: SIZE;
 			bFound: BOOLEAN;
 		BEGIN
 			pos := FindPosition(x, bFound);
@@ -280,9 +280,9 @@ TYPE
 			INC(nCount)
 		END AppendUnlocked;
 
-		PROCEDURE InsertUnlocked(pos: LONGINT; x: ANY);
+		PROCEDURE InsertUnlocked(pos: SIZE; x: ANY);
 		VAR
-			i: LONGINT;
+			i: SIZE;
 		BEGIN
 			IF bNoDuplicates THEN
 				ASSERT(FindSequentially(x) = -1)
@@ -346,7 +346,7 @@ TYPE
 			vector.Remove(i)
 		END Remove;
 
-		PROCEDURE GetCount*(): LONGINT;
+		PROCEDURE GetCount*(): SIZE;
 		BEGIN
 			RETURN vector.GetCount()
 		END GetCount;
@@ -390,7 +390,7 @@ TYPE
 			vector.Add(item)
 		END Add;
 
-		PROCEDURE Insert*(pos: LONGINT; x: LONGINT);
+		PROCEDURE Insert*(pos: SIZE; x: LONGINT);
 		VAR
 			item: LongintItem;
 		BEGIN
@@ -399,7 +399,7 @@ TYPE
 			vector.Insert(pos, item)
 		END Insert;
 
-		PROCEDURE IndexOf*(x: LONGINT): LONGINT;
+		PROCEDURE IndexOf*(x: LONGINT): SIZE;
 		VAR
 			item: LongintItem;
 		BEGIN
@@ -408,7 +408,7 @@ TYPE
 			RETURN vector.IndexOf(item)
 		END IndexOf;
 
-		PROCEDURE GetItem*(i: LONGINT): LONGINT;
+		PROCEDURE GetItem*(i: SIZE): LONGINT;
 		BEGIN
 			RETURN vector.GetItem(i)(LongintItem).value
 		END GetItem;
@@ -433,17 +433,17 @@ TYPE
 			vector.Add(x)
 		END Add;
 
-		PROCEDURE Insert*(pos: LONGINT; x: LongintVector);
+		PROCEDURE Insert*(pos: SIZE; x: LongintVector);
 		BEGIN
 			vector.Insert(pos, x)
 		END Insert;
 
-		PROCEDURE IndexOf*(x: LongintVector): LONGINT;
+		PROCEDURE IndexOf*(x: LongintVector): SIZE;
 		BEGIN
 			RETURN vector.IndexOf(x)
 		END IndexOf;
 
-		PROCEDURE GetItem*(i: LONGINT): LongintVector;
+		PROCEDURE GetItem*(i: SIZE): LongintVector;
 		BEGIN
 			RETURN vector.GetItem(i)(LongintVector)
 		END GetItem;
@@ -473,7 +473,7 @@ TYPE
 			vector.Add(item)
 		END Add;
 
-		PROCEDURE Insert*(pos: LONGINT; CONST x: ARRAY OF CHAR);
+		PROCEDURE Insert*(pos: SIZE; CONST x: ARRAY OF CHAR);
 		VAR
 			item: StringItem;
 		BEGIN
@@ -482,7 +482,7 @@ TYPE
 			vector.Insert(pos, item)
 		END Insert;
 
-		PROCEDURE IndexOf*(CONST x: ARRAY OF CHAR): LONGINT;
+		PROCEDURE IndexOf*(CONST x: ARRAY OF CHAR): SIZE;
 		VAR
 			item: StringItem;
 		BEGIN
@@ -491,7 +491,7 @@ TYPE
 			RETURN vector.IndexOf(item)
 		END IndexOf;
 
-		PROCEDURE GetItem*(i: LONGINT): Strings.String;
+		PROCEDURE GetItem*(i: SIZE): Strings.String;
 		BEGIN
 			RETURN vector.GetItem(i)(StringItem).value
 		END GetItem;
@@ -502,7 +502,7 @@ TYPE
 	Dictionary* = OBJECT
 	VAR
 		array: AnyArray;
-		hashes: LongintArray;
+		hashes: SizeArray;
 		deleted: SetArray;
 
 		iterator*: DictionaryIterator;
@@ -525,7 +525,7 @@ TYPE
 
 		PROCEDURE InitArrays;
 		VAR
-			i, prime: LONGINT;
+			i, prime: SIZE;
 		BEGIN
 			prime := PRIMES[iPrime];
 			NEW(array, prime);
@@ -542,13 +542,13 @@ TYPE
 		PROCEDURE Grow;
 		VAR
 			oldArray: AnyArray;
-			oldHashes: LongintArray;
+			oldHashes: SizeArray;
 			oldDeleted: SetArray;
-			i: LONGINT;
+			i: SIZE;
 
-			PROCEDURE Deleted(i: LONGINT): BOOLEAN;
+			PROCEDURE Deleted(i: SIZE): BOOLEAN;
 			VAR
-				iDiv, iMod: LONGINT;
+				iDiv, iMod: SIZE;
 			BEGIN
 				iDiv := i DIV BASE_DWORD;
 				iMod := i MOD BASE_DWORD;
@@ -571,32 +571,32 @@ TYPE
 			END
 		END Grow;
 
-		PROCEDURE Delete(i: LONGINT);
+		PROCEDURE Delete(i: SIZE);
 		VAR
-			iDiv, iMod: LONGINT;
+			iDiv, iMod: SIZE;
 		BEGIN
 			iDiv := i DIV BASE_DWORD;
 			iMod := i MOD BASE_DWORD;
 			deleted[iDiv] := deleted[iDiv] + {iMod}
 		END Delete;
 
-		PROCEDURE Deleted(i: LONGINT): BOOLEAN;
+		PROCEDURE Deleted(i: SIZE): BOOLEAN;
 		VAR
-			iDiv, iMod: LONGINT;
+			iDiv, iMod: SIZE;
 		BEGIN
 			iDiv := i DIV BASE_DWORD;
 			iMod := i MOD BASE_DWORD;
 			RETURN deleted[iDiv] * {iMod} # {}
 		END Deleted;
 
-		PROCEDURE GetCount(): LONGINT;
+		PROCEDURE GetCount(): SIZE;
 		BEGIN
 			RETURN nCount
 		END GetCount;
 
 		PROCEDURE Add*(item: ANY);
 		VAR
-			nHashCode: LONGINT;
+			nHashCode: SIZE;
 		BEGIN
 			ASSERT(~hashSearch(item, TRUE, FALSE, nHashCode));
 			INC(nCount);
@@ -608,14 +608,14 @@ TYPE
 
 		PROCEDURE Contains*(item: ANY): BOOLEAN;
 		VAR
-			nHashCode: LONGINT;
+			nHashCode: SIZE;
 		BEGIN
 			RETURN hashSearch(item, FALSE, FALSE, nHashCode);
 		END Contains;
 
 		PROCEDURE Get*(item: ANY): ANY;
 		VAR
-			nHashCode: LONGINT;
+			nHashCode: SIZE;
 			itemResult: ANY;
 		BEGIN
 			itemResult := NIL;
@@ -627,7 +627,7 @@ TYPE
 
 		PROCEDURE Remove*(item: ANY);
 		VAR
-			nHashCode: LONGINT;
+			nHashCode: SIZE;
 		BEGIN
 			IF hashSearch(item, FALSE, FALSE, nHashCode) THEN
 				Delete(nHashCode);
@@ -635,9 +635,9 @@ TYPE
 			END;
 		END Remove;
 
-		PROCEDURE hashSearch(item: ANY; bAddAllowed: BOOLEAN; bGrowOperation: BOOLEAN; VAR nHashCode: LONGINT): BOOLEAN;
+		PROCEDURE hashSearch(item: ANY; bAddAllowed: BOOLEAN; bGrowOperation: BOOLEAN; VAR nHashCode: SIZE): BOOLEAN;
 		VAR
-			d, nHash, h, prime: LONGINT;
+			d, nHash, h, prime: SIZE;
 			bFound, bExit, bOverflow: BOOLEAN;
 		BEGIN
 
@@ -748,7 +748,7 @@ TYPE
 	VAR
 		dictionary*: Dictionary;
 
-		PROCEDURE GetCount*(): LONGINT;
+		PROCEDURE GetCount*(): SIZE;
 		BEGIN
 			RETURN dictionary.GetCount()
 		END GetCount;
@@ -778,7 +778,7 @@ TYPE
 			RETURN first(LongintItem).value = second(LongintItem).value
 		END LongintItemsEqual;
 
-		PROCEDURE LongintItemHash(item: ANY): LONGINT;
+		PROCEDURE LongintItemHash(item: ANY): SIZE;
 		BEGIN
 			RETURN item(LongintItem).value
 		END LongintItemHash;
@@ -848,7 +848,7 @@ TYPE
 			RETURN first(StringItem).value^ = second(StringItem).value^
 		END StringsEqual;
 
-		PROCEDURE StringHash(item: ANY): LONGINT;
+		PROCEDURE StringHash(item: ANY): SIZE;
 		BEGIN
 			RETURN HashString(item(StringItem).value)
 		END StringHash;
@@ -900,7 +900,7 @@ TYPE
 			RETURN EqualityCompareLongintSets(first(LongintSet), second(LongintSet))
 		END LongintSetsEqual;
 
-		PROCEDURE LongintSetHash(item: ANY): LONGINT;
+		PROCEDURE LongintSetHash(item: ANY): SIZE;
 		BEGIN
 			RETURN HashLongintSet(item(LongintSet))
 		END LongintSetHash;
@@ -950,17 +950,17 @@ TYPE
 			vector.Add(x)
 		END Add;
 
-		PROCEDURE Insert*(pos: LONGINT; x: LongintSet);
+		PROCEDURE Insert*(pos: SIZE; x: LongintSet);
 		BEGIN
 			vector.Insert(pos, x)
 		END Insert;
 
-		PROCEDURE IndexOf*(x: LongintSet): LONGINT;
+		PROCEDURE IndexOf*(x: LongintSet): SIZE;
 		BEGIN
 			RETURN vector.IndexOf(x)
 		END IndexOf;
 
-		PROCEDURE GetItem*(i: LONGINT): LongintSet;
+		PROCEDURE GetItem*(i: SIZE): LongintSet;
 		BEGIN
 			RETURN vector.GetItem(i)(LongintSet)
 		END GetItem;
@@ -1000,7 +1000,7 @@ TYPE
 		PROCEDURE Grow;
 		VAR
 			old: AnyArray;
-			i: LONGINT;
+			i: SIZE;
 		BEGIN
 			old := array;
 			NEW(array, LEN(array) * 2);
@@ -1012,7 +1012,7 @@ TYPE
 		(** return the number of objects in the list. If count is used for indexing elements (e.g. FOR - Loop) in a multi-process
 			situation, the process calling the GetCount method should call Lock before GetCount and Unlock after the
 			last use of an index based on GetCount *)
-		PROCEDURE GetCount*():LONGINT;
+		PROCEDURE GetCount*():SIZE;
 		BEGIN
 			RETURN nCount
 		END GetCount;
@@ -1145,7 +1145,7 @@ TYPE
 			heap.Unlock
 		END Unlock;
 
-		PROCEDURE GetCount*(): LONGINT;
+		PROCEDURE GetCount*(): SIZE;
 		BEGIN
 			RETURN heap.GetCount()
 		END GetCount;
@@ -1200,7 +1200,7 @@ TYPE
 
 	PROCEDURE CompareLongintVectors*(first, second: LongintVector): LONGINT;
 	VAR
-		n, i, nRes: LONGINT;
+		n, i: SIZE; nRes: LONGINT;
 	BEGIN
 		n := MIN(first.GetCount(), second.GetCount());
 		IF n = 0 THEN
@@ -1237,7 +1237,7 @@ TYPE
 
 	PROCEDURE CompareLongintSets*(first, second: LongintSet): LONGINT;
 	VAR
-		n, i, nRes, iF, iS: LONGINT;
+		n, i: SIZE; nRes, iF, iS: LONGINT;
 	BEGIN
 		n := MIN(first.GetCount(), second.GetCount());
 		IF n = 0 THEN
@@ -1288,9 +1288,9 @@ TYPE
 		RETURN bResult
 	END EqualityCompareLongintSets;
 
-	PROCEDURE HashLongintSet*(item: LongintSet): LONGINT;
+	PROCEDURE HashLongintSet*(item: LongintSet): SIZE;
 	VAR
-		i, iValue, iDivSum, iModSum, n: LONGINT;
+		i, iValue, iDivSum, iModSum, n: SIZE;
 	BEGIN
 		iDivSum := 0;
 		iModSum := 0;
@@ -1311,9 +1311,9 @@ TYPE
 		RETURN iDivSum + iModSum DIV n
 	END HashLongintSet;
 
-	PROCEDURE HashString*(item: Strings.String): LONGINT;
+	PROCEDURE HashString*(item: Strings.String): SIZE;
 	VAR
-		i, iValue, iDivSum, iModSum, n: LONGINT;
+		i, iValue, iDivSum, iModSum, n: SIZE;
 	BEGIN
 		iDivSum := 0;
 		iModSum := 0;
@@ -1370,7 +1370,7 @@ TYPE
 	VAR
 		vec: StringVector;
 		set: StringSet;
-		i: LONGINT;
+		i: SIZE;
 	BEGIN
 		context.out.Ln;
 		NEW(vec, {});
@@ -1407,6 +1407,4 @@ END Containers.
 System.Free Containers ~
 
 Containers.StringSetTest ~
-
-
 

@@ -71,7 +71,7 @@ TYPE
 			RETURN TRUE;
 		END initGL;
 
-		PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
+		PROCEDURE KeyEvent (ucs: SIZE; flags: SET; keysym: SIZE);
 		BEGIN
 		CASE CHR(ucs) OF
 			| "b": NextClearColor(); UpdateImage;
@@ -93,7 +93,7 @@ TYPE
 		END;
 		END KeyEvent;
 
-		PROCEDURE WheelMove(dz : LONGINT);
+		PROCEDURE WheelMove(dz : SIZE);
 		BEGIN
 			fScale := fScale + dz*0.5*0.2;
 			UpdateImage;
@@ -265,11 +265,11 @@ TYPE
 			DeActivate();
 		END NextClearColor;
 
-		PROCEDURE Reshape(w,  h: LONGINT);
+		PROCEDURE Reshape(w,  h: SIZE);
 		BEGIN
 			MakeCurrent;
 
-			GL.Viewport(0, 0, w, h);
+			GL.Viewport(0, 0, w(GL.Sizei), h(GL.Sizei));
 			GL.MatrixMode(GLC.GL_PROJECTION);
 			GL.LoadIdentity();
 			GLU.Perspective(45, 1, 0.1, 100);

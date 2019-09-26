@@ -23,7 +23,7 @@ TYPE
 		hWind: WinApi.HWND;   (* handle of this window *)
 		hDC: WinApi.HDC; (* drawing context of this window*)
 		hGLRC : WinApi.HGLRC; (* GL render context handles for this window *)
-		width, height: LONGINT; (* size of window *)
+		width, height: SIZE; (* size of window *)
 		doublebuffer: BOOLEAN;
 		context: Context;
 	END;
@@ -40,22 +40,19 @@ TYPE
 		buffer: Buffer;	(* for speedup flip image in y*)
 		mode: Raster.Mode;
 
-    	PROCEDURE Init(w, h: LONGINT);
+    	PROCEDURE Init(w, h: SIZE);
     	BEGIN  {EXCLUSIVE}
     		wincreated := FALSE;
-		initialized := FALSE;
+			initialized := FALSE;
     		NEW(glWin);
     		glWin.doublebuffer := TRUE;
     		glWin.width := w; glWin.height := h;
-
     		glWin.title:="GLContext.Window";
-		glWin.context := SELF;
-
+			glWin.context := SELF;
     		NEW(buffer, w*h*4);
-		Raster.InitMode(mode, Raster.srcCopy);
+			Raster.InitMode(mode, Raster.srcCopy);
     		initialized := TRUE;
-
-		AWAIT (wincreated);
+			AWAIT (wincreated);
     	END Init;
 
 	(* create a new opengl context with opengl version major, minor *)
@@ -75,11 +72,11 @@ TYPE
 		attr[i] := minor; INC(i);
 
 (*		attr[i] := GLC.WGL_CONTEXT_FLAGS_ARB; INC(i);
-			attr[i] := GLC.WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB; INC(i);
+		attr[i] := GLC.WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB; INC(i);
 *)
 		attr[i] := GLC.WGL_CONTEXT_PROFILE_MASK_ARB; INC(i);
-			(* attr[i] := GLC.WGL_CONTEXT_CORE_PROFILE_BIT_ARB; INC(i); *)
-			attr[i] := GLC.WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB; INC(i);
+		(* attr[i] := GLC.WGL_CONTEXT_CORE_PROFILE_BIT_ARB; INC(i); *)
+		attr[i] := GLC.WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB; INC(i);
 		attr[i] := 0; (* end of attribute list *)
 
 (*	attribs:= [
@@ -112,18 +109,15 @@ TYPE
 		IF debug THEN
 			KernelLog.String("Using new style context"); KernelLog.Ln;
 		END;
-
   		RETURN TRUE;
 	END SetProfile;
 
 	PROCEDURE Close;
 	VAR res: LONGINT;
 	BEGIN
-		 wincreated := FALSE;
-		 res := User32.SendMessage(glWin.hWind, User32.WMQuit, 0, 0);
-
+		wincreated := FALSE;
+		res := User32.SendMessage(glWin.hWind, User32.WMQuit, 0, 0);
 		IF debug THEN KernelLog.String("Close SendMessage res = "); KernelLog.Int(res, 0); KernelLog.Ln; END;
-
 	END Close;
 
 	PROCEDURE MakeCurrent();
@@ -138,16 +132,6 @@ TYPE
 		IF debug THEN KernelLog.String("ctx DeActivate res= "); KernelLog.Boolean(res); KernelLog.Ln; END;
 	END DeActivate;
 
-	PROCEDURE SwapBuffers();
-	VAR res: WinApi.BOOL;
-	BEGIN {EXCLUSIVE}
-		IF glWin.doublebuffer THEN
-		 	res := WinApi.SwapBuffers(glWin.hDC);
-		ELSE
-	 	 	GL.Flush();
-		END;
-	END SwapBuffers;
-
 		(** move the window to x,y and  resize width,height *)
 	PROCEDURE MoveResizeWindow(x, y, w, h: LONGINT);
 	VAR
@@ -156,23 +140,23 @@ TYPE
 		res := User32.MoveWindow(glWin.hWind, x, y, w, h, 1); (* repaint *)
 	END MoveResizeWindow;
 
-	PROCEDURE Resize(w, h: LONGINT);
+	PROCEDURE Resize(w, h: SIZE);
 	BEGIN
 		buffer := NIL;
 		NEW(buffer, w*h*4);
-		MoveResizeWindow(0,0, w, h);
+		MoveResizeWindow(0,0, w(LONGINT), h(LONGINT));
 		glWin.width := w; glWin.height := h;
 	END Resize;
 
 	PROCEDURE RenderInto(image: Raster.Image);
 	VAR
-		i: LONGINT;
-		w, h: LONGINT;
+		i: SIZE;
+		w, h: SIZE;
 		sadr, dadr: ADDRESS;
 	BEGIN
 		IF (image = NIL) OR (image.adr = NIL) THEN RETURN END;
 		w := image.width; h := image.height;
-		GL.ReadPixels(0, 0, w, h, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, ADDRESSOF(buffer^[0]));
+		GL.ReadPixels(0, 0, w(GL.Sizei), h(GL.Sizei), GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, ADDRESSOF(buffer^[0]));
 
 		(* flip vertical, y *)
 		sadr := ADDRESSOF(buffer[4*w*(h-1)]); dadr := image.adr;
@@ -202,8 +186,8 @@ TYPE
 
 	PROCEDURE MyLoop;
 	VAR
-		 res: Kernel32.BOOL;
-		  msg: User32.Msg;
+		res: Kernel32.BOOL;
+		msg: User32.Msg;
 	BEGIN
 		BEGIN {EXCLUSIVE} AWAIT (initialized); END;
 		wincreated := CreateHWND( glWin);
@@ -240,7 +224,7 @@ TYPE
 	VAR
 		context : Context;
 
-		PROCEDURE &Init*(w, h: LONGINT; alpha: BOOLEAN);
+		PROCEDURE &Init*(w, h: SIZE; alpha: BOOLEAN);
 		BEGIN
 			Init^(w, h, alpha); (* use alpha, for 32bpp img *)
 			NEW(context);
@@ -277,13 +261,13 @@ TYPE
 			context.RenderInto(backImg);
 		END SwapGLBuffer;
 
-		PROCEDURE Reshape*(w,h: LONGINT);
+		PROCEDURE Reshape*(w,h: SIZE);
 		END Reshape;
 
 		PROCEDURE UpdateImage*();
 		END UpdateImage;
 
-		PROCEDURE Resized(w, h: LONGINT);
+		PROCEDURE Resized(w, h: SIZE);
 		BEGIN
 			context.Resize(w, h);
 			ReInit(w, h);
@@ -359,7 +343,7 @@ VAR
 		dwStyle := WinApi.WS_POPUP +  WinApi.WS_CLIPSIBLINGS + WinApi.WS_CLIPCHILDREN;
 
 		 (* create the window *)
-		glWin.hWind := User32.CreateWindowEx(SYSTEM.VAL(LONGINT, dwExStyle) , glWin.windowClassName, glWin.title, dwStyle , 10, 10, glWin.width, glWin.height, 0, 0,  glWin.Instance, SYSTEM.VAL( User32.LParam, glWin));
+		glWin.hWind := User32.CreateWindowEx(SYSTEM.VAL(LONGINT, dwExStyle) , glWin.windowClassName, glWin.title, dwStyle , 10, 10, glWin.width(LONGINT), glWin.height(LONGINT), 0, 0,  glWin.Instance, SYSTEM.VAL( User32.LParam, glWin));
 		IF glWin.hWind = 0 THEN
 			IF debug THEN
 				KernelLog.String("CreateWindowEx hWind= "); KernelLog.Int(glWin.hWind, 0); KernelLog.Ln;

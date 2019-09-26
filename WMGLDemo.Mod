@@ -36,7 +36,7 @@ TYPE
 			alive := TRUE;
 		END New;
 
-		PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
+		PROCEDURE KeyEvent (ucs: SIZE; flags: SET; keysym: SIZE);
 		BEGIN
 			CASE CHR(ucs) OF
 				"a", "A": BEGIN {EXCLUSIVE} animated := ~ animated; END;
@@ -48,7 +48,7 @@ TYPE
 			END;
 		END KeyEvent;
 
-		PROCEDURE WheelMove(dz : LONGINT);
+		PROCEDURE WheelMove(dz : SIZE);
 		BEGIN
 			eyeposz := eyeposz + dz;
 			IF eyeposz < 0 THEN eyeposz:=0.0; END;
@@ -84,10 +84,10 @@ TYPE
 			Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 		END UpdateImage;
 
-		PROCEDURE Reshape(w, h: LONGINT);
+		PROCEDURE Reshape(w, h: SIZE);
 		BEGIN
 			MakeCurrent();
-			GL.Viewport(0, 0, w, h);
+			GL.Viewport(0, 0, w(GL.Sizei), h(GL.Sizei));
 			GL.ClearColor(0.3, 0.3, 0.0, 1.0);
 			GL.Enable(GLC.GL_DEPTH_TEST);
 

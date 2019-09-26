@@ -62,26 +62,27 @@ Compiler.Compile
 # 2- Compile platform independent demo examples of GLContext :
 
 Compiler.Compile 
-	 GLTest.Mod
-	 WMGLDemo.Mod
-	 WMGLDemo1.Mod
-	 WMGLDemo2.Mod
-	 WMGLDemo3.Mod
-	 WMGLDemo4.Mod
-	 WMGLDemo6.Mod
-	 WMGLDemo7.Mod
-	 WMGLDemo9.Mod
-	 WMGLDemoFlags.Mod
-	 WMGLDemoLorenz.Mod
-	 WMGLPlotSurface.Mod
-	 WMGLSteamEngine.Mod
-	 WMGLPolyStipple.Mod
-	 WMGLSLBricks.Mod
+	GLTest.Mod
+	WMGLDemo.Mod
+	WMGLDemo1.Mod
+	WMGLDemo2.Mod
+	WMGLDemo3.Mod
+	WMGLDemo4.Mod
+	WMGLDemo6.Mod
+	WMGLDemo7.Mod
+	WMGLDemo9.Mod
+	WMGLDemoFlags.Mod
+	WMGLDemoLorenz.Mod
+	WMGLPlotSurface.Mod
+	WMGLSteamEngine.Mod
+	WMGLPolyStipple.Mod
+	WMGLSLBricks.Mod
 	WMSpaceSim3.Mod	 
 	~
 # =========================================
 
 # LinuxAos specific demos (using linux native X11-Window ):
+
 Compiler.Compile
 	Unix.X11KeySymDef.Mod
 	MyXGear.Mod
@@ -233,11 +234,11 @@ VAR
 	  		WM.AddWindow(SELF, 200, 200);	  		
 	  	END New;
 	  	
-	  	PROCEDURE Reshape(w, h: LONGINT);
+	  	PROCEDURE Reshape(w, h: SIZE);
 		BEGIN
 			MakeCurrent();
 				(* GL codes *)
-				GL.Viewport(0,0,w, h);
+				GL.Viewport(0,0,w(GL.Sizei), h(GL.Sizei));
 				
 			DeActivate();
 	  	END Reshape;

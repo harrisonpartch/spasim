@@ -126,7 +126,7 @@ TYPE
 
 	END ResetPositions;
 
-	PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
+	PROCEDURE KeyEvent (ucs: SIZE; flags: SET; keysym: SIZE);
 	BEGIN
 		CASE CHR(ucs) OF
 			"a" :	BEGIN {EXCLUSIVE} animated := ~ animated; END;
@@ -279,10 +279,10 @@ TYPE
 
 	END Display;
 
-	PROCEDURE Reshape(w, h: LONGINT);
+	PROCEDURE Reshape(w, h: SIZE);
 	BEGIN
 		MakeCurrent();
-		gl.Viewport(0, 0, w, h);
+		gl.Viewport(0, 0, w(gl.Sizei), h(gl.Sizei));
 		(* Set up the OpenGL parameters *)
 		gl.Enable ( glc.GL_DEPTH_TEST ) ;
 		gl.ClearColor ( 0.0, 0.0, 0.0, 0.0 ) ;

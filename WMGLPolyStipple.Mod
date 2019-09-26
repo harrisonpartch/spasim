@@ -39,7 +39,7 @@ TYPE
 			alive := TRUE;
 		END New;
 
-		PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
+		PROCEDURE KeyEvent (ucs: SIZE; flags: SET; keysym: SIZE);
 		BEGIN
 
 		CASE CHR(ucs) OF
@@ -80,7 +80,7 @@ TYPE
 
 		(* print  stipples bits *)
 		PROCEDURE PrintVals;
-		VAR i: LONGINT;
+		VAR i: SIZE;
 		BEGIN
 			KernelLog.Ln;
 			KernelLog.String("--------- fly bits----------------");
@@ -142,10 +142,10 @@ TYPE
 			DeActivate;
 		END GLinit;
 
-		PROCEDURE Reshape(w, h: LONGINT);
+		PROCEDURE Reshape(w, h: SIZE);
 		BEGIN
 		MakeCurrent();
-			GL.Viewport(0, 0, w, h);
+			GL.Viewport(0, 0, w(GL.Sizei), h(GL.Sizei));
 			GL.MatrixMode(GLC.GL_PROJECTION);
 			GL.LoadIdentity();
 

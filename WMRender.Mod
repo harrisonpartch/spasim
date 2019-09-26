@@ -1,6 +1,6 @@
 MODULE WMRender;
 IMPORT Kernel, Objects, Random, Marsh, Rectangles := WMRectangles, WM := WMWindowManager, WMMessages,
- Out := KernelLog, Math,SPSMMath, Base, Retina,  
+ Out := KernelLog, Math := MathL,SPSMMath, Base, Retina,  
 	 Inputs,  Raster, Strings, Streams, Debugging;
 
 TYPE
@@ -20,11 +20,11 @@ TYPE Camera = OBJECT
 VAR
 	random: Random.Generator;
 	rayschanged, ang1,filter: BOOLEAN;
-	fovealeft, fovearight, foveabottom, foveatop: LONGINT;
+	fovealeft, fovearight, foveabottom, foveatop: INTEGER;
 	fovea: BOOLEAN;
 	cam,worldcenter: PT;
 	d2c:REAL;
-	W,H,pointerx,pointery:LONGINT;
+	W,H,pointerx,pointery:INTEGER;
 	aperture: Aperture;
 	iamalargecamera: BOOLEAN;
 	lookdxyz:PT;
@@ -267,9 +267,9 @@ END P;
 TYPE RayWindow=OBJECT(WM.DoubleBufferWindow)
 VAR
 	alive: BOOLEAN;
-	i, t1: LONGINT;
-	mousepreviousx, mousepreviousy: LONGINT;
-	px, pdx, py, pdy: LONGINT;
+	i, t1: INTEGER;
+	mousepreviousx, mousepreviousy: INTEGER;
+	px, pdx, py, pdy: INTEGER;
 	pi: WM.PointerInfo;
 	warpvent,rlock: BOOLEAN;
 	saccade: BOOLEAN;
@@ -294,7 +294,7 @@ BEGIN
 	mainloopgo:= TRUE;
 END openwincam;
 
-PROCEDURE KeyEvent (ucs : LONGINT; flags : SET; keysym : LONGINT);
+PROCEDURE KeyEvent (ucs : SIZE; flags : SET; keysym : SIZE);
 VAR
 	v: Voxel;
 	s: Strings.String;
@@ -355,7 +355,7 @@ BEGIN
 	END
 END KeyEvent;
 
-PROCEDURE PointerDown(x, y: LONGINT; keys: SET);
+PROCEDURE PointerDown(x, y: SIZE; keys: SET);
 VAR 
 	wmanager: WM.WindowManager;
 BEGIN
@@ -363,18 +363,18 @@ BEGIN
 	MB:=keys;		
 END PointerDown;
 
-PROCEDURE PointerUp(x, y: LONGINT; keys: SET);
+PROCEDURE PointerUp(x, y: SIZE; keys: SET);
 BEGIN
 	MB:=keys;		
 END PointerUp;
 	
-PROCEDURE PointerMove(x,y: LONGINT; keys: SET);
+PROCEDURE PointerMove(x,y: SIZE; keys: SET);
 BEGIN
-	pdx := px - x; pdy := py - y;
+	pdx := (px - x); pdy := py - y;
 	px := ABS(x); py := ABS(y); pkeys := keys;
 END PointerMove;
 
-PROCEDURE WheelMove(dz: LONGINT);
+PROCEDURE WheelMove(dz: SIZE);
 BEGIN
 	IF TRUE  THEN
 		IF dz > 0 THEN slowdown; Out.String("slowdown dz="); Out.Int(dz, 0); Out.Ln;
@@ -447,20 +447,20 @@ END detail;
 VAR
 rand: Random.Generator;
 	wcount: INTEGER;
-	frame, tickframe: LONGINT;
+	frame, tickframe: INTEGER;
 	movierecording, movieplaying: BOOLEAN;
 	frtrace, foveate: BOOLEAN;
-	foveasize, fovealeft, fovearight, foveadown, foveaup: LONGINT;
+	foveasize, fovealeft, fovearight, foveadown, foveaup: INTEGER;
 	DEATH, wLOOK, PAUSE: BOOLEAN;
 	tracetiled,avaTF, capturethemouse: BOOLEAN;
-	framecount: LONGINT;
+	framecount: INTEGER;
 	multicore,filtor,uplock,rollcam,suppressz: BOOLEAN;
 	camrotinertia:REAL;
-	framedt: LONGINT;
+	framedt: INTEGER;
 	pkeys: SET;
-	pointerx, pointerdx, pointery, pointerdy: LONGINT;
+	pointerx, pointerdx, pointery, pointerdy: INTEGER;
 	R1,R2: REAL;
-	update: LONGINT;
+	update: INTEGER;
 	MLseen, MMseen, MRseen: BOOLEAN;
 	chatting: BOOLEAN;
 	chatvoxel: Voxel;
@@ -470,11 +470,11 @@ rand: Random.Generator;
 	camera:Camera;
 	fogdensity:REAL;
 	leftsticky,upsticky: REAL;
-	centerx,centery: LONGINT;
+	centerx,centery: SIZE;
 	GLIDE:REAL;
 	msd: REAL;
 	RW:  RayWindow;
-	RWcenterx, RWcentery,mousedx,mousedy: LONGINT;
+	RWcenterx, RWcentery,mousedx,mousedy: SIZE;
 	ftimer: Kernel.Timer;
 	key: CHAR;
 

@@ -13,28 +13,28 @@ CONST
 	opStereo = 1;
 
 TYPE
-	WindowStruct*= POINTER TO RECORD
+	WindowStruct= POINTER TO RECORD
 		windowClassName, title: ARRAY 32 OF CHAR;
 		Instance: Kernel32.HMODULE;
-		hWind-: WinApi.HWND;   (* handle of this window *)
-		hDC-: WinApi.HDC; (* drawing context of this window*)
-		hGLRC- : WinApi.HGLRC; (* GL render context handles for this window *)
-		width-, height-: LONGINT; (* size of window *)
+		hWind: WinApi.HWND;   (* handle of this window *)
+		hDC: WinApi.HDC; (* drawing context of this window*)
+		hGLRC : WinApi.HGLRC; (* GL render context handles for this window *)
+		width, height: SIZE; (* size of window *)
 		doublebuffer-: BOOLEAN;
 		context: Context;
 	END;
 
-	Buffer* = POINTER TO ARRAY OF CHAR;
+	Buffer = POINTER TO ARRAY OF CHAR;
 
 
 TYPE
 	Context*= OBJECT
 	VAR
-		glWin- : WindowStruct;
+		glWin : WindowStruct;
 		wincreated: BOOLEAN;
 		initialized: BOOLEAN;
 		res: BOOLEAN;
-		buffer-: Buffer;	(* for speedup flip image in y*)
+		buffer: Buffer;	(* for speedup flip image in y*)
 
     	PROCEDURE Init*(w, h: LONGINT);
     	BEGIN  {EXCLUSIVE}
@@ -61,12 +61,12 @@ TYPE
 		IF debug THEN KernelLog.String("Close SendMessage res = "); KernelLog.Int(res, 0); KernelLog.Ln; END;
 	END Close;
 
-	PROCEDURE GetWidth*(): LONGINT;
+	PROCEDURE GetWidth*(): SIZE;
 	BEGIN
 		RETURN glWin.width;
 	END GetWidth;
 
-	PROCEDURE GetHeight*(): LONGINT;
+	PROCEDURE GetHeight*(): SIZE;
 	BEGIN
 		RETURN glWin.height;
 	END GetHeight;
@@ -90,14 +90,14 @@ TYPE
 		RETURN 0; (*context.glWin.screen*)
 	END GetScreen;
 
-	PROCEDURE Resize*(w, h: LONGINT);
+	PROCEDURE Resize*(w, h: SIZE);
 	VAR
 		res: Kernel32.BOOL;
 	BEGIN
 		buffer := NIL;
 		NEW(buffer, w*h*4);
 	(*	MoveResizeWindow(0,0, w, h);*)
-		res := User32.MoveWindow(glWin.hWind, 0, 0, w, h, 1); (* repaint *)
+		res := User32.MoveWindow(glWin.hWind, 0, 0, w(LONGINT), h(LONGINT), 1); (* repaint *)
 		glWin.width := w; glWin.height := h;
 	END Resize;
 
@@ -121,13 +121,13 @@ TYPE
 *)
 	PROCEDURE RenderInto*(image: Raster.Image);
 	VAR
-		i: LONGINT;
-		w, h: LONGINT;
+		i: SIZE;
+		w, h: SIZE;
 		sadr, dadr: ADDRESS;
 	BEGIN
 		IF (image = NIL) OR (image.adr = NIL) THEN RETURN END;
 		w := image.width; h := image.height;
-		GL.ReadPixels(0, 0, w, h, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, ADDRESSOF(buffer^[0]));
+		GL.ReadPixels(0, 0, w(GL.Sizei), h(GL.Sizei), GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, ADDRESSOF(buffer^[0]));
 
 		(* flip vertical, y *)
 		sadr := ADDRESSOF(buffer[4*w*(h-1)]); dadr := image.adr;
@@ -242,7 +242,7 @@ VAR
 		dwStyle := WinApi.WS_POPUP +  WinApi.WS_CLIPSIBLINGS + WinApi.WS_CLIPCHILDREN;
 
 		 (* create the window *)
-		glWin.hWind := User32.CreateWindowEx(SYSTEM.VAL(LONGINT, dwExStyle) , glWin.windowClassName, glWin.title, dwStyle , 10, 10, glWin.width, glWin.height, 0, 0,  glWin.Instance, SYSTEM.VAL( User32.LParam, glWin));
+		glWin.hWind := User32.CreateWindowEx(SYSTEM.VAL(LONGINT, dwExStyle) , glWin.windowClassName, glWin.title, dwStyle , 10, 10, glWin.width(LONGINT), glWin.height(LONGINT), 0, 0,  glWin.Instance, SYSTEM.VAL( User32.LParam, glWin));
 		IF glWin.hWind = 0 THEN
 			IF debug THEN
 				KernelLog.String("CreateWindowEx hWind= "); KernelLog.Int(glWin.hWind, 0); KernelLog.Ln;

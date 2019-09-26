@@ -1,17 +1,17 @@
 MODULE WMGLWindow; (** AUTHOR "fnecati"; PURPOSE "an OpenGL Context enabled WM.Window using GLXPixmap for LinuxAos"; *)
 IMPORT
-	WM := WMWindowManager, KernelLog, GLContext := GLContext, WMMessages;
+	WM := WMWindowManager, KernelLog, GLContext;
 
-CONST debug = TRUE;
+CONST debug = FALSE;
 
 TYPE Context = GLContext.Context;
 
 TYPE
 	Window* =  OBJECT(WM.DoubleBufferWindow)
 	VAR
-		context {UNTRACED} : Context;
+		context : Context;
 
-		PROCEDURE &Init*(w, h: LONGINT; alpha: BOOLEAN);
+		PROCEDURE &Init*(w, h: SIZE; alpha: BOOLEAN);
 		BEGIN
 			Init^(w, h, alpha); (* use alpha, for 32bpp img *)
 			NEW(context);
@@ -22,14 +22,13 @@ TYPE
 		PROCEDURE Close*();
 		BEGIN
 			context.Close();
-			context := NIL;
+			(* context := NIL; *)
 			Close^;
 		END Close;
 
 		PROCEDURE MakeCurrent*();
 		BEGIN
 			context.MakeCurrent();
-		(*	GLShaderUtils.PrintOpenGLError("ERROR Context.MakeCurrent: "); *)
 		END MakeCurrent;
 
 		PROCEDURE DeActivate*();
@@ -38,51 +37,38 @@ TYPE
 		END DeActivate;
 
 		PROCEDURE SwapGLBuffer*();
-		BEGIN
+		BEGIN 
 			context.RenderInto(backImg);
 		END SwapGLBuffer;
 
-		PROCEDURE Reshape*(w,h: LONGINT);
+		PROCEDURE Reshape*(w,h: SIZE);
 		END Reshape;
 
 		PROCEDURE UpdateImage*();
 		END UpdateImage;
 
-		PROCEDURE MyResized(w, h: LONGINT);
+		PROCEDURE Resized(w, h: SIZE);
 		BEGIN
-			IF (backImg = NIL) OR (backImg.adr = NIL) THEN RETURN END;
-
+			IF debug THEN 
+				KernelLog.String("wmglwindow.resized w, h = "); KernelLog.Int(w, 0); KernelLog.Int(h, 10); KernelLog.Ln;
+			END;
+			context.Resize(w, h);
 			ReInit(w, h);
-			IF context.Resize(w, h) THEN
+			Reshape(w, h);
+			UpdateImage;
+		END Resized;
 
-				Reshape(w, h);
-				UpdateImage;
-			(*	KernelLog.String("WMGLWindow Resized TRUE"); KernelLog.Ln; *)
-			ELSE
-(*				KernelLog.String("WMGLWindow Resized FALSE"); KernelLog.Ln; *)
-			END;
-		END MyResized;
-
-		PROCEDURE Handle*(VAR m : WMMessages.Message);
-		BEGIN
-			IF m.msgType = WMMessages.MsgResized THEN
-				MyResized(m.x, m.y);
-			ELSE
-				Handle^(m);
-			END;
-		END Handle;
-
-		PROCEDURE GetDisplay*(): LONGWORD;
+		PROCEDURE GetDisplay*(): LONGINTEGER;
 		BEGIN
 			RETURN context.GetDisplay();
 		END GetDisplay;
 
-		PROCEDURE GetContext*(): LONGWORD;
+		PROCEDURE GetContext*(): LONGINTEGER;
 		BEGIN
 			RETURN context.GetContext();
 		END GetContext;
 
-		PROCEDURE GetScreen*(): LONGINT;
+		PROCEDURE GetScreen*(): SIGNED32;
 		BEGIN
 			RETURN 0; (*context.glWin.screen *)
 		END GetScreen;

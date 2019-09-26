@@ -140,14 +140,14 @@ BEGIN
 		denormalize(cvx,cvy,cvz,d);	
 		cvx:=cvx/2; cvy:=cvy/2; cvz:=cvz/2; 
 	END;
-	IF cx<0 THEN cx:=cx+1
-	ELSIF cx>1 THEN cx:=cx-1
+	IF cx<0 THEN cx:=0
+	ELSIF cx>1 THEN cx:=1
 	END;
-	IF cy<0 THEN cy:=cy+1
-	ELSIF cy>1 THEN cy:=cy-1
+	IF cy<0 THEN cy:=0
+	ELSIF cy>1 THEN cy:=1
 	END;
-	IF cz<0 THEN cz:=cz+1
-	ELSIF cz>1 THEN cz:=cz-1
+	IF cz<0 THEN cz:=0
+	ELSIF cz>1 THEN cz:=1
 	END;	
 END move; 
 
@@ -256,12 +256,11 @@ BEGIN
 	IF MOUSEDOWN THEN	
 		IF GLW.ML IN MB THEN  Marsh.tunnelinto; 
 		ELSIF  GLW.MM IN MB THEN Marsh.snipeinto; 
-(*		ELSIF  GLW.MR IN MB THEN Marsh.snipeonto;*)
+		ELSIF  GLW.MR IN MB THEN Marsh.snipeonto;
 		END;	
 	END;
 	trace; 
 	Base.tick;	
-	GLIDE:=0.99;	
 	cvz := cvz+gravityvector.z; 
 	cvx := cvx*GLIDE; cvy := cvy*GLIDE; 
 	cvl :=0; cvu := 0;
@@ -280,6 +279,7 @@ VAR
 	curprogram: Uint;
 	splashscreen: BOOLEAN;
 	mstarget: REAL;
+	framecounter: INTEGER;
 	
 PROCEDURE &openwincam;
 BEGIN
@@ -313,8 +313,8 @@ BEGIN
 	NEW(rand);
 	foveasize := 100;
 	camrotinertia:=100;
-	Base.DTL:=25000;
-	Base.DTL2:=2500;
+	Base.DTL:=2500;
+	Base.DTL2:=250;
 	Base.gravity:=0.00000001;
 	Base.speed:=0.00001;
 	Base.maxspeed:=0.001;
@@ -365,8 +365,8 @@ VAR
 BEGIN
 	key:=CHR(ucs);
 		CASE CHR(ucs) OF		
-			"S": Base.DTL:=Base.DTL*7/6; Out.String("Base.DTL ++"); 
-			| "W":Base.DTL:=Base.DTL*6/7; ; Out.String("Base.DTL --");
+			"S": Base.DTL:=Base.DTL*7/6; Base.DTL2:=Base.DTL2*7/6; Out.String("Base.DTL ++"); 
+			| "W":Base.DTL:=Base.DTL*6/7; Base.DTL2:=Base.DTL2*6/7; Out.String("Base.DTL --");
 			| "X": Base.horizon2:=Base.horizon2*7/6; Out.String("++horizon");
 			| "C": Base.horizon2:=Base.horizon2*6/7;  Out.String("--horizon");								
 			| "s" : camera.forward(-0.51*Base.speed); 
@@ -387,7 +387,7 @@ BEGIN
 			| "1": CAMLOCK:=~CAMLOCK ; Out.String(" ");
 			| "2": Base.gravity:= Base.gravity/1.5 ; Out.String(" ");	
 			| "@": Base.gravity:= 1.5*Base.gravity ; Out.String(" ");
-			| "3": 
+			| "3": camera.glidetoggle;
 			| "4": Base.STOPGO; Out.String(" ");
 			| "5": Retina.Res; Out.String(" ");
 			| "6": avaTF:=~avaTF ; Out.String(" ");
@@ -404,8 +404,8 @@ BEGIN
 			| "l": Marsh.lines:=~Marsh.lines ; Out.String(" ");
 			| "g": camera.glidetoggle ; Out.String(" ");
 			| "b": Marsh.showcode	; Out.String(" ");
-			| "f": curprogram := (curprogram+1 ) MOD 13 ; Out.String("next glsl filter");
-			| "F": curprogram := (curprogram-1 ) MOD 13 ; Out.String("previous glsl filter");		
+			| "f": curprogram := (curprogram+1 ) MOD 13 ; Out.String("glsl filter"); Out.Int(curprogram,3);
+			| "F": curprogram := (curprogram-1 ) MOD 13 ; Out.String("glsl filter");	 Out.Int(curprogram,3);	
 			| "+": Marsh.swapworld; Out.String("Swap")					
 		ELSE (* use keysm *)
 			CASE keysym OF
@@ -465,7 +465,7 @@ END KeyEvent;
 				up:=-ABS(yr)*yr;  
 				camera.up(-up/(1500*leftsticky)); 
 				camera.left(left/(6000*leftsticky));
-				WarpPointer(1000,1000, centerx,centery);
+				WarpPointer(1000,1000, centerx,centery); 
 				IF (ABS(xr)+ABS(yr)>300) THEN
 					Retina.saccade:=TRUE
 				ELSE
@@ -582,7 +582,6 @@ END KeyEvent;
 			programs[9] := InitShader("passthroughVS.glsl", "unsharpMaskFS.glsl");
 			programs[10] := InitShader("passthroughVS.glsl", "sharpenFS.glsl");
 			programs[11] := InitShader("passthroughVS.glsl", "nightVisionFS.glsl");
-(*			programs[12]:=InitShader("passthroughVS.glsl", "passthroughFS.glsl");*)
 			programs[12] := InitShader("passthroughVS.glsl", "toonShadingFS.glsl"); 
 		curprogram := 6;	  
 		Out.String("InitGL");
@@ -592,8 +591,20 @@ END KeyEvent;
 		
 	PROCEDURE  ReloadShader;
 	BEGIN
-		programs[6] := InitShader("passthroughVS.glsl", "toonShadingFS.glsl");
-		programs[12] := InitShader("passthroughVS.glsl", "kuwahara.glsl");	
+			programs[0] := InitShader("passthroughVS.glsl", "passthroughFS.glsl");
+			programs[1] := InitShader("passthroughVS.glsl", "boxBlurFS.glsl");
+			programs[2] := InitShader("passthroughVS.glsl", "negativeFS.glsl");
+			programs[3] := InitShader("passthroughVS.glsl", "gaussianBlurFS.glsl");
+			programs[4] := InitShader("passthroughVS.glsl", "grayscaleFS.glsl");
+			programs[5] := InitShader("passthroughVS.glsl", "edgeDetectionFS.glsl");
+			programs[6] := InitShader("passthroughVS.glsl", "toonShadingFS.glsl");
+			programs[7] := InitShader("passthroughVS.glsl", "vintageFS.glsl");
+			programs[8] := InitShader("passthroughVS.glsl", "brightnessFS.glsl");
+			programs[9] := InitShader("passthroughVS.glsl", "unsharpMaskFS.glsl");
+			programs[10] := InitShader("passthroughVS.glsl", "sharpenFS.glsl");
+			programs[11] := InitShader("passthroughVS.glsl", "nightVisionFS.glsl");
+(*			programs[12] := InitShader("passthroughVS.glsl", "toonShadingFS.glsl"); *)
+			programs[12] := InitShader("passthroughVS.glsl", "kuwahara.glsl");	
 	END ReloadShader;
 
 	PROCEDURE Display();
@@ -613,8 +624,12 @@ END KeyEvent;
 		ms: INTEGER;
 	BEGIN
 		ms:= GetCurrentFrameMs();
-		Out.Int(ms,5);
-		Out.Ln;
+		INC(framecounter);
+		IF framecounter>10 THEN
+			framecounter:=0;
+			Out.Int(ms,5);
+			Out.Ln
+		END;
 		IF ms > mstarget+5 THEN 
 			Retina.lessdetail(1)
 		ELSIF GetCurrentFrameMs()<mstarget THEN

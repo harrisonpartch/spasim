@@ -12,7 +12,7 @@ TYPE
 
 	PChar = POINTER {UNSAFE} TO ARRAY OF CHAR;
 	cuchar = CHAR; (* int8 *)
-	Pcushort = POINTER {UNSAFE} TO ARRAY OF INTEGER;
+	Pcushort = POINTER {UNSAFE} TO ARRAY OF SIGNED16;
 
 	Bool = X11.Bool;
 
@@ -73,48 +73,48 @@ CONST
 	(* Video Mode Settings: *)
 TYPE
 	ModeLine* = POINTER {UNSAFE} TO RECORD
-		hdisplay* : INTEGER; (* Number of display pixels horizontally *)
-		hsyncstart* : INTEGER; (* Horizontal sync start *)
-		hsyncend * : INTEGER;  (* Horizontal sync end *)
-		htotal * : INTEGER;  (* Total horizontal pixels *)
-		hskew * : INTEGER;
-		vdisplay * : INTEGER; (* Number of display pixels vertically *)
-		vsyncstart * : INTEGER; (* Vertical sync start *)
-		vsyncend * : INTEGER;  (* Vertical sync start *)
-		vtotal * : INTEGER; (* Total vertical pixels *)
+		hdisplay* : SIGNED16; (* Number of display pixels horizontally *)
+		hsyncstart* : SIGNED16; (* Horizontal sync start *)
+		hsyncend * : SIGNED16;  (* Horizontal sync end *)
+		htotal * : SIGNED16;  (* Total horizontal pixels *)
+		hskew * : SIGNED16;
+		vdisplay * : SIGNED16; (* Number of display pixels vertically *)
+		vsyncstart * : SIGNED16; (* Vertical sync start *)
+		vsyncend * : SIGNED16;  (* Vertical sync start *)
+		vtotal * : SIGNED16; (* Total vertical pixels *)
 		flags * : SET;  (* Mode flags *)
-		privsize * : LONGINT; (* Size of private *)
-		c_private-  : LONGINT; (* Server privates *)
+		privsize * : SIGNED32; (* Size of private *)
+		c_private-  : SIGNED32; (* Server privates *)
 	END;
 
 
 	PModeInfo* = POINTER {UNSAFE} TO ARRAY OF ModeInfo;
 	ModeInfo* = POINTER {UNSAFE} TO RECORD
-		dotclock * : LONGINT; (* Pixel clock *)
-		hdisplay * : INTEGER; (* Number of display pixels horizontally *)
-		hsyncstart * : INTEGER; (* Horizontal sync start *)
-		hsyncend * : INTEGER;  (* Horizontal sync end *)
-		htotal * : INTEGER; (* Total horizontal pixels *)
-		hskew * : INTEGER;
-		vdisplay * : INTEGER; (* Number of display pixels vertically *)
-		vsyncstart * : INTEGER;  (* Vertical sync start *)
-		vsyncend * : INTEGER; (* Vertical sync start *)
-		vtotal * : INTEGER;  (* Total vertical pixels *)
+		dotclock * : SIGNED32; (* Pixel clock *)
+		hdisplay * : SIGNED16; (* Number of display pixels horizontally *)
+		hsyncstart * : SIGNED16; (* Horizontal sync start *)
+		hsyncend * : SIGNED16;  (* Horizontal sync end *)
+		htotal * : SIGNED16; (* Total horizontal pixels *)
+		hskew * : SIGNED16;
+		vdisplay * : SIGNED16; (* Number of display pixels vertically *)
+		vsyncstart * : SIGNED16;  (* Vertical sync start *)
+		vsyncend * : SIGNED16; (* Vertical sync start *)
+		vtotal * : SIGNED16;  (* Total vertical pixels *)
 		flags * : SET; (* Mode flags *)
-		privsize * : LONGINT; (* Size of private *)
-		c_private*  : LONGINT;  (* Server privates *)
+		privsize * : SIGNED32; (* Size of private *)
+		c_private*  : SIGNED32;  (* Server privates *)
 	END;
 
 	(* Monitor information: *)
 	SyncRange* = RECORD
-		hi* : REAL; (* Top of range *)
-		lo* : REAL; (* Bottom of range *)
+		hi* : FLOAT32; (* Top of range *)
+		lo* : FLOAT32; (* Bottom of range *)
 	END;
 
 	Monitor* = POINTER {UNSAFE} TO RECORD
 		vendor * : PChar;  (* Name of manufacturer *)
 		model * : PChar; (* Model name *)
-		empty * : REAL; (* Monitor bandwidth *)
+		empty * : FLOAT32; (* Monitor bandwidth *)
 		nhsync * : cuchar; (* Number of horiz sync ranges *)
 		hsync * : SyncRange; (* Horizontal sync ranges *)
 		nvsync * : cuchar; (* Number of vert sync ranges *)
@@ -122,58 +122,58 @@ TYPE
 	END;
 
 	NotifyEvent* = RECORD
-		typ * : LONGINT;       (* of event *)
-		serial * : LONGINT;    (* # of last request processed by server *)
+		typ * : SIGNED32;       (* of event *)
+		serial * : SIGNED32;    (* # of last request processed by server *)
 		sendEvent * : Bool; (* true if this came from a SendEvent req *)
 		display * : DisplayPtr; (* Display the event was read from *)
 		root * : Window;     (* root window of event screen *)
-		state * : LONGINT;       (* What happened *)
-		kind * : LONGINT;        (* What happened *)
+		state * : SIGNED32;       (* What happened *)
+		kind * : SIGNED32;        (* What happened *)
 		forced * : Bool;     (* extents of new region *)
 		time * : Time;       (* event timestamp *)
 	END;
 
 	Gamma* = RECORD
-		red * : REAL;   (* Red Gamma value *)
-		green * : REAL; (* Green Gamma value *)
-		blue * : REAL;  (* Blue Gamma value *)
+		red * : FLOAT32;   (* Red Gamma value *)
+		green * : FLOAT32; (* Green Gamma value *)
+		blue * : FLOAT32;  (* Blue Gamma value *)
 	END;
 
 
 VAR
 
-	QueryVersion- : PROCEDURE {PlatformCC} (dpy: DisplayPtr; VAR majorVersion : LONGINT; VAR minorVersion : LONGINT) : Bool;
-	QueryExtension- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; VAR eventBaseReturn : LONGINT; VAR errorBaseReturn : LONGINT ) : Bool;
+	QueryVersion- : PROCEDURE {PlatformCC} (dpy: DisplayPtr; VAR majorVersion : SIGNED32; VAR minorVersion : SIGNED32) : Bool;
+	QueryExtension- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; VAR eventBaseReturn : SIGNED32; VAR errorBaseReturn : SIGNED32 ) : Bool;
 	SetClientVersion- : PROCEDURE {PlatformCC} (dpy : DisplayPtr) : Bool;
-	GetModeLine- : PROCEDURE {PlatformCC} ( dpy : DisplayPtr; screen : LONGINT; VAR dotclockReturn : LONGINT; VAR modeline :  ModeLine) : Bool;
-	GetAllModeLines- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT;  VAR modecountReturn : LONGINT; VAR modelinesr : PModeInfo ) : Bool;
-	AddModeLine- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT;  new_modeline : ModeInfo;  VAR after_modeline : ModeInfo ) : Bool;
-	DeleteModeLine- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; modeline : ModeInfo ) : Bool;
-	ModModeLine- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; modeline : ModeLine) : Bool;
-	ValidateModeLine- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; modeline : ModeInfo ) : LONGINT (* Api.Status *);
-	SwitchMode- : PROCEDURE {PlatformCC} ( dpy : DisplayPtr; screen : LONGINT; zoom : LONGINT ) : Bool;
-	SwitchToMode- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; modeline : ModeInfo ) : Bool;
-	LockModeSwitch- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; lock : LONGINT) : Bool;
-	GetMonitor- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT;  monitor : Monitor) : Bool;
-	GetViewPort- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; VAR xreturn : LONGINT; VAR yreturn : LONGINT ) : Bool;
-	SetViewPort- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; x : LONGINT; y : LONGINT ) : Bool;
-	GetDotClocks- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; VAR flagsReturn : SET; VAR numberOffClocksReturn : LONGINT;  VAR maxDotClockReturn : LONGINT;
+	GetModeLine- : PROCEDURE {PlatformCC} ( dpy : DisplayPtr; screen : SIGNED32; VAR dotclockReturn : SIGNED32; VAR modeline :  ModeLine) : Bool;
+	GetAllModeLines- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32;  VAR modecountReturn : SIGNED32; VAR modelinesr : PModeInfo ) : Bool;
+	AddModeLine- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32;  new_modeline : ModeInfo;  VAR after_modeline : ModeInfo ) : Bool;
+	DeleteModeLine- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; modeline : ModeInfo ) : Bool;
+	ModModeLine- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; modeline : ModeLine) : Bool;
+	ValidateModeLine- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; modeline : ModeInfo ) : SIGNED32 (* Api.Status *);
+	SwitchMode- : PROCEDURE {PlatformCC} ( dpy : DisplayPtr; screen : SIGNED32; zoom : SIGNED32 ) : Bool;
+	SwitchToMode- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; modeline : ModeInfo ) : Bool;
+	LockModeSwitch- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; lock : SIGNED32) : Bool;
+	GetMonitor- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32;  monitor : Monitor) : Bool;
+	GetViewPort- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; VAR xreturn : SIGNED32; VAR yreturn : SIGNED32 ) : Bool;
+	SetViewPort- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; x : SIGNED32; y : SIGNED32 ) : Bool;
+	GetDotClocks- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; VAR flagsReturn : SET; VAR numberOffClocksReturn : SIGNED32;  VAR maxDotClockReturn : SIGNED32;
 	    VAR clocksReturn : Pcushort ) : Bool;
-	GetGamma- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; VAR gamma : Gamma ) : Bool;
-	SetGamma- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; VAR gamma : Gamma ) : Bool;
-	SetGammaRamp-: PROCEDURE {PlatformCC} ( dpy : DisplayPtr; screen : LONGINT; asize : LONGINT; redarray : Pcushort; greenarray : Pcushort; bluearray : Pcushort ) : Bool;
-	GetGammaRamp- : PROCEDURE {PlatformCC} ( dpy : DisplayPtr; screen : LONGINT; asize : LONGINT; redarray : Pcushort;  greenarray : Pcushort; bluearray : Pcushort ) : Bool;
-	GetGammaRampSize- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; VAR asize : LONGINT ) : Bool;
-	GetPermissions- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : LONGINT; VAR permissions : LONGINT ) : Bool;
+	GetGamma- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; VAR gamma : Gamma ) : Bool;
+	SetGamma- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; VAR gamma : Gamma ) : Bool;
+	SetGammaRamp-: PROCEDURE {PlatformCC} ( dpy : DisplayPtr; screen : SIGNED32; asize : SIGNED32; redarray : Pcushort; greenarray : Pcushort; bluearray : Pcushort ) : Bool;
+	GetGammaRamp- : PROCEDURE {PlatformCC} ( dpy : DisplayPtr; screen : SIGNED32; asize : SIGNED32; redarray : Pcushort;  greenarray : Pcushort; bluearray : Pcushort ) : Bool;
+	GetGammaRampSize- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; VAR asize : SIGNED32 ) : Bool;
+	GetPermissions- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; VAR permissions : SIGNED32 ) : Bool;
 
 (* *********** Wrapper macros ************* *)
 
-PROCEDURE SelectNextMode*(disp : DisplayPtr; scr : LONGINT) : Bool;
+PROCEDURE SelectNextMode*(disp : DisplayPtr; scr : SIGNED32) : Bool;
 BEGIN
     RETURN SwitchMode(disp, scr, 1);
 END SelectNextMode;
 
-PROCEDURE SelectPrevMode*(disp : DisplayPtr; scr : LONGINT) : Bool;
+PROCEDURE SelectPrevMode*(disp : DisplayPtr; scr : SIGNED32) : Bool;
 BEGIN
     RETURN SwitchMode(disp, scr, -1);
 END SelectPrevMode;

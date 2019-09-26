@@ -44,7 +44,7 @@ TYPE
 		IncCount
 	  END New;
 
-	PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
+	PROCEDURE KeyEvent (ucs: SIZE; flags: SET; keysym: SIZE);
 	BEGIN
 		IF  ucs = ORD("q") THEN Close;
 		ELSIF  ucs = ORD("a") THEN BEGIN {EXCLUSIVE} animated := ~ animated; END;
@@ -52,7 +52,7 @@ TYPE
 		END;
 	END KeyEvent;
 
-	PROCEDURE WheelMove(dz : LONGINT);
+	PROCEDURE WheelMove(dz : SIZE);
 	BEGIN
 		Reshape(GetWidth(), GetHeight());
 		UpdateImage;
@@ -83,10 +83,10 @@ TYPE
 		Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 	END UpdateImage;
 
-	PROCEDURE Reshape(w, h: LONGINT);
+	PROCEDURE Reshape(w, h: SIZE);
 	BEGIN
 		  MakeCurrent();
-		  GL.Viewport(0, 0, w, h);
+		  GL.Viewport(0, 0, w(GL.Sizei), h(GL.Sizei));
 		  (* Resetuje aktuastaven  *)
 		  GL.MatrixMode(GLC.GL_PROJECTION);     (* projection matrix *)
 		  GL.LoadIdentity();                                       (* Reset matrix *)
@@ -144,7 +144,7 @@ TYPE
 
 	 	GL.GenTextures(1, ADDRESSOF(tex));
 	 	GL.BindTexture(GLC.GL_TEXTURE_2D, tex);
-	 	GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, teximg.width, teximg.height, 0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, teximg.adr);
+	 	GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, teximg.width(GL.Sizei), teximg.height(GL.Sizei), 0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, teximg.adr);
 	 	GL.TexParameteri(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR);
 	 	GL.TexParameteri(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MIN_FILTER, GLC.GL_LINEAR);
 	 	RETURN tex;

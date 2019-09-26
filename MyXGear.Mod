@@ -1,7 +1,7 @@
 MODULE MyXGear; (** AUTHOR "fnecati"; PURPOSE "glxgears for commandline run"; *)
 
 IMPORT
-	X11, Api := X11Api, GL:=OpenGL, GLC := OpenGLConst, Kernel, Commands,
+	X11, GL:=OpenGL, GLC := OpenGLConst, Kernel, Commands,
 	StdIO,  Math ;
 
 (*
@@ -25,13 +25,13 @@ VAR
 	(* window variables *)
 	display : X11.DisplayPtr;
 	win : X11.Window ;
-	visinfoptr : Api.VisualInfoPtr; (* pointer to X11 VisualInfo *)
+	visinfoptr : X11.VisualInfoPtr; (* pointer to X11 VisualInfo *)
 	glctx : GL.GLXContext;  (* GL context *)
 
 	(*	gc : X11.GC; (* graphics context, may be useful for X11 drawing operations *)	*)
 
-	gwa : Api.XWindowAttributes; (* get window attributes *)
-	swa : Api.XSetWindowAttributes; (* set window attributes*)
+	gwa : X11.XWindowAttributes; (* get window attributes *)
+	swa : X11.XSetWindowAttributes; (* set window attributes*)
 	cmap : X11.Colormap; (* colormap for window *)
 
 	width, height : LONGINT; (* size of window *)
@@ -267,16 +267,16 @@ END Reshape;
 	(* do we have a window *)
 	IF win # 0 THEN
 		(* Unmap the window*)
-		Api.UnmapWindow(display, win);
+		X11.UnmapWindow(display, win);
 		(* Destroy the window *)
-		res:= Api.DestroyWindow(display, win);
+		res:= X11.DestroyWindow(display, win);
 		win := 0;
 		IF debug THEN context.out.String("window deleted"); context.out.Ln; context.out.Update; END;
 	END;
 
 	(* do we have a display *)
 	IF display # 0 THEN
-		res := Api.CloseDisplay(display);
+		res := X11.CloseDisplay(display);
 		display := 0;
 		IF debug THEN context.out.String("display deleted"); context.out.Ln; context.out.Update; END;
 	END;
@@ -287,11 +287,10 @@ PROCEDURE  InitWindow(w, h: LONGINT; CONST title: ARRAY OF CHAR);
 VAR
 	res: LONGINT;
 	masks: LONGWORD;
-	buf: X11.Buffer;
 	attrib : POINTER TO ARRAY OF GL.Int;  (* attributes of GL window *)
 	defwin: X11.Window;
 BEGIN
- display := X11.OpenDisplay(0);
+ display := X11.OpenDisplay("");
  IF display =0 THEN
  	context.out.String(" cannot connect to X server"); context.out.Ln; context.out.Update;
 	Close;
@@ -344,8 +343,8 @@ END;
  END;
 
  (* window event masks *)
- masks :=  Api.KeyPressMask + Api.KeyReleaseMask + Api.ButtonPressMask + Api.ButtonReleaseMask + Api.PointerMotionMask +
- Api.ButtonMotionMask + Api.ExposureMask + Api.StructureNotifyMask + Api.FocusChangeMask;
+ masks :=  X11.KeyPressMask + X11.KeyReleaseMask + X11.ButtonPressMask + X11.ButtonReleaseMask + X11.PointerMotionMask +
+ X11.ButtonMotionMask + X11.ExposureMask + X11.StructureNotifyMask + X11.FocusChangeMask;
 
   (* window attributes *)
  swa.backgroundPixel := 0;
@@ -353,16 +352,16 @@ END;
  swa.colormap := cmap;
  swa.eventMask := masks;
 
- masks := Api.CWBackPixel + Api.CWBorderPixel + Api.CWColormap + Api.CWEventMask;
+ masks := X11.CWBackPixel + X11.CWBorderPixel + X11.CWColormap + X11.CWEventMask;
 
- win := Api.CreateWindow(display, defwin, 0, 0, w, h,
-		        0, visinfoptr.depth, Api.InputOutput,  visinfoptr.visual, masks, swa);
+ win := X11.CreateWindow(display, defwin, 0, 0, w, h,
+		        0, visinfoptr.depth, X11.InputOutput,  visinfoptr.visual, masks, swa);
 
  (* show window *)
-  Api.MapWindow(display, win);
+  X11.MapWindow(display, win);
 
  (* set title of window *)
- res := Api.StoreName(display, win, title);
+ X11.StoreName(display, win, ADDRESSOF(title[0]));
 
 (* create GL context *)
  (* GL_TRUE: Use direct rendering, GL_FLASE: use X server for rendering *)
@@ -381,36 +380,36 @@ END Wr;
 
 (* process pending X11 events *)
 PROCEDURE LoopForEvents;
-VAR xev: Api.XEvent;
+VAR xev: X11.Event;
 	res: LONGINT;
 BEGIN
- WHILE Api.Pending(display)>0 DO
-	Api.NextEvent(display, xev);
+ WHILE X11.Pending(display)>0 DO
+	X11.NextEvent(display, xev);
 			CASE xev.typ OF
-			Api.Expose:
-					res := Api.GetWindowAttributes(display, win, gwa);
+			X11.Expose:
+					res := X11.GetWindowAttributes(display, win, gwa);
 					Reshape(gwa.width, gwa.height);
 					Wr("Expose");
-			| Api.KeyPress:	Wr("KeyPressed");
+			| X11.KeyPress:	Wr("KeyPressed");
 							alive := FALSE;
-			| Api.KeyRelease:	Wr("KeyReleased");
-			| Api.ButtonPress: Wr("ButtonPressed");
-			| Api.ButtonRelease: Wr("ButtonRelease");
-			| Api.MotionNotify: Wr("MotionNotify");
-			| Api.FocusIn: Wr("FocusIn");
-			| Api.FocusOut: Wr("FocusOut");
-			| Api.GraphicsExpose: Wr("GraphicsExpose");
-			| Api.NoExpose: Wr("NoExpose");
-			| Api.UnmapNotify: Wr("UnmapNotify");
-			| Api.MapNotify: Wr("MapNotify");
-			| Api.PropertyNotify: Wr("PropertyNotify");
-			| Api.SelectionClear: Wr("SelectionClear");
-			| Api.SelectionRequest: Wr("SelectionRequest");
-			| Api.SelectionNotify: Wr("SelectionNotify");
+			| X11.KeyRelease:	Wr("KeyReleased");
+			| X11.ButtonPress: Wr("ButtonPressed");
+			| X11.ButtonRelease: Wr("ButtonRelease");
+			| X11.MotionNotify: Wr("MotionNotify");
+			| X11.FocusIn: Wr("FocusIn");
+			| X11.FocusOut: Wr("FocusOut");
+			| X11.GraphicsExpose: Wr("GraphicsExpose");
+			| X11.NoExpose: Wr("NoExpose");
+			| X11.UnmapNotify: Wr("UnmapNotify");
+			| X11.MapNotify: Wr("MapNotify");
+			| X11.PropertyNotify: Wr("PropertyNotify");
+			| X11.SelectionClear: Wr("SelectionClear");
+			| X11.SelectionRequest: Wr("SelectionRequest");
+			| X11.SelectionNotify: Wr("SelectionNotify");
 
 			(* and others .... *)
-			| Api.ClientMessage: Wr("ClientMessage");
-			| Api.MappingNotify: Wr("MappingNotify");
+			| X11.ClientMessage: Wr("ClientMessage");
+			| X11.MappingNotify: Wr("MappingNotify");
 			ELSE
 			END;
 	   	END;

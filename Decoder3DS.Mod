@@ -124,7 +124,7 @@ TYPE
 TYPE Chunk = RECORD
 		ID: INTEGER;	(* The chunk's ID *)
 		length: LONGINT;				(* The length of the chunk *)
-		bytesRead: LONGINT;			(* The amount of bytes read within that chunk *)
+		bytesRead: SIZE;			(* The amount of bytes read within that chunk *)
 END;
 
 (* will be used to store the vertices of our model. *)
@@ -172,7 +172,7 @@ TYPE  Object3D* = OBJECT
 		numFaces*: INTEGER;			(* The number of faces in the model *)
 		numTexVerts*: INTEGER;		(* The number of texture coordinates *)
 
-		materialID*: LONGINT;			(* The texture ID to use, which is the index into our texture array *)
+		materialID*: SIZE;			(* The texture ID to use, which is the index into our texture array *)
 		hasTexture*: BOOLEAN;		(* This is TRUE if there is a texture map for this object *)
 
 		verts*: POINTER TO ARRAY OF Vector3f;			(* The object's vertices *)
@@ -247,7 +247,7 @@ END ReadColorChunk;
 
 
 (**	This function reads in a string of characters *)
-PROCEDURE GetString(VAR pBuffer: ARRAY OF CHAR): LONGINT;
+PROCEDURE GetString(VAR pBuffer: ARRAY OF CHAR): SIZE;
 VAR index: LONGINT;
 	ch: CHAR;
 BEGIN
@@ -438,7 +438,7 @@ END ReadVertices;
 (**	This function reads in the material name assigned to the object and sets the materialID *)
 PROCEDURE ReadObjectMaterial(VAR model: Model3D;  object: Object3D;  VAR prevChunk: Chunk );
 VAR  strMaterial: ARRAY 255 OF CHAR;  (* This is used to hold the objects material name *)
-	i: LONGINT;
+	i: SIZE;
 	mat: MaterialInfo;
 	any: ANY;
 BEGIN
@@ -594,7 +594,7 @@ VAR
 	newObject: Object3D; (* Object3D;  This is used to add to our object list *)
 	newTexture: MaterialInfo; (* MaterialInfo, This is used to add to our material list *)
 	version: LONGINT; (* This will hold the file version *)
-	cnt: LONGINT;
+	cnt: SIZE;
 
 BEGIN
 
@@ -950,10 +950,10 @@ BEGIN
 	GL.TexEnvf(GLC.GL_TEXTURE_ENV, GLC.GL_TEXTURE_ENV_MODE, GLC.GL_REPLACE);  (* We don't combine the color with the original surface color, use only the texture map. *)
 
 	(* Finally we define the 2d texture *)
-	GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, img.width, img.height, 0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, img.adr);
+	GL.TexImage2D(GLC.GL_TEXTURE_2D, 0, GLC.GL_RGBA, img.width(GL.Sizei), img.height(GL.Sizei), 0, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, img.adr);
 
 	(* And create 2d mipmaps for the minifying function *)
-	res := GLU.Build2DMipmaps(GLC.GL_TEXTURE_2D, GLC.GL_RGBA, img.width, img.height, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, img.adr);
+	res := GLU.Build2DMipmaps(GLC.GL_TEXTURE_2D, GLC.GL_RGBA, img.width(GL.Sizei), img.height(GL.Sizei), GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, img.adr);
 
 	img0 := NIL;
 	img := NIL;
@@ -961,7 +961,7 @@ BEGIN
 END LoadImage;
 
 PROCEDURE TransposeImage(im: Raster.Image): Raster.Image;
-VAR i, j: LONGINT;
+VAR i, j: SIZE;
 	tim: Raster.Image;
 	pix: Raster.Pixel;
 	mode: Raster.Mode;
@@ -981,7 +981,7 @@ END TransposeImage;
 
 (** for testing *)
 PROCEDURE PrintModelInfo(VAR m: Model3D);
-VAR i, j: LONGINT;
+VAR i, j: SIZE;
 
 	obj: Object3D;
 	mat: MaterialInfo;

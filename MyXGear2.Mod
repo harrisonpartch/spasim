@@ -3,7 +3,7 @@ MODULE MyXGear2; (** AUTHOR "fnecati"; PURPOSE "glxgears for commandline run"; *
 (* Test: FULLSCREEN,  Press F1, F11 F12,  window close events *)
 
 IMPORT
-	X11, Api := X11Api, GL:=OpenGL, GLC := OpenGLConst, Kernel, Inputs, KS := X11KeySymDef,
+	X11, GL:=OpenGL, GLC := OpenGLConst, Kernel, Inputs, KS := X11KeySymDef,
 	 Math , Raster, WMGraphics,  SYSTEM, V := XF86VMode, StdIO, Commands ;
 
 (*
@@ -15,8 +15,8 @@ or
 
 
 CONST
-	debug = TRUE; (* for window creation/closing *)
-	debugevents = TRUE; (* for testing events *)
+	debug = FALSE; (* for window creation/closing *)
+	debugevents = FALSE; (* for testing events *)
 
 	 (* show window with window decorations *)
 
@@ -27,10 +27,10 @@ CONST
 TYPE
 	Hints = RECORD
 		flags: SET;
-		functions: LONGWORD;
-		decorations: LONGWORD;
-		inputMode: LONGWORD;
-		status: LONGWORD;
+		functions: LONGINT;
+		decorations: LONGINT;
+		inputMode: LONGINT;
+		status: LONGINT;
 	END;
 
 
@@ -46,7 +46,7 @@ VAR
 	fullscreen, fullwindow, windecorations : BOOLEAN;
 
 	doubleBuffered: BOOLEAN;
-	winAttr : Api.XSetWindowAttributes; (* set window attributes*)
+	winAttr : X11.XSetWindowAttributes; (* set window attributes*)
 	wmDelete: X11.Atom;
 
 (* original desktop mode which we save so we can restore it later *)
@@ -62,8 +62,8 @@ CONST
 
 
 VAR
-	event: Api.XEvent;  xbuttons: SET;
-	compstatus: Api.ComposeStatus;
+	event: X11.Event;  xbuttons: SET;
+	compstatus: X11.ComposeStatus;
 
 	MMseen, MRseen: BOOLEAN;
 	noEventCount: LONGINT;
@@ -202,16 +202,16 @@ BEGIN
 	interval := 0;
 		IF GL.glXSwapIntervalEXT # NIL THEN
 			GL.glXSwapIntervalEXT(display, win, interval);
-			context.out.String("GL.glXSwapIntervalEXT # NIL"); context.out.Ln;
+			context.out.String("GL.glXSwapIntervalEXT # NIL"); context.out.Ln; 
 		ELSIF GL.glXSwapIntervalSGI # NIL THEN
 			bres := GL.glXSwapIntervalSGI(interval);
-			context.out.String("GL.glXSwapIntervalSGI # NIL"); context.out.Ln;
+			context.out.String("GL.glXSwapIntervalSGI # NIL"); context.out.Ln; 
 		ELSIF GL.glXSwapIntervalMESA # NIL THEN
 			bres := GL.glXSwapIntervalMESA(interval);
-			context.out.String("GL.glXSwapIntervalMESA # NIL"); context.out.Ln;
+			context.out.String("GL.glXSwapIntervalMESA # NIL"); context.out.Ln; 
 		END;
 	context.out.Ln; context.out.Update;
-
+	
 
     lightPos[0] := 5.0;	lightPos[1] := 5.0;  lightPos[2] := 10.0; lightPos[3] := 1.0;
     red[0] := 0.8; red[1] := 0.1; red[2] := 0.0; red[3] := 1.0;
@@ -325,16 +325,16 @@ END Reshape;
 	(* do we have a window *)
 	IF win # 0 THEN
 		(* Unmap the window*)
-		Api.UnmapWindow(display, win);
+		X11.UnmapWindow(display, win);
 		(* Destroy the window *)
-		res:= Api.DestroyWindow(display, win);
+		res:= X11.DestroyWindow(display, win);
 		win := 0;
 		IF debug THEN context.out.String("window deleted"); context.out.Ln; context.out.Update; END;
 	END;
 
 	(* do we have a display *)
 	IF display # 0 THEN
-		res := Api.CloseDisplay(display);
+		res := X11.CloseDisplay(display);
 		IF debug THEN context.out.String("display deleted"); context.out.Ln; context.out.Update; END;
 	END;
 
@@ -343,10 +343,9 @@ END Reshape;
 PROCEDURE  InitWindow(): BOOLEAN;
 VAR
 	res: LONGINT;
-	masks: LONGWORD;
-	buf: X11.Buffer;
+	masks: LONGINT;
 
-	visinfoptr : Api.VisualInfoPtr; (* pointer to X11 VisualInfo *)
+	visinfoptr : X11.VisualInfoPtr; (* pointer to X11 VisualInfo *)
 	cmap : X11.Colormap; (* colormap for window *)
 	att : POINTER TO ARRAY OF GL.Int;  (* attributes of GL window *)
 	glxMajor, glxMinor, wmMajor, wmMinor: LONGINT;
@@ -355,11 +354,11 @@ VAR
 	bmodes : V.ModeInfo;
 	modnum, bestmode: LONGINT;
 	i: LONGINT;
-	dumysize: Api.XSizeHints;
+	dumysize: X11.XSizeHints;
 	defwin: X11.Window;
-
+	
 BEGIN
-	display := Api.OpenDisplay("");
+	display := X11.OpenDisplay("");
 	IF display =0 THEN
 		context.out.String(" cannot connect to X server"); context.out.Ln; context.out.Update;
 		RETURN FALSE;
@@ -410,7 +409,7 @@ BEGIN
  	END;
 
 (*	X11.Free(ADDRESSOF(modes));*)
-
+	
 	doubleBuffered := TRUE;
 
 (*  NEW(att, 13);
@@ -427,10 +426,10 @@ BEGIN
  NEW(att, 11);
   att[0] := GLC.GLX_RGBA;
   att[1] := GLC.GLX_DOUBLEBUFFER;
-  att[2] := GLC.GLX_DEPTH_SIZE;		att[3] := 16;
-  att[4] := GLC.GLX_RED_SIZE;  		att[5] := 4;
-  att[6] := GLC.GLX_GREEN_SIZE;	att[7] := 4;
-  att[8] := GLC.GLX_BLUE_SIZE;		att[9] := 4;
+  att[2] := GLC.GLX_DEPTH_SIZE;		att[3] := 24;
+  att[4] := GLC.GLX_RED_SIZE;  		att[5] := 8;
+  att[6] := GLC.GLX_GREEN_SIZE;	att[7] := 8;
+  att[8] := GLC.GLX_BLUE_SIZE;		att[9] := 8;
   att[10] := 0 ;
 
 
@@ -460,7 +459,7 @@ BEGIN
 	glctx := GL.glXCreateContext(display, visinfoptr, 0, GLC.GL_TRUE);
 	IF debug THEN context.out.String("glXCreateContext glctx= "); context.out.Int(glctx, 0); context.out.Ln; context.out.Update; END;
 
-	defwin :=  Api.RootWindow(display, visinfoptr.screen);
+	defwin :=  X11.RootWindow(display, visinfoptr.screen);
 	(* create a color map *)
 	cmap := X11.CreateColormap(display,  defwin, visinfoptr.visual, X11.AllocNone);
 	IF cmap = 0 THEN
@@ -468,7 +467,7 @@ BEGIN
 			context.out.String(" cannot create colormap"); context.out.Ln;
 (*			X11.GetErrorText(display, cmap, buf, LEN(buf));
 			context.out.String("ERROR: CreateColormap = "); context.out.String(buf); context.out.Ln;
-*)
+*)			
 			context.out.Update;
 		END;
 	END;
@@ -497,40 +496,40 @@ BEGIN
 
 		winAttr.overrideRedirect := TRUE;
 		 (* window event masks *)
-		winAttr.eventMask :=  Api.ExposureMask + Api.KeyPressMask + Api.ButtonPressMask + Api.StructureNotifyMask ;
-		masks := Api.CWBorderPixel + Api.CWColormap + Api.CWEventMask + Api.CWOverrideRedirect;
+		winAttr.eventMask :=  X11.ExposureMask + X11.KeyPressMask + X11.ButtonPressMask + X11.StructureNotifyMask ;
+		masks := X11.CWBorderPixel + X11.CWColormap + X11.CWEventMask + X11.CWOverrideRedirect;
 
-		win := Api.CreateWindow(display, defwin,  0, 0, dispWidth, dispHeight,
-		        0, visinfoptr.depth, Api.InputOutput,  visinfoptr.visual, masks, winAttr);
+		win := X11.CreateWindow(display, defwin,  0, 0, dispWidth, dispHeight,
+		        0, visinfoptr.depth, X11.InputOutput,  visinfoptr.visual, masks, winAttr);
 
-		(*Api.WarpPointer(display, Api.None, win, 0, 0, 0, 0, 0, 0);*)
-		Api.WarpPointer(display, Api.None, win, 0, 0, 0, 0, dispWidth DIV 2, dispHeight DIV 2);
-		Api.MapWindow(display, win);
-		res := Api.GrabKeyboard(display, win, Api.True, Api.GrabModeAsync , Api.GrabModeAsync, Api.CurrentTime);
-		res := Api.GrabPointer(display, win, Api.True, Api.ButtonPressMask, Api.GrabModeAsync, Api.GrabModeAsync, win, X11.None, Api.CurrentTime);
+		(*X11.WarpPointer(display, X11.None, win, 0, 0, 0, 0, 0, 0);*)
+		X11.WarpPointer(display, X11.None, win, 0, 0, 0, 0, dispWidth DIV 2, dispHeight DIV 2);
+		X11.MapWindow(display, win);
+		res := X11.GrabKeyboard(display, win, X11.True, X11.GrabModeAsync , X11.GrabModeAsync, X11.CurrentTime);
+		res := X11.GrabPointer(display, win, X11.True, X11.ButtonPressMask, X11.GrabModeAsync, X11.GrabModeAsync, win, X11.None, X11.CurrentTime);
 		context.out.String("fullscreen ends"); context.out.Ln; context.out.Update;
 	ELSE
 		context.out.String("NOT fullscreen"); context.out.Ln; context.out.Update;
 		(* create a window in windowed mode *)
 		(* window event masks *)
-		winAttr.eventMask := Api.ExposureMask + Api.KeyPressMask + Api.ButtonPressMask + Api.StructureNotifyMask;
+		winAttr.eventMask := X11.ExposureMask + X11.KeyPressMask + X11.ButtonPressMask + X11.StructureNotifyMask;
 
-		masks := Api.CWBorderPixel + Api.CWColormap + Api.CWEventMask;
-		win := Api.CreateWindow(display, defwin,  100, 100, width, height,
-		        0, visinfoptr.depth, Api.InputOutput,  visinfoptr.visual, masks, winAttr);
+		masks := X11.CWBorderPixel + X11.CWColormap + X11.CWEventMask;
+		win := X11.CreateWindow(display, defwin,  100, 100, width, height,
+		        0, visinfoptr.depth, X11.InputOutput,  visinfoptr.visual, masks, winAttr);
 
 		(* only set window title and handle wm_delete_events if in windowed mode *)
-		wmDelete := Api.InternAtom(display, "WM_DELETE_WINDOW", Api.True);
-		res := Api.SetWMProtocols(display, win, ADDRESSOF(wmDelete), 1);
-		Api.SetStandardProperties(display, win, TITLE, TITLE, Api.None, 0, 0, dumysize);
-		Api.MapWindow(display, win);
+		wmDelete := X11.InternAtom(display, "WM_DELETE_WINDOW", X11.True);
+		res := X11.SetWMProtocols(display, win, ADDRESSOF(wmDelete), 1);
+		X11.SetStandardProperties(display, win, TITLE, TITLE, X11.None, 0, 0, dumysize);
+		X11.MapWindow(display, win);
 	END;
 	IF win = 0 THEN
 		Close;
 		RETURN FALSE;
 	END;
-
-
+	
+	
 	res := GL.glXMakeCurrent(display, win, glctx);
 	IF res = 0 THEN
 		Close;
@@ -546,7 +545,7 @@ BEGIN
 		END;
 		context.out.Update;
 	END;
-
+	
  RETURN TRUE;
 END InitWindow;
 
@@ -555,12 +554,11 @@ VAR 	hints: Hints;
 	property: X11.Atom;
 BEGIN
 	IF  ~fullwindow OR  ~fullscreen THEN
-	windecorations := ~windecorations;
-
-		property := Api.InternAtom(display, "_MOTIF_WM_HINTS", Api.True);
-
-		IF ~windecorations THEN hints.flags := {1};END;
-		X11.ChangeProperty(display, win, property, property, 32, Api.PropModeReplace, ADDRESSOF(hints), 5);
+		hints.flags := {1};
+ 		windecorations := ~windecorations;
+ 		IF windecorations THEN hints.decorations := 0; ELSE hints.decorations := 1; END;
+		property := X11.InternAtom(display, "_MOTIF_WM_HINTS", X11.True);
+		X11.ChangeProperty(display, win, property, property, 32, X11.PropModeReplace, ADDRESSOF(hints), 5);
 	END;
 
 END ToggleDecorations;
@@ -594,19 +592,19 @@ END SaveImage;
 
 	PROCEDURE CheckAlternateKeys( VAR mb: SET );
 	BEGIN
-		IF ~MMseen & (Api.ControlMask IN xbuttons) THEN INCL( mb, MM ) END;
-		IF ~MRseen & (Api.Mod1Mask IN xbuttons) THEN INCL( mb, MR ) END
+		IF ~MMseen & (X11.ControlMask IN xbuttons) THEN INCL( mb, MM ) END;
+		IF ~MRseen & (X11.Mod1Mask IN xbuttons) THEN INCL( mb, MR ) END
 	END CheckAlternateKeys;
 
 	(* mouse handler *)
-	PROCEDURE SendMouseMsg( x, y, dz: LONGINT; xbuttons: SET32 );
+	PROCEDURE SendMouseMsg( x, y, dz: LONGINT; xbuttons: SET );
 	VAR mm: Inputs.AbsMouseMsg;
 	BEGIN
 		mm.keys := {};
 		mm.x := x;  mm.y := y;  mm.dz := dz;
-		IF Api.Button1Mask IN xbuttons THEN  INCL( mm.keys, ML )  END;
-		IF Api.Button2Mask IN xbuttons THEN  INCL( mm.keys, MM );  MMseen := TRUE  END;
-		IF Api.Button3Mask IN xbuttons THEN  INCL( mm.keys, MR );  MRseen := TRUE  END;
+		IF X11.Button1Mask IN xbuttons THEN  INCL( mm.keys, ML )  END;
+		IF X11.Button2Mask IN xbuttons THEN  INCL( mm.keys, MM );  MMseen := TRUE  END;
+		IF X11.Button3Mask IN xbuttons THEN  INCL( mm.keys, MR );  MRseen := TRUE  END;
 		IF ~(MMseen & MRseen) THEN  CheckAlternateKeys( mm.keys )  END;
 (*		Inputs.mouse.Handle( mm );*)
 		currX := x; currY := y;
@@ -626,38 +624,39 @@ END SaveImage;
 	VAR keys: SET;
 	BEGIN
 		keys := {};
-		IF Api.ShiftMask IN xbuttons THEN  INCL( keys, Inputs.LeftShift )  END;
-		IF Api.ControlMask IN xbuttons THEN  INCL( keys, Inputs.LeftCtrl )  END;
-		IF Api.Mod1Mask IN xbuttons THEN  INCL( keys, Inputs.LeftAlt )  END;
-		IF Api.Mod4Mask IN xbuttons THEN  INCL( keys, Inputs.LeftMeta )  END;
-		IF Api.Mod5Mask IN xbuttons THEN  INCL( keys, Inputs.RightAlt )  END;
+		IF X11.ShiftMask IN xbuttons THEN  INCL( keys, Inputs.LeftShift )  END;
+		IF X11.ControlMask IN xbuttons THEN  INCL( keys, Inputs.LeftCtrl )  END;
+		IF X11.Mod1Mask IN xbuttons THEN  INCL( keys, Inputs.LeftAlt )  END;
+		IF X11.Mod4Mask IN xbuttons THEN  INCL( keys, Inputs.LeftMeta )  END;
+		IF X11.Mod5Mask IN xbuttons THEN  INCL( keys, Inputs.RightAlt )  END;
 		RETURN keys
 	END KeyState;
 
 
 	PROCEDURE ToggleFullWindow;
 	VAR
-		cm: Api.XClientMessageEvent;
-		xev: Api.XEvent;
-		dl: Api.Data40;
+		cm: X11.ClientMessageEvent;
+		xev: X11.Event;
+		dl: X11.Data40;
 		wmstate, wmfullscreen: X11.Atom;
 		res: LONGINT;
 		defwin: X11.Window;
 	BEGIN
-	wmstate := Api.InternAtom(display, "_NET_WM_STATE", Api.False);
-	wmfullscreen := Api.InternAtom(display, "_NET_WM_STATE_FULLSCREEN", Api.False);
+	wmstate := X11.InternAtom(display, "_NET_WM_STATE", X11.False);
+	wmfullscreen := X11.InternAtom(display, "_NET_WM_STATE_FULLSCREEN", X11.False);
 
 	fullwindow := ~ fullwindow;
-	cm.typ := Api.ClientMessage;
+	cm.typ := X11.ClientMessage;
 	cm.window := win;
 	cm.messageType := wmstate;
 	cm.format := 32;
 	IF fullwindow THEN dl[0] := 1; ELSE dl[0] := 0; END;
-	dl[1] := wmfullscreen;	dl[2] := 0;
-	cm.data:= dl;
-	xev := SYSTEM.VAL(Api.XEvent, cm);
+	dl[1] := wmfullscreen;
+	dl[2] := 0;
+	cm.data:=dl;
+	xev := SYSTEM.VAL(X11.Event, cm);
 	defwin := X11.DefaultRootWindow(display);
-	res := Api.SendEvent(display, defwin, Api.False, Api.SubstructureNotifyMask, ADDRESSOF(xev));
+	X11.SendEvent(display, defwin, X11.False, X11.SubstructureNotifyMask, ADDRESSOF(xev));
 
 	END ToggleFullWindow;
 
@@ -665,10 +664,10 @@ END SaveImage;
 	PROCEDURE ChangeCursor;
 	VAR cursor: X11.Cursor;
 	BEGIN
-		curcursor := (curcursor MOD Api.XC_num_glyphs);
+		curcursor := (curcursor MOD X11.XC_num_glyphs);
 		cursor := X11.CreateFontCursor(display, curcursor);
 		X11.DefineCursor(display, win, cursor);
-		Api.FreeCursor(display, cursor);
+		X11.FreeCursor(display, cursor);
 		X11.Flush(display);
 		INC(curcursor);
 	END ChangeCursor;
@@ -690,25 +689,26 @@ END SaveImage;
 		 keysym: X11.KeySym;
 		 buffer: ARRAY 32 OF CHAR;
 		keycount: LONGINT;
-		 cm: Api.XClientMessageEvent;
-		 ke: Api.XKeyEvent;
-		 be: Api.XButtonEvent;
-		 cn : Api.XConfigureEvent;
-		 ee : Api.XExposeEvent;
-		 atomName: Api.PChar;
+		 cm: X11.ClientMessageEvent;
+		 ke: X11.KeyEvent;
+		 be: X11.ButtonEvent;
+		 cn : X11.ConfigureEvent;
+		 ee : X11.ExposeEvent;
+		 datal: X11.Data40;
+		 atomName: POINTER {UNSAFE} TO ARRAY OF CHAR;
 	BEGIN
-	 WHILE Api.Pending(display) > 0 DO
+	 WHILE X11.Pending(display) > 0 DO
 
-				Api.NextEvent( display, event );
+				X11.NextEvent( display, event );
 				CASE event.typ OF
-				| Api.Expose: Wr("Expose, GraphicsExpose");
-								ee := SYSTEM.VAL(Api.XExposeEvent, event);
+				| X11.Expose: Wr("Expose, GraphicsExpose");
+								ee := SYSTEM.VAL(X11.ExposeEvent, event);
 								context.out.String("expose serial"); context.out.Int(ee.serial,5); context.out.Ln;
 								context.out.Update;
 								IF ee.count = 0 THEN DrawGears(); END;
 
-				| Api.ConfigureNotify: Wr("ConfigureNotify");
-						cn := SYSTEM.VAL(Api.XConfigureEvent, event);
+				| X11.ConfigureNotify: Wr("ConfigureNotify");
+						cn := SYSTEM.VAL(X11.ConfigureEvent, event);
 
 			                    (* call Reshape only if our window-size changed *)
 						IF (cn.width # width) OR  (cn.height # height) THEN
@@ -717,19 +717,19 @@ END SaveImage;
 								Reshape(width, height);
 						END;
 
-				| Api.ButtonPress: Wr("ButtonPress");
-							be := SYSTEM.VAL(Api.XButtonEvent, event);
-							context.out.String("sendEvent="); IF be.sendEvent  THEN context.out.String("TRUE") ELSE context.out.String("FALSE") END; context.out.Ln;
+				| X11.ButtonPress: Wr("ButtonPress");
+							be := SYSTEM.VAL(X11.ButtonEvent, event);
+							context.out.String("sendEvent="); IF be.sendEvent=1 THEN context.out.String("TRUE") ELSE context.out.String("FALSE") END; context.out.Ln;
 							context.out.String("be.button="); context.out.Int(be.button,2); context.out.Ln;
 							context.out.Update;
-							(* IF be.button = Api.Button1 THEN
+							(* IF be.button = X11.Button1 THEN
 								alive := FALSE;
 							END; *)
-				| Api.KeyPress: Wr("KeyPress");
-								ke := SYSTEM.VAL(Api.XKeyEvent, event);
-								keycount := Api.LookupString(ke, buffer, X11.BufferSize, keysym, compstatus );
+				| X11.KeyPress: Wr("KeyPress");
+								ke := SYSTEM.VAL(X11.KeyEvent, event);
+								keycount := X11.LookupString(ke, buffer, X11.BufferSize, keysym, compstatus );
 
-								(* keysym := Api.LookupKeysym(ke, 0); *)
+								(* keysym := X11.LookupKeysym(ke, 0); *)
 								WrKey(keycount, buffer, keysym);
 
 								IF (keysym = KS.XK_Escape) OR (keysym = KS.XK_q1) OR (keysym = KS.XK_Q) THEN alive := FALSE
@@ -748,25 +748,25 @@ END SaveImage;
 								ELSIF (keysym = KS.XK_m1) THEN ChangeCursor();
 								END;
 
-				| Api.ClientMessage: Wr("ClientMessage");
-						cm := SYSTEM.VAL(Api.XClientMessageEvent, event);
+				| X11.ClientMessage: Wr("ClientMessage");
+						cm := SYSTEM.VAL(X11.ClientMessageEvent, event);
 						(* context.out.String("sendEvent="); context.out.Boolean(cm.sendEvent); context.out.Ln; *)
-						atomName := Api.GetAtomName(display, cm.messageType);
+						atomName := X11.XGetAtomName(display, cm.messageType);
 						context.out.String("cm.messageType= "); context.out.Int(cm.messageType, 0); context.out.Ln;
-						IF atomName # NIL THEN
+				(*		IF atomName # NIL THEN
 							context.out.String("atomName="); context.out.String(atomName^); context.out.Ln;
 						END;
-
-
-						context.out.String("cm.data[0]="); context.out.Int(cm.data[0], 0); context.out.Ln;
+*)
+						datal := cm.data;
+						context.out.String("datal[0]="); context.out.Int(datal[0], 0); context.out.Ln;
 						context.out.String("wmDeleteWindow="); context.out.Int(wmDelete,0); context.out.Ln;
-						atomName := Api.GetAtomName(display, SYSTEM.VAL(X11.Atom, cm.data[0]));
-						IF atomName # NIL THEN
-							context.out.String("cm.data[0] atomName="); context.out.String(atomName^); context.out.Ln;
-						END;
+						atomName := X11.XGetAtomName(display, datal[0]);
+(*						IF atomName # NIL THEN
+							context.out.String("datal[0] atomName="); (* context.out.String(atomName^); context.out.Ln; *)
+						END; *)
 						context.out.Update;
 
-						IF  cm.data[0] = wmDelete THEN
+						IF datal[0] = wmDelete THEN
 						    Wr("DeleteWindow");
 						    alive := FALSE;
 						END;
@@ -830,6 +830,6 @@ END MyXGear2.
 
 MyXGear2.Open~
 
-System.Free MyXGear2 ~
+System.Free MyXGear2 ~ 
 
 System.FreeDownTo OpenGL ~ 

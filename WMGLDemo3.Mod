@@ -34,7 +34,7 @@ TYPE
 			Init(w, h, FALSE); (* use alpha, for 32bpp img *)
 			WM.DefaultAddWindow(SELF);
 			SetTitle(Strings.NewString("WMGLDemo3: Gears "));
-			canvas.SetColor(WMGraphics.Green);
+			
 			font := canvas.GetFont();
 			fpsstr := "FPS: ";
 
@@ -51,7 +51,7 @@ TYPE
 			alive := TRUE;
 		END New;
 
-		PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
+		PROCEDURE KeyEvent (ucs: SIZE; flags: SET; keysym: SIZE);
 		BEGIN
 
 			CASE CHR(ucs) OF
@@ -73,7 +73,7 @@ TYPE
 			END;
 		END KeyEvent;
 
-		PROCEDURE WheelMove(dz : LONGINT);
+		PROCEDURE WheelMove(dz : SIZE);
 		BEGIN
 			ztrans := ztrans + dz;
 			IF ztrans > -1.0 THEN ztrans := -1.0; END;
@@ -98,20 +98,18 @@ TYPE
 		END Close;
 
 		PROCEDURE UpdateImage;
-		VAR textWidth, textHeight: LONGINT;
+		VAR textWidth, textHeight: SIZE;
 		BEGIN
 			MakeCurrent();
 			DrawGears;
 			SwapGLBuffer();
 			DeActivate();
-
-
+			canvas.SetColor(WMGraphics.Green);
 			font.GetStringSize(fpsstr, textWidth, textHeight);
 			canvas.DrawString(4, textHeight, fpsstr);
 
 			Swap();
 			Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
-
 		END UpdateImage;
 
 	PROCEDURE DrawMode(dm: LONGINT);
@@ -329,11 +327,11 @@ TYPE
 
 	END DrawGears;
 
-	PROCEDURE Reshape(w, h: LONGINT);
+	PROCEDURE Reshape(w, h: SIZE);
 	BEGIN
 		MakeCurrent();
 
-			GL.Viewport(0, 0, w, h);
+			GL.Viewport(0, 0, w(GL.Sizei), h(GL.Sizei));
 			GL.ClearColor(0.0, 0.0, 0.0, 0.0);
 			GL.MatrixMode(GLC.GL_PROJECTION);
 			GL.LoadIdentity();

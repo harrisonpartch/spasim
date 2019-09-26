@@ -50,7 +50,7 @@ TYPE
 			IncCount
 		END New;
 
-		PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
+		PROCEDURE KeyEvent (ucs: SIZE; flags: SET; keysym: SIZE);
 		BEGIN
 			CASE CHR(ucs) OF
 				"a", "A": BEGIN {EXCLUSIVE} animated := ~ animated; END;
@@ -63,7 +63,7 @@ TYPE
 			END;
 		END KeyEvent;
 
-		PROCEDURE WheelMove(dz : LONGINT);
+		PROCEDURE WheelMove(dz : SIZE);
 		BEGIN
 			lookatz := lookatz + dz;
 			Reshape(GetWidth(), GetHeight());
@@ -183,7 +183,7 @@ TYPE
 		GL.BindVertexArray(vaoID);
 		GL.GenBuffers(1, ADDRESSOF(vertexVBOID));
 		GL.BindBuffer(GLC.GL_ARRAY_BUFFER, vertexVBOID);
-		GL.BufferData(GLC.GL_ARRAY_BUFFER, LEN(pvertex,0)*8*4, ADDRESSOF(pvertex[0].x), GLC.GL_STATIC_DRAW);
+		GL.BufferData(GLC.GL_ARRAY_BUFFER, (LEN(pvertex,0)*8*4)(GL.Sizei), ADDRESSOF(pvertex[0].x), GLC.GL_STATIC_DRAW);
 
 		GL.EnableVertexAttribArray(0);
 		offset := 0;
@@ -214,10 +214,10 @@ TYPE
 		GL.PopMatrix();
 	END displayCB;
 
-	PROCEDURE Reshape(w, h: LONGINT);
+	PROCEDURE Reshape(w, h: SIZE);
 	BEGIN
 		MakeCurrent();
-		GL.Viewport(0 , 0, w, h);
+		GL.Viewport(0 , 0, w(GL.Sizei), h(GL.Sizei));
 
 			GL.MatrixMode(GLC.GL_PROJECTION);
 			GL.LoadIdentity();

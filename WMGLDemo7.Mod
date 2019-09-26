@@ -43,7 +43,7 @@ TYPE
 
 	END New;
 
-	PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
+	PROCEDURE KeyEvent (ucs: SIZE; flags: SET; keysym: SIZE);
 	BEGIN
 		CASE CHR(ucs) OF
 			"a", "A": BEGIN {EXCLUSIVE} animated := ~ animated; END;
@@ -76,7 +76,7 @@ TYPE
 
 	PROCEDURE UpdateImage;
 	VAR
-		textWidth, textHeight: LONGINT;
+		textWidth, textHeight: SIZE;
 	BEGIN
 		MakeCurrent();
 			Display;
@@ -237,10 +237,10 @@ TYPE
 		drawScene(glc.GL_CCW);
 	END Display;
 
-	PROCEDURE Reshape(w, h: LONGINT);
+	PROCEDURE Reshape(w, h: SIZE);
 	BEGIN
 		MakeCurrent();
-		gl.Viewport (0, 0, w, h);
+		gl.Viewport (0, 0, w(gl.Sizei), h(gl.Sizei));
 		gl.MatrixMode (glc.GL_PROJECTION);
 		gl.LoadIdentity ();
 		GLU.Perspective (50.0, 1.0, 1.0, 20.0);
@@ -307,4 +307,4 @@ System.Free  WMGLDemo7 ~
 
 WMGLDemo7.Open ~
 
-System.FreeDownTo OpenGL ~ 
+System.FreeDownTo OpenGL ~

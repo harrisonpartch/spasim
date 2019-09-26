@@ -38,7 +38,7 @@ TYPE
 			IncCount
 		END New;
 
-		PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
+		PROCEDURE KeyEvent (ucs: SIZE; flags: SET; keysym: SIZE);
 		BEGIN
 			CASE CHR(ucs) OF
 				"a", "A": BEGIN {EXCLUSIVE} animated := ~ animated; END;
@@ -167,10 +167,10 @@ TYPE
 	END DrawPlane;
 
 
-	PROCEDURE Reshape(w, h: LONGINT);
+	PROCEDURE Reshape(w, h: SIZE);
 	BEGIN
 		MakeCurrent();
-		GL.Viewport(0,0, w, h);
+		GL.Viewport(0,0, w(GL.Sizei), h(GL.Sizei));
 		GL.MatrixMode(GLC.GL_PROJECTION);
 		GL.LoadIdentity ();
 			GL.Ortho(-1.5 ,1.5, -1.5, 1.5, -1.0, 1.0);

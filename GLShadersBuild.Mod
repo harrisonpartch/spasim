@@ -237,7 +237,7 @@ TYPE
 
 
 	PROCEDURE PrintShaderInfoLog(CONST tit: ARRAY OF CHAR; obj: Uint);
-	VAR infologLength, charsWritten: LONGINT;
+	VAR infologLength, charsWritten: SIGNED32;
 		logInfo: Strings.String;
 		info: Strings.String;
 
@@ -259,7 +259,7 @@ TYPE
 	END PrintShaderInfoLog;
 
 	PROCEDURE PrintProgramInfoLog(obj: Uint);
-	VAR infologLength, charsWritten: LONGINT;
+	VAR infologLength, charsWritten: SIGNED32;
 		infoLog: Strings.String;
 	BEGIN
 		infologLength := 0;
@@ -450,7 +450,7 @@ TYPE
 	END Window;
 
 VAR
-	nofWindows : LONGINT;
+	nofWindows : SIGNED32;
 	context: GLContext.Context; (* opengl context *)
 
 

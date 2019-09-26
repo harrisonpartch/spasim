@@ -105,11 +105,24 @@ BEGIN
 END clrd;
 
 PROCEDURE clrd4(CONST ra,rb,rc,rd: Base.Ray): REAL;
-BEGIN		
-	RETURN (clrd(rb,rd)+clrd(ra,rc))/2;
+BEGIN	
+	IF ra.justhit = rd.justhit THEN	
+		RETURN (clrd(rb,rd)+clrd(ra,rc))/6;
+	ELSE
+		RETURN 1
+	END
 END clrd4;
 
 PROCEDURE tessa16(cam:Camera);	
+
+VAR
+	i,j,k: INTEGER;
+	theta,phi,dtheta,dphi: REAL;
+	ray: Base.Ray;
+	rays: ARRAY 16,16 OF Base.Ray;
+	tileimage: ARRAY 16,16 OF Base.ray_color;
+	pixel: Raster.Pixel;
+	r,b,g: REAL;
 
 PROCEDURE t2x2a(CONST x,y: INTEGER);
 BEGIN
@@ -277,29 +290,35 @@ PROCEDURE t16x16fill();
 VAR
 	i,j: INTEGER;
 BEGIN
-(*	IF clrd4(rays[0,0], rays[15,0], rays[15,15], rays[0,15]) > thresh1a THEN *)
+	IF clrd4(rays[0,0], rays[15,0], rays[15,15], rays[0,15]) > thresh1a THEN
 		t8x8a(0,0);
 		t8x8b(8,0);
 		t8x8c(8,8);
 		t8x8d(0,8); 
-(*	ELSE
-		FOR i:= 0 TO 15 DO
-			FOR j:= 0 TO 15 DO
-				tileimage[i,j]:=rays[0,0];
+	ELSE
+		FOR i:= 0 TO 7 DO
+			FOR j:= 0 TO 7 DO
+				tileimage[i,j]:=rays[0,0].clr;
 			END
-		END
+		END;
+		FOR i:= 8 TO 15 DO
+			FOR j:= 0 TO 7 DO
+				tileimage[i,j]:=rays[15,0].clr;
+			END
+		END;	
+		FOR i:= 8 TO 15 DO
+			FOR j:= 8 TO 15 DO
+				tileimage[i,j]:=rays[15,15].clr;
+			END
+		END;
+		FOR i:= 0 TO 7 DO
+			FOR j:= 8 TO 15 DO
+				tileimage[i,j]:=rays[0,15].clr
+			END
+		END;	
 	END
-*)
 END t16x16fill;
 
-VAR
-	i,j,k: INTEGER;
-	theta,phi,dtheta,dphi: REAL;
-	ray: Base.Ray;
-	rays: ARRAY 16,16 OF Base.Ray;
-	tileimage: ARRAY 16,16 OF Base.ray_color;
-	pixel: Raster.Pixel;
-	r,b,g: REAL;
 BEGIN
 	angletoray(rays[0,0],cam.theta,cam.phi);
 	angletoray(rays[0,15],cam.theta+cam.dtheta,cam.phi);
@@ -671,15 +690,15 @@ END splitcam;
 PROCEDURE moredetail*(d: INTEGER);
 BEGIN
 	decthresh1(d); 
-	Base.horizon:=Base.horizon+0.001;
+	Base.horizon:=Base.horizon*11/10;
 	IF Base.horizon>1 THEN Base.horizon:=1 END
 END moredetail;
 
 PROCEDURE lessdetail*(d: INTEGER);
 BEGIN
 	incthresh1(d); 
-	Base.horizon:=Base.horizon-0.001; 
-	IF Base.horizon<0.01 THEN Base.horizon:=0.01 END
+	Base.horizon:=Base.horizon*10/11; 
+	IF Base.horizon<0.0001 THEN Base.horizon:=0.0001 END
 END lessdetail;
 
 PROCEDURE decthresh1(d: INTEGER);
@@ -694,8 +713,8 @@ END decthresh1;
 PROCEDURE incthresh1(d: INTEGER);
 BEGIN
 	thresh1a:=thresh1a*11/10;
-	IF thresh1a>1/12 THEN 
-		thresh1a:=1/12;
+	IF thresh1a>3/12 THEN 
+		thresh1a:=3/12;
 		INC(foveaparameter)
 	END
 END incthresh1;
@@ -794,7 +813,7 @@ BEGIN
 	END;	
 	AFTER:=2;
  	FAST:=3;
- 	thresh1a:=0.5;
+ 	thresh1a:=0.01;
  	horizon:=1.0;
  	lsense:=0.2;
  	aperture.width:=1;

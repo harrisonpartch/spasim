@@ -47,7 +47,7 @@ TYPE
 	END New;
 
 
-	PROCEDURE KeyEvent (ucs: LONGINT; flags: SET; keysym: LONGINT);
+	PROCEDURE KeyEvent (ucs: SIZE; flags: SET; keysym: SIZE);
 	BEGIN
 		CASE CHR(ucs) OF
 			 "d": drawMode := (drawMode+1) MOD 3; DrawMode(drawMode); UpdateImage;
@@ -65,7 +65,7 @@ TYPE
 		END;
 	END KeyEvent;
 
-	PROCEDURE WheelMove(dz : LONGINT);
+	PROCEDURE WheelMove(dz : SIZE);
 	BEGIN
 		IF dz < 0 THEN
 			MakeCurrent();
@@ -238,10 +238,10 @@ TYPE
 		 END;
 	END render;
 
-	PROCEDURE Reshape(w, h: LONGINT);
+	PROCEDURE Reshape(w, h: SIZE);
 	BEGIN
 		MakeCurrent();
-		GL.Viewport (0, 0, w, h);
+		GL.Viewport (0, 0, w(GL.Sizei), h(GL.Sizei));
 
 		GL.MatrixMode (GLC.GL_PROJECTION);
 		GL.LoadIdentity ();

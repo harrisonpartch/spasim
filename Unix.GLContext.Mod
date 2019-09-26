@@ -1,7 +1,7 @@
 MODULE GLContext; (** AUTHOR "fnecati"; PURPOSE "OpenGL Context using GLXPixmap for LinuxAos"; *)
 
 IMPORT
-	Machine, X11, Api:=X11Api, GL:=OpenGL, GLC := OpenGLConst, Raster,
+	Machine, X11, GL:=OpenGL, GLC := OpenGLConst, Raster,
 	KernelLog, SYSTEM;
 
 (*! resizeble context using X11 Pixmap *)
@@ -13,8 +13,8 @@ TYPE
 		display- : X11.DisplayPtr;
 		root: X11.Window;
 		glctx- : GL.GLXContext;
-		width-, height-: LONGINT;
-		visualInfoPtr- : Api.VisualInfoPtr;
+		width-, height-: SIZE;
+		visualInfoPtr- : X11.VisualInfoPtr;
 		pixmap-: X11.Pixmap;
 		glxpixmap-: GL.GLXPixmap;
 	END;
@@ -23,24 +23,22 @@ TYPE
 
 TYPE Context* = OBJECT
 	VAR
-		glWin -{UNTRACED}: WindowStruct;
-	 	buffer-: Buffer; (* for speedup flip image in y*)
+		glWin-: WindowStruct;
+	 	buffer: Buffer; (* for speedup flip image in y*)
 
-		width, height: LONGINT;
-
-	PROCEDURE Init*(w, h: LONGINT);
+	PROCEDURE Init*(w, h: SIZE);
 	VAR
 		resb: X11.Bool;
-		att: POINTER TO  ARRAY OF GL.Int;
-	  	dumy1, dumy2: LONGINT;
+		att: ARRAY 13 OF GL.Int;
+	  	dumy1, dumy2: SIGNED32;
 
 	BEGIN
 		NEW(glWin);
-		width := w; height := h;
+		glWin.width := w; glWin.height := h;
 		Machine.Acquire( Machine.X11 );
 
 	(*  get a connection *)
-		glWin.display := Api.OpenDisplay("");
+		glWin.display := X11.OpenDisplay("");
 		IF glWin.display = NIL THEN
  			Machine.Release( Machine.X11 );
  			KernelLog.String(" cannot connect to X server"); KernelLog.Ln;
@@ -57,7 +55,7 @@ TYPE Context* = OBJECT
 			RETURN
 		END;
 
-		NEW(att, 13);
+(*		NEW(att, 13); *)
 		att[0] := GLC.GLX_RGBA;
 		att[1] := GLC.GLX_DOUBLEBUFFER;
 		att[2] := GLC.GLX_DEPTH_SIZE;	att[3] := 24;
@@ -84,8 +82,8 @@ TYPE Context* = OBJECT
 		END;
 
 		glWin.root := X11.DefaultRootWindow(glWin.display);
-		glWin.pixmap := X11.CreatePixmap(glWin.display, glWin.root, w, h, glWin.visualInfoPtr.depth);
-		IF glWin.pixmap = 0 THEN
+		glWin.pixmap := X11.CreatePixmap(glWin.display, glWin.root, w(SIGNED16), h(SIGNED16), glWin.visualInfoPtr.depth);
+		IF glWin.pixmap = NIL THEN
 			Machine.Release( Machine.X11 );
 			KernelLog.String(" glWin.pixmap ERROR"); KernelLog.Ln;
 			Close;
@@ -94,7 +92,7 @@ TYPE Context* = OBJECT
 
 		glWin.glxpixmap := GL.glXCreateGLXPixmap(glWin.display, glWin.visualInfoPtr, glWin.pixmap);
 
-		IF glWin.glxpixmap = 0 THEN
+		IF glWin.glxpixmap = NIL THEN
 			Machine.Release( Machine.X11 );
 			KernelLog.String("glWin.glxpixmap ERROR"); KernelLog.Ln;
 			Close;
@@ -106,7 +104,7 @@ TYPE Context* = OBJECT
 	 	(* create GL context *)
 	 	(* GL_TRUE: Use direct rendering, GL_FLASE: use X server for rendering *)
 	 	glWin.glctx := GL.glXCreateContext(glWin.display, glWin.visualInfoPtr, 0, GLC.GL_TRUE);
-	 	IF glWin.glctx = 0 THEN
+	 	IF glWin.glctx = NIL THEN
 	 		Machine.Release( Machine.X11 );
 			KernelLog.String("could not create context");
 			Close;
@@ -139,36 +137,37 @@ TYPE Context* = OBJECT
 	END Close;
 
 	PROCEDURE CloseWindow;
-	VAR resb: X11.Bool; res: WORD;
+	VAR resb: X11.Bool; res: INTEGER;
 	BEGIN
 		Machine.Acquire( Machine.X11 );
+		GL.glXWaitGL();
 		GL.glXWaitX();
 		X11.Sync(glWin.display,X11.False);
 
 		(* do we have a rendering context *)
-		IF glWin.glctx # 0 THEN
+		IF glWin.glctx # NIL THEN
 			(* Release the context *)
-		    	resb := GL.glXMakeCurrent(glWin.display, 0, 0);
-		    	(* Delete the context *)
+			resb := GL.glXMakeCurrent(glWin.display, NIL, NIL);
+			(* Delete the context *)
 			GL.glXDestroyContext(glWin.display, glWin.glctx);
 			IF debug THEN KernelLog.String("context deleted"); KernelLog.Ln; END;
 		END;
 
 		(* do we have a window *)
-		IF glWin.glxpixmap # 0 THEN
+		IF glWin.glxpixmap # NIL THEN
 			GL.glXDestroyGLXPixmap(glWin.display, glWin.glxpixmap);
 			IF debug THEN KernelLog.String("GLXPixmap deleted"); KernelLog.Ln; END;
 		END;
 
 		(* do we have a window *)
-		IF glWin.pixmap # 0 THEN
+		IF glWin.pixmap # NIL THEN
 			X11.FreePixmap(glWin.display, glWin.pixmap);
 			IF debug THEN KernelLog.String("X11-Pixmap deleted"); KernelLog.Ln; END;
 		END;
 
 		(* do we have a display *)
 		IF glWin.display # NIL THEN
-			 res := Api.CloseDisplay(glWin.display);
+			 res := X11.CloseDisplay(glWin.display);
 			IF debug THEN KernelLog.String("display deleted"); KernelLog.Ln; END;
 		END;
 		glWin := NIL;
@@ -176,74 +175,66 @@ TYPE Context* = OBJECT
  	END CloseWindow;
 
 	(** *)
-	PROCEDURE CreatePixmaps(w, h: LONGINT): BOOLEAN;
+	PROCEDURE CreatePixmaps(w, h: SIZE);
 	VAR resb: X11.Bool;
 	BEGIN
 		Machine.Acquire( Machine.X11 );
-		(* resb := GL.glXMakeCurrent(glWin.display, glWin.glxpixmap, glWin.glctx); *)
+		resb := GL.glXMakeCurrent(glWin.display, NIL, NIL);
 		(* first delete these, do we have a gxpixmap *)
-		IF glWin.glxpixmap # 0 THEN
+		IF glWin.glxpixmap # NIL THEN
 			GL.glXDestroyGLXPixmap(glWin.display, glWin.glxpixmap);
 			IF debug THEN KernelLog.String("GLXPixmap deleted"); KernelLog.Ln; END;
 		END;
 
 		(* do we have a pixmap *)
-		IF glWin.pixmap # 0 THEN
+		IF glWin.pixmap # NIL THEN
 			X11.FreePixmap(glWin.display, glWin.pixmap);
 			IF debug THEN KernelLog.String("X11-Pixmap deleted"); KernelLog.Ln; END;
 		END;
 
 		(* now create them *)
-		glWin.pixmap := X11.CreatePixmap(glWin.display, glWin.root, w, h, glWin.visualInfoPtr.depth);
-		IF glWin.pixmap = 0 THEN
+		glWin.pixmap := X11.CreatePixmap(glWin.display, glWin.root, w(SIGNED16), h(SIGNED16), glWin.visualInfoPtr.depth);
+		IF glWin.pixmap = NIL THEN
 			KernelLog.String(" glWin.pixmap ERROR"); KernelLog.Ln;
 			Machine.Release( Machine.X11 );
-			RETURN FALSE;
+			RETURN ;
 		END;
 
 		glWin.glxpixmap := GL.glXCreateGLXPixmap(glWin.display, glWin.visualInfoPtr, glWin.pixmap);
 
-		IF glWin.glxpixmap = 0 THEN
+		IF glWin.glxpixmap = NIL THEN
 			KernelLog.String("glWin.glxpixmap ERROR"); KernelLog.Ln;
 			Machine.Release( Machine.X11 );
-			RETURN FALSE;
-
+			RETURN;
 		END;
 		Machine.Release( Machine.X11 );
-		RETURN TRUE
-
 	END CreatePixmaps;
 
-	PROCEDURE GetDisplay*(): LONGWORD;
+	PROCEDURE GetDisplay*(): LONGINTEGER;
 	BEGIN
 		RETURN glWin.display;
 	END GetDisplay;
 
-	PROCEDURE GetContext*(): LONGWORD;
+	PROCEDURE GetContext*(): LONGINTEGER;
 	BEGIN
 		RETURN glWin.glctx;
 	END GetContext;
 
-	PROCEDURE GetScreen*(): LONGINT;
+	PROCEDURE GetScreen*(): SIGNED32;
 	BEGIN
 		RETURN 0; (*context.glWin.screen*)
 	END GetScreen;
 
-	PROCEDURE Resize*(w, h: LONGINT): BOOLEAN;
-	VAR res: BOOLEAN;
-	BEGIN {EXCLUSIVE}
-		res := FALSE;
-		IF (width = w) & (height = h) THEN RETURN FALSE END;
-
-		IF  CreatePixmaps(w, h) THEN
-			NEW(buffer, w*h*4);
-			width := w; height := h;
-			res := TRUE;
-		END;
+	PROCEDURE Resize*(w, h: SIZE);
+	BEGIN {EXCLUSIVE}	
+		IF (glWin.width = w) & (glWin.height = h) THEN RETURN END;
+		buffer := NIL;
+		NEW(buffer, w*h*4);
+		CreatePixmaps(w, h);			
+		glWin.width := w; glWin.height := h;
 		IF debug THEN
-			KernelLog.String("context resize res: "); KernelLog.Boolean(res); KernelLog.Ln;
+			KernelLog.String("context.resize w, h = "); KernelLog.Int(w, 0); KernelLog.Int(h, 10); KernelLog.Ln;
 		END;
-		RETURN res;
 	END Resize;
 
 	PROCEDURE MakeCurrent*();
@@ -272,17 +263,17 @@ TYPE Context* = OBJECT
 
 	PROCEDURE RenderInto*(image: Raster.Image);
 	VAR
-		i: LONGINT;
-		w, h, bytes: LONGINT;
+		i: SIZE;
+		w, h, bytes: SIZE;
 		sadr, dadr: ADDRESS;
 	BEGIN
 		(* KernelLog.String("context.RenderInto ..."); KernelLog.Ln; *)
 		IF (image = NIL) OR (image.adr = NIL) THEN RETURN END;
-		w := image.width;
-		h := image.height;
+		w := image.width; h := image.height;
+		(* KernelLog.String("renderinto w, h = "); KernelLog.Int(w, 0); KernelLog.Int(h, 10); KernelLog.Ln;  *)
 		Machine.Acquire( Machine.X11 );
-(*		GL.glXWaitGL(); *)
-		GL.ReadPixels(0, 0, w, h, GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, ADDRESSOF(buffer^[0]) );
+		GL.glXWaitGL();
+		GL.ReadPixels(0, 0, w(GL.Sizei), h(GL.Sizei), GLC.GL_BGRA, GLC.GL_UNSIGNED_BYTE, ADDRESSOF(buffer^[0]) );
 		Machine.Release( Machine.X11 );
 
 		(* flip vertical, y *)

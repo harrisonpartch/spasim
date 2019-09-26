@@ -59,6 +59,7 @@ BEGIN
 		IF ~out THEN
 			v:= blox[ijk.i,ijk.j,ijk.k];
 			IF (v#NIL) THEN
+				ray.justhit:=v;
 				ray.lxyz.x := ABS(xyz.x - ijk.i);
 				ray.lxyz.y := ABS(xyz.y - ijk.j);
 				ray.lxyz.z := ABS(xyz.z - ijk.k);
@@ -152,6 +153,7 @@ BEGIN
 				IF ~(out OR ray.terminate) THEN
 					v := blox[ijk.i,ijk.j,ijk.k];
 					IF (v#NIL) THEN
+						ray.justhit:=v;
 						ray.lxyz.x := ABS(xyz.x - ijk.i);
 						ray.lxyz.y := ABS(xyz.y - ijk.j);
 						ray.lxyz.z := ABS(xyz.z - ijk.k);
@@ -801,7 +803,9 @@ BEGIN
 		w.RawLReal(red);
 		w.RawLReal(green);
 		w.RawLReal(blue);
-		w.RawLReal(black);
+		w.RawLReal(redblack);
+		w.RawLReal(greenblack);
+		w.RawLReal(blueblack);
 		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 			IF (blox[i,j,k]#NIL) THEN
 				w.RawBool(TRUE);
@@ -830,7 +834,9 @@ BEGIN
 		r.RawLReal(red);
 		r.RawLReal(green);
 		r.RawLReal(blue);
-		r.RawLReal(black);
+		r.RawLReal(redblack);
+		r.RawLReal(greenblack);
+		r.RawLReal(blueblack);
 		FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 			r.RawBool(b);
 			IF b THEN

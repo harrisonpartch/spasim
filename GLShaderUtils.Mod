@@ -11,14 +11,14 @@ TYPE
 	Uint = gl.Uint;
 	Int = gl.Int;
 
-	Vector16f = ARRAY 16 OF REAL; (* 4x4 GLfloat Matrix *)
+	Vector16f = ARRAY 16 OF FLOAT32; (* 4x4 GLfloat Matrix *)
 
 VAR
 	wr: Streams.Writer;
 
 (* write projection matrix *)
 PROCEDURE WriteProjMatrixf*(CONST title: ARRAY OF CHAR);
-VAR i: LONGINT;
+VAR i: SIGNED32;
 	v: Vector16f;
 BEGIN
 	gl.GetFloatv(glc.GL_PROJECTION_MATRIX, ADDRESSOF(v[0]));
@@ -32,7 +32,7 @@ END WriteProjMatrixf;
 
 (* write modelview matrix *)
 PROCEDURE WriteModelMatrixf*(CONST title: ARRAY OF CHAR);
-VAR i : LONGINT;
+VAR i : SIGNED32;
 	v: Vector16f;
 BEGIN
 	gl.GetFloatv(glc.GL_MODELVIEW_MATRIX, ADDRESSOF(v[0]));
@@ -48,14 +48,14 @@ END WriteModelMatrixf;
 PROCEDURE TextFileRead*(CONST fname: ARRAY OF CHAR): Strings.String;
 VAR
 	f: Files.File; rider: Files.Rider;
-	str: Strings.String; len: LONGINT;
+	str: Strings.String; len: Files.Position;
 BEGIN
 	f := Files.Old(fname);
 	IF f #  NIL THEN
 		len := f.Length();
-		NEW(str, len+1);
+		NEW(str, SIZE(len+1));
 		f.Set(rider, 0);
-		f.ReadBytes(rider, str^, 0, len);
+		f.ReadBytes(rider, str^, 0, SIZE(len));
 	END;
 	RETURN str
 END TextFileRead;
@@ -102,7 +102,7 @@ BEGIN
 END PrintOpenGLError;
 
 PROCEDURE PrintShaderSource*(obj: Uint);
-VAR sourceLength: LONGINT;
+VAR sourceLength: SIGNED32;
 	ssource: Strings.String;
 	sslength: gl.Sizei;
 BEGIN
@@ -116,7 +116,7 @@ BEGIN
 END PrintShaderSource;
 
 PROCEDURE PrintShaderInfoLog*(CONST tit: ARRAY OF CHAR; obj: Uint);
-VAR infologLength, charsWritten: LONGINT;
+VAR infologLength, charsWritten: SIGNED32;
 	logInfo: Strings.String;
 	info: Strings.String;
 
@@ -137,7 +137,7 @@ BEGIN
 END PrintShaderInfoLog;
 
 PROCEDURE PrintProgramInfoLog*(obj: Uint);
-VAR infologLength, charsWritten: LONGINT;
+VAR infologLength, charsWritten: SIGNED32;
 	infoLog: Strings.String;
 BEGIN
 	gl.GetProgramiv(obj, glc.GL_INFO_LOG_LENGTH, ADDRESSOF(infologLength));

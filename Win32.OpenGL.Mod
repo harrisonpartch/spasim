@@ -11352,7 +11352,7 @@ END ReadCoreVersion;
 PROCEDURE Int_GetExtensionString(): Strings.String;
 VAR
 	buffer0, buffer1, buffer2, es: Strings.String;
-	len0, len1: LONGINT;
+	len0, len1: SIZE;
 	i: LONGINT;
 	extensionCount : LONGINT;
 	strarray: Strings.StringArray;

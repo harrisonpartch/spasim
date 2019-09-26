@@ -149,11 +149,11 @@ TYPE
 	END GetHeight;
 
 	(** sets title of window *)
-	PROCEDURE SetTitle*(tit: ARRAY OF CHAR);
+	PROCEDURE SetTitle*(CONST tit: ARRAY OF CHAR);
 	VAR res: LONGINT;
 	BEGIN
 		COPY(tit, title);
-		res:=User32.SetWindowText(SELF.hWnd, title);
+		res := User32.SetWindowText(SELF.hWnd, title);
 	END SetTitle;
 
 	(** set idle time  for calling IdleDisplay proc *)
@@ -233,11 +233,11 @@ TYPE
 		attr[i] := minor; INC(i);
 
 (*		attr[i] := GLC.WGL_CONTEXT_FLAGS_ARB; INC(i);
-			attr[i] := GLC.WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB; INC(i);
+		attr[i] := GLC.WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB; INC(i);
 *)
 		attr[i] := GLC.WGL_CONTEXT_PROFILE_MASK_ARB; INC(i);
-			(* attr[i] := GLC.WGL_CONTEXT_CORE_PROFILE_BIT_ARB; INC(i); *)
-			attr[i] := GLC.WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB; INC(i);
+		(* attr[i] := GLC.WGL_CONTEXT_CORE_PROFILE_BIT_ARB; INC(i); *)
+		attr[i] := GLC.WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB; INC(i);
 		attr[i] := 0; (* end of attribute list *)
 
 (*	attribs:= [
