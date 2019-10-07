@@ -38,17 +38,17 @@ VAR
 	radius*, rsquared*: REAL;
 	center*:PT;
 	cxf*:BOOLEAN;
-	rand*:Random.Sequence;
-		
-PROCEDURE &init*;
-
+	rand: Random.Generator
+	
+PROCEDURE & init*;
 BEGIN
-	NEW(rand);
+	NEW(rand)
 END init;
-
+			
 PROCEDURE color*(p:PT):Color;
 VAR
 	c: Color;
+
 BEGIN
 	c.red:=cxolor.red+(rand.Uniform()*0.06);
 	c.green:=cxolor.green+(rand.Uniform()*0.06);
@@ -107,8 +107,6 @@ BEGIN
 	c.blue:=cxolor.blue;
 	c.alpha:=cxolor.alpha;
 	c.mirror:=cxolor.mirror;
-	Base.clamp3(c.red,c.green,c.blue);
-	Base.clamp(c.mirror);
 	RETURN c
 END color;
 
@@ -686,6 +684,5 @@ BEGIN
 END normal;
 		
 END bifr;
-
 
 END FRep.

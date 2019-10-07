@@ -51,6 +51,7 @@ TYPE NCube*=RECORD
 	TF*:BOOLEAN;
 	normal*: PT; 
 	color*: Color;
+	mirrorTF*:BOOLEAN;
 END;
 
 TYPE Time*=RECORD
@@ -259,6 +260,7 @@ TYPE Ray* = RECORD
 	justhit*:Voxel;
 	thisvoxelisempty*:BOOLEAN;
 	texdtl*:REAL;
+	rand*: Random.Generator;
 END;
 
 TYPE Path*=ARRAY 20 OF ARRAY 3 OF INTEGER;
@@ -513,7 +515,7 @@ END setvoxel;
 
 PROCEDURE setcolor*(r,g,b,a,m: REAL);  
 BEGIN
-	cxolor.red:=r; cxolor.green:=g; cxolor.blue:=b; cxolor.alpha:=a; cxolor.mirror:=m;
+	cxolor.red:=r; cxolor.green:=g; cxolor.blue:=b; cxolor.alpha:=a; cxolor.mirror:=1-m;
 END setcolor;
 
 PROCEDURE getcolor*(p:PT):Color;
@@ -570,7 +572,7 @@ VAR
 	iterlimit*: INTEGER;
 	speed*,maxspeed*:REAL;
 	frame*: SIZE;
-	rand*:Random.Sequence;
+	rand*:Random.Generator;
 	worldalive*: BOOLEAN;
 	gravity*:REAL;
 	fuzzon*, STOP*: BOOLEAN;
@@ -924,6 +926,18 @@ BEGIN
 	RETURN p
 END randPT;
 
+PROCEDURE randnormalPT*():PT;
+VAR
+	p:PT;
+BEGIN
+	p.x := rand.Uniform();	
+	p.y := rand.Uniform();	
+	p.z := rand.Uniform();	
+	normalizePT(p);
+	RETURN p
+END randnormalPT;
+
+
 PROCEDURE randColor*():Color;
 VAR
 	c:Color;
@@ -1238,7 +1252,7 @@ BEGIN
 	worldalive := TRUE;
 	frame:=0;
 	fog := 1.1;
-	texdetail:=30;
+	texdetail:=100;
 	horizon:=0.11;
 	horizon2:=1;
 	rlimit := 4;
@@ -1261,6 +1275,7 @@ BEGIN
 	blankray.scale := 1; 
 	blankray.tscale:=1;
 	blankray.dtl:=0.075;	
+	blankray.rand:=rand;
 	blankpray.clr.ra := 1;
 	blankpray.clr.ga := 1;
 	blankpray.clr.ba := 1;

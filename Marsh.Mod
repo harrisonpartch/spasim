@@ -320,7 +320,7 @@ BEGIN
 	NEW(ms);
 	NEW(EMPTY);
 	EMPTY.passable:=TRUE;
-  rand:=Base.rand;	
+  	NEW(rand);
    NEW(mcube);
 (*	xot:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoR"); 
 	push(xot);
@@ -473,8 +473,6 @@ BEGIN
 	push(sky1);
 	sky2:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXXBiQ"); 	
 	push(sky2);
-	tigerlily:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  				
-	push(tigerlily);	
 	bottle1:=Base.VoxelFromName("Nbottle1");  
 	push(bottle1);
 	bottle2:=Base.VoxelFromName("Nbottle2");  
@@ -500,19 +498,19 @@ BEGIN
 	push(greensuncouple);
 *)
 	NEW(noise[0]);		
-	noise[0].seed:=153466690;		
-	noise[0].a:=3;
-	noise[0].b:=3;
+	noise[0].seed:=435678;		
+	noise[0].a:=1;
+	noise[0].b:=1;
 	noise[0].c:=1;		
-	noise[0].octaves:=4;
-	noise[0].persistence:=3.71;	
+	noise[0].octaves:=5;
+	noise[0].persistence:=3.41;	
 	starspider:=Base.VoxelFromName("Nstarspider");
   	noise[0].setvoxel(starspider);		
 	NEW(noise[1]);		
-	noise[1].seed:=678;		
-	noise[1].a:=1;
-	noise[1].b:=1;
-	noise[1].c:=1;		
+	noise[1].seed:=78432;		
+	noise[1].a:=4;
+	noise[1].b:=4;
+	noise[1].c:=4;		
 	noise[1].octaves:=4;
 	noise[1].persistence:=3.81;	
 	noise[1].setcolor(0.8,2.8,4,1/2,0);	
@@ -553,56 +551,56 @@ BEGIN
 	
 	z3:=Base.VoxelFromName("NM2");	
 	z3a:=Base.VoxelFromName("NM3");
-	z3b:=Base.VoxelFromName("NM2");
+	z3b:=Base.VoxelFromName("NM3");
 
-	z3a.setcolor(0,1,0,2,2,2);
- 	z3b.setcolor(0,1,1,1,1,1);    
+
+	z3.setcolor(0,0,1,1,1,1);
+	z3a.setcolor(10,0,0,20,20,20);
 	dieone:=Base.VoxelFromName("NCjgzkmiTyecI5x6eOgYqpQ"); 	
   	push(dieone);
-  	dieone.tscale:=1000;
+  	dieone.tscale:=0;
   			
 	Base.setPT(center,1/2,1/2,1/2);
 
 	GREEN:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODg");	
 	NEW(siv,GREEN,NIL,0.6); 
-	NEW(ball,center,0.5);
-	ball.setcolor(0.61,0.61,0.61,1,0);	
+
 	medley:=Base.VoxelFromName("NM2");	
-	med1:=Base.VoxelFromName("NM2");		
-	med1.FRaster(ball,8);
-
-	medley.FRaster(ball,4);	
-	
-
-	NEW(ball,center,0.6);	
-	ball.setcolor(0.41,0.21,0.21,1,0);	
-	ball.setvoxel(med1);
+	med1:=Base.VoxelFromName("NM3");		
+	NEW(ball,center,0.35);
+	ball.setcolor(0.11,0.11,0.951,1,0.1);	
+	med1.FRasterSolid(ball,3);
+	ball.setcolor(0.91,0.91,0.921,1,0.999);	
 	medley.FRaster(ball,16);	
+(*	NEW(ball,center,0.7);	
+	ball.setvoxel(medley);
+	med1.FRaster(ball,9);	
+	ball.setvoxel(med1);
+	medley.FRaster(ball,3);		
+*)	
 	push(medley);
-			
-  	noise[0].setvoxel(dieone);
-	z3b.FRaster(noise[0],16);
-	noise[1].setvoxel(medley);
-	z3b.FRaster(noise[1],8);
-
-	noise[0].setvoxel(z3b);	
-	z3a.FRaster(noise[0],16);
-	noise[1].setvoxel(z3a);		
-	z3.FRaster(noise[1],16);	
-	
+	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999"); 
+	push(serp);			
+	tigerlily:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  				
+	push(tigerlily);	
+		
+	noise[1].setvoxel(Base.VoxelFromName("Nearthchan"));
+	z3.FRaster(noise[1],64);		
+	noise[0].setvoxel(tigerlily);
+	z3.FRaster(noise[0],64);
 	Base.setPT(center,1/2,1/2,1/3);	
  	NEW(plane,center,up);
 
 	plane.setvoxel(Base.EMPTY);			
-	z3.FRaster(plane,16);	 		
+	z3.FRaster(plane,9);	 		
 
 
 	harrison:=Base.VoxelFromName("Nharrisonavatar"); 
 	push(harrison);	
-	Base.avatar:=harrison;
+	Base.avatar:=dieone;
 	
 		
-	Base.avatarsize:=81; 
+	Base.avatarsize:=243; 
 	
 	med1.copyonstroke:=TRUE;		
 	medley.copyonstroke:=TRUE;

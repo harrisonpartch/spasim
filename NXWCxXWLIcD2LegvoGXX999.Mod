@@ -1,6 +1,6 @@
 MODULE NXWCxXWLIcD2LegvoGXX999;
 
-IMPORT Base, NM3, Nrdvolvox, Voxel4, RotaVox;
+IMPORT Base, NM3, Voxel4, RotaVox;
 TYPE PT = Base.PT;
 	Ray = Base.Ray;
 	Voxel = Base.Voxel;  
@@ -64,7 +64,6 @@ VAR
 	darkblue:TransparaVox;
 	gray: DiffuseVox;
 	s0,s1,s2,s3,s4: NM3.cell;
-	rd: Nrdvolvox.RDVolVox; 
 	fuzz: Voxel4.FuzzVox;
 	mirrorball: Voxel4.MirrorSphereInVox;
 	p,q: Base.PT;
@@ -79,7 +78,7 @@ BEGIN
 	sky:=Base.VoxelFromName("NM3");  	
 	nark:=Base.VoxelFromName("Narchillect"); 
 	xot:=Base.VoxelFromName("Nearthchan"); 
-	xot.tscale:=127;
+	xot.tscale:=243;
 	echan:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");  	
 	uk:=Base.VoxelFromName("Ndimetrodon");  	
 	NEW(s0);
@@ -104,7 +103,7 @@ BEGIN
 *)	s0.fillsierp(xot,NIL);
 	s1.fillsierp(s0,NIL);	
 	s2.fillsierp(s1,NIL);
-	s3.fillsierp(NIL,s2);		
+	s3.fillsierp(s2,NIL);		
 	s3.setcolor(1/28, 1/28, 1/28, 1/28,1/28,1/28);	
 	s2.setcolor(1/28, 1/28, 1/28, 1/28,1/28,1/28);	
 	s1.setcolor(1/28, 1/28, 1/28, 1/28,1/28,1/28);	

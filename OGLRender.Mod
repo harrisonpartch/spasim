@@ -365,10 +365,12 @@ VAR
 BEGIN
 	key:=CHR(ucs);
 		CASE CHR(ucs) OF		
-			"S": Base.DTL:=Base.DTL*7/6; Base.DTL2:=Base.DTL2*7/6; Out.String("Base.DTL ++"); 
-			| "W":Base.DTL:=Base.DTL*6/7; Base.DTL2:=Base.DTL2*6/7; Out.String("Base.DTL --");
-			| "X": Base.horizon2:=Base.horizon2*7/6; Out.String("++horizon");
-			| "C": Base.horizon2:=Base.horizon2*6/7;  Out.String("--horizon");								
+			"S": Base.texdetail:=Base.texdetail*7/6; Out.String("Base.texdetail ++"); 
+			| "W":Base.texdetail:=Base.texdetail*6/7;  Out.String("Base.texdetail --");
+			| "X": Base.DTL:=Base.DTL*7/6; Out.String("++DTL");
+			| "C": Base.DTL:=Base.DTL*6/7;  Out.String("--DTL");	
+			| "M": Retina.threshmax:=Retina.threshmax*7/6; Out.String("++threshmax");
+			| "N": 	Retina.threshmax:=Retina.threshmax*6/7; Out.String("--threshmax");									
 			| "s" : camera.forward(-0.51*Base.speed); 
 			| "w" : camera.forward(0.51*Base.speed) ; 
 			| "a" : camera.rightstrafe(-0.5*Base.speed)	; 
@@ -583,7 +585,7 @@ END KeyEvent;
 			programs[10] := InitShader("passthroughVS.glsl", "sharpenFS.glsl");
 			programs[11] := InitShader("passthroughVS.glsl", "nightVisionFS.glsl");
 			programs[12] := InitShader("passthroughVS.glsl", "toonShadingFS.glsl"); 
-		curprogram := 6;	  
+		curprogram := 9;	  
 		Out.String("InitGL");
 		Out.Ln;
 		RETURN TRUE;

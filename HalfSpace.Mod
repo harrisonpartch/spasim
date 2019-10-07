@@ -1,5 +1,5 @@
 MODULE HalfSpace;
-IMPORT  Base, SPSMMath;
+IMPORT  Base, SPSMMath, Math:=MathL;
 
 TYPE PT=Base.PT;
 TYPE Ray = Base.Ray;
@@ -8,19 +8,30 @@ TYPE Voxel = Base.Voxel;
 TYPE halfvox*=OBJECT(Voxel);
 VAR
 	P*,N*:PT;
-	inside,outside*:Voxel;
+	outside*:Voxel;
 	
 PROCEDURE&init*(v:Voxel; p,n:PT);
 BEGIN
-	P:=p;
-	N:=n;
+	P:=p; N:=n;
 	Base.normalizePT(N);
 	outside:=v;
 END init;
 
+
+PROCEDURE normalize*(VAR a,b,c: REAL);
+VAR
+	d: REAL;
+BEGIN
+	d := Math.sqrt(a*a + b*b + c*c);
+	IF d = 0 THEN 
+		d := 1;
+	END;
+	a := a/d; b := b/d; c:=c/d
+END normalize;	
+
 PROCEDURE passprobe*(p:PT):BOOLEAN;
 BEGIN
-	IF test(p) THEN RETURN(TRUE) ELSE RETURN(FALSE) END
+	RETURN(test(p)) 
 END passprobe;
 
 PROCEDURE tick*;    
@@ -36,8 +47,9 @@ BEGIN
 	a:=p.x-P.x;
 	b:=p.y-P.y;
 	c:=p.z-P.z;
+	normalize(a,b,c);
 	dot:=a*N.x+b*N.y+c*N.z;
-	IF dot<0  THEN RETURN(TRUE) ELSE RETURN(FALSE) END	
+	IF dot<0 THEN RETURN(TRUE) ELSE RETURN(FALSE) END	
 END test;
 
 PROCEDURE Shade*(VAR ray: Ray);
@@ -59,6 +71,7 @@ BEGIN
 			ray.xyz.y:=ray.xyz.y+C.y/ray.scale;		
 			ray.xyz.z:=ray.xyz.z+C.z/ray.scale;			
 			ray.normal:=N;
+			ray.fnormal:=N;
 			outside.Shade(ray)		
 		ELSE 
 			

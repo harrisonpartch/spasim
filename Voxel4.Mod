@@ -14,14 +14,12 @@ TYPE PT=Base.PT;
 TYPE FuzzVox*=OBJECT(Voxel);
 VAR
 	fuzzdivisor, fuzzsubtract: REAL;
-	rand: Random.Generator;
-	
+
 PROCEDURE & init*;
 BEGIN
 	passable := TRUE;
 	fuzzdivisor := 100;
 	fuzzsubtract := 1/(2*fuzzdivisor);
-	NEW(rand);
 END init;
 
 PROCEDURE setFuzz*(f: REAL);
@@ -33,9 +31,9 @@ END setFuzz;
 PROCEDURE Shade*(VAR ray: Ray);
 BEGIN
 	ray.changed := TRUE;
-	ray.dxyz.x := ray.dxyz.x + rand.Uniform()/100 - 0.005;
-	ray.dxyz.y := ray.dxyz.y + rand.Uniform()/100 - 0.005;
-	ray.dxyz.z := ray.dxyz.z + rand.Uniform()/100 - 0.005; 
+	ray.dxyz.x := ray.dxyz.x + ray.rand.Uniform()/100 - 0.005;
+	ray.dxyz.y := ray.dxyz.y + ray.rand.Uniform()/100 - 0.005;
+	ray.dxyz.z := ray.dxyz.z + ray.rand.Uniform()/100 - 0.005; 
 END Shade;
 
 END FuzzVox;

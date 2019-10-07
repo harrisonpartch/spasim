@@ -22,14 +22,10 @@ void main(void)
 
 	vec4 originalColor = texture2D(u_image, v_Texcoords);
 
-	// Unsharp Mask
-	vec3 difference = vec3(originalColor.rgb) - accum/16.0 ;
-	float dlen = length(difference);	
-	float olen = length(originalColor.rgb);
-	if (dlen>olen) 
-		gl_FragColor = vec4(difference*4.66, 1.0);
+	// Unsharp Maskv
+	vec3 difference = abs(vec3(originalColor.rgb) - accum/16.0) ;
+	if (difference.x > 0.025 || difference.y > 0.025 || difference.z > 0.025)
+		gl_FragColor = vec4((difference*5.1+originalColor.rgb)/2.0 , 1.0);
 	else
-		{
-			gl_FragColor = vec4(originalColor.rgb, 1.0);
-		}
+		gl_FragColor = vec4(originalColor.rgb, 1.0);
 }

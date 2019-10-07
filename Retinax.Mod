@@ -1,6 +1,6 @@
 MODULE Retina; (* EXPERIMENTAL RETINA WITH EDGEFINDING TILE *)
 IMPORT  Base, Objects, Out:=KernelLog, 
-Math:=MathL, SPSMMath, Raster, Graphics:=WMGraphics, WMRasterScale,  Rect := WMRectangles;
+Math:=MathL, SPSMMath, Random, Raster, Graphics:=WMGraphics, WMRasterScale,  Rect := WMRectangles;
 
 TYPE
 	Ray=Base.Ray;
@@ -26,6 +26,12 @@ VAR
 	GO: BOOLEAN;
 	cam: Camera;
 	dtl: REAL;
+	rand: Random.Generator;
+
+PROCEDURE & init;
+BEGIN
+	NEW(rand);
+END init;
 	
 PROCEDURE go;
 BEGIN{EXCLUSIVE}
@@ -62,6 +68,7 @@ BEGIN
 	ray.scale := 1; 
 	ray.tscale:=1;
 	ray.dtl:=Base.DTL;
+	ray.rand:=rand;
 END angletoray;
 
 PROCEDURE interpray(CONST ra,rb: Ray; mix: REAL): Ray;
@@ -79,6 +86,7 @@ BEGIN
 	r.scale := 1; 
 	r.tscale:=1;
 	r.dtl:=Base.DTL;	
+	r.rand:=ra.rand;
 	mixi:=1-mix;
 	r.dxyz.x:= ra.dxyz.x*mixi + rb.dxyz.x*mix;
 	r.dxyz.y:= ra.dxyz.y*mixi + rb.dxyz.y*mix;
@@ -561,7 +569,7 @@ BEGIN{ACTIVE, PRIORITY(Objects.Normal)}
 		BEGIN{EXCLUSIVE}
 			AWAIT(GO);
 		END;
-		zftrace(cam,T); 
+		ztrace(cam,T); 
 		BEGIN{EXCLUSIVE}
 			GO:=FALSE;
 		incTD; 
@@ -589,7 +597,7 @@ VAR
 	foveaparameter:INTEGER;
 	FV: REAL;
 	copy: Raster.Mode;
-	thresh1a, horizon: REAL;
+	thresh1a, threshmax*, horizon: REAL
 	
 PROCEDURE Res*;
 BEGIN
@@ -689,33 +697,34 @@ END splitcam;
 
 PROCEDURE moredetail*(d: INTEGER);
 BEGIN
-	decthresh1(d); 
-	Base.horizon:=Base.horizon*11/10;
-	IF Base.horizon>1 THEN Base.horizon:=1 END
+	Base.horizon:=Base.horizon*31/30;
+	IF Base.horizon>1 THEN 
+		Base.horizon:=1; 
+		decthresh1
+	END
 END moredetail;
 
 PROCEDURE lessdetail*(d: INTEGER);
 BEGIN
-	incthresh1(d); 
-	Base.horizon:=Base.horizon*10/11; 
-	IF Base.horizon<0.0001 THEN Base.horizon:=0.0001 END
+	Base.horizon:=Base.horizon*30/31; 
+	IF Base.horizon<0.0001 THEN 
+		Base.horizon:=0.0001;
+	END
 END lessdetail;
 
-PROCEDURE decthresh1(d: INTEGER);
+PROCEDURE decthresh1;
 BEGIN
 	thresh1a:=thresh1a*10/11;
 	IF thresh1a<0.002 THEN 
 		thresh1a:=0.002;
-		DEC(foveaparameter) 
 	END
 END decthresh1;
 
-PROCEDURE incthresh1(d: INTEGER);
+PROCEDURE incthresh1;
 BEGIN
 	thresh1a:=thresh1a*11/10;
-	IF thresh1a>3/12 THEN 
-		thresh1a:=3/12;
-		INC(foveaparameter)
+	IF thresh1a>threshmax THEN 
+		thresh1a:=threshmax;
 	END
 END incthresh1;
 
@@ -813,7 +822,8 @@ BEGIN
 	END;	
 	AFTER:=2;
  	FAST:=3;
- 	thresh1a:=0.01;
+ 	thresh1a:=0.05;
+ 	threshmax:=0.1;
  	horizon:=1.0;
  	lsense:=0.2;
  	aperture.width:=1;

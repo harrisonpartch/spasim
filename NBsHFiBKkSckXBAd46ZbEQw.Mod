@@ -5,9 +5,9 @@ IMPORT Base, TexVox,  HalfSpace;
 VAR vox: HalfSpace.halfvox; v: TexVox.TexVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	 NEW(v, "mandel.png"); 
-	 v.tscale:=3000;
+	 NEW(v, "tigerlily.png"); 
+	 v.tscale:=30;
 	 NEW(vox,v,Base.randPT(),Base.randPT());
-	RETURN v
+	RETURN vox
 END thisvox;
  END NBsHFiBKkSckXBAd46ZbEQw. 
