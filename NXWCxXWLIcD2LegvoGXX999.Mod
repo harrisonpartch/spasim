@@ -78,9 +78,9 @@ BEGIN
 	sky:=Base.VoxelFromName("NM3");  	
 	nark:=Base.VoxelFromName("Narchillect"); 
 	xot:=Base.VoxelFromName("Nearthchan"); 
-	xot.tscale:=243;
+	xot.tscale:=100;
 	echan:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");  	
-	uk:=Base.VoxelFromName("Ndimetrodon");  	
+	uk:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU889");  	
 	NEW(s0);
 	NEW(s1);
 	NEW(s2);
@@ -100,10 +100,10 @@ BEGIN
 	NEW(rd,empty,nark,empty);	
 	rd.register;
 	rd.passable:=TRUE;
-*)	s0.fillsierp(xot,NIL);
-	s1.fillsierp(s0,NIL);	
-	s2.fillsierp(s1,NIL);
-	s3.fillsierp(s2,NIL);		
+*)	s0.fillsierp(xot,uk);
+	s1.fillsierp(s0,uk);	
+	s2.fillsierp(s1,uk);
+	s3.fillsierp(s2,uk);		
 	s3.setcolor(1/28, 1/28, 1/28, 1/28,1/28,1/28);	
 	s2.setcolor(1/28, 1/28, 1/28, 1/28,1/28,1/28);	
 	s1.setcolor(1/28, 1/28, 1/28, 1/28,1/28,1/28);	

@@ -14,7 +14,7 @@ CONST
 	H*=TS*TH;
 	CX=W DIV 2;
 	CY=H DIV 2;
-	GAMMA=250; 
+	GAMMA=255; 
 
 TYPE Camera= RECORD			(* solid angle *)
 	dtheta, dphi, theta, phi,rphi:REAL;
@@ -696,12 +696,15 @@ BEGIN
 END splitcam;
 
 PROCEDURE moredetail*(d: INTEGER);
+VAR i: INTEGER;
 BEGIN
-	Base.horizon:=Base.horizon*31/30;
-	IF Base.horizon>1 THEN 
-		Base.horizon:=1; 
-		decthresh1
-	END
+	FOR i:=0 TO d-1 DO
+		Base.horizon:=Base.horizon*31/30;
+		IF Base.horizon>1 THEN 
+			Base.horizon:=1; 
+			decthresh1
+		END
+	END;
 END moredetail;
 
 PROCEDURE lessdetail*(d: INTEGER);
@@ -709,7 +712,7 @@ BEGIN
 	Base.horizon:=Base.horizon*30/31; 
 	IF Base.horizon<0.0001 THEN 
 		Base.horizon:=0.0001;
-	END
+	END;
 END lessdetail;
 
 PROCEDURE decthresh1;
@@ -822,8 +825,8 @@ BEGIN
 	END;	
 	AFTER:=2;
  	FAST:=3;
- 	thresh1a:=0.05;
- 	threshmax:=0.1;
+ 	thresh1a:=0.2;
+ 	threshmax:=0.31;
  	horizon:=1.0;
  	lsense:=0.2;
  	aperture.width:=1;

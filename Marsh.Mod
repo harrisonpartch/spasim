@@ -310,10 +310,9 @@ VAR
 	jordan, bottle1,bottle2,bottle3,bottlepossum,bottlegrounds,greensuncouple,wstar,starspider,arevclock: Voxel;
 	ball: FRep.sphere;
 	medley: Voxel;
-	med1,med2,med3: Voxel;
-	mcube: srVoxel.DiffuseMVox;
+	med1,med2,med3,mimp,mimp1,mimp2,mimp3: Voxel;
 	fuzz: Voxel4.FuzzVox;
-	siv: Voxel4.SphereInVox;
+	siv: Voxel4.MirrorSphereInVox;
 	noise: ARRAY 5 OF FRep.noise;	 
 	twonoise: FRep.twonoise;
 BEGIN
@@ -321,7 +320,6 @@ BEGIN
 	NEW(EMPTY);
 	EMPTY.passable:=TRUE;
   	NEW(rand);
-   NEW(mcube);
 (*	xot:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoR"); 
 	push(xot);
 	cage:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");
@@ -508,9 +506,9 @@ BEGIN
   	noise[0].setvoxel(starspider);		
 	NEW(noise[1]);		
 	noise[1].seed:=78432;		
-	noise[1].a:=4;
-	noise[1].b:=4;
-	noise[1].c:=4;		
+	noise[1].a:=1;
+	noise[1].b:=1;
+	noise[1].c:=1;		
 	noise[1].octaves:=4;
 	noise[1].persistence:=3.81;	
 	noise[1].setcolor(0.8,2.8,4,1/2,0);	
@@ -537,11 +535,11 @@ BEGIN
 	noise[3].setvoxel(gxy);	
 	NEW(noise[4]);		
 	noise[4].seed:=123456;		
-	noise[4].a:=7.3;
-	noise[4].b:=7.3;
-	noise[4].c:=7.5;		
-	noise[4].octaves:=4;
-	noise[4].persistence:=3.31;	
+	noise[4].a:=1;
+	noise[4].b:=1;
+	noise[4].c:=1;		
+	noise[4].octaves:=5;
+	noise[4].persistence:=3.51;	
 	noise[4].setvoxel(gxy);		
 
 	Out.String("EEEEP!");
@@ -549,60 +547,80 @@ BEGIN
 	Base.setPT(center,1/2,1/2,9/10);
 	Base.setPT(up,0,0,1);
 	
-	z3:=Base.VoxelFromName("NM2");	
-	z3a:=Base.VoxelFromName("NM3");
-	z3b:=Base.VoxelFromName("NM3");
+	z3:=Base.VoxelFromName("NM10");
+
+	z3a:=Base.VoxelFromName("NM5");
+	z3b:=Base.VoxelFromName("NM5");
 
 
-	z3.setcolor(0,0,1,1,1,1);
-	z3a.setcolor(10,0,0,20,20,20);
+	z3.setcolor(0,0,1/5,1/3,1/3,1/3);
+	z3a.setcolor(1/2,1/2,0,1,1,1);
 	dieone:=Base.VoxelFromName("NCjgzkmiTyecI5x6eOgYqpQ"); 	
   	push(dieone);
-  	dieone.tscale:=0;
+  	dieone.tscale:=64;
   			
 	Base.setPT(center,1/2,1/2,1/2);
 
 	GREEN:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODg");	
-	NEW(siv,GREEN,NIL,0.6); 
+	NEW(siv); 
+	siv.passable:=TRUE;
 
-	medley:=Base.VoxelFromName("NM2");	
-	med1:=Base.VoxelFromName("NM3");		
-	NEW(ball,center,0.35);
-	ball.setcolor(0.11,0.11,0.951,1,0.1);	
-	med1.FRasterSolid(ball,3);
-	ball.setcolor(0.91,0.91,0.921,1,0.999);	
-	medley.FRaster(ball,16);	
-(*	NEW(ball,center,0.7);	
+	medley:=Base.VoxelFromName("NM5");
+	med1:=Base.VoxelFromName("NM5");		
+	med2:=Base.VoxelFromName("NM3");	
+(*	medley.setcolor(1/13,0,0,1/6,1/6,1/6);
+*)
+	med1.setcolor(1/26,0,0,1/13,1/13,1/13);	
+	med2.setcolor(1/26,0,0,1/13,1/13,1/13);	
+	NEW(ball,center,0.55);
+	ball.setcolor(0.01,0.01,0.991,1,0);
+	ball.setsidecolor(0.5,0.5,0.5,1,0);	
+	medley.FRasterSolid(ball,5);	
+
+
+	ball.setcolor(0.11,0.11,0.951,1,0);	
+	ball.setsidecolor(0.99,0.05,0.05,1,0);		
+	med1.FRaster(ball,5);
+
+	NEW(ball,center,0.6);	
 	ball.setvoxel(medley);
-	med1.FRaster(ball,9);	
-	ball.setvoxel(med1);
-	medley.FRaster(ball,3);		
-*)	
+	med1.FRaster(ball,5);	
+	ball.setvoxel(medley);
+	medley.FRaster(ball,5);		
+		
 	push(medley);
 	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999"); 
 	push(serp);			
 	tigerlily:=Base.VoxelFromName("NBsHFiBKkSckXBAd46ZbEQw");  				
 	push(tigerlily);	
 		
-	noise[1].setvoxel(Base.VoxelFromName("Nearthchan"));
-	z3.FRaster(noise[1],64);		
-	noise[0].setvoxel(tigerlily);
-	z3.FRaster(noise[0],64);
+(*	noise[1].setvoxel(Base.VoxelFromName("Nearthchan"));
+*)	noise[4].setvoxel(serp);	
+	z3a.FRaster(noise[4],5);
+	noise[4].setvoxel(z3a);	
+	z3b.FRaster(noise[1],5);	
+	noise[4].setvoxel(z3b);	
+	z3.FRaster(noise[4],10);		
+
+
+	
+	
 	Base.setPT(center,1/2,1/2,1/3);	
  	NEW(plane,center,up);
 
 	plane.setvoxel(Base.EMPTY);			
-	z3.FRaster(plane,9);	 		
+	z3.FRaster(plane,6);	 		
 
 
 	harrison:=Base.VoxelFromName("Nharrisonavatar"); 
 	push(harrison);	
-	Base.avatar:=dieone;
+	Base.avatar:=harrison;
 	
 		
-	Base.avatarsize:=243; 
+	Base.avatarsize:=216; 
 	
 	med1.copyonstroke:=TRUE;		
+	med2.copyonstroke:=TRUE;
 	medley.copyonstroke:=TRUE;
 	z3b.copyonstroke:=TRUE; 
 	z3a.copyonstroke:=TRUE; 

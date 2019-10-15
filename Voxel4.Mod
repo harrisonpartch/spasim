@@ -87,10 +87,10 @@ BEGIN
 	 RETURN((c.x-x)*(c.x-x)+ (c.y-y)*(c.y-y) + (c.z-z)*(c.z-z));
 END d2;
 
-PROCEDURE dee2(p:PT):REAL;
+PROCEDURE D(x,y,z:REAL):REAL;
 BEGIN
-	 RETURN((c.x-p.x)*(c.x-p.x)+ (c.y-p.y)*(c.y-p.y) + (c.z-p.z)*(c.z-p.z));
-END dee2;
+	 RETURN(Math.sqrt((c.x-x)*(c.x-x)+ (c.y-y)*(c.y-y) + (c.z-z)*(c.z-z)))
+END D;
 
 PROCEDURE in(x,y,z:REAL):BOOLEAN;
 BEGIN
@@ -112,7 +112,7 @@ END ctop;
 
 PROCEDURE ctop1(p:PT; VAR th,ph,d: REAL);
 BEGIN
-	d := Math.sqrt(dee2(p));
+	d := Math.sqrt((p.x));
 (*	th := (1+SPSMMath.sin((x-cx)/d))/2;
 	ph := (1+SPSMMath.cos((y-cy)/d))/2; *)
 END ctop1;
@@ -397,15 +397,16 @@ END SphereInVox;
 TYPE MirrorSphereInVox*=OBJECT(ImpliciVox);
 
 VAR
-	D2*:REAL;
+	diameter*:REAL;
 PROCEDURE &init*;
 BEGIN
 	setCenter(1/2,1/2,1/2);
-	D2 := 1/5;
+	diameter:= 1/3;
 (*	register; *)
 END init;
 
 PROCEDURE Shade*(VAR ray: Ray);
+CONST R=12;
 VAR
 	x,y,z, th,ph,d,r,g,blue,alpha: REAL;
 	dx, dy, dz , dista, distb: REAL;
@@ -417,11 +418,11 @@ BEGIN
 	a := ray.lxyz;
 	b:= Base.Exit(ray);
 	x := (a.x+b.x)/2; y := (a.y+b.y)/2; z := (a.z + b.z)/2;
-	d := d2(a.x, a.y, a.z);
-	IF d > D2 THEN
-		FOR i := 0 TO 24 DO
+	d := D(a.x, a.y, a.z);
+	IF d > diameter THEN
+		FOR i := 0 TO R DO
 			d := d2(x,y,z);
-			IF d < D2 THEN 
+			IF d < diameter THEN 
 				b.x := x; b.y := y; b.z := z
 			ELSE
 				a.x := x; a.y := y; a.z := z
@@ -429,9 +430,9 @@ BEGIN
 			x := (a.x+b.x)/2; y := (a.y+b.y)/2; z := (a.z + b.z)/2;
 		END;
 	ELSE
-		FOR i := 0 TO 24 DO
+		FOR i := 0 TO R DO
 			d := d2(x,y,z);
-			IF d > D2 THEN 
+			IF d > diameter THEN 
 				b.x := x; b.y := y; b.z := z
 			ELSE
 				a.x := x; a.y := y; a.z := z
@@ -439,31 +440,26 @@ BEGIN
 			x := (a.x+b.x)/2; y := (a.y+b.y)/2; z := (a.z + b.z)/2;
 		END;
 	END;
-	IF (ABS(d-D2) < 0.001) THEN 
+	IF (ABS(d-diameter) < 0.001) THEN 
 		n.x := cx-x; n.y := cy - y; n.z := cz - z;
 		Base.normalizePT(n);
-		reflect(ray.dxyz.x,ray.dxyz.y,ray.dxyz.z, n.x,n.y,n.z);
-		ray.xyz.x:=ray.xyz.x+x/ray.scale;
-		ray.xyz.y:=ray.xyz.y+y/ray.scale;		
-		ray.xyz.z:=ray.xyz.z+z/ray.scale;			
+		reflect(ray.dxyz.x,ray.dxyz.y,ray.dxyz.z, n.x,n.y,n.z);		
 		ray.clr.ra := ray.clr.ra - 0.1;
 		ray.clr.ga := ray.clr.ga - 0.1;
 		ray.clr.ba := ray.clr.ba - 0.1;
 		IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END;
 		IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 		IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;
-		ray.xyz.x:=ray.xyz.x+ray.dxyz.x/10000000 ;
-		ray.xyz.y:=ray.xyz.y+ray.dxyz.y/10000000 ;	
-		ray.xyz.z:=ray.xyz.z+ray.dxyz.z/10000000 ;	
+		ray.xyz.x:=ray.xyz.x+ray.dxyz.x/(ray.scale*10000000);
+		ray.xyz.y:=ray.xyz.y+ray.dxyz.y/(ray.scale*10000000);	
+		ray.xyz.z:=ray.xyz.z+ray.dxyz.z/(ray.scale*10000000);	
 		Base.world.Shade(ray);	
-		ray.clr.b:=1;	
-		ray.changed := TRUE;
 	END;
 END Shade;
 
 PROCEDURE tick;
 BEGIN
-	D2:= 1/3 + rand.Uniform()/50 ; 
+	diameter:= 1/3 + rand.Uniform()/50 ; 
 END tick;
 
 END MirrorSphereInVox;

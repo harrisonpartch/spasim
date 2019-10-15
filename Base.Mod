@@ -49,8 +49,8 @@ END;
 
 TYPE NCube*=RECORD
 	TF*:BOOLEAN;
-	normal*: PT; 
-	color*: Color;
+	point*,normal*: PT; 
+	color*,sidecolor*: Color;
 	mirrorTF*:BOOLEAN;
 END;
 
@@ -475,8 +475,14 @@ VAR
 	scale*: REAL; 	(*might be needed as this object is handed down to mcell levels in v-rasterization*)
 	vox*,imposter*: Voxel;
 	mir*: REAL;
-	cxolor*:Color;
+	cxolor*, sidecxolor*:Color;
 	allowdeath*,passable*:BOOLEAN;
+
+PROCEDURE & init*;
+BEGIN
+(*	vox:= EMPTY;
+	imposter:= EMPTY; *)
+END init;
 
 PROCEDURE in*(p:PT):BOOLEAN;
 BEGIN
@@ -501,11 +507,11 @@ BEGIN
 	RETURN FALSE
 END normaltf;
 
-PROCEDURE normal*(p:PT):PT;
+PROCEDURE getnormal*(p:PT):PT;
 BEGIN
 	normalizePT(norml);		(* norml is often calculated in d2s but not normalized there *)
 	RETURN norml					(* this is the normal for the most recent point handed to d2s *)
-END normal;
+END getnormal;
 
 PROCEDURE setvoxel*(v:Voxel);  
 BEGIN
@@ -515,13 +521,23 @@ END setvoxel;
 
 PROCEDURE setcolor*(r,g,b,a,m: REAL);  
 BEGIN
-	cxolor.red:=r; cxolor.green:=g; cxolor.blue:=b; cxolor.alpha:=a; cxolor.mirror:=1-m;
+	cxolor.red:=r; cxolor.green:=g; cxolor.blue:=b; cxolor.alpha:=a; cxolor.mirror:=m;
 END setcolor;
+
+PROCEDURE setsidecolor*(r,g,b,a,m: REAL);  
+BEGIN
+	sidecxolor.red:=r; sidecxolor.green:=g; sidecxolor.blue:=b; sidecxolor.mirror:=m;
+END setsidecolor;
 
 PROCEDURE getcolor*(p:PT):Color;
 BEGIN
 	RETURN cxolor
 END getcolor;
+
+PROCEDURE getsidecolor*(p:PT):Color;
+BEGIN
+	RETURN sidecxolor
+END getsidecolor;
 
 PROCEDURE setimposter*(v:Voxel);  
 BEGIN
@@ -1252,12 +1268,12 @@ BEGIN
 	worldalive := TRUE;
 	frame:=0;
 	fog := 1.1;
-	texdetail:=100;
+	texdetail:=10;
 	horizon:=0.11;
 	horizon2:=1;
 	rlimit := 4;
 	iterlimit := 500;
-	DTL:=3;	
+	DTL:=30;	
 	PRO:=1;
 	patchx:=1;
 	patchy:=1;

@@ -462,7 +462,7 @@ END KeyEvent;
 			
 			xr := ENTIER((x-centerx)*temporaljust); yr :=ENTIER((y-centery)*temporaljust);
 			
-			IF CAPTUREMOUSE & (ABS(xr)+ABS(yr)>5) THEN
+			IF CAPTUREMOUSE & (ABS(xr)+ABS(yr)>1) THEN
 				left:=ABS(xr)*xr;
 				up:=-ABS(yr)*yr;  
 				camera.up(-up/(1500*leftsticky)); 
@@ -585,7 +585,7 @@ END KeyEvent;
 			programs[10] := InitShader("passthroughVS.glsl", "sharpenFS.glsl");
 			programs[11] := InitShader("passthroughVS.glsl", "nightVisionFS.glsl");
 			programs[12] := InitShader("passthroughVS.glsl", "toonShadingFS.glsl"); 
-		curprogram := 9;	  
+		curprogram := 0;	  
 		Out.String("InitGL");
 		Out.Ln;
 		RETURN TRUE;
@@ -633,9 +633,9 @@ END KeyEvent;
 			Out.Ln
 		END;
 		IF ms > mstarget+5 THEN 
-			Retina.lessdetail(1)
+			Retina.lessdetail(5)
 		ELSIF GetCurrentFrameMs()<mstarget THEN
-			Retina.moredetail(1)
+			Retina.moredetail(5)
 		END
 	END GameLogic;
 	

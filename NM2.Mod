@@ -8,7 +8,7 @@ Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
 
 CONST M=2; (* defines grid size *)
 	MMO=M-1;
-	CUBERADIUS=0.866025;   (*change to sqrt(3)/2 ???*)
+	CUBERADIUS=0.9;   (*change to sqrt(3)/2 ???*)
 	NL=Base.NL;
 
 TYPE PT = Base.PT;
@@ -43,29 +43,31 @@ VAR
 	i,j: INTEGER;
 	lastlength:REAL;
 BEGIN
-	ray.dtl:=Base.DTL*(1-ray.length/Base.horizon);
-	ray.scale := ray.scale*M;
+	ray.dtl:=Base.DTL*(1-ray.length/Base.horizon);	
 	IF (ray.length*ray.scale>ray.dtl) THEN (* size of the child voxels at camera *)
 		IF imposter#NIL THEN
 			imposter.Shade(ray)
 		END
 	ELSE
-		pushxyz:=ray.xyz;
+		ray.scale := ray.scale*M;
+		pushxyz:=ray.xyz;	
 		xyz.x := (ray.lxyz.x) * M;
 		xyz.y := (ray.lxyz.y) * M;
 		xyz.z := (ray.lxyz.z)* M;
 		SPSME.E(xyz,ijk);
 		bounds(ijk.i,ijk.j,ijk.k,out);
-		IF ~out THEN
-			v:= blox[ijk.i,ijk.j,ijk.k];
-			IF (v#NIL) THEN
-				ray.justhit:=v;
-				ray.lxyz.x := ABS(xyz.x - ijk.i);
-				ray.lxyz.y := ABS(xyz.y - ijk.j);
-				ray.lxyz.z := ABS(xyz.z - ijk.k);
-				v.Shade(ray);
-			ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
+		IF ~out THEN	
+			IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 				nshade(nblox[ijk.i,ijk.j,ijk.k],ray)
+			ELSE
+				v:= blox[ijk.i,ijk.j,ijk.k];	
+				IF (v#NIL) THEN
+					ray.justhit:=v;
+					ray.lxyz.x := ABS(xyz.x - ijk.i);
+					ray.lxyz.y := ABS(xyz.y - ijk.j);
+					ray.lxyz.z := ABS(xyz.z - ijk.k);
+					v.Shade(ray);
+				END
 			END
 		END;
 		IF ~ray.terminate THEN
@@ -133,35 +135,33 @@ BEGIN
 				ray.xyz.y:=ray.xyz.y + (newxyz.y-xyz.y)/ray.scale;
 				ray.xyz.z:=ray.xyz.z + (newxyz.z-xyz.z)/ray.scale;				
 				ray.length:=ray.length+v2;
-				v2:=v2*Base.horizon*10;
 				ray.hitxyz:=ray.xyz;
 				xyz:=newxyz;	
-				ray.clr.ra := ray.clr.ra-redblack*v2;
-				ray.clr.ga := ray.clr.ga-greenblack*v2;
-				ray.clr.ba := ray.clr.ba-blueblack*v2;	
-				ray.clr.r := ray.clr.r+red*ray.clr.ra*v2;
-				ray.clr.g:= ray.clr.g+green*ray.clr.ga*v2;
-				ray.clr.b := ray.clr.b+blue*ray.clr.ba*v2;		
+				ray.clr.ra := ray.clr.ra-redblack*vdepth;
+				ray.clr.ga := ray.clr.ga-greenblack*vdepth;
+				ray.clr.ba := ray.clr.ba-blueblack*vdepth;	
+				ray.clr.r := ray.clr.r+red*ray.clr.ra*vdepth;
+				ray.clr.g:= ray.clr.g+green*ray.clr.ga*vdepth;
+				ray.clr.b := ray.clr.b+blue*ray.clr.ba*vdepth;		
 				IF ray.length>Base.horizon THEN
 					ray.clr.b:= ray.clr.b + ray.clr.ba;
 					ray.terminate:=TRUE;
 				END;
 				bounds(ijk.i,ijk.j,ijk.k, out);		
 				IF ~(out OR ray.terminate) THEN
-					v := blox[ijk.i,ijk.j,ijk.k];
-					IF (v#NIL) THEN
-						ray.justhit:=v;
-						ray.lxyz.x := ABS(xyz.x - ijk.i);
-						ray.lxyz.y := ABS(xyz.y - ijk.j);
-						ray.lxyz.z := ABS(xyz.z - ijk.k);
+					IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 						ray.normal := ray.fnormal;
-						v.Shade(ray);
-					ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
-						ray.normal := ray.fnormal;
-						ray.ncube:=nblox[ijk.i,ijk.j,ijk.k];
-						ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal; 
 						nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
-					ELSE
+					ELSE				
+						v := blox[ijk.i,ijk.j,ijk.k];
+						IF (v#NIL) THEN
+							ray.justhit:=v;
+							ray.lxyz.x := ABS(xyz.x - ijk.i);
+							ray.lxyz.y := ABS(xyz.y - ijk.j);
+							ray.lxyz.z := ABS(xyz.z - ijk.k);
+							ray.normal := ray.fnormal;
+							v.Shade(ray);
+						END
 					END
 				END;
 				IF (ray.clr.ba<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ra<0.1) THEN 	
@@ -169,10 +169,10 @@ BEGIN
 					ray.terminate:=TRUE 
 				END;		
 			UNTIL out OR ray.terminate;
-		END
-	END;
-	ray.scale := ray.scale/M;	
-	ray.xyz:=pushxyz;	
+		END;	
+		ray.scale := ray.scale/M;	
+		ray.xyz:=pushxyz;	
+	END
 END Shade;
 
 PROCEDURE nshade(nc: NCube; VAR ray: Ray);
@@ -192,7 +192,7 @@ BEGIN
 	ray.clr.ra:= ray.clr.ra - mi;
 	ray.clr.ga := ray.clr.ga - mi;
 	ray.clr.ba := ray.clr.ba - mi;	
-	reflect(ray.dxyz, ray.fnormal);
+	reflect(ray.dxyz, nc.normal);
 	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END;
 	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;
@@ -203,22 +203,34 @@ END mirror;
 
 VAR
 	dr,dg,db,mix,dot,dot1,dot2,mi,mir: REAL;
-	hitxyz: PT;
-	light: Base.Light;
+	A,B,C,exit: PT;
+	a,b,c,depth: REAL;
+	i:INTEGER;	
 BEGIN
-	IF nc.mirrorTF THEN
-		mirror(ray);
-	ELSE	
 	dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z);
 	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-	mix:=ray.length*ray.scale/10;
+	mix:=ray.length*ray.scale*0.05;
 	IF mix>1 THEN mix:=1 END;
-		dot:=mix*dot1+(1-mix)*dot2;		
+	dot:=mix*dot1+(1-mix)*dot2;
+	IF nc.color.mirror>0 THEN
+		mi:=1-nc.color.mirror;
+		ray.clr.r := ray.clr.r + nc.color.red*ray.clr.ra*dot*mi;
+		ray.clr.g := ray.clr.g + nc.color.green*ray.clr.ga*dot*mi;
+		ray.clr.b := ray.clr.b + nc.color.blue*ray.clr.ba*dot*mi;
+		ray.clr.ra := ray.clr.ra-nc.color.alpha*mi;
+		ray.clr.ga := ray.clr.ra-nc.color.alpha*mi;
+		ray.clr.ba := ray.clr.ra-nc.color.alpha*mi;
+		ray.normal:=nc.normal;
+		mirror(ray);
+	ELSE		
 		ray.clr.r := ray.clr.r + nc.color.red * ray.clr.ra*dot;
 		ray.clr.g := ray.clr.g + nc.color.green * ray.clr.ga*dot;
 		ray.clr.b := ray.clr.b + nc.color.blue * ray.clr.ba*dot;
-		ray.terminate:=TRUE;		
-	END;
+		ray.clr.ra := ray.clr.ra-nc.color.alpha;
+		ray.clr.ga := ray.clr.ra-nc.color.alpha;
+		ray.clr.ba := ray.clr.ra-nc.color.alpha;		
+		ray.terminate:=TRUE
+	END	
 END nshade;
 
 PROCEDURE erase*(p:PT; resolution:INTEGER);
@@ -586,7 +598,7 @@ BEGIN
 					blox[i,j,k]:=newcell;
 					IF f.normaltf(p) THEN
 						newcell.nposterTF:=TRUE;
-						newcell.nposter.normal:=f.normal(p)
+						newcell.nposter.normal:=f.getnormal(p)
 					END;
 					newcell.nposter.color:=f.color(p);
 					newcell.imposter:=f.getimposter(p);
@@ -597,7 +609,7 @@ BEGIN
 				 		WITH v:Cell DO
 				 			v.imposter:=f.getimposter(p);
 							v.nposterTF:=TRUE;
-							v.nposter.normal:=f.normal(p);
+							v.nposter.normal:=f.getnormal(p);
 							v.nposter.color:=f.color(p);
 							v.FRasterrec(f,resolution,o,nextscale)
 				 		END
@@ -611,16 +623,19 @@ BEGIN
 			d2s:=f.d2s(p);
 			IF ABS(d2s) < CRDNS THEN
 				v:=f.voxel(p);
-				IF v#NIL THEN blox[i,j,k]:=v END;
-				nbloxTF[i,j,k]:=TRUE;
-				nblox[i,j,k].color:=f.color(p);
-				IF Base.rand.Uniform() > nblox[i,j,k].color.mirror THEN
-					nblox[i,j,k].mirrorTF:=TRUE
-				END;
-				nblox[i,j,k].normal:=f.normal(p);
-			END
-		END END END
-	END
+				IF v=NIL THEN
+					nbloxTF[i,j,k]:=TRUE;	
+					nblox[i,j,k].normal:=f.getnormal(p);
+					IF d2s<0 THEN
+						nblox[i,j,k].color:=f.getcolor(p);
+					ELSE
+						nblox[i,j,k].color:=f.getsidecolor(p)
+					END
+				ELSE
+					blox[i,j,k]:=v;
+				END
+			END END END
+		END END
 END FRasterrec;
 
 PROCEDURE FRasterSolid*( f: FR; resolution: INTEGER);
@@ -638,6 +653,7 @@ VAR
 	d2s,MS,TWOMS,CRDS,CRDNS:REAL;
 	nextscale: INTEGER;
 	v: Voxel;
+	color: Color;
 	newcell: cell;
 	solidmarker: BOOLEAN;
 BEGIN
@@ -658,7 +674,7 @@ BEGIN
 					newcell.setcolor(red,green,blue,redblack,greenblack,blueblack);
 					newcell.imposter:=f.voxel(p);
 					newcell.nposterTF:=TRUE;
-					newcell.nposter.normal:=f.normal(p);
+					newcell.nposter.normal:=f.getnormal(p);
 					newcell.nposter.color:=f.color(p);
 					newcell.FRasterrecSolid(f,resolution,o,nextscale);
 					blox[i,j,k]:=newcell				
@@ -668,7 +684,7 @@ BEGIN
 				 		WITH v:Cell DO
 				 			v.imposter:=f.voxel(p);
 							v.nposterTF:=TRUE;
-							v.nposter.normal:=f.normal(p);
+							v.nposter.normal:=f.getnormal(p);
 							v.nposter.color:=f.color(p);
 							v.FRasterrecSolid(f,resolution,o,nextscale)
 				 		END
@@ -677,7 +693,7 @@ BEGIN
 			ELSIF d2s<0 THEN
 				nbloxTF[i,j,k]:=TRUE;
 				nblox[i,j,k].color:=f.color(p);
-				nblox[i,j,k].normal:=f.normal(p);
+				nblox[i,j,k].normal:=f.getnormal(p);
 				blox[i,j,k]:=f.voxel(p);
 			END
 		END END END
@@ -686,9 +702,13 @@ BEGIN
 			p.x:=origin.x+(i+1/2)/MS; p.y:=origin.y+(j+1/2)/MS; p.z:=origin.z+(k+1/2)/MS;
 			d2s:=f.d2s(p);
 			IF ABS(d2s) < CRDNS THEN
-				nbloxTF[i,j,k]:=TRUE;
-				nblox[i,j,k].color:=f.color(p);
-				nblox[i,j,k].normal:=f.normal(p);
+				nbloxTF[i,j,k]:=TRUE;	
+				IF d2s>0 THEN
+					nblox[i,j,k].color:=f.getcolor(p);
+				ELSE
+					nblox[i,j,k].color:=f.getsidecolor(p)
+				END;
+				nblox[i,j,k].normal:=f.getnormal(p);
 				blox[i,j,k]:=f.voxel(p);
 			END
 		END END END

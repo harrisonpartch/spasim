@@ -14,12 +14,12 @@ TYPE
 
 TYPE rprism= OBJECT(FR)
 
-PROCEDURE&init*(c1,c2:PT);
+PROCEDURE&newish*(c1,c2:PT);
 BEGIN
 	IF c1.x<c2.x THEN bbc1.x:=c1.x; bbc2.x:=c2.x ELSE bbc1.x:=c2.x; bbc2.x:=c1.x END;
 	IF c1.y<c2.y THEN bbc1.y:=c1.y; bbc2.y:=c2.y ELSE bbc1.y:=c2.y; bbc2.y:=c1.y END;
 	IF c1.z<c2.z THEN bbc1.z:=c1.z; bbc2.z:=c2.z ELSE bbc1.z:=c2.z; bbc2.z:=c1.z END;	
-END init;
+END newish;
 
 PROCEDURE in*(p:PT):BOOLEAN;
 VAR
@@ -40,12 +40,12 @@ VAR
 	cxf*:BOOLEAN;
 	rand: Random.Generator
 	
-PROCEDURE & init*;
+PROCEDURE & newish*;
 BEGIN
 	NEW(rand)
-END init;
+END newish;
 			
-PROCEDURE color*(p:PT):Color;
+PROCEDURE getcolor*(p:PT):Color;
 VAR
 	c: Color;
 
@@ -55,7 +55,18 @@ BEGIN
 	c.blue:=cxolor.blue+(rand.Uniform()*0.06);
 	Base.clamp3(c.red,c.green,c.blue);
 	RETURN c
-END color;
+END getcolor;
+
+PROCEDURE sidecolor*(p:PT):Color;
+VAR
+	c: Color;
+
+BEGIN
+	c.red:=sidecxolor.red+(rand.Uniform()*0.06);
+	c.green:=sidecxolor.green+(rand.Uniform()*0.06);
+	c.blue:=sidecxolor.blue+(rand.Uniform()*0.06);
+	RETURN c
+END sidecolor;
 
 PROCEDURE in*(p:PT):BOOLEAN;
 BEGIN
@@ -79,9 +90,9 @@ VAR
 	radius*, rsquared*: REAL;
 	center*:PT;
 	cxf*:BOOLEAN;
-	rand*:Random.Sequence;
+	rand*:Random.Generator;
 		
-PROCEDURE &init*(c:PT; r: REAL);
+PROCEDURE &newish*(c:PT; r: REAL);
 
 BEGIN
 	NEW(rand);
@@ -96,19 +107,7 @@ BEGIN
 	bbc2.z:=c.z+r;	
 	center:=c;	
 	mir:=0.0;
-END init;
-
-PROCEDURE color*(p:PT):Color;
-VAR
-	c: Color;
-BEGIN
-	c.red:=cxolor.red;
-	c.green:=cxolor.green;
-	c.blue:=cxolor.blue;
-	c.alpha:=cxolor.alpha;
-	c.mirror:=cxolor.mirror;
-	RETURN c
-END color;
+END newish;
 
 PROCEDURE reset*(c:PT; r: REAL);
 BEGIN
@@ -225,12 +224,12 @@ BEGIN
 	RETURN r
 END pow;
 	
-PROCEDURE &init*(cen:PT; d,a,b,c: REAL; p,q,r: INTEGER);
+PROCEDURE & newish*(cen:PT; d,a,b,c: REAL; p,q,r: INTEGER);
 BEGIN
 	NEW(rand);
 	center:=cen;	
 	D:=d; A:=a; B:=b; C:=c; P:=p; Q:=q;
-END init;
+END newish;
 
 PROCEDURE d2s*(p:PT):REAL;  (* distance to surface *)
 VAR
@@ -278,7 +277,7 @@ PROCEDURE d2s*(p:PT):REAL;  (* distance to surface *)
 VAR 
 	n,d:REAL;
 BEGIN
-	RETURN(	SHORT(Noise.noise3dperlin(a*p.x,b*p.y,c*p.z, seed,octaves,persistence)/1000 - 1/2000))	
+	RETURN(Noise.noise3dperlin(a*p.x,b*p.y,c*p.z, seed,octaves,persistence)/1000)
 END d2s;
 
 PROCEDURE color*(p:PT):Color;
@@ -310,13 +309,13 @@ VAR
 	radius: REAL;
 	center0,center1,norml0,norml1:PT;	
 	
-PROCEDURE &init*(a,b:PT; m: REAL);
+PROCEDURE &newish*(a,b:PT; m: REAL);
 
 BEGIN
 	center0:=a;	
 	center1:=b;
 	radius:=m;		
-END init;
+END newish;
 
 PROCEDURE setcenter*(x,y,z,a,b,c: REAL);
 BEGIN
@@ -348,7 +347,7 @@ VAR
 	rsquared,lensq: REAL;
 	p1,p2,d:PT;
 	
-PROCEDURE &init*(a,b:PT; r: REAL);
+PROCEDURE &newish*(a,b:PT; r: REAL);
 
 BEGIN
 	rsquared:=r*r;
@@ -358,7 +357,7 @@ BEGIN
 	d.z:=p2.z-p1.z;
 	lensq:=d.x*d.x+d.y*d.y+d.z*d.z;
 	Base.setPT(norml,1,0,0)
-END init;
+END newish;
 
 PROCEDURE d2s*(p:PT):REAL;  (* distance to surface *)
 VAR
@@ -384,7 +383,7 @@ VAR
 	copy : Raster.Mode;
 	W,H, bpr,adr: SIZE;	
 
-PROCEDURE &init*(a,b:PT; r,r2: REAL; n: Name);
+PROCEDURE &newish*(a,b:PT; r,r2: REAL; n: Name);
 BEGIN
 	rsquared:=r*r;
 	r2squared:=r2*r2;
@@ -397,7 +396,7 @@ BEGIN
 	Raster.InitMode(copy, Raster.srcCopy);
 	img :=Graphics.LoadImage(n, TRUE);
 	IF img#NIL THEN W := img.width-1; H:= img.height-1; END;
-END init;
+END newish;
 
 PROCEDURE getcolor*(p:PT):Color;
 VAR
@@ -440,7 +439,7 @@ VAR
 	d: REAL;
 	p,cp:PT;
 		
-PROCEDURE &init*(a,b:PT); 
+PROCEDURE &newish*(a,b:PT); 
 BEGIN
 	p:=a;   norml:=b;
 	norml.x:= norml.x + (Base.rand.Uniform()-1/2)/20;
@@ -448,7 +447,7 @@ BEGIN
 	norml.z:= norml.z + (Base.rand.Uniform()-1/2)/20;
 	Base.normalizePT(norml);
 	d:= -norml.x*p.x - norml.y*p.y - norml.z*p.z;
-END init;
+END newish;
 
 PROCEDURE getcolor*(p:PT):Color;
 VAR
@@ -487,12 +486,12 @@ VAR
 	d: REAL;
 	p,cp:PT;
 		
-PROCEDURE &init*(a,b:PT); 
+PROCEDURE &newish*(a,b:PT); 
 BEGIN
 	p:=a;   norml:=b;
 	Base.normalizePT(norml);
 	d:= -norml.x*p.x - norml.y*p.y - norml.z*p.z;
-END init;
+END newish;
 
 PROCEDURE getcolor*(p:PT):Color;
 VAR
@@ -541,7 +540,7 @@ VAR
 	rarevox*:Voxel;
 	z: REAL;
 		
-PROCEDURE &init*(a,b:PT; heightmap, colormap: Name); 
+PROCEDURE &newish*(a,b:PT; heightmap, colormap: Name); 
 BEGIN
 	pt:=a;   norml:=b;
 	Base.normalizePT(norml);
@@ -552,7 +551,7 @@ BEGIN
 	IF heightimage#NIL THEN heightW := heightimage.width-1; heightH:= heightimage.height-1; END;
 	IF colorimage#NIL THEN heightW := heightimage.width-1; heightH:= heightimage.height-1; END;
 	z:=1
-END init;
+END newish;
 
 PROCEDURE getcolor*(p:PT):Color;
 VAR
@@ -622,7 +621,7 @@ VAR
 	radius, rsquared,lensq: REAL;
 	p1,p2,d:PT;
 	
-PROCEDURE &init*(a,b:PT; r: REAL);
+PROCEDURE &newish*(a,b:PT; r: REAL);
 
 BEGIN
 	rsquared:=r*r;
@@ -631,7 +630,7 @@ BEGIN
 	d.y:=p2.y-p1.y;
 	d.z:=p2.z-p1.z;
 	lensq:=d.x*d.x+d.y*d.y+d.z*d.z;
-END init;
+END newish;
 
 PROCEDURE d2s*(p:PT):REAL;  (* distance to surface *)
 VAR
@@ -654,11 +653,11 @@ TYPE bifr*=OBJECT(FR)
 VAR
 	fr1,fr2: FR;	
 
-PROCEDURE&init*(a,b: FR);
+PROCEDURE&newish*(a,b: FR);
 BEGIN
 	IF a# NIL THEN fr1:=a ELSE NEW(fr1) END;
 	IF b# NIL THEN fr2:=b ELSE NEW(fr2) END
-END init;
+END newish;
 
 PROCEDURE color(p:PT):Color;
 VAR
