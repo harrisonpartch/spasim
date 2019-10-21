@@ -57,18 +57,17 @@ BEGIN
 		SPSME.E(xyz,ijk);
 		bounds(ijk.i,ijk.j,ijk.k,out);
 		IF ~out THEN	
-			IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
-				nshade(nblox[ijk.i,ijk.j,ijk.k],ray)
-			ELSE
-				v:= blox[ijk.i,ijk.j,ijk.k];	
-				IF (v#NIL) THEN
-					ray.justhit:=v;
-					ray.lxyz.x := ABS(xyz.x - ijk.i);
-					ray.lxyz.y := ABS(xyz.y - ijk.j);
-					ray.lxyz.z := ABS(xyz.z - ijk.k);
-					v.Shade(ray);
-				END
-			END
+			v:= blox[ijk.i,ijk.j,ijk.k];	
+			IF (v#NIL) THEN
+				ray.justhit:=v;
+				ray.lxyz.x := ABS(xyz.x - ijk.i);
+				ray.lxyz.y := ABS(xyz.y - ijk.j);
+				ray.lxyz.z := ABS(xyz.z - ijk.k);
+				ray.normal := ray.fnormal;
+				v.Shade(ray);
+			ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
+				nshade(nblox[ijk.i,ijk.j,ijk.k],ray) 
+			END 
 		END;
 		IF ~ray.terminate THEN
 			REPEAT
@@ -149,24 +148,24 @@ BEGIN
 					ray.terminate:=TRUE;
 				END;
 				bounds(ijk.i,ijk.j,ijk.k, out);		
-				IF ~(out OR ray.terminate) THEN
-					IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
-						ray.normal := ray.fnormal;
-						nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
-					ELSE				
+				IF ~(out OR ray.terminate) THEN				
 						v := blox[ijk.i,ijk.j,ijk.k];
 						IF (v#NIL) THEN
 							ray.justhit:=v;
 							ray.lxyz.x := ABS(xyz.x - ijk.i);
 							ray.lxyz.y := ABS(xyz.y - ijk.j);
 							ray.lxyz.z := ABS(xyz.z - ijk.k);
-							ray.normal := ray.fnormal;
+							IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN 
+								ray.normal := nblox[ijk.i,ijk.j,ijk.k].normal
+							ELSE
+								ray.normal := ray.fnormal;
+							END;
 							v.Shade(ray);
+						ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
+							nshade(nblox[ijk.i,ijk.j,ijk.k],ray);							
 						END
-					END
-				END;
-				IF (ray.clr.ba<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ra<0.1) THEN 	
-					Base.clampclr(ray.clr);		
+					END;
+				IF (ray.clr.ba<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ra<0.1) THEN 		
 					ray.terminate:=TRUE 
 				END;		
 			UNTIL out OR ray.terminate;
@@ -627,9 +626,9 @@ BEGIN
 			d2s:=f.d2s(p);
 			IF ABS(d2s) < CRDNS THEN
 				v:=f.voxel(p);
+				nbloxTF[i,j,k]:=TRUE;	
+				nblox[i,j,k].normal:=f.getnormal(p);
 				IF v=NIL THEN
-					nbloxTF[i,j,k]:=TRUE;	
-					nblox[i,j,k].normal:=f.getnormal(p);
 					IF d2s<0 THEN
 						nblox[i,j,k].color:=f.getcolor(p);
 					ELSE

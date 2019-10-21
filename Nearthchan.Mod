@@ -4,16 +4,16 @@ VAR vox: TexVox.TexVox;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
+	NEW(vox,"earthchan.png");
+	vox.tscale:=26 + Base.rand.Uniform()*250;  
+	vox.register;	
 	RETURN vox
 END thisvox;
 
 PROCEDURE tick;
 BEGIN
-	vox.tscale:= 26 + Base.rand.Uniform()*5;
+	vox.tscale:= 26 + Base.rand.Uniform()*250;
 END tick;
 
 BEGIN
-	NEW(vox,"earthchan.png");
-	vox.tscale:=24;  
-	vox.register;
 END Nearthchan. 

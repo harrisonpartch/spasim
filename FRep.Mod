@@ -48,7 +48,6 @@ END newish;
 PROCEDURE getcolor*(p:PT):Color;
 VAR
 	c: Color;
-
 BEGIN
 	c.red:=cxolor.red+(rand.Uniform()*0.06);
 	c.green:=cxolor.green+(rand.Uniform()*0.06);
@@ -60,7 +59,6 @@ END getcolor;
 PROCEDURE sidecolor*(p:PT):Color;
 VAR
 	c: Color;
-
 BEGIN
 	c.red:=sidecxolor.red+(rand.Uniform()*0.06);
 	c.green:=sidecxolor.green+(rand.Uniform()*0.06);
@@ -83,7 +81,6 @@ BEGIN
 END d2s;
 	
 END randpoints;
-
 
 TYPE sphere*= OBJECT(FR)
 VAR 
@@ -614,7 +611,6 @@ BEGIN
 END voxel;
 		
 END landscape;
-
 
 TYPE hexgrid*= OBJECT(FR)  (*accidentally created from cyl *)
 VAR 

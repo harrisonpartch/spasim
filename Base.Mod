@@ -819,19 +819,6 @@ BEGIN
 	END
 END tick; 
 
-(*PROCEDURE sniprobe;
-VAR
-	v:Voxel;
-	ray: Ray;
-	x,y: INTEGER;
-BEGIN
-	x:=W DIV 2;
-	y:=H DIV 2;
-	ray:=XNXLBase.rays[x,y];
-	v:=world.proberay(ray); 
-(*	XNXLBase.cursordist:=2*ray.length/3; *)
-END sniprobe;
-*)
 PROCEDURE cleartick*;
 VAR i: INTEGER;
 BEGIN

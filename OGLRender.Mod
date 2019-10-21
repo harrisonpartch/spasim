@@ -261,9 +261,9 @@ BEGIN
 	END;
 	trace; 
 	Base.tick;	
-	cvz := cvz+gravityvector.z; 
+	cvz := cvz*GLIDE+gravityvector.z; 
 	cvx := cvx*GLIDE; cvy := cvy*GLIDE; 
-	cvl :=0; cvu := 0;
+	cvl := cvl*0.85; cvu := cvu*0.85;
 END tick;
  
 END Camera;
@@ -457,18 +457,16 @@ END KeyEvent;
 		temporaljust: REAL; 
 		BEGIN
 			MB := keys;  (* *)
-(*			temporaljust := mstarget/GetCurrentFrameMs();*)
-			temporaljust := 1.0;
 			
-			xr := ENTIER((x-centerx)*temporaljust); yr :=ENTIER((y-centery)*temporaljust);
+			xr :=x-centerx; yr :=y-centery;
 			
 			IF CAPTUREMOUSE & (ABS(xr)+ABS(yr)>1) THEN
 				left:=ABS(xr)*xr;
 				up:=-ABS(yr)*yr;  
-				camera.up(-up/(1500*leftsticky)); 
+				camera.up(-up/(3000*leftsticky)); 
 				camera.left(left/(6000*leftsticky));
 				WarpPointer(1000,1000, centerx,centery); 
-				IF (ABS(xr)+ABS(yr)>300) THEN
+				IF (ABS(xr)+ABS(yr)>600) THEN
 					Retina.saccade:=TRUE
 				ELSE
 					Retina.saccade:=FALSE

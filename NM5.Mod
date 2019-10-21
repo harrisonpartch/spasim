@@ -56,17 +56,19 @@ BEGIN
 		xyz.z := (ray.lxyz.z)* M;
 		SPSME.E(xyz,ijk);
 		bounds(ijk.i,ijk.j,ijk.k,out);
-		IF ~out THEN	
-			IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
-				nshade(nblox[ijk.i,ijk.j,ijk.k],ray)
+		IF ~out THEN		
+			v:= blox[ijk.i,ijk.j,ijk.k];	
+			IF (v#NIL) THEN
+				ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal;
+				ray.justhit:=v;
+				ray.lxyz.x := ABS(xyz.x - ijk.i);
+				ray.lxyz.y := ABS(xyz.y - ijk.j);
+				ray.lxyz.z := ABS(xyz.z - ijk.k);
+				v.Shade(ray);
 			ELSE
-				v:= blox[ijk.i,ijk.j,ijk.k];	
-				IF (v#NIL) THEN
-					ray.justhit:=v;
-					ray.lxyz.x := ABS(xyz.x - ijk.i);
-					ray.lxyz.y := ABS(xyz.y - ijk.j);
-					ray.lxyz.z := ABS(xyz.z - ijk.k);
-					v.Shade(ray);
+				IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
+					ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal;
+					nshade(nblox[ijk.i,ijk.j,ijk.k],ray)
 				END
 			END
 		END;
@@ -149,20 +151,18 @@ BEGIN
 					ray.terminate:=TRUE;
 				END;
 				bounds(ijk.i,ijk.j,ijk.k, out);		
-				IF ~(out OR ray.terminate) THEN
-					IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
-						ray.normal := ray.fnormal;
-						nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
-					ELSE				
-						v := blox[ijk.i,ijk.j,ijk.k];
-						IF (v#NIL) THEN
-							ray.justhit:=v;
-							ray.lxyz.x := ABS(xyz.x - ijk.i);
-							ray.lxyz.y := ABS(xyz.y - ijk.j);
-							ray.lxyz.z := ABS(xyz.z - ijk.k);
-							ray.normal := ray.fnormal;
-							v.Shade(ray);
-						END
+				IF ~(out OR ray.terminate) THEN		
+					v := blox[ijk.i,ijk.j,ijk.k];
+					IF (v#NIL) THEN
+						ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal;
+						ray.justhit:=v;
+						ray.lxyz.x := ABS(xyz.x - ijk.i);
+						ray.lxyz.y := ABS(xyz.y - ijk.j);
+						ray.lxyz.z := ABS(xyz.z - ijk.k);
+						v.Shade(ray);
+					ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
+							ray.normal:=nblox[ijk.i,ijk.j,ijk.k].normal;
+							nshade(nblox[ijk.i,ijk.j,ijk.k],ray)
 					END
 				END;
 				IF (ray.clr.ba<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ra<0.1) THEN 	
@@ -600,10 +600,7 @@ BEGIN
 					NEW(newcell);
 					newcell.setcolor(red/M,green/M,blue/M, redblack/M,greenblack/M,blueblack/M);
 					blox[i,j,k]:=newcell;
-					IF f.normaltf(p) THEN
-						newcell.nposterTF:=TRUE;
-						newcell.nposter.normal:=f.getnormal(p)
-					END;
+					newcell.nposter.normal:=f.getnormal(p);
 					newcell.nposter.color:=f.color(p);
 					newcell.imposter:=f.getimposter(p);
 					newcell.FRasterrec(f,resolution,o,nextscale);
