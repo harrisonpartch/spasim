@@ -4,6 +4,7 @@ IMPORT Math:=MathL, Random, SPSMMath, Base, Raster, Graphics:=WMGraphics, Noise;
 	
 CONST
 	twopi = 2*Math.pi;
+	
 TYPE 
 	PT=Base.PT;
 	Color=Base.Color;
@@ -11,6 +12,7 @@ TYPE
 	Name = Base.Name;
 	FR=Base.FR;
 	NCube=Base.NCube; 
+
 
 TYPE rprism= OBJECT(FR)
 
@@ -155,6 +157,62 @@ BEGIN
 END mirror;
 	
 END sphere;
+
+TYPE sqube*= OBJECT(FR)
+VAR 
+  Radius,R,S,T,A,B,C: REAL;
+	center:PT;
+	cxf*:BOOLEAN;
+		
+PROCEDURE &newish*(c:PT; rad,r,s,t,a,b,cc: REAL);
+
+BEGIN
+	center:=c;
+	Radius:=rad;	
+	R:=r; S:=s; T:=t;
+	A:=a; B:=b; C:=cc;
+END newish;
+
+PROCEDURE setcenter*(x,y,z: REAL);
+BEGIN
+	center.x:=x; center.y:=y; center.z:=z
+END setcenter;
+
+PROCEDURE distanc3(a,b: PT): REAL;
+VAR x,y,z: REAL;
+BEGIN	
+	x:=ABS((a.x-b.x)/A)+0.000001;
+	y:=ABS((a.y-b.y)/B)+0.000001;
+	z:=ABS((a.z-b.z)/C)+0.000001;
+	RETURN(ABS(Math.exp(R*Math.ln(x)))+ABS(Math.exp(S*Math.ln(y)))+ABS(Math.exp(T*Math.ln(z))))
+END distanc3;
+
+PROCEDURE in*(p:PT):BOOLEAN;
+BEGIN
+	RETURN distanc3(center,p)<Radius
+END in;
+
+PROCEDURE d2s*(p:PT):REAL;  (* distance to surface *)
+BEGIN
+	norml.x:= center.x-p.x; 
+	norml.y:= center.y-p.y; 	
+	norml.z:= center.z-p.z; 
+	RETURN(Radius-distanc3(p,center))
+END d2s;
+
+PROCEDURE normal*(p:PT):PT;
+BEGIN
+	Base.normalizePT(norml);	(* norml is often calculated in d2s but not normalized there *)
+	RETURN norml					(* this is the normal for the most recent point handed to d2s *)
+END normal;
+
+PROCEDURE normaltf*(p:PT):BOOLEAN;
+BEGIN	
+	RETURN TRUE			
+END normaltf;
+	
+END sqube;
+
 
 TYPE twosphere*= OBJECT(sphere);
 VAR
@@ -679,5 +737,9 @@ BEGIN
 END normal;
 		
 END bifr;
+
+VAR
+
+BEGIN
 
 END FRep.

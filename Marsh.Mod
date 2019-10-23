@@ -309,6 +309,7 @@ VAR
 	akatrump, archillect,arkilekt,kat,muratpak,dogepearl,
 	jordan, bottle1,bottle2,bottle3,bottlepossum,bottlegrounds,greensuncouple,wstar,starspider,arevclock: Voxel;
 	ball: FRep.sphere;
+	sqube: FRep.sqube;
 	medley: Voxel;
 	med1,med2,med3,mimp,mimp1,mimp2,mimp3: Voxel;
 	fuzz: Voxel4.FuzzVox;
@@ -569,33 +570,33 @@ BEGIN
 	medley:=Base.VoxelFromName("NM3");
 	med1:=Base.VoxelFromName("NM3");		
 	med2:=Base.VoxelFromName("NM3");	
-	medley.setcolor(1/13,0,0,1/6,1/6,1/6);
+	medley.setcolor(1/33,0,0,1/16,1/16,1/16);
 
 	med1.setcolor(0,0,0,1/17,1/17,1/17);	
 	med2.setcolor(1/26,0,0,1/13,1/13,1/13);	
-	NEW(ball,center,0.3);
-	ball.setcolor(0.01,0.01,0.991,1,0);
-	ball.setsidecolor(0.5,0.5,0.5,1,0);	
-	med1.FRaster(ball,9);
-	medley.FRaster(ball,9);
-	NEW(ball,center,0.45);	
+	NEW(sqube,center,0.45,1,2,3,1,0.5,2);
+	sqube.setcolor(0.91,0.91,0.991,1,0);
+	sqube.setsidecolor(0.5,0.5,0.5,1,0);	
+	med1.FRaster(sqube,9);
+	medley.FRaster(sqube,9);
+	NEW(ball,center,0.25);	
 	ball.setvoxel(Base.VoxelFromName("Nwaterdrops"));
 	medley.FRaster(ball,9);	
 	
-	NEW(ball,center,0.55);	
+	NEW(ball,center,0.45);	
 	ball.setvoxel(GREEN);
 	medley.FRaster(ball,9);
 
-	med1.imposter:=Base.VoxelFromName("Nearthchan");
+(*	med1.imposter:=Base.VoxelFromName("Nearthchan");*)
 
-	NEW(ball,center,0.53);
+(*	NEW(ball,center,0.53);
 	ball.setvoxel(medley);
 	med1.FRaster(ball,9);		
 
 	NEW(ball,center,0.53);
 	ball.setvoxel(med1);
 	medley.FRaster(ball,9);		
-
+*)
 	push(medley);
 	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999"); 
 	push(serp);			
@@ -607,9 +608,11 @@ BEGIN
 	hexgrid.setsidecolor(0.99,0.05,0.05,1,0);	
 		
 	noise[1].setvoxel(medley);
-	noise[4].setvoxel(serp);	
-	z3.FRaster(noise[4],30);
-	z3.FRaster(noise[1],90);				
+	noise[3].setvoxel(GREEN);	
+
+	z3.FRaster(noise[3],30);	
+	z3.FRaster(noise[1],90);	
+		
 	Base.setPT(center,1/2,1/2,1/3);	
  	NEW(plane,center,up);
 
@@ -653,7 +656,7 @@ BEGIN
 	marshv.vox:= Base.EMPTY;
 	push(Base.EMPTY);
 	dawn; 
-	cursorsize:=243;
+	cursorsize:=4000;
 	cursorTF:=TRUE;
 	atmdark:=0;
 	SNIPEINTO:=TRUE;

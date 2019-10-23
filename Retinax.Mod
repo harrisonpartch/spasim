@@ -6,8 +6,8 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=2;        
-	TS=16*4;  (*  TS MUST BE {size of unit tile} MULTIPLIED BY 2**T *)
+	T=1;        
+	TS=16*2;  (*  TS MUST BE {size of unit tile} MULTIPLIED BY 2**T *)
 	TW=16;
 	TH=9;
 	W*=TS*TW;
@@ -189,7 +189,7 @@ PROCEDURE t4x4fill(CONST x,y: INTEGER);
 VAR
 	i,j: INTEGER;
 BEGIN
-	IF clrd4(rays[x,y], rays[x+3,y], rays[x+3,y+3], rays[x,y+3]) > thresh1a THEN
+	IF clrd4(rays[x,y], rays[x+3,y], rays[x+3,y+3], rays[x,y+3]) > thresh2 THEN
 		t2x2a(x,y);
 		t2x2b(x+2,y);
 		t2x2c(x+2,y+2);
@@ -249,7 +249,7 @@ PROCEDURE t8x8fill(CONST x,y: INTEGER);
 VAR
 	i,j: INTEGER;
 BEGIN
-	IF clrd4(rays[x,y], rays[x+7,y], rays[x+7,y+7], rays[x,y+7]) > thresh1a THEN
+	IF clrd4(rays[x,y], rays[x+7,y], rays[x+7,y+7], rays[x,y+7]) > thresh2 THEN
 		t4x4a(x,y);
 		t4x4b(x+4,y);
 		t4x4c(x+4,y+4);
@@ -569,7 +569,7 @@ BEGIN{ACTIVE, PRIORITY(Objects.Normal)}
 		BEGIN{EXCLUSIVE}
 			AWAIT(GO);
 		END;
-		ztrace(cam,T); 
+		zftrace(cam,T); 
 		BEGIN{EXCLUSIVE}
 			GO:=FALSE;
 		incTD; 
@@ -579,7 +579,6 @@ END Tile;
 
 VAR
 	tile: ARRAY TW,TH OF Tile;
-	TESSA: INTEGER;
 	frameasteps*,framebsteps*:INTEGER;
 	a,b: INTEGER;
 	tilesdone:INTEGER;
@@ -597,14 +596,8 @@ VAR
 	foveaparameter:INTEGER;
 	FV: REAL;
 	copy: Raster.Mode;
-	thresh1a, threshmax*, horizon: REAL
+	thresh1a, thresh2, thresh3, threshmax*, horizon: REAL
 	
-PROCEDURE Res*;
-BEGIN
-	INC(TESSA);
-	TESSA:=TESSA MOD 3;
-END Res;
-
 PROCEDURE reflect(VAR p: PT; n: PT);
 VAR 
 	a,b,c,dot: REAL;
@@ -720,7 +713,9 @@ BEGIN
 	thresh1a:=thresh1a*10/11;
 	IF thresh1a<0.002 THEN 
 		thresh1a:=0.002;
-	END
+	END;
+	thresh2:=2*thresh1a;
+	thresh3:=4*thresh1a;
 END decthresh1;
 
 PROCEDURE incthresh1;
@@ -728,7 +723,9 @@ BEGIN
 	thresh1a:=thresh1a*11/10;
 	IF thresh1a>threshmax THEN 
 		thresh1a:=threshmax;
-	END
+	END;
+	thresh2:=2*thresh1a;
+	thresh3:=4*thresh1a;
 END incthresh1;
 
 PROCEDURE incTD;
@@ -825,7 +822,9 @@ BEGIN
 	END;	
 	AFTER:=2;
  	FAST:=3;
- 	thresh1a:=0.2;
+ 	thresh1a:=0.01;
+ 	thresh2:=0.02;
+ 	thresh3:=0.04;
  	threshmax:=0.31;
  	horizon:=1.0;
  	lsense:=0.2;

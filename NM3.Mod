@@ -209,7 +209,7 @@ VAR
 BEGIN
 	dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z);
 	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-	mix:=ray.length*ray.scale*0.05;
+	mix:=ray.length*ray.scale*0.005;
 	IF mix>1 THEN mix:=1 END;
 	dot:=mix*dot1+(1-mix)*dot2;
 	IF nc.color.mirror>0 THEN
@@ -571,7 +571,9 @@ VAR
 	origin: PT;
 BEGIN
 	origin.x:=0; origin.y:=0; origin.z:=0;
-	FRasterrec(f,resolution,origin,1);   (* origin is (0,0,0) *)
+	IF f#NIL THEN
+		FRasterrec(f,resolution,origin,1)
+	END;  (* origin is (0,0,0) *)
 END FRaster;
 
 PROCEDURE FRasterrec(f: FR; resolution: INTEGER; origin: PT; scale: INTEGER); (*origin is always in world space*)

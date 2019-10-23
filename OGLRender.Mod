@@ -48,8 +48,8 @@ BEGIN
 	filter:=FALSE;
 	cameratheta := 0;
 	cameraphi := 0;
-	aperture.width :=1.5;
-	aperture.height :=1.5;
+	aperture.width := 1.5;
+	aperture.height := 1.5;
 	aperjust(1,1);
 	Base.setPT(xaxis, 1,0,0);	
 	Base.setPT(yaxis,0,1,0);	
@@ -57,13 +57,13 @@ BEGIN
 	Base.setPT(worldcenter,1/2,1/2,1/2);	
 	cx:=1/2; cy:=1/2; cz:=1/2;
 	fisheye:=1;
-	GLIDE:=0.995;
+	GLIDE:=0.95;
 	hop; 
 END init;
 
 PROCEDURE aperjust(w,h: INTEGER);
 BEGIN
-	aperture.width :=aperture.width*(w/h);
+	aperture.width := aperture.width*(w/h);
 END aperjust;
 
 PROCEDURE hop;
@@ -263,7 +263,7 @@ BEGIN
 	Base.tick;	
 	cvz := cvz*GLIDE+gravityvector.z; 
 	cvx := cvx*GLIDE; cvy := cvy*GLIDE; 
-	cvl := cvl*0.85; cvu := cvu*0.85;
+	cvl := cvl*0.75; cvu := cvu*0.75;
 END tick;
  
 END Camera;
@@ -280,19 +280,18 @@ VAR
 	splashscreen: BOOLEAN;
 	mstarget: REAL;
 	framecounter: INTEGER;
+	saccadeTF: BOOLEAN;
 	
 PROCEDURE &openwincam;
 BEGIN
 	Init(Retina.W, Retina.H, 0,0, FALSE);
 	NEW(camera,Retina.W, Retina.H); 
-	Retina.Res;
-	Retina.Res;
 	camera.aperjust(Retina.W, Retina.H);
 	SetTitle("SPASIM");
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
-	mstarget:=40;
+	mstarget:=30;
 	Base.STOPGO; 
 END openwincam;
 
@@ -391,7 +390,7 @@ BEGIN
 			| "@": Base.gravity:= 1.5*Base.gravity ; Out.String(" ");
 			| "3": camera.glidetoggle;
 			| "4": Base.STOPGO; Out.String(" ");
-			| "5": Retina.Res; Out.String(" ");
+			| "5":  Out.String(" ");
 			| "6": avaTF:=~avaTF ; Out.String(" ");
 			| "h": camera.hop ; Out.String(" ");
 			| "e":  Marsh.tunnelinto ; Out.String(" ");
@@ -463,13 +462,13 @@ END KeyEvent;
 			IF CAPTUREMOUSE & (ABS(xr)+ABS(yr)>1) THEN
 				left:=ABS(xr)*xr;
 				up:=-ABS(yr)*yr;  
-				camera.up(-up/(3000*leftsticky)); 
+				camera.up(-up/(6000*leftsticky)); 
 				camera.left(left/(6000*leftsticky));
 				WarpPointer(1000,1000, centerx,centery); 
-				IF (ABS(xr)+ABS(yr)>600) THEN
-					Retina.saccade:=TRUE
+				IF (ABS(xr)+ABS(yr)>15) THEN
+					Retina.saccade:=TRUE;
 				ELSE
-					Retina.saccade:=FALSE
+					Retina.saccade:=FALSE;
 				END
 			END
 	END PointerMove;
@@ -630,10 +629,12 @@ END KeyEvent;
 			Out.Int(ms,5);
 			Out.Ln
 		END;
-		IF ms > mstarget+5 THEN 
-			Retina.lessdetail(5)
-		ELSIF GetCurrentFrameMs()<mstarget THEN
-			Retina.moredetail(5)
+		IF ~Retina.saccade THEN
+			IF ms > mstarget+5 THEN 
+				Retina.lessdetail(5)
+			ELSIF GetCurrentFrameMs()<mstarget THEN
+				Retina.moredetail(5)
+			END
 		END
 	END GameLogic;
 	
