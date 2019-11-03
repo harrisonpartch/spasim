@@ -20,7 +20,7 @@ VAR
 	m : ARRAY M,N OF BOOLEAN;
 	n: ARRAY M,N OF INTEGER;
 	gen: INTEGER;
-	i:LONGINT;
+	i:INTEGER;
 			
 PROCEDURE &init;
 BEGIN
@@ -30,7 +30,7 @@ END init;
 			
 PROCEDURE seed;
 VAR
-	i,j:LONGINT;
+	i,j:INTEGER;
 BEGIN								
 	FOR i := 1 TO M - 2 DO
 		FOR j := 1 TO N - 2 DO
@@ -46,7 +46,7 @@ END touch;
 			
 PROCEDURE tick;
 VAR
-	i, j: LONGINT;
+	i, j: INTEGER;
 BEGIN	
 	IF Base.rand.Dice(100) = 0 THEN seed END;	
 	FOR i := 1 TO M - 2 DO
@@ -73,7 +73,7 @@ END tick;
 PROCEDURE Shade (VAR ray: Ray);
 VAR
 	p: Raster.Pixel;
-	x,y: LONGINT;
+	x,y: INTEGER;
 	lx, ly, d: REAL;
 	nx, ny, nz: INTEGER;
 	dot: REAL;

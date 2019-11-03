@@ -9,7 +9,7 @@ VAR
 	ball: FRep.sphere;
 	dot,v: Voxel;
 	center:  PT;
-	i:LONGINT;
+	i: INTEGER;
 	avatar: TexVox.TexVox;
 	
 PROCEDURE draw;

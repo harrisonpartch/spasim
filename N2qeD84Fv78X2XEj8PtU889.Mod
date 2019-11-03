@@ -8,7 +8,7 @@ TYPE Ray = Base.Ray;
 
 	
 VAR 
-	ball: FRep.sphere;
+	sqube: FRep.sqube;
 	noise: FRep.noise;
 	cyl: FRep.hexgrid;
 	dot,reddot,bludot,tigerlily,v: Voxel;
@@ -17,12 +17,17 @@ VAR
 	
 PROCEDURE draw;
 BEGIN
-	dot:=Base.VoxelFromName("NM3");
+	dot:=Base.VoxelFromName("NM20");
 	Base.setPT(center,1/2,1/2,1/2);  
-	NEW(ball,center,5/12);	
-	ball.setcolor(0.51,0.66,0.5,1,0);			
-	dot.FRaster(ball,9);
-	dot.copyonstroke:=TRUE;
+	NEW(sqube,center,0.1,3,3,3,1,0.5,2);
+	sqube.setcolor(0.051,0.99,0.2,1,0);	
+	sqube.setsidecolor(0.81,0.66,0.5,1,0);			
+	dot.FRaster(sqube,20);
+	NEW(sqube,center,0.15,2,2,3,1,2,2);
+	sqube.setcolor(0.951,0.09,0.6,1,0);	
+	sqube.setsidecolor(0.11,0.96,0.5,1,0);	
+	dot.FRaster(sqube,20);
+	dot.copyonstroke:=FALSE;
 END draw;
 
 PROCEDURE thisvox*():Base.Voxel;

@@ -10,11 +10,11 @@ TYPE Ray = Base.Ray;
 TYPE anim=OBJECT(Base.V)
 VAR
 	target: Voxel;
-	i: LONGINT;
+	i: INTEGER;
 
 PROCEDURE tick;
 VAR 
-	i: LONGINT;
+	i: INTEGER;
 BEGIN
 	FOR i:=0 TO 10 DO
 		p1:=Base.randPT();
@@ -34,7 +34,7 @@ VAR
 	tblue: Voxel;
 	dot,bdot,rdot,gdot,reddot,bluedot,greendot, bottlepossum,v: Voxel;
 	center, pole ,p1, p2,n:  PT;
-	i:LONGINT;
+	i:INTEGER;
 	rand: Random.Generator;
 	shell: RotaVox.RVox;
 	an: anim;

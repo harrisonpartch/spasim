@@ -15,7 +15,7 @@ TYPE TexVox* = OBJECT(Voxel);
 VAR
 	txTF*: BOOLEAN;
 	texcube*: TexCube;
-	texscale*:LONGINT;
+	texscale*:INTEGER;
 	name*: Name; 
 
 PROCEDURE & init*(n: Name);
@@ -29,7 +29,7 @@ END init;
 PROCEDURE Shade (VAR ray: Ray);
 VAR
 	p: Raster.Pixel;
-	x,y,xi,yj: LONGINT;
+	x,y,xi,yj: INTEGER;
 	X,Y, xblend, yblend,blendx,blendy: REAL;
 	r,g,b,a: REAL;
 	dr,dg,db,da,blackness:REAL;
@@ -47,7 +47,7 @@ VAR
 	hitp,lxyz,exit: Base.PT;
 	lsp: Base.SPT;
 	faace:INTEGER;
-	dtl: LONGINT;
+	dtl: INTEGER;
 	mip,mipverse,gray,grayinv: REAL;
 	patchradius: REAL;
 	pclr: Base.ray_color;

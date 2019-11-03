@@ -108,7 +108,10 @@ BEGIN
 	p:=Base.mkPT(x,y,z);
 	v := Base.world.probe(p,200);
 	pass := Base.world.passprobe(p);
-
+	x := cx + cvx/2; y := cy + cvy/2; z := cz + cvz/2;
+	p:=Base.mkPT(x,y,z);
+	v := Base.world.probe(p,200);
+	pass := Base.world.passprobe(p) & pass;
 	IF ~pass THEN
 		x := cx + cvx; y := cy + cvy; z := cz;	
 		q:=Base.mkPT(x,y,z);
@@ -291,7 +294,7 @@ BEGIN
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
-	mstarget:=30;
+	mstarget:=45;
 	Base.STOPGO; 
 END openwincam;
 
@@ -380,7 +383,7 @@ BEGIN
 			| "m": leftsticky:=leftsticky/1.3; upsticky:=upsticky/1.3 ; Out.String("m decrease leftsticky");
 			| "o": GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_NEAREST) ; Out.String(" ");
 			| "t": GL.TexParameterf(GLC.GL_TEXTURE_2D, GLC.GL_TEXTURE_MAG_FILTER, GLC.GL_LINEAR) ; Out.String(" ");
-			| "v": ReloadShader; Out.String("v reload toon shader");
+			| "v": ReloadShaders; Out.String("v reload toon shader");
 			| "P": Marsh.sprout ; Out.String("P Marsh.sprout");
 			| "x": Marsh.incVN ; Out.String("x Marsh.IncVN");
 			| "z": Marsh.decVN	; Out.String("z Marsh.decVN");	
@@ -588,7 +591,7 @@ END KeyEvent;
 		RETURN TRUE;
 	END InitGL;
 		
-	PROCEDURE  ReloadShader;
+	PROCEDURE  ReloadShaders;
 	BEGIN
 			programs[0] := InitShader("passthroughVS.glsl", "passthroughFS.glsl");
 			programs[1] := InitShader("passthroughVS.glsl", "boxBlurFS.glsl");
@@ -604,7 +607,7 @@ END KeyEvent;
 			programs[11] := InitShader("passthroughVS.glsl", "nightVisionFS.glsl");
 (*			programs[12] := InitShader("passthroughVS.glsl", "toonShadingFS.glsl"); *)
 			programs[12] := InitShader("passthroughVS.glsl", "kuwahara.glsl");	
-	END ReloadShader;
+	END ReloadShaders;
 
 	PROCEDURE Display();
 	BEGIN
@@ -630,10 +633,10 @@ END KeyEvent;
 			Out.Ln
 		END;
 		IF ~Retina.saccade THEN
-			IF ms > mstarget+5 THEN 
-				Retina.lessdetail(5)
+			IF ms > mstarget+2 THEN 
+				Retina.lessdetail
 			ELSIF GetCurrentFrameMs()<mstarget THEN
-				Retina.moredetail(5)
+				Retina.moredetail
 			END
 		END
 	END GameLogic;

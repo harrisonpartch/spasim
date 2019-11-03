@@ -8,7 +8,7 @@ Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
 
 CONST M=2; (* defines grid size *)
 	MMO=M-1;
-	CUBERADIUS=0.9;   (*change to sqrt(3)/2 ???*)
+	CUBERADIUS=0.866025;   (*change to sqrt(3)/2 ???*)
 	NL=Base.NL;
 
 TYPE PT = Base.PT;
@@ -43,7 +43,7 @@ VAR
 	i,j: INTEGER;
 	lastlength:REAL;
 BEGIN
-	ray.dtl:=Base.DTL*(1-ray.length/Base.horizon);	
+	ray.dtl:=ray.length/Base.DTL;	
 	IF (ray.length*ray.scale>ray.dtl) THEN (* size of the child voxels at camera *)
 		IF imposter#NIL THEN
 			imposter.Shade(ray)
@@ -57,18 +57,17 @@ BEGIN
 		SPSME.E(xyz,ijk);
 		bounds(ijk.i,ijk.j,ijk.k,out);
 		IF ~out THEN	
-			IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
-				nshade(nblox[ijk.i,ijk.j,ijk.k],ray)
-			ELSE
-				v:= blox[ijk.i,ijk.j,ijk.k];	
-				IF (v#NIL) THEN
-					ray.justhit:=v;
-					ray.lxyz.x := ABS(xyz.x - ijk.i);
-					ray.lxyz.y := ABS(xyz.y - ijk.j);
-					ray.lxyz.z := ABS(xyz.z - ijk.k);
-					v.Shade(ray);
-				END
-			END
+			v:= blox[ijk.i,ijk.j,ijk.k];	
+			IF (v#NIL) THEN
+				ray.justhit:=v;
+				ray.lxyz.x := ABS(xyz.x - ijk.i);
+				ray.lxyz.y := ABS(xyz.y - ijk.j);
+				ray.lxyz.z := ABS(xyz.z - ijk.k);
+				ray.normal := ray.fnormal;
+				v.Shade(ray);
+			ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
+				nshade(nblox[ijk.i,ijk.j,ijk.k],ray) 
+			END 
 		END;
 		IF ~ray.terminate THEN
 			REPEAT
@@ -135,37 +134,38 @@ BEGIN
 				ray.xyz.y:=ray.xyz.y + (newxyz.y-xyz.y)/ray.scale;
 				ray.xyz.z:=ray.xyz.z + (newxyz.z-xyz.z)/ray.scale;				
 				ray.length:=ray.length+v2;
+				v2:=vdepth;
 				ray.hitxyz:=ray.xyz;
 				xyz:=newxyz;	
-				ray.clr.ra := ray.clr.ra-redblack*vdepth;
-				ray.clr.ga := ray.clr.ga-greenblack*vdepth;
-				ray.clr.ba := ray.clr.ba-blueblack*vdepth;	
-				ray.clr.r := ray.clr.r+red*ray.clr.ra*vdepth;
-				ray.clr.g:= ray.clr.g+green*ray.clr.ga*vdepth;
-				ray.clr.b := ray.clr.b+blue*ray.clr.ba*vdepth;		
+				ray.clr.ra := ray.clr.ra-redblack*v2;
+				ray.clr.ga := ray.clr.ga-greenblack*v2;
+				ray.clr.ba := ray.clr.ba-blueblack*v2;	
+				ray.clr.r := ray.clr.r+red*ray.clr.ra*v2;
+				ray.clr.g:= ray.clr.g+green*ray.clr.ga*v2;
+				ray.clr.b := ray.clr.b+blue*ray.clr.ba*v2;		
 				IF ray.length>Base.horizon THEN
 					ray.clr.b:= ray.clr.b + ray.clr.ba;
 					ray.terminate:=TRUE;
 				END;
 				bounds(ijk.i,ijk.j,ijk.k, out);		
-				IF ~(out OR ray.terminate) THEN
-					IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
-						ray.normal := ray.fnormal;
-						nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
-					ELSE				
+				IF ~(out OR ray.terminate) THEN				
 						v := blox[ijk.i,ijk.j,ijk.k];
 						IF (v#NIL) THEN
 							ray.justhit:=v;
 							ray.lxyz.x := ABS(xyz.x - ijk.i);
 							ray.lxyz.y := ABS(xyz.y - ijk.j);
 							ray.lxyz.z := ABS(xyz.z - ijk.k);
-							ray.normal := ray.fnormal;
+							IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN 
+								ray.normal := nblox[ijk.i,ijk.j,ijk.k].normal
+							ELSE
+								ray.normal := ray.fnormal;
+							END;
 							v.Shade(ray);
+						ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
+							nshade(nblox[ijk.i,ijk.j,ijk.k],ray);							
 						END
-					END
-				END;
-				IF (ray.clr.ba<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ra<0.1) THEN 	
-					Base.clampclr(ray.clr);		
+					END;
+				IF (ray.clr.ba<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ra<0.1) THEN 		
 					ray.terminate:=TRUE 
 				END;		
 			UNTIL out OR ray.terminate;
@@ -209,7 +209,7 @@ VAR
 BEGIN
 	dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z);
 	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-	mix:=ray.length*ray.scale*0.05;
+	mix:=ray.length*ray.scale*0.005;
 	IF mix>1 THEN mix:=1 END;
 	dot:=mix*dot1+(1-mix)*dot2;
 	IF nc.color.mirror>0 THEN
@@ -568,7 +568,9 @@ VAR
 	origin: PT;
 BEGIN
 	origin.x:=0; origin.y:=0; origin.z:=0;
-	FRasterrec(f,resolution,origin,1);   (* origin is (0,0,0) *)
+	IF f#NIL THEN
+		FRasterrec(f,resolution,origin,1)
+	END;  (* origin is (0,0,0) *)
 END FRaster;
 
 PROCEDURE FRasterrec(f: FR; resolution: INTEGER; origin: PT; scale: INTEGER); (*origin is always in world space*)
@@ -623,9 +625,9 @@ BEGIN
 			d2s:=f.d2s(p);
 			IF ABS(d2s) < CRDNS THEN
 				v:=f.voxel(p);
+				nbloxTF[i,j,k]:=TRUE;	
+				nblox[i,j,k].normal:=f.getnormal(p);
 				IF v=NIL THEN
-					nbloxTF[i,j,k]:=TRUE;	
-					nblox[i,j,k].normal:=f.getnormal(p);
 					IF d2s<0 THEN
 						nblox[i,j,k].color:=f.getcolor(p);
 					ELSE
@@ -671,7 +673,7 @@ BEGIN
 				o.x:=p.x-1/TWOMS; o.y:=p.y-1/TWOMS; o.z:=p.z-1/TWOMS; (* p is center, o is corner *)
 				IF blox[i,j,k]=NIL THEN
 					NEW(newcell);
-					newcell.setcolor(red,green,blue,redblack,greenblack,blueblack);
+					newcell.setcolor(red/M,green/M,blue/M, redblack/M,greenblack/M,blueblack/M);
 					newcell.imposter:=f.voxel(p);
 					newcell.nposterTF:=TRUE;
 					newcell.nposter.normal:=f.getnormal(p);

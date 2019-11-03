@@ -10,11 +10,11 @@ VAR
 	cyl: FRep.hexgrid;
 	u,w,v: Voxel;
 	center, p1, p2,n:  PT;
-	i:LONGINT;
+	i: INTEGER;
 	
 PROCEDURE draw;
 VAR
-	i: LONGINT;
+	i: INTEGER;
 BEGIN
 	Base.setPT(center,1/2,1/2,1/2);
 	u:=Base.VoxelFromName("NM3");

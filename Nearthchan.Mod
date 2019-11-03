@@ -5,7 +5,7 @@ VAR vox: TexVox.TexVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	NEW(vox,"earthchan.png");
-	vox.tscale:=26 + Base.rand.Uniform()*250;  
+	vox.tscale:=10000;  
 	vox.register;	
 	RETURN vox
 END thisvox;

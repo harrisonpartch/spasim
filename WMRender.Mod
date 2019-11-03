@@ -269,7 +269,7 @@ VAR
 	alive: BOOLEAN;
 	i, t1: INTEGER;
 	mousepreviousx, mousepreviousy: INTEGER;
-	px, pdx, py, pdy: INTEGER;
+	px, pdx, py, pdy: REAL;
 	pi: WM.PointerInfo;
 	warpvent,rlock: BOOLEAN;
 	saccade: BOOLEAN;
@@ -281,8 +281,6 @@ PROCEDURE &openwincam(W,H: INTEGER);
 BEGIN
 	Init(W, H, TRUE);
 	NEW(camera, Retina.W, Retina.H);
-	Retina.Res;
-	Retina.Res;
 	camera.aperjust(W,H);
 	manager := WM.GetDefaultManager();
 	manager.Add(100,100, SELF, { WM.FlagFrame, WM.FlagClose, WM.FlagStayOnTop});
@@ -330,7 +328,7 @@ BEGIN
 			| "2" : Marsh.darken
 			| "3" : Base.gravity:= Base.gravity/1.5
 			| "4" : Base.gravity:= 1.5*Base.gravity
-			| "5" : Retina.Res;
+			| "5" : Close;
 			| "6" : BEGIN{EXCLUSIVE} mainloopgo:=~mainloopgo END; avaTF:=~avaTF
 			| "?" : Out.Int(Base.world.count(7),4); Out.Ln
 			| "h" : camera.hop
@@ -408,9 +406,9 @@ END pan;
 PROCEDURE detail();
 BEGIN
 	IF framedt < mstarget THEN
-		Retina.moredetail(5); 
+		Retina.moredetail; 
 	ELSIF framedt > (mstarget+5) THEN
-		Retina.lessdetail(5); 
+		Retina.lessdetail; 
 	END
 END detail;
 
@@ -535,4 +533,4 @@ END WMRender.
 
 WMRender.Open ~
 
-SystemTools.Free WMRender ~
+System.Free WMRender ~

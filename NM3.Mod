@@ -1,12 +1,12 @@
 MODULE NM3; (*! This module may be either imported or used anonymously *)
-IMPORT Objects, Base, SPSME, Noise, Math, TexVox, Out := KernelLog, Debugging, Heaps, Streams,Strings;
+IMPORT Objects, Base, SPSME, Noise, Math:=MathL, TexVox, Out := KernelLog, Debugging, Heaps, Streams,Strings;
 
 (*
 Special voxel containing 27 children arranged in a 3x3x3 grid.
 Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
 *)
 
-CONST M=3; (* defines grid size *)
+CONST M*=3; (* defines grid size *)
 	MMO=M-1;
 	CUBERADIUS=0.866025;   (*change to sqrt(3)/2 ???*)
 	NL=Base.NL;
@@ -43,8 +43,7 @@ VAR
 	i,j: INTEGER;
 	lastlength:REAL;
 BEGIN
-	ray.dtl:=Base.DTL*(1-ray.length/Base.horizon);	
-	IF (ray.length*ray.scale>ray.dtl) THEN (* size of the child voxels at camera *)
+	IF (ray.length*ray.scale>Base.DTL) THEN (* size of the child voxels at camera *)
 		IF imposter#NIL THEN
 			imposter.Shade(ray)
 		END
@@ -137,16 +136,12 @@ BEGIN
 				v2:=vdepth;
 				ray.hitxyz:=ray.xyz;
 				xyz:=newxyz;	
-				ray.clr.ra := ray.clr.ra-redblack*v2;
-				ray.clr.ga := ray.clr.ga-greenblack*v2;
-				ray.clr.ba := ray.clr.ba-blueblack*v2;	
 				ray.clr.r := ray.clr.r+red*ray.clr.ra*v2;
 				ray.clr.g:= ray.clr.g+green*ray.clr.ga*v2;
 				ray.clr.b := ray.clr.b+blue*ray.clr.ba*v2;		
-				IF ray.length>Base.horizon THEN
-					ray.clr.b:= ray.clr.b + ray.clr.ba;
-					ray.terminate:=TRUE;
-				END;
+				ray.clr.ra := ray.clr.ra-redblack*v2;
+				ray.clr.ga := ray.clr.ga-greenblack*v2;
+				ray.clr.ba := ray.clr.ba-blueblack*v2;	
 				bounds(ijk.i,ijk.j,ijk.k, out);		
 				IF ~(out OR ray.terminate) THEN				
 						v := blox[ijk.i,ijk.j,ijk.k];
@@ -206,31 +201,17 @@ VAR
 	A,B,C,exit: PT;
 	a,b,c,depth: REAL;
 	i:INTEGER;	
+	red: REAL;
 BEGIN
 	dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z);
 	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-	mix:=ray.length*ray.scale*0.005;
+	mix:=ray.length*ray.scale*0.015;
 	IF mix>1 THEN mix:=1 END;
-	dot:=mix*dot1+(1-mix)*dot2;
-	IF nc.color.mirror>0 THEN
-		mi:=1-nc.color.mirror;
-		ray.clr.r := ray.clr.r + nc.color.red*ray.clr.ra*dot*mi;
-		ray.clr.g := ray.clr.g + nc.color.green*ray.clr.ga*dot*mi;
-		ray.clr.b := ray.clr.b + nc.color.blue*ray.clr.ba*dot*mi;
-		ray.clr.ra := ray.clr.ra-nc.color.alpha*mi;
-		ray.clr.ga := ray.clr.ra-nc.color.alpha*mi;
-		ray.clr.ba := ray.clr.ra-nc.color.alpha*mi;
-		ray.normal:=nc.normal;
-		mirror(ray);
-	ELSE		
-		ray.clr.r := ray.clr.r + nc.color.red * ray.clr.ra*dot;
-		ray.clr.g := ray.clr.g + nc.color.green * ray.clr.ga*dot;
-		ray.clr.b := ray.clr.b + nc.color.blue * ray.clr.ba*dot;
-		ray.clr.ra := ray.clr.ra-nc.color.alpha;
-		ray.clr.ga := ray.clr.ra-nc.color.alpha;
-		ray.clr.ba := ray.clr.ra-nc.color.alpha;		
-		ray.terminate:=TRUE
-	END	
+	dot:=mix*dot1+(1-mix)*dot2;		
+	ray.clr.r := ray.clr.r + nc.color.red*ray.clr.ra*dot;
+	ray.clr.g := ray.clr.g + nc.color.green * ray.clr.ga*dot;
+	ray.clr.b := ray.clr.b + nc.color.blue * ray.clr.ba*dot;	
+	ray.terminate:=TRUE
 END nshade;
 
 PROCEDURE erase*(p:PT; resolution:INTEGER);
@@ -265,13 +246,20 @@ VAR
 	i,j,k: INTEGER;
 BEGIN
 	fill(v);
-	blox[1,1,0]:=w;
-	blox[0,1,1]:=w;
-	blox[1,0,1]:=w;
+	blox[1,1,0]:=NIL;
+	blox[0,1,1]:=NIL;
+	blox[1,0,1]:=NIL;
+	blox[1,1,1]:=NIL;
+	blox[1,1,2]:=NIL;
+	blox[2,1,1]:=NIL;
+	blox[1,2,1]:=NIL; 
+	blox[2,0,2]:=w;
+	blox[2,2,0]:=w;
+	blox[0,0,0]:=w;
+	blox[2,2,2]:=w;
+	blox[0,2,2]:=w;
+	blox[0,2,0]:=w;
 	blox[1,1,1]:=w;
-	blox[1,1,2]:=w;
-	blox[2,1,1]:=w;
-	blox[1,2,1]:=w;
 END fillsierp;
 
 PROCEDURE fillcqr2*(v,w: Voxel);
@@ -341,7 +329,7 @@ BEGIN
 		blueblack := bb;
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 			v:=blox[i,j,k];
-			IF (v#NIL) & ~v.colorlock THEN
+			IF (v#NIL) THEN
 				v.setcolorrec(r/M,g/M,b/M,rb/M,gb/M,bb/M);
 			END
 		END END END;
@@ -432,7 +420,6 @@ VAR
 BEGIN
 	IF ~lockTF THEN
 		Base.clamPT(p);
-		voxel.setcolor(red*res,green*res,blue*res,redblack*res,greenblack*res,blueblack*res); 
 		IF voxel#NIL THEN
 			strokerec(p,res,M, voxel);
 		END
@@ -466,11 +453,14 @@ BEGIN
 		IF nextscale>resolution THEN
 			blox[i,j,k]:=voxel
 		ELSE
-			IF blox[i,j,k]#NIL THEN
-				IF  blox[i,j,k].copyonstroke THEN
-					copyv:= blox[i,j,k].deepcopy();
-					blox[i,j,k]:=copyv;	
-					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
+			vu:=blox[i,j,k];
+			IF vu#NIL THEN
+				IF  vu.copyonstroke THEN
+					copyv:= vu.deepcopy();
+					IF copyv IS cell THEN
+						copyv.strokerec(p, resolution,nextscale,voxel)
+					END;
+					blox[i,j,k]:=copyv;					
 				ELSIF blox[i,j,k] IS Cell THEN
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
 				ELSE
@@ -628,13 +618,15 @@ BEGIN
 			d2s:=f.d2s(p);
 			IF ABS(d2s) < CRDNS THEN
 				v:=f.voxel(p);
-				nbloxTF[i,j,k]:=TRUE;	
-				nblox[i,j,k].normal:=f.getnormal(p);
 				IF v=NIL THEN
-					IF d2s<0 THEN
-						nblox[i,j,k].color:=f.getcolor(p);
-					ELSE
-						nblox[i,j,k].color:=f.getsidecolor(p)
+					IF f.strokeTF(p) THEN
+						nbloxTF[i,j,k]:=TRUE;	
+						nblox[i,j,k].normal:=f.getnormal(p);
+						IF d2s<0 THEN
+							nblox[i,j,k].color:=f.getcolor(p);
+						ELSE
+							nblox[i,j,k].color:=f.getsidecolor(p)
+						END
 					END
 				ELSE
 					blox[i,j,k]:=v;
@@ -752,17 +744,16 @@ VAR
 	i,j,k: INTEGER;
 BEGIN
 	code:=ncode; (* if this voxel has been rezzed from another module, make it NM3 *)
+	copyclear;
 	copymarker:=TRUE;
 	NEW(c);
-	c.setcolor(red/M, green/M, blue/M, redblack/M, greenblack/M, blueblack/M); 
 	c.nbloxTF:=nbloxTF;
 	c.nblox:=nblox;
+	
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 		child:=blox[i,j,k];
 		IF (child#NIL) THEN
-			IF child.copyonstroke THEN
-				c.blox[i,j,k]:=child
-			ELSIF child.copymarker THEN
+			IF child.copyonstroke OR child.copymarker  THEN
 				c.blox[i,j,k]:=child
 			ELSE
 				c.blox[i,j,k]:=child.deepcopy() 

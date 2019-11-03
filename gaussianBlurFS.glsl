@@ -5,7 +5,7 @@ uniform vec2 u_step;
 
 const int KERNEL_WIDTH = 3; // Odd
 const float offset = 1.0;
-const mat3 gauss = mat3(vec3(1,2,1), vec3(2,8,2), vec3(1,2,1));
+const mat3 gauss = mat3(vec3(1,2,1), vec3(2,12,2), vec3(1,2,1));
 
 void main(void)
 {

@@ -24,8 +24,8 @@ void main(void)
 
 	// Unsharp Maskv
 	vec3 difference = abs(vec3(originalColor.rgb) - accum/16.0) ;
-	if (difference.x > 0.025 || difference.y > 0.025 || difference.z > 0.025)
-		gl_FragColor = vec4((difference*5.1+originalColor.rgb)/2.0 , 1.0);
+	if (difference.x > 0.25 || difference.y > 0.25 || difference.z > 0.25)
+		gl_FragColor = vec4((difference*7.1+originalColor.rgb)/2.0 , 1.0);
 	else
 		gl_FragColor = vec4(originalColor.rgb, 1.0);
 }

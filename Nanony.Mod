@@ -13,7 +13,7 @@ VAR
 	reddot,bludot,yellodot,greendot: Voxel;
 	center,q,qq:  PT;
 	p:ARRAY 7 OF PT;
-	i,j,k:LONGINT;
+	i,j,k: INTEGER;
 	GO: BOOLEAN;
 PROCEDURE thisvox*():Base.Voxel;
 VAR
@@ -46,7 +46,7 @@ BEGIN
 	Base.setPT(q,1/2,1/2,0);
 	Base.setPT(qq,1/2,1/2,1);
 	NEW(ball,center,6/12);
-	ball.setcolor(1,1,0,1/2);
+	ball.setcolor(1,1,0,1/2,0);
 	ball.setvoxel(v); 
 	starr.FRaster(ball,27);	
 	FOR i:= 0 TO 1000 DO

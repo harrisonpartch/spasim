@@ -102,7 +102,7 @@ BEGIN
 	END;
 END Shade;
 
-PROCEDURE stroke*(p:PT; resolution: LONGINT; voxel:Voxel);
+PROCEDURE stroke*(p:PT; resolution: INTEGER; voxel:Voxel);
 BEGIN
 	innard.stroke(p,resolution,voxel);
 END stroke;

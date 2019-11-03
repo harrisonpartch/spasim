@@ -6,10 +6,10 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=1;        
-	TS=16*2;  (*  TS MUST BE {size of unit tile} MULTIPLIED BY 2**T *)
-	TW=16;
-	TH=9;
+	T=2;        
+	TS=16*4;  (*  TS MUST BE {size of unit tile} MULTIPLIED BY 2**T *)
+	TW=12;
+	TH=8;
 	W*=TS*TW;
 	H*=TS*TH;
 	CX=W DIV 2;
@@ -410,7 +410,7 @@ PROCEDURE t8x8fill(CONST x,y: INTEGER);
 VAR
 	i,j: INTEGER;
 BEGIN
-	IF clrd4(rays[x,y], rays[x+7,y], rays[x+7,y+7], rays[x,y+7]) > thresh1a THEN
+	IF clrd4(rays[x,y], rays[x+7,y], rays[x+7,y+7], rays[x,y+7]) > thresh2 THEN
 		t4x4a(x,y);
 		t4x4b(x+4,y);
 		t4x4c(x+4,y+4);
@@ -518,7 +518,7 @@ VAR
 BEGIN	
 	splitcam(cam,a,b,c,d);
 	IF level<2 THEN
-		FVV:=10*FV*FV;
+		FVV:=FV*FV;
 		x:=a.imx-W/2;
 		y:=a.imy-H/2;		
 		D:=(x*x+y*y);			
@@ -569,7 +569,7 @@ BEGIN{ACTIVE, PRIORITY(Objects.Normal)}
 		BEGIN{EXCLUSIVE}
 			AWAIT(GO);
 		END;
-		zftrace(cam,T); 
+		ztrace(cam,T); 
 		BEGIN{EXCLUSIVE}
 			GO:=FALSE;
 		incTD; 
@@ -577,44 +577,7 @@ BEGIN{ACTIVE, PRIORITY(Objects.Normal)}
 	UNTIL ~Base.worldalive; 
 END Tile;
 
-VAR
-	tile: ARRAY TW,TH OF Tile;
-	frameasteps*,framebsteps*:INTEGER;
-	a,b: INTEGER;
-	tilesdone:INTEGER;
 
-	AFTER*: INTEGER;
-	FAST*:INTEGER;
-	lsense,ls2:REAL;
-	FGUAARD,FRAMEBOORT:BOOLEAN;
-	saccade*,SACCADE1*,DTLRAYS*:BOOLEAN;
-	cameratheta*,cameraphi*:REAL;
-	aperture*: Base.Aperture;
-	image*: Raster.Image;
-	rtheta,rphi: REAL; (* camera pitch,roll. global variables because they are the same for all rays in a frame *)
-	fward*, dward*, rward*,camrward*: PT;  
-	foveaparameter:INTEGER;
-	FV: REAL;
-	copy: Raster.Mode;
-	thresh1a, thresh2, thresh3, threshmax*, horizon: REAL
-	
-PROCEDURE reflect(VAR p: PT; n: PT);
-VAR 
-	a,b,c,dot: REAL;
-BEGIN
-	dot := p.x*n.x+p.y*n.y+p.z*n.z;
-	a := 2*n.x*dot; b := 2*n.y*dot; c := 2*n.z*dot;
-	p.x := p.x-a; p.y := p.y-b; p.z := p.z-c;
-END reflect;
-	
-PROCEDURE mirror(VAR ray: Ray);
-BEGIN
-	reflect(ray.dxyz, ray.normal);	
-	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
-	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
-	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
-END mirror;
-	
 PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
 VAR 
 	d: REAL;
@@ -688,44 +651,35 @@ BEGIN
 	
 END splitcam;
 
-PROCEDURE moredetail*(d: INTEGER);
+PROCEDURE moredetail*();
 VAR i: INTEGER;
 BEGIN
-	FOR i:=0 TO d-1 DO
-		Base.horizon:=Base.horizon*31/30;
-		IF Base.horizon>1 THEN 
-			Base.horizon:=1; 
-			decthresh1
-		END
-	END;
+	IF FV<fvmax THEN FV:=FV*12/11 END
 END moredetail;
 
-PROCEDURE lessdetail*(d: INTEGER);
+PROCEDURE lessdetail*();
 BEGIN
-	Base.horizon:=Base.horizon*30/31; 
-	IF Base.horizon<0.0001 THEN 
-		Base.horizon:=0.0001;
-	END;
+	IF FV>fvmin THEN FV:=FV*11/12 END
 END lessdetail;
 
 PROCEDURE decthresh1;
 BEGIN
-	thresh1a:=thresh1a*10/11;
-	IF thresh1a<0.002 THEN 
-		thresh1a:=0.002;
+	thresh1a:=thresh1a*2/3;
+	IF thresh1a<threshmin THEN 
+		thresh1a:=threshmin;
 	END;
-	thresh2:=2*thresh1a;
-	thresh3:=4*thresh1a;
+	thresh2:=10*thresh1a;
+	thresh3:=30*thresh1a;
 END decthresh1;
 
 PROCEDURE incthresh1;
 BEGIN
-	thresh1a:=thresh1a*11/10;
+	thresh1a:=thresh1a*3/2;
 	IF thresh1a>threshmax THEN 
 		thresh1a:=threshmax;
 	END;
-	thresh2:=2*thresh1a;
-	thresh3:=4*thresh1a;
+	thresh2:=5*thresh1a;
+	thresh3:=20*thresh1a;
 END incthresh1;
 
 PROCEDURE incTD;
@@ -811,6 +765,25 @@ BEGIN
 	Raster.Put(image,CX+1,CY-1,pixel,copy);	
 END go;
 
+VAR
+	tile: ARRAY TW,TH OF Tile;
+	frameasteps*,framebsteps*:INTEGER;
+	a,b: INTEGER;
+	tilesdone:INTEGER;
+	lsense,ls2:REAL;
+	FGUAARD,FRAMEBOORT:BOOLEAN;
+	saccade*,SACCADE1*,DTLRAYS*:BOOLEAN;
+	cameratheta*,cameraphi*:REAL;
+	aperture*: Base.Aperture;
+	image*: Raster.Image;
+	rtheta,rphi: REAL; (* camera pitch,roll. global variables because they are the same for all rays in a frame *)
+	fward*, dward*, rward*,camrward*: PT;  
+	foveaparameter:INTEGER;
+	FV: REAL;
+	copy: Raster.Mode;
+	thresh1a, thresh2, thresh3, threshmax*, fvmax, fvmin, threshmin, horizon: REAL
+
+
 BEGIN
 	Out.String("Retina loading...");
 	Raster.InitMode(copy,Raster.srcCopy);	
@@ -820,17 +793,18 @@ BEGIN
 			NEW(tile[a,b]);
 		END
 	END;	
-	AFTER:=2;
- 	FAST:=3;
- 	thresh1a:=0.01;
- 	thresh2:=0.02;
+ 	thresh1a:=0.0031;
+ 	thresh2:=0.01;
  	thresh3:=0.04;
- 	threshmax:=0.31;
+ 	threshmax:=0.3;
+ 	threshmin:=0.000001;
  	horizon:=1.0;
  	lsense:=0.2;
  	aperture.width:=1;
  	aperture.height:=1;
  	foveaparameter:=13;
  	FV:=W/foveaparameter; 
+ 	fvmax:=FV*6;
+ 	fvmin:=FV/3;
  	Out.String("loaded...");	
 END Retina.

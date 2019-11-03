@@ -103,7 +103,7 @@ BEGIN
 			WMRectangles.MakeRect(0,0, mip_zero.width, mip_zero.height),
 				WMRectangles.MakeRect(0,0,mip_zero.width, mip_zero.height),
 					WMRasterScale.ModeCopy,
-						WMRasterScale.ScaleBilinear);
+						WMRasterScale.ScaleBox);
 	WMRasterScale.Scale(img,WMRectangles.MakeRect(0,0, img.width, img.height), mip_one,
 			WMRectangles.MakeRect(0,0, mip_one.width, mip_one.height), 
 				WMRectangles.MakeRect(0,0, mip_one.width, mip_one.height),
@@ -480,8 +480,7 @@ VAR
 
 PROCEDURE & init*;
 BEGIN
-(*	vox:= EMPTY;
-	imposter:= EMPTY; *)
+	setsidecolor(1/2,1/2,1/2,1,0);
 END init;
 
 PROCEDURE in*(p:PT):BOOLEAN;
@@ -564,15 +563,10 @@ BEGIN
 	RETURN cxolor		
 END color;
 
-PROCEDURE death*(p:PT):BOOLEAN;
-BEGIN
-	RETURN allowdeath
-END death;
-
-PROCEDURE pass*(p:PT):BOOLEAN;
-BEGIN
-	RETURN passable
-END pass;
+PROCEDURE strokeTF*(p:PT):BOOLEAN;
+BEGIN	
+	RETURN TRUE		
+END strokeTF;
 
 END FR;
 

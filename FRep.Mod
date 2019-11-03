@@ -158,15 +158,26 @@ END mirror;
 	
 END sphere;
 
+TYPE randsphere*=OBJECT(sphere)
+
+PROCEDURE strokeTF*(p: PT):BOOLEAN;
+BEGIN		
+	RETURN (rand.Uniform()<0.3)
+END strokeTF
+
+END randsphere;
+
 TYPE sqube*= OBJECT(FR)
 VAR 
-  Radius,R,S,T,A,B,C: REAL;
+	Radius,R,S,T,A,B,C: REAL;
 	center:PT;
 	cxf*:BOOLEAN;
-		
+	rand*:Random.Generator;		
+	
 PROCEDURE &newish*(c:PT; rad,r,s,t,a,b,cc: REAL);
 
 BEGIN
+	NEW(rand);
 	center:=c;
 	Radius:=rad;	
 	R:=r; S:=s; T:=t;
