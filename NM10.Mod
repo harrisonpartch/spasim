@@ -1,12 +1,12 @@
-MODULE NM2; (*! This module may be either imported or used anonymously *)
-IMPORT Objects, Base, SPSME, Noise, Math:=MathL, TexVox, Out := KernelLog, Debugging, Heaps, Streams,Strings;
+MODULE NM10; (*! This module may be either imported or used anonymously *)
+IMPORT Base, SPSME, Streams, NM3;
 
 (*
 Special voxel containing 27 children arranged in a 3x3x3 grid.
 Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
 *)
 
-CONST M=2; (* defines grid size *)
+CONST M*=10; (* defines grid size *)
 	MMO=M-1;
 	CUBERADIUS=0.866025;   (*change to sqrt(3)/2 ???*)
 	NL=Base.NL;
@@ -246,9 +246,19 @@ VAR
 	i,j,k: INTEGER;
 BEGIN
 	fill(v);
-	blox[1,1,0]:=w;
-	blox[0,1,1]:=w;
-	blox[1,0,1]:=w;
+	blox[1,1,0]:=NIL;
+	blox[0,1,1]:=NIL;
+	blox[1,0,1]:=NIL;
+	blox[1,1,1]:=NIL;
+	blox[1,1,2]:=NIL;
+	blox[2,1,1]:=NIL;
+	blox[1,2,1]:=NIL; 
+	blox[2,0,2]:=w;
+	blox[2,2,0]:=w;
+	blox[0,0,0]:=w;
+	blox[2,2,2]:=w;
+	blox[0,2,2]:=w;
+	blox[0,2,0]:=w;
 	blox[1,1,1]:=w;
 END fillsierp;
 
@@ -278,8 +288,8 @@ BEGIN
 	passable:=TRUE;
 	complex:=TRUE;
 	imposter:=Base.EMPTY;
-	code:="NM2";
-	ncode:="NM2"
+	code:="NM10";
+	ncode:="NM10"
 END init;
 
 PROCEDURE copyclear*;
@@ -301,7 +311,7 @@ VAR
 BEGIN
 	copyclear;
 	colorlock:=TRUE;
-	setcolorrec(r,g,b,rb,gb,bb)
+	setcolorrec(r,g,b,rb,gb,bb) 
 END setcolor;
 
 PROCEDURE setcolorrec(r,g,b,rb,gb,bb: REAL);
@@ -320,7 +330,7 @@ BEGIN
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 			v:=blox[i,j,k];
 			IF (v#NIL) THEN
-				v.setcolorrec(r,g,b,rb,gb,bb);
+				v.setcolorrec(r/M,g/M,b/M,rb/M,gb/M,bb/M);
 			END
 		END END END;
 		copymarker:=FALSE
@@ -425,7 +435,7 @@ VAR
 	code: Base.Name;
 BEGIN
 	IF ~lockTF THEN
-		code:="NM2"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
+		code:="NM10"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 		nextscale:=scale*M;
 		p.x:=p.x*M;
 		p.y:=p.y*M;
@@ -433,7 +443,6 @@ BEGIN
 		i := ENTIER(p.x)MOD M; j := ENTIER(p.y)MOD M; k := ENTIER(p.z)MOD M;
 		IF nextscale>resolution THEN
 			blox[i,j,k]:=voxel;
-			nbloxTF[i,j,k]:=FALSE
 		ELSE
 			vu:=blox[i,j,k];
 			IF vu#NIL THEN
@@ -443,11 +452,11 @@ BEGIN
 						copyv.strokerec(p, resolution,nextscale,voxel)
 					END;
 					blox[i,j,k]:=copyv;					
-				ELSIF blox[i,j,k] IS Cell THEN
-					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
+				ELSIF vu IS Cell THEN
+					vu.strokerec(p, resolution,nextscale,voxel)
 				ELSE
 					NEW(c);
-					c.setcolor(red, green, blue, redblack, greenblack, blueblack); 
+					c.setcolor(red/M, green/M, blue/M, redblack/M, greenblack/M, blueblack/M); 
 					c.fill(blox[i,j,k]);
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
@@ -503,9 +512,9 @@ VAR
 	d2s,MS,TWOMS,CRDS,CRDNS:REAL;
 	nextscale: INTEGER;
 	v: Voxel;
-	newcell: cell;
+	newcell: NM3.cell;
 BEGIN
-	code:="NM2"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
+	code:="NM10"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 	MS:=M*scale;
 	TWOMS:=2*MS;
 	nextscale:=scale*M;
@@ -530,8 +539,8 @@ BEGIN
 					newcell.FRasterrec(f,resolution,o,nextscale);
 				ELSE
 				 	v:=blox[i,j,k];
-				 	IF v IS cell THEN
-				 		WITH v:cell DO
+				 	IF v IS Cell THEN
+				 		WITH v:Cell DO
 				 			v.imposter:=f.getimposter(p);
 							v.nposterTF:=TRUE;
 							v.nposter.normal:=f.getnormal(p);
@@ -581,7 +590,7 @@ VAR
 	nextscale: INTEGER;
 	v: Voxel;
 	color: Color;
-	newcell: cell;
+	newcell: NM3.cell;
 	solidmarker: BOOLEAN;
 BEGIN
 	MS:=M*scale;
@@ -607,8 +616,8 @@ BEGIN
 					blox[i,j,k]:=newcell				
 				ELSE
 				 	v:=blox[i,j,k];
-				 	IF v IS cell THEN
-				 		WITH v:cell DO
+				 	IF v IS Cell THEN
+				 		WITH v:Cell DO
 				 			v.imposter:=f.voxel(p);
 							v.nposterTF:=TRUE;
 							v.nposter.normal:=f.getnormal(p);
@@ -673,16 +682,18 @@ VAR
 	cv,child:Voxel;
 	i,j,k: INTEGER;
 BEGIN
-	code:=ncode; (* if this voxel has been rezzed from another module, make it NM2 *)
+	code:=ncode; (* if this voxel has been rezzed from another module, make it NM10 *)
 	copymarker:=TRUE;
 	NEW(c);
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
+		c.red:=red; c.green:=green; c.blue:=blue; 
+		c.redblack:= redblack; c.greenblack:=greenblack; c.blueblack:= blueblack;
 		c.nbloxTF[i,j,k]:=nbloxTF[i,j,k];
 		c.nblox[i,j,k]:=nblox[i,j,k];
 		c.blox[i,j,k]:=blox[i,j,k];
 		child:=c.blox[i,j,k];
 		IF (child#NIL) THEN
-			IF child.copyonstroke OR child.copymarker  THEN
+			IF ~child.copyonstroke OR child.copymarker  THEN
 				c.blox[i,j,k]:=child
 			ELSE
 				c.blox[i,j,k]:=child.deepcopy() 
@@ -714,7 +725,7 @@ END count;
 
 (*
 Engrains this voxel and it's children recursively in the following format:
-"NM2"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
+"NM10"|red|green|blue|TRUE|child0.engrain|FALSE|TRUE|child1.engrain|....
 <----- Voxel data -----><------                     children data                     ------>
 Children data contains 27 boolean-child pairs, each boolean being TRUE if a child is contained in that position.
 In case of FALSE the length of child data is 0 for that child (i.e. no data is being written except for the FALSE).
@@ -817,4 +828,4 @@ END thisvox;
 
 BEGIN
 	NEW(copyengine)
-END NM2.
+END NM10.

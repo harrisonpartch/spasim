@@ -514,7 +514,7 @@ TYPE
 			END
 		END IsHit;
 
-		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h, q : LONGINT);
+		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h, q : INTEGER);
 		BEGIN
 			IF reduceQuality THEN q := 0 END;
 			IF img # NIL THEN

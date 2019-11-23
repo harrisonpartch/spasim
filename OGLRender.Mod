@@ -252,12 +252,12 @@ BEGIN
 		gravity:=Base.gravity;
 		gravityvector:=Base.mulPT(gravityvector,Base.gravity);
 		a:=Retina.fward.x*Base.cursordist; b:=Retina.fward.y*Base.cursordist; c:=Retina.fward.z*Base.cursordist;
-		d:=Retina.fward.x*0.0021; e:=Retina.fward.y*0.0021;  f:=Retina.fward.z*0.0021; 
+		d:=Retina.fward.x*0.021; e:=Retina.fward.y*0.021;  f:=Retina.fward.z*0.021; 
 		Base.updatecamera(cx,cy,cz,a,b,c,d,e,f);	
 		IF avaTF THEN Marsh.drawavatar END
 	END;
 	IF MOUSEDOWN THEN	
-		IF GLW.ML IN MB THEN  Marsh.tunnelinto; 
+		IF GLW.ML IN MB THEN Marsh.tunnelinto;
 		ELSIF  GLW.MM IN MB THEN Marsh.snipeinto; 
 		ELSIF  GLW.MR IN MB THEN Marsh.snipeonto;
 		END;	
@@ -392,7 +392,7 @@ BEGIN
 			| "2": Base.gravity:= Base.gravity/1.5 ; Out.String(" ");	
 			| "@": Base.gravity:= 1.5*Base.gravity ; Out.String(" ");
 			| "3": camera.glidetoggle;
-			| "4": Base.STOPGO; Out.String(" ");
+			| "4": Base.STOPGO; Out.String("STOPGO");
 			| "5":  Out.String(" ");
 			| "6": avaTF:=~avaTF ; Out.String(" ");
 			| "h": camera.hop ; Out.String(" ");
@@ -458,17 +458,15 @@ END KeyEvent;
 		xr,yr: INTEGER;
 		temporaljust: REAL; 
 		BEGIN
-			MB := keys;  (* *)
-			
-			xr :=x-centerx; yr :=y-centery;
-			
+			MB := keys;  (* *)		
+			xr :=x-centerx; yr :=y-centery;		
 			IF CAPTUREMOUSE & (ABS(xr)+ABS(yr)>1) THEN
 				left:=ABS(xr)*xr;
 				up:=-ABS(yr)*yr;  
 				camera.up(-up/(6000*leftsticky)); 
 				camera.left(left/(6000*leftsticky));
 				WarpPointer(1000,1000, centerx,centery); 
-				IF (ABS(xr)+ABS(yr)>15) THEN
+				IF (ABS(xr)+ABS(yr)>150) THEN
 					Retina.saccade:=TRUE;
 				ELSE
 					Retina.saccade:=FALSE;
@@ -771,8 +769,6 @@ BEGIN
 	NEW(glw);
 (*	Debugging.DisableGC *)
 END Open;
-
-
 
 BEGIN
 

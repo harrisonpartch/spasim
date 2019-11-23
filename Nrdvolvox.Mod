@@ -1,12 +1,12 @@
 MODULE Nrdvolvox;
 
-IMPORT Base, SPSME, FRep,Objects;
+IMPORT Base, SPSME, FRep, Kernel;
 
 CONST	
-	M=20;
+	M= 10;
 	A = 80;
 	B = 20;
-	C = 0.03;
+	C = 0.045;
 
 TYPE
 	PT=Base.PT;
@@ -17,18 +17,20 @@ TYPE RDVolVox*=OBJECT(Base.Voxel);
 VAR
 	m1*,m2,n1,n2: ARRAY M,M,M OF REAL;
 	gen: INTEGER;
-	i:LONGINT;
+	i:INTEGER;
 	tock*: INTEGER;
 	BLUE: Voxel;
 	RED: Voxel;
 	YELLOW: Voxel;
-	frame: LONGINT;
+	frame: INTEGER;
+	timer: Kernel.Timer;
 
 PROCEDURE &init*(red,blue,yellow: Voxel);
 BEGIN
 	RED := red;
 	BLUE := blue;
 	YELLOW:= yellow;
+	NEW(timer);
 	clere;
 	seed;
 	tock := 1;
@@ -37,7 +39,7 @@ END init;
 			
 PROCEDURE clere*;
 VAR
-	i,j,k:LONGINT;
+	i,j,k:INTEGER;
 BEGIN								
 	FOR i := 0 TO M - 1 DO
 		FOR j := 0 TO M - 1 DO
@@ -54,7 +56,7 @@ END clere;
 
 PROCEDURE seed*;
 VAR
-	i,j,k:LONGINT;
+	i,j,k:INTEGER;
 BEGIN								
 	FOR i := 0 TO M - 1 DO
 		FOR j := 0 TO M - 1 DO
@@ -65,7 +67,7 @@ BEGIN
 	END;
 END seed;
 
-PROCEDURE bounds (i, j, k: LONGINT; VAR out: BOOLEAN);
+PROCEDURE bounds (i, j, k: INTEGER; VAR out: BOOLEAN);
 BEGIN
 	IF (i < 0) OR (i > M-1) OR (j < 0) OR (j > M-1) OR (k < 0) OR (k > M-1) THEN
 		out := TRUE
@@ -76,7 +78,7 @@ END bounds;
 
 PROCEDURE tick;
 VAR
-		i, j,k: LONGINT;
+		i, j,k: INTEGER;
 		nx1, nx2: REAL;
 		A1, B1, C1, D1: REAL;
 BEGIN
@@ -110,7 +112,7 @@ BEGIN
 			END
 		END;
 	END;
- END tick;
+END tick;
 
 PROCEDURE Shade (VAR ray: Ray);
 VAR
@@ -123,7 +125,7 @@ VAR
 	vdepth: REAL;
 	last:BOOLEAN;
 	dtl:REAL;	
-	color: LONGINT;
+	color: INTEGER;
 BEGIN
 	ray.scale := ray.scale*M;
 	scaleInv := 1/ray.scale;
@@ -224,13 +226,6 @@ BEGIN
 			ray.xyz.z:=ray.xyz.z +((newxyz.z-xyz.z)+ray.ddxyz.z)*scaleInv;			
 			xyz:=newxyz;
 			ray.length:=ray.length+vdepth;
-			rr := red*vdepth*ray.clr.ra; gr := green*vdepth*ray.clr.ga; br := blue*vdepth*ray.clr.ba; blr:=black*vdepth; bla:=alpha*vdepth;
-			ray.clr.r := ray.clr.r+rr;
-			ray.clr.g:= ray.clr.g+gr;
-			ray.clr.b := ray.clr.b+br; 
-			ray.clr.ra := (ray.clr.ra-rr)-blr;
-			ray.clr.ga := (ray.clr.ga-gr)-blr;
-			ray.clr.ba := (ray.clr.ba-br)-blr; 	
 			bounds(ijk.i,ijk.j,ijk.k, out);
 			IF ~out THEN
 				ray.lxyz.x := ABS(xyz.x - ijk.i);
@@ -259,11 +254,13 @@ BEGIN
 	ray.scale := ray.scale/M;
 END Shade;
 
-(* BEGIN{ACTIVE, PRIORITY(Objects.Low)}
+ BEGIN{ACTIVE}
 	REPEAT
+	BEGIN
 		tick;
-		Objects.Sleep(40)
-	UNTIL FALSE *)
+		timer.Sleep(30)
+	END;
+	UNTIL FALSE 
 END RDVolVox;
 
 VAR
@@ -271,20 +268,18 @@ VAR
 	r,b,y: Base.Voxel;
 	center: Base.PT;
 	ball: FRep.sphere;
+	GO, DONE: BOOLEAN;
 	
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN	
 	RETURN vox
 END thisvox;
 
-PROCEDURE P*;
-END P;
-
 BEGIN
 	r:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODh"); 	
 	y:=Base.VoxelFromName("Nbluedot");
 	b:=Base.EMPTY;
-	NEW(vox,b,r,y);
+	NEW(vox,b,y,b);
 	vox.passable:=TRUE
 END Nrdvolvox.
 

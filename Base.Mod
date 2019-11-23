@@ -287,12 +287,6 @@ END count;
 
 PROCEDURE Shade*(VAR ray: Ray);
 END Shade;
-PROCEDURE proberay*(VAR ray: Ray):Voxel;
-VAR v:Voxel;
-BEGIN
-	NEW(v);
-	RETURN(v)
-END proberay;
 PROCEDURE probe*(p:PT; resolution: INTEGER):Voxel;
 BEGIN
 	RETURN(SELF);
@@ -646,7 +640,7 @@ BEGIN
 	previouscameraPT:=cameraPT;
 	cameraPT.x:=x; cameraPT.y:=y; cameraPT.z:=z;
 	cursorPT.x:=x+a; cursorPT.y:=y+b; cursorPT.z:=z+c; 
-	avatarPT.x:=x+d; avatarPT.y:=y+e; avatarPT.z:=z+f; 
+	avatarPT.x:=x+a+d; avatarPT.y:=y+b+e; avatarPT.z:=z+c+f; 
 END updatecamera;
 
 PROCEDURE clearvoxelist*;
@@ -1242,9 +1236,8 @@ BEGIN
 	rward:=mkPT(0,1,0);
 	dward:=mkPT(0,0,1);
 	NEW(EMPTY);
-	NEW(OPAQUE);
+	EMPTY.code:="EMPTY";
 	EMPTY.passable:=TRUE;
-	EMPTY.setcolor(0,0,0,1,1,1);
 	NEW(world);
 	worldalive := TRUE;
 	frame:=0;

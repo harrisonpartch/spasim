@@ -31,16 +31,18 @@ Render.Open    <== Middle mouse click on this
 srVoxel.Mod
 WMRender.Open 
 
+RD.Mod
+TexRD.Mod
 
 ======
 
-System.FreeDownTo  Base ~   
+System.FreeDownTo Base ~   
 System.FreeDownTo OpenGL ~
 =======  
 
-OpenGL.Tool
+opengloberon/OpenGL.Tool
 
-OGLRetina.Mod
+openaloberon/OpenAL.Tool
 
 Compiler.SetDefaultPlatform Linux32G ~
 
@@ -54,6 +56,7 @@ NXWCxXWLIcD2LegvoGXX666.Mod	Serp
 
 NBsHFiBKkSckXBAd46ZbEQw.Mod mandelbrot
 
+NM50.Mod
 NM20.Mod
 NM10.Mod
 NM5.Mod

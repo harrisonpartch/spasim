@@ -1,11 +1,12 @@
 MODULE Marsh;
 IMPORT  Base , Retina, Engrainer, Random, CellAuto, srVoxel, Voxel4,
- FRep, Files, Streams, Commands, Out:=KernelLog,NM3,NM10,NM20;
+ FRep, Files, Streams, Commands, Out:=KernelLog,NM3,NM10,NM20, NM50,NM5;
 
 CONST sfile="marshstrokes.text"
 TYPE Voxel=Base.Voxel;
 	PT=Base.PT;
-	Color=Base.Color;  
+	Color=Base.Color; 
+	Ray=Base.Ray; 
 	Path=Base.Path;
 	VA=ARRAY 5 OF Voxel;
 
@@ -152,7 +153,7 @@ END stroke;
 PROCEDURE tunnelinto*;
 VAR
 	p,dp:PT;
-	ray:Base.Ray;
+	ray:Ray;
 	v: Voxel;
 	dx,dy,dz,d:REAL;
 BEGIN
@@ -161,16 +162,11 @@ BEGIN
 	dy:=ray.dxyz.y/10000000;
 	dz:=ray.dxyz.z/10000000;	
 	Base.world.Shade(ray);
-	IF ray.firsthitTF THEN 
-		p:=ray.firsthitxyz
-	ELSE
-		p:=ray.hitxyz
-	END;
+	p:=ray.hitxyz;
 	p.x:=p.x+dx;
 	p.y:=p.y+dy;
 	p.z:=p.z+dz;
-	Base.cursorPT:=p; 	
-	Base.world.stroke(p,cursorsize, Base.EMPTY)
+	Base.world.stroke(p,cursorsize, EMPTY)
 END tunnelinto;
 
 PROCEDURE snipeinto*;
@@ -206,14 +202,6 @@ BEGIN
 	Base.cursorPT:=p; 	
 	stroke(Base.cursorPT,cursorsize,marshv.vox)
 END snipeonto;
-
-PROCEDURE sniprobe*():Voxel;
-VAR
-	v: Voxel;
-BEGIN
-	v:=Base.world.proberay(Base.sniperay);
-	RETURN v
-END sniprobe;
 
 PROCEDURE drawHUD*;
 VAR
@@ -308,10 +296,10 @@ VAR
 	w3,z3,z3a,z3b,z2,z2a,z4,cage,floop,volvox,life,iml,speckle, doge, reddot,treeserp,acidcats, badopossum, raccoon,
 	akatrump, archillect,arkilekt,kat,muratpak,dogepearl,
 	jordan, bottle1,bottle2,bottle3,bottlepossum,bottlegrounds,greensuncouple,wstar,starspider,arevclock: Voxel;
-	ball: FRep.randsphere;
+	ball: FRep.sphere;
 	sqube: FRep.sqube;
-	medley: NM20.cell;
-	med1: NM20.cell;	
+	medley: NM10.cell;
+	med1: NM10.cell;	
 	med2: NM3.cell;
 	fuzz: Voxel4.FuzzVox;
 	siv: Voxel4.MirrorSphereInVox;
@@ -358,9 +346,6 @@ BEGIN
 	push(harrison);
 	doge:=Base.VoxelFromName("Ndogepearl"); 
 	push(doge);		
-
-  volvox:=Base.VoxelFromName("Nrdvolvox");  	
-  push(volvox);
   serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999"); 
 	push(serp);	
 	badopossum:=Base.VoxelFromName("Nbadopossum"); 	
@@ -498,7 +483,7 @@ BEGIN
 	greensuncouple:=Base.VoxelFromName("Ngreensuncouple");  
 	push(greensuncouple);
 *)
-		NEW(noise[0]);		
+	NEW(noise[0]);		
 	noise[0].seed:=435678;		
 	noise[0].a:=1;
 	noise[0].b:=1;
@@ -528,10 +513,10 @@ BEGIN
 	noise[2].setvoxel(wstar);	
 	NEW(noise[3]);		
 	noise[3].seed:=8866688;		
-	noise[3].a:=1;
-	noise[3].b:=1;
-	noise[3].c:=1;		
-	noise[3].octaves:=3;
+	noise[3].a:=4;
+	noise[3].b:=4;
+	noise[3].c:=4;		
+	noise[3].octaves:=4;
 	noise[3].persistence:=3.91;	
 	gxy:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 	
 	push(gxy);
@@ -550,15 +535,15 @@ BEGIN
 	Base.setPT(center,1/2,1/2,9/10);
 	Base.setPT(up,0,0,1);
 	
-	z3:=Base.VoxelFromName("NM20");
+	z3:= Base.VoxelFromName("NM10");
 
-	z3a:=Base.VoxelFromName("NM3");
-	z3b:=Base.VoxelFromName("NM3");
+	z3.setcolor(0.0,0.05,0,0.1,0.1,0.1);
 
 	dieone:=Base.VoxelFromName("NCjgzkmiTyecI5x6eOgYqpQ"); 	
-  	push(dieone);
-  	dieone.tscale:=100;
-  			
+  push(dieone);
+  dieone.tscale:=100;
+  volvox:=Base.VoxelFromName("Nrdvolvox");  
+    			
 	Base.setPT(center,1/2,1/2,1/2);
 
 	GREEN:=Base.VoxelFromName("Nwaterdrops");	
@@ -568,41 +553,47 @@ BEGIN
 
 	NEW(medley); 
 	NEW(med1);
-	medley.setcolor(0,0,0,0.1,0.1,0.1);
+	medley.setcolor(0.06,0,0,0.1,0.1,0.1);
 	NEW(sqube,center,0.1,3,3,3,1,0.5,2);
 	sqube.setcolor(0.99,0.31,0.991,1,0);
 	sqube.setsidecolor(0,0.5,0.5,1,0);	
-	medley.FRaster(sqube,20);
-	NEW(ball,center,0.45);	
-	ball.setcolor(0.1,0.831,0.1,1,0);
+	medley.FRaster(sqube,10);
+	NEW(ball,center,0.495);	
+	ball.setcolor(0.81,0.831,0.1,1,0);
 	ball.setsidecolor(0.15,0.09,0.1,1,0.5);		
-	med1.FRaster(ball,20);		
-
-
-
-	medley.fillwithprobability(med1,0.3);		
-
+	med1.FRaster(ball,10);	
+	medley.FRaster(ball,10);			
+	NEW(ball,center,0.55);	
+	ball.setcolor(0.1,0.831,0.1,1,0);
+	ball.setsidecolor(0.95,0.09,0.1,1,0.5);	
+	med1.FRaster(ball,10);	
+	NEW(ball,center,0.55);	
+	ball.setvoxel(med1);	
+	medley.FRaster(ball,10);	
 	
-	noise[1].setvoxel(serp); 
-	noise[3].setvoxel(dieone);	
-		
-	z3.FRaster(noise[1],27);	
-	
+	noise[0].setvoxel(serp);		
+	noise[1].setvoxel(medley); 
+	noise[3].setvoxel(volvox);	
+	noise[4].setvoxel(dieone);			
+
+	z3.FRaster(noise[1],10);	
+	z3.FRaster(noise[0],10);	
+	z3.FRaster(noise[3],10);		
 	Base.setPT(center,1/2,1/2,2/3);	
 	NEW(plane,center,up);
 	plane.setvoxel(Base.EMPTY);			
-	z3.FRaster(plane,1);	
+	z3.FRaster(plane,10);	
 
 	harrison:=Base.VoxelFromName("Nharrisonavatar"); 
 	push(harrison);	
 	Base.avatar:=harrison;
 
 		
-	Base.avatarsize:=216; 	
+	Base.avatarsize:=2160; 	
 	
 	med1.copyonstroke:=TRUE;		
 	medley.copyonstroke:=TRUE;
-	
+
 	Base.world:=z3;
 	alternateworld:=z3;	
 
@@ -623,8 +614,10 @@ END lighten
 
 BEGIN
 	NEW(marshv);
-	marshv.vox:= Base.EMPTY;
+	EMPTY:= Base.VoxelFromName("NM3");
+	marshv.vox:= EMPTY;
 	push(Base.EMPTY);
+	Base.EMPTY.setcolor(0,0,0,1/3,1/3,1/3);
 	dawn; 
 	cursorsize:=4000;
 	cursorTF:=TRUE;

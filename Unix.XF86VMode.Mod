@@ -9,10 +9,10 @@ VAR
 	lib: ADDRESS;
 
 TYPE
-
-	PChar = POINTER {UNSAFE} TO ARRAY OF CHAR;
+ 
+	PChar = POINTER {UNSAFE} TO ARRAY MAX(SIZE)OF CHAR;
 	cuchar = CHAR; (* int8 *)
-	Pcushort = POINTER {UNSAFE} TO ARRAY OF SIGNED16;
+	Pcushort = POINTER {UNSAFE} TO ARRAY MAX(SIZE) OF SIGNED16;
 
 	Bool = X11.Bool;
 
@@ -88,7 +88,7 @@ TYPE
 	END;
 
 
-	PModeInfo* = POINTER {UNSAFE} TO ARRAY OF ModeInfo;
+	PModeInfo* = POINTER {UNSAFE} TO ARRAY MAX(SIZE)OF ModeInfo;
 	ModeInfo* = POINTER {UNSAFE} TO RECORD
 		dotclock * : SIGNED32; (* Pixel clock *)
 		hdisplay * : SIGNED16; (* Number of display pixels horizontally *)

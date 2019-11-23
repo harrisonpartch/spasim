@@ -10590,7 +10590,7 @@ END ReadExtensions;
 
 (* Get string from address  *)
 PROCEDURE GetStringFromAddr*(adr0: ADDRESS): Strings.String;
-VAR s  {UNTRACED} : POINTER {UNSAFE} TO ARRAY OF CHAR;
+VAR s  {UNTRACED} : POINTER {UNSAFE} TO ARRAY MAX(SIZE) OF CHAR;
 	str: Strings.String;
 	size, pos: SIZE;
 BEGIN

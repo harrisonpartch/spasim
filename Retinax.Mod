@@ -6,8 +6,8 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=2;        
-	TS=16*4;  (*  TS MUST BE {size of unit tile} MULTIPLIED BY 2**T *)
+	T=3;        
+	TS=16*8;  (*  TS MUST BE {size of unit tile} MULTIPLIED BY 2**T *)
 	TW=12;
 	TH=8;
 	W*=TS*TW;
@@ -137,7 +137,9 @@ BEGIN
 	Base.world.Shade(rays[x,y+1]);	
 	Base.world.Shade(rays[x+1,y]);	
 	Base.world.Shade(rays[x+1,y+1]);		
-	
+	Base.clampclr(rays[x,y+1].clr);	
+	Base.clampclr(rays[x+1,y].clr);	
+	Base.clampclr(rays[x+1,y+1].clr);			
 	tileimage[x,y]:=rays[x,y].clr;
 	tileimage[x+1,y]:=rays[x+1,y].clr;
 	tileimage[x+1,y+1]:=rays[x+1,y+1].clr;
@@ -149,6 +151,9 @@ BEGIN
 	Base.world.Shade(rays[x,y]);	
 	Base.world.Shade(rays[x,y+1]);	
 	Base.world.Shade(rays[x+1,y+1]);		
+	Base.clampclr(rays[x,y].clr);	
+	Base.clampclr(rays[x,y+1].clr);	
+	Base.clampclr(rays[x+1,y+1].clr);			
 	tileimage[x,y]:=rays[x,y].clr;
 	tileimage[x+1,y]:=rays[x+1,y].clr;
 	tileimage[x+1,y+1]:=rays[x+1,y+1].clr;
@@ -160,6 +165,9 @@ BEGIN
 	Base.world.Shade(rays[x,y]);	
 	Base.world.Shade(rays[x+1,y]);	
 	Base.world.Shade(rays[x,y+1]);		
+	Base.clampclr(rays[x,y].clr);	
+	Base.clampclr(rays[x+1,y].clr);	
+	Base.clampclr(rays[x,y+1].clr);		
 	tileimage[x,y]:=rays[x,y].clr;
 	tileimage[x+1,y]:=rays[x+1,y].clr;
 	tileimage[x+1,y+1]:=rays[x+1,y+1].clr;
@@ -171,6 +179,9 @@ BEGIN
 	Base.world.Shade(rays[x,y]);	
 	Base.world.Shade(rays[x+1,y]);	
 	Base.world.Shade(rays[x+1,y+1]);		
+	Base.clampclr(rays[x,y].clr);	
+	Base.clampclr(rays[x+1,y].clr);	
+	Base.clampclr(rays[x+1,y+1].clr);		
 	tileimage[x,y]:=rays[x,y].clr;
 	tileimage[x+1,y]:=rays[x+1,y].clr;
 	tileimage[x+1,y+1]:=rays[x+1,y+1].clr;
@@ -207,6 +218,9 @@ BEGIN
 	Base.world.Shade(rays[x+3,y]);	
 	Base.world.Shade(rays[x,y+3]);	
 	Base.world.Shade(rays[x+3,y+3]);	
+	Base.clampclr(rays[x+3,y].clr);	
+	Base.clampclr(rays[x,y+3].clr);	
+	Base.clampclr(rays[x+3,y+3].clr);	
 	t4x4fill(x,y)
 END t4x4a;
 
@@ -214,7 +228,10 @@ PROCEDURE t4x4b(x,y: INTEGER);
 BEGIN
 	Base.world.Shade(rays[x,y]);	
 	Base.world.Shade(rays[x,y+3]);	
-	Base.world.Shade(rays[x+3,y+3]);		
+	Base.world.Shade(rays[x+3,y+3]);	
+	Base.clampclr(rays[x,y].clr);	
+	Base.clampclr(rays[x,y+3].clr);	
+	Base.clampclr(rays[x+3,y+3].clr);			
 	t4x4fill(x,y)	
 END t4x4b;
 
@@ -223,6 +240,9 @@ BEGIN
 	Base.world.Shade(rays[x,y]);	
 	Base.world.Shade(rays[x+3,y]);	
 	Base.world.Shade(rays[x,y+3]);		
+	Base.clampclr(rays[x,y].clr);	
+	Base.clampclr(rays[x+3,y].clr);	
+	Base.clampclr(rays[x,y+3].clr);		
 	t4x4fill(x,y)
 END t4x4c;
 
@@ -231,6 +251,9 @@ BEGIN
 	Base.world.Shade(rays[x,y]);	
 	Base.world.Shade(rays[x+3,y]);	
 	Base.world.Shade(rays[x+3,y+3]);		
+	Base.clampclr(rays[x,y].clr);	
+	Base.clampclr(rays[x+3,y].clr);	
+	Base.clampclr(rays[x+3,y+3].clr);	
 	t4x4fill(x,y)	
 END t4x4d;
 
@@ -267,6 +290,9 @@ BEGIN
 	Base.world.Shade(rays[x+7,y]);	
 	Base.world.Shade(rays[x,y+7]);	
 	Base.world.Shade(rays[x+7,y+7]);	
+	Base.clampclr(rays[x+7,y].clr);	
+	Base.clampclr(rays[x,y+7].clr);	
+	Base.clampclr(rays[x+7,y+7].clr);	
 	t8x8fill(x,y)
 END t8x8a;
 
@@ -275,22 +301,31 @@ BEGIN
 	Base.world.Shade(rays[x,y]);	
 	Base.world.Shade(rays[x,y+7]);	
 	Base.world.Shade(rays[x+7,y+7]);		
+	Base.clampclr(rays[x,y].clr);	
+	Base.clampclr(rays[x,y+7].clr);	
+	Base.clampclr(rays[x+7,y+7].clr);		
 	t8x8fill(x,y)	
 END t8x8b;
 
 PROCEDURE t8x8c(x,y: INTEGER);
 BEGIN
 	Base.world.Shade(rays[x,y]);	
+	Base.clampclr(rays[x,y].clr);
 	Base.world.Shade(rays[x+7,y]);	
+	Base.clampclr(rays[x+7,y].clr);
 	Base.world.Shade(rays[x,y+7]);		
+	Base.clampclr(rays[x,y+7].clr);
 	t8x8fill(x,y)
 END t8x8c;
 
 PROCEDURE t8x8d(x,y: INTEGER);
 BEGIN
 	Base.world.Shade(rays[x,y]);	
+	Base.clampclr(rays[x,y].clr);
 	Base.world.Shade(rays[x+7,y]);	
-	Base.world.Shade(rays[x+7,y+7]);		
+	Base.clampclr(rays[x+7,y].clr);
+	Base.world.Shade(rays[x+7,y+7]);
+	Base.clampclr(rays[x+7,y+7].clr);		
 	t8x8fill(x,y)	
 END t8x8d;
 
@@ -341,10 +376,14 @@ BEGIN
 			rays[i,j]:= interpray(rays[i,0],rays[i,15],j/16);
 		END
 	END;		
-	Base.world.Shade(rays[0,0]);	
+	Base.world.Shade(rays[0,0]);
+	Base.clampclr(rays[0,0].clr);
 	Base.world.Shade(rays[15,0]);		
-	Base.world.Shade(rays[15,15]);		
-	Base.world.Shade(rays[0,15]);		
+	Base.clampclr(rays[15,0].clr);
+	Base.world.Shade(rays[15,15]);	
+	Base.clampclr(rays[15,15].clr);	
+	Base.world.Shade(rays[0,15]);	
+	Base.clampclr(rays[0,15].clr);	
 	t16x16fill;	
 	FOR i:= 0 TO 15 DO
 		FOR j := 0 TO 15 DO 
@@ -379,6 +418,9 @@ BEGIN
 	Base.world.Shade(rays[x+3,y]);	
 	Base.world.Shade(rays[x,y+3]);	
 	Base.world.Shade(rays[x+3,y+3]);	
+	Base.clampclr(rays[x+3,y].clr);	
+	Base.clampclr(rays[x,y+3].clr);	
+	Base.clampclr(rays[x+3,y+3].clr);	
 	t4x4fill(x,y)
 END t4x4a;
 
@@ -386,7 +428,10 @@ PROCEDURE t4x4b(x,y: INTEGER);
 BEGIN
 	Base.world.Shade(rays[x,y]);	
 	Base.world.Shade(rays[x,y+3]);	
-	Base.world.Shade(rays[x+3,y+3]);		
+	Base.world.Shade(rays[x+3,y+3]);	
+	Base.clampclr(rays[x,y].clr);	
+	Base.clampclr(rays[x,y+3].clr);	
+	Base.clampclr(rays[x+3,y+3].clr);			
 	t4x4fill(x,y)	
 END t4x4b;
 
@@ -395,6 +440,9 @@ BEGIN
 	Base.world.Shade(rays[x,y]);	
 	Base.world.Shade(rays[x+3,y]);	
 	Base.world.Shade(rays[x,y+3]);		
+	Base.clampclr(rays[x,y].clr);	
+	Base.clampclr(rays[x+3,y].clr);	
+	Base.clampclr(rays[x,y+3].clr);		
 	t4x4fill(x,y)
 END t4x4c;
 
@@ -403,6 +451,9 @@ BEGIN
 	Base.world.Shade(rays[x,y]);	
 	Base.world.Shade(rays[x+3,y]);	
 	Base.world.Shade(rays[x+3,y+3]);		
+	Base.clampclr(rays[x,y].clr);	
+	Base.clampclr(rays[x+3,y].clr);	
+	Base.clampclr(rays[x+3,y+3].clr);	
 	t4x4fill(x,y)	
 END t4x4d;
 
@@ -429,6 +480,9 @@ BEGIN
 	Base.world.Shade(rays[x+7,y]);	
 	Base.world.Shade(rays[x,y+7]);	
 	Base.world.Shade(rays[x+7,y+7]);	
+	Base.clampclr(rays[x+7,y].clr);	
+	Base.clampclr(rays[x,y+7].clr);	
+	Base.clampclr(rays[x+7,y+7].clr);	
 	t8x8fill(x,y)
 END t8x8a;
 
@@ -437,22 +491,31 @@ BEGIN
 	Base.world.Shade(rays[x,y]);	
 	Base.world.Shade(rays[x,y+7]);	
 	Base.world.Shade(rays[x+7,y+7]);		
+	Base.clampclr(rays[x,y].clr);	
+	Base.clampclr(rays[x,y+7].clr);	
+	Base.clampclr(rays[x+7,y+7].clr);		
 	t8x8fill(x,y)	
 END t8x8b;
 
 PROCEDURE t8x8c(x,y: INTEGER);
 BEGIN
 	Base.world.Shade(rays[x,y]);	
+	Base.clampclr(rays[x,y].clr);
 	Base.world.Shade(rays[x+7,y]);	
+	Base.clampclr(rays[x+7,y].clr);
 	Base.world.Shade(rays[x,y+7]);		
+	Base.clampclr(rays[x,y+7].clr);		
 	t8x8fill(x,y)
 END t8x8c;
 
 PROCEDURE t8x8d(x,y: INTEGER);
 BEGIN
 	Base.world.Shade(rays[x,y]);	
+	Base.clampclr(rays[x,y].clr);
 	Base.world.Shade(rays[x+7,y]);	
-	Base.world.Shade(rays[x+7,y+7]);		
+	Base.clampclr(rays[x+7,y].clr);
+	Base.world.Shade(rays[x+7,y+7]);
+	Base.clampclr(rays[x+7,y+7].clr);		
 	t8x8fill(x,y)	
 END t8x8d;
 
@@ -496,10 +559,14 @@ BEGIN
 			rays[i,j]:= interpray(rays[i,0],rays[i,15],j/16);
 		END
 	END;		
-	Base.world.Shade(rays[0,0]);	
+	Base.world.Shade(rays[0,0]);
+	Base.clampclr(rays[0,0].clr);
 	Base.world.Shade(rays[15,0]);		
-	Base.world.Shade(rays[15,15]);		
-	Base.world.Shade(rays[0,15]);		
+	Base.clampclr(rays[15,0].clr);
+	Base.world.Shade(rays[15,15]);	
+	Base.clampclr(rays[15,15].clr);	
+	Base.world.Shade(rays[0,15]);	
+	Base.clampclr(rays[0,15].clr);	
 	t16x16fill;	
 	FOR i:= 0 TO 15 DO
 		FOR j := 0 TO 15 DO 

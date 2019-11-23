@@ -133,7 +133,7 @@ BEGIN
 				ray.xyz.y:=ray.xyz.y + (newxyz.y-xyz.y)/ray.scale;
 				ray.xyz.z:=ray.xyz.z + (newxyz.z-xyz.z)/ray.scale;				
 				ray.length:=ray.length+v2;
-				v2:=vdepth;
+				v2:=vdepth; 
 				ray.hitxyz:=ray.xyz;
 				xyz:=newxyz;	
 				ray.clr.r := ray.clr.r+red*ray.clr.ra*v2;
@@ -246,20 +246,13 @@ VAR
 	i,j,k: INTEGER;
 BEGIN
 	fill(v);
-	blox[1,1,0]:=NIL;
-	blox[0,1,1]:=NIL;
-	blox[1,0,1]:=NIL;
-	blox[1,1,1]:=NIL;
-	blox[1,1,2]:=NIL;
-	blox[2,1,1]:=NIL;
-	blox[1,2,1]:=NIL; 
-	blox[2,0,2]:=w;
-	blox[2,2,0]:=w;
-	blox[0,0,0]:=w;
-	blox[2,2,2]:=w;
-	blox[0,2,2]:=w;
-	blox[0,2,0]:=w;
+	blox[1,1,0]:=w;
+	blox[0,1,1]:=w;
+	blox[1,0,1]:=w;
 	blox[1,1,1]:=w;
+	blox[1,1,2]:=w;
+	blox[2,1,1]:=w;
+	blox[1,2,1]:=w; 
 END fillsierp;
 
 PROCEDURE fillcqr2*(v,w: Voxel);
@@ -330,7 +323,7 @@ BEGIN
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
 			v:=blox[i,j,k];
 			IF (v#NIL) THEN
-				v.setcolorrec(r/M,g/M,b/M,rb/M,gb/M,bb/M);
+				v.setcolorrec(r,g,b,rb,gb,bb);
 			END
 		END END END;
 		copymarker:=FALSE
@@ -426,15 +419,6 @@ BEGIN
 	END
 END stroke;
 
-PROCEDURE nstroke(p:PT; resolution:INTEGER; normal:PT; color: Color);
-VAR
-	i,j,k: INTEGER;
-BEGIN
-	Base.clamPT(p);
-	color.alpha:=1;
-	nstrokerec(p,resolution,1,normal,color);
-END nstroke;
-
 PROCEDURE strokerec*(p:PT; resolution,scale: INTEGER; voxel :Voxel);
 VAR
 	i,j,k,ii,jj,kk,nextscale: INTEGER;
@@ -451,7 +435,9 @@ BEGIN
 		p.z:=p.z*M;
 		i := ENTIER(p.x)MOD M; j := ENTIER(p.y)MOD M; k := ENTIER(p.z)MOD M;
 		IF nextscale>resolution THEN
-			blox[i,j,k]:=voxel
+			voxel:= voxel.deepcopy();
+			voxel.setcolor(red, green, blue, redblack, greenblack, blueblack); 
+			blox[i,j,k]:=voxel;
 		ELSE
 			vu:=blox[i,j,k];
 			IF vu#NIL THEN
@@ -481,58 +467,6 @@ BEGIN
 		END
 	END
 END strokerec;
-
-PROCEDURE nstrokerec(p:PT; resolution,scale:INTEGER; normal:PT; color: Color);
-VAR
-	i,j,k,ii,jj,kk,nextscale: INTEGER;
-	v:Voxel;
-	c,c2: cell;
-	smallcopy: Voxel;
-BEGIN
-	IF ~lockTF THEN
-		nextscale:=scale*M;
-		p.x:=p.x*M;
-		p.y:=p.y*M;
-		p.z:=p.z*M;
-		i := ENTIER(p.x)MOD M; j := ENTIER(p.y)MOD M; k := ENTIER(p.z)MOD M;
-		IF nextscale>resolution THEN
-			IF ~((blox[i,j,k]#NIL) &  blox[i,j,k].lockTF) THEN
-				nblox[i,j,k].normal:= normal;
-				nblox[i,j,k].color:= color;
-			END
-		ELSE
-			IF blox[i,j,k]#NIL THEN
-				IF (blox[i,j,k] IS Cell) THEN
-					v:=blox[i,j,k];
-					WITH v: Cell DO v.nstrokerec(p, resolution,nextscale,normal,color) END
-				ELSIF (blox[i,j,k] IS Voxel) THEN
-					blox[i,j,k].nstroke(p, resolution DIV nextscale,normal,color)
-				ELSE
-					NEW(c);
-					c.setcolor(red,green,blue,redblack,greenblack,blueblack);
-					c.imposter:=blox[i,j,k];
-					IF blox[i,j,k].emptysplit THEN
-						FOR ii := 0 TO MMO DO FOR jj := 0 TO MMO DO FOR kk:= 0 TO MMO DO
-							NEW(c2);
-							blox[i,j,k]:=c2
-						END END END;
-					ELSE
-						c.fill(blox[i,j,k])
-					END;
-					blox[i,j,k]:=c;
-					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-					c.nstrokerec(p, resolution,nextscale,normal,color);
-				END
-			ELSE
-				NEW(c);
-				c.setcolor(red,green,blue,redblack,greenblack,blueblack);
-				blox[i,j,k]:=c;
-				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
-				c.nstrokerec(p, resolution,nextscale,normal,color);
-			END
-		END
-	END
-END nstrokerec;
 
 PROCEDURE line*(a,b: PT; resolution: INTEGER; v: Voxel);
 VAR
@@ -600,8 +534,8 @@ BEGIN
 					newcell.FRasterrec(f,resolution,o,nextscale);
 				ELSE
 				 	v:=blox[i,j,k];
-				 	IF v IS Cell THEN
-				 		WITH v:Cell DO
+				 	IF v IS cell THEN
+				 		WITH v:cell DO
 				 			v.imposter:=f.getimposter(p);
 							v.nposterTF:=TRUE;
 							v.nposter.normal:=f.getnormal(p);
@@ -677,8 +611,8 @@ BEGIN
 					blox[i,j,k]:=newcell				
 				ELSE
 				 	v:=blox[i,j,k];
-				 	IF v IS Cell THEN
-				 		WITH v:Cell DO
+				 	IF v IS cell THEN
+				 		WITH v:cell DO
 				 			v.imposter:=f.voxel(p);
 							v.nposterTF:=TRUE;
 							v.nposter.normal:=f.getnormal(p);
@@ -744,14 +678,14 @@ VAR
 	i,j,k: INTEGER;
 BEGIN
 	code:=ncode; (* if this voxel has been rezzed from another module, make it NM3 *)
-	copyclear;
 	copymarker:=TRUE;
 	NEW(c);
-	c.nbloxTF:=nbloxTF;
-	c.nblox:=nblox;
-	
 	FOR i := 0 TO MMO DO FOR j := 0 TO MMO DO FOR k:= 0 TO MMO DO
-		child:=blox[i,j,k];
+		c.nbloxTF[i,j,k]:=nbloxTF[i,j,k];
+		c.nblox[i,j,k]:=nblox[i,j,k];
+		c.blox[i,j,k]:=blox[i,j,k];
+		c.setcolor(red, green, blue, redblack, greenblack, blueblack); 
+		child:=c.blox[i,j,k];
 		IF (child#NIL) THEN
 			IF child.copyonstroke OR child.copymarker  THEN
 				c.blox[i,j,k]:=child
@@ -761,7 +695,6 @@ BEGIN
 		END
 	END END END;
 	copymarker:=FALSE;
-	c.baked:=TRUE; (* baked means done copying *)
 	RETURN c;
 END deepcopy;
 

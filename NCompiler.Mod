@@ -1,5 +1,5 @@
 MODULE NCompiler;
-IMPORT Base, Files, Streams, Texts, TextUtilities, Diagnostics, CompilerInterface, Commands;
+IMPORT Base, Files, Streams, Texts, TextUtilities, Diagnostics, CompilerInterface, Commands,Out:=KernelLog;
 
 PROCEDURE ncompile*(context : Commands.Context);
 VAR
@@ -15,10 +15,12 @@ VAR
        time, date : SIGNED32;
        size: Streams.Position;
 BEGIN
-        NEW(e);
-      e.Open("./N*Mod", {}); 
+       NEW(e);
+       e.Open("./N*Mod", {}); 
        compiler:=CompilerInterface.GetCompilerByName("Fox");
        context.out.String("compiling all N*Mod ");
+       Out.String("compiling all N*Mod ");
+       Out.Ln;
        context.out.Ln;
        IF compiler#NIL THEN
 		WHILE e.HasMoreEntries() DO
