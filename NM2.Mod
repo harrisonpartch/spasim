@@ -6,7 +6,7 @@ Special voxel containing 27 children arranged in a 3x3x3 grid.
 Some shapes e.g. sierpinski cubes can only be represented on a 3^n grid.
 *)
 
-CONST M=2; (* defines grid size *)
+CONST M*=2; (* defines grid size *)
 	MMO=M-1;
 	CUBERADIUS=0.866025;   (*change to sqrt(3)/2 ???*)
 	NL=Base.NL;
@@ -133,7 +133,7 @@ BEGIN
 				ray.xyz.y:=ray.xyz.y + (newxyz.y-xyz.y)/ray.scale;
 				ray.xyz.z:=ray.xyz.z + (newxyz.z-xyz.z)/ray.scale;				
 				ray.length:=ray.length+v2;
-				v2:=vdepth;
+				v2:=vdepth; 
 				ray.hitxyz:=ray.xyz;
 				xyz:=newxyz;	
 				ray.clr.r := ray.clr.r+red*ray.clr.ra*v2;
@@ -432,8 +432,9 @@ BEGIN
 		p.z:=p.z*M;
 		i := ENTIER(p.x)MOD M; j := ENTIER(p.y)MOD M; k := ENTIER(p.z)MOD M;
 		IF nextscale>resolution THEN
+			voxel:= voxel.deepcopy();
+			 voxel.setcolor(red, green, blue, redblack, greenblack, blueblack); 
 			blox[i,j,k]:=voxel;
-			nbloxTF[i,j,k]:=FALSE
 		ELSE
 			vu:=blox[i,j,k];
 			IF vu#NIL THEN
@@ -447,7 +448,7 @@ BEGIN
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
 				ELSE
 					NEW(c);
-					c.setcolor(red, green, blue, redblack, greenblack, blueblack); 
+					c.setcolor(red/M, green/M, blue/M, redblack/M, greenblack/M, blueblack/M); 
 					c.fill(blox[i,j,k]);
 					blox[i,j,k]:=c;
 					p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
@@ -455,7 +456,7 @@ BEGIN
 				END
 			ELSE
 				NEW(c);
-				c.setcolor(red/M,green/M,blue/M,redblack/M,greenblack/M,blueblack/M);
+				c.setcolor(red/M,green/M,blue/M,redblack/M,greenblack/M,blueblack/M); 
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
 				c.strokerec(p, resolution,nextscale, voxel);
@@ -680,6 +681,8 @@ BEGIN
 		c.nbloxTF[i,j,k]:=nbloxTF[i,j,k];
 		c.nblox[i,j,k]:=nblox[i,j,k];
 		c.blox[i,j,k]:=blox[i,j,k];
+		c.red:=red; c.green:=green; c.blue:=blue;
+		c.redblack:=redblack; c.greenblack:=greenblack; c.blueblack:=blueblack;
 		child:=c.blox[i,j,k];
 		IF (child#NIL) THEN
 			IF child.copyonstroke OR child.copymarker  THEN

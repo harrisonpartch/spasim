@@ -414,7 +414,7 @@ TYPE ControlWindow = OBJECT(WMComponents.FormWindow)
 VAR
 	controlWin: ControlWindow;
 	deviceName: ARRAY 16 OF CHAR;
-	preview : PreviewWindow;
+	preview* : PreviewWindow;
 	out: Streams.Writer;
 	
 	fd: SIGNED32; (* device file handle *)
@@ -777,6 +777,20 @@ BEGIN
 		CloseDevice();	
 	END;	
 END Start;
+
+PROCEDURE Start2*; (* [devicename], ex: /dev/video1 *)
+BEGIN
+	IF fd > 0 THEN
+		IF starter # NIL THEN starter.Stop(); END;
+		CloseDevice();
+	END;	
+	IF OpenDevice("/dev/video0") THEN
+		IF InitDevice() THEN NEW(starter); END;
+	ELSE
+		CloseDevice();	
+	END;	
+END Start2;
+
 
 PROCEDURE Stop*;
 BEGIN
@@ -1388,17 +1402,17 @@ END SetMeasurementScale;
 
 BEGIN
 	
-(*	camWidth := 1280; (* default *)
-	camHeight := 960;	
-*)	
+	camWidth := 1280; (* default *)
+	camHeight := 720;	
+	
 
 (*     camWidth := 720; (* special camera *)
 	camHeight := 576; 
 *)	
 
-     camWidth := 320; (* webcam *)
+(*   camWidth := 320; (* webcam *)
 	camHeight := 240; 
-	
+*)	
 	Streams.OpenWriter(out, KernelLog.Send);
 	Raster.InitMode(mode, Raster.srcCopy);
 	Modules.InstallTermHandler(Cleanup)

@@ -8,32 +8,6 @@ TYPE Ray = Base.Ray;
 VAR 	
 	cage: OutlineVox;
 
-TYPE TransparaVox*=OBJECT(Base.Voxel);
-
-PROCEDURE Shade (VAR ray: Ray);
-VAR 
-	depth: REAL;
-	exit:PT;
-	dr,dg,db,dbl: REAL;
-BEGIN
-	exit:=Base.Exit(ray);
-	depth:=Base.dist(ray.lxyz,exit);
-	dr := red*depth;
-	dg := green*depth;
-	db := blue*depth;
-	ray.clr.r := ray.clr.r + dr;
-	ray.clr.g := ray.clr.g + dg;
-	ray.clr.b := ray.clr.b + db; 
-	ray.clr.ra := (ray.clr.ra - dr)-redblack;
-	ray.clr.ga := (ray.clr.ga - dg)-greenblack;
-	ray.clr.ba := (ray.clr.ba - db)-blueblack; 
-	IF (ray.clr.ra<0.1)&(ray.clr.ga<0.1)&(ray.clr.ba<0.1) THEN ray.terminate:=TRUE 
-	ELSE ray.lxyz:=exit;
-	END
-END Shade;
-
-END TransparaVox;  
-
 TYPE OutlineVox*=OBJECT(Voxel);
 VAR
 	or, og, ob,oa: REAL;
@@ -41,20 +15,17 @@ VAR
 	dot: REAL;
 	inside: BOOLEAN;
 	X:REAL;
-	blue: TransparaVox;
 	innard: Voxel;
 	
 PROCEDURE&init*;
 BEGIN
 	setoutline(0,0,0,1/2);
-	NEW(blue);
-	blue.setcolor(1/7,0,0,1/3,1/3,1/3);
 	innard:=Base.VoxelFromName("NM3");	
-	innard.setcolor(0,0,2/3,1,1,1);
+	innard.setcolor(0,1/33,0,1/12,1/12,1/12);
 	passable:=TRUE;
-	copyonstroke:=TRUE;
-	complex:=TRUE;	
+	copyonstroke:=FALSE;
 END init;	
+
 PROCEDURE setoutline* (red, green, blue,alpha: REAL);
 BEGIN
 	or := red ;
@@ -78,7 +49,7 @@ BEGIN
 		ray.clr.r := ray.clr.r + or * ray.clr.ra*oa;
 		ray.clr.g := ray.clr.g + og * ray.clr.ga*oa;
 		ray.clr.b := ray.clr.b + ob * ray.clr.ba*oa;
-			ray.clr.ra:= ray.clr.ra - oa;
+		ray.clr.ra:= ray.clr.ra - oa;
 		ray.clr.ga:=ray.clr.ga-oa;
 		ray.clr.ba:=ray.clr.ba-oa;
 	END;
@@ -114,6 +85,7 @@ BEGIN
 	v.innard:=SELF.innard.deepcopy();
 	RETURN(v)
 END deepcopy;
+
 
 END OutlineVox;
 

@@ -1,10 +1,6 @@
 MODULE Voxel4;
 IMPORT Random, Base,  SPSMMath, Math:=MathL, Raster;
 
-VAR
-	rand: Random.Generator;
-
-
 TYPE PT=Base.PT;
 	BOX=Base.BOX;
 	Ray = Base.Ray;
@@ -401,26 +397,27 @@ VAR
 PROCEDURE &init*;
 BEGIN
 	setCenter(1/2,1/2,1/2);
-	diameter:= 1/3;
+	diameter:= 1/6;
 (*	register; *)
 END init;
 
 PROCEDURE Shade*(VAR ray: Ray);
-CONST R=12;
+CONST R=8;
 VAR
 	x,y,z, th,ph,d,r,g,blue,alpha: REAL;
 	dx, dy, dz , dista, distb: REAL;
-	a,b,c,n: Base.PT; 
+	a,b,c,n,exit: Base.PT; 
 	i: INTEGER;
 	hit: BOOLEAN;
 	nx,ny,nz: REAL;
 BEGIN       
 	a := ray.lxyz;
-	b:= Base.Exit(ray);
+	exit:= Base.Exit(ray);
+	b:=exit;
 	x := (a.x+b.x)/2; y := (a.y+b.y)/2; z := (a.z + b.z)/2;
-	d := D(a.x, a.y, a.z);
+	d := d2(x,y,z);
 	IF d > diameter THEN
-		FOR i := 0 TO R DO
+(*		FOR i := 0 TO R DO
 			d := d2(x,y,z);
 			IF d < diameter THEN 
 				b.x := x; b.y := y; b.z := z
@@ -429,7 +426,7 @@ BEGIN
 			END;
 			x := (a.x+b.x)/2; y := (a.y+b.y)/2; z := (a.z + b.z)/2;
 		END;
-	ELSE
+*)	ELSE
 		FOR i := 0 TO R DO
 			d := d2(x,y,z);
 			IF d > diameter THEN 
@@ -443,6 +440,7 @@ BEGIN
 	IF (ABS(d-diameter) < 0.001) THEN 
 		n.x := cx-x; n.y := cy - y; n.z := cz - z;
 		Base.normalizePT(n);
+		
 		reflect(ray.dxyz.x,ray.dxyz.y,ray.dxyz.z, n.x,n.y,n.z);		
 		ray.clr.ra := ray.clr.ra - 0.1;
 		ray.clr.ga := ray.clr.ga - 0.1;
@@ -450,10 +448,10 @@ BEGIN
 		IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END;
 		IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 		IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;
-		ray.xyz.x:=ray.xyz.x+ray.dxyz.x/(ray.scale*10000000);
-		ray.xyz.y:=ray.xyz.y+ray.dxyz.y/(ray.scale*10000000);	
-		ray.xyz.z:=ray.xyz.z+ray.dxyz.z/(ray.scale*10000000);	
-		Base.world.Shade(ray);	
+		ray.xyz.x:=ray.xyz.x+x*(exit.x-ray.lxyz.x);
+		ray.xyz.y:=ray.xyz.y+x*(exit.y-ray.lxyz.y);	
+		ray.xyz.z:=ray.xyz.z+x*(exit.z-ray.lxyz.z);	
+		Base.world.Shade(ray);
 	END;
 END Shade;
 
@@ -590,6 +588,9 @@ BEGIN
 	x := x-nx; y := y-ny; z := z-nz; 
 END reflect;
 
+VAR
+	rand: Random.Generator;
+	
 BEGIN
 	NEW(rand);
 END Voxel4.

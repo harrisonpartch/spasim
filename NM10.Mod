@@ -1,5 +1,5 @@
 MODULE NM10; (*! This module may be either imported or used anonymously *)
-IMPORT Base, SPSME, Streams, NM3;
+IMPORT Base, SPSME, Streams, NM2;
 
 (*
 Special voxel containing 27 children arranged in a 3x3x3 grid.
@@ -512,7 +512,7 @@ VAR
 	d2s,MS,TWOMS,CRDS,CRDNS:REAL;
 	nextscale: INTEGER;
 	v: Voxel;
-	newcell: NM3.cell;
+	newcell: NM2.cell;
 BEGIN
 	code:="NM10"; (* if this cell was born from a name, it is changed now and will be engrained accordingly *)
 	MS:=M*scale;
@@ -590,7 +590,7 @@ VAR
 	nextscale: INTEGER;
 	v: Voxel;
 	color: Color;
-	newcell: NM3.cell;
+	newcell: NM2.cell;
 	solidmarker: BOOLEAN;
 BEGIN
 	MS:=M*scale;

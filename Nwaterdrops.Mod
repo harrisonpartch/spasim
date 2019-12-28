@@ -8,6 +8,6 @@ BEGIN
 END thisvox;
 
 BEGIN
-	NEW(vox,"waterdrops.png");
+	NEW(vox,"forest.png");
 	vox.tscale:=180;  
 END Nwaterdrops. 

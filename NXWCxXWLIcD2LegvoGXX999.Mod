@@ -1,6 +1,6 @@
 MODULE NXWCxXWLIcD2LegvoGXX999;
 
-IMPORT Base, NM3, Voxel4, RotaVox;
+IMPORT Base, NM3, Voxel4, RotaVox (*, CamTexVox *);
 TYPE PT = Base.PT;
 	Ray = Base.Ray;
 	Voxel = Base.Voxel;  
@@ -68,6 +68,8 @@ VAR
 	mirrorball: Voxel4.MirrorSphereInVox;
 	p,q: Base.PT;
 	sball: RotaVox.RVox;
+(*	camvox: CamTexVox.CamVox;*)
+	i: INTEGER;
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
@@ -79,7 +81,8 @@ BEGIN
 	nark:=Base.VoxelFromName("Narchillect"); 
 	echan:=Base.VoxelFromName("Nearthchan"); 
 	xot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");  	
-	uk:=Base.VoxelFromName("Nugandaknuckles");  	
+	uk:=Base.VoxelFromName("Nugandaknuckles"); 
+(*	NEW(camvox); 	*)
 	NEW(s0);
 	NEW(s1);
 	NEW(s2);
@@ -99,14 +102,17 @@ BEGIN
 	NEW(rd,empty,nark,empty);	
 	rd.register;
 	rd.passable:=TRUE;
-*)	s0.fillsierp(echan,NIL);
-	s1.fillsierp(s0,NIL);	
+*)	
+	FOR i:=0 TO 100 DO
+		s0.stroke(Base.randPT(),9,uk)
+	END;
+	s1.fillsierp(echan,s0);	
 	s2.fillsierp(s1,NIL);
 	s3.fillsierp(s2,NIL);	
-	s3.setcolor(1/3,0,1/3,1,1,1);	
-	s2.setcolor(1/4, 0, 2/3,1,1,1);	
-	s1.setcolor(1/3, 1/3, 0,1,1,1);			
-	s0.setcolor(2/3, 0, 0, 1,1,1);	
+	s3.setcolor(0,1/7,0,1/6,1/6,1/6);	
+	s2.setcolor(0, 0, 2/7,1/3,1/3,1/3);	
+	s1.setcolor(2/13, 2/13, 0,1/3,1/3,1/3);			
+	s0.setcolor(0, 0, 1/9, 1/8,1/8,1/8);	
 	s0.imposter:=uk;
 	s1.imposter:=uk;
 	s2.imposter:=uk;

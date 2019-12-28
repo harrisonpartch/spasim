@@ -14,6 +14,7 @@ Engrainer.Mod
 Saboteur.Mod
 NCompiler.Mod
 Retinax.Mod
+CamTexVox.Mod
 Marsh.Mod
 OGLRender.Mod 
 ~
@@ -71,6 +72,8 @@ Nturing.Mod
 
 
 Nrdvolvox.Mod
+
+Nmedley.Mod
 
 NIXARXB2vH6ieKZmsc6mODh.Mod
 
