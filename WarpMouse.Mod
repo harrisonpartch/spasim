@@ -1,18 +1,19 @@
 MODULE WarpMouse;
-IMPORT Machine, X11Api,  XDisplay,  Out:= KernelLog;
+IMPORT Machine, X11,  XDisplay,  Out:= KernelLog;
 
-PROCEDURE warp*(x,y:LONGINT);
+PROCEDURE warp*(x,y:INTEGER);
 BEGIN
-		Machine.Acquire(Machine.X11);
-		X11Api.WarpPointer(display.xdisp, X11Api.None, display.primary,0,0,0,0,x,y);
-		Machine.Release(Machine.X11);
+	(*	Machine.Acquire(Machine.X11); *)
+		X11.WarpPointer(display, X11.None, X11.None,0,0,0,0,x,y);
+	(*	Machine.Release(Machine.X11); *)
 END warp;
-
 PROCEDURE Open*;
+BEGIN
+	warp(100,100)
 END Open;
 
 VAR
-	display:  XDisplay.Display;
+	display:  X11.DisplayPtr;
 
 BEGIN
 	display := XDisplay.DISP;
@@ -20,6 +21,6 @@ END WarpMouse.
 
 WarpMouse.Open
 
-SystemTools.Free WarpMouse~
+System.Free WarpMouse~
 
 

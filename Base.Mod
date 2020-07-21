@@ -261,6 +261,7 @@ TYPE Ray* = RECORD
 	thisvoxelisempty*:BOOLEAN;
 	texdtl*:REAL;
 	rand*: Random.Generator;
+	lighting*: REAL;
 END;
 
 TYPE Path*=ARRAY 20 OF ARRAY 3 OF INTEGER;
@@ -269,13 +270,14 @@ TYPE Voxel*=OBJECT(V)
 VAR
 	complex*, passable*: BOOLEAN;
 	imposter*, texture*, deepcopyofme*: Voxel;
-	lockTF*,copymarker*,emptysplit*: BOOLEAN;
+	lockTF*, copymarker*, emptysplit*: BOOLEAN;
 	DTL*: REAL;
-	code*,ncode*:Name;  
+	code*, ncode*:Name;  
 	tscale*: REAL;
-	red*,green*,blue*,black*,alpha*,redblack*,greenblack*, blueblack*: REAL;
+	red*, green*, blue*, black*, alpha*, redblack*, greenblack*, blueblack*: REAL;
 	colored*, colorlock*, frozen*, probelock*, copyonstroke*, baked*:BOOLEAN;
 	offset*:PT;
+	lighting*: REAL;
 	
 PROCEDURE r90z*;
 END r90z;

@@ -4,7 +4,7 @@ Refer to the general ETH Oberon System license contract available at: http://www
 MODULE XDisplay;   (** AUTHOR "gf"; PURPOSE  "display driver plugin for X Windows *)
 
 
-IMPORT S := SYSTEM, Trace, Unix, Machine, Files, UnixFiles, X11, Api := X11Api, Displays, Strings;
+IMPORT S := SYSTEM, Trace, Unix, Machine, Files, UnixFiles, X11, Displays, Strings;
 
 CONST
 	BG = 0;  FG = 15;   (* Background, foreground colors.*)
@@ -23,19 +23,19 @@ CONST
 
 VAR
 	winName, iconName: ARRAY 128 OF CHAR;
-	DISP*:  Display;
+  DISP*: X11.DisplayPtr;
 
 TYPE
-	
+
 	RGB =	RECORD
-				r, g, b: INTEGER
+				r, g, b: SIGNED16
 			END;
 
 
 
 	Clip* = OBJECT
 		VAR
-			d: Display;  lx, ly, lw, lh: LONGINT;
+			d: Display;  lx, ly, lw, lh: SIGNED32;
 
 			PROCEDURE & Init( disp: Display );
 			BEGIN
@@ -43,7 +43,7 @@ TYPE
 				Reset
 			END Init;
 
-			PROCEDURE Set*( x, y, w, h: LONGINT );
+			PROCEDURE Set*( x, y, w, h: SIGNED32 );
 			VAR rect: X11.Rectangle;
 			BEGIN
 				IF w < 0 THEN  w := 0  END;
@@ -63,12 +63,12 @@ TYPE
 				END;
 			END Set;
 
-			PROCEDURE Get*( VAR x, y, w, h: LONGINT );
+			PROCEDURE Get*( VAR x, y, w, h: SIGNED32 );
 			BEGIN
 				x := lx;  y := ly;  w := lw;  h := lh
 			END Get;
 
-			PROCEDURE InClip*( x, y, w, h: LONGINT ): BOOLEAN;
+			PROCEDURE InClip*( x, y, w, h: SIGNED32 ): BOOLEAN;
 			BEGIN
 				RETURN  (x >= lx) & (x + w <= lx + lw) & (y >= ly) & (y + h <= ly + lh)
 			END InClip;
@@ -80,8 +80,8 @@ TYPE
 			END Reset;
 
 			(** Intersect with current clip rectangle resulting in a new clip rectangle. *)
-			PROCEDURE Adjust*( x, y, w, h: LONGINT );   (* intersection *)
-			VAR x0, y0, x1, y1: LONGINT;
+			PROCEDURE Adjust*( x, y, w, h: SIGNED32 );   (* intersection *)
+			VAR x0, y0, x1, y1: SIGNED32;
 			BEGIN
 				IF x > lx THEN  x0 := x  ELSE  x0 := lx  END;
 				IF y > ly THEN  y0 := y  ELSE  y0 := ly  END;
@@ -101,38 +101,38 @@ TYPE
 				secondary-			: X11.Window;
 				currwin				: X11.Window;
 				wmDelete- 		: X11.Atom;
-				screen				: LONGINT;	
+				screen				: SIGNED32;
 				visual{UNTRACED}		: X11.VisualPtr;
-				depth				: LONGINT;
+				depth				: SIGNED32;
 				bigEndian			: BOOLEAN;
 				gc					: X11.GC;
 				clip					: Clip;
-				
+
 				cmap				: X11.Colormap;
-				planesMask			: LONGINT;
+				planesMask			: SIGNED32;
 				foreground,
-				background			: LONGINT;
+				background			: LONGINTEGER;
 				rgb, defPal			: ARRAY 256 OF RGB;	(* 8-bit pseudo color *)
-				pixel				: ARRAY 256 OF LONGINT;   (* pixel values for Oberon colors *)
+				pixel				: ARRAY 256 OF SIGNED32;   (* pixel values for Oberon colors *)
 
-				xformat				: LONGINT;
-				currcol, currmode	: LONGINT;
-				xfunc				: ARRAY 3 OF LONGINT;
-				
-				
+				xformat				: SIGNED32;
+				currcol, currmode	: SIGNED32;
+				xfunc				: ARRAY 3 OF SIGNED32;
 
-				PROCEDURE SetMode( col: LONGINT );
-				VAR mode: LONGINT;
+
+
+				PROCEDURE SetMode( col: SIGNED32 );
+				VAR mode: SIGNED32;
 				BEGIN
 					mode :=  replace;
-					IF (col # -1) & (30 IN S.VAL( SET, col )) THEN  mode := invert;  EXCL( S.VAL( SET, col ), 30 )  END;
+					IF (col # -1) & (30 IN SET(col )) THEN  mode := invert;  EXCL( S.VAL( SET32, col ), 30 )  END;
 					IF mode # currmode THEN  X11.SetFunction( xdisp, gc, xfunc[mode] );  currmode := mode  END;
 					IF col # currcol THEN  X11.SetForeground( xdisp, gc, ColorToPixel( col ) );  currcol := col  END;
 				END SetMode;
 
 
 
-				PROCEDURE Dot*( col, x, y: LONGINT );
+				PROCEDURE Dot*( col, x, y: SIGNED32 );
 				BEGIN
 					IF currwin = secondary THEN  DEC( y, height )  END;
 					Machine.Acquire( Machine.X11 );
@@ -141,7 +141,7 @@ TYPE
 					Machine.Release( Machine.X11 )
 				END Dot;
 
-				PROCEDURE Fill*( col, x, y, w, h: LONGINT );
+				PROCEDURE Fill*( col, x, y, w, h: SIGNED32 );
 				BEGIN
 					IF (h > 0) & (w > 0) THEN
 						IF currwin = secondary THEN  DEC( y, height )  END;
@@ -157,21 +157,23 @@ TYPE
 					are transferred to or from "buf", starting at "ofs".  The line byte increment is "stride", which may
 					be positive, negative or zero. *)
 
-				PROCEDURE Transfer*( VAR buf: ARRAY OF CHAR;  ofs, stride, x, y, w, h, op: LONGINT );
+				PROCEDURE Transfer*( VAR buf: ARRAY OF CHAR;  ofs, stride, left, top, width, height : SIZE; op: INTEGER );
 				CONST  Get = 0;  Set = 1;
 				VAR image: X11.Image;
 					imp: X11.ImagePtr;
-					bp, ip: ADDRESS; 
-					line, ll: LONGINT;
+					bp, ip: ADDRESS;
+					line, ll: SIGNED32;
+					x, y, w, h : SIGNED32;
 				BEGIN
+					x := left(SIGNED32); y := top(SIGNED32); w := width(SIGNED32); h := height(SIGNED32);
 					ll := w*(xformat DIV 8);
 					IF (ofs + (h - 1)*stride + ll > LEN( buf )) OR (ofs + (h - 1)*stride < 0) THEN  HALT( 99 )  END;
-		
+
 					IF LEN( imgBuffer ) < 4*w*h THEN
 						NEW( imgBuffer, 4*w*h );	(* create buffer outside lock to avoid deadlock *)
 					END;
-			
-					bp := ADDRESSOF( buf[ofs] );  
+
+					bp := ADDRESSOF( buf[ofs] );
 					IF op = Set THEN
 						Machine.Acquire( Machine.X11 );
 						image := X11.CreateImage( xdisp, visual, depth, X11.ZPixmap, 0, 0, w, h, 32, 0 );
@@ -188,8 +190,8 @@ TYPE
 								INC( bp, stride );  INC( ip, imp.bytesPerLine )
 							END;
 						END;
-						IF currmode # replace THEN  
-							X11.SetFunction( xdisp, gc, xfunc[replace] );  currmode := replace  
+						IF currmode # replace THEN
+							X11.SetFunction( xdisp, gc, xfunc[replace] );  currmode := replace
 						END;
 						X11.PutImage( xdisp, primary, gc, image, 0, 0, x, y, w, h );
 						X11.Free( image );  imp := NIL;
@@ -219,11 +221,11 @@ TYPE
 					transferred from left to right and top to bottom.  The pixels are transferred from "buf", starting
 					at bit offset "bitofs".  The line byte increment is "stride", which may be positive, negative or zero.
 					"fg" and "bg" specify the colors for value 1 and 0 pixels respectively. *)
-				PROCEDURE Mask*( VAR buf: ARRAY OF CHAR;  bitofs, stride, fg, bg, x, y, w, h: LONGINT );
-				VAR p: ADDRESS; i: LONGINT;  s: SET;
+				PROCEDURE Mask*( VAR buf: ARRAY OF CHAR;  bitofs, stride, fg, bg, x, y, w, h: SIGNED32 );
+				VAR p: ADDRESS; i: SIGNED32;  s: SET;
 					image: X11.Image;
-					fgpixel, bgpixel, xret: LONGINT;
-					ix, iy, ih: LONGINT;
+					fgpixel, bgpixel, xret: SIGNED32;
+					ix, iy, ih: SIGNED32;
 					imp: X11.ImagePtr;
 				BEGIN
 					IF (w > 0) & (h > 0) THEN
@@ -238,7 +240,7 @@ TYPE
 						image := X11.CreateImage( xdisp, visual, depth, X11.ZPixmap, 0, 0, w, h, 32, 0 );
 						imp := S.VAL( X11.ImagePtr, image );
 						imp.data := ADDRESSOF( imgBuffer[0] );
-						i := LONGINT(ADDRESSOF( buf[0] ) MOD 4);  INC( bitofs, i*8 );
+						i := SIGNED32(ADDRESSOF( buf[0] ) MOD 4);  INC( bitofs, i*8 );
 						p := ADDRESSOF( buf[0] ) - i + bitofs DIV 32*4;   (* p always aligned to 32-bit boundary *)
 						bitofs := bitofs MOD 32;  stride := stride*8;
 						ix := 0; iy := 0; ih := h;
@@ -268,7 +270,7 @@ TYPE
 				END Mask;
 
 				(** Copy source block sx, sy, w, h to destination dx, dy.  Overlap is allowed. *)
-				PROCEDURE Copy*( sx, sy, w, h, dx, dy: LONGINT );
+				PROCEDURE Copy*( sx, sy, w, h, dx, dy: SIGNED32 );
 				VAR src: X11.DisplayPtr;
 				BEGIN
 					IF (w > 0) & (h > 0) THEN
@@ -291,25 +293,25 @@ TYPE
 				END Update;
 
 				(** Map a color value to an 8-bit CLUT index.  Only used if xformat = index8. *)
-				PROCEDURE ColorToIndex*( col: LONGINT ): LONGINT;
+				PROCEDURE ColorToIndex*( col: SIGNED32 ): SIGNED32;
 				BEGIN
 					RETURN ColorToIndex0( SELF, col )
 				END ColorToIndex;
 
 				(** Map an 8-bit CLUT index to a color value.  Only used if xformat = index8. *)
-				PROCEDURE IndexToColor*( n: LONGINT ): LONGINT;
-				VAR r, g, b: LONGINT;
+				PROCEDURE IndexToColor*( n: SIGNED32 ): SIGNED32;
+				VAR r, g, b: SIGNED32;
 				BEGIN
 					IF n >= 0 THEN
 						IF n > 255 THEN  n := BG  END;
 						r := rgb[n].r;  g := rgb[n].g;  b := rgb[n].b;
-						RETURN MIN( LONGINT ) + (r*100H + g)*100H + b
+						RETURN MIN( SIGNED32 ) + (r*100H + g)*100H + b
 					ELSE  RETURN n
 					END;
 				END IndexToColor;
 
-				PROCEDURE SetColor*( col, red, green, blue: INTEGER );   (* 0 <= col, red, green, blue < 256 *)
-				VAR xcol: X11.Color;  res: LONGINT;
+				PROCEDURE SetColor*( col, red, green, blue: SIGNED16 );   (* 0 <= col, red, green, blue < 256 *)
+				VAR xcol: X11.Color;  res: INTEGER;
 				BEGIN
 					IF (col < 0) OR (col > 255) THEN  RETURN   END;
 					rgb[col].r := red;  rgb[col].g := green;  rgb[col].b := blue;
@@ -317,15 +319,15 @@ TYPE
 					Machine.Acquire( Machine.X11 );
 					IF depth > 8 THEN
 						res := X11.AllocColor( xdisp, cmap, ADDRESSOF( xcol ) );
-						IF res # 0 THEN  pixel[col] := xcol.pixel  END
+						IF res # 0 THEN  pixel[col] := SIGNED32 (xcol.pixel)  END
 					ELSE
 						xcol.flags := CHR( X11.DoAll );  xcol.pixel := pixel[col];
-						X11.StoreColor( xdisp, cmap, ADDRESSOF( xcol ) ) 
+						X11.StoreColor( xdisp, cmap, ADDRESSOF( xcol ) )
 					END;
 					Machine.Release( Machine.X11 )
 				END SetColor;
 
-				PROCEDURE GetColor*( col: INTEGER;  VAR red, green, blue: INTEGER );
+				PROCEDURE GetColor*( col: SIGNED16;  VAR red, green, blue: SIGNED16 );
 				BEGIN
 					IF (0 <= col) & (col <= 255) THEN
 						red := rgb[col].r;  green := rgb[col].g;  blue := rgb[col].b
@@ -334,8 +336,8 @@ TYPE
 					END
 				END GetColor;
 
-				PROCEDURE ColorToPixel*( col: LONGINT ): LONGINT;
-				VAR r, g, b, i, ii, x, y, z, m, min: LONGINT;  rc: RGB;
+				PROCEDURE ColorToPixel*( col: SIGNED32 ): SIGNED32;
+				VAR r, g, b, i, ii, x, y, z, m, min: SIGNED32;  rc: RGB;
 				BEGIN
 					r := LSH( col, -16 ) MOD 256;  g := LSH( col, -8 ) MOD 256;  b := col MOD 256;
 					CASE xformat OF
@@ -359,9 +361,9 @@ TYPE
 								ELSE  RETURN ASH( r, 10 ) + ASH( g, 4 ) + b
 								END
 					ELSE  (* index8 *)
-						i := 0;  ii := 0;  min := MAX( LONGINT );
+						i := 0;  ii := 0;  min := MAX( SIGNED32 );
 						WHILE (i < 256) & (min > 0) DO
-							rc := rgb[i];  
+							rc := rgb[i];
 							x := ABS( r - rc.r );  y := ABS( g - rc.g );  z := ABS( b - rc.b );  m := x;
 							IF y > m THEN  m := y  END;
 							IF z > m THEN  m := z  END;
@@ -375,21 +377,20 @@ TYPE
 
 
 
-				PROCEDURE  & Initialize( disp: X11.DisplayPtr; absWidth, absHeight, relWidth, relHeight: LONGINT );
-				VAR 
-					event: Api.XEvent;  root: X11.Window;  
-					gRoot, gX, gY, gW, gH, gBW, gD, res: LONGINT;  screenw, screenh	: LONGINT;
+				PROCEDURE  & Initialize( disp: X11.DisplayPtr; absWidth, absHeight, relWidth, relHeight: SIGNED32 );
+				VAR
+					event: X11.Event;  root: X11.Window;
+					gRoot, gX, gY, gW, gH, gBW, gD, res: SIGNED32;  screenw, screenh	: SIGNED32;
 				BEGIN
-					
-					xdisp := disp;  
+					xdisp := disp;
+					Machine.Acquire( Machine.X11 );
 					screen := X11.DefaultScreen( xdisp );
 					screenw := X11.DisplayWidth( xdisp, screen );
-					screenh := X11.DisplayHeight( xdisp, screen );	
+					screenh := X11.DisplayHeight( xdisp, screen );
 					depth := X11.DefaultDepth( xdisp, screen );
 					cmap := X11.DefaultColormap( xdisp, screen );
 					foreground := X11.BlackPixel( xdisp, screen );
 					background := X11.WhitePixel( xdisp, screen );
-					Machine.Acquire( Machine.X11 );
 					root := X11.DefaultRootWindow( xdisp );
 					primary := X11.CreateSimpleWindow( xdisp, root, 0, 0,
 											     			screenw - 16, screenh - 32, 0,
@@ -398,15 +399,15 @@ TYPE
 					X11.SetIconName( xdisp, primary, ADDRESSOF( iconName ) );
 					X11.SetCommand( xdisp, primary, Unix.argv, Unix.argc );
 					X11.SelectInput( xdisp, primary, X11.ExposureMask );
-					
-					
+
+
 					(* set wm_delete_events if in windowed mode *)
-					wmDelete := Api.InternAtom(xdisp, "WM_DELETE_WINDOW", Api.True);   
-					res := Api.SetWMProtocols(xdisp, primary, ADDRESSOF(wmDelete), 1);
-							
+					wmDelete := X11.InternAtom(xdisp, "WM_DELETE_WINDOW", X11.True);
+					res := X11.SetWMProtocols(xdisp, primary, ADDRESSOF(wmDelete), 1);
+
 					X11.MapRaised( xdisp, primary );
-					REPEAT  Api.NextEvent( xdisp, event )
-					UNTIL (event.typ = Api.Expose) & (event.window = primary);
+					REPEAT  X11.NextEvent( xdisp, event )
+					UNTIL (event.typ = X11.Expose) & (event.window = primary);
 					(* adjust to physical window size *)
 					X11.GetGeometry( xdisp, primary, gRoot, gX, gY, gW, gH, gBW, gD );
 					IF relWidth # -1 THEN
@@ -430,7 +431,7 @@ TYPE
 					secondary := X11.CreatePixmap( xdisp, primary, gW, gH, depth );
 					Machine.Release( Machine.X11 );
 
-					CreateColors( SELF );  InitPalette( SELF );  SuppressX11Cursors( SELF ); 
+					CreateColors( SELF );  InitPalette( SELF );  SuppressX11Cursors( SELF );
 					InitFormat( SELF );  CreateGC( SELF );  InitFunctions( SELF );
 
 					NEW( clip, SELF )
@@ -450,15 +451,15 @@ TYPE
 
 VAR
 	dispname: ARRAY 128 OF CHAR;
-	
+
 	imgBuffer: POINTER TO ARRAY OF CHAR;
 
 
-	PROCEDURE ColorToIndex0( disp: Display; col: LONGINT ): INTEGER;
-	VAR idx, i: INTEGER;  r, g, b, min, x, y, z, d: LONGINT;  rc: RGB;
+	PROCEDURE ColorToIndex0( disp: Display; col: SIGNED32 ): SIGNED16;
+	VAR idx, i: SIGNED16;  r, g, b, min, x, y, z, d: SIGNED32;  rc: RGB;
 	BEGIN
 		r := ASH( col, -16 ) MOD 100H;  g := ASH( col, -8 ) MOD 100H;  b := col MOD 100H;
-		i := 0;  idx := 0;  min := MAX( LONGINT );
+		i := 0;  idx := 0;  min := MAX( SIGNED32 );
 		WHILE (i < 256) & (min > 0) DO
 			rc := disp.defPal[i];  x := ABS( r - rc.r );  y := ABS( g - rc.g );  z := ABS( b - rc.b );  d := x;
 			IF y > d THEN  d := y  END;
@@ -471,71 +472,60 @@ VAR
 	END ColorToIndex0;
 
 
-	PROCEDURE PutLine( xformat, width: LONGINT;  ip, bp: ADDRESS );
-	VAR i: LONGINT;  byte: CHAR;
+	PROCEDURE PutLine( xformat, width: SIGNED32;  ip, bp: ADDRESS );
+	VAR i: SIGNED32;  byte: CHAR;
 	BEGIN
 		CASE xformat OF
 		| index8:
-				FOR i := 1 TO width DO
-					S.GET( bp, byte );  S.PUT( ip, byte );  INC( bp );  INC( ip )
-				END;
+				S.MOVE(bp, ip, width);
 		| color565, color555, color664:
+				S.MOVE(bp, ip, 2*width);
+		| color888: (* x-format (destination) is 888, A ignored (?) , Aos Format (source) is 8888 *)
+				S.MOVE(bp, ip, 4*width);
+				(*
 				FOR i := 1 TO width DO
-					S.GET( bp, byte );  S.PUT( ip, byte );  INC( bp );  INC( ip );
-					S.GET( bp, byte );  S.PUT( ip, byte );  INC( bp );  INC( ip )
-				END;
-		| color888:
-				FOR i := 1 TO width DO
+					S.MOVE(bp,ip,3); INC(bp,3); INC(ip,3);
+					(*
 					S.GET( bp, byte );  S.PUT( ip, byte );  INC( bp );  INC( ip );   (* B *)
 					S.GET( bp, byte );  S.PUT( ip, byte );  INC( bp );  INC( ip );   (* G *)
 					S.GET( bp, byte );  S.PUT( ip, byte );  INC( bp );  INC( ip );   (* R *)
+					*)
 					byte := 0X;  S.PUT( ip, byte );  INC( ip )
 				END;
+				*)
 		ELSE  (* color8888 *)
-				FOR i := 1 TO width DO
-					S.GET( bp, byte );  S.PUT( ip, byte );  INC( bp );  INC( ip );   (* B *)
-					S.GET( bp, byte );  S.PUT( ip, byte );  INC( bp );  INC( ip );   (* G *)
-					S.GET( bp, byte );  S.PUT( ip, byte );  INC( bp );  INC( ip );   (* R *)
-					S.GET( bp, byte );  S.PUT( ip, byte );  INC( bp );  INC( ip );   (* X *)
-				END
+				S.MOVE(bp, ip, 4*width);
 		END
 	END PutLine;
 
 
 
-	PROCEDURE GetLine( xformat, width: LONGINT;  ip, bp: ADDRESS );
-	VAR i: LONGINT;  byte: CHAR;
-	BEGIN			
+	PROCEDURE GetLine( xformat, width: SIGNED32;  ip, bp: ADDRESS );
+	VAR i: SIGNED32;  byte: CHAR;
+	BEGIN
 		CASE xformat OF
 		| index8:
-				FOR i := 1 TO width DO
-					S.GET( ip, byte );  S.PUT( bp, byte );  INC( ip );  INC( bp )
-				END;
+				S.MOVE(ip, bp, width);
 		| color565, color555, color664:
-				FOR i := 1 TO width DO
-					S.GET( ip, byte );  S.PUT( bp, byte );  INC( ip );  INC( bp );
-					S.GET( ip, byte );  S.PUT( bp, byte );  INC( ip );  INC( bp )
-				END
+				S.MOVE(ip, bp, 2*width);
 		| color888:
+				S.MOVE(ip, bp, 4*width);
+				(*
 				FOR i := 1 TO width DO
 					S.GET( ip, byte );  S.PUT( bp, byte );  INC( ip );  INC( bp );   (* B *)
 					S.GET( ip, byte );  S.PUT( bp, byte );  INC( ip );  INC( bp );   (* G *)
 					S.GET( ip, byte );  S.PUT( bp, byte );  INC( ip );  INC( bp );   (* R *)
 					INC( ip )
 				END
+				*)
 		ELSE  (* color8888 *)
-				FOR i := 1 TO width DO
-					S.GET( ip, byte );  S.PUT( bp, byte );  INC( ip );  INC( bp );   (* B *)
-					S.GET( ip, byte );  S.PUT( bp, byte );  INC( ip );  INC( bp );   (* G *)
-					S.GET( ip, byte );  S.PUT( bp, byte );  INC( ip );  INC( bp );   (* R *)
-					S.GET( ip, byte );  S.PUT( bp, byte );  INC( ip );  INC( bp );   (* X *)
-				END
+				S.MOVE(ip, bp, 4*width);
 		END;
 	END GetLine;
 
 
-	PROCEDURE PutLineBE( xformat, width: LONGINT;  ip, bp: ADDRESS );
-	VAR i: LONGINT;  byte: CHAR;
+	PROCEDURE PutLineBE( xformat, width: SIGNED32;  ip, bp: ADDRESS );
+	VAR i: SIGNED32;  byte: CHAR;
 	BEGIN
 		CASE xformat OF
 		index8:
@@ -550,11 +540,11 @@ VAR
 				END
 		| color888:
 				FOR i := 1 TO width DO
-					byte := 0X;  S.PUT( ip, byte );  INC( ip );
+					S.PUT8( ip, 0X );  INC( ip );
 					S.GET( bp + 2, byte );  S.PUT( ip, byte );  INC( ip );   (* B *)
 					S.GET( bp + 1, byte );  S.PUT( ip, byte );  INC( ip );   (* G *)
 					S.GET( bp + 0, byte );  S.PUT( ip, byte );  INC( ip );   (* R *)
-					INC( bp, 3 )
+					INC( bp, 4 )
 				END
 		ELSE  (* color8888 *)
 				FOR i := 1 TO width DO
@@ -567,8 +557,8 @@ VAR
 		END;
 	END PutLineBE;
 
-	PROCEDURE GetLineBE( xformat, width: LONGINT;  ip, bp: ADDRESS );
-	VAR i: LONGINT;  byte: CHAR;
+	PROCEDURE GetLineBE( xformat, width: SIGNED32;  ip, bp: ADDRESS );
+	VAR i: SIGNED32;  byte: CHAR;
 	BEGIN
 		CASE xformat OF
 		| index8:
@@ -603,11 +593,11 @@ VAR
 
 
 	PROCEDURE NewPattern( d: Display;
-							CONST image: ARRAY OF SET;  
-							width, height: INTEGER ): X11.Pattern;
+							CONST image: ARRAY OF SET;
+							width, height: SIGNED16 ): X11.Pattern;
 	VAR
-		pixmap: X11.Pixmap;  pat: X11.PatternPtr;
-		w, h, i, j, b, dest, srcw, destb, srci, desti: LONGINT;
+		pixmap: X11.Pixmap;  pat {UNTRACED}: X11.PatternPtr;
+		w, h, i, j, b, dest, srcw, destb, srci, desti: SIGNED32;
 		data: ARRAY 256*32 OF CHAR;   (* 256*256 bits *)
 	BEGIN
 		i := 0;
@@ -642,23 +632,23 @@ VAR
 		IF pixmap = 0 THEN  HALT( 99 )  END;
 		pat := S.VAL( X11.PatternPtr, Unix.malloc( SIZEOF( X11.PatternDesc ) ) );
 		pat.x := 0;  pat.y := 0;  pat.w := width;  pat.h := height;  pat.pixmap := pixmap;
-		RETURN S.VAL( LONGINT, pat )
+		RETURN S.VAL( X11.Pattern, pat )
 	END NewPattern;
 
 	PROCEDURE InitNames;
-	VAR cwd: ARRAY 128 OF CHAR;  i: LONGINT;
+	VAR cwd: ARRAY 128 OF CHAR;  i: SIGNED32;
 	BEGIN
 		UnixFiles.GetWorkingDirectory( cwd );
-		COPY( Machine.version, winName );  
+		COPY( Machine.version, winName );
 		Strings.Append( winName, ",  Work: " );  Strings.Append( winName, cwd );
-		COPY( winName, iconName);  
+		COPY( winName, iconName);
 		i := 0;
 		WHILE iconName[i] > ' ' DO  INC( i )  END;
 		iconName[i] := 0X
 	END InitNames;
 
 	PROCEDURE getDisplayName;
-	VAR adr: LONGINT;  i: INTEGER;  ch: CHAR;
+	VAR adr: ADDRESS;  i: SIGNED16;  ch: CHAR;
 	BEGIN
 		Unix.GetArgval( "-display", dispname );
 		IF dispname = "" THEN
@@ -672,16 +662,19 @@ VAR
 	END getDisplayName;
 
 	PROCEDURE OpenX11Display( ): X11.DisplayPtr;
-	VAR xdisp: X11.DisplayPtr;  screen, depth: LONGINT;
+	VAR xdisp: X11.DisplayPtr;  screen, depth: SIGNED32;
 	BEGIN
 		getDisplayName;
-		xdisp := Api.OpenDisplay( dispname );
+		Machine.Acquire(Machine.X11);
+		xdisp := X11.OpenDisplay( dispname );
 		IF xdisp = 0 THEN
+			Machine.Release(Machine.X11);
 			Trace.String( "Cannot open X11 display " );  Trace.StringLn( dispname );  Unix.exit( 1 )
 		END;
 		screen := X11.DefaultScreen( xdisp );
 		depth := X11.DefaultDepth( xdisp, screen );
-		IF depth < 8 THEN  
+		Machine.Release(Machine.X11);
+		IF depth < 8 THEN
 			Trace.StringLn( "UnixAos needs a color display. sorry." );  Unix.exit( 1 )
 		END;
 		Trace.String( "X11 Display depth = " ); Trace.Int( depth, 1 ); Trace.Ln;
@@ -690,8 +683,8 @@ VAR
 
 
 	PROCEDURE CreateColors( d: Display );
-	VAR col: INTEGER;
-		visualInfo: X11.VisualInfo;  
+	VAR col: SIGNED16;
+		visualInfo: X11.VisualInfo;
 	BEGIN
 		Machine.Acquire( Machine.X11 );
 		col := 0;
@@ -702,8 +695,8 @@ VAR
 			d.visual := visualInfo.visual
 		END;
 		d.bigEndian := FALSE;
-		IF d.depth > 8 THEN  
-			d.bigEndian := d.visual.blueMask > d.visual.redMask 
+		IF d.depth > 8 THEN
+			d.bigEndian := d.visual.blueMask > d.visual.redMask
 		ELSE (* pseudo color *)
 			d.cmap := X11.CreateColormap( d.xdisp, d.primary, d.visual, X11.AllocAll );
 			X11.SetWindowColormap( d.xdisp, d.primary, d.cmap );
@@ -718,7 +711,7 @@ VAR
 
 
 	PROCEDURE InitPalette( d: Display );
-	VAR f: Files.File;  r: Files.Reader;  red, green, blue: CHAR;  i, cols: INTEGER;
+	VAR f: Files.File;  r: Files.Reader;  red, green, blue: CHAR;  i, cols: SIGNED16;
 	BEGIN
 		IF d.depth >= 8 THEN cols := 256 ELSE cols := 16 END;
 		f := Files.Old( "Default.Pal" );
@@ -734,31 +727,31 @@ VAR
 
 
 	PROCEDURE SuppressX11Cursors( d: Display );
-	VAR 
-		fg, bg: X11.Color;  src, msk: X11.PatternPtr;
-		image: ARRAY 17 OF SET;  i: INTEGER;
+	VAR
+		fg, bg: X11.Color;  src {UNTRACED}, msk {UNTRACED}: X11.PatternPtr;
+		image: ARRAY 17 OF SET;  i: SIGNED16;
 		noCursor: X11.Cursor;
 	BEGIN
 		fg.red := 256*d.rgb[FG].r;  fg.green := 256*d.rgb[FG].g;  fg.blue := 256*d.rgb[FG].b;
 		bg.red := 256*d.rgb[BG].r;  bg.green := 256*d.rgb[BG].g;  bg.blue := 256*d.rgb[BG].b;
 
 		FOR i := 1 TO 16 DO  image[i] := {}  END;
-		src := S.VAL( X11.PatternPtr, NewPattern( d, image, 16, 16 ) );  
+		src := S.VAL( X11.PatternPtr, NewPattern( d, image, 16, 16 ) );
 		msk := S.VAL( X11.PatternPtr, NewPattern( d, image, 16, 16 ) );
-		
+
 		Machine.Acquire( Machine.X11 );
 		noCursor := X11.CreatePixmapCursor( d.xdisp, src.pixmap, msk.pixmap, fg, bg, 1, 1 );
 		X11.DefineCursor( d.xdisp, d.primary, noCursor );
 		Machine.Release( Machine.X11 )
 	END SuppressX11Cursors;
-	
+
 
 	PROCEDURE InitFormat( d: Display );
 	BEGIN
-		IF d.depth = 8 THEN  
+		IF d.depth = 8 THEN
 			d.format := Displays.index8;
 			d.xformat := index8
-		ELSIF d.depth = 15 THEN  
+		ELSIF d.depth = 15 THEN
 			d.format := Displays.color565;
 			d.xformat := color555
 		ELSIF d.depth = 16 THEN
@@ -766,13 +759,13 @@ VAR
 			IF d.visual.blueMask = 0FH THEN  d.xformat := color664
 			ELSE  d.xformat := color565
 			END
-		ELSIF d.depth = 24 THEN  
-			d.format := Displays.color888;
+		ELSIF d.depth = 24 THEN
+			d.format := Displays.color8888;
 			d.xformat := color888
-		ELSIF d.depth = 32 THEN  
+		ELSIF d.depth = 32 THEN
 			d.format := Displays.color8888;
 			d.xformat := color8888
-		ELSE  
+		ELSE
 			d.format := unknown
 		END;
 	END InitFormat;
@@ -793,7 +786,7 @@ VAR
 		d.xfunc[replace] := X11.GXcopy;
 		d.xfunc[paint] := X11.GXor;   (* not used *)
 		(* drawing in invert mode with BackgroundCol on BackgroundCol is a no-op: *)
-		IF S.VAL( SET, d.background )*S.VAL( SET, d.planesMask ) # {} THEN
+		IF SET(d.background )* SET(d.planesMask ) # {} THEN
 			d.xfunc[invert] := X11.GXequiv
 		ELSE
 			d.xfunc[invert] := X11.GXxor
@@ -809,8 +802,8 @@ VAR
 
 		Lower limit is either 50% as scaling factor or 640x480 as absolute size.
 	*)
-	PROCEDURE GetDisplaySize(VAR width, height: LONGINT): LONGINT;  (* % of Screen [50% ... 100%] *)
-	VAR buf: ARRAY 64 OF CHAR; size, i: LONGINT; c: CHAR; absolute: BOOLEAN;
+	PROCEDURE GetDisplaySize(VAR width, height: SIGNED32): SIGNED32;  (* % of Screen [50% ... 100%] *)
+	VAR buf: ARRAY 64 OF CHAR; size, i: SIGNED32; c: CHAR; absolute: BOOLEAN;
 	BEGIN
 		Machine.GetConfig( "DisplaySize", buf );
 		IF buf = "" THEN size := 100
@@ -849,7 +842,7 @@ VAR
 	END GetDisplaySize;
 
 	PROCEDURE Install*;
-	VAR disp: Display; res: LONGINT; s, w, h: LONGINT; xdisp: X11.DisplayPtr;
+	VAR disp: Display; res: INTEGER; s, w, h: SIGNED32; xdisp: X11.DisplayPtr;
 	BEGIN
 		InitNames; xdisp := OpenX11Display( );
 		s := GetDisplaySize( w, h );
@@ -857,7 +850,6 @@ VAR
 		disp.SetName( "XDisplay" );
 		disp.desc := "X11 display driver";
 		Displays.registry.Add( disp, res );
-		DISP:=disp;		
 	END Install;
 
 BEGIN

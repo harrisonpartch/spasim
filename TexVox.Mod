@@ -155,6 +155,7 @@ BEGIN
 				mix:=ray.length*ray.scale*0.00005;
 				IF mix>1 THEN mix:=1 END;
 				dot:=mix*dot1+(1-mix)*dot2;		
+				IF ray.lighting>0 THEN dot:= dot*ray.lighting END;
 				dr:=color.alpha*color.red*dot*ray.clr.ra;
 				dg:=color.alpha*color.green*dot*ray.clr.ga;
 				db:=color.alpha*color.blue*dot*ray.clr.ba;

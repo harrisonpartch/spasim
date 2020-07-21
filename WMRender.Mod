@@ -1,7 +1,7 @@
 MODULE WMRender;
 IMPORT Kernel, Objects, Random, Marsh, Rectangles := WMRectangles, WM := WMWindowManager, WMMessages,
- Out := KernelLog, Math := MathL,SPSMMath, Base, Retina,  
-	 Inputs,  Raster, Strings, Streams, Debugging;
+ Out := KernelLog, Math := MathL,SPSMMath, Base, Retina,  Inputs,  Raster, Strings, 
+ Streams, Debugging, WarpMouse;
 
 TYPE
 	Aperture = Base.Aperture;
@@ -253,7 +253,7 @@ END Camera;
 
 PROCEDURE P(VAR message:WMMessages.Message; VAR discard: BOOLEAN);
 BEGIN
-	IF CAPTURE THEN 
+	IF CAPTUREMOUSE THEN 
 		RW.Handle(message);
 		discard:=TRUE;
 (*		IF (message.msgType=WMMessages.MsgPointer) THEN
@@ -273,8 +273,7 @@ VAR
 	pi: WM.PointerInfo;
 	warpvent,rlock: BOOLEAN;
 	saccade: BOOLEAN;
-	mstarget: INTEGER;
-	mainloopgo: BOOLEAN;
+	mstarget, framecounter: INTEGER;
 	movemode: CHAR;
 
 PROCEDURE &openwincam(W,H: INTEGER);
@@ -284,12 +283,11 @@ BEGIN
 	camera.aperjust(W,H);
 	manager := WM.GetDefaultManager();
 	manager.Add(100,100, SELF, { WM.FlagFrame, WM.FlagClose, WM.FlagStayOnTop});
-	RWcenterx:=100+(W DIV 2);
-	RWcentery:=100+(H DIV 2);
-     WM.LoadCursor("blankrecticle.png", 3,3, pi);
+	centerx:=100+(W DIV 2);
+	centery:=100+(H DIV 2);
+  WM.LoadCursor("blankrecticle.png", 3,3, pi);
 	SetPointerInfo(pi);
 	mstarget:=30;
-	mainloopgo:= TRUE;
 END openwincam;
 
 PROCEDURE KeyEvent (ucs : SIZE; flags : SET; keysym : SIZE);
@@ -300,17 +298,17 @@ VAR
 BEGIN
 	key:=CHR(ucs);
 	CASE ucs OF
-		| 164: Close;
 		| 193: INC(Base.PRO); Out.Int(Base.PRO,4); Out.Ln
 		| 194: DEC(Base.PRO); Out.Int(Base.PRO,4); Out.Ln
-(*		| 195: camera.left(0.03)
+		| 195: camera.left(0.03)
 		| 196: camera.left(-0.03)
-*)		| 195: Base.DTL:= Base.DTL*2/3;
+(*		| 195: Base.DTL:= Base.DTL*2/3;
 		| 196: Base.DTL:= Base.DTL*3/2;
-	ELSE
+*)	ELSE
 		CASE CHR(ucs) OF
 			"S": Base.fog:=Base.fog*7/6; Out.String("more fog"); 
 			| "W": Base.fog:=Base.fog*6/7; ; Out.String("less fog");
+			| "Q": alive:=FALSE;
 			|   "s" : camera.forward(-0.51*Base.speed)
 			| "w" :camera.forward(0.51*Base.speed)
 			| "a" :camera.rightstrafe(-0.5*Base.speed)
@@ -329,7 +327,7 @@ BEGIN
 			| "3" : Base.gravity:= Base.gravity/1.5
 			| "4" : Base.gravity:= 1.5*Base.gravity
 			| "5" : Close;
-			| "6" : BEGIN{EXCLUSIVE} mainloopgo:=~mainloopgo END; avaTF:=~avaTF
+			| "6" :  avaTF:=~avaTF 
 			| "?" : Out.Int(Base.world.count(7),4); Out.Ln
 			| "h" : camera.hop
 			| "]": camera.aperture.width := camera.aperture.width * 101/99; camera.aperture.height := camera.aperture.height *101/99;
@@ -358,6 +356,7 @@ VAR
 	wmanager: WM.WindowManager;
 BEGIN
 	Out.Char("!");
+	IF ~CAPTUREMOUSE THEN CAPTUREMOUSE:=TRUE END;
 	MB:=keys;		
 END PointerDown;
 
@@ -367,9 +366,27 @@ BEGIN
 END PointerUp;
 	
 PROCEDURE PointerMove(x,y: SIZE; keys: SET);
+VAR
+		up,left: REAL;
+		xr,yr: SIZE;
+		temporaljust: REAL; 
 BEGIN
-	pdx := (px - x); pdy := py - y;
-	px := ABS(x); py := ABS(y); pkeys := keys;
+			MB := keys;  (* *)		
+			centerx := INTEGER(bounds.r - bounds.l);
+			centery := INTEGER(bounds.b - bounds.t);
+			xr := x-centerx; yr :=y-centery;		
+			IF CAPTUREMOUSE & (ABS(xr)+ABS(yr)>1) THEN
+				left:=ABS(xr)*xr;
+				up:=-ABS(yr)*yr;  
+				camera.up(-up/(6000*leftsticky)); 
+				camera.left(left/(6000*leftsticky));
+				WarpMouse.warp(centerx,centery); 
+				IF (ABS(xr)+ABS(yr)>150) THEN
+					Retina.saccade:=TRUE;
+				ELSE
+					Retina.saccade:=FALSE;
+				END
+			END					
 END PointerMove;
 
 PROCEDURE WheelMove(dz: SIZE);
@@ -429,17 +446,25 @@ END detail;
 		leftsticky:=10.0;
 		upsticky:=10.0;
 		Out.String('*line 1217!*');
-		msd:=30;		
+		msd:=30;	 
+		framecounter:= 0;	
 		NEW(ftimer);
+		alive:=TRUE;
 		REPEAT
+			framecounter:= (framecounter+1) MOD 10;
 			t1:=Kernel.GetTicks();
 			camera.tick;
 			framedt:=Kernel.GetTicks()-t1;	
+			IF framecounter=0 THEN
+				Out.Int(framedt, 4);
+				Out.Ln;
+			END;
 			detail;
 			Swap; 
 			Invalidate(Rectangles.MakeRect(0, 0, GetWidth(), GetHeight()));	
 			Retina.image := backImg; 
-		UNTIL FALSE
+		UNTIL ~alive;
+		Close;
 	END RayWindow;
 
 VAR
@@ -464,15 +489,14 @@ rand: Random.Generator;
 	chatvoxel: Voxel;
 	warpedthemouse: BOOLEAN;
 	MB : SET;	(* 0, 1, 2 *)
-	MOUSEDOWN, CAPTURE, GO,TRAIL,AVATAR,SCULL,METASLASH: BOOLEAN;
+	MOUSEDOWN, CAPTUREMOUSE, GO,TRAIL,AVATAR,SCULL,METASLASH: BOOLEAN;
 	camera:Camera;
 	fogdensity:REAL;
 	leftsticky,upsticky: REAL;
-	centerx,centery: SIZE;
 	GLIDE:REAL;
 	msd: REAL;
 	RW:  RayWindow;
-	RWcenterx, RWcentery,mousedx,mousedy: SIZE;
+	centerx, centery,mousedx,mousedy: INTEGER;
 	ftimer: Kernel.Timer;
 	key: CHAR;
 

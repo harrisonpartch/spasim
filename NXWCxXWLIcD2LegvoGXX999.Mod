@@ -60,7 +60,7 @@ END DiffuseVox;
 VAR 
 	subserp: Voxel;
 	sky: Voxel;
-	uk,echan,nark, xot, dblue, empty: Voxel;
+	uk, echan, nark, nepal, xot, dblue, empty: Voxel;
 	darkblue:TransparaVox;
 	gray: DiffuseVox;
 	s0,s1,s2,s3,s4: NM3.cell;
@@ -73,11 +73,12 @@ VAR
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	RETURN s3
+	RETURN s1
 END thisvox;
 
 BEGIN
-	sky:=Base.VoxelFromName("NM3");  	
+	sky:=Base.VoxelFromName("NM3");  
+	nepal:=Base.VoxelFromName("Nlachlan"); 	
 	nark:=Base.VoxelFromName("Narchillect"); 
 	echan:=Base.VoxelFromName("Nearthchan"); 
 	xot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");  	
@@ -106,13 +107,13 @@ BEGIN
 	FOR i:=0 TO 100 DO
 		s0.stroke(Base.randPT(),9,uk)
 	END;
-	s1.fillsierp(echan,s0);	
+	s1.fillsierp(nepal,s0);	
 	s2.fillsierp(s1,NIL);
 	s3.fillsierp(s2,NIL);	
-	s3.setcolor(0,1/7,0,1/6,1/6,1/6);	
+(*	s3.setcolor(0,1/7,0,1/6,1/6,1/6);	
 	s2.setcolor(0, 0, 2/7,1/3,1/3,1/3);	
 	s1.setcolor(2/13, 2/13, 0,1/3,1/3,1/3);			
-	s0.setcolor(0, 0, 1/9, 1/8,1/8,1/8);	
+*)	s0.setcolor(0, 0, 1/9, 1/8,1/8,1/8);	
 	s0.imposter:=uk;
 	s1.imposter:=uk;
 	s2.imposter:=uk;

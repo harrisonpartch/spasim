@@ -48,6 +48,7 @@ BEGIN
 			imposter.Shade(ray)
 		END
 	ELSE
+		ray.lighting := lighting;
 		ray.scale := ray.scale*M;
 		pushxyz:=ray.xyz;	
 		xyz.x := (ray.lxyz.x) * M;
@@ -404,7 +405,6 @@ END passprobe;
 PROCEDURE copyprime;
 BEGIN
 	copyonstroke:=TRUE;
-	copyengine.add(SELF);	
 END copyprime;
 
 PROCEDURE stroke*(p:PT; res: INTEGER; voxel :Voxel);
@@ -436,7 +436,8 @@ BEGIN
 		i := ENTIER(p.x)MOD M; j := ENTIER(p.y)MOD M; k := ENTIER(p.z)MOD M;
 		IF nextscale>resolution THEN
 			voxel:= voxel.deepcopy();
-			 voxel.setcolor(red, green, blue, redblack, greenblack, blueblack); 
+			voxel.setcolor(red, green, blue, redblack, greenblack, blueblack); 
+			voxel.lighting := voxel.lighting*0.9;
 			blox[i,j,k]:=voxel;
 		ELSE
 			vu:=blox[i,j,k];
@@ -451,6 +452,7 @@ BEGIN
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
 				ELSE
 					NEW(c);
+					c.lighting := c.lighting*0.9;
 					c.setcolor(red/M, green/M, blue/M, redblack/M, greenblack/M, blueblack/M); 
 					c.fill(blox[i,j,k]);
 					blox[i,j,k]:=c;
@@ -459,6 +461,7 @@ BEGIN
 				END
 			ELSE
 				NEW(c);
+				c.lighting := c.lighting*0.9;
 				c.setcolor(red/M,green/M,blue/M,redblack/M,greenblack/M,blueblack/M); 
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
@@ -786,33 +789,6 @@ END sprout;
 
 END cell;
 
-TYPE CopyEngine = OBJECT(Base.V);
-VAR
-	tobecopied: Voxel;	
-	COPYGO:BOOLEAN;
-PROCEDURE add(CONST v:Voxel);
-BEGIN
-	tobecopied:=v;
-	go
-END add;
-PROCEDURE go;
-BEGIN
-	BEGIN {EXCLUSIVE} COPYGO:=TRUE END;
-END go;
-
-(* BEGIN{ACTIVE, PRIORITY(Objects.Low)}
-REPEAT
-	Out.String("COPYENGINE");
-	BEGIN {EXCLUSIVE} AWAIT(COPYGO) END;
-	tobecopied.deepcopyofme:=tobecopied.deepcopy();
-	Out.String("COPYENGINE");
-	BEGIN {EXCLUSIVE} COPYGO:=FALSE END;
-UNTIL FALSE *)
-END CopyEngine;
-
-VAR
-	copyengine: CopyEngine;
-
 PROCEDURE thisvox*():Voxel;
 VAR
 	v: cell;
@@ -822,5 +798,4 @@ BEGIN
 END thisvox;
 
 BEGIN
-	NEW(copyengine)
 END NM3.

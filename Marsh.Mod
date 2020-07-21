@@ -311,13 +311,13 @@ BEGIN
 	NEW(EMPTY);
 	EMPTY.passable:=TRUE;
   	NEW(rand);
-(*	xot:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoR"); 
+	xot:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoR"); 
 	push(xot);
 	archillect:=Base.VoxelFromName("Narchillect"); 
 	push(archillect);
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	push(greenball);	
-	conglomerate:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7"); 	
+(*	conglomerate:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7"); 	
 	conglomerate.copyonstroke:=TRUE;
 	push(conglomerate);	
 	reddot:=Base.VoxelFromName("Nbrownianspheres"); 	
@@ -488,9 +488,9 @@ BEGIN
 	noise[0].octaves:=5;
 	noise[0].persistence:=3.41;	
 	starspider:=Base.VoxelFromName("Nstarspider");
-  	noise[0].setvoxel(starspider);		
+  noise[0].setvoxel(starspider);		
 	NEW(noise[1]);		
-	noise[1].seed:=567483;		
+	noise[1].seed:=5558443;		
 	noise[1].a:=1;
 	noise[1].b:=1;
 	noise[1].c:=1;		
@@ -501,23 +501,26 @@ BEGIN
 	push(wstar);
 	noise[1].setvoxel(wstar);	
 	NEW(noise[2]);	
-	noise[2].seed:=900909;		
+	noise[2].seed:=7007896;		
 	noise[2].a:=7.5;
 	noise[2].b:=7.5;
 	noise[2].c:=3.5;		
 	noise[2].octaves:=4;
 	noise[2].persistence:=3.61;	
 	noise[2].setvoxel(wstar);	
+
 	NEW(noise[3]);		
-	noise[3].seed:=8866688;		
-	noise[3].a:=4;
-	noise[3].b:=4;
-	noise[3].c:=4;		
+	noise[3].seed:=8357236;		
+	noise[3].a:=1;
+	noise[3].b:=1;
+	noise[3].c:=1;		
 	noise[3].octaves:=4;
-	noise[3].persistence:=3.91;	
-	gxy:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 	
+	noise[3].persistence:=4.91;	
+	gxy:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 
+	gxy.tscale := 0;	
 	push(gxy);
 	noise[3].setvoxel(gxy);	
+	
 	NEW(noise[4]);		
 	noise[4].seed:=123456;		
 	noise[4].a:=1;
@@ -532,9 +535,9 @@ BEGIN
 	Base.setPT(center,1/2,1/2,9/10);
 	Base.setPT(up,0,0,1);
 	
-	z3:= Base.VoxelFromName("NM2");
+	z3:= Base.VoxelFromName("NM3");
 
-	z3.setcolor(0.0,0.05,0,0.1,0.1,0.1);
+	z3.setcolor(0.0,0.05,0.1,0.1,0.1,0.1);
 
 	dieone:=Base.VoxelFromName("NCjgzkmiTyecI5x6eOgYqpQ"); 	
   push(dieone);
@@ -554,16 +557,13 @@ BEGIN
 
 	
 	noise[0].setvoxel(GREEN);	
-(*	cvox:=Base.VoxelFromName("CamTexVox");		
-	noise[1].setvoxel(cvox); *)
-	noise[3].setvoxel(serp);	
-	noise[4].setvoxel(cage);		
+	cvox:=Base.VoxelFromName("CamTexVox");	
 
-	z3.FRaster(noise[1],100);	
-	z3.FRaster(noise[3],100);	
+	z3.FRaster(noise[0],81);	
+	z3.FRaster(noise[3],81);	
 	Base.setPT(center,1/2,1/2,2/3);	
 	NEW(plane,center,up);
-	plane.setvoxel(Base.EMPTY);			
+	plane.setvoxel(cvox);			
 	z3.FRaster(plane,10);	
 
 	harrison:=Base.VoxelFromName("Nharrisonavatar"); 
@@ -605,4 +605,5 @@ BEGIN
 END Marsh.
 
 XNXL.ourfounder.png
+
 
