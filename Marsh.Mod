@@ -527,7 +527,8 @@ BEGIN
 	noise[4].c:=1;		
 	noise[4].octaves:=4;
 	noise[4].persistence:=3.71;	
-	noise[4].setvoxel(gxy);		
+	NEW(siv);
+	noise[4].setvoxel(siv);		
 
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);

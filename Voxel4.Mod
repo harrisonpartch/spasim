@@ -397,7 +397,7 @@ VAR
 PROCEDURE &init*;
 BEGIN
 	setCenter(1/2,1/2,1/2);
-	diameter:= 1/6;
+	diameter:= 1/66;
 (*	register; *)
 END init;
 

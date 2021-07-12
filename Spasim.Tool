@@ -14,7 +14,7 @@ Engrainer.Mod
 Saboteur.Mod
 NCompiler.Mod
 Retinax.Mod
-CamTexVox.Mod
+
 Marsh.Mod
 OGLRender.Mod 
 ~
@@ -22,6 +22,8 @@ Compiler.Compile
 WMRetina.Mod
 WMRender.Mod
 ~
+CamTexVox.Mod
+~ 
 
 NCompiler.ncompile  <== Middle mouse click on this
 
