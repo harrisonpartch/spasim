@@ -12,9 +12,9 @@ TYPE
 	END KillerMsg;
 
 	Vertex=RECORD
-		x, y, z: REAL;	(* vertex *)
-		nx, ny, nz: REAL; (* normal *)
-		s0, t0: REAL; (* Texcoord0 *)
+		x, y, z: FLOAT32;	(* vertex *)
+		nx, ny, nz: FLOAT32; (* normal *)
+		s0, t0: FLOAT32; (* Texcoord0 *)
 	END;
 
 	MyVertex = POINTER TO ARRAY OF Vertex;
@@ -24,14 +24,14 @@ TYPE
 		timer: Kernel.MilliTimer;
 		alive,  animated: BOOLEAN;
 
-		angle: REAL;
-		drawMode: LONGINT;
+		angle: FLOAT32;
+		drawMode: SIGNED32;
 		vertexVBOID, indexVBOID, vaoID: GL.Uint;
-		pindices : ARRAY [3] OF INTEGER;
+		pindices : ARRAY [3] OF SIGNED16;
 		pvertex : MyVertex;
-	 	lookatz: LONGREAL;
+	 	lookatz: FLOAT64;
 
-		PROCEDURE &New(w, h: LONGINT);
+		PROCEDURE &New(w, h: SIGNED32);
 		BEGIN
 
 			Init(w, h, FALSE); (* use alpha, for 32bpp img *)
@@ -107,8 +107,8 @@ TYPE
 			Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 		END UpdateImage;
 
-	PROCEDURE DrawMode(dm: LONGINT);
-	VAR drawMode: LONGINT;
+	PROCEDURE DrawMode(dm: SIGNED32);
+	VAR drawMode: SIGNED32;
 	BEGIN
 		drawMode := dm;
 		MakeCurrent();
@@ -130,7 +130,7 @@ TYPE
 	END DrawMode;
 
 	PROCEDURE initGL(): BOOLEAN;
-	VAR offset: LONGINT;
+	VAR offset: SIGNED32;
 	BEGIN
 			MakeCurrent();
 
@@ -244,7 +244,7 @@ END GLWindow;
 
 
 VAR
-	nofWindows : LONGINT;
+	nofWindows : SIGNED32;
 
 PROCEDURE Open*;
 VAR

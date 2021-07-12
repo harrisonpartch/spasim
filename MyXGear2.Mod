@@ -27,10 +27,10 @@ CONST
 TYPE
 	Hints = RECORD
 		flags: SET;
-		functions: LONGINT;
-		decorations: LONGINT;
-		inputMode: LONGINT;
-		status: LONGINT;
+		functions: SIGNED32;
+		decorations: SIGNED32;
+		inputMode: SIGNED32;
+		status: SIGNED32;
 	END;
 
 
@@ -39,7 +39,7 @@ VAR
 	context: Commands.Context; (* StdIO context *)
 
 	display: X11.DisplayPtr;
-	screen: LONGINT;
+	screen: SIGNED32;
 	win: X11.Window; (* our window instance *)
 	glctx : GL.GLXContext;  (* GL context *)
 
@@ -52,10 +52,10 @@ VAR
 (* original desktop mode which we save so we can restore it later *)
 
 	 desktopMode: V.ModeInfo;
-	width, height : LONGINT; (* size of window *)
+	width, height : SIGNED32; (* size of window *)
 
 	alive : BOOLEAN; (* for main loop control *)
-	curcursor: LONGINT;
+	curcursor: SIGNED32;
 
 CONST
 	ML = 0;  MM = 1;  MR = 2;
@@ -66,21 +66,21 @@ VAR
 	compstatus: X11.ComposeStatus;
 
 	MMseen, MRseen: BOOLEAN;
-	noEventCount: LONGINT;
+	noEventCount: SIGNED32;
 
 
 VAR
-	keySymbol: ARRAY 256 OF LONGINT;
-	currX, currY: LONGINT;
+	keySymbol: ARRAY 256 OF SIGNED32;
+	currX, currY: SIGNED32;
 
   (*  gear variables *)
   	gear1, gear2, gear3: GL.Uint;
   	rotx, roty, rotz, angle: GL.Float;
 
 
-PROCEDURE  MakeGear (innerRadius, outerRadius, width: GL.Float; teeth: LONGINT;  toothDepth: GL.Float);
+PROCEDURE  MakeGear (innerRadius, outerRadius, width: GL.Float; teeth: SIGNED32;  toothDepth: GL.Float);
 VAR  r0, r1, r2 , angle, da, u, v, len: GL.Float;
-	  i: LONGINT;
+	  i: SIGNED32;
 BEGIN
 
 	r0 := innerRadius;
@@ -189,7 +189,7 @@ END MakeGear;
 PROCEDURE  InitGears;
 VAR
 	red, green, blue, lightPos: ARRAY [4] OF GL.Float;
-     interval, bres: LONGINT;
+     interval, bres: SIGNED32;
 BEGIN
 	rotx := 20;  roty := 30;  rotz := 0;  angle := 20;
 
@@ -286,7 +286,7 @@ BEGIN
      GL.glXSwapBuffers(display, win);
 END DrawGears;
 
-PROCEDURE Reshape(w, h: LONGINT);
+PROCEDURE Reshape(w, h: SIGNED32);
 
 BEGIN
 
@@ -303,7 +303,7 @@ END Reshape;
 
 (* close the window and its resources *)
  PROCEDURE Close;
-  VAR res: LONGINT;
+  VAR res: SIGNED32;
  BEGIN
 	(* do we have a rendering context *)
 	IF glctx # 0 THEN
@@ -342,18 +342,18 @@ END Reshape;
 
 PROCEDURE  InitWindow(): BOOLEAN;
 VAR
-	res: LONGINT;
-	masks: LONGINT;
+	res: SIGNED32;
+	masks: SIGNED32;
 
 	visinfoptr : X11.VisualInfoPtr; (* pointer to X11 VisualInfo *)
 	cmap : X11.Colormap; (* colormap for window *)
 	att : POINTER TO ARRAY OF GL.Int;  (* attributes of GL window *)
-	glxMajor, glxMinor, wmMajor, wmMinor: LONGINT;
-	dispWidth, dispHeight: LONGINT;
+	glxMajor, glxMinor, wmMajor, wmMinor: SIGNED32;
+	dispWidth, dispHeight: SIGNED32;
 	modes : V.PModeInfo;
 	bmodes : V.ModeInfo;
-	modnum, bestmode: LONGINT;
-	i: LONGINT;
+	modnum, bestmode: SIGNED32;
+	i: SIGNED32;
 	dumysize: X11.XSizeHints;
 	defwin: X11.Window;
 	
@@ -571,7 +571,7 @@ END Wr;
 (* save the rendered image to disk when mouse clicked *)
 PROCEDURE SaveImage(CONST fname: ARRAY OF CHAR);
 VAR image: Raster.Image;
-	i, res: LONGINT;
+	i, res: SIGNED32;
 BEGIN
 	NEW(image);
 	Raster.Create(image, width, height,Raster.BGRA8888);
@@ -597,7 +597,7 @@ END SaveImage;
 	END CheckAlternateKeys;
 
 	(* mouse handler *)
-	PROCEDURE SendMouseMsg( x, y, dz: LONGINT; xbuttons: SET );
+	PROCEDURE SendMouseMsg( x, y, dz: SIGNED32; xbuttons: SET );
 	VAR mm: Inputs.AbsMouseMsg;
 	BEGIN
 		mm.keys := {};
@@ -639,7 +639,7 @@ END SaveImage;
 		xev: X11.Event;
 		dl: X11.Data40;
 		wmstate, wmfullscreen: X11.Atom;
-		res: LONGINT;
+		res: SIGNED32;
 		defwin: X11.Window;
 	BEGIN
 	wmstate := X11.InternAtom(display, "_NET_WM_STATE", X11.False);
@@ -672,7 +672,7 @@ END SaveImage;
 		INC(curcursor);
 	END ChangeCursor;
 
-	PROCEDURE WrKey(keyc: LONGINT; buf: ARRAY OF CHAR; keysym: X11.KeySym);
+	PROCEDURE WrKey(keyc: SIGNED32; buf: ARRAY OF CHAR; keysym: X11.KeySym);
 	BEGIN
 		context.out.String("keysym: "); context.out.Int(keysym,0); context.out.String(":"); context.out.Hex(keysym, 8);
 
@@ -688,14 +688,14 @@ END SaveImage;
 	VAR
 		 keysym: X11.KeySym;
 		 buffer: ARRAY 32 OF CHAR;
-		keycount: LONGINT;
+		keycount: SIGNED32;
 		 cm: X11.ClientMessageEvent;
 		 ke: X11.KeyEvent;
 		 be: X11.ButtonEvent;
 		 cn : X11.ConfigureEvent;
 		 ee : X11.ExposeEvent;
 		 datal: X11.Data40;
-		 atomName: POINTER {UNSAFE} TO ARRAY OF CHAR;
+		 atomName: POINTER {UNSAFE} TO ARRAY 128 OF CHAR;
 	BEGIN
 	 WHILE X11.Pending(display) > 0 DO
 
@@ -778,7 +778,7 @@ END SaveImage;
 
 (* windows main loop *)
 PROCEDURE MainLoop;
-VAR	frames : LONGINT;
+VAR	frames : SIGNED32;
 BEGIN
 frames := 0;
 Kernel.SetTimer(timer, 5000);
@@ -807,7 +807,7 @@ PROCEDURE Open*;
 BEGIN
 	context := StdIO.env;
 
-	width := 800; height := 600; (* window size*)
+	width := 300; height := 300; (* window size*)
 	fullscreen := FALSE;
 (*	fullwindow := TRUE; *)
 	windecorations := TRUE;

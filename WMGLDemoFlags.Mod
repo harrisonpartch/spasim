@@ -24,11 +24,11 @@ TYPE
  		yrot: GL.Float;                    (* Rotate v about y *)
  		zrot: GL.Float;                    (* Rotate v about z *)
 		texture, texture2:  GL.Uint;  (*  handles for texture *)
-		wigglecount, wigglecount2: LONGINT;        (* Rychlost vln*)
+		wigglecount, wigglecount2: SIGNED32;        (* Rychlost vln*)
 		hold: GL.Float;                    (* Pomocnk zajilynulosti pohybu *)
 		points, points2:  Points;  (* flag vertice points *)
 
-	PROCEDURE &New(w, h: LONGINT);
+	PROCEDURE &New(w, h: SIGNED32);
 	BEGIN
 		Init(w, h, FALSE); (* use alpha, for 32bpp img *)
 		WM.DefaultAddWindow(SELF);
@@ -98,7 +98,7 @@ TYPE
 	END Reshape;
 
 	PROCEDURE initGL();
-	VAR x, y: LONGINT;
+	VAR x, y: SIGNED32;
 	BEGIN
 		MakeCurrent();
 
@@ -152,7 +152,7 @@ TYPE
 
 	PROCEDURE displayEurope;
 	VAR
-		x, y: LONGINT;
+		x, y: SIGNED32;
 		float_x, float_y, float_xb, float_yb: GL.Float;
 	 BEGIN
 		GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT);  (* Smazovku a hloubkover *)
@@ -200,7 +200,7 @@ TYPE
 
 	PROCEDURE displayTurkiye();
 	VAR
-		x, y: LONGINT;
+		x, y: SIGNED32;
 		float_x, float_y, float_xb, float_yb: GL.Float;
 	 BEGIN
 
@@ -267,7 +267,7 @@ BEGIN  { ACTIVE }
 END GLWindow;
 
 VAR
-	nofWindows : LONGINT;
+	nofWindows : SIGNED32;
 
 PROCEDURE Open*;
 VAR

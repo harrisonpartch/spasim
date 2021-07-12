@@ -15,13 +15,13 @@ TYPE
 	VAR
 		 timer: Kernel.MilliTimer;
 		alive,  animated: BOOLEAN;
-		angle : REAL;
+		angle : FLOAT32;
 
 		plane: GL.Uint; (* radar plane list *)
 		circle: GL.Uint;
-		drawMode: LONGINT;
+		drawMode: SIGNED32;
 
-		PROCEDURE &New(w, h: LONGINT);
+		PROCEDURE &New(w, h: SIGNED32);
 		BEGIN
 			Init(w, h, FALSE); (* use alpha, for 32bpp img *)
 			WM.DefaultAddWindow(SELF);
@@ -76,8 +76,8 @@ TYPE
 			Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 		END UpdateImage;
 
-	PROCEDURE DrawMode(dm: LONGINT);
-	VAR drawMode: LONGINT;
+	PROCEDURE DrawMode(dm: SIGNED32);
+	VAR drawMode: SIGNED32;
 	BEGIN
 		drawMode := dm;
 		MakeCurrent();
@@ -100,10 +100,10 @@ TYPE
 	END DrawMode;
 
 	PROCEDURE initGL;
-	VAR i, n: LONGINT;
+	VAR i, n: SIGNED32;
 		  da,  a, b: GL.Float;
 		  ga, gb: GL.Float;
-		  twopi: REAL;
+		  twopi: FLOAT32;
 
 	BEGIN
 		n := 120;
@@ -192,7 +192,7 @@ BEGIN {ACTIVE}
 END GLWindow;
 
 VAR
-	nofWindows : LONGINT;
+	nofWindows : SIGNED32;
 
 PROCEDURE Open*;
 VAR

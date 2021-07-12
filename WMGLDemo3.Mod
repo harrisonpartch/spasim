@@ -18,18 +18,18 @@ TYPE
 		timer: Kernel.MilliTimer;
 		alive, animated: BOOLEAN;
 		font: WMGraphics.Font;
-		frames: LONGINT;
+		frames: SIGNED32;
 		fpsstr: ARRAY 30 OF CHAR;
 
-		ztrans: REAL;
+		ztrans: FLOAT32;
 
 		(* for gears *)
 		light: BOOLEAN;
-		drawMode: LONGINT;
+		drawMode: SIGNED32;
 	  	gear1, gear2, gear3: GL.Uint;
 	  	rotx, roty, rotz, angle, angley: GL.Float;
 
-		PROCEDURE &New(w, h: LONGINT);
+		PROCEDURE &New(w, h: SIGNED32);
 		BEGIN
 			Init(w, h, FALSE); (* use alpha, for 32bpp img *)
 			WM.DefaultAddWindow(SELF);
@@ -112,8 +112,8 @@ TYPE
 			Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 		END UpdateImage;
 
-	PROCEDURE DrawMode(dm: LONGINT);
-	VAR drawMode: LONGINT;
+	PROCEDURE DrawMode(dm: SIGNED32);
+	VAR drawMode: SIGNED32;
 	BEGIN
 		drawMode := dm;
 		MakeCurrent();
@@ -137,9 +137,9 @@ TYPE
 
 	END DrawMode;
 
-	PROCEDURE  MakeGear (innerRadius, outerRadius, width: GL.Float; teeth: LONGINT;  toothDepth: GL.Float);
+	PROCEDURE  MakeGear (innerRadius, outerRadius, width: GL.Float; teeth: SIGNED32;  toothDepth: GL.Float);
 	VAR  r0, r1, r2 , angle, da, u, v, len: GL.Float;
-		  i: LONGINT;
+		  i: SIGNED32;
 	BEGIN
 
 		r0 := innerRadius;
@@ -367,7 +367,7 @@ BEGIN  {ACTIVE}
 END GLWindow;
 
 VAR
-	nofWindows : LONGINT;
+	nofWindows : SIGNED32;
 
 PROCEDURE Open*;
 VAR

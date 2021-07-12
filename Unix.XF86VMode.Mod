@@ -9,8 +9,8 @@ VAR
 	lib: ADDRESS;
 
 TYPE
- 
-	PChar = POINTER {UNSAFE} TO ARRAY MAX(SIZE)OF CHAR;
+
+	PChar = POINTER {UNSAFE} TO ARRAY MAX(SIZE) OF CHAR;
 	cuchar = CHAR; (* int8 *)
 	Pcushort = POINTER {UNSAFE} TO ARRAY MAX(SIZE) OF SIGNED16;
 
@@ -88,7 +88,7 @@ TYPE
 	END;
 
 
-	PModeInfo* = POINTER {UNSAFE} TO ARRAY MAX(SIZE)OF ModeInfo;
+	PModeInfo* = POINTER {UNSAFE} TO ARRAY MAX(SIZE) OF ModeInfo;
 	ModeInfo* = POINTER {UNSAFE} TO RECORD
 		dotclock * : SIGNED32; (* Pixel clock *)
 		hdisplay * : SIGNED16; (* Number of display pixels horizontally *)
@@ -142,29 +142,29 @@ TYPE
 
 VAR
 
-	QueryVersion- : PROCEDURE {PlatformCC} (dpy: DisplayPtr; VAR majorVersion : SIGNED32; VAR minorVersion : SIGNED32) : Bool;
-	QueryExtension- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; VAR eventBaseReturn : SIGNED32; VAR errorBaseReturn : SIGNED32 ) : Bool;
-	SetClientVersion- : PROCEDURE {PlatformCC} (dpy : DisplayPtr) : Bool;
-	GetModeLine- : PROCEDURE {PlatformCC} ( dpy : DisplayPtr; screen : SIGNED32; VAR dotclockReturn : SIGNED32; VAR modeline :  ModeLine) : Bool;
-	GetAllModeLines- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32;  VAR modecountReturn : SIGNED32; VAR modelinesr : PModeInfo ) : Bool;
-	AddModeLine- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32;  new_modeline : ModeInfo;  VAR after_modeline : ModeInfo ) : Bool;
-	DeleteModeLine- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; modeline : ModeInfo ) : Bool;
-	ModModeLine- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; modeline : ModeLine) : Bool;
-	ValidateModeLine- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; modeline : ModeInfo ) : SIGNED32 (* Api.Status *);
-	SwitchMode- : PROCEDURE {PlatformCC} ( dpy : DisplayPtr; screen : SIGNED32; zoom : SIGNED32 ) : Bool;
-	SwitchToMode- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; modeline : ModeInfo ) : Bool;
-	LockModeSwitch- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; lock : SIGNED32) : Bool;
-	GetMonitor- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32;  monitor : Monitor) : Bool;
-	GetViewPort- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; VAR xreturn : SIGNED32; VAR yreturn : SIGNED32 ) : Bool;
-	SetViewPort- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; x : SIGNED32; y : SIGNED32 ) : Bool;
-	GetDotClocks- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; VAR flagsReturn : SET; VAR numberOffClocksReturn : SIGNED32;  VAR maxDotClockReturn : SIGNED32;
+	QueryVersion- : PROCEDURE {C} (dpy: DisplayPtr; VAR majorVersion : SIGNED32; VAR minorVersion : SIGNED32) : Bool;
+	QueryExtension- : PROCEDURE {C} (dpy : DisplayPtr; VAR eventBaseReturn : SIGNED32; VAR errorBaseReturn : SIGNED32 ) : Bool;
+	SetClientVersion- : PROCEDURE {C} (dpy : DisplayPtr) : Bool;
+	GetModeLine- : PROCEDURE {C} ( dpy : DisplayPtr; screen : SIGNED32; VAR dotclockReturn : SIGNED32; VAR modeline :  ModeLine) : Bool;
+	GetAllModeLines- : PROCEDURE {C} (dpy : DisplayPtr; screen : SIGNED32;  VAR modecountReturn : SIGNED32; VAR modelinesr : PModeInfo ) : Bool;
+	AddModeLine- : PROCEDURE {C} (dpy : DisplayPtr; screen : SIGNED32;  new_modeline : ModeInfo;  VAR after_modeline : ModeInfo ) : Bool;
+	DeleteModeLine- : PROCEDURE {C} (dpy : DisplayPtr; screen : SIGNED32; modeline : ModeInfo ) : Bool;
+	ModModeLine- : PROCEDURE {C} (dpy : DisplayPtr; screen : SIGNED32; modeline : ModeLine) : Bool;
+	ValidateModeLine- : PROCEDURE {C} (dpy : DisplayPtr; screen : SIGNED32; modeline : ModeInfo ) : SIGNED32 (* Api.Status *);
+	SwitchMode- : PROCEDURE {C} ( dpy : DisplayPtr; screen : SIGNED32; zoom : SIGNED32 ) : Bool;
+	SwitchToMode- : PROCEDURE {C} (dpy : DisplayPtr; screen : SIGNED32; modeline : ModeInfo ) : Bool;
+	LockModeSwitch- : PROCEDURE {C} (dpy : DisplayPtr; screen : SIGNED32; lock : SIGNED32) : Bool;
+	GetMonitor- : PROCEDURE {C} (dpy : DisplayPtr; screen : SIGNED32;  monitor : Monitor) : Bool;
+	GetViewPort- : PROCEDURE {C} (dpy : DisplayPtr; screen : SIGNED32; VAR xreturn : SIGNED32; VAR yreturn : SIGNED32 ) : Bool;
+	SetViewPort- : PROCEDURE {C} (dpy : DisplayPtr; screen : SIGNED32; x : SIGNED32; y : SIGNED32 ) : Bool;
+	GetDotClocks- : PROCEDURE {C} (dpy : DisplayPtr; screen : SIGNED32; VAR flagsReturn : SET; VAR numberOffClocksReturn : SIGNED32;  VAR maxDotClockReturn : SIGNED32;
 	    VAR clocksReturn : Pcushort ) : Bool;
-	GetGamma- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; VAR gamma : Gamma ) : Bool;
-	SetGamma- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; VAR gamma : Gamma ) : Bool;
-	SetGammaRamp-: PROCEDURE {PlatformCC} ( dpy : DisplayPtr; screen : SIGNED32; asize : SIGNED32; redarray : Pcushort; greenarray : Pcushort; bluearray : Pcushort ) : Bool;
-	GetGammaRamp- : PROCEDURE {PlatformCC} ( dpy : DisplayPtr; screen : SIGNED32; asize : SIGNED32; redarray : Pcushort;  greenarray : Pcushort; bluearray : Pcushort ) : Bool;
-	GetGammaRampSize- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; VAR asize : SIGNED32 ) : Bool;
-	GetPermissions- : PROCEDURE {PlatformCC} (dpy : DisplayPtr; screen : SIGNED32; VAR permissions : SIGNED32 ) : Bool;
+	GetGamma- : PROCEDURE {C} (dpy : DisplayPtr; screen : SIGNED32; VAR gamma : Gamma ) : Bool;
+	SetGamma- : PROCEDURE {C} (dpy : DisplayPtr; screen : SIGNED32; VAR gamma : Gamma ) : Bool;
+	SetGammaRamp-: PROCEDURE {C} ( dpy : DisplayPtr; screen : SIGNED32; asize : SIGNED32; redarray : Pcushort; greenarray : Pcushort; bluearray : Pcushort ) : Bool;
+	GetGammaRamp- : PROCEDURE {C} ( dpy : DisplayPtr; screen : SIGNED32; asize : SIGNED32; redarray : Pcushort;  greenarray : Pcushort; bluearray : Pcushort ) : Bool;
+	GetGammaRampSize- : PROCEDURE {C} (dpy : DisplayPtr; screen : SIGNED32; VAR asize : SIGNED32 ) : Bool;
+	GetPermissions- : PROCEDURE {C} (dpy : DisplayPtr; screen : SIGNED32; VAR permissions : SIGNED32 ) : Bool;
 
 (* *********** Wrapper macros ************* *)
 
@@ -211,10 +211,10 @@ END LoadX11Functions;
 
 PROCEDURE OnClose;
 BEGIN
- IF lib # 0 THEN
-       Unix.Dlclose(lib);
-       KernelLog.String(libname); KernelLog.String(' unloaded.'); KernelLog.Ln;
-END;
+	IF lib # 0 THEN
+		Unix.Dlclose(lib);
+		KernelLog.String(libname); KernelLog.String(' unloaded.'); KernelLog.Ln;
+	END;
 END OnClose;
 
 BEGIN

@@ -16,24 +16,24 @@ TYPE
 	KillerMsg = OBJECT
 	END KillerMsg;
 
-	Vector = ARRAY [*] OF REAL;
+	Vector = ARRAY [*] OF FLOAT32;
 
 	GLWindow =  OBJECT(WMGL.Window)
 	VAR
 		 timer: Kernel.MilliTimer;
 
 		alive, animated: BOOLEAN;
-		eyeposz: LONGREAL;
-		drawMode:LONGINT; (* fill, lines, points *)
+		eyeposz: FLOAT64;
+		drawMode:SIGNED32; (* fill, lines, points *)
 
-		spinXL, spinYL, spinXR, spinYR : REAL;
+		spinXL, spinYL, spinXR, spinYR : FLOAT32;
 		testTextureID, dynamicTextureID: GL.Uint;
 		frameBuffer, depthRenderBuffer: GL.Uint;
 
 		cubeVertices: Vector;
 		(*cubeVertices: VertexArray;*)
 
-		PROCEDURE &New(w, h: LONGINT);
+		PROCEDURE &New(w, h: SIGNED32);
 		BEGIN
 			Init(w, h, FALSE); (* use alpha, for 32bpp img *)
 			WM.DefaultAddWindow(SELF);
@@ -366,7 +366,7 @@ BEGIN  { ACTIVE }
 END GLWindow;
 
 VAR
-	nofWindows : LONGINT;
+	nofWindows : SIGNED32;
 
 
 PROCEDURE FramebufferStatusToString(status: GL.Enum): Str256;

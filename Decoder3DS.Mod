@@ -116,25 +116,25 @@ TYPE
 (* Here is our structure for our 3DS indicies (since .3DS stores 4 unsigned shorts) *)
 TYPE
 	Indices = RECORD
-		a, b, c, bVisible: INTEGER; (* This will hold point1, 2, and 3 index's into the vertex array plus a visible flag*)
+		a, b, c, bVisible: SIGNED16; (* This will hold point1, 2, and 3 index's into the vertex array plus a visible flag*)
 	END;
 *)
 
 (* This holds the chunk info *)
 TYPE Chunk = RECORD
-		ID: INTEGER;	(* The chunk's ID *)
-		length: LONGINT;				(* The length of the chunk *)
+		ID: SIGNED16;	(* The chunk's ID *)
+		length: SIGNED32;				(* The length of the chunk *)
 		bytesRead: SIZE;			(* The amount of bytes read within that chunk *)
 END;
 
 (* will be used to store the vertices of our model. *)
 TYPE Vector3f* = RECORD
-		x*, y*, z*: REAL;
+		x*, y*, z*: FLOAT32;
 	END;
 
 (*  will be used to store the UV coordinates.*)
 	Vector2f* = RECORD
-		x*, y*: REAL;
+		x*, y*: FLOAT32;
 	END;
 
 (*  Face structure is used for indexing into the vertex
@@ -142,8 +142,8 @@ TYPE Vector3f* = RECORD
  from our vertex array go to which face, along with the correct texture coordinates. *)
 TYPE
 	Face* = RECORD
-		a*, b*, c* : INTEGER;		(* indicies for the verts that make up this triangle*)
-		tia*, tib*, tic* : INTEGER;		(* indicies for the tex coords to texture this face *)
+		a*, b*, c* : SIGNED16;		(* indicies for the verts that make up this triangle*)
+		tia*, tib*, tic* : SIGNED16;		(* indicies for the tex coords to texture this face *)
 	END;
 
 (* This holds the information for a material.  It may be a texture map of a color.
@@ -154,11 +154,11 @@ TYPE MaterialInfo* = OBJECT
 		name*: ARRAY 255 OF CHAR;		(* The texture name *)
 		texFilename*: ARRAY 255 OF CHAR;	(* The texture file name (If this is set it's a texture map) *)
 		color*: ARRAY 3 OF CHAR;			(* The color of the object (R, G, B) *)
-		textureId*: LONGINT;		(* the texture ID *)
-		uTile*: REAL;				(* u tiling of texture  (Currently not used) *)
-		vTile*: REAL;				(* v tiling of texture	(Currently not used) *)
-		uOffset*: REAL;			(* u offset of texture	(Currently not used)*)
-		vOffset*: REAL;			(* v offset of texture	(Currently not used) *)
+		textureId*: SIGNED32;		(* the texture ID *)
+		uTile*: FLOAT32;				(* u tiling of texture  (Currently not used) *)
+		vTile*: FLOAT32;				(* v tiling of texture	(Currently not used) *)
+		uOffset*: FLOAT32;			(* u offset of texture	(Currently not used)*)
+		vOffset*: FLOAT32;			(* v offset of texture	(Currently not used) *)
 	END MaterialInfo ;
 
 (* This holds all the information for our model/scene.
@@ -168,9 +168,9 @@ TYPE MaterialInfo* = OBJECT
 TYPE  Object3D* = OBJECT
 	VAR
 		name*: ARRAY 255 OF CHAR;				(* The name of the object *)
-		numVerts*: INTEGER;			(* The number of verts in the model *)
-		numFaces*: INTEGER;			(* The number of faces in the model *)
-		numTexVerts*: INTEGER;		(* The number of texture coordinates *)
+		numVerts*: SIGNED16;			(* The number of verts in the model *)
+		numFaces*: SIGNED16;			(* The number of faces in the model *)
+		numTexVerts*: SIGNED16;		(* The number of texture coordinates *)
 
 		materialID*: SIZE;			(* The texture ID to use, which is the index into our texture array *)
 		hasTexture*: BOOLEAN;		(* This is TRUE if there is a texture map for this object *)
@@ -182,7 +182,7 @@ TYPE  Object3D* = OBJECT
 
 		(** render the object *)
 		PROCEDURE Draw*();
-		VAR i, j: LONGINT;
+		VAR i, j: SIGNED32;
 		BEGIN
 
 		END Draw;
@@ -194,8 +194,8 @@ TYPE  Object3D* = OBJECT
 TYPE
 	Model3D* = OBJECT
 	VAR
-	 	numObjects*: LONGINT;			(* The number of objects in the model *)
-		numMaterials*: LONGINT;			(* The number of materials for the model *)
+	 	numObjects*: SIGNED32;			(* The number of objects in the model *)
+		numMaterials*: SIGNED32;			(* The number of materials for the model *)
 		materials*: List;	(* The list of material information (Textures and colors) *)
 		objects*: List;			(* The object list for our model*)
 
@@ -248,7 +248,7 @@ END ReadColorChunk;
 
 (**	This function reads in a string of characters *)
 PROCEDURE GetString(VAR pBuffer: ARRAY OF CHAR): SIZE;
-VAR index: LONGINT;
+VAR index: SIGNED32;
 	ch: CHAR;
 BEGIN
 	index := 0;
@@ -334,8 +334,8 @@ END ProcessNextMaterialChunk;
 
 (** 	This function reads in the indices for the vertex array *)
 PROCEDURE ReadVertexIndices(object: Object3D; VAR prevChunk: Chunk );
-VAR index: INTEGER; (* This is used to read in the current face index *)
-	i, j: LONGINT;
+VAR index: SIGNED16; (* This is used to read in the current face index *)
+	i, j: SIGNED32;
 BEGIN
 
 	(* In order to read in the vertex indices for the object, we need to first
@@ -366,7 +366,7 @@ END ReadVertexIndices;
 
 (**	This function reads in the UV coordinates for the object *)
 PROCEDURE ReadUVCoordinates( object: Object3D;  VAR prevChunk: Chunk );
-VAR i: LONGINT;
+VAR i: SIGNED32;
 BEGIN
 	(* In order to read in the UV indices for the object, we need to first
 	 read in the amount there are, then read them in. *)
@@ -389,8 +389,8 @@ END ReadUVCoordinates;
 
 (** This function reads in the vertices for the object*)
 PROCEDURE ReadVertices(object: Object3D; VAR prevChunk: Chunk);
-VAR i: LONGINT;
-	tempY: REAL;
+VAR i: SIGNED32;
+	tempY: FLOAT32;
 BEGIN
 	(* Like most chunks, before we read in the actual vertices, we need
 	 to find out how many there are to read in.  Once we have that number
@@ -492,8 +492,8 @@ BEGIN
 END ReadObjectMaterial;
 
 PROCEDURE ReadCameraChunk(VAR prevChunk: Chunk);
-VAR cam_eye, cam_focus : ARRAY 3 OF REAL;
-	rotation, lens: REAL;
+VAR cam_eye, cam_focus : ARRAY 3 OF FLOAT32;
+	rotation, lens: FLOAT32;
 BEGIN
 		Files.ReadReal(rider, cam_eye[0]);
 		Files.ReadReal(rider, cam_eye[1]);
@@ -593,7 +593,7 @@ PROCEDURE ProcessNexChunk(VAR model: Model3D;  prevChunk: Chunk);
 VAR
 	newObject: Object3D; (* Object3D;  This is used to add to our object list *)
 	newTexture: MaterialInfo; (* MaterialInfo, This is used to add to our material list *)
-	version: LONGINT; (* This will hold the file version *)
+	version: SIGNED32; (* This will hold the file version *)
 	cnt: SIZE;
 
 BEGIN
@@ -746,7 +746,7 @@ BEGIN
 END AddVector;
 
 (** This divides a vector by a single number (scalar) and returns the result*)
-PROCEDURE DivideVectorByScaler(v1: Vector3f;  scaler: REAL): Vector3f;
+PROCEDURE DivideVectorByScaler(v1: Vector3f;  scaler: FLOAT32): Vector3f;
 VAR
 	 res: Vector3f;
 BEGIN
@@ -770,14 +770,14 @@ BEGIN
 END Cross;
 
 (** This computes the magnitude of a normal.   (magnitude = sqrt(x^2 + y^2 + z^2) *)
-PROCEDURE  Mag(normal: Vector3f): REAL;
+PROCEDURE  Mag(normal: Vector3f): FLOAT32;
 BEGIN
 	RETURN Math.sqrt(normal.x*normal.x + normal.y*normal.y + normal.z*normal.z);
 END Mag;
 
 (** This returns the normal of a vector *)
 PROCEDURE Normalize( vnormal: Vector3f): Vector3f;
-VAR mag: REAL;
+VAR mag: FLOAT32;
 BEGIN
 	mag := Mag(vnormal);	(* Get the magnitude*)
 
@@ -792,11 +792,11 @@ PROCEDURE ComputeNormals(VAR model: Model3D);
 VAR
  vec1, vec2, vnorm: Vector3f;
  vpoly: ARRAY 3 OF Vector3f;;
- i, j, index: LONGINT;
+ i, j, index: SIGNED32;
  object: Object3D;
  normals, tmpNormals : POINTER TO ARRAY OF Vector3f;
  vsum, vzero: Vector3f;
- shared: LONGINT;
+ shared: SIGNED32;
 BEGIN
 	(* If there are no objects, we can skip this part *)
 	IF model.numObjects <= 0 THEN RETURN END;
@@ -860,7 +860,7 @@ BEGIN
 			END;
 
 			(* Get the normal by dividing the sum by the shared.  We negate the shared so it has the normals pointing out. *)
-			object.normals[i] := DivideVectorByScaler(vsum, REAL(-shared));
+			object.normals[i] := DivideVectorByScaler(vsum, FLOAT32(-shared));
 
 			(* Normalize the normal for the final vertex normal *)
 			object.normals[i] := Normalize(object.normals[i]);
@@ -922,10 +922,10 @@ END Import3DS;
 
 
 (**  This function loads an image file and return the OpenGL reference ID to use that texture *)
-PROCEDURE LoadImage* (CONST filename: ARRAY OF CHAR): LONGINT;
+PROCEDURE LoadImage* (CONST filename: ARRAY OF CHAR): GL.Uint;
 VAR img0, img: Raster.Image;
-	res: LONGINT;
-	textureNumber: LONGINT;
+	res: SIGNED32;
+	textureNumber: GL.Uint;
 BEGIN
 
 	img0:= WMGraphics.LoadImage(filename, FALSE); (* loaded image format is BGRA8888 - > GL.GL_BGRA *)

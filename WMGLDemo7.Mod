@@ -14,14 +14,14 @@ TYPE
 	VAR
 		timer: Kernel.MilliTimer;
 		alive,  animated, dead: BOOLEAN;
-		xrot : REAL;
+		xrot : FLOAT32;
  		quad: GLU.Quadric;
-		drawMode: LONGINT;
+		drawMode: SIGNED32;
 		font: WMGraphics.Font;
-		frames: LONGINT;
+		frames: SIGNED32;
 		fpsstr: ARRAY 30 OF CHAR;
 
-	PROCEDURE &New(w, h: LONGINT);
+	PROCEDURE &New(w, h: SIGNED32);
 	BEGIN
 		Init(w, h, FALSE); (* use alpha, for 32bpp img *)
 		WM.DefaultAddWindow(SELF);
@@ -91,8 +91,8 @@ TYPE
 		Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
 	END UpdateImage;
 
-	PROCEDURE DrawMode(dm: LONGINT);
-	VAR drawMode: LONGINT;
+	PROCEDURE DrawMode(dm: SIGNED32);
+	VAR drawMode: SIGNED32;
 	BEGIN
 		drawMode := dm;
 		MakeCurrent();
@@ -267,7 +267,7 @@ BEGIN  {ACTIVE}
 END GLWindow;
 
 VAR
-	nofWindows : LONGINT;
+	nofWindows : SIGNED32;
 
 PROCEDURE Open*;
 VAR

@@ -8,14 +8,14 @@ TYPE
 	MyGLControl = OBJECT(OGW.Window)
 
 	(** constructor for this window *)
-	PROCEDURE &New(w, h: LONGINT );
+	PROCEDURE &New(w, h: SIGNED32 );
 	BEGIN
 		Init(w,h,300,200, FALSE);  				(* initilialize the inherited window first *)
 		SetTitle("OGLDemo"); 	(* set title of this window *)
 	END New;
 
 	(* process keyboard events *)
-	PROCEDURE KeyEvent* (ucs : LONGINT; flags : SET; keysym : LONGINT);
+	PROCEDURE KeyEvent* (ucs : SIGNED32; flags : SET; keysym : SIGNED32);
 	BEGIN
 		CASE CHR(ucs) OF
 		"q": Close;
@@ -38,7 +38,7 @@ TYPE
 	END Display;
 
 	(* reshape OpenGL window *)
-	PROCEDURE Reshape(w, h: LONGINT);
+	PROCEDURE Reshape(w, h: SIGNED32);
 	BEGIN
 		GL.Viewport(0, 0, w, h) ;
 		GL.ClearColor(0.8, 0.1 ,0.8, 1.0) ;

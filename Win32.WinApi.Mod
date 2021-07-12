@@ -617,8 +617,8 @@ CONST
 	HWND* = HANDLE;
 	HBITMAP* = HANDLE;
 	HFONT* = HANDLE;
-(*	WORD* = INTEGER;*)
-	DWORD* = LONGINT;
+(*	SIGNED16* = SIGNED16;*)
+	DWORD* = SIGNED32;
 
 	RGBQUAD* = RECORD
 		rgbBlur*, rgbGreen*, rgbRed*, rgbReserved*: CHAR;
@@ -633,34 +633,34 @@ CONST
 	PtrPALETTEENTRY* = POINTER TO PALETTEENTRY;
 
 	LOGPALETTE* = RECORD
-		palVersion*: INTEGER;
-		palNumEntries*: INTEGER;
+		palVersion*: SIGNED16;
+		palNumEntries*: SIGNED16;
 		palPalEntry*: ARRAY 1 OF PALETTEENTRY;
 	END;
 	PtrLOGPALETTE* = POINTER TO LOGPALETTE;
 
 	BITMAP* = RECORD
-		bmType*: LONGINT;
-		bmWidth*: LONGINT;
-		bmHeight*: LONGINT;
-		bmWidthBytes*: LONGINT;
-		bmPlanes*: INTEGER;
-		bmBitsPixel*: INTEGER;
-		bmBits*: LONGINT;
+		bmType*: SIGNED32;
+		bmWidth*: SIGNED32;
+		bmHeight*: SIGNED32;
+		bmWidthBytes*: SIGNED32;
+		bmPlanes*: SIGNED16;
+		bmBitsPixel*: SIGNED16;
+		bmBits*: SIGNED32;
 	END;
 
 	BITMAPINFOHEADER* = RECORD
-		biSize*: LONGINT;
-		biWidth*: LONGINT;
-		biHeight*: LONGINT;
-		biPlanes*: INTEGER;
-		biBitCount*: INTEGER;
-		biCompression*: LONGINT;
-		biSizeImage*: LONGINT;
-		biXPelsPerMeter*: LONGINT;
-		biYPelsPerMeter*: LONGINT;
-		biClrUsed*: LONGINT;
-		biClrImportant*: LONGINT;
+		biSize*: SIGNED32;
+		biWidth*: SIGNED32;
+		biHeight*: SIGNED32;
+		biPlanes*: SIGNED16;
+		biBitCount*: SIGNED16;
+		biCompression*: SIGNED32;
+		biSizeImage*: SIGNED32;
+		biXPelsPerMeter*: SIGNED32;
+		biYPelsPerMeter*: SIGNED32;
+		biClrUsed*: SIGNED32;
+		biClrImportant*: SIGNED32;
 	END;
 
 	BITMAPINFO* = RECORD
@@ -670,9 +670,9 @@ CONST
 
 
 	PIXELFORMATDESCRIPTOR* = RECORD
-		nSize*: INTEGER;
-		nVersion*: INTEGER;
-		dwFlags*:WORDSET ;
+		nSize*: SIGNED16;
+		nVersion*: SIGNED16;
+		dwFlags*:INTEGERSET ;
 		iPixelType*: CHAR;
 		cColorBits*: CHAR;
 		cRedBits*: CHAR;
@@ -693,55 +693,55 @@ CONST
 		cAuxBuffers*: CHAR;
 		iLayerType*: CHAR;
 		bReserved*: CHAR;
-		dwLayerMask*: WORDSET;
-		dwVisibleMask*: WORDSET;
-		dwDamageMask*: WORDSET;
+		dwLayerMask*: INTEGERSET;
+		dwVisibleMask*: INTEGERSET;
+		dwDamageMask*: INTEGERSET;
 	END;
 
 	CREATESTRUCTA* = RECORD
-		lpCreateParams*: LONGINT;
+		lpCreateParams*: SIGNED32;
 		hInstance*: HINSTANCE;
 		hMenu*: HMENU;
 		hwndParent*: HWND;
-		cy*: LONGINT;
-		cx*: LONGINT;
-		y*: LONGINT;
-		x*: LONGINT;
+		cy*: SIGNED32;
+		cx*: SIGNED32;
+		y*: SIGNED32;
+		x*: SIGNED32;
 		style*: DWORD;
-		lpszName*: LONGINT;
-		lpszClass*:LONGINT;
-		dwExStyle*: WORDSET;
+		lpszName*: SIGNED32;
+		lpszClass*:SIGNED32;
+		dwExStyle*: INTEGERSET;
 	END;
 
 	CREATESTRUCTW* = RECORD
-		lpCreateParams*: LONGINT;
+		lpCreateParams*: SIGNED32;
 		hInstance*: HINSTANCE;
 		hMenu*: HMENU;
 		hwndParent*: HWND;
-		cy*: LONGINT;
-		cx*: LONGINT;
-		y*: LONGINT;
-		x*: LONGINT;
+		cy*: SIGNED32;
+		cx*: SIGNED32;
+		y*: SIGNED32;
+		x*: SIGNED32;
 		style*: DWORD;
-		lpszName*: LONGINT;
-		lpszClass*: LONGINT;
-		dwExStyle*: WORDSET;
+		lpszName*: SIGNED32;
+		lpszClass*: SIGNED32;
+		dwExStyle*: INTEGERSET;
 	END;
 	CREATESTRUCT* = CREATESTRUCTA;
 
 	PGlyphMetricsFloat* = POINTER TO GlyphMetricsFloat;
 	GlyphMetricsFloat* = RECORD
-		gmfBlackBoxX*: REAL;
-		gmfBlackBoxY*: REAL;
+		gmfBlackBoxX*: FLOAT32;
+		gmfBlackBoxY*: FLOAT32;
 		gmfptGlyphOrigin*: User32.PointF;
-		gmfCellIncX*: REAL;
-		gmfCellIncY*: REAL;
+		gmfCellIncX*: FLOAT32;
+		gmfCellIncY*: FLOAT32;
 	END;
 
 	LayerPlaneDescriptor* = RECORD
-		nSize*: INTEGER;
-		nVersion*: INTEGER;
-		dwFlags*: WORDSET;
+		nSize*: SIGNED16;
+		nVersion*: SIGNED16;
+		dwFlags*: INTEGERSET;
 		iPixelType*: CHAR;
 		cColorBits*: CHAR;
 		cRedBits*: CHAR;
@@ -762,83 +762,83 @@ CONST
 		cAuxBuffers*: CHAR;
 		iLayerType*: CHAR;
 		bReserved*: CHAR;
-		crTransparent*: LONGINT;
+		crTransparent*: SIGNED32;
 	END;
 
 (*! Screen DeviceMode *)
 	DEVMODEA* = RECORD
 		dmDeviceName*: ARRAY  32 OF CHAR;
-		dmSpecVersion*: INTEGER;
-		dmDriverVersion*: INTEGER;
-		dmSize*: INTEGER;
-		dmDriverExtra*: INTEGER;
-		dmFields*: SET;
-		dmOrientation*: INTEGER;
-		dmPaperSize*: INTEGER;
-		dmPaperLength*: INTEGER;
-		dmPaperWidth*: INTEGER;
-		dmScale*: INTEGER;
-		dmCopies*: INTEGER;
-		dmDefaultSource*: INTEGER;
-		dmPrintQuality*: INTEGER;
-		dmColor*: INTEGER;
-		dmDuplex*: INTEGER;
-		dmYResolution*: INTEGER;
-		dmTTOption*: INTEGER;
-		dmCollate*: INTEGER;
+		dmSpecVersion*: SIGNED16;
+		dmDriverVersion*: SIGNED16;
+		dmSize*: SIGNED16;
+		dmDriverExtra*: SIGNED16;
+		dmFields*: SET32;
+		dmOrientation*: SIGNED16;
+		dmPaperSize*: SIGNED16;
+		dmPaperLength*: SIGNED16;
+		dmPaperWidth*: SIGNED16;
+		dmScale*: SIGNED16;
+		dmCopies*: SIGNED16;
+		dmDefaultSource*: SIGNED16;
+		dmPrintQuality*: SIGNED16;
+		dmColor*: SIGNED16;
+		dmDuplex*: SIGNED16;
+		dmYResolution*: SIGNED16;
+		dmTTOption*: SIGNED16;
+		dmCollate*: SIGNED16;
 		dmFormName*: ARRAY 32 OF CHAR;
-		dmLogPixels*: INTEGER;
-		dmBitsPerPel*: LONGINT;
-		dmPelsWidth*: LONGINT;
-		dmPelsHeight*: LONGINT;
-		dmDisplayFlags*: SET;
-		dmDisplayFrequency*: LONGINT;
-		dmICMMethod*: LONGINT;
-		dmICMIntent*: LONGINT;
-		dmMediaType*: LONGINT;
-		dmDitherType*: LONGINT;
-		dmICCManufacturer*: LONGINT;
-		dmICCModel*: LONGINT;
-		dmPanningWidth*: LONGINT;
-		dmPanningHeight*: LONGINT;
+		dmLogPixels*: SIGNED16;
+		dmBitsPerPel*: SIGNED32;
+		dmPelsWidth*: SIGNED32;
+		dmPelsHeight*: SIGNED32;
+		dmDisplayFlags*: SET32;
+		dmDisplayFrequency*: SIGNED32;
+		dmICMMethod*: SIGNED32;
+		dmICMIntent*: SIGNED32;
+		dmMediaType*: SIGNED32;
+		dmDitherType*: SIGNED32;
+		dmICCManufacturer*: SIGNED32;
+		dmICCModel*: SIGNED32;
+		dmPanningWidth*: SIGNED32;
+		dmPanningHeight*: SIGNED32;
 	END;
 	PtrDEVMODEA* = POINTER TO DEVMODEA;
 
 	DEVMODEW* = RECORD
-		dmDeviceName*: ARRAY 32 OF CHAR16;
-		dmSpecVersion*: INTEGER;
-		dmDriverVersion*: INTEGER;
-		dmSize*: INTEGER;
-		dmDriverExtra*: INTEGER;
-		dmFields*: SET;
-		dmOrientation*: INTEGER;
-		dmPaperSize*: INTEGER;
-		dmPaperLength*: INTEGER;
-		dmPaperWidth*: INTEGER;
-		dmScale*: INTEGER;
-		dmCopies*: INTEGER;
-		dmDefaultSource*: INTEGER;
-		dmPrintQuality*: INTEGER;
-		dmColor*: INTEGER;
-		dmDuplex*: INTEGER;
-		dmYResolution*: INTEGER;
-		dmTTOption*: INTEGER;
-		dmCollate*: INTEGER;
-		dmFormName*: ARRAY 32 OF CHAR16;
-		dmLogPixels*: INTEGER;
-		dmBitsPerPel*: LONGINT;
-		dmPelsWidth*: LONGINT;
-		dmPelsHeight*: LONGINT;
-		dmDisplayFlags*: SET;
-		dmDisplayFrequency*: LONGINT;
-		dmICMMethod*: LONGINT;
-		dmICMIntent*: LONGINT;
-		dmMediaType*: LONGINT;
-		dmDitherType*: LONGINT;
-		dmICCManufacturer*: LONGINT;
-		dmICCModel*: LONGINT;
-		dmPanningWidth*: LONGINT;
-		dmPanningHeight*: LONGINT;
+		dmDeviceName*: ARRAY 32 OF CHAR;
+		dmSpecVersion*: SIGNED16;
+		dmDriverVersion*: SIGNED16;
+		dmSize*: SIGNED16;
+		dmDriverExtra*: SIGNED16;
+		dmFields*: SET32;
+		dmOrientation*: SIGNED16;
+		dmPaperSize*: SIGNED16;
+		dmPaperLength*: SIGNED16;
+		dmPaperWidth*: SIGNED16;
+		dmScale*: SIGNED16;
+		dmCopies*: SIGNED16;
+		dmDefaultSource*: SIGNED16;
+		dmPrintQuality*: SIGNED16;
+		dmColor*: SIGNED16;
+		dmDuplex*: SIGNED16;
+		dmYResolution*: SIGNED16;
+		dmTTOption*: SIGNED16;
+		dmCollate*: SIGNED16;
+		dmFormName*: ARRAY 32 OF CHAR;
+		dmLogPixels*: SIGNED16;
+		dmBitsPerPel*: SIGNED32;
+		dmPelsWidth*: SIGNED32;
+		dmPelsHeight*: SIGNED32;
+		dmDisplayFlags*: SET32;
+		dmDisplayFrequency*: SIGNED32;
+		dmICMMethod*: SIGNED32;
+		dmICMIntent*: SIGNED32;
+		dmMediaType*: SIGNED32;
+		dmDitherType*: SIGNED32;
+		dmICCManufacturer*: SIGNED32;
+		dmICCModel*: SIGNED32;
+		dmPanningWidth*: SIGNED32;
+		dmPanningHeight*: SIGNED32;
 	END;
 	PtrDEVMODEW* = POINTER TO DEVMODEW;
 	DEVMODE* = DEVMODEA;
@@ -847,35 +847,35 @@ CONST
 VAR
 
 	(* GDI32.dll *)
-	CreateDIBSection- : PROCEDURE {WINAPI}  (p0: HDC;   p1: ADDRESS (*BITMAPINFO*); p2: LONGINT;  p3: ADDRESS; p4: HANDLE; p5: LONGINT): HBITMAP;
+	CreateDIBSection- : PROCEDURE {WINAPI}  (p0: HDC;   p1: ADDRESS (*BITMAPINFO*); p2: SIGNED32;  p3: ADDRESS; p4: HANDLE; p5: SIGNED32): HBITMAP;
 	CreatePalette-: PROCEDURE {WINAPI} ( p0: ADDRESS (*LOGPALETTE*)): HPALETTE;
-	GetCurrentObject-: PROCEDURE {WINAPI} (p0: HDC; p1: LONGINT): HGDIOBJ;
-	GetObject-: PROCEDURE {WINAPI}  (p0: HGDIOBJ; p1: LONGINT; p2: ADDRESS): LONGINT;
-	GetObjectType-: PROCEDURE  {WINAPI} (h: HGDIOBJ): LONGINT;
-	PeekMessage-: PROCEDURE {WINAPI} (VAR  lpMsg: User32.Msg; hWnd: HWND; wMsgFilterMin: LONGINT; wMsgFilterMax: LONGINT; wRemoveMsg: LONGINT): BOOL;
-	RealizePalette- : PROCEDURE  {WINAPI} (p0: HDC): LONGINT;
+	GetCurrentObject-: PROCEDURE {WINAPI} (p0: HDC; p1: SIGNED32): HGDIOBJ;
+	GetObject-: PROCEDURE {WINAPI}  (p0: HGDIOBJ; p1: SIGNED32; p2: ADDRESS): SIGNED32;
+	GetObjectType-: PROCEDURE  {WINAPI} (h: HGDIOBJ): SIGNED32;
+	PeekMessage-: PROCEDURE {WINAPI} (VAR  lpMsg: User32.Msg; hWnd: HWND; wMsgFilterMin: SIGNED32; wMsgFilterMax: SIGNED32; wRemoveMsg: SIGNED32): BOOL;
+	RealizePalette- : PROCEDURE  {WINAPI} (p0: HDC): SIGNED32;
 	SelectPalette-: PROCEDURE {WINAPI} (p0: HDC; p1: HPALETTE; p2: BOOL): HPALETTE;
-	ChoosePixelFormat- :PROCEDURE  {WINAPI} (p0: HDC;   p1: ADDRESS (*PIXELFORMATDESCRIPTOR*)): LONGINT;
- 	DescribePixelFormat-: PROCEDURE {WINAPI} (p0: HDC; p1: LONGINT; p2: LONGINT;  p3: ADDRESS(*PIXELFORMATDESCRIPTOR*)): LONGINT;
-	GetPixelFormat-: PROCEDURE {WINAPI} (p0: HDC): LONGINT;
-	SetPixelFormat- : PROCEDURE {WINAPI}  (p0: HDC; p1: LONGINT;  p2: ADDRESS (*PIXELFORMATDESCRIPTOR*)): BOOL;
+	ChoosePixelFormat- :PROCEDURE  {WINAPI} (p0: HDC;   p1: ADDRESS (*PIXELFORMATDESCRIPTOR*)): SIGNED32;
+ 	DescribePixelFormat-: PROCEDURE {WINAPI} (p0: HDC; p1: SIGNED32; p2: SIGNED32;  p3: ADDRESS(*PIXELFORMATDESCRIPTOR*)): SIGNED32;
+	GetPixelFormat-: PROCEDURE {WINAPI} (p0: HDC): SIGNED32;
+	SetPixelFormat- : PROCEDURE {WINAPI}  (p0: HDC; p1: SIGNED32;  p2: ADDRESS (*PIXELFORMATDESCRIPTOR*)): BOOL;
 	SwapBuffers- : PROCEDURE {WINAPI}  (p0: HDC): BOOL;
 	CreateFont-: PROCEDURE{WINAPI} (nHeight, nWidth, nEscapement, nOrientation, fnWeight,
 					fdwItalic, fdwUnderline, fdwStrikeOut, fdwCharSet, fwOutputPrecision, fdwClipPrecision,
-					fdwQuality, fdwPitchAndFamily: LONGINT; CONST lpszFace: ARRAY OF CHAR): HFONT;
+					fdwQuality, fdwPitchAndFamily: SIGNED32; CONST lpszFace: ARRAY OF CHAR): HFONT;
 
 
 	(* USER32.dll *)
-	AdjustWindowRectEx-: PROCEDURE {WINAPI} (VAR lpRect: User32.Rect (* ADDRESS *); dwStyle: WORDSET; bMenu: BOOL; dwExStyle: WORDSET): BOOL;
+	AdjustWindowRectEx-: PROCEDURE {WINAPI} (VAR lpRect: User32.Rect (* ADDRESS *); dwStyle: INTEGERSET; bMenu: BOOL; dwExStyle: INTEGERSET): BOOL;
 	ClientToScreen- : PROCEDURE {WINAPI} (hWnd: HWND; VAR lpPoint: User32.Point): BOOL;
 	FindWindow- : PROCEDURE {WINAPI} (CONST lpClassName: ARRAY OF CHAR; CONST lpWindowName: ARRAY OF CHAR): HWND;
 	GetDesktopWindow-: PROCEDURE {WINAPI} (): HWND;
 	GetWindowDC- : PROCEDURE {WINAPI} (hwin: HWND): HDC;
 
-(*	ChangeDisplaySettingsA-: PROCEDURE {WINAPI} (lpDevMode: ADDRESS; (*DEVMODEA*) dwFlags: SET): LONGINT;
-	ChangeDisplaySettingsW- : PROCEDURE {WINAPI} (lpDevMode: ADDRESS (*DEVMODEW*); dwFlags: SET): LONGINT;
+(*	ChangeDisplaySettingsA-: PROCEDURE {WINAPI} (lpDevMode: ADDRESS; (*DEVMODEA*) dwFlags: SET): SIGNED32;
+	ChangeDisplaySettingsW- : PROCEDURE {WINAPI} (lpDevMode: ADDRESS (*DEVMODEW*); dwFlags: SET): SIGNED32;
 *)
-	ChangeDisplaySettings-: PROCEDURE{WINAPI} (lpDevMode: ADDRESS (*DEVMODEA*); dwFlags: WORDSET): LONGINT;
+	ChangeDisplaySettings-: PROCEDURE{WINAPI} (lpDevMode: ADDRESS (*DEVMODEA*); dwFlags: INTEGERSET): SIGNED32;
 
 (*
 
@@ -884,12 +884,12 @@ BEGIN
 	RETURN User32.GetDC(hwn);
 END GetDC;
 
-PROCEDURE DeleteDC*(hdc: HDC): LONGINT;
+PROCEDURE DeleteDC*(hdc: HDC): SIGNED32;
 BEGIN
 	RETURN GDI32.DeleteDC(hdc);
 END DeleteDC;
 
-PROCEDURE ReleaseDC*(hwn: HWND; hdc: HDC): LONGINT;
+PROCEDURE ReleaseDC*(hwn: HWND; hdc: HDC): SIGNED32;
 BEGIN
 	RETURN User32.ReleaseDC(hwn, hdc);
 END ReleaseDC;
@@ -899,7 +899,7 @@ BEGIN
 	RETURN GDI32.SelectObject(hdc, hbm);
 END SelectObject;
 
-PROCEDURE DeleteObject*(hnd: HANDLE): LONGINT;
+PROCEDURE DeleteObject*(hnd: HANDLE): SIGNED32;
 BEGIN
 	RETURN GDI32.DeleteObject(hnd);
 END DeleteObject;
@@ -946,7 +946,7 @@ BEGIN
 END InitWinApiLibs;
 
 PROCEDURE OnClose;
-VAR res: LONGINT;
+VAR res: SIGNED32;
 BEGIN
 	IF libuser # Kernel32.NULL THEN
 		res := Kernel32.FreeLibrary(libuser);

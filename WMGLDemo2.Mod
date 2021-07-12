@@ -12,16 +12,16 @@ TYPE
 
 	GLWindow =  OBJECT(WMGL.Window)
 	VAR
-		drawMode:LONGINT; (* fill, lines, points *)
+		drawMode:SIGNED32; (* fill, lines, points *)
 		texture: ARRAY 3 OF GL.Uint;  (* Storage For 3 Textures  *)
 		LightAmbient, LightDiffuse, LightPosition: ARRAY [4] OF GL.Float;
-		xrot, yrot: REAL;  (* X, Y  rotation *)
-		z : REAL; (* depth into the screen *)
-		xspeed, yspeed: REAL;
+		xrot, yrot: FLOAT32;  (* X, Y  rotation *)
+		z : FLOAT32; (* depth into the screen *)
+		xspeed, yspeed: FLOAT32;
 		light, blend: BOOLEAN; (* Whether or not lighting is on,  Whether or not blending is on *)
-		filter: LONGINT; (* type of filter *)
+		filter: SIGNED32; (* type of filter *)
 
-		PROCEDURE &New(w, h: LONGINT);
+		PROCEDURE &New(w, h: SIGNED32);
 		BEGIN
 			Init(w, h, FALSE); (* use alpha, for 32bpp img *)
 			WM.DefaultAddWindow(SELF);
@@ -231,8 +231,8 @@ TYPE
 			RETURN TRUE;
 		END InitGL;
 
-		PROCEDURE DrawMode(dm: LONGINT);
-		VAR drawMode: LONGINT;
+		PROCEDURE DrawMode(dm: SIGNED32);
+		VAR drawMode: SIGNED32;
 		BEGIN
 			drawMode := dm;
 			MakeCurrent();
@@ -324,7 +324,7 @@ TYPE
 		END Cube;
 
 		PROCEDURE Testspeed;
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 		BEGIN
 			FOR i:=1 TO 360 DO
 				xrot := xrot + 2;
@@ -337,7 +337,7 @@ TYPE
 	END GLWindow;
 
 VAR
-	nofWindows : LONGINT;
+	nofWindows : SIGNED32;
 
 PROCEDURE Open*;
 VAR

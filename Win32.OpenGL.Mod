@@ -27,22 +27,22 @@ TYPE
  	PAnsiChar* = ADDRESS;
 
 	(* GL data types *)
-	Enum* = LONGINT; 	(* 4 bytes *)
+	Enum* = SIGNED32; 	(* 4 bytes *)
 	Boolean* = UNSIGNED8; 	(*  *)
 	Bitfield* = SET32; 	(* SET *)
-	Byte* = SHORTINT; 		(* 1 byte signed *)
-	Short* = INTEGER; 	(* 2 bytes signed *)
-	Int* = LONGINT; 	(* 4 bytes signed *)
-	Sizei* = LONGINT; 	(* 4 bytes signed	 SIZE ??? *)
+	Byte* = SIGNED8; 		(* 1 byte signed *)
+	Short* = SIGNED16; 	(* 2 bytes signed *)
+	Int* = SIGNED32; 	(* 4 bytes signed *)
+	Sizei* = SIGNED32; 	(* 4 bytes signed	 SIZE ??? *)
 	Ubyte* = UNSIGNED8; 		(* 1 byte unsigned *)
 	Ushort* = UNSIGNED16;	(* 2 bytes unsigned *)
-	Uint* = WORD;	(* 4 bytes unsigned *)
-	Float* = REAL;		(* single precision real *)
-	Clampf* = REAL;		(* single precision real in [0,1] *)
-	Double* = LONGREAL;	(* double precision real *)
-	Clampd* = LONGREAL;	(* double precision real in [0,1] *)
+	Uint* = UNSIGNED32;	(* 4 bytes unsigned *)
+	Float* = FLOAT32;		(* single precision real *)
+	Clampf* = FLOAT32;		(* single precision real in [0,1] *)
+	Double* = FLOAT64;	(* double precision real *)
+	Clampd* = FLOAT64;	(* double precision real in [0,1] *)
 	Void* = ADDRESS;
-	Int64* = HUGEINT;
+	Int64* = SIGNED64;
 	Uint64* = UNSIGNED64;
 
 	PBoolean* = ADDRESS; 	(* POINTER TO ARRAY OF Boolean; *)
@@ -123,7 +123,7 @@ TYPE
 	HGLRC* = Kernel32.HANDLE;
 
 	TRect* = RECORD
-		Left*, Top*, Right*, Bottom*: LONGINT;
+		Left*, Top*, Right*, Bottom*: SIGNED32;
 	END;
 
 	PGPU_DEVICE* = POINTER TO GPU_DEVICE;
@@ -3679,7 +3679,7 @@ TYPE
 	TwglCreateContext* = PROCEDURE {WINAPI} (DC: HDC): HGLRC;
 	TwglCreateLayerContext* = PROCEDURE {WINAPI} (p1: HDC; p2: Int): HGLRC;
 	TwglDeleteContext = PROCEDURE {WINAPI} (p1: HGLRC): BOOLEAN;
-	TwglDescribeLayerPlane*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3: LONGINT; p4: LONGINT; p5: WinApi.LayerPlaneDescriptor): BOOLEAN;
+	TwglDescribeLayerPlane*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3: SIGNED32; p4: SIGNED32; p5: WinApi.LayerPlaneDescriptor): BOOLEAN;
 	TwglGetCurrentContext* = PROCEDURE {WINAPI}(): HGLRC;
 	TwglGetCurrentDC* = PROCEDURE {WINAPI}(): HDC;
 	TwglGetLayerPaletteEntries* = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: Int; varpcr: ADDRESS): Int;
@@ -3700,9 +3700,9 @@ TYPE
 	TwglUseFontBitmapsW*  = PROCEDURE {WINAPI} (DC: HDC; p2, p3, p4: Uint): BOOLEAN;
 	TwglUseFontBitmaps*  = PROCEDURE {WINAPI} (DC: HDC; p2, p3, p4: Uint): BOOLEAN;
 
-	TwglUseFontOutlinesA*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: Uint; p5, p6: Float; p7: LONGINT; p8: ADDRESS (*GlyphMetricsFloat*) ): BOOLEAN;
-	TwglUseFontOutlinesW*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: Uint; p5, p6: Float; p7: LONGINT; p8: ADDRESS (*GlyphMetricsFloat*)): BOOLEAN;
-	TwglUseFontOutlines*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: Uint; p5, p6: Float; p7: LONGINT; p8: ADDRESS (*GlyphMetricsFloat*)): BOOLEAN;
+	TwglUseFontOutlinesA*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: Uint; p5, p6: Float; p7: SIGNED32; p8: ADDRESS (*GlyphMetricsFloat*) ): BOOLEAN;
+	TwglUseFontOutlinesW*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: Uint; p5, p6: Float; p7: SIGNED32; p8: ADDRESS (*GlyphMetricsFloat*)): BOOLEAN;
+	TwglUseFontOutlines*  = PROCEDURE {WINAPI} (p1: HDC; p2, p3, p4: Uint; p5, p6: Float; p7: SIGNED32; p8: ADDRESS (*GlyphMetricsFloat*)): BOOLEAN;
 
 
 	(* WGL_ARB_buffer_region *)
@@ -11175,11 +11175,10 @@ BEGIN
 END ReadExtensions;
 
 (* utilities *)
-(* Get string from address *)
 
 (* Get string from address  *)
 PROCEDURE GetStringFromAddr*(adr0: ADDRESS): Strings.String;
-VAR s {UNTRACED}: POINTER {UNSAFE} TO ARRAY OF CHAR;
+VAR s {UNTRACED}: POINTER {UNSAFE} TO ARRAY MAX(SIZE) OF CHAR;
 	str: Strings.String;
 	size, pos: SIZE;
 BEGIN
@@ -11205,40 +11204,6 @@ BEGIN
 	RETURN str;
 
 END GetStringFromAddr;
-
-(*
-PROCEDURE GetStringFromAddr*(adr: ADDRESS): Strings.String;
-VAR
-	sadr, sadr1: ADDRESS;
-	i, cnt: LONGINT;
-	ch: CHAR;
-	s: Strings.String;
-BEGIN
-	sadr := adr;
-
-	(* find length *)
-	cnt :=0;
-	sadr1 := sadr;
-	IF sadr1 # 0 THEN
-		SYSTEM.GET(sadr1,ch);
-		WHILE (ch # 0X) DO  INC(cnt); INC(sadr1); SYSTEM.GET(sadr1,ch); END;
-	END;
-
-	IF cnt = 0 THEN  (* empty string *)
-		NEW(s,1); s[0]:=0X; RETURN s
-	END;
-
-	NEW(s, cnt+1);
-	i:=0;
-	sadr1 := sadr;
-	SYSTEM.GET(sadr1,ch);
-	WHILE (i< cnt) & (ch # 0X) DO
-		s^[i] := ch; INC(i); INC(sadr1);
-		SYSTEM.GET(sadr1,ch);
-	END;
-	RETURN s;
-END GetStringFromAddr;
-*)
 
 (* wrapper procedures  *)
 PROCEDURE GetString*(name: Enum): Strings.String;
@@ -11272,11 +11237,11 @@ END wglARBStrings;
 PROCEDURE ReadCoreVersion*;
 VAR
 	Buffer: Strings.String;
-	MajorVersion, MinorVersion: LONGINT;
+	MajorVersion, MinorVersion: SIGNED32;
 
 	PROCEDURE isNumber(ch: CHAR): BOOLEAN;
 	VAR
-	      val: LONGINT;
+	      val: SIGNED32;
 	      res: BOOLEAN;
 	BEGIN
 		res := FALSE;
@@ -11286,7 +11251,7 @@ VAR
 	END isNumber;
 
 
-	PROCEDURE TrimAndSplitVersionString(CONST buffer: ARRAY OF CHAR; VAR Max, Min: LONGINT);
+	PROCEDURE TrimAndSplitVersionString(CONST buffer: ARRAY OF CHAR; VAR Max, Min: SIGNED32);
 	VAR separator: SIZE;
 	BEGIN
 		separator := Strings.Pos('.', buffer);
@@ -11353,8 +11318,8 @@ PROCEDURE Int_GetExtensionString(): Strings.String;
 VAR
 	buffer0, buffer1, buffer2, es: Strings.String;
 	len0, len1: SIZE;
-	i: LONGINT;
-	extensionCount : LONGINT;
+	i: SIGNED32;
+	extensionCount : SIGNED32;
 	strarray: Strings.StringArray;
 BEGIN
 	IF GL_VERSION_3_0 THEN
@@ -12057,7 +12022,7 @@ END Color3dv;
 
 (* ---------------------- *)
 PROCEDURE OnClose;
-VAR res: LONGINT;
+VAR res: SIGNED32;
 BEGIN
 	IF libHandle # Kernel32.NULL THEN
 		res := Kernel32.FreeLibrary(libHandle);

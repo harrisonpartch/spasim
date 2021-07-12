@@ -21,7 +21,7 @@ TYPE
 
 
 VAR
-	 w, h: LONGINT; (* size of window *)
+	 w, h: SIGNED32; (* size of window *)
 	 ctx : Context.Context;  (* GL context *)
 	 image: Raster.Image; (* for saving the rendered image *)
 
@@ -31,7 +31,7 @@ BEGIN
 END Error;
 
 PROCEDURE SaveToImage(fname: ARRAY OF CHAR);
-VAR imres: LONGINT;
+VAR imres: SIGNED32;
 
 BEGIN
 	ctx.RenderInto(image);
@@ -116,9 +116,9 @@ GL.End();
 END Esquare;
 
 PROCEDURE Park;
-VAR i: LONGINT;
-    p: REAL;
-    x, y: REAL;
+VAR i: SIGNED32;
+    p: FLOAT32;
+    x, y: FLOAT32;
 BEGIN
  GL.Begin(GLC.GL_TRIANGLE_FAN);
    GL.Vertex3f(0,0,0.0 );
@@ -131,9 +131,9 @@ BEGIN
 END Park;
 
 PROCEDURE Pillar;
-VAR i : LONGINT;
-    p: REAL;
-    x, y: REAL;
+VAR i : SIGNED32;
+    p: FLOAT32;
+    x, y: FLOAT32;
 BEGIN
 GL.Begin(GLC.GL_QUAD_STRIP);
    FOR i := 0 TO 390 BY 30 DO
@@ -222,9 +222,9 @@ ctx.DeActivate;
 END Primitives;
 
 
-PROCEDURE  MakeGear (innerRadius, outerRadius, width: REAL; teeth: LONGINT;  toothDepth: REAL);
-VAR  r0, r1, r2 , angle, da, u, v, len: REAL;
-		i: LONGINT;
+PROCEDURE  MakeGear (innerRadius, outerRadius, width: FLOAT32; teeth: SIGNED32;  toothDepth: FLOAT32);
+VAR  r0, r1, r2 , angle, da, u, v, len: FLOAT32;
+		i: SIGNED32;
 BEGIN
 
 	r0 := innerRadius;
@@ -333,7 +333,7 @@ END MakeGear;
 
 PROCEDURE  Do*;
 VAR
-	i: LONGINT;
+	i: SIGNED32;
 	r, g, b: ARRAY 3 OF GL.Float;
 BEGIN
 	IF ctx = NIL THEN Error; RETURN END;
@@ -514,14 +514,14 @@ ctx.MakeCurrent();
 	ctx.DeActivate;
 END Gears;
 
-PROCEDURE  SetP (VAR a: ARRAY OF GL.Float;  a0, a1, a2: LONGREAL);
+PROCEDURE  SetP (VAR a: ARRAY OF GL.Float;  a0, a1, a2: FLOAT64);
 BEGIN
 	a[0] := SHORT(a0);  a[1] := SHORT(a1);  a[2] := SHORT(a2)
 END SetP;
 
 PROCEDURE  BezSurf*;
 VAR
-	 i, j : LONGINT;
+	 i, j : SIGNED32;
 	ctrlPoints: ARRAY 4, 4 OF Point;
 BEGIN
 	IF ctx = NIL THEN Error; RETURN END;
@@ -647,8 +647,8 @@ END Accum;
 PROCEDURE  MakeBall ():GL.Uint;
 CONST  da = 18;  db = 18;  r = 1.0;
 VAR  list: GL.Uint;  color: BOOLEAN;
-		a, b: LONGINT;
-		x, y, z: LONGREAL;
+		a, b: SIGNED32;
+		x, y, z: FLOAT64;
 BEGIN
 ctx.MakeCurrent();
 	list := GL.GenLists(1);
@@ -682,8 +682,8 @@ ctx.MakeCurrent();
 END MakeBall;
 
 PROCEDURE  MakeLines ():GL.Uint;
-	VAR  list: GL.Uint;  i: LONGINT;
-		  x: REAL;
+	VAR  list: GL.Uint;  i: SIGNED32;
+		  x: FLOAT32;
 BEGIN
 ctx.MakeCurrent();
 	list := GL.GenLists(1);
@@ -719,9 +719,9 @@ PROCEDURE  Bounce*;
 VAR
 
 	ball, lines: GL.Uint;
-	x, y: REAL;
-	vx, vy: REAL;
-	zRot, dRot: LONGINT;
+	x, y: FLOAT32;
+	vx, vy: FLOAT32;
+	zRot, dRot: SIGNED32;
 
 BEGIN
 IF ctx = NIL THEN Error; RETURN END;

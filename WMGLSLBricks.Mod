@@ -13,19 +13,19 @@ TYPE
 
 	GLWindow =  OBJECT(WMGL.Window)
 	VAR
-		color: LONGINT;
+		color: SIGNED32;
 
 		(* Movement variables *)
-		fXDiff,  fYDiff, fZDiff: REAL;
-		xLastIncr, yLastIncr: LONGINT;
-		fXInertia, fYInertia, fScale, ftime: REAL;
-		xLast, yLast : LONGINT;
+		fXDiff,  fYDiff, fZDiff: FLOAT32;
+		xLastIncr, yLastIncr: SIGNED32;
+		fXInertia, fYInertia, fScale, ftime: FLOAT32;
+		xLast, yLast : SIGNED32;
 		rotate: BOOLEAN;
-		RotL : REAL;
+		RotL : FLOAT32;
 
 		brickProg: GL.Uint;  (* shader program *)
 
-		PROCEDURE &New(w, h: LONGINT);
+		PROCEDURE &New(w, h: SIGNED32);
 		BEGIN
 			Init(w, h, FALSE); (* use alpha, for 32bpp img *)
 			WM.DefaultAddWindow(SELF);
@@ -125,8 +125,8 @@ TYPE
 		END UpdateImage;
 
 		PROCEDURE DrawCube();
-		VAR size, scale, delta: REAL;
-			A, B, C, D, E, F, G, H, I, K, L, M, N, O: ARRAY [3] OF REAL;
+		VAR size, scale, delta: FLOAT32;
+			A, B, C, D, E, F, G, H, I, K, L, M, N, O: ARRAY [3] OF FLOAT32;
 		BEGIN
 
 			size := 1.0;  scale := 0.2; delta := 0.1;
@@ -318,7 +318,7 @@ TYPE
 END GLWindow;
 
 VAR
-	nofWindows : LONGINT;
+	nofWindows : SIGNED32;
 
 PROCEDURE Open*;
 VAR

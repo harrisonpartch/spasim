@@ -210,12 +210,12 @@ TYPE Context* = OBJECT
 		Machine.Release( Machine.X11 );
 	END CreatePixmaps;
 
-	PROCEDURE GetDisplay*(): LONGINTEGER;
+	PROCEDURE GetDisplay*(): ADDRESS;
 	BEGIN
 		RETURN glWin.display;
 	END GetDisplay;
 
-	PROCEDURE GetContext*(): LONGINTEGER;
+	PROCEDURE GetContext*(): ADDRESS;
 	BEGIN
 		RETURN glWin.glctx;
 	END GetContext;

@@ -7,11 +7,11 @@ IMPORT
 TYPE
 	MyGLControl = OBJECT(OGW.Window)
 	VAR
-		eyeposz: LONGREAL;
-		anglez: REAL;
+		eyeposz: FLOAT64;
+		anglez: FLOAT32;
 		left : BOOLEAN;
 
-	PROCEDURE &New(w, h: LONGINT );
+	PROCEDURE &New(w, h: SIGNED32 );
 	BEGIN
 		Init(w, h, 400, 300, FALSE);
 			anglez := 30.0;
@@ -43,23 +43,23 @@ TYPE
 	END Close;
 
 
-	PROCEDURE PointerMove* (x, y : LONGINT; keys : SET);
+	PROCEDURE PointerMove* (x, y : SIGNED32; keys : SET);
 	BEGIN
 	(*	KernelLog.String("PointerMove: "); KernelLog.Int(x, 0); KernelLog.Int(y,4); KernelLog.String(" : "); KernelLog.Bits(keys, 0, 4);  KernelLog.Ln;*)
 	END PointerMove;
 
-	PROCEDURE PointerDown* (x, y : LONGINT; keys : SET);
+	PROCEDURE PointerDown* (x, y : SIGNED32; keys : SET);
 	BEGIN
 	(*	KernelLog.String("PointerDown: "); KernelLog.Int(x, 0); KernelLog.Int(y,4); KernelLog.String(" : "); KernelLog.Bits(keys, 0, 4);  KernelLog.Ln;*)
 	END PointerDown;
 
-	PROCEDURE PointerUp* (x, y : LONGINT; keys : SET);
+	PROCEDURE PointerUp* (x, y : SIGNED32; keys : SET);
 	BEGIN
 		(* KernelLog.String("PointerUp: "); KernelLog.Int(x, 0); KernelLog.Int(y,4); KernelLog.String(" : "); KernelLog.Bits(keys, 0, 4);  KernelLog.Ln;*)
 	END PointerUp;
 
 	(** *)
-	PROCEDURE WheelMove*(dz: LONGINT);
+	PROCEDURE WheelMove*(dz: SIGNED32);
 	BEGIN
 		eyeposz := eyeposz + dz;
 		IF eyeposz < 0.0 THEN eyeposz := 0.0; END;
@@ -70,7 +70,7 @@ TYPE
 	END WheelMove;
 
 	(** *)
-	PROCEDURE KeyEvent* (ucs : LONGINT; flags : SET; keysym : LONGINT);
+	PROCEDURE KeyEvent* (ucs : SIGNED32; flags : SET; keysym : SIGNED32);
 	BEGIN
 		IF keysym = Inputs.KsLeft THEN left := TRUE; ReDisplay;
 		ELSIF keysym = Inputs.KsRight THEN left := FALSE; ReDisplay;
@@ -175,7 +175,7 @@ TYPE
 	END Display;
 
 
-	PROCEDURE Reshape(w, h: LONGINT);
+	PROCEDURE Reshape(w, h: SIGNED32);
 	BEGIN
 		GL.Viewport(0, 0, w, h) ;
 

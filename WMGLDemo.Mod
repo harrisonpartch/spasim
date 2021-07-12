@@ -15,10 +15,10 @@ TYPE
 	VAR
 		 timer: Kernel.MilliTimer;
 		alive, animated: BOOLEAN;
-		eyeposz: LONGREAL;
-		anglez: REAL;
+		eyeposz: FLOAT64;
+		anglez: FLOAT32;
 
-		PROCEDURE &New(w, h: LONGINT);
+		PROCEDURE &New(w, h: SIGNED32);
 		BEGIN
 
 			Init(w, h, TRUE); (* use alpha, for 32bpp img *)
@@ -184,7 +184,7 @@ TYPE
 	END GLWindow;
 
 VAR
-	nofWindows : LONGINT;
+	nofWindows : SIGNED32;
 
 PROCEDURE Open*;
 VAR

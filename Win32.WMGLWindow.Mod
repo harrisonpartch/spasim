@@ -56,12 +56,12 @@ TYPE
     	END Init;
 
 	(* create a new opengl context with opengl version major, minor *)
-	PROCEDURE SetProfile(major, minor: LONGINT; flags: SET): BOOLEAN;
+	PROCEDURE SetProfile(major, minor: SIGNED32; flags: SET): BOOLEAN;
 	VAR
 		bres: BOOLEAN;
-		attr: POINTER TO ARRAY OF LONGINT;
+		attr: POINTER TO ARRAY OF SIGNED32;
 		tempContext: WinApi.HGLRC;
-		i: LONGINT;
+		i: SIGNED32;
 	BEGIN
 		(* create opengl compatibilitity mode context *)
 		NEW(attr, 13);
@@ -79,13 +79,13 @@ TYPE
 		attr[i] := GLC.WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB; INC(i);
 		attr[i] := 0; (* end of attribute list *)
 
-(*	attribs:= [
-				GLC.WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
-				GLC.WGL_CONTEXT_MINOR_VERSION_ARB, 1,
-				(* GLC.WGL_CONTEXT_FLAGS_ARB, GLC.WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB, *)
-				GLC.WGL_CONTEXT_PROFILE_MASK_ARB, (*GLC.WGL_CONTEXT_CORE_PROFILE_BIT_ARB,*)
-				GLC.WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
-				0
+(*		attribs:= [
+		GLC.WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
+		GLC.WGL_CONTEXT_MINOR_VERSION_ARB, 1,
+		(* GLC.WGL_CONTEXT_FLAGS_ARB, GLC.WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB, *)
+		GLC.WGL_CONTEXT_PROFILE_MASK_ARB, (*GLC.WGL_CONTEXT_CORE_PROFILE_BIT_ARB,*)
+		GLC.WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+		0
 			];
 *)
 		GL.Read_WGL_ARB_create_context(); (* read wglCreateContextAttribsARB function *)
@@ -113,7 +113,7 @@ TYPE
 	END SetProfile;
 
 	PROCEDURE Close;
-	VAR res: LONGINT;
+	VAR res: User32.LResult;
 	BEGIN
 		wincreated := FALSE;
 		res := User32.SendMessage(glWin.hWind, User32.WMQuit, 0, 0);
@@ -133,9 +133,8 @@ TYPE
 	END DeActivate;
 
 		(** move the window to x,y and  resize width,height *)
-	PROCEDURE MoveResizeWindow(x, y, w, h: LONGINT);
-	VAR
-		res: Kernel32.BOOL;
+	PROCEDURE MoveResizeWindow(x, y, w, h: SIGNED32);
+	VAR res: Kernel32.BOOL;
 	BEGIN
 		res := User32.MoveWindow(glWin.hWind, x, y, w, h, 1); (* repaint *)
 	END MoveResizeWindow;
@@ -144,14 +143,13 @@ TYPE
 	BEGIN
 		buffer := NIL;
 		NEW(buffer, w*h*4);
-		MoveResizeWindow(0,0, w(LONGINT), h(LONGINT));
+		MoveResizeWindow(0,0, w(SIGNED32), h(SIGNED32));
 		glWin.width := w; glWin.height := h;
 	END Resize;
 
 	PROCEDURE RenderInto(image: Raster.Image);
 	VAR
-		i: SIZE;
-		w, h: SIZE;
+		i, w, h: SIZE;
 		sadr, dadr: ADDRESS;
 	BEGIN
 		IF (image = NIL) OR (image.adr = NIL) THEN RETURN END;
@@ -163,15 +161,10 @@ TYPE
 		FOR i := 0 TO h - 1 DO
 			SYSTEM.MOVE(sadr - i*w*4, dadr + i*w*4, w*4);
 		END;
-
-(*		FOR i := 0 TO h - 1 DO
-			Raster.PutPixels(image, 0, h-1-i, w, Raster.BGRA8888, buffer^, i * w * 4, mode)
-		END;
-*)
 	END RenderInto;
 
 	(* handler for this context's window *)
-	PROCEDURE WindowHandler( uMsg: LONGINT;  wParam: User32.WParam;
+	PROCEDURE WindowHandler( uMsg: SIGNED32;  wParam: User32.WParam;
 													  lParam: User32.LParam ): User32.LResult;
 	BEGIN
 		CASE uMsg OF
@@ -231,7 +224,7 @@ TYPE
 			context.Init(w, h);
 		END Init;
 
-		PROCEDURE SetProfile*(major, minor: LONGINT; flags: SET): BOOLEAN;
+		PROCEDURE SetProfile*(major, minor: SIGNED32; flags: SET): BOOLEAN;
 		VAR res: BOOLEAN;
 		BEGIN
 			res := context.SetProfile(major, minor, flags);
@@ -275,21 +268,17 @@ TYPE
 			UpdateImage;
 		END Resized;
 
-		PROCEDURE GetDisplay*(): LONGINT;
-		VAR x: LONGINT;
+		PROCEDURE GetDisplay*(): ADDRESS;
 		BEGIN
-			x := SYSTEM.VAL(LONGINT, context.glWin.hDC);
-			RETURN x;
+			RETURN context.glWin.hDC;
 		END GetDisplay;
 
-		PROCEDURE GetContext*(): LONGINT;
-		VAR x: LONGINT;
+		PROCEDURE GetContext*(): ADDRESS;
 		BEGIN
-			x := SYSTEM.VAL(LONGINT, context.glWin.hGLRC);
-			RETURN x
+			RETURN context.glWin.hGLRC
 		END GetContext;
 
-		PROCEDURE GetScreen*(): LONGINT;
+		PROCEDURE GetScreen*(): SIGNED32;
 		BEGIN
 			RETURN 0; (* unnecessary for windows; context.glWin.screen*)
 		END GetScreen;
@@ -297,151 +286,139 @@ TYPE
 	END Window;
 
 VAR
-	ctxtcounter: LONGINT;
+	ctxtcounter: SIGNED32;
 
-    PROCEDURE CreateHWND(VAR glWin:WindowStruct): BOOLEAN;
-		VAR res: Kernel32.BOOL;
-			 dwStyle: WORDSET;
-			 dwExStyle: WORDSET;
-			 windowClass: User32.WndClassEx;
-			 bres: BOOLEAN;
-			 scnt: ARRAY 16 OF CHAR;
-       BEGIN
+PROCEDURE CreateHWND(VAR glWin:WindowStruct): BOOLEAN;
+VAR res: Kernel32.BOOL;
+	dwStyle: INTEGERSET;
+	dwExStyle: INTEGERSET;
+	windowClass: User32.WndClassEx;
+	bres: BOOLEAN;
+	scnt: ARRAY 16 OF CHAR;
+BEGIN
+	glWin.Instance := Kernel32.GetModuleHandle( NIL );
 
-		glWin.Instance := Kernel32.GetModuleHandle( NIL );
+	(* to create multiple GLContext with different window, change class name by appending and increasing counter value  *)
+	ctxtcounter:=Kernel32.GetTickCount(); Strings.IntToStr(ctxtcounter, scnt);
+	glWin.windowClassName := "WinAos.GLWindow";
+	Strings.Append(glWin.windowClassName, scnt);
+	IF debug THEN KernelLog.String("glWin.windowClassName= "); KernelLog.String(glWin.windowClassName); KernelLog.Ln; END;
 
-		(* to create multiple GLContext with different window, change class name by appending and increasing counter value  *)
-		ctxtcounter:=Kernel32.GetTickCount(); Strings.IntToStr(ctxtcounter, scnt);
-		glWin.windowClassName := "WinAos.GLWindow";
-		Strings.Append(glWin.windowClassName, scnt);
-		IF debug THEN KernelLog.String("glWin.windowClassName= "); KernelLog.String(glWin.windowClassName); KernelLog.Ln; END;
+	windowClass.cbSize := SIZEOF( User32.WndClassEx );
+	windowClass.style := WinApi.CS_OWNDC + WinApi.CS_VREDRAW + WinApi.CS_HREDRAW;
+	windowClass.lpfnWndProc := WindowProc; (* Message handler *)
+	windowClass.cbClsExtra := 0;
+	windowClass.cbWndExtra := 0;
+	windowClass.hInstance := glWin.Instance;
+	windowClass.hIcon := Kernel32.NULL;
+	windowClass.hIconSm := Kernel32.NULL;
+	windowClass.hCursor := Kernel32.NULL;
+	windowClass.hbrBackground := Kernel32.NULL;
+	windowClass.lpszMenuName := Kernel32.NULL;
+	windowClass.lpszClassName := SYSTEM.VAL( Kernel32.LPSTR, ADDRESSOF( glWin.windowClassName ) );
 
-		windowClass.cbSize := SIZEOF( User32.WndClassEx );
-		windowClass.style := WinApi.CS_OWNDC + WinApi.CS_VREDRAW + WinApi.CS_HREDRAW;
-		windowClass.lpfnWndProc := WindowProc; (* Message handler *)
-		windowClass.cbClsExtra := 0;
-		windowClass.cbWndExtra := 0;
-		windowClass.hInstance := glWin.Instance;
-		windowClass.hIcon := Kernel32.NULL;
-		windowClass.hIconSm := Kernel32.NULL;
-		windowClass.hCursor := Kernel32.NULL;
-		windowClass.hbrBackground := Kernel32.NULL;
-		windowClass.lpszMenuName := Kernel32.NULL;
-		windowClass.lpszClassName := SYSTEM.VAL( Kernel32.LPSTR, ADDRESSOF( glWin.windowClassName ) );
-
-		(* register window class *)
-		res := User32.RegisterClassEx( windowClass );
-		IF res = 0 THEN
-			IF debug THEN
-				KernelLog.String("RegisterClassEx res= "); KernelLog.Int(res, 0); KernelLog.Ln;
-				KernelLog.String("ERROR: "); KernelLog.Int(Kernel32.GetLastError(), 0); KernelLog.Ln;
-			END;
-			RETURN FALSE;
+	(* register window class *)
+	res := User32.RegisterClassEx( windowClass );
+	IF res = 0 THEN
+		IF debug THEN
+			KernelLog.String("RegisterClassEx res= "); KernelLog.Int(res, 0); KernelLog.Ln;
+			KernelLog.String("ERROR: "); KernelLog.Int(Kernel32.GetLastError(), 0); KernelLog.Ln;
 		END;
+		RETURN FALSE;
+	END;
 
-		dwExStyle :={};
-		dwStyle := WinApi.WS_POPUP +  WinApi.WS_CLIPSIBLINGS + WinApi.WS_CLIPCHILDREN;
+	dwExStyle :={};
+	dwStyle := WinApi.WS_POPUP +  WinApi.WS_CLIPSIBLINGS + WinApi.WS_CLIPCHILDREN;
 
-		 (* create the window *)
-		glWin.hWind := User32.CreateWindowEx(SYSTEM.VAL(LONGINT, dwExStyle) , glWin.windowClassName, glWin.title, dwStyle , 10, 10, glWin.width(LONGINT), glWin.height(LONGINT), 0, 0,  glWin.Instance, SYSTEM.VAL( User32.LParam, glWin));
-		IF glWin.hWind = 0 THEN
-			IF debug THEN
-				KernelLog.String("CreateWindowEx hWind= "); KernelLog.Int(glWin.hWind, 0); KernelLog.Ln;
-				KernelLog.String("ERROR: CreateWindowEx: "); KernelLog.Int(Kernel32.GetLastError(), 0); KernelLog.Ln;
-			END;
-			RETURN FALSE;
+	 (* create the window *)
+	glWin.hWind := User32.CreateWindowEx(SYSTEM.VAL(SIGNED32, dwExStyle) , glWin.windowClassName, glWin.title, dwStyle , 10, 10, glWin.width(SIGNED32), glWin.height(SIGNED32), 0, 0,  glWin.Instance, SYSTEM.VAL( User32.LParam, glWin));
+	IF glWin.hWind = 0 THEN
+		IF debug THEN
+			KernelLog.String("CreateWindowEx hWind= "); KernelLog.Int(glWin.hWind, 0); KernelLog.Ln;
+			KernelLog.String("ERROR: CreateWindowEx: "); KernelLog.Int(Kernel32.GetLastError(), 0); KernelLog.Ln;
 		END;
+		RETURN FALSE;
+	END;
 
-		res := User32.UpdateWindow(glWin.hWind);
+	res := User32.UpdateWindow(glWin.hWind);
 
-		(* get drawing context for this window *)
-		glWin.hDC := User32.GetDC(glWin.hWind);
+	(* get drawing context for this window *)
+	glWin.hDC := User32.GetDC(glWin.hWind);
 
-		IF glWin.hDC = 0 THEN
-			IF debug THEN
-				KernelLog.String("hDC= "); KernelLog.Int(glWin.hDC, 0); KernelLog.Ln;
-				KernelLog.String("ERROR: GetDC: "); KernelLog.Int(Kernel32.GetLastError(), 0); KernelLog.Ln;
-			END;
-			RETURN FALSE;
+	IF glWin.hDC = 0 THEN
+		IF debug THEN
+			KernelLog.String("hDC= "); KernelLog.Int(glWin.hDC, 0); KernelLog.Ln;
+			KernelLog.String("ERROR: GetDC: "); KernelLog.Int(Kernel32.GetLastError(), 0); KernelLog.Ln;
 		END;
+		RETURN FALSE;
+	END;
 
-		(* create GL context for this window *)
-		bres := CreateGLRC(glWin, {opDoubleBuffered}, 24, 8, 8, 8,0,0);
-		RETURN bres;
-	END CreateHWND;
+	(* create GL context for this window *)
+	bres := CreateGLRC(glWin, {opDoubleBuffered}, 24, 8, 8, 8,0,0);
+	RETURN bres;
+END CreateHWND;
 
-	PROCEDURE CloseWindow(VAR glWin: WindowStruct);
-	VAR res: Kernel32.BOOL;
-		bres : BOOLEAN;
-	BEGIN (*{EXCLUSIVE}*)
+PROCEDURE CloseWindow(VAR glWin: WindowStruct);
+VAR res: Kernel32.BOOL;
+	bres : BOOLEAN;
+BEGIN
+	(* do we have a rendering context *)
+	IF glWin.hGLRC # 0 THEN
+		(* Release the DC and RC contexts *)
+		bres := GL.wglMakeCurrent(0, 0);
+		(* Delete the rendering context *)
+		bres := GL.wglDeleteContext( glWin.hGLRC );
+		glWin.hGLRC := 0;
+		IF debug THEN KernelLog.String("delete glcontext .."); KernelLog.Ln; END;
+	END;
 
-	   (* do we have a rendering context *)
-    IF  glWin.hGLRC # 0 THEN
-        (* Release the DC and RC contexts *)
-        bres := GL.wglMakeCurrent(0, 0 );
-
-        (* Delete the rendering context *)
-
-        bres := GL.wglDeleteContext( glWin.hGLRC );
-
-        glWin.hGLRC := 0;
-         IF debug THEN KernelLog.String("delete glcontext .."); KernelLog.Ln; END;
-    END;
-
-    (* Do we have a device context *)
-    IF glWin.hDC # 0 THEN
-
-        (* Release the device context *)
-        res := User32.ReleaseDC(glWin.hWind, glWin.hDC);
-        glWin.hDC := 0;
-      IF debug THEN KernelLog.String("release hdc .."); KernelLog.Ln; END;
-    END;
-
-
-
-    (* Do we have a window *)
-    IF glWin.hWind # 0 THEN
-        (* Destroy the window *)
+	(* Do we have a device context *)
+	IF glWin.hDC # 0 THEN
+		(* Release the device context *)
+		res := User32.ReleaseDC(glWin.hWind, glWin.hDC);
+		glWin.hDC := 0;
+		IF debug THEN KernelLog.String("release hdc .."); KernelLog.Ln; END;
+	END;
+	(* Do we have a window *)
+	IF glWin.hWind # 0 THEN
+		(* Destroy the window *)
 		res := User32.DestroyWindow(glWin.hWind );
 		glWin.hWind := Kernel32.NULL;
-        IF debug THEN KernelLog.String("destroy window .."); KernelLog.Ln; END;
-   END;
+		IF debug THEN KernelLog.String("destroy window .."); KernelLog.Ln; END;
+	END;
 
-    (* Do we have an instance? *)
-    IF  glWin.Instance # 0 THEN
-        (* Unregister class *)
-        res := User32.UnregisterClass( glWin.windowClassName, glWin.Instance );
-        glWin.Instance := Kernel32.NULL;
-        IF debug THEN KernelLog.String("unregister class .."); KernelLog.Ln; END;
-    END;
+	(* Do we have an instance? *)
+	IF  glWin.Instance # 0 THEN
+		(* Unregister class *)
+		res := User32.UnregisterClass( glWin.windowClassName, glWin.Instance );
+		glWin.Instance := Kernel32.NULL;
+		IF debug THEN KernelLog.String("unregister class .."); KernelLog.Ln; END;
+	END;
 
 	IF debug THEN KernelLog.String("CloseWindow Ok."); KernelLog.Ln; END;
-	END CloseWindow;
+END CloseWindow;
 
-PROCEDURE CreateGLRC(VAR glWin: WindowStruct; Options: SET; colorbits, depthbits, stencilbits, accumbits, auxbuffers: LONGINT; layer: LONGINT): BOOLEAN;
-
+PROCEDURE CreateGLRC(VAR glWin: WindowStruct; Options: SET; colorbits, depthbits, stencilbits, accumbits, auxbuffers: SIGNED32; layer: SIGNED32): BOOLEAN;
 VAR
   pfd: WinApi.PIXELFORMATDESCRIPTOR;
-  pixelformat : LONGINT;
-  res: LONGINT;
-  tmpflag: WORDSET;
+  pixelformat : SIGNED32;
+  res: SIGNED32;
+  tmpflag: INTEGERSET;
 BEGIN
+	pfd.nSize := SIZEOF(WinApi.PIXELFORMATDESCRIPTOR);
+	pfd.nVersion := 1;
+	tmpflag := WinApi.PFD_SUPPORT_OPENGL + WinApi.PFD_DRAW_TO_WINDOW + WinApi.PFD_DOUBLEBUFFER;
+	IF opStereo IN Options THEN
+		tmpflag := tmpflag + WinApi.PFD_STEREO;
+	END;
 
-    pfd.nSize := SIZEOF(WinApi.PIXELFORMATDESCRIPTOR);
-    pfd.nVersion := 1;
-    tmpflag := WinApi.PFD_SUPPORT_OPENGL + WinApi.PFD_DRAW_TO_WINDOW + WinApi.PFD_DOUBLEBUFFER;
-
-    IF opStereo IN Options THEN
-        tmpflag := tmpflag + WinApi.PFD_STEREO;
-    END;
-
-    pfd.dwFlags := tmpflag;
-    pfd.iPixelType := CHR(WinApi.PFD_TYPE_RGBA);
-    pfd.cColorBits := CHR(colorbits);
-    pfd.cDepthBits := CHR(depthbits);
-    pfd.cStencilBits := CHR(stencilbits);
-    pfd.cAccumBits := CHR(accumbits);
-    pfd.cAuxBuffers := CHR(auxbuffers);
+	pfd.dwFlags := tmpflag;
+	pfd.iPixelType := CHR(WinApi.PFD_TYPE_RGBA);
+	pfd.cColorBits := CHR(colorbits);
+	pfd.cDepthBits := CHR(depthbits);
+	pfd.cStencilBits := CHR(stencilbits);
+	pfd.cAccumBits := CHR(accumbits);
+	pfd.cAuxBuffers := CHR(auxbuffers);
 
 	IF layer = 0 THEN
 		pfd.iLayerType := CHR(WinApi.PFD_MAIN_PLANE);
@@ -459,39 +436,36 @@ BEGIN
 		END;
 		RETURN FALSE;
 	END;
-  (*    ASSERT(pixelformat # 0, 201); *)
+	(* ASSERT(pixelformat # 0, 201); *)
 
 	res := WinApi.DescribePixelFormat(glWin.hDC, pixelformat, SIZEOF(WinApi.PIXELFORMATDESCRIPTOR), ADDRESSOF(pfd));
 	IF res = 0 THEN
 		IF debug THEN
 			KernelLog.String("ERROR: Describepixelformat Kernel32.GetLastError()= "); KernelLog.Int(Kernel32.GetLastError(), 0); KernelLog.Ln;
 		END;
-   		RETURN FALSE;
-   	END;
+   	RETURN FALSE;
+   END;
 
 	res := WinApi.SetPixelFormat(glWin.hDC, pixelformat, ADDRESSOF(pfd));
-	IF res =0 THEN
+	IF res = 0 THEN
 		IF debug THEN
 			KernelLog.String("ERROR: SetpixelFormat: "); KernelLog.Int(Kernel32.GetLastError(), 0); KernelLog.Ln;
 		END;
 		RETURN FALSE;
 	END;
   	(* ASSERT(res # 0, 202); *)
-
 	glWin.hGLRC := GL.wglCreateContext(glWin.hDC);
-
   RETURN (glWin.hGLRC # 0)
-
 END CreateGLRC;
 
-PROCEDURE {WINAPI} WindowProc( wnd: User32.HWND;  uMsg: LONGINT;  wParam: User32.WParam;
+PROCEDURE {WINAPI} WindowProc( wnd: User32.HWND;  uMsg: SIGNED32;  wParam: User32.WParam;
 															    lParam: User32.LParam ): User32.LResult;
 VAR
 	glWin: WindowStruct;
 	context: Context;
 	ret: Kernel32.BOOL;
 BEGIN
-	context := SYSTEM.VAL( Context, User32.GetWindowLong( wnd, WinApi.GWL_USERDATA));
+	context := SYSTEM.VAL( Context, ADDRESS(User32.GetWindowLong( wnd, WinApi.GWL_USERDATA)));
 
 	IF context # NIL THEN
 		RETURN context.WindowHandler( uMsg, wParam, lParam );
@@ -505,7 +479,8 @@ BEGIN
 			ret := User32.PostMessage( wnd, WMSetup, wParam, lParam );
 			RETURN 0;
 		| WMSetup:
-			context := SYSTEM.VAL( Context, lParam );  ret := User32.SetWindowLong( wnd, WinApi.GWL_USERDATA, SYSTEM.VAL(LONGINT, lParam ));
+			context := SYSTEM.VAL( Context, lParam );
+			ret := User32.SetWindowLong( wnd, WinApi.GWL_USERDATA, SIGNED32(ADDRESS(lParam )));
 			glWin := SYSTEM.VAL( WindowStruct, wParam );
 			RETURN 0;
 	ELSE

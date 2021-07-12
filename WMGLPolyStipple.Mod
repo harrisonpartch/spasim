@@ -1,7 +1,7 @@
 MODULE WMGLPolyStipple; (** AUTHOR "fnecati"; PURPOSE "a demo using glPolygonStipple"; *)
  (* example from OpenGL redbook pdf *)
 IMPORT
-	WMRectangles, Strings, Kernel, Modules, SYSTEM, KernelLog,
+	WMRectangles, Strings, Kernel, Modules, KernelLog,
 	WM := WMWindowManager,  WMMessages,
 	GL := OpenGL, GLC := OpenGLConst, WMGL := WMGLWindow;
 
@@ -16,23 +16,21 @@ TYPE
 
 	GLWindow =  OBJECT(WMGL.Window)
 	VAR
-		 timer: Kernel.MilliTimer;
+		timer: Kernel.MilliTimer;
 		alive, animated: BOOLEAN;
 
-		anglez: REAL;
+		anglez: FLOAT32;
 		fly, halftone: Stipples;
 
-		PROCEDURE &New(w, h: LONGINT);
+		PROCEDURE &New(w, h: SIGNED32);
 		BEGIN
 
 			Init(w, h, FALSE); (* use alpha, for 32bpp img *)
 			WM.DefaultAddWindow(SELF);
-
 			SetTitle(Strings.NewString("WMGLPolyStipple"));
-
 			animated := FALSE;
 			anglez := 30.0;
-   			GLinit;
+   		GLinit;
 			Reshape(w, h);
 			UpdateImage;
 			IncCount;
@@ -41,16 +39,14 @@ TYPE
 
 		PROCEDURE KeyEvent (ucs: SIZE; flags: SET; keysym: SIZE);
 		BEGIN
-
-		CASE CHR(ucs) OF
-			"a", "A": BEGIN {EXCLUSIVE} animated := ~ animated; END;
-			| "-" : anglez := anglez - 5.0; UpdateImage;
-			| "+" : anglez := anglez + 5.0; UpdateImage;
-			| "p": PrintVals;
-			| "q" : Close;
-		ELSE
-
-		END;
+			CASE CHR(ucs) OF
+				"a", "A": BEGIN {EXCLUSIVE} animated := ~ animated; END;
+				| "-" : anglez := anglez - 5.0; UpdateImage;
+				| "+" : anglez := anglez + 5.0; UpdateImage;
+				| "p": PrintVals;
+				| "q" : Close;
+			ELSE
+			END;
 		END KeyEvent;
 
 		PROCEDURE Handle(VAR m: WMMessages.Message);
@@ -84,17 +80,17 @@ TYPE
 		BEGIN
 			KernelLog.Ln;
 			KernelLog.String("--------- fly bits----------------");
-			FOR i:=0 TO LEN(fly,0)-1 DO
+			FOR i := 0 TO LEN(fly,0)-1 DO
 				IF (i MOD 8) = 0 THEN KernelLog.Ln; END;
-				KernelLog.Bits(SYSTEM.VAL(SET, fly[i]),0, 8);
+				KernelLog.Bits(SET32(ORD(fly[i])),0, 8);
 			END;
 			KernelLog.Ln; KernelLog.Ln;
 
 			KernelLog.String("--------- halftone bits------------");
 
-			FOR i:=0 TO LEN(fly,0)-1 DO
+			FOR i := 0 TO LEN(halftone,0)-1 DO
 				IF (i MOD 8) = 0 THEN KernelLog.Ln; END;
-				KernelLog.Bits(SYSTEM.VAL(SET, halftone[i]),0, 8);
+				KernelLog.Bits(SET32(ORD(halftone[i])),0, 8);
 			END;
 			KernelLog.Ln;
 			KernelLog.String("----------------------------");	KernelLog.Ln;
@@ -138,37 +134,33 @@ TYPE
 
 			MakeCurrent();
 			GL.ClearColor (0.0, 0.0, 0.0, 0.0); (*  clear the background and set it to black *)
-   			GL.ShadeModel (GLC.GL_FLAT);  (* set the shading model to FLAT *)
+   		GL.ShadeModel (GLC.GL_FLAT);  (* set the shading model to FLAT *)
 			DeActivate;
 		END GLinit;
 
 		PROCEDURE Reshape(w, h: SIZE);
 		BEGIN
-		MakeCurrent();
-			GL.Viewport(0, 0, w(GL.Sizei), h(GL.Sizei));
-			GL.MatrixMode(GLC.GL_PROJECTION);
-			GL.LoadIdentity();
-
-				 GL.Ortho(-2.0, 2.0, -2.0 , 2.0, -2.0, 2.0);
-
-		DeActivate;
+			MakeCurrent();
+				GL.Viewport(0, 0, w(GL.Sizei), h(GL.Sizei));
+				GL.MatrixMode(GLC.GL_PROJECTION);
+				GL.LoadIdentity();
+				GL.Ortho(-2.0, 2.0, -2.0 , 2.0, -2.0, 2.0);
+			DeActivate;
 		END Reshape;
 
 		(* create unit size square object *)
 		PROCEDURE Square;
 		BEGIN
-
 			GL.Begin(GLC.GL_POLYGON);
 			GL.Vertex3f(0.0,0.0 ,0.0);(* a *)
 			GL.Vertex3f(1.0,0.0, 0.0);(* b *)
 			GL.Vertex3f(1.0,1.0,0.0);(* c *)
 			GL.Vertex3f(0.0,1.0,0.0);(* d *)
 			GL.End();
-
 		END Square;
 
 		PROCEDURE DrawStripple;
-		VAR ianglez : REAL;
+		VAR ianglez : FLOAT32;
 		BEGIN
 			ianglez := -anglez;
 			GL.Clear (GLC.GL_COLOR_BUFFER_BIT);
@@ -191,9 +183,7 @@ TYPE
 				GL.Color3f (0.0, 0.0, 1.0);
 				GL.Translatef(1.0, 0.0, 0.0);
 					GL.PushMatrix();
-
-							GL.Rotatef(ianglez, 0.0, 0.0, 1.0);
-
+						GL.Rotatef(ianglez, 0.0, 0.0, 1.0);
 						GL.PolygonStipple (ADDRESSOF(halftone[0]));
 						Square();
 					GL.PopMatrix();
@@ -202,11 +192,9 @@ TYPE
 			(* draw a stippled with fly, rotating cyan square *)
 			GL.Color3f (0.0, 1.0, 1.0);
 			GL.PushMatrix();
-
-					GL.Rotatef(anglez, 0.0, 0.0, 1.0);
-
+				GL.Rotatef(anglez, 0.0, 0.0, 1.0);
 				GL.PolygonStipple (ADDRESSOF(fly[0]));
-			    	GL.Rectd (-1.9, 1.9, -0.1, 0.1);
+				GL.Rectd (-1.9, 1.9, -0.1, 0.1);
 			GL.PopMatrix();
 
 			GL.Disable (GLC.GL_POLYGON_STIPPLE);    (* disable POLYGON STIPPLE *)
@@ -225,11 +213,10 @@ BEGIN {ACTIVE}
 END GLWindow;
 
 VAR
-	nofWindows : LONGINT;
+	nofWindows : SIGNED32;
 
 PROCEDURE Open*;
-VAR
-	window: GLWindow;
+VAR window: GLWindow;
 BEGIN
 	NEW(window, 256, 256);
 END Open;

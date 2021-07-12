@@ -33,7 +33,7 @@ VAR
 	swa : X11.XSetWindowAttributes; (* set window attributes*)
 	cmap : X11.Colormap; (* colormap for window *)
 
-	width, height : LONGINT; (* size of window *)
+	width, height : SIGNED32; (* size of window *)
 	alive : BOOLEAN; (* for main loop control *)
 
 	context: Commands.Context; (* StdIO context *)
@@ -48,21 +48,21 @@ VAR
 	compstatus: X11.ComposeStatus;
 
 	MMseen, MRseen: BOOLEAN;
-	noEventCount: LONGINT;
+	noEventCount: SIGNED32;
 
 
 VAR
-	keySymbol: ARRAY 256 OF LONGINT;
-	currX, currY: LONGINT;
+	keySymbol: ARRAY 256 OF SIGNED32;
+	currX, currY: SIGNED32;
 
 
   (*  gear variables *)
   	gear1, gear2, gear3: GL.Uint;
   	rotx, roty, rotz, angle: GL.Float;
 
-PROCEDURE  MakeGear (innerRadius, outerRadius, width: GL.Float; teeth: LONGINT;  toothDepth: GL.Float);
+PROCEDURE  MakeGear (innerRadius, outerRadius, width: GL.Float; teeth: SIGNED32;  toothDepth: GL.Float);
 VAR  r0, r1, r2 , angle, da, u, v, len: GL.Float;
-	  i: LONGINT;
+	  i: SIGNED32;
 BEGIN
 
 	r0 := innerRadius;
@@ -255,7 +255,7 @@ BEGIN
      GL.glXSwapBuffers(display, win);
 END DrawGears;
 
-PROCEDURE Reshape(w, h: LONGINT);
+PROCEDURE Reshape(w, h: SIGNED32);
 BEGIN
 
 	GL.Viewport(0, 0, w, h);
@@ -271,7 +271,7 @@ END Reshape;
 
 (* close the window and its resources *)
  PROCEDURE Close;
-  VAR res: LONGINT;
+  VAR res: SIGNED32;
  BEGIN
 	(* do we have a rendering context *)
 	IF glctx # 0 THEN
@@ -302,10 +302,10 @@ END Reshape;
 
  END Close;
 
-PROCEDURE  InitWindow(w, h: LONGINT; CONST title: ARRAY OF CHAR);
+PROCEDURE  InitWindow(w, h: SIGNED32; CONST title: ARRAY OF CHAR);
 VAR
-	res: LONGINT;
-	masks: LONGWORD;
+	res: SIGNED32;
+	masks: LONGINTEGER;
 	attrib : POINTER TO ARRAY OF GL.Int;  (* attributes of GL window *)
 	defwin: X11.Window;
 BEGIN
@@ -411,7 +411,7 @@ END Wr;
 (* save the rendered image to disk when mouse clicked *)
 PROCEDURE SaveImage(CONST fname: ARRAY OF CHAR);
 VAR image: Raster.Image;
-	i, res: LONGINT;
+	i, res: SIGNED32;
 BEGIN
 	NEW(image);
 	Raster.Create(image, width, height,Raster.BGRA8888);
@@ -437,7 +437,7 @@ END SaveImage;
 	END CheckAlternateKeys;
 
 	(* mouse handler *)
-	PROCEDURE SendMouseMsg( x, y, dz: LONGINT; xbuttons: SET32 );
+	PROCEDURE SendMouseMsg( x, y, dz: SIGNED32; xbuttons: SET32 );
 	VAR mm: Inputs.AbsMouseMsg;
 	BEGIN
 		mm.keys := {};
@@ -472,7 +472,7 @@ END SaveImage;
 		RETURN keys
 	END KeyState;
 
-	PROCEDURE WrKey(keysym: LONGWORD);
+	PROCEDURE WrKey(keysym: LONGINTEGER);
 	BEGIN
 		context.out.String("keysym: "); context.out.Int(keysym,0); context.out.String(":"); context.out.Hex(keysym, 8);
 
@@ -482,7 +482,7 @@ END SaveImage;
 
 (* process pending X11 events, from Unix.KbdMouse.Mod *)
 	PROCEDURE PollXQueue;
-	VAR eventcount, keycount, xr, yr, x, y, dz, i, res: LONGINT;
+	VAR eventcount, keycount, xr, yr, x, y, dz, i, res: SIGNED32;
 		rw, cw: X11.Window;  buffer: X11.Buffer;  keysym: X11.KeySym;
 		newxbuttons, bdiff: SET32;
 		 km: Inputs.KeyboardMsg;
@@ -587,7 +587,7 @@ END SaveImage;
 
 (* windows main loop *)
 PROCEDURE MainLoop;
-VAR	frames : LONGINT;
+VAR	frames : SIGNED32;
 BEGIN
 frames := 0;
 Kernel.SetTimer(timer, 5000);

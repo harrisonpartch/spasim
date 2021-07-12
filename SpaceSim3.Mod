@@ -8,15 +8,15 @@ TYPE
 	SpaceWindow = OBJECT(OGW.Window)
 	VAR
 		model: ML.Model3D;
-		textureId: LONGINT;
+		textureId: GL.Uint;
 		(* Absolute rotation values (0-359 degrees) and rotation increments for each frame *)
-		rotationX, deltaXrotation: REAL;
-		rotationY, deltaYrotation: REAL;
-		rotationZ, deltaZrotation: REAL;
-		transZ: REAL;
+		rotationX, deltaXrotation: FLOAT32;
+		rotationY, deltaYrotation: FLOAT32;
+		rotationZ, deltaZrotation: FLOAT32;
+		transZ: FLOAT32;
 		
 		(* Flag for rendering as lines or filled polygons *)
-		filling: INTEGER;
+		filling: SIGNED16;
 
 		object:  ML.Object3D;
 		fname: ARRAY 128 OF CHAR;
@@ -41,7 +41,7 @@ TYPE
 	(* Used to initialize OpenGL and to setup our world *)
 	PROCEDURE OnLoad;
 	VAR loadok: BOOLEAN;
-		ratio: LONGREAL;
+		ratio: FLOAT64;
 	BEGIN
 		ratio := width / height;
 		GL.ClearColor(0.0, 0.0, 0.0, 0.0);  (* This clear the background color to black *)
@@ -69,8 +69,8 @@ TYPE
 	END OnLoad;
 
 	(* This routine must be called everytime we resize our window.*)
-	PROCEDURE Reshape (w, h: LONGINT);
-	VAR ratio: LONGREAL;
+	PROCEDURE Reshape (w, h: SIGNED32);
+	VAR ratio: FLOAT64;
 	BEGIN
 		ratio := w /h;
 		GL.Viewport(0,0,width, height);  (* Viewport transformation *)
@@ -80,7 +80,7 @@ TYPE
 	END Reshape;
 
 	(* Used to handle the keyboard input *)
-	PROCEDURE KeyEvent* (ucs : LONGINT; flags : SET; keysym : LONGINT);
+	PROCEDURE KeyEvent* (ucs : SIGNED32; flags : SET; keysym : SIGNED32);
 	BEGIN
 		CASE CHR(ucs) OF
 			"q": Close;
@@ -108,7 +108,7 @@ TYPE
 	END KeyEvent;
 
 	PROCEDURE DrawObjectVert(object: ML.Object3D );
-		VAR  i: LONGINT;
+		VAR  i: SIGNED32;
 	BEGIN
 		GL.Color3f(1.0, 0.0, 0.0);
 		GL.Begin(GLC.GL_TRIANGLES);  (* glBegin and glEnd delimit the vertices that define a primitive (in our case triangles) *)
@@ -135,7 +135,7 @@ TYPE
 	END DrawObjectVert;
 
 	PROCEDURE DrawObjectTextured(object: ML.Object3D );
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 	BEGIN
 		GL.BindTexture(GLC.GL_TEXTURE_2D, textureId);  (* We set the active texture  *)
 		GL.Begin(GLC.GL_TRIANGLES);  (* glBegin and glEnd delimit the vertices that define a primitive (in our case triangles) *)

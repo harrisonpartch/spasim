@@ -17,15 +17,15 @@ TYPE
 
 		alive, animated: BOOLEAN;
 
-		eyeposz: LONGREAL;
-		drawMode:LONGINT; (* fill, lines, points *)
+		eyeposz: FLOAT64;
+		drawMode:SIGNED32; (* fill, lines, points *)
 		light : BOOLEAN;
-		angle: REAL;
+		angle: FLOAT32;
 		vboId, colorId, normalId : GL.Uint;     (* ID of VBO for vertex arrays*)
 		lightKa, lightKd, lightKs, lightPos : ARRAY [4] OF GL.Float;
-		vertices, normals, colors: ARRAY [*] OF REAL ;
+		vertices, normals, colors: ARRAY [*] OF FLOAT32 ;
 
-	PROCEDURE &New(w, h: LONGINT);
+	PROCEDURE &New(w, h: SIGNED32);
 	BEGIN
 		Init(w, h, FALSE); (* use alpha, for 32bpp img *)
 		WM.DefaultAddWindow(SELF);
@@ -232,8 +232,8 @@ TYPE
 		RETURN TRUE;
 	END initGL;
 
-	PROCEDURE DrawMode(dm: LONGINT);
-	VAR drawMode: LONGINT;
+	PROCEDURE DrawMode(dm: SIGNED32);
+	VAR drawMode: SIGNED32;
 	BEGIN
 		MakeCurrent();
 
@@ -290,7 +290,7 @@ BEGIN { ACTIVE }
 END GLWindow;
 
 VAR
-	nofWindows : LONGINT;
+	nofWindows : SIGNED32;
 
 PROCEDURE Open*;
 VAR

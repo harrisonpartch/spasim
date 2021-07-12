@@ -7,10 +7,10 @@ IMPORT
 TYPE
 	MyGLControl = OBJECT(OGW.Window)
 	VAR
-		listenerPos, source0Pos, source1Pos,  source2Pos  : ARRAY [3] OF REAL;
-		transdz: REAL;
+		listenerPos, source0Pos, source1Pos,  source2Pos  : ARRAY [3] OF FLOAT32;
+		transdz: FLOAT32;
 
-	PROCEDURE &New(w, h: LONGINT );
+	PROCEDURE &New(w, h: SIGNED32 );
 	BEGIN
 		Init(w,h,400,100, FALSE);
 		listenerPos := [ 0.0, 0.0, 4.0];
@@ -38,23 +38,23 @@ TYPE
 		Close^;
 	END Close;
 
-	PROCEDURE PointerMove* (x, y : LONGINT; keys : SET);
+	PROCEDURE PointerMove* (x, y : SIGNED32; keys : SET);
 	BEGIN
 	(*	KernelLog.String("PointerMove: "); KernelLog.Int(x, 0); KernelLog.Int(y,4); KernelLog.String(" : "); KernelLog.Bits(keys, 0, 4);  KernelLog.Ln;*)
 	END PointerMove;
 
-	PROCEDURE PointerDown* (x, y : LONGINT; keys : SET);
+	PROCEDURE PointerDown* (x, y : SIGNED32; keys : SET);
 	BEGIN
 		KernelLog.String("PointerDown: "); KernelLog.Int(x, 0); KernelLog.Int(y,4); KernelLog.String(" : "); KernelLog.Bits(keys, 0, 4);  KernelLog.Ln;
 	END PointerDown;
 
-	PROCEDURE PointerUp* (x, y : LONGINT; keys : SET);
+	PROCEDURE PointerUp* (x, y : SIGNED32; keys : SET);
 	BEGIN
 		(* KernelLog.String("PointerUp: "); KernelLog.Int(x, 0); KernelLog.Int(y,4); KernelLog.String(" : "); KernelLog.Bits(keys, 0, 4);  KernelLog.Ln;*)
 	END PointerUp;
 
 	(** *)
-	PROCEDURE WheelMove*(dz: LONGINT);
+	PROCEDURE WheelMove*(dz: SIGNED32);
 	BEGIN
 		transdz := transdz + dz;
 		Reshape(width, height);
@@ -62,7 +62,7 @@ TYPE
 	END WheelMove;
 
 	(** *)
-	PROCEDURE KeyEvent* (ucs : LONGINT; flags : SET; keysym : LONGINT);
+	PROCEDURE KeyEvent* (ucs : SIGNED32; flags : SET; keysym : SIGNED32);
 	BEGIN
 		CASE CHR(ucs) OF
 		"q": Close;
@@ -83,7 +83,7 @@ TYPE
 	END KeyEvent ;
 
 	PROCEDURE ChangePosititon*;
-	VAR x: REAL;
+	VAR x: FLOAT32;
 	BEGIN
 		x := listenerPos[0] + 0.1;
 		IF x > 3.0 THEN x := -3.0; END;
@@ -92,7 +92,7 @@ TYPE
 
 
 	PROCEDURE Display;
-	VAR x: REAL;
+	VAR x: FLOAT32;
 	BEGIN
 		GL.Clear(GLC.GL_COLOR_BUFFER_BIT + GLC.GL_DEPTH_BUFFER_BIT) ;
 		GL.PushMatrix() ;
@@ -135,8 +135,8 @@ TYPE
 		END Display;
 
 
-		PROCEDURE Reshape(w, h: LONGINT);
-		VAR ratio: LONGREAL;
+		PROCEDURE Reshape(w, h: SIGNED32);
+		VAR ratio: FLOAT64;
 		BEGIN
 			ratio := w / h;
 			GL.Viewport(0, 0, w, h) ;

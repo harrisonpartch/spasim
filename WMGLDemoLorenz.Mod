@@ -58,29 +58,29 @@ TYPE
 	GLWindow =  OBJECT(WMGL.Window)
 	VAR
 		timer: Kernel.MilliTimer;
-		waittime: LONGINT; (* between animation time *)
+		waittime: SIGNED32; (* between animation time *)
 		alive,  animated: BOOLEAN;
 
 		red_position: Positions ;          (* Path of the red point *)
 		grn_position: Positions ;          (* Path of the green point *)
-		array_index: LONGINT ;                             (* Position in *_position arrays of most recent point *)
-		distance: LONGREAL ;                       (* Distance between the two points *)
+		array_index: SIGNED32 ;                             (* Position in *_position arrays of most recent point *)
+		distance: FLOAT64 ;                       (* Distance between the two points *)
 
 		(* GLUT variables *)
-		yaw, pit: LONGREAL ;                 (* Euler angles of the viewing rotation *)
-		scale: LONGREAL;                          (* Scale factor *)
-		xcen, ycen, zcen: LONGREAL ;   (* Coordinates of the point looked at *)
+		yaw, pit: FLOAT64 ;                 (* Euler angles of the viewing rotation *)
+		scale: FLOAT64;                          (* Scale factor *)
+		xcen, ycen, zcen: FLOAT64 ;   (* Coordinates of the point looked at *)
 
-		animate: LONGINT; ;                             (* 0 - stop, 1 = go, 2 = single-step *)
+		animate: SIGNED32; ;                             (* 0 - stop, 1 = go, 2 = single-step *)
 
 		(* Lorenz Attractor variables *)
-		s0, r0, b0 : LONGREAL ;   (* Default Lorenz attactor parameters *)
-		time_step : LONGREAL ;                     (* Time step in the simulation *)
-		sigma, r, b: LONGREAL ;  (* Lorenz attactor parameters *)
+		s0, r0, b0 : FLOAT64 ;   (* Default Lorenz attactor parameters *)
+		time_step : FLOAT64 ;                     (* Time step in the simulation *)
+		sigma, r, b: FLOAT64 ;  (* Lorenz attactor parameters *)
 
 		distancestr: ARRAY 64 OF CHAR; (* to display distance on the window *);
 
-	PROCEDURE &New(w, h: LONGINT);
+	PROCEDURE &New(w, h: SIGNED32);
 	BEGIN
 		Init(w, h, FALSE); (* use alpha, for 32bpp img *)
 		WM.DefaultAddWindow(SELF);
@@ -103,7 +103,7 @@ TYPE
 	END New;
 
 	PROCEDURE ResetPositions;
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 	BEGIN
 
 		(* Reset the Lorenz parameters *)
@@ -238,8 +238,8 @@ TYPE
 		DeActivate;
 	END initGL;
 
-	PROCEDURE DrawCurve (index: LONGINT; CONST position: Positions);
-	VAR i: LONGINT;
+	PROCEDURE DrawCurve (index: SIGNED32; CONST position: Positions);
+	VAR i: SIGNED32;
 	BEGIN
 		i := index;
 		gl.Begin (glc.GL_LINE_STRIP) ;
@@ -304,8 +304,8 @@ TYPE
 
 	PROCEDURE TimerCB;
 	VAR
-		deltax, deltay, deltaz: LONGREAL;
-		new_index: LONGINT;
+		deltax, deltay, deltaz: FLOAT64;
+		new_index: SIGNED32;
 		str: ARRAY 64 OF CHAR;
 	BEGIN
 
@@ -345,7 +345,7 @@ TYPE
 	 	deriv[2] := -position[0] * position[1] - b * position[2] ;
 	END CalcDeriv;
 
-	PROCEDURE AdvanceInTime (time_step: LONGREAL;  CONST position: Vector3d; VAR new_position: Vector3d );
+	PROCEDURE AdvanceInTime (time_step: FLOAT64;  CONST position: Vector3d; VAR new_position: Vector3d );
 	VAR
 	       deriv0, deriv1, deriv2, deriv3: Vector3d;
 	BEGIN
@@ -385,7 +385,7 @@ END GLWindow;
 
 VAR
 	random: Random.Generator;
-	nofWindows : LONGINT;
+	nofWindows : SIGNED32;
 
 PROCEDURE Open*;
 VAR

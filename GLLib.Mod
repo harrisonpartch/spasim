@@ -38,18 +38,18 @@ BEGIN
 	ASSERT(quadObj # 0, 60)
 END InitQuadObj;
 
-PROCEDURE  Set2f (VAR a: ARRAY [2] OF gl.Float;  a0, a1: REAL);
+PROCEDURE  Set2f (VAR a: ARRAY [2] OF gl.Float;  a0, a1: FLOAT32);
 BEGIN
 	a[0] := a0;  a[1] := a1
 END Set2f;
 
-PROCEDURE  Set3f (VAR a: ARRAY [3] OF gl.Float;  a0, a1, a2: REAL);
+PROCEDURE  Set3f (VAR a: ARRAY [3] OF gl.Float;  a0, a1, a2: FLOAT32);
 BEGIN
 	a[0] := a0;  a[1] := a1;  a[2] := a2
 END Set3f;
 
 PROCEDURE  Set16i (VAR a: ARRAY [16] OF gl.Int;
-							a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15: LONGINT);
+							a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15: SIGNED32);
 BEGIN
 	a[0] := a0;  a[1] := a1;  a[2] := a2;  a[3] := a3;
 	a[4] := a4;  a[5] := a5;  a[6] := a6;  a[7] := a7;
@@ -80,7 +80,7 @@ END NormalizeV;
 PROCEDURE  DrawBox (size: gl.Float;  type: gl.Enum);
 VAR  n: ARRAY [6,3] OF gl.Float;  faces: ARRAY [6,4] OF gl.Int;
 	v: ARRAY [8,3] OF gl.Float;
-	i: LONGINT;  s: gl.Float;
+	i: SIGNED32;  s: gl.Float;
 BEGIN
 	n := [ 	[ -1.0, 0.0, 0.0], [ 0.0, 1.0, 0.0], [ 1.0, 0.0, 0.0],
 			[ 0.0, -1.0, 0.0],	[ 0.0, 0.0, 1.0], 	[ 0.0, 0.0, -1.0]	];
@@ -103,17 +103,17 @@ BEGIN
 	END;
 END DrawBox;
 
-PROCEDURE  WireCube* (size: REAL);
+PROCEDURE  WireCube* (size: FLOAT32);
 BEGIN
 	DrawBox(size, glc.GL_LINE_LOOP)
 END WireCube;
 
-PROCEDURE  SolidCube* (size: REAL);
+PROCEDURE  SolidCube* (size: FLOAT32);
 BEGIN
 	DrawBox(size, glc.GL_QUADS)
 END SolidCube;
 
-PROCEDURE  WireSphere* (radius: REAL;  slices, stacks: LONGINT);
+PROCEDURE  WireSphere* (radius: FLOAT32;  slices, stacks: SIGNED32);
 BEGIN
 	InitQuadObj;
 	glu.QuadricDrawStyle(quadObj, glu.GLU_LINE);
@@ -121,7 +121,7 @@ BEGIN
 	glu.Sphere(quadObj, radius, slices, stacks)
 END WireSphere;
 
-PROCEDURE SolidSphere* (radius: REAL;  slices, stacks: LONGINT);
+PROCEDURE SolidSphere* (radius: FLOAT32;  slices, stacks: SIGNED32);
 BEGIN
 	InitQuadObj;
 	glu.QuadricDrawStyle(quadObj, glu.GLU_FILL);
@@ -131,7 +131,7 @@ END SolidSphere;
 
 
 (** baseradius at z=0, topradius at x=height *)
-PROCEDURE WireCylinder* (baseradius, topradius, height: REAL;  slices, stacks: LONGINT);
+PROCEDURE WireCylinder* (baseradius, topradius, height: FLOAT32;  slices, stacks: SIGNED32);
 BEGIN
 	InitQuadObj;
 	glu.QuadricDrawStyle(quadObj, glu.GLU_LINE);
@@ -140,7 +140,7 @@ BEGIN
 END WireCylinder;
 
 (** baseradius at z=0, topradius at x=height *)
-PROCEDURE SolidCylinder* (baseradius, topradius, height: REAL;  slices, stacks: LONGINT);
+PROCEDURE SolidCylinder* (baseradius, topradius, height: FLOAT32;  slices, stacks: SIGNED32);
 BEGIN
 	InitQuadObj;
 	glu.QuadricDrawStyle(quadObj, glu.GLU_FILL);
@@ -148,7 +148,7 @@ BEGIN
 	glu.Cylinder(quadObj, baseradius, topradius, height, slices, stacks)
 END SolidCylinder;
 
-PROCEDURE WireCone* (base, height: REAL;  slices, stacks: LONGINT);
+PROCEDURE WireCone* (base, height: FLOAT32;  slices, stacks: SIGNED32);
 BEGIN
 	InitQuadObj;
 	glu.QuadricDrawStyle(quadObj, glu.GLU_LINE);
@@ -156,7 +156,7 @@ BEGIN
 	glu.Cylinder(quadObj, base, 0.0, height, slices, stacks);
 END WireCone;
 
-PROCEDURE  SolidCone* (base, height: REAL;  slices, stacks: LONGINT);
+PROCEDURE  SolidCone* (base, height: FLOAT32;  slices, stacks: SIGNED32);
 BEGIN
 	InitQuadObj;
 	glu.QuadricDrawStyle(quadObj, glu.GLU_FILL);
@@ -164,10 +164,10 @@ BEGIN
 	glu.Cylinder(quadObj, base, 0.0, height, slices, stacks);
 END SolidCone;
 
-PROCEDURE Torus (r, R: REAL;  nsides, rings: LONGINT);
-VAR  i, j: LONGINT;
+PROCEDURE Torus (r, R: FLOAT32;  nsides, rings: SIGNED32);
+VAR  i, j: SIGNED32;
 	theta, phi, theta1, cosPhi, sinPhi, dist, cosTheta, sinTheta,
-	cosTheta1, sinTheta1, ringDelta, sideDelta: REAL;
+	cosTheta1, sinTheta1, ringDelta, sideDelta: FLOAT32;
 BEGIN
 	ringDelta := 2.0 * pi / rings;  sideDelta := 2.0 * pi / nsides;
 	theta := 0.0;  cosTheta := 1.0;  sinTheta := 0.0;
@@ -193,7 +193,7 @@ BEGIN
 	END
 END Torus;
 
-PROCEDURE  WireTorus* (innerRadius, outerRadius: REAL;  nsides, rings: LONGINT);
+PROCEDURE  WireTorus* (innerRadius, outerRadius: FLOAT32;  nsides, rings: SIGNED32);
 BEGIN
 	gl.PushAttrib(glc.GL_POLYGON_BIT);
 	gl.PolygonMode(glc.GL_FRONT_AND_BACK, glc.GL_LINE);
@@ -201,7 +201,7 @@ BEGIN
 	gl.PopAttrib
 END WireTorus;
 
-PROCEDURE  SolidTorus* (innerRadius, outerRadius: REAL;  nsides, rings: LONGINT);
+PROCEDURE  SolidTorus* (innerRadius, outerRadius: FLOAT32;  nsides, rings: SIGNED32);
 BEGIN
 	Torus(innerRadius, outerRadius, nsides, rings)
 END SolidTorus;
@@ -222,7 +222,7 @@ BEGIN
 END RecordItem;
 
 PROCEDURE  Subdivide (CONST v0, v1, v2: ARRAY [3] OF gl.Float;  shadeType: gl.Enum);
-VAR  depth, i, j, k, n: LONGINT;
+VAR  depth, i, j, k, n: SIGNED32;
 	w0, w1, w2: ARRAY [3] OF gl.Float;
 BEGIN
 	depth := 1;
@@ -240,13 +240,13 @@ BEGIN
 	END
 END Subdivide;
 
-PROCEDURE DrawTriangle (i: LONGINT; VAR data: ARRAY [*,3] OF gl.Float;  VAR ndx: ARRAY [*,3] OF gl.Int; shadeType: gl.Enum);
+PROCEDURE DrawTriangle (i: SIGNED32; VAR data: ARRAY [*,3] OF gl.Float;  VAR ndx: ARRAY [*,3] OF gl.Int; shadeType: gl.Enum);
 BEGIN
 	Subdivide(data[ndx[i, 0]], data[ndx[i, 1]], data[ndx[i, 2]], shadeType)
 END DrawTriangle;
 
 PROCEDURE  DrawTetrahedron (shadeType: gl.Enum);
-	VAR  i: LONGINT;
+	VAR  i: SIGNED32;
 BEGIN
 	FOR  i := 3 TO 0 BY -1 DO
 		DrawTriangle(i, tData, tIndex, shadeType)
@@ -264,7 +264,7 @@ BEGIN
 END SolidTetrahedron;
 
 PROCEDURE DrawIcosahedron (shadeType: gl.Enum);
-VAR  i: LONGINT;
+VAR  i: SIGNED32;
 BEGIN
 	FOR  i := 19 TO 0 BY -1 DO
 		DrawTriangle(i, iData, iIndex, shadeType)
@@ -282,7 +282,7 @@ BEGIN
 END SolidIcosahedron;
 
 PROCEDURE  DrawTeapot (grid: gl.Int;  scale: gl.Float;  type: gl.Enum);
-VAR  i, j, k, l: LONGINT;  p, q, r, s: ARRAY [4, 4, 3] OF gl.Float;
+VAR  i, j, k, l: SIGNED32;  p, q, r, s: ARRAY [4, 4, 3] OF gl.Float;
 BEGIN
 	gl.PushAttrib(glc.GL_ENABLE_BIT + glc.GL_EVAL_BIT);
 	gl.Enable(glc.GL_AUTO_NORMAL);
@@ -332,18 +332,18 @@ BEGIN
 END DrawTeapot;
 
 
-PROCEDURE  SolidTeapot* (scale: REAL);
+PROCEDURE  SolidTeapot* (scale: FLOAT32);
 BEGIN
 	DrawTeapot(14, scale, glc.GL_FILL)
 END SolidTeapot;
 
-PROCEDURE  WireTeapot* (scale: REAL);
+PROCEDURE  WireTeapot* (scale: FLOAT32);
 BEGIN
 	DrawTeapot(10, scale, glc.GL_LINE)
 END WireTeapot;
 
 PROCEDURE DrawOctahedron (shadeType: gl.Enum);
-VAR  i: LONGINT;
+VAR  i: SIGNED32;
 BEGIN
 	FOR  i := 7 TO 0 BY -1 DO
 		DrawTriangle(i, oData, oIndex, shadeType)
@@ -360,7 +360,7 @@ BEGIN
 	DrawOctahedron(glc.GL_TRIANGLES)
 END SolidOctahedron;
 
-PROCEDURE  DrawPentagon (a, b, c, d, e: LONGINT;  shadeType: gl.Enum);
+PROCEDURE  DrawPentagon (a, b, c, d, e: SIGNED32;  shadeType: gl.Enum);
 VAR  n, d1, d2: ARRAY [3] OF gl.Float;
 BEGIN
 	d1 := dodec[a] - dodec[b];
@@ -404,7 +404,7 @@ BEGIN
 END SolidDodecahedron;
 
 PROCEDURE  InitDodecahedron;
-VAR  alpha, beta: REAL;
+VAR  alpha, beta: FLOAT32;
 BEGIN
 	alpha := Math.sqrt(2.0 / (3.0 + Math.sqrt(5.0)));
 	beta := 1.0 + Math.sqrt(6.0 / (3.0 + Math.sqrt(5.0)) -
@@ -420,7 +420,7 @@ BEGIN
 END InitDodecahedron;
 
 PROCEDURE  InitTeapot;
-VAR  i: LONGINT;
+VAR  i: SIGNED32;
 BEGIN
 	i := 0;
 	(* rim *)

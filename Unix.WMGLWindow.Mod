@@ -58,12 +58,12 @@ TYPE
 			UpdateImage;
 		END Resized;
 
-		PROCEDURE GetDisplay*(): LONGINTEGER;
+		PROCEDURE GetDisplay*(): ADDRESS;
 		BEGIN
 			RETURN context.GetDisplay();
 		END GetDisplay;
 
-		PROCEDURE GetContext*(): LONGINTEGER;
+		PROCEDURE GetContext*(): ADDRESS;
 		BEGIN
 			RETURN context.GetContext();
 		END GetContext;

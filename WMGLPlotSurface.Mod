@@ -23,7 +23,7 @@ TYPE
 	KillerMsg = OBJECT
 	END KillerMsg;
 
-	TVector3d = ARRAY [3] OF LONGREAL;
+	TVector3d = ARRAY [3] OF FLOAT64;
 
 	GLWindow =  OBJECT(WMGL.Window)
 	VAR
@@ -31,10 +31,10 @@ TYPE
 		ambientLight,  diffuseLight, specularLight,
 		(* Position the light somewhere close over the top of the figure*)
 	  	position: ARRAY [4] OF GL.Float;
-		drawMode: LONGINT;
+		drawMode: SIGNED32;
 		funcplane: GL.Uint;
 
-	PROCEDURE &New(w, h: LONGINT);
+	PROCEDURE &New(w, h: SIGNED32);
 	BEGIN
 		Init(w, h, FALSE); (* use alpha, for 32bpp img *)
 		WM.DefaultAddWindow(SELF);
@@ -114,13 +114,13 @@ TYPE
 		RETURN result
 	END Cross;
 
-	PROCEDURE Sqr(x: LONGREAL):LONGREAL;
+	PROCEDURE Sqr(x: FLOAT64):FLOAT64;
 	BEGIN
 		RETURN x * x
 	END Sqr;
 
-	PROCEDURE VLength3(CONST a0: TVector3d):LONGREAL;
-	VAR t: LONGREAL;
+	PROCEDURE VLength3(CONST a0: TVector3d):FLOAT64;
+	VAR t: FLOAT64;
 		a: TVector3d;
 	BEGIN
 		a := a0;
@@ -133,7 +133,7 @@ TYPE
 		END
 	END VLength3;
 
-	PROCEDURE VScaled3(CONST a: TVector3d; factor: LONGREAL):TVector3d;
+	PROCEDURE VScaled3(CONST a: TVector3d; factor: FLOAT64):TVector3d;
 	VAR result : TVector3d;
 	BEGIN
 	       result := factor*a;
@@ -146,16 +146,16 @@ TYPE
 	END VNormed3;
 
 
-(*	PROCEDURE MyFunc ( x, y: LONGREAL): LONGREAL;
-	VAR z: LONGREAL;
+(*	PROCEDURE MyFunc ( x, y: FLOAT64): FLOAT64;
+	VAR z: FLOAT64;
 	BEGIN
 		 z := 2*Math.exp(- (x*x + y*y));
 		 RETURN z;
 	END MyFunc;
 
 *)
-	PROCEDURE MyFunc ( x, y: LONGREAL): LONGREAL;
-	VAR z, r: LONGREAL;
+	PROCEDURE MyFunc ( x, y: FLOAT64): FLOAT64;
+	VAR z, r: FLOAT64;
 	BEGIN
 		r :=10* (x*x + y*y);
 		IF r # 0.0  THEN
@@ -167,7 +167,7 @@ TYPE
 	END MyFunc;
 
 	PROCEDURE Grid;
-	VAR x: LONGREAL;
+	VAR x: FLOAT64;
 	BEGIN
 		GL.LineWidth(1.0);
 		GL.Color3d(1.0,1.0,1.0);
@@ -186,8 +186,8 @@ TYPE
 	END Grid;
 (*
 	PROCEDURE render;
-	VAR i, j: LONGINT;
-		x, y: LONGREAL;
+	VAR i, j: SIGNED32;
+		x, y: FLOAT64;
 	BEGIN
 		FOR i:=0 TO Nx-1 DO
 			FOR j:=0 TO Ny-1 DO
@@ -204,8 +204,8 @@ TYPE
 	END render;
 *)
 	PROCEDURE render;
-	VAR i, j: LONGINT;
-		x, y: LONGREAL;
+	VAR i, j: SIGNED32;
+		x, y: FLOAT64;
 		p1, p2, p3, norm, v1, v2: TVector3d;
 	BEGIN
 		FOR i:=0 TO Nx-1 DO
@@ -253,8 +253,8 @@ TYPE
 		DeActivate;
 	END Reshape;
 
-	PROCEDURE DrawMode(dm: LONGINT);
-	VAR drawMode: LONGINT;
+	PROCEDURE DrawMode(dm: SIGNED32);
+	VAR drawMode: SIGNED32;
 	BEGIN
 		drawMode := dm;
 		MakeCurrent();
@@ -321,7 +321,7 @@ BEGIN
 END GLWindow;
 
 VAR
-	nofWindows : LONGINT;
+	nofWindows : SIGNED32;
 
 PROCEDURE Open*;
 VAR
