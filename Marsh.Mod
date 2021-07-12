@@ -536,7 +536,7 @@ BEGIN
 	
 	z3:= Base.VoxelFromName("NM3");
 
-	z3.setcolor(0.3,0.05,0.5,0.5,0.5,0.1);
+	z3.setcolor(0.3,0.05,0.05,0.05,0.5,0.1);
 
 	dieone:=Base.VoxelFromName("NCjgzkmiTyecI5x6eOgYqpQ"); 	
   push(dieone);
