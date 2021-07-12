@@ -10,7 +10,7 @@ BEGIN
 END thisvox;
 
 BEGIN
-	NEW(cv,"ugandaknuckles.png");
+	NEW(cv,"statue.png");
 	cv.passable:=TRUE; 	
 END Nharrisonavatar. 
  

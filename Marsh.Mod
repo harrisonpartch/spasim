@@ -183,7 +183,7 @@ BEGIN
 	p.y:=p.y+ray.dxyz.y/10000000;
 	p.z:=p.z+ray.dxyz.z/10000000;
 	Base.cursorPT:=p; 	
-	stroke(p,cursorsize,marshv.vox)
+  IF marshv.vox#NIL THEN stroke(p,cursorsize,marshv.vox) END
 END snipeinto;
 
 PROCEDURE snipeonto*;
@@ -200,7 +200,7 @@ BEGIN
 	p.y:=p.y-ray.dxyz.y/1000000;
 	p.z:=p.z-ray.dxyz.z/1000000;
 	Base.cursorPT:=p; 	
-	stroke(Base.cursorPT,cursorsize,marshv.vox)
+	IF marshv.vox#NIL THEN stroke(Base.cursorPT,cursorsize,marshv.vox) END
 END snipeonto;
 
 PROCEDURE drawHUD*;
@@ -301,7 +301,6 @@ VAR
 
 	fuzz: Voxel4.FuzzVox;
 	siv: Voxel4.MirrorSphereInVox;
-(*	camvox: CamTexVox.CamVox; *)
 	cvox: Voxel;
 	noise: ARRAY 5 OF FRep.noise;	 
 	twonoise: FRep.twonoise;
@@ -317,7 +316,7 @@ BEGIN
 	push(archillect);
 	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	push(greenball);	
-(*	conglomerate:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7"); 	
+	conglomerate:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7"); 	
 	conglomerate.copyonstroke:=TRUE;
 	push(conglomerate);	
 	reddot:=Base.VoxelFromName("Nbrownianspheres"); 	
@@ -348,7 +347,7 @@ BEGIN
 	badopossum:=Base.VoxelFromName("Nbadopossum"); 	
 	raccoon:=Base.VoxelFromName("Nraccoon"); 	
 	push(raccoon);	
- 	gorge:=Base.VoxelFromName("NxxxGAernhjFK40xASZZVoQ"); 
+ (* 	gorge:=Base.VoxelFromName("NxxxGAernhjFK40xASZZVoQ"); 
 	push(gorge);
 	xot2:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 	
 	push(xot2);
@@ -356,7 +355,7 @@ BEGIN
 	push(reddot);
 	msphere:=Base.VoxelFromName("NBsHFiBKkSckXBAd46Zbsss"); 	
 	 push(msphere);	
- 
+
       rdpseudosolid:=Base.VoxelFromName("Nrdpseudosolid"); 
        push(rdpseudosolid);
 	beatrix:=Base.VoxelFromName("NwPicBWw4NfcserX4ELaQ3b"); 
@@ -378,14 +377,12 @@ BEGIN
 	push(doge);	
     	MCUBE:=Base.VoxelFromName("Nr3kPtbyEYLFK3AN2UUVrqg");
 	push(MCUBE);
-  	
 	cage:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");
 	cage.copyonstroke:=TRUE;
   	push(cage);
  	fuse:=Base.VoxelFromName("NFuse");
 
  	push(fuse);
-
 
 	sfish:=Base.VoxelFromName("NcufbYokzVEuEfN5MYiDlhA"); 	 	
 	push(sfish);
@@ -409,10 +406,10 @@ BEGIN
 	push(conglomerate);
 	push(xot);	
 	push(cloud);	
-		 		
+	 		
 	rd:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODg"); 	
 	push(rd);
-	gren:=Base.VoxelFromName("NUeconrGpx7plz7ym76ibLw"); 		
+*)		gren:=Base.VoxelFromName("NUeconrGpx7plz7ym76ibLw"); 		
 	push(gren);
 	die:=Base.VoxelFromName("NCjgzkmiTyecI5x6eOgYqpQ"); 
 	push(die);
@@ -479,7 +476,7 @@ BEGIN
 	push(sand);	
 	greensuncouple:=Base.VoxelFromName("Ngreensuncouple");  
 	push(greensuncouple);
-*)
+
 	NEW(noise[0]);		
 	noise[0].seed:=435678;		
 	noise[0].a:=1;
@@ -489,6 +486,7 @@ BEGIN
 	noise[0].persistence:=3.41;	
 	starspider:=Base.VoxelFromName("Nstarspider");
   noise[0].setvoxel(starspider);		
+
 	NEW(noise[1]);		
 	noise[1].seed:=5558443;		
 	noise[1].a:=1;
@@ -500,6 +498,7 @@ BEGIN
 	wstar:=Base.VoxelFromName("Nwstar"); 
 	push(wstar);
 	noise[1].setvoxel(wstar);	
+
 	NEW(noise[2]);	
 	noise[2].seed:=7007896;		
 	noise[2].a:=7.5;
@@ -537,11 +536,11 @@ BEGIN
 	
 	z3:= Base.VoxelFromName("NM3");
 
-	z3.setcolor(0.0,0.05,0.1,0.1,0.1,0.1);
+	z3.setcolor(0.3,0.05,0.5,0.5,0.5,0.1);
 
 	dieone:=Base.VoxelFromName("NCjgzkmiTyecI5x6eOgYqpQ"); 	
   push(dieone);
-  dieone.tscale:=100;
+  dieone.tscale:=1;
     			
 	Base.setPT(center,1/2,1/2,1/2);
 
@@ -555,16 +554,13 @@ BEGIN
   	
 	medley:=Base.VoxelFromName("Nmedley");
 
-	
-	noise[0].setvoxel(GREEN);	
-	cvox:=Base.VoxelFromName("CamTexVox");	
+	z3.FRaster(noise[4],27);	
+	z3.FRaster(noise[0],27);	
 
-	z3.FRaster(noise[0],81);	
-	z3.FRaster(noise[3],81);	
 	Base.setPT(center,1/2,1/2,2/3);	
 	NEW(plane,center,up);
-	plane.setvoxel(cvox);			
-	z3.FRaster(plane,10);	
+	plane.setvoxel(wstar);			
+	z3.FRaster(plane,27);	
 
 	harrison:=Base.VoxelFromName("Nharrisonavatar"); 
 	push(harrison);	

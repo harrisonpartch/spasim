@@ -73,7 +73,7 @@ VAR
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	RETURN s1
+	RETURN s4
 END thisvox;
 
 BEGIN

@@ -7,14 +7,14 @@ TYPE
 	PT=Base.PT;
 CONST
 	T=2;        
-	TS=8*8;  (*  TS MUST BE {size of unit tile} MULTIPLIED BY 2**T *)
-	TW=8;
-	TH=8;
+	TS=16*4;  (*  TS MUST BE {size of unit tile} MULTIPLIED BY 2**T *)
+	TW=16;
+	TH=9;
 	W*=TS*TW;
 	H*=TS*TH;
 	CX=W DIV 2;
 	CY=H DIV 2;
-	GAMMA=255; 
+	GAMMA=250; 
 
 TYPE Camera= RECORD			(* solid angle *)
 	dtheta, dphi, theta, phi,rphi:REAL;
@@ -86,7 +86,6 @@ BEGIN
 	r.scale := 1; 
 	r.tscale:=1;
 	r.dtl:=Base.DTL;	
-	r.rand:=ra.rand;
 	mixi:=1-mix;
 	r.dxyz.x:= ra.dxyz.x*mixi + rb.dxyz.x*mix;
 	r.dxyz.y:= ra.dxyz.y*mixi + rb.dxyz.y*mix;
@@ -118,7 +117,7 @@ BEGIN
 		RETURN (clrd(rb,rd)+clrd(ra,rc))/6;
 	ELSE
 		RETURN 1
-	END 
+	END
 END clrd4;
 
 PROCEDURE tessa16(cam:Camera);	
@@ -137,9 +136,7 @@ BEGIN
 	Base.world.Shade(rays[x,y+1]);	
 	Base.world.Shade(rays[x+1,y]);	
 	Base.world.Shade(rays[x+1,y+1]);		
-	Base.clampclr(rays[x,y+1].clr);	
-	Base.clampclr(rays[x+1,y].clr);	
-	Base.clampclr(rays[x+1,y+1].clr);			
+	
 	tileimage[x,y]:=rays[x,y].clr;
 	tileimage[x+1,y]:=rays[x+1,y].clr;
 	tileimage[x+1,y+1]:=rays[x+1,y+1].clr;
@@ -151,9 +148,6 @@ BEGIN
 	Base.world.Shade(rays[x,y]);	
 	Base.world.Shade(rays[x,y+1]);	
 	Base.world.Shade(rays[x+1,y+1]);		
-	Base.clampclr(rays[x,y].clr);	
-	Base.clampclr(rays[x,y+1].clr);	
-	Base.clampclr(rays[x+1,y+1].clr);			
 	tileimage[x,y]:=rays[x,y].clr;
 	tileimage[x+1,y]:=rays[x+1,y].clr;
 	tileimage[x+1,y+1]:=rays[x+1,y+1].clr;
@@ -165,9 +159,6 @@ BEGIN
 	Base.world.Shade(rays[x,y]);	
 	Base.world.Shade(rays[x+1,y]);	
 	Base.world.Shade(rays[x,y+1]);		
-	Base.clampclr(rays[x,y].clr);	
-	Base.clampclr(rays[x+1,y].clr);	
-	Base.clampclr(rays[x,y+1].clr);		
 	tileimage[x,y]:=rays[x,y].clr;
 	tileimage[x+1,y]:=rays[x+1,y].clr;
 	tileimage[x+1,y+1]:=rays[x+1,y+1].clr;
@@ -179,9 +170,6 @@ BEGIN
 	Base.world.Shade(rays[x,y]);	
 	Base.world.Shade(rays[x+1,y]);	
 	Base.world.Shade(rays[x+1,y+1]);		
-	Base.clampclr(rays[x,y].clr);	
-	Base.clampclr(rays[x+1,y].clr);	
-	Base.clampclr(rays[x+1,y+1].clr);		
 	tileimage[x,y]:=rays[x,y].clr;
 	tileimage[x+1,y]:=rays[x+1,y].clr;
 	tileimage[x+1,y+1]:=rays[x+1,y+1].clr;
@@ -200,7 +188,7 @@ PROCEDURE t4x4fill(CONST x,y: INTEGER);
 VAR
 	i,j: INTEGER;
 BEGIN
-	IF clrd4(rays[x,y], rays[x+3,y], rays[x+3,y+3], rays[x,y+3]) > thresh2 THEN
+	IF clrd4(rays[x,y], rays[x+3,y], rays[x+3,y+3], rays[x,y+3]) > thresh1a THEN
 		t2x2a(x,y);
 		t2x2b(x+2,y);
 		t2x2c(x+2,y+2);
@@ -218,9 +206,6 @@ BEGIN
 	Base.world.Shade(rays[x+3,y]);	
 	Base.world.Shade(rays[x,y+3]);	
 	Base.world.Shade(rays[x+3,y+3]);	
-(*	Base.clampclr(rays[x+3,y].clr);	
-	Base.clampclr(rays[x,y+3].clr);	
-	Base.clampclr(rays[x+3,y+3].clr);	*)
 	t4x4fill(x,y)
 END t4x4a;
 
@@ -228,10 +213,7 @@ PROCEDURE t4x4b(x,y: INTEGER);
 BEGIN
 	Base.world.Shade(rays[x,y]);	
 	Base.world.Shade(rays[x,y+3]);	
-	Base.world.Shade(rays[x+3,y+3]);	
-	Base.clampclr(rays[x,y].clr);	
-	Base.clampclr(rays[x,y+3].clr);	
-	Base.clampclr(rays[x+3,y+3].clr);			
+	Base.world.Shade(rays[x+3,y+3]);		
 	t4x4fill(x,y)	
 END t4x4b;
 
@@ -240,9 +222,6 @@ BEGIN
 	Base.world.Shade(rays[x,y]);	
 	Base.world.Shade(rays[x+3,y]);	
 	Base.world.Shade(rays[x,y+3]);		
-	Base.clampclr(rays[x,y].clr);	
-	Base.clampclr(rays[x+3,y].clr);	
-	Base.clampclr(rays[x,y+3].clr);		
 	t4x4fill(x,y)
 END t4x4c;
 
@@ -251,9 +230,6 @@ BEGIN
 	Base.world.Shade(rays[x,y]);	
 	Base.world.Shade(rays[x+3,y]);	
 	Base.world.Shade(rays[x+3,y+3]);		
-	Base.clampclr(rays[x,y].clr);	
-	Base.clampclr(rays[x+3,y].clr);	
-	Base.clampclr(rays[x+3,y+3].clr);	
 	t4x4fill(x,y)	
 END t4x4d;
 
@@ -272,7 +248,7 @@ PROCEDURE t8x8fill(CONST x,y: INTEGER);
 VAR
 	i,j: INTEGER;
 BEGIN
-	IF clrd4(rays[x,y], rays[x+7,y], rays[x+7,y+7], rays[x,y+7]) > thresh2 THEN
+	IF clrd4(rays[x,y], rays[x+7,y], rays[x+7,y+7], rays[x,y+7]) > thresh1a THEN
 		t4x4a(x,y);
 		t4x4b(x+4,y);
 		t4x4c(x+4,y+4);
@@ -290,9 +266,6 @@ BEGIN
 	Base.world.Shade(rays[x+7,y]);	
 	Base.world.Shade(rays[x,y+7]);	
 	Base.world.Shade(rays[x+7,y+7]);	
-	Base.clampclr(rays[x+7,y].clr);	
-	Base.clampclr(rays[x,y+7].clr);	
-	Base.clampclr(rays[x+7,y+7].clr);	
 	t8x8fill(x,y)
 END t8x8a;
 
@@ -301,31 +274,22 @@ BEGIN
 	Base.world.Shade(rays[x,y]);	
 	Base.world.Shade(rays[x,y+7]);	
 	Base.world.Shade(rays[x+7,y+7]);		
-	Base.clampclr(rays[x,y].clr);	
-	Base.clampclr(rays[x,y+7].clr);	
-	Base.clampclr(rays[x+7,y+7].clr);		
 	t8x8fill(x,y)	
 END t8x8b;
 
 PROCEDURE t8x8c(x,y: INTEGER);
 BEGIN
 	Base.world.Shade(rays[x,y]);	
-	Base.clampclr(rays[x,y].clr);
 	Base.world.Shade(rays[x+7,y]);	
-	Base.clampclr(rays[x+7,y].clr);
 	Base.world.Shade(rays[x,y+7]);		
-	Base.clampclr(rays[x,y+7].clr);
 	t8x8fill(x,y)
 END t8x8c;
 
 PROCEDURE t8x8d(x,y: INTEGER);
 BEGIN
 	Base.world.Shade(rays[x,y]);	
-	Base.clampclr(rays[x,y].clr);
 	Base.world.Shade(rays[x+7,y]);	
-	Base.clampclr(rays[x+7,y].clr);
-	Base.world.Shade(rays[x+7,y+7]);
-	Base.clampclr(rays[x+7,y+7].clr);		
+	Base.world.Shade(rays[x+7,y+7]);		
 	t8x8fill(x,y)	
 END t8x8d;
 
@@ -376,14 +340,10 @@ BEGIN
 			rays[i,j]:= interpray(rays[i,0],rays[i,15],j/16);
 		END
 	END;		
-	Base.world.Shade(rays[0,0]);
-	Base.clampclr(rays[0,0].clr);
+	Base.world.Shade(rays[0,0]);	
 	Base.world.Shade(rays[15,0]);		
-	Base.clampclr(rays[15,0].clr);
-	Base.world.Shade(rays[15,15]);	
-	Base.clampclr(rays[15,15].clr);	
-	Base.world.Shade(rays[0,15]);	
-	Base.clampclr(rays[0,15].clr);	
+	Base.world.Shade(rays[15,15]);		
+	Base.world.Shade(rays[0,15]);		
 	t16x16fill;	
 	FOR i:= 0 TO 15 DO
 		FOR j := 0 TO 15 DO 
@@ -418,9 +378,6 @@ BEGIN
 	Base.world.Shade(rays[x+3,y]);	
 	Base.world.Shade(rays[x,y+3]);	
 	Base.world.Shade(rays[x+3,y+3]);	
-	Base.clampclr(rays[x+3,y].clr);	
-	Base.clampclr(rays[x,y+3].clr);	
-	Base.clampclr(rays[x+3,y+3].clr);	
 	t4x4fill(x,y)
 END t4x4a;
 
@@ -428,10 +385,7 @@ PROCEDURE t4x4b(x,y: INTEGER);
 BEGIN
 	Base.world.Shade(rays[x,y]);	
 	Base.world.Shade(rays[x,y+3]);	
-	Base.world.Shade(rays[x+3,y+3]);	
-	Base.clampclr(rays[x,y].clr);	
-	Base.clampclr(rays[x,y+3].clr);	
-	Base.clampclr(rays[x+3,y+3].clr);			
+	Base.world.Shade(rays[x+3,y+3]);		
 	t4x4fill(x,y)	
 END t4x4b;
 
@@ -440,9 +394,6 @@ BEGIN
 	Base.world.Shade(rays[x,y]);	
 	Base.world.Shade(rays[x+3,y]);	
 	Base.world.Shade(rays[x,y+3]);		
-	Base.clampclr(rays[x,y].clr);	
-	Base.clampclr(rays[x+3,y].clr);	
-	Base.clampclr(rays[x,y+3].clr);		
 	t4x4fill(x,y)
 END t4x4c;
 
@@ -451,9 +402,6 @@ BEGIN
 	Base.world.Shade(rays[x,y]);	
 	Base.world.Shade(rays[x+3,y]);	
 	Base.world.Shade(rays[x+3,y+3]);		
-	Base.clampclr(rays[x,y].clr);	
-	Base.clampclr(rays[x+3,y].clr);	
-	Base.clampclr(rays[x+3,y+3].clr);	
 	t4x4fill(x,y)	
 END t4x4d;
 
@@ -461,7 +409,7 @@ PROCEDURE t8x8fill(CONST x,y: INTEGER);
 VAR
 	i,j: INTEGER;
 BEGIN
-	IF clrd4(rays[x,y], rays[x+7,y], rays[x+7,y+7], rays[x,y+7]) > thresh2 THEN
+	IF clrd4(rays[x,y], rays[x+7,y], rays[x+7,y+7], rays[x,y+7]) > thresh1a THEN
 		t4x4a(x,y);
 		t4x4b(x+4,y);
 		t4x4c(x+4,y+4);
@@ -480,9 +428,6 @@ BEGIN
 	Base.world.Shade(rays[x+7,y]);	
 	Base.world.Shade(rays[x,y+7]);	
 	Base.world.Shade(rays[x+7,y+7]);	
-	Base.clampclr(rays[x+7,y].clr);	
-	Base.clampclr(rays[x,y+7].clr);	
-	Base.clampclr(rays[x+7,y+7].clr);	
 	t8x8fill(x,y)
 END t8x8a;
 
@@ -491,31 +436,22 @@ BEGIN
 	Base.world.Shade(rays[x,y]);	
 	Base.world.Shade(rays[x,y+7]);	
 	Base.world.Shade(rays[x+7,y+7]);		
-	Base.clampclr(rays[x,y].clr);	
-	Base.clampclr(rays[x,y+7].clr);	
-	Base.clampclr(rays[x+7,y+7].clr);		
 	t8x8fill(x,y)	
 END t8x8b;
 
 PROCEDURE t8x8c(x,y: INTEGER);
 BEGIN
 	Base.world.Shade(rays[x,y]);	
-	Base.clampclr(rays[x,y].clr);
 	Base.world.Shade(rays[x+7,y]);	
-	Base.clampclr(rays[x+7,y].clr);
 	Base.world.Shade(rays[x,y+7]);		
-	Base.clampclr(rays[x,y+7].clr);		
 	t8x8fill(x,y)
 END t8x8c;
 
 PROCEDURE t8x8d(x,y: INTEGER);
 BEGIN
 	Base.world.Shade(rays[x,y]);	
-	Base.clampclr(rays[x,y].clr);
 	Base.world.Shade(rays[x+7,y]);	
-	Base.clampclr(rays[x+7,y].clr);
-	Base.world.Shade(rays[x+7,y+7]);
-	Base.clampclr(rays[x+7,y+7].clr);		
+	Base.world.Shade(rays[x+7,y+7]);		
 	t8x8fill(x,y)	
 END t8x8d;
 
@@ -559,14 +495,10 @@ BEGIN
 			rays[i,j]:= interpray(rays[i,0],rays[i,15],j/16);
 		END
 	END;		
-	Base.world.Shade(rays[0,0]);
-	Base.clampclr(rays[0,0].clr);
+	Base.world.Shade(rays[0,0]);	
 	Base.world.Shade(rays[15,0]);		
-	Base.clampclr(rays[15,0].clr);
-	Base.world.Shade(rays[15,15]);	
-	Base.clampclr(rays[15,15].clr);	
-	Base.world.Shade(rays[0,15]);	
-	Base.clampclr(rays[0,15].clr);	
+	Base.world.Shade(rays[15,15]);		
+	Base.world.Shade(rays[0,15]);		
 	t16x16fill;	
 	FOR i:= 0 TO 15 DO
 		FOR j := 0 TO 15 DO 
@@ -585,7 +517,7 @@ VAR
 BEGIN	
 	splitcam(cam,a,b,c,d);
 	IF level<2 THEN
-		FVV:=FV*FV;
+		FVV:=10*FV*FV;
 		x:=a.imx-W/2;
 		y:=a.imy-H/2;		
 		D:=(x*x+y*y);			
@@ -632,6 +564,7 @@ BEGIN
 END zftrace;
 
 BEGIN{ACTIVE, PRIORITY(Objects.Normal)}
+	NEW(rand);
 	REPEAT
 		BEGIN{EXCLUSIVE}
 			AWAIT(GO);
@@ -644,7 +577,51 @@ BEGIN{ACTIVE, PRIORITY(Objects.Normal)}
 	UNTIL ~Base.worldalive; 
 END Tile;
 
+VAR
+	tile: ARRAY TW,TH OF Tile;
+	TESSA: INTEGER;
+	frameasteps*,framebsteps*:INTEGER;
+	a,b: INTEGER;
+	tilesdone:INTEGER;
 
+	AFTER*: INTEGER;
+	FAST*:INTEGER;
+	lsense,ls2:REAL;
+	FGUAARD,FRAMEBOORT:BOOLEAN;
+	saccade*,SACCADE1*,DTLRAYS*:BOOLEAN;
+	cameratheta*,cameraphi*:REAL;
+	aperture*: Base.Aperture;
+	image*: Raster.Image;
+	rtheta,rphi: REAL; (* camera pitch,roll. global variables because they are the same for all rays in a frame *)
+	fward*, dward*, rward*,camrward*: PT;  
+	foveaparameter:INTEGER;
+	FV: REAL;
+	copy: Raster.Mode;
+	thresh1a, threshmax*, horizon: REAL
+	
+PROCEDURE Res*;
+BEGIN
+	INC(TESSA);
+	TESSA:=TESSA MOD 3;
+END Res;
+
+PROCEDURE reflect(VAR p: PT; n: PT);
+VAR 
+	a,b,c,dot: REAL;
+BEGIN
+	dot := p.x*n.x+p.y*n.y+p.z*n.z;
+	a := 2*n.x*dot; b := 2*n.y*dot; c := 2*n.z*dot;
+	p.x := p.x-a; p.y := p.y-b; p.z := p.z-c;
+END reflect;
+	
+PROCEDURE mirror(VAR ray: Ray);
+BEGIN
+	reflect(ray.dxyz, ray.normal);	
+	IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
+	IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
+	IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
+END mirror;
+	
 PROCEDURE angletoray(VAR ray: Base.Ray; theta,phi: REAL);
 VAR 
 	d: REAL;
@@ -718,35 +695,37 @@ BEGIN
 	
 END splitcam;
 
-PROCEDURE moredetail*();
-VAR i: INTEGER;
+PROCEDURE moredetail*(d: INTEGER);
 BEGIN
-	IF FV<fvmax THEN FV:=FV*12/9 END
+	Base.horizon:=Base.horizon*31/30;
+	IF Base.horizon>1 THEN 
+		Base.horizon:=1; 
+		decthresh1
+	END
 END moredetail;
 
-PROCEDURE lessdetail*();
+PROCEDURE lessdetail*(d: INTEGER);
 BEGIN
-	IF FV>fvmin THEN FV:=FV*9/12 END
+	Base.horizon:=Base.horizon*30/31; 
+	IF Base.horizon<0.0001 THEN 
+		Base.horizon:=0.0001;
+	END
 END lessdetail;
 
 PROCEDURE decthresh1;
 BEGIN
-	thresh1a:=thresh1a*2/3;
-	IF thresh1a<threshmin THEN 
-		thresh1a:=threshmin;
-	END;
-	thresh2:=10*thresh1a;
-	thresh3:=30*thresh1a;
+	thresh1a:=thresh1a*10/11;
+	IF thresh1a<0.002 THEN 
+		thresh1a:=0.002;
+	END
 END decthresh1;
 
 PROCEDURE incthresh1;
 BEGIN
-	thresh1a:=thresh1a*3/2;
+	thresh1a:=thresh1a*11/10;
 	IF thresh1a>threshmax THEN 
 		thresh1a:=threshmax;
-	END;
-	thresh2:=5*thresh1a;
-	thresh3:=20*thresh1a;
+	END
 END incthresh1;
 
 PROCEDURE incTD;
@@ -832,25 +811,6 @@ BEGIN
 	Raster.Put(image,CX+1,CY-1,pixel,copy);	
 END go;
 
-VAR
-	tile: ARRAY TW,TH OF Tile;
-	frameasteps*,framebsteps*:INTEGER;
-	a,b: INTEGER;
-	tilesdone:INTEGER;
-	lsense,ls2:REAL;
-	FGUAARD,FRAMEBOORT:BOOLEAN;
-	saccade*,SACCADE1*,DTLRAYS*:BOOLEAN;
-	cameratheta*,cameraphi*:REAL;
-	aperture*: Base.Aperture;
-	image*: Raster.Image;
-	rtheta,rphi: REAL; (* camera pitch,roll. global variables because they are the same for all rays in a frame *)
-	fward*, dward*, rward*,camrward*: PT;  
-	foveaparameter:INTEGER;
-	FV: REAL;
-	copy: Raster.Mode;
-	thresh1a, thresh2, thresh3, threshmax*, fvmax, fvmin, threshmin, horizon: REAL
-
-
 BEGIN
 	Out.String("Retina loading...");
 	Raster.InitMode(copy,Raster.srcCopy);	
@@ -860,18 +820,15 @@ BEGIN
 			NEW(tile[a,b]);
 		END
 	END;	
- 	thresh1a:=0.0031;
- 	thresh2:=0.01;
- 	thresh3:=0.04;
- 	threshmax:=0.3;
- 	threshmin:=0.000001;
+	AFTER:=2;
+ 	FAST:=3;
+ 	thresh1a:=0.05;
+ 	threshmax:=0.1;
  	horizon:=1.0;
  	lsense:=0.2;
  	aperture.width:=1;
  	aperture.height:=1;
  	foveaparameter:=13;
  	FV:=W/foveaparameter; 
- 	fvmax:=FV*6;
- 	fvmin:=FV/3;
  	Out.String("loaded...");	
 END Retina.

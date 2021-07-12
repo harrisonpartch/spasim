@@ -57,7 +57,7 @@ BEGIN
 	Base.setPT(worldcenter,1/2,1/2,1/2);	
 	cx:=1/2; cy:=1/2; cz:=1/2;
 	fisheye:=1;
-	GLIDE:=0.95;
+	GLIDE:=0.985;
 	hop; 
 END init;
 
@@ -630,12 +630,10 @@ END KeyEvent;
 			Out.Int(ms,5);
 			Out.Ln
 		END;
-		IF ~Retina.saccade THEN
-			IF ms > mstarget+2 THEN 
+		IF ms > mstarget THEN 
 				Retina.lessdetail
-			ELSIF GetCurrentFrameMs()<mstarget THEN
+		ELSE 
 				Retina.moredetail
-			END
 		END
 	END GameLogic;
 	
