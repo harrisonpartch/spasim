@@ -10,7 +10,7 @@ CONST
 VAR
 	device : AL.ALCdevice;
 	context : AL.ALCcontext;
-	buffer : AL.ALuint;
+	buffer : AL.ALint;
 	source : AL.ALuint;
 	pitch, gain: AL.ALfloat;
 	
@@ -21,8 +21,8 @@ VAR
 	sourcePos, listenerPos, oldListenerPos, velocity: ARRAY [3] OF AL.ALfloat;
 	directionVect: ARRAY [6] OF AL.ALfloat; (* indices 0,1,2: listener forward direction. 3,4,5: listener up vectors *)
 
-PROCEDURE Delay(ms: LONGINT);
-VAR t0: LONGINT;
+PROCEDURE Delay(ms: SIGNED32);
+VAR t0: SIGNED32;
 BEGIN
 	t0 := Kernel.GetTicks() ;
 	WHILE ms + t0 < Kernel.GetTicks() DO END;
@@ -53,11 +53,11 @@ END LoadDeviceName;
 		
 PROCEDURE ALWriteError(CONST tit: ARRAY OF CHAR);
 VAR s: Strings.String;
-	err: AL.ALuint;
+	err: AL.ALenum;
 BEGIN
 	err := AL.alGetError();
 	IF ~ debug THEN RETURN END;
-	s := AL.ALGetString(err);
+	s := AL.alGetString(err);
 	IF s # NIL THEN
 		KernelLog.String(tit);  KernelLog.String(s^); KernelLog.Ln; 
 	END;
@@ -65,11 +65,11 @@ END ALWriteError;
 
 PROCEDURE ALCWriteError(d: AL.ALCdevice; CONST tit: ARRAY OF CHAR);
 VAR s: Strings.String;
-	err: AL.ALuint;
+	err: AL.ALenum;
 BEGIN
 	err := AL.alcGetError(d);
 	IF ~ debug THEN RETURN END;
-	s := AL.ALCGetString(d, err);
+	s := AL.alcGetString(d, err);
 	IF s # NIL THEN
 		KernelLog.String(tit); KernelLog.String(s^); KernelLog.Ln; 
 	END;
@@ -92,13 +92,13 @@ END Play3D;
 			
 PROCEDURE LoadWav*(fname: ARRAY OF CHAR);
 VAR
-	fmt: AL.ALuint; 
-	dres: LONGINT;
+	fmt: AL.ALenum; 
+	dres: SIGNED32;
 	
 	file: Files.File;
 	in: Files.Reader;
 	sbuffer  : SoundDevices.Buffer;	
-	nofChannels, samplePerSecond, bitsPerSample, samples, sizeBytes : LONGINT;
+	nofChannels, samplePerSecond, bitsPerSample, samples, sizeBytes : SIGNED32;
 		
 BEGIN 
 	file := Files.Old(fname);
@@ -179,7 +179,7 @@ END LoadWav;
 
 (** *)
 PROCEDURE Play*;
-VAR istate: LONGINT;
+VAR istate: SIGNED32;
 BEGIN
 
 	AL.alSourcePlay(source);
@@ -246,11 +246,11 @@ BEGIN
 
 	device := AL.alcOpenDevice(s); (* use from configuration *)
 		ALCWriteError(device, "Device Open Error: ");	
-	KernelLog.String("opened dev= "); KernelLog.Int(device, 0); KernelLog.Ln; 
+	 KernelLog.Ln; 
 
-	IF device = 0 THEN RETURN END;
+	IF device = NIL THEN RETURN END;
 	
-	str := AL.ALCGetString(device,   AL.ALC_DEVICE_SPECIFIER);
+	str := AL.alcGetString(device,   AL.ALC_DEVICE_SPECIFIER);
 		ALCWriteError(device, "Device Specifier Error: ");	
 		KernelLog.String("ALC_DEVICE_SPECIFIER = "); KernelLog.String(str^); KernelLog.Ln; 
 		
@@ -280,9 +280,8 @@ BEGIN
 	 IF buffer # 0 THEN AL.alDeleteBuffers(1, ADDRESSOF(buffer)); buffer := 0;  END;
 	 
 	res := AL.alcMakeContextCurrent(0);
-	AL.alcDestroyContext(context); context := 0;
-	res := AL.alcCloseDevice(device); device := 0;
-	KernelLog.String("closed dev= "); KernelLog.Int(device, 0); KernelLog.Ln; 
+	AL.alcDestroyContext(context); context := NIL;
+	res := AL.alcCloseDevice(device); device := NIL;
 	KernelLog.String("close res: ");  KernelLog.Boolean(res); KernelLog.Ln; 
 	
   KernelLog.String("DeviceClosed. "); KernelLog.Ln; 		
@@ -338,12 +337,12 @@ TestOpenALWav.Open "openaloberon/rugby.wav" ~
 TestOpenALWav.Open "openaloberon/s11k16bitpcm.wav" ~
 TestOpenALWav.Open "openaloberon/s11k8bitpcm.wav" ~
 TestOpenALWav.Open "openaloberon/s11kulaw.wav" ~
- TestOpenALWav.Open "openaloberon/s8k16bitpcm.wav" ~
+TestOpenALWav.Open "openaloberon/s8k16bitpcm.wav" ~
 TestOpenALWav.Open "openaloberon/s8k8bitpcm.wav" ~
 TestOpenALWav.Open "openaloberon/s8kulaw.wav" ~
 TestOpenALWav.Open "openaloberon/Wave4.WAV" ~
 
-TestOpenALWav.Open "grain.wav" ~
+TestOpenALWav.Open "openaloberon/desktoplogin.wav" ~
 
 TestOpenALWav.Play ~  
 
@@ -353,7 +352,7 @@ TestOpenALWav.DecPitch ~  TestOpenALWav.IncPitch~
 
 TestOpenALWav.Do ~ 
 
-SystemTools.FreeDownTo  OpenAL~ 
+System.FreeDownTo  OpenAL~ 
 
 OpenALinfo.Do~ 
 
