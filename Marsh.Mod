@@ -555,9 +555,9 @@ BEGIN
   	
 	medley:=Base.VoxelFromName("Nmedley");
 
-	z3.FRaster(noise[4],27);	
+(*	z3.FRaster(noise[4],27);	
 	z3.FRaster(noise[0],27);	
-
+*)
 	Base.setPT(center,1/2,1/2,2/3);	
 	NEW(plane,center,up);
 	plane.setvoxel(wstar);			

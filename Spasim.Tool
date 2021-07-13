@@ -9,6 +9,7 @@ TexVox.Mod
 CellAuto.Mod
 Voxel4.Mod
 HalfSpace.Mod
+NM3.Mod
 RotaVox.Mod
 Engrainer.Mod
 Saboteur.Mod
