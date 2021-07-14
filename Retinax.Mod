@@ -6,9 +6,9 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=2;        
-	TS=8*8;  (*  TS MUST BE {size of unit tile} MULTIPLIED BY 2**T *)
-	TW=8;
+	T=3;        
+	TS=8*16;  (*  TS MUST BE {size of unit tile} MULTIPLIED BY 2**T *)
+	TW=12;
 	TH=8;
 	W*=TS*TW;
 	H*=TS*TH;

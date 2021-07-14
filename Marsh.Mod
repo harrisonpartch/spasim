@@ -527,8 +527,7 @@ BEGIN
 	noise[4].c:=1;		
 	noise[4].octaves:=4;
 	noise[4].persistence:=3.71;	
-	NEW(siv);
-	noise[4].setvoxel(siv);		
+	noise[4].setvoxel(gxy);		
 
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
@@ -555,9 +554,9 @@ BEGIN
   	
 	medley:=Base.VoxelFromName("Nmedley");
 
-(*	z3.FRaster(noise[4],27);	
+	z3.FRaster(noise[4],27);	
 	z3.FRaster(noise[0],27);	
-*)
+
 	Base.setPT(center,1/2,1/2,2/3);	
 	NEW(plane,center,up);
 	plane.setvoxel(wstar);			

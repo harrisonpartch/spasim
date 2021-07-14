@@ -44,9 +44,9 @@ System.FreeDownTo Base ~
 System.FreeDownTo OpenGL ~
 =======  
 
-opengloberon/OpenGL.Tool
+OpenGL.Tool
 
-openaloberon/OpenAL.Tool
+OpenAL.Tool
 
 Compiler.SetDefaultPlatform Linux32G ~
 
