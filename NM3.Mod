@@ -303,7 +303,7 @@ PROCEDURE setcolor* (r,g,b,rb,gb,bb: REAL);
 VAR
 	i,j,k: INTEGER;
 BEGIN
-	copyclear;
+(*	copyclear; this crashes recursive geometry *)
 	colorlock:=TRUE;
 	setcolorrec(r,g,b,rb,gb,bb)
 END setcolor;

@@ -1,5 +1,5 @@
 MODULE Nugandaknuckles;
-IMPORT Base:=Base, TexVox;
+IMPORT Base, TexVox;
 VAR vox: TexVox.TexVox;
 
 PROCEDURE thisvox*():Base.Voxel;
@@ -8,7 +8,7 @@ BEGIN
 END thisvox;
 
 BEGIN
-	NEW(vox,"ugandaknuckles.png");
-	vox.tscale:=500;  
+	NEW(vox,"covid.png");
+	vox.tscale:=1;  
 	vox.passable:=TRUE;
 END Nugandaknuckles. 

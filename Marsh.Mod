@@ -485,7 +485,7 @@ BEGIN
 	noise[0].octaves:=5;
 	noise[0].persistence:=3.41;	
 	starspider:=Base.VoxelFromName("Nstarspider");
-  noise[0].setvoxel(starspider);		
+  	noise[0].setvoxel(starspider);		
 
 	NEW(noise[1]);		
 	noise[1].seed:=5558443;		
@@ -527,8 +527,8 @@ BEGIN
 	noise[4].c:=1;		
 	noise[4].octaves:=4;
 	noise[4].persistence:=3.71;	
-	NEW(siv);
-	noise[4].setvoxel(siv);		
+	gxy:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 
+	noise[4].setvoxel(gxy);		
 
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
@@ -549,18 +549,19 @@ BEGIN
 	push(GREEN);
 	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999"); 
 	push(serp);	
+	noise[4].setvoxel(serp);
 	cage:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");
 	cage.copyonstroke:=TRUE;
   push(cage);	
   	
 	medley:=Base.VoxelFromName("Nmedley");
-
-(*	z3.FRaster(noise[4],27);	
+	
+	z3.FRaster(noise[4],27);	
 	z3.FRaster(noise[0],27);	
-*)
+
 	Base.setPT(center,1/2,1/2,2/3);	
 	NEW(plane,center,up);
-	plane.setvoxel(wstar);			
+	plane.setvoxel(serp);			
 	z3.FRaster(plane,27);	
 
 	harrison:=Base.VoxelFromName("Nharrisonavatar"); 
