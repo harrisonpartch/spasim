@@ -528,6 +528,7 @@ BEGIN
 	noise[4].octaves:=4;
 	noise[4].persistence:=3.71;	
 	gxy:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 
+
 	noise[4].setvoxel(gxy);		
 
 	Out.String("EEEEP!");
@@ -555,7 +556,6 @@ BEGIN
   push(cage);	
   	
 	medley:=Base.VoxelFromName("Nmedley");
-	
 	z3.FRaster(noise[4],27);	
 	z3.FRaster(noise[0],27);	
 
