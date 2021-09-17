@@ -564,7 +564,7 @@ BEGIN
 	plane.setvoxel(serp);			
 	z3.FRaster(plane,27);	
 
-	harrison:=Base.VoxelFromName("Nharrisonavatar"); 
+	harrison:=Base.VoxelFromName("Nugandaknuckles"); 
 	push(harrison);	
 	Base.avatar:=harrison;
 

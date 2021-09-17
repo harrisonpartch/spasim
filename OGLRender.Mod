@@ -252,7 +252,7 @@ BEGIN
 		gravity:=Base.gravity;
 		gravityvector:=Base.mulPT(gravityvector,Base.gravity);
 		a:=Retina.fward.x*Base.cursordist; b:=Retina.fward.y*Base.cursordist; c:=Retina.fward.z*Base.cursordist;
-		d:=Retina.fward.x*0.021; e:=Retina.fward.y*0.021;  f:=Retina.fward.z*0.021; 
+		d:=Retina.fward.x*0.0021; e:=Retina.fward.y*0.0021;  f:=Retina.fward.z*0.0021; 
 		Base.updatecamera(cx,cy,cz,a,b,c,d,e,f);	
 		IF avaTF THEN Marsh.drawavatar END
 	END;
@@ -320,7 +320,7 @@ BEGIN
 	Base.gravity:=0.00000001;
 	Base.speed:=0.00001;
 	Base.maxspeed:=0.001;
-	Base.cursordist:=0.01;
+	Base.cursordist:=0.001;
 	R1:=100;
 	R2:=150;
 	Base.worldalive := TRUE;	

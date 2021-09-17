@@ -47,8 +47,11 @@ BEGIN
 	vox.tscale:=4050;
 	reddot:=Base.VoxelFromName("NM3");
 	bottlepossum:=Base.VoxelFromName("Nbottlepossum"); 
-	NEW(ball,center,0.33);
-	ball.setcolor(0.7,0.6,0.6,1,0);
+	NEW(ball,center,0.47);
+	ball.setcolor(0.1,0.1,0.9,1,0);
+	reddot.FRaster(ball,9);	
+	NEW(ball,center,0.517);
+	ball.setcolor(0.8,0.1,0.1,1,0);
 	reddot.FRaster(ball,9);	
 	reddot.copyonstroke:=TRUE;
 	NEW(shell,vox,center,pole,0.1,0.1);
@@ -57,7 +60,7 @@ END draw;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	reddot.copyonstroke:=TRUE;
-	RETURN vox
+	RETURN reddot
 END thisvox;
 
 BEGIN

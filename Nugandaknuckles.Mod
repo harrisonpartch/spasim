@@ -8,7 +8,7 @@ BEGIN
 END thisvox;
 
 BEGIN
-	NEW(vox,"covid.png");
+	NEW(vox,"foxbreadtemplate.png");
 	vox.tscale:=1;  
 	vox.passable:=TRUE;
 END Nugandaknuckles. 
