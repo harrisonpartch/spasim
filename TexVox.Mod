@@ -137,16 +137,12 @@ BEGIN
 			ly:=1-ly;
 		END;
  		mip:=ray.length*Base.texdetail;
-		IF mip>12 THEN
-			color:=texcube.side[ray.face].pixelmip_zero(lx,ly); 
-		ELSIF mip>3 THEN
-			color:=texcube.side[ray.face].pixelmip_one(lx,ly);
-		ELSIF mip>1 THEN
+		IF mip>5 THEN
 			color:=texcube.side[ray.face].pixelmip_two(lx,ly);
 		ELSE
 			color:=texcube.side[ray.face].pixel(lx,ly); 
 		END; 
-		IF   color.alpha<0.99 THEN
+		IF color.alpha<0.99 THEN
 		 	IF color.alpha>0.9 THEN
 				mirror(ray,0);
 			ELSE
@@ -170,12 +166,12 @@ BEGIN
 				END;	
 			END
 		ELSE
-			dot:= ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
-(*			dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-			mix:=ray.length*ray.scale*0.5;
+			dot1:= ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
+			dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
+			mix:=ray.length*ray.scale*0.015;
 			IF mix>1 THEN mix:=1 END;
 			dot:=mix*dot1+(1-mix)*dot2;		
-	*)		dr:=color.red*dot;
+			dr:=color.red*dot;
 			dg:=color.green*dot;
 			db:=color.blue*dot;
 			ray.clr.r := ray.clr.r + dr*ray.clr.ra;

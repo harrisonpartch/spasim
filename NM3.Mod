@@ -20,6 +20,7 @@ TYPE PT = Base.PT;
 	FR = Base.FR;
 	Name = Base.Name;
  	NCube=Base.NCube;
+ 	RCube=Base.RCube;
  	LCube=Base.LightCube;
 
 TYPE cell* = OBJECT(Cell);
@@ -29,7 +30,21 @@ VAR
 	blox*: ARRAY M,M,M OF Voxel;
 	nbloxTF*: ARRAY M,M,M OF BOOLEAN;
 	nblox*: ARRAY M,M,M OF NCube;
+	rbloxTF*: ARRAY M,M,M OF BOOLEAN;
+	rblox*: ARRAY M,M,M OF RCube;	
 	deepcopyofme:cell;
+	
+PROCEDURE rollz;
+VAR
+	blx: ARRAY M,M,M OF Voxel;
+BEGIN
+	blx[0,0,0] := blox[0,0,2];
+	blx[1,0,0] := blox[0,0,1];	
+	blx[2,0,0] := blox[0,0,0];
+	blx[0,1,0] := blox[0,1,2];
+	blx[1,1,0] := blox[0,1,1];	
+	blx[2,1,0] := blox[0,1,0];	
+END rollz;
 
 PROCEDURE Shade(VAR ray: Ray);
 VAR
@@ -67,6 +82,8 @@ BEGIN
 				v.Shade(ray);
 			ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 				nshade(nblox[ijk.i,ijk.j,ijk.k],ray) 
+			ELSIF rbloxTF[ijk.i,ijk.j,ijk.k] THEN
+				rshade(rblox[ijk.i,ijk.j,ijk.k],ray) 	
 			END 
 		END;
 		IF ~ray.terminate THEN
@@ -158,7 +175,9 @@ BEGIN
 							END;
 							v.Shade(ray);
 						ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
-							nshade(nblox[ijk.i,ijk.j,ijk.k],ray);							
+							nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
+						ELSIF rbloxTF[ijk.i,ijk.j,ijk.k] THEN
+							rshade(rblox[ijk.i,ijk.j,ijk.k],ray) 					
 						END
 					END;
 				IF (ray.clr.ba<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ra<0.1) THEN 		
@@ -214,6 +233,10 @@ BEGIN
 	ray.clr.b := ray.clr.b + nc.color.blue * ray.clr.ba*dot;	
 	ray.terminate:=TRUE
 END nshade;
+
+PROCEDURE rshade(rc: RCube; VAR ray: Ray);
+
+END rshade;
 
 PROCEDURE erase*(p:PT; resolution:INTEGER);
 VAR

@@ -10,14 +10,14 @@ VAR
 	cyl: FRep.hexgrid;
 	yellow,cage,v: Voxel;
 	center, p1, p2,n:  PT;
-	i:LONGINT;
+	i:INTEGER;
 	rand: Random.Generator;
 	c:Base.Color;
 	vu: Voxel;
 	
 PROCEDURE draw;
 VAR
-	i: LONGINT;
+	i: INTEGER;
 BEGIN
 	NEW(rand);
 	Base.setPT(center,1/2,1/2,1/2);

@@ -19,9 +19,10 @@ VAR
 	
 PROCEDURE&init*;
 BEGIN
-	setoutline(0,0,0,1/2);
+	setoutline(0,0,0,1);
 	innard:=Base.VoxelFromName("NM3");	
-	innard.setcolor(0,1/33,0,1/12,1/12,1/12);
+	innard.setcolor(0,1/7,0,1/6,1/6,1/6);
+	or:=1;
 	passable:=TRUE;
 	copyonstroke:=FALSE;
 END init;	
@@ -33,6 +34,7 @@ BEGIN
 	ob := blue;
 	oa:=alpha;
 END setoutline;
+
 PROCEDURE Shade (VAR ray: Ray);
 VAR
 	nx, ny, nz: INTEGER;
@@ -42,9 +44,9 @@ VAR
 	a: REAL;
 	exit:PT;
 BEGIN
-	IF (ray.lxyz.x< 0.011) OR (ray.lxyz.x > 0.989) THEN INC(ecount) END;
-	IF (ray.lxyz.y <0.011) OR (ray.lxyz.y > 0.989) THEN INC(ecount) END;
-	IF (ray.lxyz.z < 0.011) OR (ray.lxyz.z > 0.989) THEN INC(ecount) END;
+	IF (ray.lxyz.x< 0.11) OR (ray.lxyz.x > 0.98) THEN INC(ecount) END;
+	IF (ray.lxyz.y <0.11) OR (ray.lxyz.y > 0.98) THEN INC(ecount) END;
+	IF (ray.lxyz.z < 0.11) OR (ray.lxyz.z > 0.98) THEN INC(ecount) END;
 	IF (ecount > 1) THEN
 		ray.clr.r := ray.clr.r + or * ray.clr.ra*oa;
 		ray.clr.g := ray.clr.g + og * ray.clr.ga*oa;

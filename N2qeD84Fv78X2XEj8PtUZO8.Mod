@@ -9,7 +9,7 @@ VAR
 	ball: FRep.ellipsoid;
 	dot,v: Voxel;
 	center1,center2:  PT;
-	i:LONGINT;
+	i:INTEGER;
 	
 PROCEDURE draw;
 BEGIN

@@ -1,6 +1,6 @@
 MODULE Render;
-IMPORT Kernel, Objects, Random, Marsh,
- Out := KernelLog, Math:=MathL,SPSMMath, Base,  Retina, GLW := OGLWindow, 
+IMPORT Kernel, Objects, Random, Base, Marsh,
+ Out := KernelLog, Math:=MathL, SPSMMath,  Retina, GLW := OGLWindow, 
 	 GL:=OpenGL, GLC := OpenGLConst,  GLSL:= GLShaderUtils,
 	 Inputs,  Raster, Strings, Streams, Debugging;
 
@@ -253,7 +253,7 @@ BEGIN
 		gravityvector:=Base.mulPT(gravityvector,Base.gravity);
 		a:=Retina.fward.x*Base.cursordist; b:=Retina.fward.y*Base.cursordist; c:=Retina.fward.z*Base.cursordist;
 		d:=Retina.fward.x*0.0021; e:=Retina.fward.y*0.0021;  f:=Retina.fward.z*0.0021; 
-		Base.updatecamera(cx,cy,cz,a,b,c,d,e,f);	
+		Base.updatecamera(cx,cy,cz,a,b,c,0,0,0);	
 		IF avaTF THEN Marsh.drawavatar END
 	END;
 	IF MOUSEDOWN THEN	
@@ -287,6 +287,7 @@ VAR
 	
 PROCEDURE &openwincam;
 BEGIN
+	Out.String("openwincam");
 	Init(Retina.W, Retina.H, 0,0, FALSE);
 	NEW(camera,Retina.W, Retina.H); 
 	camera.aperjust(Retina.W, Retina.H);
@@ -294,7 +295,7 @@ BEGIN
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
 	splashscreen := TRUE;
-	mstarget:=100;
+	mstarget:=30;
 	Base.STOPGO; 
 END openwincam;
 

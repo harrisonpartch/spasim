@@ -166,7 +166,7 @@ BEGIN
 	p.x:=p.x+dx;
 	p.y:=p.y+dy;
 	p.z:=p.z+dz;
-	Base.world.stroke(p,cursorsize, EMPTY)
+(*	Base.world.stroke(p,cursorsize, EMPTY)*)
 END tunnelinto;
 
 PROCEDURE snipeinto*;
@@ -306,10 +306,11 @@ VAR
 	twonoise: FRep.twonoise;
 	hexgrid: FRep.hexgrid;
 BEGIN
+	Out.String("dawn begins...");
 	NEW(ms);
 	NEW(EMPTY);
 	EMPTY.passable:=TRUE;
-  	NEW(rand);
+  NEW(rand);
 	xot:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoR"); 
 	push(xot);
 	archillect:=Base.VoxelFromName("Narchillect"); 
@@ -319,12 +320,14 @@ BEGIN
 	conglomerate:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZO7"); 	
 	conglomerate.copyonstroke:=TRUE;
 	push(conglomerate);	
-	reddot:=Base.VoxelFromName("Nbrownianspheres"); 	
+	Out.String("dawn check zero point three ...");	
+(*	reddot:=Base.VoxelFromName("Nbrownianspheres"); 	
 	push(reddot);		
-	rd:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODg"); 	
+ *) Out.String("dawn check zero point four ...");
+(*	rd:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODg"); 	
 	push(rd);
-		
-	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
+*)	Out.String("dawn check zero point five ...");	
+(*	greenball:=Base.VoxelFromName("NnviGAernhjFK40xASZZVoQ"); 	
 	push(greenball);
 	akatrump:=Base.VoxelFromName("Nakatrump"); 
 	push(akatrump);
@@ -347,7 +350,8 @@ BEGIN
 	badopossum:=Base.VoxelFromName("Nbadopossum"); 	
 	raccoon:=Base.VoxelFromName("Nraccoon"); 	
 	push(raccoon);	
- (* 	gorge:=Base.VoxelFromName("NxxxGAernhjFK40xASZZVoQ"); 
+*)	Out.String("dawn check one ...");
+ (*	gorge:=Base.VoxelFromName("NxxxGAernhjFK40xASZZVoQ"); 
 	push(gorge);
 	xot2:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 	
 	push(xot2);
@@ -409,7 +413,7 @@ BEGIN
 	 		
 	rd:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODg"); 	
 	push(rd);
-*)		gren:=Base.VoxelFromName("NUeconrGpx7plz7ym76ibLw"); 		
+		gren:=Base.VoxelFromName("NUeconrGpx7plz7ym76ibLw"); 		
 	push(gren);
 	die:=Base.VoxelFromName("NCjgzkmiTyecI5x6eOgYqpQ"); 
 	push(die);
@@ -447,7 +451,8 @@ BEGIN
 	push(cthulhu);
 	rat:=Base.VoxelFromName("NGJBlQ95mTkoMhozr6XOJYg"); 	
 	push(rat);
-	conglo2:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZOq"); 	
+*)
+(*	conglo2:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZOq"); 	
 	push(conglo2);
 	sky1:=Base.VoxelFromName("N5a2g4M6HYjPJxYSNQvYy7"); 	
 	push(sky1);
@@ -461,13 +466,12 @@ BEGIN
 	bottlepossum:=Base.VoxelFromName("Njellywish");  
 	push(bottlepossum);	
 	bottlegrounds:=Base.VoxelFromName("Nbottlegrounds");  
-
+*)
 	wstar:=Base.VoxelFromName("Nwstar");  
 	starspider:=Base.VoxelFromName("Nstarspider");  
 	arevclock:=Base.VoxelFromName("Narevclock");  
 	push(arevclock);
 	jordan:=Base.VoxelFromName("Njbp");  	
-
 	gxy:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 	
 	push(gxy);
 	bottle3:=Base.VoxelFromName("Nbottle3");  
@@ -477,6 +481,8 @@ BEGIN
 	greensuncouple:=Base.VoxelFromName("Ngreensuncouple");  
 	push(greensuncouple);
 
+	Out.String("dawn check two ...");
+
 	NEW(noise[0]);		
 	noise[0].seed:=435678;		
 	noise[0].a:=1;
@@ -485,7 +491,7 @@ BEGIN
 	noise[0].octaves:=5;
 	noise[0].persistence:=3.41;	
 	starspider:=Base.VoxelFromName("Nstarspider");
-  	noise[0].setvoxel(starspider);		
+  noise[0].setvoxel(starspider);		
 
 	NEW(noise[1]);		
 	noise[1].seed:=5558443;		
@@ -529,18 +535,21 @@ BEGIN
 	noise[4].persistence:=3.71;	
 	gxy:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 
 
-	noise[4].setvoxel(gxy);		
+	noise[4].setvoxel(wstar);		
 
 	Out.String("EEEEP!");
 	Base.setPT(up,0,0,1);
 	Base.setPT(center,1/2,1/2,9/10);
 	Base.setPT(up,0,0,1);
+
+	Out.String("dawn check three ...");
 	
 	z3:= Base.VoxelFromName("NM3");
 
-	z3.setcolor(0.3,0.05,0.05,0.05,0.5,0.1);
+	z3.setcolor(0.0,0.0,0.0,1,1,0.7);
 
-	dieone:=Base.VoxelFromName("NCjgzkmiTyecI5x6eOgYqpQ"); 	
+	rdpseudosolid:=Base.VoxelFromName("Nrdpseudosolid"); 
+  dieone:=Base.VoxelFromName("NCjgzkmiTyecI5x6eOgYqpQ"); 	
   push(dieone);
   dieone.tscale:=1;
     			
@@ -550,26 +559,32 @@ BEGIN
 	push(GREEN);
 	serp:=Base.VoxelFromName("NXWCxXWLIcD2LegvoGXX999"); 
 	push(serp);	
-	noise[4].setvoxel(serp);
+	
+	
 	cage:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");
 	cage.copyonstroke:=TRUE;
   push(cage);	
   	
 	medley:=Base.VoxelFromName("Nmedley");
+	
+	noise[4].setvoxel(xot);
+	noise[0].setvoxel(Base.VoxelFromName("Nugandaknuckles"));
 	z3.FRaster(noise[4],27);	
 	z3.FRaster(noise[0],27);	
+	
+	Out.String("dawn check four...");
 
 	Base.setPT(center,1/2,1/2,2/3);	
 	NEW(plane,center,up);
-	plane.setvoxel(serp);			
+	plane.setvoxel(cage);			
 	z3.FRaster(plane,27);	
 
 	harrison:=Base.VoxelFromName("Nugandaknuckles"); 
 	push(harrison);	
-	Base.avatar:=harrison;
+	Base.avatar:=cage;
 
 		
-	Base.avatarsize:=2160; 	
+	Base.avatarsize:=3160; 	
 	
 	Base.world:=z3;
 	alternateworld:=z3;	

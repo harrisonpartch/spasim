@@ -50,7 +50,14 @@ END;
 TYPE NCube*=RECORD
 	TF*:BOOLEAN;
 	point*,normal*: PT; 
-	color*,sidecolor*: Color;
+	color*: Color;
+	mirrorTF*:BOOLEAN;
+END;
+
+TYPE RCube*=RECORD
+	TF*:BOOLEAN;
+	point*,normal*: PT; 
+	color*: Color;
 	mirrorTF*:BOOLEAN;
 END;
 
@@ -231,7 +238,8 @@ END reload;
 
 END TexCube;
 
-TYPE Ray* = RECORD
+
+TYPE Ray*=RECORD;
 	xyz*, dxyz*, ddxyz*, lxyz*, lastlxyz*, txyz*, origin*, oxyz*, hitxyz*,firsthitxyz*: PT;	
 	downxyz*,rightxyz*: PT;
 	theta*,phi*, dtheta*,dphi*: REAL;
@@ -624,13 +632,13 @@ PROCEDURE VoxelFromName*(modname: Name): Voxel;
 				voxel := fackery();		 
 			END;
 			IF voxel=NIL THEN 
-				(* Out.String("failed voxelfromname 1"); *)
+				 Out.String("failed voxelfromname 1"); 
 				voxel:=EMPTY
 			ELSE
 				voxel.code:=modname;
 			END;
 		ELSE
-			 (* Out.String("failed voxelfromname 2"); *)
+			  Out.String("failed voxelfromname 2"); 
 			voxel:=EMPTY
 		END;
 		RETURN voxel

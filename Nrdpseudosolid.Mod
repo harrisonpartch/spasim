@@ -18,12 +18,12 @@ TYPE rdps*=OBJECT(Base.Voxel);
 VAR
 	mesh1*,mesh2,n1,n2: ARRAY M,M OF REAL;
 	gen: INTEGER;
-	i:LONGINT;
+	i:INTEGER;
 	tscale: REAL
 
 PROCEDURE &New*;
 VAR 
-	i, j : LONGINT;
+	i, j : INTEGER;
 BEGIN
 	clere;
 	seed;
@@ -32,7 +32,7 @@ END New;
 			
 PROCEDURE clere*;
 VAR
-	i,j,k:LONGINT;
+	i,j,k:INTEGER;
 BEGIN								
 	FOR i := 0 TO M - 1 DO
 		FOR j := 0 TO M - 1 DO
@@ -47,7 +47,7 @@ END clere;
 
 PROCEDURE seed*;
 VAR
-	i,j,k:LONGINT;
+	i,j,k:INTEGER;
 BEGIN								
 	FOR i := 0 TO M - 1 DO
 		FOR j := 0 TO M - 1 DO
@@ -56,7 +56,7 @@ BEGIN
 	END;
 END seed;
 
-PROCEDURE bounds (i, j, k: LONGINT; VAR out: BOOLEAN);
+PROCEDURE bounds (i, j, k: INTEGER; VAR out: BOOLEAN);
 BEGIN
 	IF (i < 0) OR (i > M-1) OR (j < 0) OR (j > M-1) OR (k < 0) OR (k > M-1) THEN
 		out := TRUE
@@ -66,7 +66,7 @@ BEGIN
 END bounds;
 
 PROCEDURE tick;
-VAR i, j,im1,ip1,jm1,jp1: LONGINT;
+VAR i, j,im1,ip1,jm1,jp1: INTEGER;
 BEGIN
 	FOR i := 0 TO M - 1 DO
 		FOR j := 0 TO M - 1 DO
@@ -90,12 +90,12 @@ END tick;
 
 PROCEDURE Shade (VAR ray: Ray);
 VAR
-	x,y,xi,yj: LONGINT;
+	x,y,xi,yj: INTEGER;
 	X,Y, xblend, yblend,blendx,blendy: REAL;
 	r,g,b: REAL;
 	dr,dg,db,da,blackness:REAL;
 	bb,c, lx, ly,lz, lx1,ly1,lz1,lx2,ly2,lz2,tq,xx,yy,zz,xxx,yyy,zzz,sc : REAL;
-	i,j: LONGINT;
+	i,j: INTEGER;
 	mix,dot,dot1,dot2, nx, ny, nz: REAL;	
 	bpdx,bpdy,cq: REAL;
 	xov,yov,zov:REAL;
@@ -105,7 +105,7 @@ VAR
 	rlm: BOOLEAN;
 	lxyz: Base.PT;
 	lsp: Base.SPT;
-	dtl: LONGINT;
+	dtl: INTEGER;
 	mip,mipverse: REAL;
 BEGIN
 	IF tscale>0 THEN
@@ -215,5 +215,7 @@ END thisvox;
 
 BEGIN
 	NEW(vox);
+	
+	vox.register;
 	vox.tscale:=128
 END Nrdpseudosolid. 

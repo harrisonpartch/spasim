@@ -61,7 +61,7 @@ VAR
 	subserp: Voxel;
 	sky: Voxel;
 	uk, echan, nark, nepal, xot, dblue, empty: Voxel;
-	darkblue:TransparaVox;
+	darkblue, darkred:TransparaVox;
 	gray: DiffuseVox;
 	s0,s1,s2,s3: NM3.cell;
 	fuzz: Voxel4.FuzzVox;
@@ -73,7 +73,7 @@ VAR
 
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
-	RETURN s2
+	RETURN s1
 END thisvox;
 
 BEGIN
@@ -89,6 +89,7 @@ BEGIN
 	NEW(s2);
 	NEW(s3);
 	NEW(darkblue);
+	NEW(darkred);
 	NEW(fuzz);
 	NEW(mirrorball);
 	NEW(empty);
@@ -103,20 +104,24 @@ BEGIN
 (*	NEW(rd,empty,nark,empty);	
 	rd.register;
 	rd.passable:=TRUE;
-	
-	FOR i:=0 TO 5 DO
-		s0.stroke(Base.randPT(),9,sball)
-	END;
-*)s0.blox[1,1,1]:=s1;
-	s1.fillsierp(NIL,s3);	
+*)	
+	s0.blox[1,1,1]:=s1;
 	s2.fillsierp(xot,s1);
 	s3.fillsierp(s2,xot);	
+	darkblue.setcolor(0,0,1/2,2/3,2/3,2/3);
+	darkred.setcolor(1/2,0,0,2/3,2/3,2/3);	
 	s3.setcolor(1/7,1/7,1/7,1/6,1/6,1/6);	
 	s2.setcolor(0, 0, 1/7,1/3,1/3,1/3);	
 	s1.setcolor(2/13, 2/13, 0,1/3,1/3,1/3);			
 	s0.setcolor(0, 1/45, 0, 1/45,1/45,1/45);	
+		FOR i:=0 TO 49 DO
+		s1.stroke(Base.randPT(),9,darkblue)
+	END;
+	FOR i:=0 TO 49 DO
+		s1.stroke(Base.randPT(),9,darkred)
+	END;	
 	s0.imposter:=xot;
-	s1.imposter:=xot;
+	s1.imposter:=darkblue;
 	s2.imposter:=xot;
 	s3.imposter:=xot;
 	s0.passable:=FALSE;	

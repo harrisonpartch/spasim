@@ -1,10 +1,17 @@
 MODULE RD;
 
-IMPORT Base, Random, Objects;
+IMPORT Objects, Base, Out:=KernelLog, Random;
+
+TYPE Ray = Base.Ray;
+	Voxel = Base.Voxel;  
+	PT =Base.PT;
+	
+VAR
+	rd: RDVox;
 
 CONST M=20;
 
-TYPE rd* = OBJECT
+TYPE RDVox* = OBJECT(Voxel)
 
 PROCEDURE & init*;
 BEGIN
@@ -75,6 +82,12 @@ BEGIN{ACTIVE, PRIORITY(Objects.Normal)}
 			GO:=FALSE;
 		END;
 	UNTIL ~Base.worldalive;
-END rd;
+END RDVox;
+
+PROCEDURE thisvox*():Base.Voxel;
+BEGIN
+	NEW(rd);
+	RETURN(rd);
+END thisvox;
 
 END RD.

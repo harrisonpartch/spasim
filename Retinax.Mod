@@ -6,13 +6,13 @@ TYPE
 	Ray=Base.Ray;
 	PT=Base.PT;
 CONST
-	T=3;        
-	TS=16*8;  (*  TS MUST BE {size of unit tile} MULTIPLIED BY 2**T *)
-	TW=8;
-	TH=8;
+	T=2;        
+	TS=16*4;  (*  TS MUST BE {size of unit tile} MULTIPLIED BY 2**T *)
+	TW=12;
+	TH=12;
 	W*=TS*TW;
 	H*=TS*TH;
-	CX=W DIV 2;
+	CX=TS*TW DIV 2;
 	CY=H DIV 2;
 	GAMMA=255; 
 
@@ -114,11 +114,12 @@ END clrd;
 
 PROCEDURE clrd4(CONST ra,rb,rc,rd: Base.Ray): REAL;
 BEGIN	
-	IF ra.justhit = rd.justhit THEN	
-		RETURN (clrd(rb,rd)+clrd(ra,rc))/6;
-	ELSE
-		RETURN 1
-	END 
+		IF clrd(ra,rc)>thresh1a THEN
+			RETURN 1.0
+		ELSIF clrd(rb,rd)>thresh1a THEN
+			RETURN 1.0
+		END;
+		RETURN 0.0 
 END clrd4;
 
 PROCEDURE tessa16(cam:Camera);	
@@ -200,7 +201,7 @@ PROCEDURE t4x4fill(CONST x,y: INTEGER);
 VAR
 	i,j: INTEGER;
 BEGIN
-	IF clrd4(rays[x,y], rays[x+3,y], rays[x+3,y+3], rays[x,y+3]) > thresh2 THEN
+	IF clrd4(rays[x,y], rays[x+3,y], rays[x+3,y+3], rays[x,y+3]) > thresh1a THEN
 		t2x2a(x,y);
 		t2x2b(x+2,y);
 		t2x2c(x+2,y+2);
@@ -218,9 +219,9 @@ BEGIN
 	Base.world.Shade(rays[x+3,y]);	
 	Base.world.Shade(rays[x,y+3]);	
 	Base.world.Shade(rays[x+3,y+3]);	
-(*	Base.clampclr(rays[x+3,y].clr);	
+	Base.clampclr(rays[x+3,y].clr);	
 	Base.clampclr(rays[x,y+3].clr);	
-	Base.clampclr(rays[x+3,y+3].clr);	*)
+	Base.clampclr(rays[x+3,y+3].clr);	
 	t4x4fill(x,y)
 END t4x4a;
 
@@ -272,7 +273,7 @@ PROCEDURE t8x8fill(CONST x,y: INTEGER);
 VAR
 	i,j: INTEGER;
 BEGIN
-	IF clrd4(rays[x,y], rays[x+7,y], rays[x+7,y+7], rays[x,y+7]) > thresh2 THEN
+	IF clrd4(rays[x,y], rays[x+7,y], rays[x+7,y+7], rays[x,y+7]) > thresh1a THEN
 		t4x4a(x,y);
 		t4x4b(x+4,y);
 		t4x4c(x+4,y+4);
@@ -333,33 +334,10 @@ PROCEDURE t16x16fill();
 VAR
 	i,j: INTEGER;
 BEGIN
-	IF clrd4(rays[0,0], rays[15,0], rays[15,15], rays[0,15]) > thresh1a THEN
 		t8x8a(0,0);
 		t8x8b(8,0);
 		t8x8c(8,8);
 		t8x8d(0,8); 
-	ELSE
-		FOR i:= 0 TO 7 DO
-			FOR j:= 0 TO 7 DO
-				tileimage[i,j]:=rays[0,0].clr;
-			END
-		END;
-		FOR i:= 8 TO 15 DO
-			FOR j:= 0 TO 7 DO
-				tileimage[i,j]:=rays[15,0].clr;
-			END
-		END;	
-		FOR i:= 8 TO 15 DO
-			FOR j:= 8 TO 15 DO
-				tileimage[i,j]:=rays[15,15].clr;
-			END
-		END;
-		FOR i:= 0 TO 7 DO
-			FOR j:= 8 TO 15 DO
-				tileimage[i,j]:=rays[0,15].clr
-			END
-		END;	
-	END
 END t16x16fill;
 
 BEGIN
@@ -461,7 +439,7 @@ PROCEDURE t8x8fill(CONST x,y: INTEGER);
 VAR
 	i,j: INTEGER;
 BEGIN
-	IF clrd4(rays[x,y], rays[x+7,y], rays[x+7,y+7], rays[x,y+7]) > thresh2 THEN
+	IF clrd4(rays[x,y], rays[x+7,y], rays[x+7,y+7], rays[x,y+7]) > thresh1a THEN
 		t4x4a(x,y);
 		t4x4b(x+4,y);
 		t4x4c(x+4,y+4);
@@ -632,6 +610,7 @@ BEGIN
 END zftrace;
 
 BEGIN{ACTIVE, PRIORITY(Objects.Normal)}
+	Out.String("tile ");
 	REPEAT
 		BEGIN{EXCLUSIVE}
 			AWAIT(GO);
@@ -860,7 +839,7 @@ BEGIN
 			NEW(tile[a,b]);
 		END
 	END;	
- 	thresh1a:=0.0031;
+ 	thresh1a:=0.001;
  	thresh2:=0.01;
  	thresh3:=0.04;
  	threshmax:=0.3;
