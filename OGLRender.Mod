@@ -460,7 +460,7 @@ END KeyEvent;
 		BEGIN
 			MB := keys;  (* *)		
 			xr :=x-centerx; yr :=y-centery;		
-			IF (ABS(xr)+ABS(yr)>10) THEN
+			IF MOUSEDOWN &(ABS(xr)+ABS(yr)>10) THEN
 				left:=ABS(xr)*xr;
 				up:=-ABS(yr)*yr;  
 				camera.up(-up/(6000*leftsticky)); 
