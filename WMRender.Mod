@@ -1,14 +1,14 @@
 MODULE WMRender;
 IMPORT Kernel, Objects, Random, Marsh, Rectangles := WMRectangles, WM := WMWindowManager, WMMessages,
- Out := KernelLog, Math := MathL,SPSMMath, Base, Retina,  Inputs,  Raster, Strings, 
- Streams, Debugging, WarpMouse;
+ Out := KernelLog, Math := MathL,SPSMMath, Base, Retina,  Inputs,  Raster, Strings,
+ Streams, Debugging;
 
 TYPE
 	Aperture = Base.Aperture;
 	Ray = Base.Ray;
 	Voxel = Base.Voxel;
 	PT = Base.PT;
-	
+
 TYPE SNAP = RECORD
 	lookphi, looktheta : REAL;
 	aperture: Aperture;
@@ -44,7 +44,7 @@ BEGIN
 	filter:=FALSE;
 	cameratheta := 0;
 	cameraphi := 0;
-	aperture.width :=1.5;
+	aperture.width := 1.5;
 	aperture.height :=1.5;
 	aperjust(1,1);
 	Base.setPT(xaxis, 1,0,0);
@@ -215,10 +215,9 @@ END left;
 
 PROCEDURE up (ph: REAL);
 BEGIN
-	cvu:=cvu+ph;
-	cameraphi := cameraphi + cvu;
-	IF cameraphi > 1.51 THEN cameraphi := 1.61 END;
-	IF cameraphi < -1.51 THEN cameraphi := -1.61 END
+	cameraphi := cameraphi + ph;
+	IF cameraphi > 1.31 THEN cameraphi :=  1.31 END;
+	IF cameraphi < -1.11 THEN cameraphi := -1.11 END
 END up;
 
 PROCEDURE tick;
@@ -239,21 +238,22 @@ BEGIN
 	IF avaTF THEN Marsh.drawavatar END;
 	GLIDE:=0.98;
 	cvz := cvz*GLIDE+gravityvector.z;
-	cvx := cvx*GLIDE+gravityvector.x; cvy := cvy*GLIDE+gravityvector.y;
-	cvl :=cvl*0.5; cvu := cvu*0.5; 
-	IF 0 IN MB THEN Marsh.snipeonto
-	ELSIF  1 IN MB THEN Marsh.snipeinto 
-	ELSIF  2 IN MB THEN Marsh.draw 
+	cvx := cvx*GLIDE+gravityvector.x; 
+	cvy := cvy*GLIDE+gravityvector.y;
+	cvl :=cvl*0.75; cvu := cvu*0.75;
+	IF 0 IN MB THEN camera.forward(0.51*Base.speed);
+	ELSIF  1 IN MB THEN Marsh.snipeinto
+	ELSIF  2 IN MB THEN camera.forward(-0.51*Base.speed);
 	END;
 	trace;
-	Base.tick
+	Base.tick;
 END tick;
-  
+
 END Camera;
 
 PROCEDURE P(VAR message:WMMessages.Message; VAR discard: BOOLEAN);
 BEGIN
-	IF CAPTUREMOUSE THEN 
+	IF CAPTUREMOUSE THEN
 		RW.Handle(message);
 		discard:=TRUE;
 (*		IF (message.msgType=WMMessages.MsgPointer) THEN
@@ -287,7 +287,7 @@ BEGIN
 	centery:=100+(H DIV 2);
   WM.LoadCursor("blankrecticle.png", 3,3, pi);
 	SetPointerInfo(pi);
-	mstarget:=30;
+	mstarget:=100;
 END openwincam;
 
 PROCEDURE KeyEvent (ucs : SIZE; flags : SET; keysym : SIZE);
@@ -299,20 +299,20 @@ BEGIN
 	key:=CHR(ucs);
 	CASE ucs OF
 		| 193: INC(Base.PRO); Out.Int(Base.PRO,4); Out.Ln
-		| 194: DEC(Base.PRO); Out.Int(Base.PRO,4); Out.Ln
+		| 194: alive:= ~alive;
 		| 195: camera.left(0.03)
 		| 196: camera.left(-0.03)
 (*		| 195: Base.DTL:= Base.DTL*2/3;
 		| 196: Base.DTL:= Base.DTL*3/2;
 *)	ELSE
 		CASE CHR(ucs) OF
-			"S": Base.fog:=Base.fog*7/6; Out.String("more fog"); 
+			"S":Close;
 			| "W": Base.fog:=Base.fog*6/7; ; Out.String("less fog");
 			| "Q": alive:=FALSE;
 			|   "s" : camera.forward(-0.51*Base.speed)
-			| "w" :camera.forward(0.51*Base.speed)
-			| "a" :camera.rightstrafe(-0.5*Base.speed)
-			| "d" :camera.rightstrafe(0.5*Base.speed)
+			| "w" : mstarget := mstarget + 5
+			| "a" : camera.rightstrafe(-0.5*Base.speed)
+			| "d" : mstarget := mstarget - 5
 			| "e": camera.upstrafe(-0.51*Base.speed)
 			| "q": camera.upstrafe(0.51*Base.speed)
 			| "n": leftsticky:=leftsticky*1.3; upsticky:=upsticky*1.3;
@@ -327,7 +327,7 @@ BEGIN
 			| "3" : Base.gravity:= Base.gravity/1.5
 			| "4" : Base.gravity:= 1.5*Base.gravity
 			| "5" : Close;
-			| "6" :  avaTF:=~avaTF 
+			| "6" :  avaTF:=~avaTF
 			| "?" : Out.Int(Base.world.count(7),4); Out.Ln
 			| "h" : camera.hop
 			| "]": camera.aperture.width := camera.aperture.width * 101/99; camera.aperture.height := camera.aperture.height *101/99;
@@ -352,41 +352,36 @@ BEGIN
 END KeyEvent;
 
 PROCEDURE PointerDown(x, y: SIZE; keys: SET);
-VAR 
+VAR
 	wmanager: WM.WindowManager;
 BEGIN
-	Out.Char("!");
+	MOUSEDOWN:=TRUE;
 	IF ~CAPTUREMOUSE THEN CAPTUREMOUSE:=TRUE END;
-	MB:=keys;		
+	MB:=keys;
 END PointerDown;
 
 PROCEDURE PointerUp(x, y: SIZE; keys: SET);
 BEGIN
-	MB:=keys;		
+	MB:=keys;
+	MOUSEDOWN:=FALSE
 END PointerUp;
-	
+
 PROCEDURE PointerMove(x,y: SIZE; keys: SET);
 VAR
 		up,left: REAL;
 		xr,yr: SIZE;
-		temporaljust: REAL; 
+		temporaljust: REAL;
 BEGIN
-			MB := keys;  (* *)		
+			MB := keys;  (* *)
 			centerx := INTEGER(bounds.r - bounds.l);
 			centery := INTEGER(bounds.b - bounds.t);
-			xr := x-centerx; yr :=y-centery;		
-			IF CAPTUREMOUSE & (ABS(xr)+ABS(yr)>1) THEN
+			xr := x-centerx; yr :=y-centery;
+			IF MOUSEDOWN & ((ABS(xr)+ABS(yr))>1) THEN
 				left:=ABS(xr)*xr;
 				up:=-ABS(yr)*yr;  
-				camera.up(-up/(6000*leftsticky)); 
-				camera.left(left/(6000*leftsticky));
-				WarpMouse.warp(centerx,centery); 
-				IF (ABS(xr)+ABS(yr)>150) THEN
-					Retina.saccade:=TRUE;
-				ELSE
-					Retina.saccade:=FALSE;
-				END
-			END					
+				camera.up(up/leftsticky);
+				camera.left(left/leftsticky); 
+			END
 END PointerMove;
 
 PROCEDURE WheelMove(dz: SIZE);
@@ -423,20 +418,19 @@ END pan;
 PROCEDURE detail();
 BEGIN
 	IF framedt < mstarget THEN
-		Retina.moredetail; 
+		Retina.moredetail;
 	ELSIF framedt > (mstarget+5) THEN
-		Retina.lessdetail; 
+		Retina.lessdetail;
 	END
 END detail;
 
 	BEGIN {ACTIVE, PRIORITY(Objects.Normal)}
-		NEW(rand);
 		foveasize := 100;
 		camrotinertia:=100;
 		Base.DTL:=250;
 		Base.DTL2:=2500;
 		Base.gravity:=0.000001;
-		Base.speed:=0.001;
+		Base.speed:=0.000001;
 		Base.maxspeed:=0.0001;
 		Base.cursordist:=0.01;
 		R1:=100;
@@ -444,31 +438,31 @@ END detail;
 		Base.worldalive := TRUE;
 		fogdensity:=0.11;
 		leftsticky:=10.0;
-		upsticky:=10.0;
+		upsticky:=30.0;
 		Out.String('*line 1217!*');
-		msd:=30;	 
-		framecounter:= 0;	
+		msd:=30;
+		framecounter:= 0;
 		NEW(ftimer);
 		alive:=TRUE;
 		REPEAT
 			framecounter:= (framecounter+1) MOD 10;
 			t1:=Kernel.GetTicks();
 			camera.tick;
-			framedt:=Kernel.GetTicks()-t1;	
+			framedt:=Kernel.GetTicks()-t1;
 			IF framecounter=0 THEN
 				Out.Int(framedt, 4);
 				Out.Ln;
 			END;
 			detail;
-			Swap; 
-			Invalidate(Rectangles.MakeRect(0, 0, GetWidth(), GetHeight()));	
-			Retina.image := backImg; 
+			Swap;
+			Invalidate(Rectangles.MakeRect(0, 0, GetWidth(), GetHeight()));
+			Retina.image := backImg;
 		UNTIL ~alive;
 		Close;
 	END RayWindow;
 
 VAR
-rand: Random.Generator;
+	rand: Random.Generator;
 	wcount: INTEGER;
 	frame, tickframe: INTEGER;
 	movierecording, movieplaying: BOOLEAN;
@@ -548,7 +542,8 @@ END Open;
 
 PROCEDURE Close*;
 BEGIN
-	 IF RW# NIL THEN RW.Close; RW := NIL END;
+	Base.STOPGO;
+	IF RW # NIL THEN RW.Close;  RW := NIL  END;
 END Close;
 
 BEGIN

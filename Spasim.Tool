@@ -3,6 +3,7 @@ Base.Mod
 SPSME.Mod 
 SPSMMath.Mod
 SPSMHex.Mod
+HalfSpace.Mod
 Noise.Mod
 FRep.Mod
 TexVox.Mod
@@ -33,12 +34,16 @@ NCompiler.ncompile  <== Middle mouse click on this
 Render.Open    <== Middle mouse click on this
 
 srVoxel.Mod
+
+
 WMRender.Open 
 
 RD.Mod
 TexRD.Mod
 
 ======
+
+System.Free Render.Mod ~
 
 System.FreeDownTo Base ~   
 System.FreeDownTo OpenGL ~
@@ -68,6 +73,7 @@ NM4.Mod
 NM3.Mod
 NM2.Mod
 
+Nsphere.Mod
 
 TuringPll.Mod
 

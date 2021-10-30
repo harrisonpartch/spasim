@@ -99,11 +99,11 @@ BEGIN
 	RETURN(TRUE);
 END in;
 
-PROCEDURE ctop(p:PT; VAR th,ph,d: REAL);
+PROCEDURE ctop(p:PT; VAR th,ph,d: LONGREAL);
 BEGIN
-(*	d := MathL.sqrt(dee2(p));
-	th := 6.28*SPSMMath.sin((x-cx)/d);
-	ph :=  6.28*SPSMMath.cos((y-cy)/d); *)
+  d := MathL.sqrt(dee2(p));
+	th := 6.28*MathL.sin((x-cx)/d);
+	ph :=  6.28*MathL.cos((y-cy)/d); 
 END ctop;
 
 PROCEDURE ctop1(p:PT; VAR th,ph,d: REAL);
@@ -338,14 +338,14 @@ BEGIN
 		b:= Base.Exit(ray);
 		x := (a.x+b.x)/2; y := (a.y+b.y)/2; z := (a.z + b.z)/2;
 		d := d2(x,y,z);
-		IF d > D2 THEN
+		IF d < D2 THEN
 			FOR i := 0 TO 24 DO
-				d := d2(x,y,z);
 				IF d < D2 THEN 
 					b.x := x; b.y := y; b.z := z
 				ELSE
 					a.x := x; a.y := y; a.z := z
 				END;
+				d := d2(x,y,z);
 				x := (a.x+b.x)/2; y := (a.y+b.y)/2; z := (a.z + b.z)/2;
 			END;
 		ELSE
@@ -390,14 +390,18 @@ BEGIN
 END Shade;
 END SphereInVox;
 
+TYPE Mirrorpoint*=OBJECT(ImpliciVox);
+
+END Mirrorpoint;
+
 TYPE MirrorSphereInVox*=OBJECT(ImpliciVox);
 
 VAR
-	diameter*:REAL;
+	radius*:REAL;
 PROCEDURE &init*;
 BEGIN
 	setCenter(1/2,1/2,1/2);
-	diameter:= 1/66;
+	radius:= 1/2;
 (*	register; *)
 END init;
 
@@ -416,31 +420,18 @@ BEGIN
 	b:=exit;
 	x := (a.x+b.x)/2; y := (a.y+b.y)/2; z := (a.z + b.z)/2;
 	d := d2(x,y,z);
-	IF d > diameter THEN
-(*		FOR i := 0 TO R DO
-			d := d2(x,y,z);
-			IF d < diameter THEN 
+	IF d < radius THEN
+		FOR i := 0 TO 12 DO
+			IF d < radius	THEN
 				b.x := x; b.y := y; b.z := z
 			ELSE
 				a.x := x; a.y := y; a.z := z
 			END;
-			x := (a.x+b.x)/2; y := (a.y+b.y)/2; z := (a.z + b.z)/2;
-		END;
-*)	ELSE
-		FOR i := 0 TO R DO
 			d := d2(x,y,z);
-			IF d > diameter THEN 
-				b.x := x; b.y := y; b.z := z
-			ELSE
-				a.x := x; a.y := y; a.z := z
-			END;
 			x := (a.x+b.x)/2; y := (a.y+b.y)/2; z := (a.z + b.z)/2;
 		END;
-	END;
-	IF (ABS(d-diameter) < 0.001) THEN 
 		n.x := cx-x; n.y := cy - y; n.z := cz - z;
 		Base.normalizePT(n);
-		
 		reflect(ray.dxyz.x,ray.dxyz.y,ray.dxyz.z, n.x,n.y,n.z);		
 		ray.clr.ra := ray.clr.ra - 0.1;
 		ray.clr.ga := ray.clr.ga - 0.1;
@@ -448,16 +439,13 @@ BEGIN
 		IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END;
 		IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
 		IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;
-		ray.xyz.x:=ray.xyz.x+x*(exit.x-ray.lxyz.x);
-		ray.xyz.y:=ray.xyz.y+x*(exit.y-ray.lxyz.y);	
-		ray.xyz.z:=ray.xyz.z+x*(exit.z-ray.lxyz.z);	
-		Base.world.Shade(ray);
+		ray.changed := TRUE;
 	END;
 END Shade;
 
 PROCEDURE tick;
 BEGIN
-	diameter:= 1/3 + rand.Uniform()/50 ; 
+	radius:= 1/13 + rand.Uniform()/50 ; 
 END tick;
 
 END MirrorSphereInVox;
@@ -579,7 +567,7 @@ BEGIN
 	x := x/d; y := y/d; z:=z/d;
 END normalize;
 
-PROCEDURE reflect(VAR x,y,z: REAL; nx,ny,nz:REAL);
+PROCEDURE reflect(VAR x,y,z: REAL; VAR nx,ny,nz:REAL);
 VAR 
 	dot: REAL;
 BEGIN

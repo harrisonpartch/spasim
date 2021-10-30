@@ -7,13 +7,13 @@ CONST
 	M2 = (M DIV 2);
 	MSIZE =1
 
-TYPE Twindow* =  OBJECT(WM.BufferWindow)
+TYPE Twindow* =  OBJECT(WM.DoubleBufferWindow)
 VAR
 	mesh1, mesh2, n1 : ARRAY M,M OF REAL;
 	alive, dead: BOOLEAN;
-	i : LONGINT;
+	i : INTEGER;
 		
-PROCEDURE KeyEvent (ucs : LONGINT; flags : SET; keysym : LONGINT);
+PROCEDURE KeyEvent (ucs : INTEGER; flags : SET; keysym : INTEGER);
 BEGIN
 	CASE CHR(ucs) OF
 		| 'q': Close
@@ -23,7 +23,7 @@ END KeyEvent;
 
 PROCEDURE &New*;
 VAR 
-	i, j : LONGINT;
+	i, j : INTEGER;
 BEGIN
 	Init(M*MSIZE, M*MSIZE, FALSE);
 	manager := WM.GetDefaultManager();
@@ -44,11 +44,6 @@ BEGIN
 	END;
 END New;
 
-PROCEDURE Draw*(canvas : WMGraphics.Canvas; w, h, q : LONGINT);
-BEGIN
-	Draw^(canvas, w, h, 0)
-END Draw;
-
 PROCEDURE Close;
 BEGIN
 	alive := FALSE;
@@ -57,7 +52,7 @@ BEGIN
 END Close;
 
 PROCEDURE Generation;
-VAR i, j,im1,ip1,jm1,jp1: LONGINT;
+VAR i, j,im1,ip1,jm1,jp1: INTEGER;
 BEGIN
 	FOR i := 0 TO M - 1 DO
 		FOR j := 0 TO M - 1 DO
@@ -80,7 +75,7 @@ BEGIN
 END Generation;
 
 PROCEDURE DrawIt;
-VAR i, j, ix, jy : LONGINT;
+VAR i, j, ix, jy : INTEGER;
 	pix : Raster.Pixel;
 	mode : Raster.Mode;
 	r,g,blue: INTEGER;
@@ -104,9 +99,9 @@ BEGIN {ACTIVE}
 	alive := TRUE;
 	Objects.SetPriority(Objects.Low);
 	WHILE alive DO
-		FOR i := 0 TO 0 DO Generation END;
+		FOR i := 0 TO 1000 DO Generation END;
 		DrawIt;
-	(*	Objects.Sleep(10) *)
+		Objects.Sleep(10) 
 	END;
 	BEGIN {EXCLUSIVE} dead := TRUE; END;
 END Twindow;

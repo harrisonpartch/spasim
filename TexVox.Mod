@@ -137,30 +137,30 @@ BEGIN
 			ly:=1-ly;
 		END;
  		mip:=ray.length*Base.texdetail;
-		IF mip>5 THEN
+		IF mip>10 THEN
 			color:=texcube.side[ray.face].pixelmip_two(lx,ly);
 		ELSE
 			color:=texcube.side[ray.face].pixel(lx,ly); 
 		END; 
 		IF color.alpha<0.99 THEN
 		 	IF color.alpha>0.9 THEN
-				mirror(ray,0);
+				 mirror(ray); 
 			ELSE
 				dot2:= ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
 				dot1:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-				mix:=ray.length*ray.scale*0.00005;
+				mix:=ray.length*ray.scale*0.0155;
 				IF mix>1 THEN mix:=1 END;
 				dot:=mix*dot1+(1-mix)*dot2;		
-				IF ray.lighting>0 THEN dot:= dot*ray.lighting END;
-				dr:=color.alpha*color.red*dot*ray.clr.ra;
-				dg:=color.alpha*color.green*dot*ray.clr.ga;
-				db:=color.alpha*color.blue*dot*ray.clr.ba;
+(*				IF ray.lighting>0 THEN dot:= dot*ray.lighting END; *)
+				dr:=color.red*dot*color.alpha*ray.clr.ra;
+				dg:=color.green*dot*color.alpha*ray.clr.ga;
+				db:=color.blue*dot*color.alpha*ray.clr.ba;
 				ray.clr.r := ray.clr.r + dr;
 				ray.clr.g := ray.clr.g + dg;
 				ray.clr.b := ray.clr.b + db;
-				ray.clr.ra:=ray.clr.ra-dr;
-				ray.clr.ga:=ray.clr.ga-dg;			
-				ray.clr.ba:=ray.clr.ba-db;			
+				ray.clr.ra:= ray.clr.ra-dr-0.1;
+				ray.clr.ga:=ray.clr.ga-dg-0.1;			
+				ray.clr.ba:=ray.clr.ba-db-0.1;			
 				IF (ray.clr.ra<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ba<0.1) THEN 
 					ray.terminate:=TRUE 
 				END;	
@@ -177,7 +177,9 @@ BEGIN
 			ray.clr.r := ray.clr.r + dr*ray.clr.ra;
 			ray.clr.g := ray.clr.g + dg*ray.clr.ga;
 			ray.clr.b := ray.clr.b + db*ray.clr.ba;
-			ray.terminate:=TRUE
+			ray.clr.ra:=ray.clr.ra-dr;
+			ray.clr.ga:=ray.clr.ga-dg;			
+			ray.clr.ba:=ray.clr.ba-db;		
 		END
 	ELSE
 	  (* camera is inside textured cube *)
@@ -190,11 +192,11 @@ VAR
 	a,b,c,dot: REAL;
 BEGIN
 	dot := p.x*n.x+p.y*n.y+p.z*n.z;
-	a := 2*n.x*dot; b := 2*n.y*dot; c := 2*n.z*dot;
+	a := n.x*dot; b := n.y*dot; c := n.z*dot;
 	p.x := p.x-a; p.y := p.y-b; p.z := p.z-c;
 END reflect;
 
-PROCEDURE mirror(VAR ray: Ray; CONST mix: REAL);
+PROCEDURE mirror(VAR ray: Ray);
 VAR
 	a:REAL;
 BEGIN
@@ -205,13 +207,24 @@ BEGIN
 		ray.clr.ra:= ray.clr.ra - 0.21;
 		ray.clr.ga := ray.clr.ga - 0.21;
 		ray.clr.ba := ray.clr.ba - 0.21;	
-		reflect(ray.dxyz, ray.normal);
-		IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END;
-		IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
-		IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;
-		ray.xyz.x:=ray.xyz.x+ray.dxyz.x/(1000*ray.scale);
-		ray.xyz.y:=ray.xyz.y+ray.dxyz.y/(1000*ray.scale);	
-		ray.xyz.z:=ray.xyz.z+ray.dxyz.z/(1000*ray.scale);	
+		CASE ray.face OF
+(*			0: ray.dxyz.x := -ray.dxyz.x; 
+		|	3: ray.dxyz.x := -ray.dxyz.x;	
+		|	2: ray.dxyz.z := -ray.dxyz.z;	 	
+		|	5: ray.dxyz.z := -ray.dxyz.y;			
+		| 1: ray.dxyz.y := -ray.dxyz.y;	
+		|	4: ray.dxyz.y := -ray.dxyz.z;			
+	 this is the order of the faces in the shader code *)	
+		0: 	 ray.dxyz.x:= -ray.dxyz.x;
+		|1:	ray.dxyz.y:= -ray.dxyz.y;
+		|2:	ray.dxyz.z:= -ray.dxyz.z;
+		|3: 	ray.dxyz.x:= -ray.dxyz.x;
+		|4:	ray.dxyz.y:= -ray.dxyz.y;
+		|5:	ray.dxyz.z:= -ray.dxyz.z;
+	ELSE
+	END;		
+		END; 
+		ray.changed:=TRUE
 	END;
 END mirror;
 
@@ -538,12 +551,13 @@ BEGIN
 			END
 		ELSE
 			Base.normalizePT(ray.normal);
-			dot:= ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
-(*			dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-			mix:=ray.length*ray.scale*0.5;
+(*			dot:= ABS(ray.normal.x*ray.dxyz.x + ray.normal.y*ray.dxyz.y+ ray.normal.z*ray.dxyz.z);
+			dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
+*)			mix:=ray.length*ray.scale*0.5;
 			IF mix>1 THEN mix:=1 END;
+			mix:=1/2;
 			dot:=mix*dot1+(1-mix)*dot2;		
-	*)		dr:=color.red*dot;
+			dr:=color.red*dot;
 			dg:=color.green*dot;
 			db:=color.blue*dot;
 			ray.clr.r := ray.clr.r + dr*ray.clr.ra;

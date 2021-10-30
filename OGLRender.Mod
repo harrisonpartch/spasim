@@ -257,9 +257,9 @@ BEGIN
 		IF avaTF THEN Marsh.drawavatar END
 	END;
 	IF MOUSEDOWN THEN	
-		IF GLW.ML IN MB THEN Marsh.tunnelinto;
+		IF GLW.ML IN MB THEN camera.forward(-1.51*Base.speed);
 		ELSIF  GLW.MM IN MB THEN Marsh.snipeinto; 
-		ELSIF  GLW.MR IN MB THEN Marsh.snipeonto;
+		ELSIF  GLW.MR IN MB THEN camera.forward(0.51*Base.speed);
 		END;	
 	END;
 	trace; 
@@ -288,14 +288,13 @@ VAR
 PROCEDURE &openwincam;
 BEGIN
 	Out.String("openwincam");
-	Init(Retina.W, Retina.H, 0,0, FALSE);
+	Init(Retina.W*2, Retina.H*2, 0,0, TRUE);
 	NEW(camera,Retina.W, Retina.H); 
 	camera.aperjust(Retina.W, Retina.H);
 	SetTitle("SPASIM");
 	SetGameMode(TRUE); 
 	SetPrintFPS(TRUE); (* show frame time timing *)
-	splashscreen := TRUE;
-	mstarget:=30;
+	mstarget:=40;
 	Base.STOPGO; 
 END openwincam;
 
@@ -316,12 +315,12 @@ BEGIN
 	NEW(rand);
 	foveasize := 100;
 	camrotinertia:=100;
-	Base.DTL:=2500;
+	Base.DTL:=25000;
 	Base.DTL2:=250;
 	Base.gravity:=0.00000001;
-	Base.speed:=0.00001;
+	Base.speed:=0.000001;
 	Base.maxspeed:=0.001;
-	Base.cursordist:=0.001;
+	Base.cursordist:=0.005;
 	R1:=100;
 	R2:=150;
 	Base.worldalive := TRUE;	
@@ -368,8 +367,8 @@ VAR
 BEGIN
 	key:=CHR(ucs);
 		CASE CHR(ucs) OF		
-			"S": Base.texdetail:=Base.texdetail*7/6; Out.String("Base.texdetail ++"); 
-			| "W":Base.texdetail:=Base.texdetail*6/7;  Out.String("Base.texdetail --");
+			"S": Base.cursordist:=Base.cursordist*7/6; Out.String("Base.cursordist ++"); 
+			| "W":Base.cursordist:=Base.cursordist*6/7;  Out.String("Base.cursordist --");
 			| "X": Base.DTL:=Base.DTL*7/6; Out.String("++DTL");
 			| "C": Base.DTL:=Base.DTL*6/7;  Out.String("--DTL");	
 			| "M": Retina.threshmax:=Retina.threshmax*7/6; Out.String("++threshmax");
@@ -418,7 +417,7 @@ BEGIN
 								CAPTUREMOUSE := FALSE;
 								PAUSE:=TRUE;
 								HideMousePointer(FALSE);
-								SetIdleTime(1000);
+								SetIdleTime(10000);
 							ELSE
 								(* alive:=FALSE *)
 							END;
@@ -461,27 +460,20 @@ END KeyEvent;
 		BEGIN
 			MB := keys;  (* *)		
 			xr :=x-centerx; yr :=y-centery;		
-			IF CAPTUREMOUSE & (ABS(xr)+ABS(yr)>1) THEN
+			IF (ABS(xr)+ABS(yr)>10) THEN
 				left:=ABS(xr)*xr;
 				up:=-ABS(yr)*yr;  
 				camera.up(-up/(6000*leftsticky)); 
 				camera.left(left/(6000*leftsticky));
 				WarpPointer(1000,1000, centerx,centery); 
-				IF (ABS(xr)+ABS(yr)>150) THEN
-					Retina.saccade:=TRUE;
-				ELSE
-					Retina.saccade:=FALSE;
-				END
-			END
+			END;
 	END PointerMove;
 	 
 	PROCEDURE WheelMove(dz: INTEGER);
 	BEGIN
-	IF TRUE  THEN
 		IF dz > 0 THEN slowdown; (* Out.String("slowdown dz="); Out.Int(dz, 0); *) Out.Ln;
 		ELSE speedup; (* Out.String("speedup dz="); Out.Int(dz, 0); *) Out.Ln;
 		END;
-	END;	
 	END WheelMove;
 
 	PROCEDURE InitShader(CONST vertexShaderPath, fragmentShaderPath: ARRAY OF CHAR): Uint;
@@ -616,7 +608,7 @@ END KeyEvent;
 		GL.UseProgram(programs[curprogram]); 		
 		GL.DrawElements(GLC.GL_TRIANGLES, 6, GLC.GL_UNSIGNED_SHORT, 0);	
 		GL.UseProgram(0); 
-	  SwapBuffers();	
+	 SwapBuffers();	
 	END Display;
 
 	(* change detail according to frame speed, called in GLWindow.MainLoop *)
@@ -628,8 +620,9 @@ END KeyEvent;
 		INC(framecounter);
 		IF framecounter>10 THEN
 			framecounter:=0;
+			
 			Out.Int(ms,5);
-			Out.Ln
+			Out.Ln;
 		END;
 		IF ms > mstarget THEN 
 				Retina.lessdetail

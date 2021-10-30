@@ -56,7 +56,7 @@ VAR
 	vdepth, v2, fog,f2: REAL;
 	last:BOOLEAN;
 	i,j: INTEGER;
-	lastlength:REAL;
+	lastlength,r:REAL;
 BEGIN
 	IF (ray.length*ray.scale>Base.DTL) THEN (* size of the child voxels at camera *)
 		IF imposter#NIL THEN
@@ -161,20 +161,17 @@ BEGIN
 				ray.clr.ga := ray.clr.ga-greenblack*v2;
 				ray.clr.ba := ray.clr.ba-blueblack*v2;	
 				bounds(ijk.i,ijk.j,ijk.k, out);		
-				IF ~(out OR ray.terminate) THEN				
+				IF ~out THEN				
 						v := blox[ijk.i,ijk.j,ijk.k];
 						IF (v#NIL) THEN
 							ray.justhit:=v;
 							ray.lxyz.x := ABS(xyz.x - ijk.i);
 							ray.lxyz.y := ABS(xyz.y - ijk.j);
 							ray.lxyz.z := ABS(xyz.z - ijk.k);
-							IF nbloxTF[ijk.i,ijk.j,ijk.k] THEN 
-								ray.normal := nblox[ijk.i,ijk.j,ijk.k].normal
-							ELSE
-								ray.normal := ray.fnormal;
-							END;
+							ray.normal := ray.fnormal;
 							v.Shade(ray);
 						ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
+							ray.normal := nblox[ijk.i,ijk.j,ijk.k].normal;
 							nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
 						ELSIF rbloxTF[ijk.i,ijk.j,ijk.k] THEN
 							rshade(rblox[ijk.i,ijk.j,ijk.k],ray) 					
@@ -182,7 +179,13 @@ BEGIN
 					END;
 				IF (ray.clr.ba<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ra<0.1) THEN 		
 					ray.terminate:=TRUE 
-				END;		
+				END;	
+			IF ray.changed THEN
+					IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
+					IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
+					IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
+					Shade(ray);
+			END;		
 			UNTIL out OR ray.terminate;
 		END;	
 		ray.scale := ray.scale/M;	
@@ -225,7 +228,7 @@ VAR
 BEGIN
 	dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z);
 	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-	mix:=ray.length*ray.scale*0.015;
+	mix:=ray.length/ray.scale*0.015;
 	IF mix>1 THEN mix:=1 END;
 	dot:=mix*dot1+(1-mix)*dot2;		
 	ray.clr.r := ray.clr.r + nc.color.red*ray.clr.ra*dot;

@@ -300,7 +300,7 @@ VAR
 
 
 	fuzz: Voxel4.FuzzVox;
-	siv: Voxel4.MirrorSphereInVox;
+	siv: Voxel4.Stripey;
 	cvox: Voxel;
 	noise: ARRAY 5 OF FRep.noise;	 
 	twonoise: FRep.twonoise;
@@ -449,10 +449,8 @@ BEGIN
 	push(sky);
 	cthulhu:=Base.VoxelFromName("NuDxZaSfDCnI8xZnbp6c5ew"); 	
 	push(cthulhu);
-	rat:=Base.VoxelFromName("NGJBlQ95mTkoMhozr6XOJYg"); 	
-	push(rat);
 *)
-(*	conglo2:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtUZOq"); 	
+(*	conglo2:=Base.VoxelFromName("N2qeD84Fv78XEj8PtUZOq"); 	
 	push(conglo2);
 	sky1:=Base.VoxelFromName("N5a2g4M6HYjPJxYSNQvYy7"); 	
 	push(sky1);
@@ -489,15 +487,13 @@ BEGIN
 	noise[0].b:=1;
 	noise[0].c:=1;		
 	noise[0].octaves:=5;
-	noise[0].persistence:=3.41;	
-	starspider:=Base.VoxelFromName("Nstarspider");
-  noise[0].setvoxel(starspider);		
+	noise[0].persistence:=3.41;		
 
 	NEW(noise[1]);		
 	noise[1].seed:=5558443;		
-	noise[1].a:=1;
-	noise[1].b:=1;
-	noise[1].c:=1;		
+	noise[1].a:=4;
+	noise[1].b:=4;
+	noise[1].c:=4;		
 	noise[1].octaves:=4;
 	noise[1].persistence:=3.81;	
 	noise[1].setcolor(0.8,2.8,4,1/2,0);	
@@ -507,18 +503,18 @@ BEGIN
 
 	NEW(noise[2]);	
 	noise[2].seed:=7007896;		
-	noise[2].a:=7.5;
-	noise[2].b:=7.5;
-	noise[2].c:=3.5;		
+	noise[2].a:=1;
+	noise[2].b:=1;
+	noise[2].c:=1;		
 	noise[2].octaves:=4;
 	noise[2].persistence:=3.61;	
 	noise[2].setvoxel(wstar);	
 
 	NEW(noise[3]);		
 	noise[3].seed:=8357236;		
-	noise[3].a:=1;
-	noise[3].b:=1;
-	noise[3].c:=1;		
+	noise[3].a:=10;
+	noise[3].b:=10;
+	noise[3].c:=10;		
 	noise[3].octaves:=4;
 	noise[3].persistence:=4.91;	
 	gxy:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 
@@ -528,13 +524,15 @@ BEGIN
 	
 	NEW(noise[4]);		
 	noise[4].seed:=123456;		
-	noise[4].a:=1;
-	noise[4].b:=1;
-	noise[4].c:=1;		
+	noise[4].a:=10;
+	noise[4].b:=10;
+	noise[4].c:=10;		
 	noise[4].octaves:=4;
 	noise[4].persistence:=3.71;	
 	gxy:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667"); 
-
+	rat:=Base.VoxelFromName("NGJBlQ95mTkoMhozr6XOJYg"); 	
+	push(rat);
+	
 	noise[4].setvoxel(wstar);		
 
 	Out.String("EEEEP!");
@@ -545,10 +543,15 @@ BEGIN
 	Out.String("dawn check three ...");
 	
 	z3:= Base.VoxelFromName("NM3");
-
-	z3.setcolor(0.0,0.0,0.0,1,1,0.7);
+	w3:= Base.VoxelFromName("NM3");
+	
+	
+	z3.setcolor(0.1,0.0,0.0,0.2,0.2,0.2);
+	w3.setcolor(0.0,1/10,0.0,1/10,1/10,1/10);	
 
 	rdpseudosolid:=Base.VoxelFromName("Nrdpseudosolid"); 
+	rd:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODg");
+	
   dieone:=Base.VoxelFromName("NCjgzkmiTyecI5x6eOgYqpQ"); 	
   push(dieone);
   dieone.tscale:=1;
@@ -563,27 +566,35 @@ BEGIN
 	
 	cage:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341");
 	cage.copyonstroke:=TRUE;
-  push(cage);	
+ push(cage);	
+ 
+ NEW(siv);
   	
 	medley:=Base.VoxelFromName("Nmedley");
 	
-	noise[4].setvoxel(xot);
-	noise[0].setvoxel(Base.VoxelFromName("Nugandaknuckles"));
-	z3.FRaster(noise[4],27);	
-	z3.FRaster(noise[0],27);	
-	
+	NEW(fuzz);
+	harrison:=Base.VoxelFromName("Nugandaknuckles");
+	harrison.passable:=TRUE;
+	volvox:=Base.VoxelFromName("Nrdvolvox");
+	noise[4].setvoxel(Base.VoxelFromName("NnviGAernhjFK40xASZZVoR"));
+
+(*	noise[4].setvoxel(bottle3);	*)
+	noise[3].setvoxel(w3);	
+	noise[0].setvoxel(cage);
+	w3.FRaster(noise[4],3);	
+	z3.FRaster(noise[3],27);	
+	z3.FRaster(noise[0],27);			
 	Out.String("dawn check four...");
 
 	Base.setPT(center,1/2,1/2,2/3);	
 	NEW(plane,center,up);
-	plane.setvoxel(cage);			
-	z3.FRaster(plane,27);	
 
-	harrison:=Base.VoxelFromName("Nugandaknuckles"); 
-	push(harrison);	
-	Base.avatar:=cage;
+	plane.setvoxel(volvox);			
+	z3.FRaster(plane,16);	
 
-		
+	 
+	Base.avatar:=harrison;
+	
 	Base.avatarsize:=3160; 	
 	
 	Base.world:=z3;
@@ -602,7 +613,7 @@ PROCEDURE lighten*;
 BEGIN
 	IF atmdark>0.11 THEN atmdark:= atmdark/1.5 END;
 	Base.world.setcolor(0,0,0,atmdark,atmdark,atmdark);	
-END lighten
+END lighten;
 
 BEGIN
 	NEW(marshv);
@@ -611,7 +622,6 @@ BEGIN
 	push(Base.EMPTY);
 	Base.EMPTY.setcolor(0,0,0,1/3,1/3,1/3);
 	dawn; 
-	cursorsize:=4000;
 	cursorTF:=TRUE;
 	atmdark:=0;
 	SNIPEINTO:=TRUE;

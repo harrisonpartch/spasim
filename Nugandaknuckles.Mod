@@ -8,6 +8,8 @@ BEGIN
 END thisvox;
 
 BEGIN
-	NEW(vox,"foxbreadmirror.png"); 
+	NEW(vox,"ugandaknuckles.png"); 
 	vox.passable:=FALSE;
 END Nugandaknuckles. 
+
+WMRender.Mod

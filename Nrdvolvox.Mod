@@ -3,15 +3,51 @@ MODULE Nrdvolvox;
 IMPORT Base, SPSME, FRep, Kernel;
 
 CONST	
-	M= 10;
-	A = 80;
+	M= 250;
+	A = 70;
 	B = 20;
-	C = 0.045;
+	C = 0.035;
 
 TYPE
 	PT=Base.PT;
 	Voxel=Base.Voxel;
 	Ray=Base.Ray;
+	
+TYPE TransparaVox*=OBJECT(Base.Voxel);
+VAR
+	r, g, b, black: REAL;	
+PROCEDURE setcolor* (red, green, blue, rbl,gbl, bbl : REAL); 
+BEGIN
+	r := red;
+	g := green;
+	b := blue;
+	black:=bbl;
+	passable := TRUE;
+END setcolor;
+
+PROCEDURE Shade (VAR ray: Ray);
+VAR 
+	depth: REAL;
+	exit:PT;
+	dr,dg,db,dbl: REAL;
+BEGIN
+	exit:=Base.Exit(ray);
+	depth:=Base.dist(ray.lxyz,exit);
+	dbl:=black*depth;
+	dr := r*depth*ray.clr.ra;
+	dg := g*depth*ray.clr.ga;
+	db := b*depth*ray.clr.ba;
+	ray.clr.r := ray.clr.r + dr;
+	ray.clr.g := ray.clr.g + dg;
+	ray.clr.b := ray.clr.b + db; 
+	ray.clr.ra := (ray.clr.ra - (dr + dbl));
+	ray.clr.ga := (ray.clr.ga - (dg + dbl));
+	ray.clr.ba := (ray.clr.ba - (db + dbl)); 	
+	ray.clr.alpha:=ray.clr.alpha-dbl-(dr+dg+db)/3;
+	IF ray.clr.alpha<0.1 THEN ray.terminate:=TRUE END;	
+END Shade;
+
+END TransparaVox;  
 	
 TYPE RDVolVox*=OBJECT(Base.Voxel);
 VAR
@@ -265,7 +301,7 @@ END RDVolVox;
 
 VAR
 	vox: RDVolVox; 
-	r,b,y: Base.Voxel;
+	r,b,y: TransparaVox;
 	center: Base.PT;
 	ball: FRep.sphere;
 	GO, DONE: BOOLEAN;
@@ -276,10 +312,11 @@ BEGIN
 END thisvox;
 
 BEGIN
-	r:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODh"); 	
-	y:=Base.VoxelFromName("Nbluedot");
-	b:=Base.EMPTY;
-	NEW(vox,b,y,b);
+	NEW(r); NEW(y); NEW(b);
+	r.setcolor(0.2,0,0.0,0.2,0.2,0.2);	
+	y.setcolor(0.3,0.3,0.0,0.4,004,0.3);	
+	b.setcolor(0,0,0.03,0.03,0.03,0.04);	
+	NEW(vox,r,y,b);
 	vox.passable:=TRUE
 END Nrdvolvox.
 

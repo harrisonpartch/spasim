@@ -78,7 +78,7 @@ END thisvox;
 
 BEGIN
 	sky:=Base.VoxelFromName("NM3");  
-	nepal:=Base.VoxelFromName("Nlachlan"); 	
+	nepal:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU341"); 	
 	nark:=Base.VoxelFromName("Narchillect"); 
 	echan:=Base.VoxelFromName("Nearthchan"); 
 	xot:=Base.VoxelFromName("N2qeD84Fv78X2XEj8PtU667");  	
@@ -94,7 +94,7 @@ BEGIN
 	NEW(mirrorball);
 	NEW(empty);
 	NEW(gray);
-	gray.setcolor(0.7, 0.0, 0.7, 1, 1, 1);
+	gray.setcolor(0.1, 0.99, 0.1, 1, 1, 1);
 	darkblue.setcolor(1/3, 1/2, 0, 1, 1, 1);
 	darkblue.passable:=TRUE;
 	dblue:=Base.VoxelFromName("NM3");  
@@ -105,26 +105,17 @@ BEGIN
 	rd.register;
 	rd.passable:=TRUE;
 *)	
-	s0.blox[1,1,1]:=s1;
-	s2.fillsierp(xot,s1);
-	s3.fillsierp(s2,xot);	
-	darkblue.setcolor(0,0,1/2,2/3,2/3,2/3);
-	darkred.setcolor(1/2,0,0,2/3,2/3,2/3);	
-	s3.setcolor(1/7,1/7,1/7,1/6,1/6,1/6);	
-	s2.setcolor(0, 0, 1/7,1/3,1/3,1/3);	
-	s1.setcolor(2/13, 2/13, 0,1/3,1/3,1/3);			
-	s0.setcolor(0, 1/45, 0, 1/45,1/45,1/45);	
-		FOR i:=0 TO 49 DO
-		s1.stroke(Base.randPT(),9,darkblue)
-	END;
-	FOR i:=0 TO 49 DO
-		s1.stroke(Base.randPT(),9,darkred)
-	END;	
-	s0.imposter:=xot;
-	s1.imposter:=darkblue;
-	s2.imposter:=xot;
-	s3.imposter:=xot;
-	s0.passable:=FALSE;	
+	darkblue.setcolor(0,0,4/12,26/13,6/13,6/13);
+	darkred.setcolor(6/12,0,0,10/13,10/13,10/13);		
+	s0.fillsierp(s1,uk);
+	s1.fillsierp(s3,s2);
+	s2.fillsierp(s1,s3);
+	s3.fillsierp(NIL,nepal);		
+	s0.imposter:=nepal;
+	s1.imposter:=darkred;
+	s2.imposter:=nepal;
+	s3.imposter:=darkred;
+	s2.passable:=FALSE;
 	s0.copyonstroke:=TRUE;	
 	s1.copyonstroke:=TRUE;	
 	s2.copyonstroke:=TRUE;	

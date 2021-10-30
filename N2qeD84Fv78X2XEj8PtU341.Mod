@@ -20,8 +20,7 @@ VAR
 PROCEDURE&init*;
 BEGIN
 	setoutline(0,0,0,1);
-	innard:=Base.VoxelFromName("NM3");	
-	innard.setcolor(0,1/7,0,1/6,1/6,1/6);
+	innard:=Base.VoxelFromName("NIXARXB2vH6ieKZmsc6mODg");	
 	or:=1;
 	passable:=TRUE;
 	copyonstroke:=FALSE;
@@ -54,6 +53,7 @@ BEGIN
 		ray.clr.ra:= ray.clr.ra - oa;
 		ray.clr.ga:=ray.clr.ga-oa;
 		ray.clr.ba:=ray.clr.ba-oa;
+		ray.terminate := TRUE;
 	END;
 	exit:= Base.Exit(ray);
 	innard.Shade(ray);
@@ -71,6 +71,7 @@ BEGIN
 			ray.clr.ra:= ray.clr.ra - a;
 			ray.clr.ga:=ray.clr.ga-a;
 			ray.clr.ba:=ray.clr.ba-a;
+			ray.terminate := TRUE;
 		END
 	END;
 END Shade;
@@ -94,7 +95,7 @@ END OutlineVox;
 PROCEDURE thisvox*():Base.Voxel;
 BEGIN
 	NEW(cage);
-	cage.setoutline(0,0,0,1);
+	cage.setoutline(0,0,0,1/6);
 	RETURN cage
 END thisvox;
 

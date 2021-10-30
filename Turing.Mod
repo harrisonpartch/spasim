@@ -18,7 +18,7 @@ TYPE
 	Stripe = OBJECT
 	VAR
 		GO: BOOLEAN;
-		I: LONGINT;
+		I: INTEGER;
 		
 	PROCEDURE go;
 	BEGIN{EXCLUSIVE}
@@ -43,10 +43,10 @@ TYPE
 		mesh1, mesh2, n1 : ARRAY M, M OF REAL;
 		random : Random.Generator;
 		alive, dead: BOOLEAN;
-		i : LONGINT;
+		i : INTEGER;
 
 		PROCEDURE &New*;
-		VAR i, j : LONGINT;
+		VAR i, j : INTEGER;
 		BEGIN
 			Init(WindowWidth, WindowHeight, FALSE);
 			manager := WM.GetDefaultManager();
@@ -80,11 +80,6 @@ TYPE
 			END
 		END Handle;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; w, h, q : LONGINT);
-		BEGIN
-			Draw^(canvas, w, h, 0)
-		END Draw;
-
 		PROCEDURE Close;
 		BEGIN
 			alive := FALSE;
@@ -94,7 +89,7 @@ TYPE
 		END Close;
 
 		PROCEDURE Generation;
-		VAR i, j : LONGINT;
+		VAR i, j : INTEGER;
 			 a,b,c: REAL;
 		BEGIN
 			FOR i := 1 TO M - 2 DO
@@ -119,7 +114,7 @@ TYPE
 			a:=1;
 			b:=10;
 			FOR i := 1 TO M - 2 DO
-				a:=a+0.48;
+				a:=a+0.888;
 				b:=b+0.024;
 				c:=0.0;
 				FOR j := 1 TO M - 2 DO
@@ -136,7 +131,7 @@ TYPE
 		END Generation;
 
 		PROCEDURE DrawIt;
-		VAR i, j, ix, jy : LONGINT;
+		VAR i, j, ix, jy : INTEGER;
 			pix : Raster.Pixel;
 			mode : Raster.Mode;
 		BEGIN
@@ -145,7 +140,7 @@ TYPE
 				ix := i * size ;
 				FOR j := 0 TO M - 1 DO
 					jy := j * size;
-					Raster.SetRGB(pix, SHORT((200-ENTIER(mesh1[i, j] * 200)) ),SHORT((255-ENTIER(n1[i, j] * 255)) ), SHORT((ENTIER(mesh2[i, j] * 200)) ));
+					Raster.SetRGB(pix, SHORT((200-ENTIER(mesh1[i, j] * 200)) ),0,SHORT((255-ENTIER(n1[i, j] * 255)) ));
 					Raster.Fill(img, ix, jy, ix+size, jy+size, pix, mode)
 				END
 			END;
@@ -163,7 +158,7 @@ TYPE
 	END TCW;
 
 VAR
-	nofWindows : LONGINT;
+	nofWindows : INTEGER;
 
 PROCEDURE Open*;
 VAR window : TCW;
@@ -199,4 +194,4 @@ END Turing.
 
 System.Free Turing ~
 
-Turing.Open ~
+TurinqQg.Open ~

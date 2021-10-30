@@ -20,6 +20,7 @@ TYPE PT = Base.PT;
 	FR = Base.FR;
 	Name = Base.Name;
  	NCube=Base.NCube;
+ 	RCube=Base.RCube;
  	LCube=Base.LightCube;
 
 TYPE cell* = OBJECT(Cell);
@@ -29,6 +30,8 @@ VAR
 	blox*: ARRAY M,M,M OF Voxel;
 	nbloxTF*: ARRAY M,M,M OF BOOLEAN;
 	nblox*: ARRAY M,M,M OF NCube;
+	rbloxTF*: ARRAY M,M,M OF BOOLEAN;
+	rblox*: ARRAY M,M,M OF RCube;	
 	deepcopyofme:cell;
 
 PROCEDURE Shade(VAR ray: Ray);
@@ -41,13 +44,14 @@ VAR
 	vdepth, v2, fog,f2: REAL;
 	last:BOOLEAN;
 	i,j: INTEGER;
-	lastlength:REAL;
+	lastlength,r:REAL;
 BEGIN
 	IF (ray.length*ray.scale>Base.DTL) THEN (* size of the child voxels at camera *)
 		IF imposter#NIL THEN
 			imposter.Shade(ray)
 		END
 	ELSE
+		ray.lighting := lighting;
 		ray.scale := ray.scale*M;
 		pushxyz:=ray.xyz;	
 		xyz.x := (ray.lxyz.x) * M;
@@ -66,6 +70,8 @@ BEGIN
 				v.Shade(ray);
 			ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
 				nshade(nblox[ijk.i,ijk.j,ijk.k],ray) 
+			ELSIF rbloxTF[ijk.i,ijk.j,ijk.k] THEN
+				rshade(rblox[ijk.i,ijk.j,ijk.k],ray) 	
 			END 
 		END;
 		IF ~ray.terminate THEN
@@ -157,12 +163,20 @@ BEGIN
 							END;
 							v.Shade(ray);
 						ELSIF nbloxTF[ijk.i,ijk.j,ijk.k] THEN
-							nshade(nblox[ijk.i,ijk.j,ijk.k],ray);							
+							nshade(nblox[ijk.i,ijk.j,ijk.k],ray);
+						ELSIF rbloxTF[ijk.i,ijk.j,ijk.k] THEN
+							rshade(rblox[ijk.i,ijk.j,ijk.k],ray) 					
 						END
 					END;
 				IF (ray.clr.ba<0.1) OR (ray.clr.ga<0.1) OR (ray.clr.ra<0.1) THEN 		
 					ray.terminate:=TRUE 
-				END;		
+				END;	
+			IF ray.changed THEN
+					IF ray.dxyz.x < 0 THEN ray.di := FALSE  ELSE ray.di := TRUE END; 
+					IF ray.dxyz.y < 0 THEN ray.dj := FALSE  ELSE ray.dj := TRUE END;
+					IF ray.dxyz.z < 0 THEN ray.dk := FALSE  ELSE ray.dk := TRUE END;	
+				Shade(ray)
+			END;		
 			UNTIL out OR ray.terminate;
 		END;	
 		ray.scale := ray.scale/M;	
@@ -205,7 +219,7 @@ VAR
 BEGIN
 	dot1:= ABS(nc.normal.x*ray.dxyz.x + nc.normal.y*ray.dxyz.y+ nc.normal.z*ray.dxyz.z);
 	dot2:= ABS(ray.fnormal.x*ray.dxyz.x + ray.fnormal.y*ray.dxyz.y+ ray.fnormal.z*ray.dxyz.z);
-	mix:=ray.length*ray.scale*0.015;
+	mix:=ray.length/ray.scale*0.0015;
 	IF mix>1 THEN mix:=1 END;
 	dot:=mix*dot1+(1-mix)*dot2;		
 	ray.clr.r := ray.clr.r + nc.color.red*ray.clr.ra*dot;
@@ -213,6 +227,10 @@ BEGIN
 	ray.clr.b := ray.clr.b + nc.color.blue * ray.clr.ba*dot;	
 	ray.terminate:=TRUE
 END nshade;
+
+PROCEDURE rshade(rc: RCube; VAR ray: Ray);
+
+END rshade;
 
 PROCEDURE erase*(p:PT; resolution:INTEGER);
 VAR
@@ -299,7 +317,7 @@ PROCEDURE setcolor* (r,g,b,rb,gb,bb: REAL);
 VAR
 	i,j,k: INTEGER;
 BEGIN
-	copyclear;
+(*	copyclear; this crashes recursive geometry *)
 	colorlock:=TRUE;
 	setcolorrec(r,g,b,rb,gb,bb)
 END setcolor;
@@ -401,7 +419,6 @@ END passprobe;
 PROCEDURE copyprime;
 BEGIN
 	copyonstroke:=TRUE;
-	copyengine.add(SELF);	
 END copyprime;
 
 PROCEDURE stroke*(p:PT; res: INTEGER; voxel :Voxel);
@@ -433,7 +450,8 @@ BEGIN
 		i := ENTIER(p.x)MOD M; j := ENTIER(p.y)MOD M; k := ENTIER(p.z)MOD M;
 		IF nextscale>resolution THEN
 			voxel:= voxel.deepcopy();
-			 voxel.setcolor(red, green, blue, redblack, greenblack, blueblack); 
+			voxel.setcolor(red, green, blue, redblack, greenblack, blueblack); 
+			voxel.lighting := voxel.lighting*0.9;
 			blox[i,j,k]:=voxel;
 		ELSE
 			vu:=blox[i,j,k];
@@ -448,6 +466,7 @@ BEGIN
 					blox[i,j,k].strokerec(p, resolution,nextscale,voxel)
 				ELSE
 					NEW(c);
+					c.lighting := c.lighting*0.9;
 					c.setcolor(red/M, green/M, blue/M, redblack/M, greenblack/M, blueblack/M); 
 					c.fill(blox[i,j,k]);
 					blox[i,j,k]:=c;
@@ -456,6 +475,7 @@ BEGIN
 				END
 			ELSE
 				NEW(c);
+				c.lighting := c.lighting*0.9;
 				c.setcolor(red/M,green/M,blue/M,redblack/M,greenblack/M,blueblack/M); 
 				blox[i,j,k]:=c;
 				p.x:=p.x-i; p.y:=p.y-j; p.z:=p.z-k;
@@ -783,33 +803,6 @@ END sprout;
 
 END cell;
 
-TYPE CopyEngine = OBJECT(Base.V);
-VAR
-	tobecopied: Voxel;	
-	COPYGO:BOOLEAN;
-PROCEDURE add(CONST v:Voxel);
-BEGIN
-	tobecopied:=v;
-	go
-END add;
-PROCEDURE go;
-BEGIN
-	BEGIN {EXCLUSIVE} COPYGO:=TRUE END;
-END go;
-
-(* BEGIN{ACTIVE, PRIORITY(Objects.Low)}
-REPEAT
-	Out.String("COPYENGINE");
-	BEGIN {EXCLUSIVE} AWAIT(COPYGO) END;
-	tobecopied.deepcopyofme:=tobecopied.deepcopy();
-	Out.String("COPYENGINE");
-	BEGIN {EXCLUSIVE} COPYGO:=FALSE END;
-UNTIL FALSE *)
-END CopyEngine;
-
-VAR
-	copyengine: CopyEngine;
-
 PROCEDURE thisvox*():Voxel;
 VAR
 	v: cell;
@@ -819,5 +812,4 @@ BEGIN
 END thisvox;
 
 BEGIN
-	NEW(copyengine)
 END NM2.
